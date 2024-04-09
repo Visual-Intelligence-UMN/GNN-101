@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>GNN Graph Classification</title>
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+    <script src="app.js"></script>
+</head>
+
+<body>
+    <h1>GNN Graph Classification with ONNX.js</h1>
+    <input type="file" id="graphInput" accept=".json">
+    <button onclick="classifyGraph()">Classify Graph</button>
+    <h2>Result</h2>
+    <div id="result"></div>
+</body>
+
+</html>
