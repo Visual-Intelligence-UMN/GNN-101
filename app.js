@@ -10,6 +10,26 @@ async function loadModel() {
     console.log("Model loaded successfully");
 }
 
+/**
+ * Compute softmax probabilities for an array of logits.
+ * @param {number[]} logits - The input logits for a single example.
+ * @returns {number[]} - The softmax probabilities.
+ */
+function softmax(logits) {
+    // Find the maximum logit to improve numerical stability.
+    const maxLogit = Math.max(...logits);
+
+    // Compute the exponential of each logit, adjusted by the max logit for numerical stability.
+    const expLogits = logits.map(logit => Math.exp(logit - maxLogit));
+
+    // Compute the sum of the exponentials.
+    const sumExpLogits = expLogits.reduce((acc, val) => acc + val, 0);
+
+    // Divide each exponential by the sum of exponentials to get the probabilities.
+    const probabilities = expLogits.map(expLogit => expLogit / sumExpLogits);
+
+    return probabilities;
+}
 
 
 function classifyGraph() {
@@ -31,8 +51,9 @@ function classifyGraph() {
 
             const outputMap = await session.run({x: xTensor, edge_index: edgeIndexTensor, batch: batchTensor});
             const outputTensor = outputMap['output']['data'];
+            const probabilities = softmax(outputTensor);
             // Process and display the results
-            document.getElementById('result').innerText = `Classification result: ${outputTensor}`;
+            document.getElementById('result').innerText = `Non-Mutagenic: ${probabilities[0].toFixed(2)} \n Mutagenic: ${probabilities[1].toFixed(2)}`;
         };
         reader.readAsText(file);
     }
