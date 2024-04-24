@@ -1,8 +1,4 @@
 let session;
-// const sessionOptions = {
-//     // Specify that you want to use the WebAssembly backend
-//     executionProviders: ['wasm']
-// };
 
 async function loadModel() {
     // await session.loadModel("gnn_model.onnx");
@@ -31,8 +27,49 @@ function softmax(logits) {
     return probabilities;
 }
 
+window.onload = loadModel;
+
+function analyzeGraph(graphData) {
+    const nodeCount = graphData.x.length; 
+    const edgePairs = graphData.edge_index;
+    const edges = edgePairs[0].length;
+    const degreeMap = new Array(nodeCount).fill(0);
+    const hasLoop = new Set();
+    let isDirected = false;
+
+    for (let i = 0; i < edges; i++) {
+        const source = edgePairs[0][i];
+        const target = edgePairs[1][i];
+
+        degreeMap[source]++;
+        degreeMap[target]++;
+
+        if (source === target) {
+            hasLoop.add(source);
+        }
+
+        if (!isDirected && !edgePairs[1].includes(source) || !edgePairs[0].includes(target)) {
+            isDirected = true;
+        }
+    }
+
+    const totalDegree = degreeMap.reduce((acc, degree) => acc + degree, 0);
+    const averageDegree = totalDegree / nodeCount;
+
+    const hasIsolatedNode = degreeMap.some(degree => degree === 0);
+
+    console.log(`Node Count: ${nodeCount}`);
+    console.log(`Edge Count: ${edges}`);
+    console.log(`Average Node Degree: ${averageDegree}`);
+    console.log(`Has Isolated Node: ${hasIsolatedNode}`);
+    console.log(`Has Loop: ${hasLoop.size > 0}`);
+    console.log(`Is Directed: ${isDirected}`);
+}
+
+
 
 function classifyGraph() {
+    console.log("start classifying....a");
     const inputElement = document.getElementById('graphInput');
     if (inputElement.files.length > 0) {
         const file = inputElement.files[0];
@@ -42,16 +79,28 @@ function classifyGraph() {
         reader.onload = async function(e) {
             await loadModel();
             const graphData = JSON.parse(e.target.result);
+            analyzeGraph(graphData);
             // Convert `graphData` to tensor-like object expected by your ONNX model
             let xTensor = new ort.Tensor("float32", new Float32Array(graphData['x'].flat()), [graphData.x.length, graphData.x[0].length]);  // flat for converting, and then adjust as needed
             let edgeIndexTensor = new ort.Tensor("int32", new Int32Array(graphData['edge_index'].flat()), [graphData.edge_index.length, graphData.edge_index[0].length]);  // flat for converting, and then adjust as needed
             // let yTensor = new ort.Tensor(new Float32Array(graphData['y']), "float32", [graphData.y.length]);  // flat for converting, and then adjust as needed
             let batchTensor = new ort.Tensor( "int32", new Int32Array(graphData['batch']),[graphData.batch.length]);  // flat for converting, and then adjust as needed
 
-
             const outputMap = await session.run({x: xTensor, edge_index: edgeIndexTensor, batch: batchTensor});
-            const outputTensor = outputMap['output']['data'];
-            const probabilities = softmax(outputTensor);
+            console.log(outputMap);  
+            const outputTensor = outputMap.final; 
+            
+            //conv1 data
+            console.log(outputMap.conv1.cpuData);
+            //conv2 data
+            console.log(outputMap.conv2.cpuData);
+            //conv3 data
+            console.log(outputMap.conv3.cpuData);
+            //the final output of gcn model data
+            console.log(outputTensor);
+            console.log(outputTensor.cpuData);
+
+            const probabilities = softmax(outputTensor.cpuData);
             // Process and display the results
             document.getElementById('result').innerText = `Non-Mutagenic: ${probabilities[0].toFixed(2)} \n Mutagenic: ${probabilities[1].toFixed(2)}`;
         };

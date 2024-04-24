@@ -74,6 +74,7 @@ class GCN(torch.nn.Module):
         self.lin = Linear(hidden_channels, dataset.num_classes)
 
     def forward(self, x, edge_index, batch):
+        outputs = {}
         # print("Input shapes:")
         # print("x:", x.shape)
         # print("edge_index:", edge_index.shape)
@@ -83,18 +84,20 @@ class GCN(torch.nn.Module):
         batch = batch.to(torch.int64)
         x = self.conv1(x, edge_index)
         x = x.relu()
+        outputs['conv1'] = x
         x = self.conv2(x, edge_index)
         x = x.relu()
+        outputs['conv2'] = x
         x = self.conv3(x, edge_index)
-
+        outputs['conv3'] = x
         # 2. Readout layer
         x = global_mean_pool(x, batch)  # [batch_size, hidden_channels]
 
         # 3. Apply a final classifier
         x = F.dropout(x, p=0.5, training=self.training)
         x = self.lin(x)
-
-        return x
+        outputs['final'] = x
+        return outputs
 
 
 model = GCN(hidden_channels=64)
@@ -108,7 +111,7 @@ def train():
 
     for data in train_loader:  # Iterate in batches over the training dataset.
          out = model(data.x, data.edge_index, data.batch)  # Perform a single forward pass.
-         loss = criterion(out, data.y)  # Compute the loss.
+         loss = criterion(out["final"], data.y)  # Compute the loss.
          loss.backward()  # Derive gradients.
          optimizer.step()  # Update parameters based on gradients.
          optimizer.zero_grad()  # Clear gradients.
@@ -122,7 +125,7 @@ def test(loader):
          # print(data.x)
          # print(data.edge_index)
          # print(data.)
-         pred = out.argmax(dim=1)  # Use the class with highest probability.
+         pred = out["final"].argmax(dim=1)  # Use the class with highest probability.
          correct += int((pred == data.y).sum())  # Check against ground-truth labels.
      return correct / len(loader.dataset)  # Derive ratio of correct predictions.
 
@@ -180,7 +183,7 @@ torch.onnx.export(model,               # model being run
                   opset_version=17,    # the ONNX version to export the model to
                 #   do_constant_folding=True,  # whether to execute constant folding for optimization
                   input_names = ['x', 'edge_index', 'batch'],   # the model's input names
-                  output_names = ['output'], # the model's output names
+                  output_names=['conv1', 'conv2', 'conv3', 'final'],
                   dynamic_axes={'x': {0: 'num_nodes'},
                                 'edge_index': {1: 'num_edges'},
                                 'batch': {0: 'num_nodes'},
