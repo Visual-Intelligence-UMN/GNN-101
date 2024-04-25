@@ -6,14 +6,26 @@
     <title>GNN Graph Classification</title>
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
     <script src="app.js"></script>
+    <style>
+        #my_dataviz {
+            width: 100%;
+            height: 100%;
+            overflow: auto; /* this enables scrollbars if content overflows */
+            overflow-x: auto;
+        }
+    </style>
 </head>
 
 <body>
     <h1>GNN Graph Classification with ONNX.js</h1>
     <input type="file" id="graphInput" accept=".json">
     <button onclick="classifyGraph()">Classify Graph</button>
+    <a href="./test.html">Testing Page</a>
     <h2>Result</h2>
     <div id="result"></div>
+    <script type="module" src="vis.js"></script>
+    <h2>Visualization</h2>
+    <div id="my_dataviz"></div>
 </body>
 
 </html>

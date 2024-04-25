@@ -1,3 +1,5 @@
+import {analyzeGraph} from "./utils";
+
 let session;
 
 async function loadModel() {
@@ -29,6 +31,7 @@ function softmax(logits) {
 
 window.onload = loadModel;
 
+/** 
 function analyzeGraph(graphData) {
     const nodeCount = graphData.x.length; 
     const edgePairs = graphData.edge_index;
@@ -65,7 +68,7 @@ function analyzeGraph(graphData) {
     console.log(`Has Loop: ${hasLoop.size > 0}`);
     console.log(`Is Directed: ${isDirected}`);
 }
-
+*/
 
 
 function classifyGraph() {
@@ -76,7 +79,7 @@ function classifyGraph() {
         // Assuming the user's input is a JSON file representing the graph
         // You will need to convert this to the appropriate tensor format
         const reader = new FileReader();
-        reader.onload = async function(e) {
+        reader.onload = async function(e) {  
             await loadModel();
             const graphData = JSON.parse(e.target.result);
             analyzeGraph(graphData);
