@@ -94,12 +94,19 @@ function classifyGraph() {
             const outputTensor = outputMap.final; 
             
             //conv1 data
+            console.log("Conv1");
             console.log(outputMap.conv1.cpuData);
+
             //conv2 data
+            console.log("Conv2");
             console.log(outputMap.conv2.cpuData);
+            
             //conv3 data
+            console.log("Conv3");
             console.log(outputMap.conv3.cpuData);
+            
             //the final output of gcn model data
+            console.log("Final");
             console.log(outputTensor);
             console.log(outputTensor.cpuData);
 
