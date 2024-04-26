@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import React, { useRef, useState } from 'react';
 import GraphVisualizer from './GraphVisualizer';
+import ClassifyGraph from './FileUpload';
 
 export default function Home() {
   const [graphData, setGraphData] = useState<any>(null);
@@ -47,6 +48,8 @@ export default function Home() {
         style={{ display: 'none' }}
       />
       <button onClick={handleUpload}>Upload JSON File</button>
+      {/*CLASSIFY GRAPH TO BE IMPLEMENTED WILL LOOK LIKE <ClassifyGraph input=graphData/>*/}
+      <ClassifyGraph/>
       <h2>Visualization</h2>
       <GraphVisualizer/>
     </div>

@@ -1,5 +1,7 @@
 // UTILS FILE BECAUSE WE HAVE SO MANY HELPER FUNCTIONS
 import * as d3 from 'd3';
+import * as ort from 'onnxruntime-web';
+
 export const load_json = async (path: string) => {
   try {
     console.log('entered load_json')
@@ -128,4 +130,77 @@ export async function process() {
   var data = await data_prep("./input_graph.json");
   console.log(data);
   return data;
+}
+let session: any;
+
+export async function loadModel() {
+  await session.loadModel("gnn_model.onnx");
+  session = await ort.InferenceSession.create("gnn_model.onnx");
+  console.log("Model loaded successfully");
+  return session;
+}
+
+export function softmax(logits: number[]) {
+  // Find the maximum logit to improve numerical stability.
+  const maxLogit = Math.max(...logits);
+
+  // Compute the exponential of each logit, adjusted by the max logit for numerical stability.
+  const expLogits = logits.map((logit) => Math.exp(logit - maxLogit));
+
+  // Compute the sum of the exponentials.
+  const sumExpLogits = expLogits.reduce((acc, val) => acc + val, 0);
+
+  // Divide each exponential by the sum of exponentials to get the probabilities.
+  const probabilities = expLogits.map((expLogit) => expLogit / sumExpLogits);
+
+  return probabilities;
+}
+
+export function analyzeGraph(graphData: any) {
+  const nodeCount = graphData.x.length;
+  const edgePairs = graphData.edge_index;
+  const edges = edgePairs[0].length;
+  const degreeMap = new Array(nodeCount).fill(0);
+  const hasLoop = new Set();
+  let isDirected = false;
+
+  for (let i = 0; i < edges; i++) {
+      const source = edgePairs[0][i];
+      const target = edgePairs[1][i];
+
+      degreeMap[source]++;
+      degreeMap[target]++;
+
+      if (source === target) {
+          hasLoop.add(source);
+      }
+
+      if (
+          (!isDirected && !edgePairs[1].includes(source)) ||
+          !edgePairs[0].includes(target)
+      ) {
+          isDirected = true;
+      }
+  }
+
+  const totalDegree = degreeMap.reduce((acc, degree) => acc + degree, 0);
+  const averageDegree = totalDegree / nodeCount;
+
+  const hasIsolatedNode = degreeMap.some((degree) => degree === 0);
+
+  console.log(`Node Count: ${nodeCount}`);
+  console.log(`Edge Count: ${edges}`);
+  console.log(`Average Node Degree: ${averageDegree}`);
+  console.log(`Has Isolated Node: ${hasIsolatedNode}`);
+  console.log(`Has Loop: ${hasLoop.size > 0}`);
+  console.log(`Is Directed: ${isDirected}`);
+
+  return {
+      node_count: nodeCount,
+      edge_count: edges,
+      avg_node_degree: averageDegree,
+      has_isolated_node: hasIsolatedNode,
+      has_loop: hasLoop.size > 0,
+      is_directed: isDirected,
+  };
 }
