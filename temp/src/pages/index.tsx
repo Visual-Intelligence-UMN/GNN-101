@@ -34,19 +34,9 @@ export default function Home() {
   };
 
   return (
-    <div>
+    <div className='bg-white min-h-screen text-black'>
       <Head>
         <title>Graph Visualization</title>
-        <style>
-          {`
-            #my_dataviz {
-              width: 100%;
-              height: 100%;
-              overflow: auto;
-              overflow-x: auto;
-            }
-          `}
-        </style>
       </Head>
       <h1>Graph Visualization</h1>
       <input
@@ -58,7 +48,7 @@ export default function Home() {
       />
       <button onClick={handleUpload}>Upload JSON File</button>
       <h2>Visualization</h2>
-      {graphData && <GraphVisualizer graphData={[graphData]} />}
+      <GraphVisualizer/>
     </div>
   );
 }
