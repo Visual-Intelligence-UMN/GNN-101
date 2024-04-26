@@ -5,13 +5,15 @@
     <meta charset="UTF-8">
     <title>GNN Graph Classification</title>
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
     <style>
         #my_dataviz {
+            display: flex;
+            flex-direction: column;
+            align-items: start;
             width: 100%;
-            height: 100%;
+            height: auto; /* change this to auto so the height adjusts to fit the content */
             overflow: auto; /* this enables scrollbars if content overflows */
-            overflow-x: auto;
         }
     </style>
 </head>
