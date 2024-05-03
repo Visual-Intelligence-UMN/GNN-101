@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent, useRef } from 'react';
 import * as ort from 'onnxruntime-web';
 import { analyzeGraph, softmax, loadModel } from '@/utils/utils';
 
@@ -13,6 +13,8 @@ interface GraphData {
 // parameter will be the user input for json file
 function ClassifyGraph() {
   const [file, setFile] = useState<File | null>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -24,7 +26,7 @@ function ClassifyGraph() {
     console.log("start classifying....a");
     const inputElement = document.getElementById("graphInput") as HTMLInputElement;
 
-    if (inputElement.files && inputElement.files.length > 0) {
+    if (inputElement && inputElement.files && inputElement.files.length > 0) {
       const file = inputElement.files[0];
 
       // Assuming the user's input is a JSON file representing the graph
@@ -64,19 +66,19 @@ function ClassifyGraph() {
         const outputTensor = outputMap.final;
 
         console.log("Conv1");
-        console.log(outputMap.conv1.cpuData);
+        console.log(outputMap.conv1.data);
 
         console.log("Conv2");
-        console.log(outputMap.conv2.cpuData);
+        console.log(outputMap.conv2.data);
 
         console.log("Conv3");
-        console.log(outputMap.conv3.cpuData);
+        console.log(outputMap.conv3.data);
 
         console.log("Final");
         console.log(outputTensor);
-        console.log(outputTensor.cpuData);
+        console.log(outputTensor.data);
 
-        const probabilities = softmax(outputTensor.cpuData);
+        const probabilities = softmax(outputTensor.data as unknown as number[]);
         const resultElement = document.getElementById("result");
         if (resultElement) {
           resultElement.innerText = `Non-Mutagenic: ${probabilities[0].toFixed(
@@ -92,7 +94,7 @@ function ClassifyGraph() {
 
   return (
     <div>
-      <input type="file" onChange={handleFileChange} />
+      <input type="file" id='graphInput' ref={inputRef} onChange={handleFileChange} />
       <button onClick={classifyGraph}>Classify Graph</button>
     </div>
   );

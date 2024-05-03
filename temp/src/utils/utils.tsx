@@ -59,25 +59,25 @@ export async function data_prep(o_data: any) {
 // prep_graphs
 export async function prep_graphs(g_num: number, data: any) {
   var graphs = [];
-    for(var i=0; i<g_num; i++){
-        let graphData = {
-            nodes: deepClone(data.nodes),
-            links: deepClone(data.links)
-        };
-        graphs.push(graphData);
-    }
-    return graphs;
+  for (var i = 0; i < g_num; i++) {
+    let graphData = {
+      nodes: deepClone(data.nodes),
+      links: deepClone(data.links)
+    };
+    graphs.push(graphData);
+  }
+  return graphs;
 }
 
-export function connectCrossGraphNodes(nodes: any, svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>, graphs: any[]) {
-  const nodesById = d3.group(nodes, (d:any) => d.id);
+export function connectCrossGraphNodes(nodes: any, svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>, graphs: any[], multiplier: number) {
+  const nodesById = d3.group(nodes, (d: any) => d.id);
   console.log(nodesById);
   nodesById.forEach((nodes, id) => {
     nodes.forEach((node, i) => {
       if (i < nodes.length - 1) {
         const nextNode = nodes[i + 1];
-        const xOffset1 = node.graphIndex * 500;
-        const xOffset2 = nextNode.graphIndex * 500;
+        const xOffset1 = node.graphIndex * multiplier;
+        const xOffset2 = nextNode.graphIndex * multiplier;
 
         console.log("first cood");
         console.log(nodes[i].x, nodes[i].y);
@@ -85,13 +85,25 @@ export function connectCrossGraphNodes(nodes: any, svg: d3.Selection<SVGSVGEleme
         console.log(nextNode.x, nextNode.y);
 
         svg.append("line")
+          .attr('opacity', 0.2)
+          .on("mouseout", function () {
+            d3.select(this)
+              .transition()
+              .duration(50)
+              .attr("opacity", 0.2);
+          })
+          .on("mouseover", function () {
+            d3.select(this)
+              .attr("opacity", 0.6);
+          })
           .attr("x1", nodes[i].x + xOffset1)
           .attr("y1", nodes[i].y + 10)
           .attr("x2", nextNode.x + xOffset2)
           .attr("y2", nextNode.y + 10)
           .style("stroke", "red")
-          .style("opacity", 0.2)
-          .style("stroke-width", 2);
+          
+          .style("stroke-width", 3);
+
 
         const nextGraphLinks = graphs[nextNode.graphIndex].links;
         nextGraphLinks.forEach((link: any) => {
@@ -104,16 +116,26 @@ export function connectCrossGraphNodes(nodes: any, svg: d3.Selection<SVGSVGEleme
                 ? link.target
                 : link.source;
             svg.append("line")
-              .attr("x1", node.x + node.graphIndex * 500)
+              .attr("x1", node.x + node.graphIndex * multiplier)
               .attr("y1", node.y + 10)
               .attr(
                 "x2",
-                neighborNode.x + neighborNode.graphIndex * 500
+                neighborNode.x + neighborNode.graphIndex * multiplier 
               )
               .attr("y2", neighborNode.y + 10)
-              .style("stroke", "blue")
-              .style("opacity", 0.2)
-              .style("stroke-width", 1);
+              .style("stroke", "black")
+              .attr('opacity', 0.2)
+              .on("mouseout", function () {
+                d3.select(this)
+                  .transition()
+                  .duration(50)
+                  .attr("opacity", 0.2);
+              })
+              .on("mouseover", function () {
+                d3.select(this)
+                  .attr("opacity", 0.6);
+              })
+              .style("stroke-width", 3);
           }
         });
       }
@@ -134,8 +156,7 @@ export async function process() {
 let session: any;
 
 export async function loadModel() {
-  await session.loadModel("gnn_model.onnx");
-  session = await ort.InferenceSession.create("gnn_model.onnx");
+  const session = await ort.InferenceSession.create("gnn_model.onnx");
   console.log("Model loaded successfully");
   return session;
 }
@@ -165,22 +186,22 @@ export function analyzeGraph(graphData: any) {
   let isDirected = false;
 
   for (let i = 0; i < edges; i++) {
-      const source = edgePairs[0][i];
-      const target = edgePairs[1][i];
+    const source = edgePairs[0][i];
+    const target = edgePairs[1][i];
 
-      degreeMap[source]++;
-      degreeMap[target]++;
+    degreeMap[source]++;
+    degreeMap[target]++;
 
-      if (source === target) {
-          hasLoop.add(source);
-      }
+    if (source === target) {
+      hasLoop.add(source);
+    }
 
-      if (
-          (!isDirected && !edgePairs[1].includes(source)) ||
-          !edgePairs[0].includes(target)
-      ) {
-          isDirected = true;
-      }
+    if (
+      (!isDirected && !edgePairs[1].includes(source)) ||
+      !edgePairs[0].includes(target)
+    ) {
+      isDirected = true;
+    }
   }
 
   const totalDegree = degreeMap.reduce((acc, degree) => acc + degree, 0);
@@ -196,11 +217,11 @@ export function analyzeGraph(graphData: any) {
   console.log(`Is Directed: ${isDirected}`);
 
   return {
-      node_count: nodeCount,
-      edge_count: edges,
-      avg_node_degree: averageDegree,
-      has_isolated_node: hasIsolatedNode,
-      has_loop: hasLoop.size > 0,
-      is_directed: isDirected,
+    node_count: nodeCount,
+    edge_count: edges,
+    avg_node_degree: averageDegree,
+    has_isolated_node: hasIsolatedNode,
+    has_loop: hasLoop.size > 0,
+    is_directed: isDirected,
   };
 }
