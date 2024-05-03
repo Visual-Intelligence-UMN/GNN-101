@@ -16,32 +16,27 @@ const GraphVisualizer = () => {
       const margin = { top: 10, right: 30, bottom: 30, left: 40 };
       const width = 800 - margin.left - margin.right;
       const temp = 400 - margin.top - margin.bottom;
-      const multiplier = 800;
       // Set the dimensions and margins of the graph
-    
       const height = graphs.length * (temp + 20);
       // Append the SVG object to the body of the page
       console.log(graphs);
       const container = d3.select('#my_dataviz')
 
-      const svg = container
-      .append('svg')
-      .attr('width', width * graphs.length * 5)
-      .attr('height', height * graphs.length)
       graphs.forEach((data, i) => {
-        const graph = svg.append('g')
-        .attr('width', width)
-        .attr('height', height)
-        .attr("transform", `translate(${i * multiplier},${margin.top})`);
+        const svg = container
+          .append('svg')
+          .attr('width', width)
+          .attr('height', height)
+
         // Initialize the links
-        const link = graph
+        const link = svg
           .selectAll("line")
           .data(data.links)
           .join("line")
           .style("stroke", "#aaa");
 
         // Initialize the nodes
-        const node = graph
+        const node = svg
           .selectAll("circle")
           .data(data.nodes)
           .join("circle")
@@ -57,9 +52,9 @@ const GraphVisualizer = () => {
             d3
               .forceLink(data.links)
               .id((d: any) => d.id) // Add type assertion to specify that 'd' has the 'id' property
-              .distance(150)
+              .distance(10)
           )
-          .force("charge", d3.forceManyBody().strength(-500))
+          .force("charge", d3.forceManyBody().strength(-400))
           .force("center", d3.forceCenter(width / 2, height / 2))
           .on("tick", ticked)
           .on("end", ended);  
@@ -79,7 +74,7 @@ const GraphVisualizer = () => {
             allNodes.push(node);
           });
           if (i === graphs.length - 1) {
-            connectCrossGraphNodes(allNodes, svg, graphs, multiplier);
+            connectCrossGraphNodes(allNodes, svg, graphs);
           }
         }
       });
@@ -109,12 +104,12 @@ const GraphVisualizer = () => {
 
   return <div id="my_dataviz" ref={containerRef} style={{
     width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
     alignItems: 'start',
     height: 'auto',
     overflow: 'auto', // this enables scrollbars if content overflows
     overflowX: 'auto',
-    overflowY: 'auto',
-
   }}></div>
 };
 export default GraphVisualizer;
