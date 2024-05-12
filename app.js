@@ -36,7 +36,7 @@ function classifyGraph() {
     const inputElement = document.getElementById("graphInput");
     if (inputElement.files.length > 0) {
         const file = inputElement.files[0];
-        // Assuming the user's input is a JSON file representing the graph
+            // Assuming the user's input is a JSON file representing the graph
         // You will need to convert this to the appropriate tensor format
         const reader = new FileReader();
         reader.onload = async function (e) {
