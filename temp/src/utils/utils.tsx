@@ -1,6 +1,11 @@
 // UTILS FILE BECAUSE WE HAVE SO MANY HELPER FUNCTIONS
 import * as d3 from 'd3';
 import * as ort from 'onnxruntime-web';
+import { env } from 'onnxruntime-web';
+
+env.wasm.wasmPaths = {
+  'ort-wasm-simd.wasm': './ort-wasm-simd.wasm'
+};
 
 export const load_json = async (path: string) => {
   try {
@@ -131,12 +136,16 @@ export async function process() {
   console.log(data);
   return data;
 }
-let session: any;
 
 export async function loadModel() {
-  await session.loadModel("gnn_model.onnx");
-  session = await ort.InferenceSession.create("gnn_model.onnx");
-  console.log("Model loaded successfully");
+  //await session.loadModel("gnn_model.onnx");
+  let session: any;
+  try{
+    session = await ort.InferenceSession.create("./gnn_model.onnx",{ executionProviders: ['wasm'] });
+    console.log("Model loaded successfully");
+  }catch(error){
+    console.log("Load model failed", error);
+  }
   return session;
 }
 
