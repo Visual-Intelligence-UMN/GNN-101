@@ -17,7 +17,7 @@ export async function data_prep(o_data: any) {
   // Painful explicit typing because we are using Typescript
   type NodeType = {
     id: number;
-    name: number;
+    name: string;
     features: any;
   };
   type LinkType = {
@@ -29,26 +29,42 @@ export async function data_prep(o_data: any) {
     nodes: [] as NodeType[],
     links: [] as LinkType[],
   }
-
+  
+  const atom_map : { [key: string]: string } = {
+    "1,0,0,0,0,0,0": "Carbon",
+    "0,1,0,0,0,0,0": "Hydrogen",
+    "0,0,1,0,0,0,0": "Oxygen",
+    "0,0,0,1,0,0,0": "Nitrogen",
+    "0,0,0,0,1,0,0": "Fluorine",
+    "0,0,0,0,0,1,0": "Phosphorus",
+    "0,0,0,0,0,0,1": "Sulfur"
+  };
+  
   try {
     var data = await load_json(o_data);
     var nodes = data.x;
     var edges = data.edge_index;
+    
 
     for (var i = 0; i < nodes.length; i++) {
+      var feature_str = nodes[i].join(',');
+      var atom_name = atom_map[feature_str] || "Unknown";
+
       var new_node = {
         "id": i,
-        "name": i,
+        "name": atom_name,
         "features": nodes[i]
       }
       final_data.nodes.push(new_node);
     }
+    
     for (var i = 0; i < edges[0].length; i++) {
       var new_relation = {
         "source": edges[0][i],
         "target": edges[1][i]
       }
       final_data.links.push(new_relation);
+      console.log(new_relation)
     }
 
     return final_data;
@@ -71,96 +87,153 @@ export async function prep_graphs(g_num: number, data: any) {
 
 export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset : number, height : number) {
   const nodesById = d3.group(nodes, (d : any) => d.id);
-    let upperIndex = 0; 
-    let lowerIndex = 0;
-    let upperIndexBlue = 0;
-    let lowerIndexBlue = 0;
+  let upperIndex = 0; 
+  let lowerIndex = 0;
+  let upperIndexBlue = 0;
+  let lowerIndexBlue = 0;
+
+    
         
-    nodesById.forEach((nodes, id) => {
-        nodes.forEach((node : any, i) => {
+  nodesById.forEach((nodes, id) => {
+      nodes.forEach((node : any, i) => {
+          const tooltip = svg
+            .append('text')
+            .attr('visibility', 'hidden') 
+            .attr('text-anchor', 'middle') 
+            .attr('x', i * offset + node.x)
+            .attr('y', node.y - 20)
+            .style('font-size', '20px')
+            .style('background', 'rgba(0, 0, 0, 0.7)')
+            .style('fill', '#000')
+            .text(`${node.name}`);
+          
+    
+          node.tooltip = tooltip  
+          if (!node.links) {
             node.links = [];
-            if (i < nodes.length - 1) {
-                const nextNode = nodes[i + 1];
-                const xOffset1 = node.graphIndex * offset;
-                const xOffset2 = nextNode.graphIndex * offset;
+          }
+          
+        
+          
+          if (i < nodes.length - 1) {
+              const nextNode = nodes[i + 1];
+              const xOffset1 = node.graphIndex * offset;
+              const xOffset2 = nextNode.graphIndex * offset;
+              
+              if (!nextNode.links) {
+                nextNode.links = [];
+              }
 
                 // Red line control points
-                const controlX = (node.x + xOffset1 + nextNode.x + xOffset2) / 2;
-                let controlY;
+              const controlX = (node.x + xOffset1 + nextNode.x + xOffset2) / 2;
+              let controlY;
 
-                if ((node.y + 10 + nextNode.y + 10) / 2 < height / 2) {
-                    controlY = Math.min(node.y + 10, nextNode.y + 10) - 50 - upperIndex * 10; 
-                    upperIndex++;
-                } else {
-                    controlY = Math.max(node.y + 10, nextNode.y + 10) + 50 + lowerIndex * 10; 
-                    lowerIndex++;
-                }
+              if ((node.y + 10 + nextNode.y + 10) / 2 < height / 2) {
+                  controlY = Math.min(node.y + 10, nextNode.y + 10) - 50 - upperIndex * 10; 
+                  upperIndex++;
+              } else {
+                  controlY = Math.max(node.y + 10, nextNode.y + 10) + 50 + lowerIndex * 10; 
+                  lowerIndex++;
+              }
 
-                const path = svg.append("path")
-                    .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${controlX} ${controlY} ${nextNode.x + xOffset2} ${nextNode.y + 10}`)
-                    .style("stroke", "red")
-                    .style("opacity", 0.1) 
-                    .style("stroke-width", 1)
-                    .style("fill", "none")
+              const path = svg.append("path")
+                  .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${controlX} ${controlY} ${nextNode.x + xOffset2} ${nextNode.y + 10}`)
+                  .style("stroke", "red")
+                  .style("opacity", 0.1) 
+                  .style("stroke-width", 1)
+                  .style("fill", "none")
  
-                node.links.push(path) 
+              node.links.push(path);
+              nextNode.links.push(path);
                    
-                let drawnLinks = new Set();  
+              let drawnLinks = new Set();  
 
-                const nextGraphLinks = graphs[nextNode.graphIndex].links;
-                nextGraphLinks.forEach((link : any) => {
+              const nextGraphLinks = graphs[nextNode.graphIndex].links;
+              nextGraphLinks.forEach((link : any) => {
 
-                    const sortedIds = [link.source.id, link.target.id].sort();
-                    const linkId = sortedIds.join("-");
+                const sortedIds = [link.source.id, link.target.id].sort();
+                const linkId = sortedIds.join("-");
 
-                    if ((link.source.id === nextNode.id || link.target.id === nextNode.id) && !drawnLinks.has(linkId)) {
-                        drawnLinks.add(linkId);  
+                if ((link.source.id === nextNode.id || link.target.id === nextNode.id) && !drawnLinks.has(linkId)) {
+                    drawnLinks.add(linkId);  
 
-                        const neighborNode = link.source.id === nextNode.id ? link.target : link.source;
-                        const neighborControlX = (node.x + node.graphIndex * offset + neighborNode.x + neighborNode.graphIndex * offset) / 2;
-                        let neighborControlY;
+                    const neighborNode = link.source.id === nextNode.id ? link.target : link.source;
+                    if (!neighborNode.links) {
+                      neighborNode.links = [];
+                    }
+                    const neighborControlX = (node.x + node.graphIndex * offset + neighborNode.x + neighborNode.graphIndex * offset) / 2;
+                    let neighborControlY;
 
-                        if ((node.y + 10 + neighborNode.y + 10) / 2 < height / 2) {
-                            neighborControlY = (node.y + 10 + neighborNode.y + 10) / 2 - 30 - upperIndexBlue * 10;
-                            upperIndexBlue++;
-                        } else {
-                            neighborControlY = (node.y + 10 + neighborNode.y + 10) / 2 + 30 + lowerIndexBlue * 10;
-                            lowerIndexBlue++;
-                        }
+                    if ((node.y + 10 + neighborNode.y + 10) / 2 < height / 2) {
+                        neighborControlY = (node.y + 10 + neighborNode.y + 10) / 2 - 30 - upperIndexBlue * 10;
+                        upperIndexBlue++;
+                    } else {
+                        neighborControlY = (node.y + 10 + neighborNode.y + 10) / 2 + 30 + lowerIndexBlue * 10;
+                        lowerIndexBlue++;
+                      }
 
-                        const path = svg.append("path")
-                            .attr("d", `M ${node.x + node.graphIndex * offset} ${node.y + 10} Q ${neighborControlX} ${neighborControlY} ${neighborNode.x + neighborNode.graphIndex * offset} ${neighborNode.y + 10}`)
-                            .style("stroke", "blue")
-                            .style("opacity", 0.1)
-                            .style("stroke-width", 1)
-                            .style("fill", "none");
+                    const path = svg.append("path")
+                      .attr("d", `M ${node.x + node.graphIndex * offset} ${node.y + 10} Q ${neighborControlX} ${neighborControlY} ${neighborNode.x + neighborNode.graphIndex * offset} ${neighborNode.y + 10}`)
+                      .style("stroke", "blue")
+                      .style("opacity", 0.1)
+                      .style("stroke-width", 1)
+                      .style("fill", "none");
 
-                        node.links.push(path);
+                      node.links.push(path);
+                      neighborNode.links.push(path)
                     }
                 });
 
-                node.svgElement = svg.append("circle")
-                .attr("cx", node.x + xOffset1)
-                .attr("cy", node.y + 10)
-                .attr("r", 10)
-                .style("fill", "#69b3a2");
+              node.svgElement = svg.append("circle")
+              .attr("cx", node.x + xOffset1)
+              .attr("cy", node.y + 10)
+              .attr("r", 10)
+              .style("fill", "#69b3a2");
+          
 
-                node.svgElement.on("mouseover", function() {
+            node.svgElement.on("mouseover", function() {
+              node.tooltip.style('visibility', 'visible')  
+              node.links.forEach((link : any) => {
+                  link.style("stroke-width", 4) 
+                      .style("opacity", 1)
+                      
+
+                });
+              }).on("mouseout", function() {
+                node.tooltip.style('visibility', 'hidden');
                 node.links.forEach((link : any) => {
-                    link.style("stroke-width", 4) 
-                        .style("opacity", 1)
+                  link.style("stroke-width", 1) 
+                      .style("opacity", 0.1)
+                      
+              }
+          )}
+      )}
+      else {
+        node.svgElement = svg.append("circle")
+              .attr("cx", node.x + i * offset)
+              .attr("cy", node.y + 10)
+              .attr("r", 10)
+              .style("fill", "#69b3a2");
 
-                  });
-                }).on("mouseout", function() {
+        node.svgElement.on("mouseover", function() {
+          node.tooltip.style('visibility', 'visible')  
+          node.links.forEach((link : any) => {
+              link.style("stroke-width", 4) 
+                  .style("opacity", 1)
+                });
+              }).on("mouseout", function() {
+                node.tooltip.style('visibility', 'hidden');
                 node.links.forEach((link : any) => {
-                    link.style("stroke-width", 1) 
-                        .style("opacity", 0.1)
+                  link.style("stroke-width", 1) 
+                      .style("opacity", 0.1)
+                    }
+                  )}
 
-                  });
-                });  
-            }
-        });
-    });
+      )}
+      
+    })
+  })
+    
 }
 
 // helper helper function
