@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import { graph_to_matrix, prepMatrices, load_json } from '../utils/utils';
+import { graph_to_matrix, prepMatrices, load_json, matrix_to_hmap, get_axis_gdata } from '../utils/utils';
 
 interface MatricesVisualizerProps {
   graph_path: string;  
@@ -53,8 +53,8 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps>=({graph_path, intmDa
           //do the real thing: visualize the matrices
           // set the dimensions and margins of the graph
           // Labels of row and columns
-          var myGroups = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
-          var myVars = ["v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10"]
+          var myGroups = get_axis_gdata(gData);
+          var myVars = get_axis_gdata(gData);
 
           // Build X scales and axis:
           var x = d3.scaleBand()
@@ -84,25 +84,14 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps>=({graph_path, intmDa
             value: number;
           }
 
-          //Read the data
-          d3.csv<HeatmapData>("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/heatmap_data.csv", function(d: d3.DSVRowString): HeatmapData | undefined {
-          // 确保数据行包含所有必要的字段
-          if (!d.group || !d.variable || d.value === undefined) {
-            return undefined;  // 跳过不完整或错误的数据行
-          }
-          return {
-            group: d.group,
-            variable: d.variable,
-            value: +d.value  // 将字符串转换为数字
-          };
-        }).then(data => {
+          const data = matrix_to_hmap(gData);
+          console.log("accepted data:", data);
           // 过滤掉未定义的数据项
           const filteredData = data.filter((d): d is HeatmapData => !!d);
 
           // 使用处理后的数据绘制图形
-          const svg = d3.select('svg');
           g.selectAll("rect")
-            .data(filteredData, (d:any) => d.group + ':' + d.variable)
+            .data(data, (d:any) => d.group + ':' + d.variable)
             .enter()
             .append("rect")
             .attr("x", (d: HeatmapData) => x(d.group)!)
@@ -110,10 +99,6 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps>=({graph_path, intmDa
             .attr("width", x.bandwidth())
             .attr("height", y.bandwidth())
             .style("fill", (d: HeatmapData) => myColor(d.value));
-        }).catch(error => {
-          console.error("Error loading or processing data:", error);
-        });
-
       });
     };
 

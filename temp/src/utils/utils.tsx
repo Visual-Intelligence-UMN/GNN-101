@@ -8,9 +8,32 @@ env.wasm.wasmPaths = {
 };
 
 
+//get axis from gData
+export function get_axis_gdata(data:number[][]){
+  let res: string[];
+  res = [];
+  for(let i=0; i<data.length; i++){
+    res.push(i.toString());
+  }
+  return res;
+}
+
 //write a function to convert gData to heatmap data
-export async function matrix_to_hmap(data: any){
-  
+export function matrix_to_hmap(data: number[][]){
+  let res: any[];
+  res = [];
+  for(let i=0; i<data.length; i++){
+    for(let j=0; j<data[0].length; j++){
+      let d = {
+        group: i.toString(),
+        variable: j.toString(),
+        value: data[i][j]  // 将字符串转换为数字
+      };
+      if(data[i][j]===1){d.value = 56;}
+      res.push(d);
+    }
+  }
+  return res;
 }
 
 //input a JSON file and transform it into a matrix representation of graph
