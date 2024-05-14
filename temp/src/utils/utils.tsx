@@ -7,6 +7,32 @@ env.wasm.wasmPaths = {
   'ort-wasm-simd.wasm': './ort-wasm-simd.wasm'
 };
 
+//input a JSON file and transform it into a matrix representation of graph
+export async function graph_to_matrix(data: any){
+  //get the number of nodes
+  const nodeCount = data.x.length;
+  //tranformation process
+  let matrix: number[][];
+  matrix = Array.from({ length: nodeCount }, () => Array(nodeCount).fill(0));
+  for(let i=0; i<data.edge_index[0].length; i++){
+    let source = data.edge_index[0][i];
+    let target = data.edge_index[1][i];
+    console.log("target:",target,"source:",source,"iter:",i);
+    matrix[source][target] = 1;
+  }
+  console.log("matrix representation",matrix);
+  return matrix;
+}
+
+//prepare for matrices data to visualize
+export async function prepMatrices(n:number, mat: number[][]){
+  let matrices = [];
+  for(let i=0; i<n; i++){
+    matrices.push(mat);
+  }
+  return matrices;
+}
+
 export const load_json = async (path: string) => {
   try {
     console.log('entered load_json')
