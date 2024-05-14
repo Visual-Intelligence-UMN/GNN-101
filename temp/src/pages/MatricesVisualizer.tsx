@@ -46,10 +46,10 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps>=({graph_path, intmDa
 
       graphs.forEach((gData, i) => {
           console.log("i",i)
-          const xOffset = i * 500 + 500;
+          const xOffset = i * 500 + 50;
           const g = svg
               .append("g")
-              .attr("transform", `translate(${margin.left},${margin.top})`);
+              .attr("transform", `translate(${xOffset + i * 50},${margin.top})`);
           //do the real thing: visualize the matrices
           // set the dimensions and margins of the graph
           // Labels of row and columns
@@ -61,7 +61,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps>=({graph_path, intmDa
           .range([ 0, gridSize ])
           .domain(myGroups)
           .padding(0.01);
-          svg.append("g")
+          g.append("g")
           .attr("transform", `translate(0,${gridSize})`)
           .call(d3.axisBottom(x))
 
@@ -70,7 +70,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps>=({graph_path, intmDa
           .range([0, gridSize ])
           .domain(myVars)
           .padding(0.01);
-          svg.append("g")
+          g.append("g")
           .call(d3.axisLeft(y));
 
           // Build color scale
@@ -101,8 +101,8 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps>=({graph_path, intmDa
 
           // 使用处理后的数据绘制图形
           const svg = d3.select('svg');
-          svg.selectAll("rect")
-            .data(filteredData, d => d.group + ':' + d.variable)
+          g.selectAll("rect")
+            .data(filteredData, (d:any) => d.group + ':' + d.variable)
             .enter()
             .append("rect")
             .attr("x", (d: HeatmapData) => x(d.group)!)

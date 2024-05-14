@@ -7,6 +7,12 @@ env.wasm.wasmPaths = {
   'ort-wasm-simd.wasm': './ort-wasm-simd.wasm'
 };
 
+
+//write a function to convert gData to heatmap data
+export async function matrix_to_hmap(data: any){
+  
+}
+
 //input a JSON file and transform it into a matrix representation of graph
 export async function graph_to_matrix(data: any){
   //get the number of nodes
