@@ -4,13 +4,14 @@ import { graph_to_matrix, prepMatrices, load_json, matrix_to_hmap, get_axis_gdat
 
 interface MatricesVisualizerProps {
   graph_path: string;  
-  intmData: null | JSON
+  intmData: null | JSON; 
+  changed: boolean;
 }
 
-const MatricesVisualizer: React.FC<MatricesVisualizerProps>=({graph_path, intmData}) => {
+const MatricesVisualizer: React.FC<MatricesVisualizerProps>=({graph_path, intmData, changed}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
-
+  //const lastIntmData = useRef(intmData);
 
   // This is really messy but init will stay at the top to remain in the scope of all functions
   
@@ -43,7 +44,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps>=({graph_path, intmDa
           .append("svg")
           .attr("width", width)
           .attr("height", height);
-
+      
       graphs.forEach((gData, i) => {
           console.log("i",i)
           const xOffset = i * 500 + 50;
@@ -102,7 +103,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps>=({graph_path, intmDa
       });
     };
 
-    const processDataAndRunD3 = async () => {
+    const processDataAndRunD3 = async (num: number) => {
       try {
         setIsLoading(true);
         // Process data
@@ -111,7 +112,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps>=({graph_path, intmDa
         console.log("data matvis", data);
         const processedData = await graph_to_matrix(data);
         console.log("pData matvis", processedData);
-        const graphsData = await prepMatrices(3, processedData);
+        const graphsData = await prepMatrices(num, processedData);
         console.log("gData", graphsData);
         // Initialize and run D3 visualization with processe  d data
         await init(graphsData);
@@ -122,9 +123,13 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps>=({graph_path, intmDa
       }
     };
 
-    processDataAndRunD3();
+    if(intmData==null || changed){
+      processDataAndRunD3(1);
+    }else{
+      processDataAndRunD3(3);
+    }
     console.log('i fire once')
-  },[graph_path, intmData]);
+  },[graph_path, intmData, changed]);
 
   return <div id="matvis" ref={containerRef} style={{
     width: '100%',

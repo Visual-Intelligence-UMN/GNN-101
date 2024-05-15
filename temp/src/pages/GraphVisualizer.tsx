@@ -4,12 +4,14 @@ import { data_prep, prep_graphs, connectCrossGraphNodes, process } from '../util
 
 interface GraphVisualizerProps {
   graph_path: string;  
-  intmData: null | JSON
+  intmData: null | JSON;
+  changed: boolean;
 }
 
-const GraphVisualizer: React.FC<GraphVisualizerProps>=({graph_path, intmData}) => {
+const GraphVisualizer: React.FC<GraphVisualizerProps>=({graph_path, intmData, changed}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const lastIntmData = useRef(intmData);
 
 
   // This is really messy but init will stay at the top to remain in the scope of all functions
@@ -22,7 +24,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps>=({graph_path, intmData}) =
 
   useEffect(() => {
     const init = async (graphs: any[]) => {
-
+      
       console.log("intmData", intmData);
       if(intmData != null){
         console.log("From Visualizer:", intmData);
@@ -103,14 +105,14 @@ const GraphVisualizer: React.FC<GraphVisualizerProps>=({graph_path, intmData}) =
     });
     };
 
-    const processDataAndRunD3 = async () => {
+    const processDataAndRunD3 = async (num: number) => {
       try {
         setIsLoading(true);
         // Process data
 
         const processedData = await data_prep(graph_path);
 
-        const graphsData = await prep_graphs(3, processedData);
+        const graphsData = await prep_graphs(num, processedData);
 
         // Initialize and run D3 visualization with processe  d data
         await init(graphsData);
@@ -120,8 +122,13 @@ const GraphVisualizer: React.FC<GraphVisualizerProps>=({graph_path, intmData}) =
         setIsLoading(false);
       }
     };
+    
 
-    processDataAndRunD3();
+    if(intmData==null || changed){
+      processDataAndRunD3(1);
+    }else{
+      processDataAndRunD3(3);
+    }
     console.log('i fire once')
   }, [graph_path, intmData]);
 
