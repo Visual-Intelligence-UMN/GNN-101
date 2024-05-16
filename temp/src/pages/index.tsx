@@ -5,34 +5,18 @@ import ClassifyGraph from './FileUpload';
 
 export default function Home() {
   const [graphData, setGraphData] = useState<any>(null);
+  const [selectedGraph, setSelectedGraph] = useState<string>("./input_graph.json")
   const inputRef = useRef<HTMLInputElement>(null);
+  const [outputData, setOutputData] = useState(null);
+  const [path, setPath] = useState("./json_data/input_graph0.json");
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const data = JSON.parse(reader.result as string);
-          setGraphData(data);
-        } catch (error) {
-          console.error('Error parsing JSON file:', error);
-        }
-      };
-      reader.readAsText(file);
-    }
-  
-    // Clear the input value
-    if (event.target) {
-      event.target.value = '';
-    }
-  };
+  //intermediate output
+  const [intmData, setIntmData] = useState<null | JSON>(null);
 
-  const handleUpload = () => {
-    if (inputRef.current) {
-      inputRef.current.click();
-    }
-  };
+  function handleDataComm(data:any){
+    setIntmData(data);
+    console.log("SET!", intmData);
+  }
 
   return (
     <div className='bg-white min-h-screen text-black'>
@@ -40,18 +24,15 @@ export default function Home() {
         <title>Graph Visualization</title>
       </Head>
       <h1>Graph Visualization</h1>
-      <input
-        type="file"
-        accept=".json"
-        onChange={handleFileChange}
-        ref={inputRef}
-        style={{ display: 'none' }}
-      />
-      <button onClick={handleUpload}>Upload JSON File</button>
-      {/*CLASSIFY GRAPH TO BE IMPLEMENTED WILL LOOK LIKE <ClassifyGraph input=graphData/>*/}
-      <ClassifyGraph/>
+      <select value={selectedGraph} onChange={(e) => {setSelectedGraph(e.target.value); setPath(e.target.value)}}>
+        <option value="./input_graph.json">Graph 0</option>
+        <option value="./json_data/input_graph0.json">Graph 1</option>
+        <option value="./json_data/input_graph1.json">Graph 2</option>
+        <option value="./json_data/input_graph2.json">Graph 3</option>
+      </select>
+      <ClassifyGraph graph_path={path} dataComm={handleDataComm}/>
       <h2>Visualization</h2>
-      <GraphVisualizer/>
+      <GraphVisualizer graph_path={selectedGraph} intmData={intmData}/>
     </div>
   );
 }

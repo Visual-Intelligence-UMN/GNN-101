@@ -1,6 +1,7 @@
 import React, { useState, ChangeEvent } from 'react';
 import * as ort from 'onnxruntime-web';
-import { analyzeGraph, softmax, loadModel } from '@/utils/utils';
+import { analyzeGraph, softmax, loadModel,load_json } from '@/utils/utils';
+import { path } from 'd3';
 
 interface GraphData {
   x: number[][];
@@ -9,30 +10,20 @@ interface GraphData {
   batch: number[];
 }
 
+interface ClassifyGraphProps{
+  graph_path: string;
+  dataComm: Function;
+}
 
 // parameter will be the user input for json file
-function ClassifyGraph() {
-  const [file, setFile] = useState<File | null>(null);
-
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setFile(event.target.files[0]);
-    }
-  };
+const ClassifyGraph: React.FC<ClassifyGraphProps>=({graph_path, dataComm}) => {
+  const [probabilities, setProbabilities] = useState<number[]>([]);
+  const [graphName, setGraphName] = useState("None");
 
   const classifyGraph = async () => {
     console.log("start classifying....a");
-    const inputElement = document.getElementById("graphInput") as HTMLInputElement;
-
-    if (inputElement.files && inputElement.files.length > 0) {
-      const file = inputElement.files[0];
-
-      // Assuming the user's input is a JSON file representing the graph
-      // You will need to convert this to the appropriate tensor format
-      const reader = new FileReader();
-      reader.onload = async (e) => {
         const session = await loadModel();
-        const graphData: GraphData = JSON.parse(e.target?.result as string);
+        const graphData: GraphData = await load_json(graph_path);
         analyzeGraph(graphData);
 
         // Convert `graphData` to tensor-like object expected by your ONNX model
@@ -63,6 +54,8 @@ function ClassifyGraph() {
         console.log(outputMap);
         const outputTensor = outputMap.final;
 
+        //onOutputReady(outputMap)
+
         console.log("Conv1");
         console.log(outputMap.conv1.cpuData);
 
@@ -76,24 +69,36 @@ function ClassifyGraph() {
         console.log(outputTensor);
         console.log(outputTensor.cpuData);
 
-        const probabilities = softmax(outputTensor.cpuData);
-        const resultElement = document.getElementById("result");
-        if (resultElement) {
-          resultElement.innerText = `Non-Mutagenic: ${probabilities[0].toFixed(
-            2
-          )} \n Mutagenic: ${probabilities[1].toFixed(2)}`;
-        }
-      };
-      reader.readAsText(file);
-    } else {
-      console.error("Please upload a file first");
-    }
+        const prob = softmax(outputTensor.cpuData);
+        const intmData = {
+          "conv1":outputMap.conv1.cpuData,
+          "conv2":outputMap.conv2.cpuData, 
+          "conv3":outputMap.conv3.cpuData,
+          "final":outputTensor.cpuData
+        };
+
+        dataComm(intmData);
+        
+        setGraphName(graph_path);
+        
+        console.log("Probabilities:",prob);
+        setProbabilities(prob);
   };
 
   return (
     <div>
-      <input type="file" onChange={handleFileChange} />
       <button onClick={classifyGraph}>Classify Graph</button>
+      <div>
+      {probabilities && probabilities.length === 2 ? (
+        <p>
+          Non-Mutagenic: {probabilities[0].toFixed(2)}<br />
+          Mutagenic: {probabilities[1].toFixed(2)}<br />
+          Classification Result for: {graphName}
+        </p>
+      ) : (
+        <p>No data available</p>
+      )}
+    </div>
     </div>
   );
 }
