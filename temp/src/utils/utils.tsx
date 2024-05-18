@@ -129,56 +129,198 @@ export async function prep_graphs(g_num: number, data: any) {
     return graphs;
 }
 
-export function connectCrossGraphNodes(nodes: any, svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>, graphs: any[]) {
-  const nodesById = d3.group(nodes, (d:any) => d.id);
-  console.log(nodesById);
+export function featureVisualizer(svg: any, nodes: any[], offset: number) {
+  const nodesById = d3.group(nodes, (d: any) => d.id);
+
   nodesById.forEach((nodes, id) => {
-    nodes.forEach((node, i) => {
+    nodes.forEach((node: any, i: number) => {
+
+      const features = node.features;
+      //console.log("features VIS", features.length);
+      const lines = [];
+      if (features != null && features.length > 7) {
+        for (let j = 0; j < features.length; j += 8) {
+          lines.push(features.slice(j, j + 8).join(' '));
+        }
+      } else {lines.push(features)}
+      const tooltipText = lines.join('<br>');
+
+      const tooltip = svg
+        .append('foreignObject')
+        .attr('x', (i - 1) * offset + node.x + 100)  
+        .attr('y', node.y - 100)  
+        .attr('width', 700)
+        .attr('height', 500)
+        .style('visibility', 'hidden')
+        .append('xhtml:div')
+        .style('font-size', '14px')
+        .style('background', 'rgba(255, 255, 255, 0.8)')
+        .style('border', '1px solid #ccc')
+        .style('padding', '5px')
+        .style('border-radius', '3px')
+        .html(tooltipText);
+
+      node.tooltip = tooltip;
+      node.svgElement.on("mouseover", function() {
+        node.tooltip.style('visibility', 'visible');
+        node.links.forEach((link: any) => {
+          link.style("stroke-width", 4).style("opacity", 1);
+        });
+      }).on("mouseout", function() {
+        node.tooltip.style('visibility', 'hidden');
+        node.links.forEach((link: any) => {
+          link.style("stroke-width", 1).style("opacity", 0.1);
+        });
+      });
+    });
+  });
+}
+
+
+export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset: number, height: number) {
+  const nodesById = d3.group(nodes, (d: any) => d.id);
+  let upperIndex = 0; 
+  let lowerIndex = 0;
+  let upperIndexBlue = 0;
+  let lowerIndexBlue = 0;
+
+  nodesById.forEach((nodes, id) => {
+    nodes.forEach((node: any, i) => {
+
+      if (!node.links) {
+        node.links = [];
+      }
+
       if (i < nodes.length - 1) {
         const nextNode = nodes[i + 1];
-        const xOffset1 = node.graphIndex * 500;
-        const xOffset2 = nextNode.graphIndex * 500;
+        if (nextNode[0] != null && nextNode[0].graphIndex == 3) { return; }
+        const xOffset1 = (node.graphIndex - 1) * offset;
+        const xOffset2 = (nextNode.graphIndex - 1) * offset;
 
-        console.log("first cood");
-        console.log(nodes[i].x, nodes[i].y);
-        console.log("second cood");
-        console.log(nextNode.x, nextNode.y);
+        if (!nextNode.links) {
+          nextNode.links = [];
+        }
 
-        svg.append("line")
-          .attr("x1", nodes[i].x + xOffset1)
-          .attr("y1", nodes[i].y + 10)
-          .attr("x2", nextNode.x + xOffset2)
-          .attr("y2", nextNode.y + 10)
+        const controlX = (node.x + xOffset1 + nextNode.x + xOffset2) / 2;
+        let controlY;
+
+        if ((node.y + 10 + nextNode.y + 10) / 2 < height / 2) {
+          controlY = Math.min(node.y + 10, nextNode.y + 10) - 50 - upperIndex * 10; 
+          upperIndex++;
+        } else {
+          controlY = Math.max(node.y + 10, nextNode.y + 10) + 50 + lowerIndex * 10; 
+          lowerIndex++;
+        }
+
+        const path = svg.append("path")
+          .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${controlX} ${controlY} ${nextNode.x + xOffset2} ${nextNode.y + 10}`)
           .style("stroke", "red")
-          .style("opacity", 0.2)
-          .style("stroke-width", 2);
+          .style("opacity", 0.1)
+          .style("stroke-width", 1)
+          .style("fill", "none");
+
+        node.links.push(path);
+        nextNode.links.push(path);
+
+        let drawnLinks = new Set();
 
         const nextGraphLinks = graphs[nextNode.graphIndex].links;
+
         nextGraphLinks.forEach((link: any) => {
-          if (
-            link.source.id === nextNode.id ||
-            link.target.id === nextNode.id
-          ) {
-            const neighborNode =
-              link.source.id === nextNode.id
-                ? link.target
-                : link.source;
-            svg.append("line")
-              .attr("x1", node.x + node.graphIndex * 500)
-              .attr("y1", node.y + 10)
-              .attr(
-                "x2",
-                neighborNode.x + neighborNode.graphIndex * 500
-              )
-              .attr("y2", neighborNode.y + 10)
+          const sortedIds = [link.source.id, link.target.id].sort();
+          const linkId = sortedIds.join("-");
+
+          if ((link.source.id === nextNode.id || link.target.id === nextNode.id) && !drawnLinks.has(linkId)) {
+            drawnLinks.add(linkId);
+
+            const neighborNode = link.source.id === nextNode.id ? link.target : link.source;
+            if (!neighborNode.links) {
+              neighborNode.links = [];
+            }
+            const neighborControlX = (node.x + xOffset1 + neighborNode.x + xOffset2) / 2;
+            let neighborControlY;
+
+            if ((node.y + 10 + neighborNode.y + 10) / 2 < height / 2) {
+              neighborControlY = (node.y + 10 + neighborNode.y + 10) / 2 - 30 - upperIndexBlue * 10;
+              upperIndexBlue++;
+            } else {
+              neighborControlY = (node.y + 10 + neighborNode.y + 10) / 2 + 30 + lowerIndexBlue * 10;
+              lowerIndexBlue++;
+            }
+          
+
+            const path = svg.append("path")
+              .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${neighborControlX} ${neighborControlY} ${neighborNode.x + (neighborNode.graphIndex - 1) * offset} ${neighborNode.y + 10}`)
               .style("stroke", "blue")
-              .style("opacity", 0.2)
-              .style("stroke-width", 1);
+              .style("opacity", 0.1)
+              .style("stroke-width", 1)
+              .style("fill", "none");
+
+            node.links.push(path);
+            neighborNode.links.push(path);
           }
+        });
+
+
+        node.svgElement = svg.append("circle")
+          .attr("cx", node.x + xOffset1)
+          .attr("cy", node.y + 10)
+          .attr("r", 10)
+          .style("fill", "#69b3a2");
+
+        node.svgElement.on("mouseover", function() {
+          node.links.forEach((link: any) => {
+            link.style("stroke-width", 4).style("opacity", 1);
+          });
+        }).on("mouseout", function() {
+
+          node.links.forEach((link: any) => {
+            link.style("stroke-width", 1).style("opacity", 0.1);
+          });
+        });
+      } else {
+
+        const xOffset1 = (node.graphIndex - 1) * offset
+        const lastLayer = graphs[3];
+        const lastLayerNodes = lastLayer.nodes;
+        lastLayerNodes.forEach((lastNode: any) => {
+          const xOffset2 = (lastNode.graphIndex - 1) * offset;
+
+
+          if (!lastNode.links) {
+            lastNode.links = [];
+          }
+
+          const path = svg.append("path")
+            .attr("d", `M ${node.x + xOffset1} ${node.y + 10} L ${lastNode.x + xOffset2} ${lastNode.y + 10}`)
+            .style("stroke", "red")
+            .style("opacity", 0.1)
+            .style("stroke-width", 1)
+            .style("fill", "none");
+
+          node.links.push(path);
+          lastNode.links.push(path);
+        });
+    
+
+        node.svgElement = svg.append("circle")
+          .attr("cx", node.x + (i - 1) * offset)
+          .attr("cy", node.y + 10)
+          .attr("r", 10)
+          .style("fill", "#69b3a2");
+
+        node.svgElement.on("mouseover", function() {
+          node.links.forEach((link: any) => {
+            link.style("stroke-width", 4).style("opacity", 1);
+          });
+        }).on("mouseout", function() {
+          node.links.forEach((link: any) => {
+            link.style("stroke-width", 1).style("opacity", 0.1);
+          });
         });
       }
     });
-  })
+  });
 }
 
 // helper helper function

@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import { data_prep, prep_graphs, connectCrossGraphNodes, process } from '../utils/utils';
+import { data_prep, prep_graphs, connectCrossGraphNodes, process, featureVisualizer } from '../utils/utils';
 
 interface GraphVisualizerProps {
   graph_path: string;  
-  intmData: null | JSON;
+  intmData: null | any;
   changed: boolean;
 }
 
@@ -34,8 +34,9 @@ const GraphVisualizer: React.FC<GraphVisualizerProps>=({graph_path, intmData, ch
       console.log("path ", graph_path);
       let allNodes: any[] = [];
       const margin = { top: 10, right: 30, bottom: 30, left: 40 };
-      const width = 3000 - margin.left - margin.right;
+      const width = 3500 - margin.left - margin.right;
       const height = 1000 - margin.top - margin.bottom;
+      const offset = 700;
       // Append the SVG object to the body of the page
       console.log(graphs);
       d3.select('#my_dataviz').selectAll('svg').remove();
@@ -47,7 +48,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps>=({graph_path, intmData, ch
 
     graphs.forEach((data, i) => {
         console.log("i",i)
-        const xOffset = i * 500;
+        const xOffset = (i - 1) * offset;
         const g1 = svg
             .append("g")
             .attr("transform", `translate(${xOffset},${margin.top})`);
@@ -67,41 +68,68 @@ const GraphVisualizer: React.FC<GraphVisualizerProps>=({graph_path, intmData, ch
             .attr("r", 10)
             .style("fill", "#69b3a2");
 
-        // Define the simulation
-
-        const simulation = d3
-            .forceSimulation(data.nodes)
-            .force(
-                "link",
-                d3
-                    .forceLink(data.links)
-                    .id((d:any) => d.id)
-                    .distance(10)
-            )
+            const parallelogram = svg.append("path")
+            .attr("d", `M${offset * (i + 1)}, ${height / 4} L${(2 + i) * offset}, ${height / 7} L${(2 + i) * offset}, ${height / 1.3} L${offset * (i + 1)}, ${height / 1.2} Z`)
+            .attr("stroke", "black")
+            .attr("fill", "none");
+  
+          // Define the simulation
+          const simulation = d3.forceSimulation(data.nodes)
+            .force("link", d3.forceLink(data.links).id((d: any) => d.id).distance(10))
             .force("charge", d3.forceManyBody().strength(-400))
             .force("center", d3.forceCenter(width / 2, height / 2))
             .on("tick", ticked)
             .on("end", ended);
-
-        // Update positions each tick
-        function ticked() {
+  
+          // Update positions each tick
+          function ticked() {
             link.attr("x1", (d:any) => d.source.x)
-                .attr("y1", (d:any) => d.source.y)
-                .attr("x2", (d:any) => d.target.x)
-                .attr("y2", (d:any) => d.target.y);
-
-            node.attr("cx", (d:any) => d.x).attr("cy", (d:any) => d.y);
-        }
-
-        function ended() {
+              .attr("y1", (d:any) => d.source.y)
+              .attr("x2", (d:any) => d.target.x)
+              .attr("y2", (d:any) => d.target.y)
+              .attr("transform", function(d: any) {
+                // Calculate the offset for each link
+                const dx = d.target.x - d.source.x;
+                const dy = d.target.y - d.source.y;
+                const dr = Math.sqrt(dx * dx + dy * dy);
+                const offsetX = 5 * (dy / dr); 
+                const offsetY = 5 * (-dx / dr); 
+  
+                return `translate(${offsetX}, ${offsetY})`;
+              });
+  
+            node.attr("cx", (d:any) => d.x)
+              .attr("cy", (d:any) => d.y);
+          }
+  
+          function ended() {
+            let value = null;
+            let index = 0;
+            if (intmData != null) {
+              if (i === 0) {value = intmData.conv1}
+              if (i === 1) {value = intmData.conv2}
+              if (i === 2) {value = intmData.conv3}
+              if (i === 3) {value = intmData.final}
+            }
             data.nodes.forEach((node:any) => {
-                node.graphIndex = i;
-                allNodes.push(node);
+              node.graphIndex = i;
+              
+              if (value != null && i <= 2) {
+                node.features = value.subarray(64 * node.id, 64 * (node.id + 1))
+              }
+              if (value != null && i === 3) {
+                node.features = value[index];
+                index = index + 1;
+              }
+              allNodes.push(node);
             });
             if (i === graphs.length - 1) {
-                connectCrossGraphNodes(allNodes, svg, graphs);
+              if(graphs.length!=1){
+                connectCrossGraphNodes(allNodes, svg, graphs, offset, height);
+                featureVisualizer(svg, allNodes, offset);
+              }
             }
-        }
+          }
     });
     };
 
@@ -127,7 +155,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps>=({graph_path, intmData, ch
     if(intmData==null || changed){
       processDataAndRunD3(1);
     }else{
-      processDataAndRunD3(3);
+      processDataAndRunD3(4);
     }
     console.log('i fire once')
   }, [graph_path, intmData]);

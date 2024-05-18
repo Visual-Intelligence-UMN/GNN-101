@@ -90,6 +90,42 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps>=({graph_path, intmDa
           // 过滤掉未定义的数据项
           const filteredData = data.filter((d): d is HeatmapData => !!d);
 
+          var tooltip = d3.select("#matvis")
+            .append("div")
+            .style("opacity", 0)
+            .attr("class", "tooltip")
+            .style("background-color", "white")
+            .style("border", "solid")
+            .style("border-width", "2px")
+            .style("border-radius", "5px")
+            .style("padding", "5px")
+
+          // Three function that change the tooltip when user hover / move / leave a cell
+          var mouseover = (event: MouseEvent, d: { value: number }) => {
+            tooltip
+              .style("opacity", 1);
+            d3.select(event.currentTarget as HTMLElement)  // 明确转换为HTMLElement
+              .style("stroke", "black")
+              .style("opacity", 1);
+          };
+          
+          var mousemove = (event: MouseEvent, d: { value: number }) => {
+            //console.log("move");
+            const [x, y] = d3.pointer(event);  // 使用传递给函数的事件对象
+            tooltip
+              .html(`The exact value of<br>this cell is: ${d.value}`)
+              .style("left", (x + 70) + "px")
+              .style("top", y + "px");
+          };
+          
+          var mouseleave = (event: MouseEvent, d: { value: number }) => {
+            tooltip
+              .style("opacity", 0);
+            d3.select(event.currentTarget as HTMLElement)  // 使用event.currentTarget
+              .style("stroke", "none")
+              .style("opacity", 0.8);
+          };
+
           // 使用处理后的数据绘制图形
           g.selectAll("rect")
             .data(data, (d:any) => d.group + ':' + d.variable)
@@ -99,7 +135,13 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps>=({graph_path, intmDa
             .attr("y", (d: HeatmapData) => y(d.variable)!)
             .attr("width", x.bandwidth())
             .attr("height", y.bandwidth())
-            .style("fill", (d: HeatmapData) => myColor(d.value));
+            .style("fill", (d: HeatmapData) => myColor(d.value))
+            .style("stroke-width", 4)
+            .style("stroke", "none")
+            .style("opacity", 0.8)
+            .on("mouseover", mouseover)
+            .on("mousemove", mousemove)
+            .on("mouseleave", mouseleave);
       });
     };
 
