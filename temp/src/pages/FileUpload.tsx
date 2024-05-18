@@ -13,6 +13,8 @@ interface GraphData {
 interface ClassifyGraphProps{
   graph_path: string;
   dataComm: Function;
+  changedComm: Function;
+  changed: boolean;
 }
 
 export interface IntmData{
@@ -23,7 +25,7 @@ export interface IntmData{
 }
 
 // parameter will be the user input for json file
-const ClassifyGraph: React.FC<ClassifyGraphProps>=({graph_path, dataComm}) => {
+const ClassifyGraph: React.FC<ClassifyGraphProps>=({graph_path, dataComm, changedComm, changed}) => {
   const [probabilities, setProbabilities] = useState<number[]>([]);
   const [graphName, setGraphName] = useState("None");
 
@@ -85,6 +87,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps>=({graph_path, dataComm}) => {
         };
 
         dataComm(intmData);
+        changedComm(false);
         
         setGraphName(graph_path);
         
@@ -96,7 +99,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps>=({graph_path, dataComm}) => {
     <div>
       <button onClick={classifyGraph}>Classify Graph</button>
       <div>
-      {probabilities && probabilities.length === 2 ? (
+      {probabilities && (!changed) && probabilities.length === 2 ? (
         <p>
           Non-Mutagenic: {probabilities[0].toFixed(2)}<br />
           Mutagenic: {probabilities[1].toFixed(2)}<br />

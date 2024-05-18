@@ -1,17 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import { data_prep, prep_graphs, connectCrossGraphNodes, featureVisualizer, process} from '../utils/utils';
+import { data_prep, prep_graphs, connectCrossGraphNodes, process, featureVisualizer } from '../utils/utils';
 import { IntmData } from './FileUpload';
-
-
 interface GraphVisualizerProps {
   graph_path: string;  
-  intmData: null | IntmData
+  intmData: null | IntmData;
+  changed: boolean;
 }
 
-const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ graph_path, intmData }) => {
+const GraphVisualizer: React.FC<GraphVisualizerProps>=({graph_path, intmData, changed}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const lastIntmData = useRef(intmData);
 
   console.log("updated", intmData);
   if (intmData != null) {
@@ -20,6 +20,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ graph_path, intmData 
 
   useEffect(() => {
     const init = async (graphs: any[]) => {
+      
       console.log("intmData", intmData);
       if (intmData != null) {
         console.log("From Visualizer:", intmData);
@@ -32,7 +33,6 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ graph_path, intmData 
       const width = 3500 - margin.left - margin.right;
       const height = 1000 - margin.top - margin.bottom;
       const offset = 700;
-
       // Append the SVG object to the body of the page
       d3.select('#my_dataviz').selectAll('svg').remove();
       const svg = d3.select("#my_dataviz")
@@ -40,12 +40,12 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ graph_path, intmData 
         .attr("width", width)
         .attr("height", height);
 
-      graphs.forEach((data, i) => {
-        console.log("i", i);
-        console.log(data)
+    graphs.forEach((data, i) => {
+        console.log("i",i)
         const xOffset = (i - 1) * offset;
-        const g1 = svg.append("g")
-          .attr("transform", `translate(${xOffset},${margin.top})`);
+        const g1 = svg
+            .append("g")
+            .attr("transform", `translate(${xOffset},${margin.top})`);
 
         // Initialize the links
         
@@ -120,17 +120,19 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ graph_path, intmData 
           if (i === graphs.length - 1) {
             connectCrossGraphNodes(allNodes, svg, graphs, offset, height);
             featureVisualizer(svg, allNodes, offset);
+
           }
         }
       });
     };
 
-    const processDataAndRunD3 = async () => {
+    const processDataAndRunD3 = async (num: number) => {
       try {
         setIsLoading(true);
         // Process data
         const processedData = await data_prep(graph_path);
-        const graphsData = await prep_graphs(3, processedData);
+
+        const graphsData = await prep_graphs(num, processedData);
 
         // Initialize and run D3 visualization with processed data
         await init(graphsData);
@@ -140,9 +142,14 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ graph_path, intmData 
         setIsLoading(false);
       }
     };
+    
 
-    processDataAndRunD3();
-    console.log('i fire once');
+    if(intmData == null || changed){
+      processDataAndRunD3(1);
+    }else{
+      processDataAndRunD3(4);
+    }
+    console.log('i fire once')
   }, [graph_path, intmData]);
 
   return (

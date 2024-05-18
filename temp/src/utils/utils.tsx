@@ -7,6 +7,61 @@ env.wasm.wasmPaths = {
   'ort-wasm-simd.wasm': './ort-wasm-simd.wasm'
 };
 
+
+//get axis from gData
+export function get_axis_gdata(data:number[][]){
+  let res: string[];
+  res = [];
+  for(let i=0; i<data.length; i++){
+    res.push(i.toString());
+  }
+  return res;
+}
+
+//write a function to convert gData to heatmap data
+export function matrix_to_hmap(data: number[][]){
+  let res: any[];
+  res = [];
+  for(let i=0; i<data.length; i++){
+    for(let j=0; j<data[0].length; j++){
+      let d = {
+        group: i.toString(),
+        variable: j.toString(),
+        value: data[i][j]  // 将字符串转换为数字
+      };
+      if(data[i][j]===1){d.value = 56;}
+      res.push(d);
+    }
+  }
+  return res;
+}
+
+//input a JSON file and transform it into a matrix representation of graph
+export async function graph_to_matrix(data: any){
+  //get the number of nodes
+  const nodeCount = data.x.length;
+  //tranformation process
+  let matrix: number[][];
+  matrix = Array.from({ length: nodeCount }, () => Array(nodeCount).fill(0));
+  for(let i=0; i<data.edge_index[0].length; i++){
+    let source = data.edge_index[0][i];
+    let target = data.edge_index[1][i];
+    console.log("target:",target,"source:",source,"iter:",i);
+    matrix[source][target] = 1;
+  }
+  console.log("matrix representation",matrix);
+  return matrix;
+}
+
+//prepare for matrices data to visualize
+export async function prepMatrices(n:number, mat: number[][]){
+  let matrices = [];
+  for(let i=0; i<n; i++){
+    matrices.push(mat);
+  }
+  return matrices;
+}
+
 export const load_json = async (path: string) => {
   try {
     console.log('entered load_json');
@@ -112,8 +167,6 @@ export async function prep_graphs(g_num: number, data: any) {
   return graphs;
 }
 
-// export function colorAssign(nodes: any, )
-
 export function featureVisualizer(svg: any, nodes: any[], offset: number) {
   const nodesById = d3.group(nodes, (d: any) => d.id);
 
@@ -121,8 +174,9 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
     nodes.forEach((node: any, i: number) => {
 
       const features = node.features;
+      //console.log("features VIS", features.length);
       const lines = [];
-      if (features.length > 7) {
+      if (features != null && features.length > 7) {
         for (let j = 0; j < features.length; j += 8) {
           lines.push(features.slice(j, j + 8).join(' '));
         }
@@ -145,6 +199,7 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
         .html(tooltipText);
 
       node.tooltip = tooltip;
+      if (node && node.svgElement) {
       node.svgElement.on("mouseover", function() {
         node.tooltip.style('visibility', 'visible');
         node.links.forEach((link: any) => {
@@ -156,8 +211,10 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
           link.style("stroke-width", 1).style("opacity", 0.1);
         });
       });
+    }
     });
   });
+  
 }
 
 
@@ -262,7 +319,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
             link.style("stroke-width", 1).style("opacity", 0.1);
           });
         });
-      } else {
+      } else if (node.graphIndex - 1 > 0) {
 
         const xOffset1 = (node.graphIndex - 1) * offset
         const lastLayer = graphs[3];
