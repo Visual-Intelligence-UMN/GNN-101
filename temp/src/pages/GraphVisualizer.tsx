@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import { data_prep, prep_graphs, connectCrossGraphNodes, featureVisualizer, process} from '../utils/utils';
 import { IntmData } from './FileUpload';
 
+
 interface GraphVisualizerProps {
   graph_path: string;  
   intmData: null | IntmData

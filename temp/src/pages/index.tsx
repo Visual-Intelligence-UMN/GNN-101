@@ -2,6 +2,8 @@ import Head from 'next/head';
 import React, { useRef, useState } from 'react';
 import GraphVisualizer from './GraphVisualizer';
 import ClassifyGraph from './FileUpload';
+import { IntmData } from './FileUpload';
+
 
 export default function Home() {
   const [graphData, setGraphData] = useState<any>(null);
@@ -9,9 +11,10 @@ export default function Home() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [outputData, setOutputData] = useState(null);
   const [path, setPath] = useState("./json_data/input_graph0.json");
+  
 
   //intermediate output
-  const [intmData, setIntmData] = useState<null | JSON>(null);
+  const [intmData, setIntmData] = useState<IntmData | null>(null);
 
   function handleDataComm(data:any){
     setIntmData(data);

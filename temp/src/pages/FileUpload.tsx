@@ -15,6 +15,13 @@ interface ClassifyGraphProps{
   dataComm: Function;
 }
 
+export interface IntmData{
+  conv1: Float32Array;
+  conv2: Float32Array;
+  conv3: Float32Array;
+  final: Float32Array;
+}
+
 // parameter will be the user input for json file
 const ClassifyGraph: React.FC<ClassifyGraphProps>=({graph_path, dataComm}) => {
   const [probabilities, setProbabilities] = useState<number[]>([]);
@@ -70,11 +77,11 @@ const ClassifyGraph: React.FC<ClassifyGraphProps>=({graph_path, dataComm}) => {
         console.log(outputTensor.cpuData);
 
         const prob = softmax(outputTensor.cpuData);
-        const intmData = {
-          "conv1":outputMap.conv1.cpuData,
-          "conv2":outputMap.conv2.cpuData, 
-          "conv3":outputMap.conv3.cpuData,
-          "final":outputTensor.cpuData
+        const intmData: IntmData= {
+          conv1: outputMap.conv1.cpuData,
+          conv2: outputMap.conv2.cpuData,
+          conv3: outputMap.conv2.cpuData,
+          final: outputTensor.cpuData
         };
 
         dataComm(intmData);
