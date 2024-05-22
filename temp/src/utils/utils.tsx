@@ -7,6 +7,45 @@ env.wasm.wasmPaths = {
   'ort-wasm-simd.wasm': './ort-wasm-simd.wasm'
 };
 
+type Matrix = number[][];
+
+export function splitIntoMatrices(array: number[], matrixSize: number = 8): Matrix[] {
+  const matrices: Matrix[] = [];
+  const totalElementsInMatrix = matrixSize * matrixSize;
+
+  if (array.length % totalElementsInMatrix !== 0) {
+    throw new Error("Array length is not a multiple of the total elements in a matrix.");
+  }
+
+  for (let i = 0; i < array.length; i += totalElementsInMatrix) {
+    const matrix: Matrix = [];
+
+    for (let row = 0; row < matrixSize; row++) {
+      const start = i + row * matrixSize;
+      const end = start + matrixSize;
+      matrix.push(array.slice(start, end));
+    }
+
+    matrices.push(matrix);
+  }
+  console.log(matrices);
+  
+  return matrices;
+}
+
+
+export function get_category_node(data: number[]){
+  for(let i=0; i<data.length; i++){
+    if(data[i]==1){
+      return i;
+    }
+  }
+  return 0;
+}
+
+export async function get_features_origin(data: any){
+  return data.x;
+}
 
 //get axis from gData
 export function get_axis_gdata(data:number[][]){

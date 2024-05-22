@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import { graph_to_matrix, prepMatrices, load_json, matrix_to_hmap, get_axis_gdata } from '../utils/utils';
+import {splitIntoMatrices, get_features_origin, graph_to_matrix, prepMatrices, load_json, matrix_to_hmap, get_axis_gdata, get_category_node } from '../utils/utils';
 
 interface MatricesVisualizerProps {
   graph_path: string;  
-  intmData: null | JSON; 
+  intmData: any; 
   changed: boolean;
 }
 
@@ -21,11 +21,18 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps>=({graph_path, intmDa
   }
 
   useEffect(()=>{
-    const init = async (graphs: any[]) => {
+    const init = async (graphs: any[], features:any[][]) => {
+
+      let conv1: number[][][], conv2: number[][][], conv3: number[][][], final = null;
 
       console.log("intmData", intmData);
       if(intmData != null){
         console.log("From Visualizer:", intmData);
+        conv1 = splitIntoMatrices(intmData.conv1);
+        conv2 = splitIntoMatrices(intmData.conv2);
+        conv3 = splitIntoMatrices(intmData.conv3);
+
+        console.log("conv1", conv1, "conv2", conv2, "conv3", conv3);
       }
 
 
@@ -170,24 +177,95 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps>=({graph_path, intmDa
             g.selectAll(".x-axis text")
             .on("mouseover", function(event) {
               const element = event.target as SVGGraphicsElement;
-              const bbox = element.getBBox();
-              const cx = bbox.x + bbox.width / 2;
-              const cy = bbox.y + bbox.height / 2;
-          
-              const svgTop = svg.node()!.getBoundingClientRect().top;
-              const elementTop = element.getBoundingClientRect().top;
-              const relativeY = elementTop - svgTop + bbox.height / 2; // 调整至文本中心或稍上方
+                const bbox = element.getBBox();
+                const cx = bbox.x + bbox.width / 2;
+                const cy = bbox.y + bbox.height / 2;
   
-              const array1: number[][] = Array(8).fill(null).map(() => Array(8).fill(0));
-          
-              g.append("circle")
-                .attr("id", "tmp")
-                .attr("cx", cx)
-                .attr("cy", relativeY - 10) // 在文本上方一点位置绘制圆
-                .attr("r", 10)
-                .attr("stroke", "blue")
-                .attr("stroke-width", 1)
-                .attr("fill", "none");
+                const transformAttr = d3.select(element.parentNode as SVGElement).attr('transform');
+                let translate = [0, 0];  // 默认为无位移
+                if (transformAttr) {
+                  const matches = transformAttr.match(/translate\(([^,]+),([^)]+)\)/);
+                  if (matches) {
+                    translate = matches.slice(1).map(Number);
+                  }
+                }
+                
+                const adjustedX = cx + translate[0];
+                const adjustedY = cy + translate[1] - 10; // 上移10以放置于文本上方
+                const cellSize = 10; // 每个格子的尺寸
+            
+              if(d3.select(this).attr("class")!= "first"){
+              // 创建一个8x8的矩阵tooltip
+              const matrixSize = 8;
+              
+              const tooltipG = d3.select(element.parentNode as SVGGElement)
+                .append('g')
+                .attr('class', 'matrix-tooltip')
+                .attr("x", adjustedX)
+                .attr("y", adjustedY)
+                .raise();
+                //.attr('transform', `translate(${adjustedX}, ${adjustedY})`);
+
+                let t = d3.select(this).text();
+                let num = Number(t);
+                console.log("TEXT", t);
+
+                //how to determine the layer? 
+                let layer = null;
+                if(i==1){layer=conv1;}
+                else if(i==2){layer=conv2;}
+                else if(i==3){layer=conv3;}
+                else if(i==4){layer=final;}
+                else {layer=null}
+                if(layer!=null){
+                let mat = layer[num];
+
+                console.log("MAT", mat);
+
+              for (let i = 0; i < matrixSize; i++) {
+                for (let j = 0; j < matrixSize; j++) {
+                  let c:number = mat[i][j] * 1000;
+                  tooltipG.append('rect')
+                    .attr('x', -(j+5) * cellSize)
+                    .attr('y', i * cellSize)
+                    .attr('width', cellSize)
+                    .attr('height', cellSize)
+                    .attr('fill', myColor(c))
+                    .attr("opacity", 1)
+                    .attr('stroke', 'black')
+                    .attr('stroke-width', 1);
+                }
+              }
+            }
+            }else{
+              const tooltipG = d3.select(element.parentNode as SVGGElement)
+                .append('g')
+                .attr('class', 'matrix-tooltip')
+                .attr("x", adjustedX)
+                .attr("y", adjustedY)
+                .raise();
+                //.attr('transform', `translate(${adjustedX}, ${adjustedY})`);
+            
+                let t = d3.select(this).text();
+                let num = Number(t);
+                console.log("TEXT", t);
+              for (let i = 0; i < 7; i++) {
+                  const cate = get_category_node(features[num]) * 100;
+                  console.log("CATE", cate);
+
+                  tooltipG.append('rect')
+                    .attr('x', -25)
+                    .attr('y', i * cellSize)
+                    .attr('width', cellSize)
+                    .attr('height', cellSize)
+                    .attr('fill', myColor(cate))
+                    .attr("opacity", 1)
+                    .attr('stroke', 'black')
+                    .attr('stroke-width', 1);
+                  
+                  console.log("node feature", features[num]);
+            }
+          }
           
               d3.select(element)
                 .style("fill", "red")
@@ -195,6 +273,8 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps>=({graph_path, intmDa
             })
             .on("mouseout", function(event) {
               const element = event.target as SVGGraphicsElement;
+              d3.select('.matrix-tooltip').remove(); // 移除矩阵tooltip
+
               d3.select(element)
                 .style("fill", "black")
                 .style("font-weight", "normal");
@@ -236,20 +316,38 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps>=({graph_path, intmDa
                 .attr("y", adjustedY)
                 .raise();
                 //.attr('transform', `translate(${adjustedX}, ${adjustedY})`);
+
+                let t = d3.select(this).text();
+                let num = Number(t);
+                console.log("TEXT", t);
+
+                //how to determine the layer? 
+                let layer = null;
+                if(i==1){layer=conv1;}
+                else if(i==2){layer=conv2;}
+                else if(i==3){layer=conv3;}
+                else if(i==4){layer=final;}
+                else {layer=null}
+                if(layer!=null){
+                let mat = layer[num];
+
+                console.log("MAT", mat);
             
-              for (let i = 0; i < matrixSize; i++) {
-                for (let j = 0; j < matrixSize; j++) {
-                  tooltipG.append('rect')
-                    .attr('x', -(j+5) * cellSize)
-                    .attr('y', i * cellSize)
-                    .attr('width', cellSize)
-                    .attr('height', cellSize)
-                    .attr('fill', 'white')
-                    .attr("opacity", 1)
-                    .attr('stroke', 'black')
-                    .attr('stroke-width', 1);
+                for (let i = 0; i < matrixSize; i++) {
+                  for (let j = 0; j < matrixSize; j++) {
+                    let c:number = mat[i][j] * 1000;
+                    tooltipG.append('rect')
+                      .attr('x', -(j+5) * cellSize)
+                      .attr('y', i * cellSize)
+                      .attr('width', cellSize)
+                      .attr('height', cellSize)
+                      .attr('fill', myColor(c))
+                      .attr("opacity", 1)
+                      .attr('stroke', 'black')
+                      .attr('stroke-width', 1);
+                  }
                 }
-              }
+            }
             }else{
               const tooltipG = d3.select(element.parentNode as SVGGElement)
                 .append('g')
@@ -258,17 +356,25 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps>=({graph_path, intmDa
                 .attr("y", adjustedY)
                 .raise();
                 //.attr('transform', `translate(${adjustedX}, ${adjustedY})`);
-            
+
+                let t = d3.select(this).text();
+                let num = Number(t);
+                console.log("TEXT", t);
               for (let i = 0; i < 7; i++) {
+                  const cate = get_category_node(features[num]) * 100;
+                  console.log("CATE", cate);
+
                   tooltipG.append('rect')
                     .attr('x', -25)
                     .attr('y', i * cellSize)
                     .attr('width', cellSize)
                     .attr('height', cellSize)
-                    .attr('fill', 'white')
+                    .attr('fill', myColor(cate))
                     .attr("opacity", 1)
                     .attr('stroke', 'black')
                     .attr('stroke-width', 1);
+                  
+                  console.log("node feature", features[num]);
             }
           }
             
@@ -294,12 +400,17 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps>=({graph_path, intmDa
         console.log("path matvis", graph_path);
         const data = await load_json(graph_path)
         console.log("data matvis", data);
+
+        //accept the features from original json file
+        const features = await get_features_origin(data);
+        console.log("o features", features);
+
         const processedData = await graph_to_matrix(data);
         console.log("pData matvis", processedData);
         const graphsData = await prepMatrices(num, processedData);
         console.log("gData", graphsData);
         // Initialize and run D3 visualization with processe  d data
-        await init(graphsData);
+        await init(graphsData, features);
       } catch (error) {
         console.error('Error in processDataAndRunD3:', error);
       } finally {
