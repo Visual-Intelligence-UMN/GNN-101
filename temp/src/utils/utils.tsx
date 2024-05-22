@@ -7,6 +7,19 @@ env.wasm.wasmPaths = {
   'ort-wasm-simd.wasm': './ort-wasm-simd.wasm'
 };
 
+
+export function printAxisTextCoordinates(): void {
+  d3.selectAll<SVGTextElement, any>(".x-axis text").each(function() {
+      const bbox = this.getBBox();
+      console.log(`X Axis Text: [x: ${bbox.x}, y: ${bbox.y}, width: ${bbox.width}, height: ${bbox.height}]`);
+  });
+
+  d3.selectAll<SVGTextElement, any>(".y-axis text").each(function() {
+      const bbox = this.getBBox();
+      console.log(`Y Axis Text: [x: ${bbox.x}, y: ${bbox.y}, width: ${bbox.width}, height: ${bbox.height}]`);
+  });
+}
+
 type Matrix = number[][];
 
 export function splitIntoMatrices(array: number[], matrixSize: number = 8): Matrix[] {
@@ -29,7 +42,7 @@ export function splitIntoMatrices(array: number[], matrixSize: number = 8): Matr
     matrices.push(matrix);
   }
   console.log(matrices);
-  
+
   return matrices;
 }
 
