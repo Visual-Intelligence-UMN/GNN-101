@@ -59,6 +59,11 @@ export async function prepMatrices(n:number, mat: number[][]){
   for(let i=0; i<n; i++){
     matrices.push(mat);
   }
+  //push a 8*8 matrix
+  if(matrices.length>1){
+  const array1: number[][] = Array(8).fill(null).map(() => Array(8).fill(0));
+  matrices.push(array1);
+}
   return matrices;
 }
 

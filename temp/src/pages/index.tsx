@@ -48,8 +48,8 @@ export default function Home() {
         if(e.target.value==="true"){setIsMat(true);console.log("mat true", isMat);setChangedG(true);}
         else{setIsMat(false);console.log("mat false", isMat);setChangedG(true);}
       }}>
-        <option value="true">Graphs View</option>
         <option value="false">Matrices View</option>
+        <option value="true">Graphs View</option>
       </select>
       <ClassifyGraph graph_path={path} dataComm={handleDataComm} changedComm={handleChangedComm} changed={changedG}/>
       
