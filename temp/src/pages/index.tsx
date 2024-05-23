@@ -35,7 +35,7 @@ export default function Home() {
       <PanelGroup direction='horizontal'>
         <DescriptionPanel />
         <PanelResizeHandle className="w-1 bg-gray-200"/>
-        <Panel>
+        <Panel className='ml-4'>
       <Head>
         <title>Graph Neural Network Visualization</title>
       </Head>
