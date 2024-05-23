@@ -48,7 +48,9 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 conv2 = splitIntoMatrices(intmData.conv2);
                 conv3 = splitIntoMatrices(intmData.conv3);
 
-                console.log("conv1", conv1, "conv2", conv2, "conv3", conv3);
+                final = intmData.final;
+
+                console.log("conv1", conv1, "conv2", conv2, "conv3", conv3, "final", final);
             }
 
             console.log("path ", graph_path);

@@ -3,6 +3,7 @@ import React, { useRef, useState } from 'react';
 import GraphVisualizer from './GraphVisualizer';
 import ClassifyGraph from './FileUpload';
 import MatricesVisualizer from './MatricesVisualizer';
+import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
 
 export default function Home() {
   const [graphData, setGraphData] = useState<any>(null);
@@ -34,6 +35,15 @@ export default function Home() {
 
   return (
     <div className='bg-white min-h-screen text-black'>
+      <PanelGroup direction='horizontal'>
+        <Panel defaultSize={30} minSize={20}>
+          <h1>What is an GNN model?</h1>
+          aaaaaaaaaaa
+          <h1>How to interact with this demo?</h1>
+          bbbbbbbbbbb
+        </Panel>
+        <PanelResizeHandle />
+        <Panel>
       <Head>
         <title>Graph Visualization</title>
       </Head>
@@ -65,6 +75,8 @@ export default function Home() {
         <MatricesVisualizer graph_path={selectedGraph} intmData={intmData} changed={changedG}/>
         </>
       }
+      </Panel>
+      </PanelGroup>
     </div>
   );
 }

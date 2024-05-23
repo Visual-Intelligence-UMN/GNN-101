@@ -7,7 +7,7 @@ env.wasm.wasmPaths = {
   'ort-wasm-simd.wasm': './ort-wasm-simd.wasm'
 };
 
-
+//print text coordinates in MatricesVisualizer
 export function printAxisTextCoordinates(): void {
   d3.selectAll<SVGTextElement, any>(".x-axis text").each(function() {
       const bbox = this.getBBox();
@@ -20,6 +20,7 @@ export function printAxisTextCoordinates(): void {
   });
 }
 
+//Split a large 1d array into a 1d array with multiple 8*8 matrices
 type Matrix = number[][];
 
 export function splitIntoMatrices(array: number[], matrixSize: number = 8): Matrix[] {
@@ -46,7 +47,7 @@ export function splitIntoMatrices(array: number[], matrixSize: number = 8): Matr
   return matrices;
 }
 
-
+//get the category of node features in the original input graph
 export function get_category_node(data: number[]){
   for(let i=0; i<data.length; i++){
     if(data[i]==1){
@@ -56,6 +57,7 @@ export function get_category_node(data: number[]){
   return 0;
 }
 
+//get the features from a JSON structure
 export async function get_features_origin(data: any){
   return data.x;
 }
