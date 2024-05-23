@@ -10,6 +10,8 @@ import {
     matrix_to_hmap,
     get_axis_gdata,
     get_category_node,
+    get_cood_from_parent,
+    get_coordination
 } from "../utils/utils";
 
 interface MatricesVisualizerProps {
@@ -133,20 +135,8 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 console.log("accepted data:", data);
                 const filteredData = data.filter((d): d is HeatmapData => !!d);
 
-                var tooltip = d3
-                    .select("#matvis")
-                    .append("div")
-                    .style("opacity", 0)
-                    .attr("class", "tooltip")
-                    .style("background-color", "white")
-                    .style("border", "solid")
-                    .style("border-width", "2px")
-                    .style("border-radius", "5px")
-                    .style("padding", "5px");
-
                 // Three function that change the tooltip when user hover / move / leave a cell
                 var mouseover = (event: MouseEvent, d: { value: number }) => {
-                    tooltip.style("opacity", 1);
                     d3.select(event.currentTarget as HTMLElement)
                         .style("stroke", "black")
                         .style("opacity", 1);
@@ -156,15 +146,9 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                     const rect = (
                         event.target as HTMLElement
                     ).getBoundingClientRect();
-                    tooltip
-                        .style("opacity", 1)
-                        .html(`The exact value of<br>this cell is: ${d.value}`)
-                        .style("left", rect.left + window.scrollX + 70 + "px")
-                        .style("top", rect.top + window.scrollY + "px");
                 };
 
                 var mouseleave = (event: MouseEvent, d: { value: number }) => {
-                    tooltip.style("opacity", 0);
                     d3.select(event.currentTarget as HTMLElement)
                         .style("stroke", "grey")
                         .style("opacity", 0.8);
@@ -188,7 +172,9 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
 
                 g.selectAll(".x-axis text")
                     .on("mouseover", function (event) {
+                        console.log("EVENT", event);
                         const element = event.target as SVGGraphicsElement;
+                        console.log("ELEMENT", element);
                         const bbox = element.getBBox();
                         const cx = bbox.x + bbox.width / 2;
                         const cy = bbox.y + bbox.height / 2;
@@ -332,6 +318,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                         const adjustedX = cx + translate[0];
                         const adjustedY = cy + translate[1] - 10; // 上移10以放置于文本上方
                         const cellSize = 10; // 每个格子的尺寸
+                        console.log("ADJ-X", adjustedX, "ADJ-Y", adjustedY);
 
                         if (d3.select(this).attr("class") != "first") {
                             // 创建一个8x8的矩阵tooltip
@@ -429,6 +416,9 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                             .style("fill", "black")
                             .style("font-weight", "normal");
                     });
+                    //getting the coordinates
+                const cood = get_cood_from_parent(".y-axis", "text");
+                console.log("coord",i, cood);
             });
         };
 

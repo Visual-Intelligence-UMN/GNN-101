@@ -4,7 +4,7 @@ import GraphVisualizer from './GraphVisualizer';
 import ClassifyGraph from './FileUpload';
 import MatricesVisualizer from './MatricesVisualizer';
 import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
-import { DescriptionPanel, GraphSelector, graph_list_generate, ViewSelector, Hint } from "./WebUtils"
+import { DescriptionPanel, GraphSelector, graph_list_generate, ViewSelector, Hint, ButtonChain } from "./WebUtils"
 
 export default function Home() {
   const [graphData, setGraphData] = useState<any>(null);
@@ -41,37 +41,7 @@ export default function Home() {
       </Head>
       <h1 className="text-2xl font-bold">Graph Neural Network Visualization</h1>
       <hr className="border-t border-gray-300 my-4"></hr>
-      <div className="flex gap-x-4">
-        <div><h2 className="text-xl font-semibold">GNN Architecture</h2></div>
-          <div>
-          <div className="flex justify-center gap-2">
-            <Hint text={"Here's the Architecture of the GNN"} />
-            <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded">
-              Input
-            </button>
-            <button className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded">
-              GNNConv1
-            </button>
-            <button className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded">
-            GNNConv2
-            </button>
-            <button className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded">
-            GNNConv3
-            </button>
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
-              Global Mean Pooling
-            </button>
-            <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded">
-              FC
-            </button>
-            <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded">
-              Output
-            </button>
-          </div>
-        </div>
-      </div>
-
-
+      <ButtonChain />
       <div className="flex gap-x-4">
         <div><h2 className="text-xl font-semibold">Data</h2></div>
         <div className="flex gap-x-4">

@@ -1,7 +1,47 @@
+//A web utilities file for general UI building
 import { useEffect } from 'react';
-import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
+import { Panel } from 'react-resizable-panels';
 import * as d3 from "d3";
 import {Description} from "./Description";
+
+
+export const ButtonChain=()=>{
+    return (
+        <div className="flex gap-x-4">
+        <div><h2 className="text-xl font-semibold">GNN Architecture</h2></div>
+          <div>
+          <div className="flex justify-center gap-2">
+            <Hint text={"Here's the Architecture of the GNN"} />
+            <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded">
+              Input
+            </button>
+            <button className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded">
+              GNNConv1
+            </button>
+            <button className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded">
+            GNNConv2
+            </button>
+            <button className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded">
+            GNNConv3
+            </button>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
+              Global Mean Pooling
+            </button>
+            <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded">
+              FC
+            </button>
+            <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded">
+              Output
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+}
+
+function roundToTwo(num: number): number {
+    return Math.round(num * 100) / 100;
+}
 
 //text panel
 export const DescriptionPanel = ()=>{
@@ -68,7 +108,7 @@ export const PredictionVisualizer: React.FC<PredictionVisualizerProps> = ({resul
             .data(result)
             .enter()
             .append("text")
-            .text(function(d, i){return d*100;})
+            .text(function(d, i){return roundToTwo(d*100);})
             .attr("x", function(d, i){return d*200;})
             .attr("y", function(d, i){return i*25+12.5;})
             .attr("font-family","sans-serif")
@@ -78,12 +118,7 @@ export const PredictionVisualizer: React.FC<PredictionVisualizerProps> = ({resul
     },
     [result]);
 
-    return (
-        <div
-            id='predvis'
-        >
-        </div>
-    )
+    return (<div id='predvis'></div>);
 }
 
 
