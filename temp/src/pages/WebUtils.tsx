@@ -1,15 +1,13 @@
 import { useEffect } from 'react';
 import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
 import * as d3 from "d3";
+import {Description} from "./Description";
 
 //text panel
 export const DescriptionPanel = ()=>{
     return (
-        <Panel defaultSize={30} minSize={20}>
-          <h1 className="text-2xl font-bold">What is an GNN model?</h1>
-          aaaaaaaaaaa
-          <h1 className="text-2xl font-bold">How to interact with this demo?</h1>
-          bbbbbbbbbbb
+        <Panel defaultSize={30} minSize={20} className="overflow-y-scroll" style={{"overflow":"auto"}}>
+          <Description />
         </Panel>
     );
 }
@@ -103,3 +101,21 @@ export const ViewSelector: React.FC<ViewSelectorProps> = ({ handleChange }) => {
         </select>
     );
 };
+
+//explanation component
+interface HintProps{
+    text:string;
+}
+
+export const Hint: React.FC<HintProps> =({text})=>{
+    return (
+        <span 
+            className='class="inline-block bg-gray-300 rounded-full w-6 h-6 flex items-center justify-center text-black' 
+            title={text}
+        >
+            ?
+        </span>
+    )
+}
+
+
