@@ -2,6 +2,7 @@ import React, { useState, ChangeEvent } from 'react';
 import * as ort from 'onnxruntime-web';
 import { analyzeGraph, softmax, loadModel,load_json } from '@/utils/utils';
 import { path } from 'd3';
+import { PredictionVisualizer } from './WebUtils';
 
 interface GraphData {
   x: number[][];
@@ -90,14 +91,38 @@ const ClassifyGraph: React.FC<ClassifyGraphProps>=({graph_path, dataComm, change
 
   return (
     <div>
-      <button onClick={classifyGraph}>Classify Graph</button>
+      <div className="flex gap-x-4">
+          <div>
+            <h1 className="text-xl font-semibold">Predictions</h1>
+          </div>
+          <div>
+      <button onClick={classifyGraph}>Classify a Graph</button>
+      </div>
+      </div>
       <div>
       {probabilities && (!changed) && probabilities.length === 2 ? (
-        <p>
-          Non-Mutagenic: {probabilities[0].toFixed(2)}<br />
-          Mutagenic: {probabilities[1].toFixed(2)}<br />
-          Classification Result for: {graphName}
-        </p>
+        <div>
+        <div className="flex gap-x-4">
+          <div>
+            <h1 className="text-xl font-semibold">Results</h1>
+          </div>
+          <div>
+            <div className="flex gap-x-4">
+              <div >
+                <p>
+                  Non-Mutagenic<br />
+                  Mutagenic<br />
+                </p>
+              </div>
+              <div>
+                <PredictionVisualizer result={probabilities}/>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p>Classification Result for: {graphName}</p>
+        </div>
+
       ) : (
         <p>No data available</p>
       )}
