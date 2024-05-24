@@ -126,10 +126,17 @@ export const PredictionVisualizer: React.FC<PredictionVisualizerProps> = ({resul
 //graph selector
 interface ViewSelectorProps {
     handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+    current: boolean;
   }
   
-export const ViewSelector: React.FC<ViewSelectorProps> = ({ handleChange }) => {
+export const ViewSelector: React.FC<ViewSelectorProps> = ({ handleChange, current }) => {
     return (
+        current ?
+        <select onChange={(e)=>{handleChange(e)}}>
+            <option value="true">Graphs View</option>
+            <option value="false">Matrices View</option>
+        </select>
+        :
         <select onChange={(e)=>{handleChange(e)}}>
             <option value="false">Matrices View</option>
             <option value="true">Graphs View</option>

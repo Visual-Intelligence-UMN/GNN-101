@@ -68,7 +68,7 @@ export default function Home() {
           <ViewSelector handleChange={(e)=>{
             if(e.target.value==="true"){setIsMat(true);console.log("mat true", isMat);setChangedG(true);}
             else{setIsMat(false);console.log("mat false", isMat);setChangedG(true);}
-          }}/>
+          }} current={true}/>
           </div>
           </div>
           <GraphVisualizer graph_path={selectedGraph} intmData={intmData} changed={changedG}/> 
@@ -84,7 +84,7 @@ export default function Home() {
           <ViewSelector handleChange={(e)=>{
             if(e.target.value==="true"){setIsMat(true);console.log("mat true", isMat);setChangedG(true);}
             else{setIsMat(false);console.log("mat false", isMat);setChangedG(true);}
-          }}/>
+          }} current={true}/>
           </div>
           </div>
           <MatricesVisualizer graph_path={selectedGraph} intmData={intmData} changed={changedG}/>
