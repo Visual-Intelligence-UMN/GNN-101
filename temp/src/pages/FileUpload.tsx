@@ -2,6 +2,7 @@ import React, { useState, ChangeEvent } from 'react';
 import * as ort from 'onnxruntime-web';
 import { analyzeGraph, softmax, loadModel,load_json } from '@/utils/utils';
 import { path } from 'd3';
+import { Hint, PredictionVisualizer } from './WebUtils';
 
 interface GraphData {
   x: number[][];
@@ -97,18 +98,52 @@ const ClassifyGraph: React.FC<ClassifyGraphProps>=({graph_path, dataComm, change
 
   return (
     <div>
-      <button onClick={classifyGraph}>Classify Graph</button>
+      <hr className="border-t border-gray-300 my-4"></hr>
+      <div className="flex gap-x-4">
+          <div className="flex gap-x-4">
+            <h1 className="text-xl font-semibold">Predictions</h1>
+            <Hint text='Press the "Classify a Graph" to predict' />
+          </div>
+          <div>
+      <button 
+      onClick={classifyGraph}
+      className="mb-4 bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+      >
+        Classify a Graph
+      </button>
+      <br />
+      </div>
+      </div>
       <div>
       {probabilities && (!changed) && probabilities.length === 2 ? (
-        <p>
-          Non-Mutagenic: {probabilities[0].toFixed(2)}<br />
-          Mutagenic: {probabilities[1].toFixed(2)}<br />
-          Classification Result for: {graphName}
-        </p>
+        <div>
+        <div className="flex gap-x-4">
+          <div className="flex gap-x-4">
+            <h1 className="text-xl font-semibold">Results</h1>
+            <Hint text={"results"} />
+          </div>
+          <div>
+            <div className="flex gap-x-4">
+              <div >
+                <p>
+                  Non-Mutagenic<br />
+                  Mutagenic<br />
+                </p>
+              </div>
+              <div>
+                <PredictionVisualizer result={probabilities}/>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p>Classification Result for: {graphName}</p>
+        </div>
+
       ) : (
         <p>No data available</p>
       )}
     </div>
+    <hr className="border-t border-gray-300 my-4"></hr>
     </div>
   );
 }
