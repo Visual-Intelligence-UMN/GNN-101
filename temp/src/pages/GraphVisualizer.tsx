@@ -116,7 +116,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ graph_path, intmData,
           });
           if (i === graphs.length - 2) {
             connectCrossGraphNodes(allNodes, svg, graphs, offset, height);
-            //featureVisualizer(svg, allNodes, offset);
+            featureVisualizer(svg, allNodes, offset);
           }
           });
 
@@ -153,10 +153,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ graph_path, intmData,
               allGrids.push(grid);
             })
           //connectGridGraphs(allGrids,allNodes,svg,graphs,offset,height)
-          featureVisualizer(svg, allGrids, offset)
-        
-
-
+          featureVisualizer(svg, allGrids, offset);
       }
     });
   };
@@ -179,9 +176,10 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ graph_path, intmData,
     }
   };
     if(intmData==null || changed){
+      
       processDataAndRunD3(1);
     }else{
-      processDataAndRunD3(4);
+      processDataAndRunD3(3);
     }
     console.log('i fire once');
   }, [graph_path, intmData]);
