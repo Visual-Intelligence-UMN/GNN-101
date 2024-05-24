@@ -481,6 +481,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
             for(let k=0; k<3; k++){
               for(let i=0; i<drawGraph.length; i++){
                 for(let j=0; j<drawGraph[0].length; j++){
+                  if(drawGraph[i][j]==1){
                   d3.select(".mats")
                     .append("path")
                     .attr("d", d3.line()([olocations[i+drawGraph.length*k], plocation[j+drawGraph.length*k]]))
@@ -488,6 +489,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                     .attr("opacity", 0.2)
                     .attr("fill", "none");
                 }
+              }
               }
             }
           }
