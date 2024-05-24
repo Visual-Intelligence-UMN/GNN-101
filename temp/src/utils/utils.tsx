@@ -68,6 +68,7 @@ export function get_cood_from_parent(
     return res;
 }
 
+//helper
 //print text coordinates in MatricesVisualizer
 export function printAxisTextCoordinates(): void {
     d3.selectAll<SVGTextElement, any>(".x-axis text").each(function () {
@@ -84,6 +85,7 @@ export function printAxisTextCoordinates(): void {
         );
     });
 }
+
 
 //Split a large 1d array into a 1d array with multiple 8*8 matrices
 type Matrix = number[][];

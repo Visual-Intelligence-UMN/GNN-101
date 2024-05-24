@@ -429,6 +429,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                             .style("font-weight", "normal");
                     });
                     //getting the coordinates
+                    
                 console.log("DATA", Math.sqrt(data.length));
                 const nCol = Math.sqrt(data.length);
                 const cood = get_cood_from_parent(".y-axis", "text");
@@ -447,7 +448,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
             });
             const cood1 = get_cood_from_parent(".mats", "rect");
             console.log("FINAL coord", cood1);
-
+            if(graphs.length>1){
             //calculate the offset
             for(let i=0; i<locations.length; i++){
               locations[i][0] += 10;
@@ -489,6 +490,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 }
               }
             }
+          }
         };
 
         //VIsualization Pipeline
