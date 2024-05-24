@@ -11,7 +11,8 @@ import {
     get_axis_gdata,
     get_category_node,
     get_cood_from_parent,
-    get_coordination
+    uniqueArray,
+    drawPoints
 } from "../utils/utils";
 
 interface MatricesVisualizerProps {
@@ -69,6 +70,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
             const svg = d3
                 .select("#matvis")
                 .append("svg")
+                .attr("class", "mats")
                 .attr("width", width)
                 .attr("height", height);
 
@@ -419,7 +421,22 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                     //getting the coordinates
                 const cood = get_cood_from_parent(".y-axis", "text");
                 console.log("coord",i, cood);
+
+                const cood1 = get_cood_from_parent("svg", "rect");
+                console.log("coord1",i, cood1);
+                console.log("coord1 unique",i, uniqueArray(cood1));
             });
+            const cood1 = get_cood_from_parent(".mats", "rect");
+            console.log("FINAL coord", cood1);
+            //drawPoints(".mats","red",cood1);
+
+            const firstThree = cood1.slice(0, 16);
+            console.log("Sliced", firstThree);
+            //drawPoints(".mats", "blue", firstThree);
+
+            const textCood = get_cood_from_parent(".y-axis", "text");
+            console.log("Text Cood", textCood);
+            drawPoints(".mats", "blue", textCood);
         };
 
         //VIsualization Pipeline

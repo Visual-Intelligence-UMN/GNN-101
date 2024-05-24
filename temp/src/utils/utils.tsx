@@ -7,6 +7,24 @@ env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
 };
 
+//for debugging purpose, input an array with coordination, draw points based on those coordinations
+export function drawPoints(cName:string, color:string, points: number[][]): void {
+  const svg = d3.select(cName);
+  svg.selectAll("circle")
+      .data(points)
+      .enter()
+      .append("circle")
+      .attr("cx", d => d[0])
+      .attr("cy", d => d[1])
+      .attr("r", 5) // 点的半径
+      .attr("fill", color); // 设置点的颜色为红色
+}
+
+//set implementation
+export function uniqueArray<T>(array: T[]): T[] {
+  return array.filter((value, index, self) => self.indexOf(value) === index);
+}
+
 //direct get coordinates - you can use this function to get the coordination of a specific element in the SVG
 export function get_coordination(element: any) {
     const bbox = element.getBBox();
