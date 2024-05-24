@@ -8,6 +8,7 @@ env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
 };
 
+//helper
 //for debugging purpose, input an array with coordination, draw points based on those coordinations
 export function drawPoints(cName:string, color:string, points: number[][]): void {
   const svg = d3.select(cName);
@@ -17,15 +18,17 @@ export function drawPoints(cName:string, color:string, points: number[][]): void
       .append("circle")
       .attr("cx", d => d[0])
       .attr("cy", d => d[1])
-      .attr("r", 5) // 点的半径
-      .attr("fill", color); // 设置点的颜色为红色
+      .attr("r", 1) // the raidus of the point
+      .attr("fill", color); // set color to color
 }
 
+//helper
 //set implementation
 export function uniqueArray<T>(array: T[]): T[] {
   return array.filter((value, index, self) => self.indexOf(value) === index);
 }
 
+//helper
 //direct get coordinates - you can use this function to get the coordination of a specific element in the SVG
 export function get_coordination(element: any) {
     const bbox = element.getBBox();
@@ -48,6 +51,7 @@ export function get_coordination(element: any) {
     return [adjustedX, adjustedY];
 }
 
+//helper
 //get coordinates for type child in the parent node parent
 export function get_cood_from_parent(
     parent: string,
@@ -340,6 +344,7 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
 
       node.tooltip = tooltip;
       const stroke_width = calculateAverage(node.features) * 1;
+      //here's the interaction part for paths that connect between graphs
       node.svgElement.on("mouseover", function() {
         node.tooltip.style('visibility', 'visible');
         if (node.links) {
@@ -363,8 +368,8 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
 function calculateAverage(arr: number[]): number {
   const sum = arr.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
   const average = sum / arr.length;
-  console.log("AWD")
-  console.log(average);
+  //console.log("AWD")
+  //console.log(average);
 
   if (average * 100 < 1 || average > 0.1) {
     return 1;
@@ -455,26 +460,13 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
               .style("opacity", 0.1)
               .style("stroke-width", stroke_width)
               .style("fill", "none")
-              .on("mouseover", function() {
-                node.links.forEach((link: any) => {
-                
-                  link.style("stroke-width", (stroke_width)).style("opacity", 1);
-            
-                });
-              })
-              .on("mouseout", function() {
-                node.links.forEach((link: any) => {
-      
-                  link.style("stroke-width", stroke_width).style("opacity", 0.1);
-      
-                })});
 
             node.links.push(path);
             neighborNode.links.push(path);
           }
         });
 
-
+        //cover original nodes to avoid rendering order issue, may need fix later
         node.svgElement = svg.append("circle")
           .attr("cx", node.x + xOffset1)
           .attr("cy", node.y + 10)
@@ -485,7 +477,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
   });
 }
 
-function deepClone(obj: any) {
+export function deepClone(obj: any) {
     return JSON.parse(JSON.stringify(obj));
 }
 

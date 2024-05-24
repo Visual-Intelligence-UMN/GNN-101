@@ -12,7 +12,8 @@ import {
     get_category_node,
     get_cood_from_parent,
     uniqueArray,
-    drawPoints
+    drawPoints,
+    deepClone
 } from "../utils/utils";
 
 interface MatricesVisualizerProps {
@@ -64,8 +65,10 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
             const width = (gridSize + margin.left + margin.right) * gLen;
             const height = (gridSize + margin.top + margin.bottom) * 2;
 
+            let locations: number[][] = [];
+
             // Append the SVG object to the body of the page
-            console.log(graphs);
+            console.log("GRAPHS",graphs);
             d3.select("#matvis").selectAll("svg").remove();
             const svg = d3
                 .select("#matvis")
@@ -171,6 +174,13 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                     .on("mouseover", mouseover)
                     .on("mousemove", mousemove)
                     .on("mouseleave", mouseleave);
+
+                    const mats = d3.select(".mats");
+                    const rectCount = mats.selectAll("rect").size();
+                    console.log("NUM RECT", rectCount);
+                    const cd = get_cood_from_parent(".mats", "rect");
+                    console.log("NUM RECT coord1",i, cd);
+                    console.log("NUM RECT coord1 unique",i, uniqueArray(cd));
 
                 g.selectAll(".x-axis text")
                     .on("mouseover", function (event) {
@@ -419,24 +429,66 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                             .style("font-weight", "normal");
                     });
                     //getting the coordinates
+                console.log("DATA", Math.sqrt(data.length));
+                const nCol = Math.sqrt(data.length);
                 const cood = get_cood_from_parent(".y-axis", "text");
                 console.log("coord",i, cood);
-
-                const cood1 = get_cood_from_parent("svg", "rect");
-                console.log("coord1",i, cood1);
-                console.log("coord1 unique",i, uniqueArray(cood1));
+                    //here's the data processing for getting locations
+                const cood1 = get_cood_from_parent(".mats", "rect");
+                console.log("FFF coord1",i, cood1);
+                console.log("FFF coord1 unique",i, uniqueArray(cood1));
+                const currMat = cood1.slice(-(nCol*nCol));
+                const sliced = currMat.slice(-(nCol));
+                console.log("FFF currMat",i, currMat);
+                console.log("FFF mats mats", i,sliced);
+                locations = locations.concat(sliced);
+                console.log("LOCATIONS", locations);
+//                drawPoints(".mats", "red", sliced);
             });
             const cood1 = get_cood_from_parent(".mats", "rect");
             console.log("FINAL coord", cood1);
-            //drawPoints(".mats","red",cood1);
 
-            const firstThree = cood1.slice(0, 16);
-            console.log("Sliced", firstThree);
-            //drawPoints(".mats", "blue", firstThree);
+            //calculate the offset
+            for(let i=0; i<locations.length; i++){
+              locations[i][0] += 10;
+              locations[i][1] += 10;
+            }
+            //drawPoints(".mats","red",locations);
 
-            const textCood = get_cood_from_parent(".y-axis", "text");
-            console.log("Text Cood", textCood);
-            drawPoints(".mats", "blue", textCood);
+            let olocations = deepClone(locations);
+
+            //we also need to find another locations array
+            for(let i=0; i<locations.length; i++){
+              locations[i][0] += 35;
+            }
+
+            let plocation = deepClone(locations);
+
+            //draw path one - one
+            for(let i=0; i<plocation.length; i++){
+              d3.select(".mats")
+              .append("path")
+              .attr("d", d3.line()([olocations[i], plocation[i]]))
+              .attr("stroke", "black")
+              .attr("opacity", 0.2)
+              .attr("fill", "none");
+            }
+
+
+            //fdraw path one - multiple
+            const drawGraph = graphs[0];
+            for(let k=0; k<3; k++){
+              for(let i=0; i<drawGraph.length; i++){
+                for(let j=0; j<drawGraph[0].length; j++){
+                  d3.select(".mats")
+                    .append("path")
+                    .attr("d", d3.line()([olocations[i+drawGraph.length*k], plocation[j+drawGraph.length*k]]))
+                    .attr("stroke", "black")
+                    .attr("opacity", 0.2)
+                    .attr("fill", "none");
+                }
+              }
+            }
         };
 
         //VIsualization Pipeline
