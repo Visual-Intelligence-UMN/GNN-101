@@ -5,6 +5,17 @@ import * as d3 from "d3";
 import {Description} from "./Description";
 
 
+//single graph visualizer
+export function visualizeGraph(){
+
+}
+
+//single matrix visualizer
+export function visualizeMatrix(){
+
+}
+
+//button chain on the general UI
 export const ButtonChain=()=>{
     return (
         <div className="flex gap-x-4">
@@ -12,25 +23,25 @@ export const ButtonChain=()=>{
           <div>
           <div className="flex justify-center gap-2">
             <Hint text={"Here's the Architecture of the GNN"} />
-            <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded">
+            <button className="bg-gray-200 border border-gray-300 hover:border-black hover:bg-gray-300 text-black py-1 px-2 rounded">
               Input
             </button>
-            <button className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded">
+            <button className="bg-yellow-200 border border-gray-300 hover:border-black hover:bg-yellow-300 text-black py-1 px-2 rounded">
               GNNConv1
             </button>
-            <button className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded">
+            <button className="bg-yellow-200 border border-gray-300 hover:border-black hover:bg-yellow-300 text-black py-1 px-2 rounded">
             GNNConv2
             </button>
-            <button className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded">
+            <button className="bg-yellow-200 border border-gray-300 hover:border-black hover:bg-yellow-300 text-black py-1 px-2 rounded">
             GNNConv3
             </button>
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
+            <button className="bg-blue-200 border border-gray-300 hover:border-black hover:bg-blue-300 text-black py-1 px-2 rounded">
               Global Mean Pooling
             </button>
-            <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded">
+            <button className="bg-green-200 border border-gray-300 hover:border-black hover:bg-green-300 text-black py-1 px-2 rounded">
               FC
             </button>
-            <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded">
+            <button className="bg-gray-200 border border-gray-300 hover:border-black hover:bg-gray-300 text-black py-1 px-2 rounded">
               Output
             </button>
           </div>
@@ -39,6 +50,7 @@ export const ButtonChain=()=>{
     );
 }
 
+//Math function:::
 function roundToTwo(num: number): number {
     return Math.round(num * 100) / 100;
 }
@@ -102,7 +114,7 @@ export const PredictionVisualizer: React.FC<PredictionVisualizerProps> = ({resul
             .attr("y", function(d, i){return i*25;})
             .attr("height", 20)
             .attr("width", function(d, i){return d*200;})
-            .attr("fill", "teal");
+            .attr("fill", "gray");
         
         const texts = svg.selectAll("text")
             .data(result)

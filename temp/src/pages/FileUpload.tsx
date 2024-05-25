@@ -107,7 +107,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps>=({graph_path, dataComm, change
           <div>
       <button 
       onClick={classifyGraph}
-      className="mb-4 bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+      className="mb-4 bg-red-200 border border-gray-300 hover:border-black hover:bg-red-300 text-black py-1 px-2 rounded"
       >
         Classify a Graph
       </button>

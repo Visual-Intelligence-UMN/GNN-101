@@ -158,7 +158,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ graph_path, intmData,
     });
   };
 
-  const processDataAndRunD3 = async (num: number) => {
+  const visualizeGNN = async (num: number) => {
     try {
       setIsLoading(true);
       // Process data
@@ -170,16 +170,16 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ graph_path, intmData,
       // Initialize and run D3 visualization with processe  d data
       await init(graphsData);
     } catch (error) {
-      console.error('Error in processDataAndRunD3:', error);
+      console.error('Error in visualizeGNN:', error);
     } finally {
       setIsLoading(false);
     }
   };
     if(intmData==null || changed){
       
-      processDataAndRunD3(1);
+      visualizeGNN(1);
     }else{
-      processDataAndRunD3(3);
+      visualizeGNN(3);
     }
     console.log('i fire once');
   }, [graph_path, intmData]);
