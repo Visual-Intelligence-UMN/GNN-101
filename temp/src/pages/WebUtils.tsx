@@ -1,9 +1,70 @@
 //A web utilities file for general UI building
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Panel } from 'react-resizable-panels';
 import * as d3 from "d3";
 import {Description} from "./Description";
+import { analyzeGraph, load_json } from '@/utils/utils';
 
+interface GraphAnalysisViewerProps{
+    path: string;
+}
+
+interface GraphData {
+    node_count: number;
+    edge_count: number;
+    avg_node_degree: number;
+    has_isolated_node: boolean;
+    has_loop: boolean;
+    is_directed: boolean;
+}
+
+export const GraphAnalysisViewer: React.FC<GraphAnalysisViewerProps> = ({ path }) => {
+    const [gPath, setGPath] = useState(path);
+    const [data, setData] = useState<GraphData | null>(null);
+
+    useEffect(()=>{
+    const analysis = async()=>{
+        const graphData: any = await load_json(path);
+        console.log("GDATA", graphData);
+        const result: any = analyzeGraph(graphData);
+        console.log("Start Analysis!");
+        setData(result);
+        console.log("Finished Analysis!");
+    }
+    console.log("PPP",path);
+    analysis();
+    },[path]);
+
+    return(
+        <div>
+        {
+        data?
+        <div>
+            <div className="flex flex-row flex-wrap items-center">
+                <div className='mr-4'>
+                    <text className='font-semibold'>Node Count</text>: {data.node_count}
+                </div>
+                <div className='mr-4'>
+                <text className='font-semibold'>Edge Count</text>: {data.edge_count}
+                </div>
+                <div className='mr-4'>
+                <text className='font-semibold'>Average Node Degree</text>: {roundToTwo(data.avg_node_degree)}
+                </div>
+                <div className='mr-4'>
+                <text className='font-semibold'>Has Isolated Node</text>: {data.has_isolated_node ? "Yes":"No"}
+                </div>
+                <div className='mr-4'>
+                <text className='font-semibold'>Has Loop</text>: {data.has_loop ? "Yes":"No"}
+                </div>
+                <div className='mr-4'>
+                <text className='font-semibold'>Is Directed</text>: {data.is_directed? "Yes":"No"}
+                </div>
+            </div>
+        </div>:<div>No data available</div>
+        }
+        </div>
+    );
+}
 
 //single graph visualizer
 export function visualizeGraph(){
@@ -155,17 +216,12 @@ export const ViewSwitch: React.FC<ViewSwitchProps> = ({ handleChange, current })
       <label
         htmlFor="toggle"
         className="block h-8 rounded-full transition-colors duration-300 ease-in-out"
-        style={{ backgroundColor: current ? '#10b981' : '#3b82f6' }} // Green when true, Blue when false
+        style={{ backgroundColor: current ? 'gray' : 'gray' }} // Green when true, Blue when false
       >
         {/* Only one span for the slider circle */}
         <span
           className={`absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow transform transition-all duration-300 ease-in-out ${current ? 'translate-x-12' : ''}`}
         ></span>
-        {/* Text elements */}
-        <span className={`absolute inset-y-0 left-0 right-0 flex items-center justify-between px-4 text-xs font-medium text-white`}>
-          <span className={`${current ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300 ease-in-out`}>A</span>
-          <span className={`${current ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300 ease-in-out`}>B</span>
-        </span>
       </label>
     </div>
       );
