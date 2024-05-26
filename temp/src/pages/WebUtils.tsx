@@ -133,6 +133,43 @@ export const PredictionVisualizer: React.FC<PredictionVisualizerProps> = ({resul
     return (<div id='predvis'></div>);
 }
 
+import React from 'react';
+
+interface ViewSwitchProps {
+  handleChange: (newView: boolean) => void;
+  current: boolean;
+}
+
+export const ViewSwitch: React.FC<ViewSwitchProps> = ({ handleChange, current }) => {
+    return (
+        <div className="relative inline-block w-20 h-8 select-none rounded-full cursor-pointer overflow-hidden">
+      {/* Input remains hidden but is functional for toggle */}
+      <input
+        type="checkbox"
+        id="toggle"
+        className="opacity-0 absolute w-6 h-6"
+        checked={current}
+        onChange={() => handleChange(!current)}
+      />
+      {/* Label serves as the background and slider control, with added text */}
+      <label
+        htmlFor="toggle"
+        className="block h-8 rounded-full transition-colors duration-300 ease-in-out"
+        style={{ backgroundColor: current ? '#10b981' : '#3b82f6' }} // Green when true, Blue when false
+      >
+        {/* Only one span for the slider circle */}
+        <span
+          className={`absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow transform transition-all duration-300 ease-in-out ${current ? 'translate-x-12' : ''}`}
+        ></span>
+        {/* Text elements */}
+        <span className={`absolute inset-y-0 left-0 right-0 flex items-center justify-between px-4 text-xs font-medium text-white`}>
+          <span className={`${current ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300 ease-in-out`}>A</span>
+          <span className={`${current ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300 ease-in-out`}>B</span>
+        </span>
+      </label>
+    </div>
+      );
+};
 
 
 //graph selector

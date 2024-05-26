@@ -4,7 +4,7 @@ import GraphVisualizer from './GraphVisualizer';
 import ClassifyGraph, { IntmData } from './FileUpload';
 import MatricesVisualizer from './MatricesVisualizer';
 import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
-import { DescriptionPanel, GraphSelector, graph_list_generate, ViewSelector, Hint, ButtonChain } from "./WebUtils"
+import { DescriptionPanel, GraphSelector, graph_list_generate, ViewSelector, Hint, ButtonChain, ViewSwitch } from "./WebUtils"
 
 export default function Home() {
   const [graphData, setGraphData] = useState<any>(null);
@@ -68,8 +68,8 @@ export default function Home() {
           <Hint text={"Change the View of GNN model"}/>
           </div>
           <div>
-          <ViewSelector handleChange={(e)=>{
-            if(e.target.value==="true"){setIsMat(true);console.log("mat true", isMat);setChangedG(true);}
+          <ViewSwitch handleChange={(e)=>{
+            if(e===true){setIsMat(true);console.log("mat true", isMat);setChangedG(true);}
             else{setIsMat(false);console.log("mat false", isMat);setChangedG(true);}
           }} current={true}/>
           </div>
@@ -84,10 +84,10 @@ export default function Home() {
           <Hint text={"Change the View of GNN model"}/>
           </div>
           <div>
-          <ViewSelector handleChange={(e)=>{
-            if(e.target.value==="true"){setIsMat(true);console.log("mat true", isMat);setChangedG(true);}
+          <ViewSwitch handleChange={(e)=>{
+            if(e===true){setIsMat(true);console.log("mat true", isMat);setChangedG(true);}
             else{setIsMat(false);console.log("mat false", isMat);setChangedG(true);}
-          }} current={true}/>
+          }} current={false}/>
           </div>
           </div>
           <MatricesVisualizer graph_path={selectedGraph} intmData={intmData} changed={changedG}/>

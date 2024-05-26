@@ -210,7 +210,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
 
                         const adjustedX = cx + translate[0];
                         const adjustedY = cy + translate[1] - 10; // 上移10以放置于文本上方
-                        const cellSize = 10; // 每个格子的尺寸
+                        const cellSize = 2; // 每个格子的尺寸
 
                         if (d3.select(this).attr("class") != "first") {
                             // 创建一个8x8的矩阵tooltip
@@ -247,21 +247,28 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
 
                                 console.log("MAT", mat);
 
+                                let k = 0;
+
                                 for (let i = 0; i < matrixSize; i++) {
-                                    for (let j = 0; j < matrixSize; j++) {
-                                        let c: number = mat[i][j] * 1000;
-                                        tooltipG
-                                            .append("rect")
-                                            .attr("x", -(j + 5) * cellSize)
-                                            .attr("y", i * cellSize)
-                                            .attr("width", cellSize)
-                                            .attr("height", cellSize)
-                                            .attr("fill", myColor(c))
-                                            .attr("opacity", 1)
-                                            .attr("stroke", "black")
-                                            .attr("stroke-width", 1);
-                                    }
-                                }
+                                  for (let j = 0; j < matrixSize; j++) {
+                                      let c: number = mat[i][j] * 1000;
+                                      tooltipG
+                                          .append("rect")
+                                          .attr("x", k * cellSize - 75 * cellSize)
+                                          .attr("y", 5 * cellSize)
+                                          .attr("width", cellSize)
+                                          .attr("height", 10)
+                                          .attr("fill", myColor(c))
+                                          .attr("opacity", 1)
+                                          .attr("stroke", "black")
+                                          .attr("class", "tooltips")
+                                          .attr("stroke-width", 0.1);
+                                      
+                                      k++;
+                                  }
+                              }
+
+                              d3.selectAll(".tooltips").raise();
                             }
                         } else {
                             const tooltipG = d3
@@ -276,24 +283,26 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                             let t = d3.select(this).text();
                             let num = Number(t);
                             console.log("TEXT", t);
+                            let k = 0;
                             for (let i = 0; i < 7; i++) {
-                                const cate =
-                                    get_category_node(features[num]) * 100;
-                                console.log("CATE", cate);
+                              const cate =
+                                  get_category_node(features[num]) * 100;
+                              console.log("CATE", cate);
 
-                                tooltipG
-                                    .append("rect")
-                                    .attr("x", -25)
-                                    .attr("y", i * cellSize)
-                                    .attr("width", cellSize)
-                                    .attr("height", cellSize)
-                                    .attr("fill", myColor(cate))
-                                    .attr("opacity", 1)
-                                    .attr("stroke", "black")
-                                    .attr("stroke-width", 1);
+                              tooltipG
+                                  .append("rect")
+                                  .attr("x", k * cellSize - 21 * cellSize)
+                                  .attr("y", 5 * cellSize)
+                                  .attr("width", cellSize)
+                                  .attr("height", 10)
+                                  .attr("fill", myColor(cate))
+                                  .attr("opacity", 1)
+                                  .attr("stroke", "black")
+                                  .attr("stroke-width", 1);
 
-                                console.log("node feature", features[num]);
-                            }
+                              console.log("node feature", features[num]);
+                              k++;
+                          }
                         }
 
                         d3.select(element)
@@ -408,6 +417,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                             let t = d3.select(this).text();
                             let num = Number(t);
                             console.log("TEXT", t);
+                            let k = 0;
                             for (let i = 0; i < 7; i++) {
                                 const cate =
                                     get_category_node(features[num]) * 100;
@@ -415,16 +425,17 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
 
                                 tooltipG
                                     .append("rect")
-                                    .attr("x", -25)
-                                    .attr("y", i * cellSize)
+                                    .attr("x", k * cellSize - 21 * cellSize)
+                                    .attr("y", -5 * cellSize)
                                     .attr("width", cellSize)
-                                    .attr("height", cellSize)
+                                    .attr("height", 10)
                                     .attr("fill", myColor(cate))
                                     .attr("opacity", 1)
                                     .attr("stroke", "black")
                                     .attr("stroke-width", 1);
 
                                 console.log("node feature", features[num]);
+                                k++;
                             }
                         }
 
@@ -504,6 +515,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
               }
               }
             }
+            d3.selectAll("path").lower();
           }
         };
 
