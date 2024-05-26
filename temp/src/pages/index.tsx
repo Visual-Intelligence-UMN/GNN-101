@@ -39,7 +39,10 @@ export default function Home() {
       <Head>
         <title>Graph Neural Network Visualization</title>
       </Head>
-      <h1 className="text-2xl font-bold">Graph Neural Network Visualization</h1>
+      <div className="flex gap-x-4">
+        <h1 className="text-2xl font-bold">Graph Neural Network Visualization</h1>
+        <p>- placeholder -</p>
+      </div>
       <hr className="border-t border-gray-300 my-4"></hr>
       {changedG?<></>:<ButtonChain />}
       <div className="flex gap-x-4">
