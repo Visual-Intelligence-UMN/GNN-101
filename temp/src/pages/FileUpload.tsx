@@ -75,9 +75,14 @@ const ClassifyGraph: React.FC<ClassifyGraphProps>=({graph_path, dataComm, change
         console.log("Conv3");
         console.log(outputMap.conv3.cpuData);
 
+        console.log("Pooling");
+        console.log(outputMap);
+        
         console.log("Final");
         console.log(outputTensor);
         console.log(outputTensor.cpuData);
+
+
 
         const prob = softmax(outputTensor.cpuData);
         const intmData: IntmData= {

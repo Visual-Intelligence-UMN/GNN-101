@@ -345,20 +345,20 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
       }
 
       node.tooltip = tooltip;
-      const stroke_width = calculateAverage(node.features) * 1;
+     
       //here's the interaction part for paths that connect between graphs
       node.svgElement.on("mouseover", function() {
         node.tooltip.style('visibility', 'visible');
         if (node.links) {
         node.links.forEach((link: any) => {
-          link.style("stroke-width", stroke_width).style("opacity", 1);
+          link.style("opacity", 1);
         });
       }
       }).on("mouseout", function() {
         node.tooltip.style('visibility', 'hidden');
         if (node.links) {
         node.links.forEach((link: any) => {
-          link.style("stroke-width", stroke_width).style("opacity", 0.1);
+          link.style("opacity", 0.1);
         });
       }
       });
