@@ -294,12 +294,12 @@ export async function prep_graphs(g_num: number, data: any) {
       };
       graphs.push(graphData);
       
-     }
-    var gridGraphData = {};
-     gridGraphData = {
-      grids: deepClone(data.grids)
-     }
-        graphs.push(gridGraphData);
+  }
+  var gridGraphData = {};
+  gridGraphData = {
+    grids: deepClone(data.grids)
+  }
+  graphs.push(gridGraphData);
 
   return graphs;
 }
