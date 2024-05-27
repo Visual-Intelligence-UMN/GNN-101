@@ -20,6 +20,7 @@ import {
     HeatmapData,
     mouseoverEvent,
 } from "@/utils/matUtils";
+import {visualizeMatrix} from "./WebUtils";
 
 interface MatricesVisualizerProps {
     graph_path: string;
@@ -223,8 +224,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
         };
 
         if (intmData == null || changed) {
-            //visualizeMatrix(graph_path);
-            visualizeGNN(1);
+            visualizeMatrix(graph_path);
         } else {
             visualizeGNN(4);
         }

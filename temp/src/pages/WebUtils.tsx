@@ -3,7 +3,26 @@ import { useEffect, useState } from "react";
 import { Panel } from "react-resizable-panels";
 import * as d3 from "d3";
 import { Description } from "./Description";
-import { analyzeGraph, data_prep, load_json, prep_graphs, featureVisualizer, get_axis_gdata, matrix_to_hmap,graph_to_matrix ,prepMatrices, get_features_origin } from "@/utils/utils";
+import {
+    analyzeGraph,
+    data_prep,
+    load_json,
+    prep_graphs,
+    featureVisualizer,
+    get_axis_gdata,
+    matrix_to_hmap,
+    graph_to_matrix,
+    prepMatrices,
+    get_features_origin,
+} from "@/utils/utils";
+import {
+    removeEffect,
+    mouseover,
+    mousemove,
+    mouseleave,
+    HeatmapData,
+    mouseoverEvent,
+} from "@/utils/matUtils";
 
 //Math function:::
 function roundToTwo(num: number): number {
@@ -409,13 +428,13 @@ export function visualizeGraph(path: string) {
                         allNodes.push(node);
                     });
                 });
-                featureVisualizer(svg, allNodes, offset);
+            featureVisualizer(svg, allNodes, offset);
         }
     };
 
-    const visualizeG = async()=>{
-        try{
-            console.log("started visualize....")
+    const visualizeG = async () => {
+        try {
+            console.log("started visualize....");
             const pData = await data_prep(path);
             console.log("s pdata", pData);
             const gData = await prep_graphs(1, pData);
@@ -423,137 +442,152 @@ export function visualizeGraph(path: string) {
             await init(gData[0]);
         } catch (error) {
             console.log("Error in single graph visualizer", error);
-        } 
-    }
+        }
+    };
 
     visualizeG();
 }
 
-
-
 //-------------------------------------------------------------
 //single matrix visualizer
 export function visualizeMatrix(path: string) {
-    const init = async(graph:any)=>{
-            const gridSize = 300;
-            const margin = { top: 10, right: 80, bottom: 30, left: 80 };
-            const width = (gridSize + margin.left + margin.right);
-            const height = (gridSize + margin.top + margin.bottom) * 2;
+    const init = async (graph: any, features: any) => {
+        const gridSize = 300;
+        const margin = { top: 10, right: 80, bottom: 30, left: 80 };
+        const width = gridSize + margin.left + margin.right;
+        const height = (gridSize + margin.top + margin.bottom) * 2;
 
-            d3.select("#matvis").selectAll("svg").remove();
-            const svg = d3
-                .select("#matvis")
-                .append("svg")
-                .attr("class", "mats")
-                .attr("width", width)
-                .attr("height", height);
-                const xOffset = 50;
-                const g = svg
-                    .append("g")
-                    .attr(
-                        "transform",
-                        `translate(${xOffset},${margin.top})`
-                    );
-                    var myGroups = get_axis_gdata(graph);
-                    var myVars = get_axis_gdata(graph);
+        d3.select("#matvis").selectAll("svg").remove();
+        const svg = d3
+            .select("#matvis")
+            .append("svg")
+            .attr("class", "mats")
+            .attr("width", width)
+            .attr("height", height);
+        const xOffset = 50;
+        const g = svg
+            .append("g")
+            .attr("transform", `translate(${xOffset},${margin.top})`);
+        var myGroups = get_axis_gdata(graph);
+        var myVars = get_axis_gdata(graph);
 
+        var x = d3
+            .scaleBand()
+            .range([0, gridSize])
+            .domain(myGroups)
+            .padding(0.01);
 
-                    var x = d3.scaleBand()
-                    .range([0, gridSize])
-                    .domain(myGroups)
-                    .padding(0.01);
+        g.append("g")
+            .attr("class", "x-axis")
+            .attr("transform", `translate(0,${gridSize})`)
+            .call(d3.axisBottom(x));
 
-                g.append("g")
-                    .attr("class", "x-axis")
-                    .attr("transform", `translate(0,${gridSize})`)
-                    .call(d3.axisBottom(x));
+        var y = d3
+            .scaleBand()
+            .range([0, gridSize])
+            .domain(myVars)
+            .padding(0.01);
 
-                    var y = d3
-                    .scaleBand()
-                    .range([0, gridSize])
-                    .domain(myVars)
-                    .padding(0.01);
+        g.append("g").attr("class", "y-axis").call(d3.axisLeft(y));
 
-                g.append("g").attr("class", "y-axis").call(d3.axisLeft(y));
+        d3.selectAll<SVGTextElement, any>(".x-axis text").classed(
+            "first",
+            true
+        );
+        d3.selectAll<SVGTextElement, any>(".y-axis text").classed(
+            "first",
+            true
+        );
 
+        var myColor = d3
+            .scaleLinear<string>()
+            .range(["white", "#69b3a2"])
+            .domain([1, 100]);
 
-                d3.selectAll<SVGTextElement, any>(".x-axis text").classed(
-                    "first",
-                    true
+        const data = matrix_to_hmap(graph);
+        console.log("accepted data:", data);
+        const filteredData = data.filter((d): d is HeatmapData => !!d);
+
+        g.selectAll("rect")
+            .data(data, (d: any) => d.group + ":" + d.variable)
+            .enter()
+            .append("rect")
+            .attr("x", (d: HeatmapData) => x(d.group)!)
+            .attr("y", (d: HeatmapData) => y(d.variable)!)
+            .attr("width", x.bandwidth())
+            .attr("height", y.bandwidth())
+            .style("fill", (d: HeatmapData) => myColor(d.value))
+            .style("stroke-width", 1)
+            .style("stroke", "grey")
+            .style("opacity", 0.8)
+            .on("mouseover", mouseover)
+            .on("mousemove", mousemove)
+            .on("mouseleave", mouseleave);
+
+        g.selectAll(".x-axis text")
+            .on("mouseover", function (event) {
+                console.log("EVENT", event);
+                const element = event.target as SVGGraphicsElement;
+                console.log("ELEMENT", element);
+                mouseoverEvent(
+                    element,
+                    this,
+                    0,
+                    [],
+                    [],
+                    [],
+                    [],
+                    features,
+                    myColor,
+                    5
                 );
-                d3.selectAll<SVGTextElement, any>(".y-axis text").classed(
-                    "first",
-                    true
+            })
+            .on("mouseout", function (event) {
+                const element = event.target as SVGGraphicsElement;
+                removeEffect(element);
+                d3.select("#tmp").remove();
+            });
+
+        g.selectAll(".y-axis text")
+            .on("mouseover", function (event, d) {
+                const element = event.target as SVGGraphicsElement;
+                console.log("ELEMENT", element);
+                mouseoverEvent(
+                    element,
+                    this,
+                    0,
+                    [],
+                    [],
+                    [],
+                    [],
+                    features,
+                    myColor,
+                    -5
                 );
+            })
+            .on("mouseout", function (event, d) {
+                const element = event.target as SVGGraphicsElement;
+                removeEffect(element);
+            });
+    };
 
-                var myColor = d3
-                    .scaleLinear<string>()
-                    .range(["white", "#69b3a2"])
-                    .domain([1, 100]);
-
-                interface HeatmapData {
-                    group: string;
-                    variable: string;
-                    value: number;
-                }
-
-                const data = matrix_to_hmap(graph);
-                console.log("accepted data:", data);
-                const filteredData = data.filter((d): d is HeatmapData => !!d);
-
-                // Three function that change the tooltip when user hover / move / leave a cell
-                var mouseover = (event: MouseEvent, d: { value: number }) => {
-                    d3.select(event.currentTarget as HTMLElement)
-                        .style("stroke", "black")
-                        .style("opacity", 1);
-                };
-
-                var mousemove = (event: MouseEvent, d: { value: number }) => {
-                    const rect = (
-                        event.target as HTMLElement
-                    ).getBoundingClientRect();
-                };
-
-                var mouseleave = (event: MouseEvent, d: { value: number }) => {
-                    d3.select(event.currentTarget as HTMLElement)
-                        .style("stroke", "grey")
-                        .style("opacity", 0.8);
-                };
-
-                g.selectAll("rect")
-                    .data(data, (d: any) => d.group + ":" + d.variable)
-                    .enter()
-                    .append("rect")
-                    .attr("x", (d: HeatmapData) => x(d.group)!)
-                    .attr("y", (d: HeatmapData) => y(d.variable)!)
-                    .attr("width", x.bandwidth())
-                    .attr("height", y.bandwidth())
-                    .style("fill", (d: HeatmapData) => myColor(d.value))
-                    .style("stroke-width", 1)
-                    .style("stroke", "grey")
-                    .style("opacity", 0.8)
-                    .on("mouseover", mouseover)
-                    .on("mousemove", mousemove)
-                    .on("mouseleave", mouseleave);
-            
-    }
-
-    const visualizeMat = async(path:string)=>{
+    const visualizeMat = async (path: string) => {
         //const features = await get_features_origin(data);
         //console.log("o features", features);
-        try{
-        const data = await load_json(path);
-
-        const processedData = await graph_to_matrix(data);
-        console.log("pData matvis", processedData);
-        const graphsData = await prepMatrices(1, processedData);
-        console.log("gData", graphsData);
-        // Initialize and run D3 visualization with processe  d data
-        await init(graphsData);
-    }catch(error){
-        console.log("Error in single matrix visualizer", error);
-    }
-    }
+        try {
+            const data = await load_json(path);
+            const features = await get_features_origin(data);
+            console.log("VIS features", features);
+            const processedData = await graph_to_matrix(data);
+            console.log("VIS pData matvis", processedData);
+            //const graphsData = await prepMatrices(1, processedData);
+            //console.log("VIS gData", graphsData);
+            // Initialize and run D3 visualization with processe  d data
+            await init(processedData, features);
+        } catch (error) {
+            console.log("Error in single matrix visualizer", error);
+        }
+    };
 
     visualizeMat(path);
 }
