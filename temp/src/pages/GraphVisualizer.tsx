@@ -57,7 +57,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                 console.log(data);
 
                 if (data.nodes) {
-                    const xOffset = (i - 1) * offset;
+                    const xOffset = (i - 2.5) * offset;
                     const g1 = svg
                         .append("g")
                         .attr(
@@ -84,11 +84,11 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                         .append("path")
                         .attr(
                             "d",
-                            `M${offset * (i + 1.5)}, ${height / 4} L${
-                                (2.5 + i) * offset
-                            }, ${height / 7} L${(2.5 + i) * offset}, ${
+                            `M${offset * (i + 0.1)}, ${height / 4} L${
+                                (0.9 + i) * offset
+                            }, ${height / 7} L${(0.9+ i) * offset}, ${
                                 height / 1.3
-                            } L${offset * (i + 1.5)}, ${height / 1.2} Z`
+                            } L${offset * (i + 0.1)}, ${height / 1.2} Z`
                         )
                         .attr("stroke", "black")
                         .attr("fill", "none");
@@ -177,16 +177,12 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                     console.log("Processing grid graph", data);
 
                     const allGrids: any[] = [];
-                    const gridSize = 8;
-                    const cellSize = offset / gridSize / 2;
-
+                    const cellSize = offset / 64; 
+                
                     const gridGroup = svg
                         .append("g")
-                        .attr(
-                            "transform",
-                            `translate(${5 * offset},${offset / 2.5})`
-                        );
-
+                        .attr("transform", `translate(${offset * 1.5},${offset / 10})`);
+                
                     const grid = gridGroup
                         .selectAll("rect")
                         .data(data.grids)
@@ -195,24 +191,17 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                         .attr("height", cellSize)
                         .attr("stroke", "black")
                         .attr("fill", "none")
-                        .attr("x", (d, index) => (index % gridSize) * cellSize)
-                        .attr(
-                            "y",
-                            (d, index) =>
-                                Math.floor(index / gridSize) * cellSize
-                        );
-
+                        .attr("x", (d, index) => 3 * offset - index * cellSize) 
+                        .attr("y", offset / 2.5); 
+                
                     data.grids.forEach((grid: any, index: number) => {
-                        (grid.graphIndex = i),
-                            (grid.row = Math.floor(index / gridSize)),
-                            (grid.col = index % gridSize),
-                            (grid.x =
-                                (index % gridSize) * cellSize + 5 * offset),
-                            (grid.y =
-                                Math.floor(index / gridSize) * cellSize +
-                                offset / 2.5),
-                            (grid.width = cellSize),
-                            (grid.height = cellSize);
+                        grid.graphIndex = i;
+                        grid.row = 0; 
+                        grid.col = index; 
+                        grid.x = index * cellSize + offset;
+                        grid.y = offset / 2.5;
+                        grid.width = cellSize;
+                        grid.height = cellSize;
                         allGrids.push(grid);
                     });
                     //connectGridGraphs(allGrids,allNodes,svg,graphs,offset,height)

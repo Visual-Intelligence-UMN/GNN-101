@@ -350,7 +350,7 @@ export function visualizeGraph(path: string) {
             .attr("height", height);
 
         if (data.nodes) {
-            const xOffset = -1 * offset;
+            const xOffset = -2.5 * offset;
             const g1 = svg
                 .append("g")
                 .attr("transform", `translate(${xOffset},${margin.top})`);
@@ -374,9 +374,9 @@ export function visualizeGraph(path: string) {
                 .append("path")
                 .attr(
                     "d",
-                    `M${offset * 1.5}, ${height / 4} L${2.5 * offset}, ${
+                    `M${offset * 0.1}, ${height / 4} L${offset * 0.9}, ${
                         height / 7
-                    } L${2.5 * offset}, ${height / 1.3} L${offset * 1.5}, ${
+                    } L${offset * 0.9}, ${height / 1.3} L${offset * 0.1}, ${
                         height / 1.2
                     } Z`
                 )
