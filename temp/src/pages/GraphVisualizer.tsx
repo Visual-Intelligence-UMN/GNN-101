@@ -158,7 +158,9 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                                 }
                                 allNodes.push(node);
                             });
+                            
                             if (i === graphs.length - 2) {
+                                
                                 connectCrossGraphNodes(
                                     allNodes,
                                     svg,
@@ -166,6 +168,8 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                                     offset,
                                     height
                                 );
+                         
+          
                                 featureVisualizer(svg, allNodes, offset);
                             }
                         });
