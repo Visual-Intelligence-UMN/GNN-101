@@ -345,20 +345,19 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
       }
 
       node.tooltip = tooltip;
-      const stroke_width = calculateAverage(node.features) * 1;
+     
       //here's the interaction part for paths that connect between graphs
       node.svgElement.on("mouseover", function() {
         node.tooltip.style('visibility', 'visible');
         if (node.links) {
         node.links.forEach((link: any) => {
-          console.log("mousevoer stroke_width:", stroke_width);
           link.style("opacity", 1);
         });
       }
       }).on("mouseout", function() {
         node.tooltip.style('visibility', 'hidden');
         if (node.links) {
-          console.log("mouseout stroke_width:", stroke_width);
+
         node.links.forEach((link: any) => {
           link.style("opacity", 0.1);
         });
@@ -476,7 +475,35 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
           .attr("cy", node.y + 10)
           .attr("r", 10)
           .style("fill", "#69b3a2");
-      } 
+        node.svgElement.on("mouseover", function() {
+          const stroke_width = calculateAverage(node.features) * 4;
+          node.links.forEach((link: any) => {
+            link.style("stroke-width", (stroke_width)).style("opacity", 1);
+          });
+        }).on("mouseout", function() {
+          node.links.forEach((link: any) => {
+            link.style("stroke-width", 10).style("opacity", 0.1);
+          });
+        });
+        d3.selectAll("circle").raise();
+        
+      } else {
+        node.svgElement = svg.append("circle")
+          .attr("cx", node.x + (i - 1) * offset)
+          .attr("cy", node.y + 10)
+          .attr("r", 10)
+          .style("fill", "#69b3a2");
+        node.svgElement.on("mouseover", function() {
+          const stroke_width = calculateAverage(node.features) * 4;
+          node.links.forEach((link: any) => {
+            link.style("stroke-width", (stroke_width)).style("opacity", 1);
+          });
+        }).on("mouseout", function() {
+          node.links.forEach((link: any) => {
+            link.style("stroke-width", 10).style("opacity", 0.1);
+          });
+        });
+      }
     });
   });
 }

@@ -56,6 +56,8 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
 
                 final = intmData.final;
 
+                console.log("pooling", intmData.global_mean_pool);
+
                 console.log("conv1", conv1, "conv2", conv2, "conv3", conv3, "final", final);
             }
 
@@ -331,7 +333,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
 
                         const adjustedX = cx + translate[0];
                         const adjustedY = cy + translate[1] - 10; // 上移10以放置于文本上方
-                        const cellSize = 10; // 每个格子的尺寸
+                        const cellSize = 2; // 每个格子的尺寸
                         console.log("ADJ-X", adjustedX, "ADJ-Y", adjustedY);
 
                         if (d3.select(this).attr("class") != "first") {
@@ -369,21 +371,29 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
 
                                 console.log("MAT", mat);
 
+                                let k = 0;
+
                                 for (let i = 0; i < matrixSize; i++) {
                                     for (let j = 0; j < matrixSize; j++) {
                                         let c: number = mat[i][j] * 1000;
                                         tooltipG
                                             .append("rect")
-                                            .attr("x", -(j + 5) * cellSize)
-                                            .attr("y", i * cellSize)
+                                            .attr("x", k * cellSize - 75 * cellSize)
+                                            .attr("y", -5 * cellSize)
                                             .attr("width", cellSize)
-                                            .attr("height", cellSize)
+                                            .attr("height", 10)
                                             .attr("fill", myColor(c))
                                             .attr("opacity", 1)
                                             .attr("stroke", "black")
-                                            .attr("stroke-width", 1);
+                                            .attr("class", "tooltips")
+                                            .attr("stroke-width", 0.1);
+                                        
+                                        k++;
                                     }
                                 }
+
+                                d3.selectAll(".tooltips").raise();
+
                             }
                         } else {
                             const tooltipG = d3
