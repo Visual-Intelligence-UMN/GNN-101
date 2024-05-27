@@ -72,7 +72,7 @@ export const GraphAnalysisViewer: React.FC<GraphAnalysisViewerProps> = ({
                         </div>
                         <div className="mr-4">
                             <text className="font-semibold">Edge Count</text>:{" "}
-                            {data.edge_count}
+                            {data.is_directed ? data.edge_count : data.edge_count/2}
                         </div>
                         <div className="mr-4">
                             <text className="font-semibold">

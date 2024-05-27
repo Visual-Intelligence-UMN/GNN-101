@@ -2,7 +2,7 @@ import React, { useState, ChangeEvent } from 'react';
 import * as ort from 'onnxruntime-web';
 import { analyzeGraph, softmax, loadModel,load_json } from '@/utils/utils';
 import { path } from 'd3';
-import { Hint, PredictionVisualizer } from './WebUtils';
+import { Hint, PredictionVisualizer } from './webUtils';
 
 interface GraphData {
   x: number[][];

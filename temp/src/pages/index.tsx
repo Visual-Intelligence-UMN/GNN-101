@@ -13,7 +13,7 @@ import {
     ButtonChain,
     ViewSwitch,
     GraphAnalysisViewer,
-} from "./WebUtils";
+} from "./webUtils";
 
 export default function Home() {
     const [graphData, setGraphData] = useState<any>(null);
