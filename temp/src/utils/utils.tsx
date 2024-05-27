@@ -305,12 +305,10 @@ export async function prep_graphs(g_num: number, data: any) {
 }
 
 export function featureVisualizer(svg: any, nodes: any[], offset: number) {
-  console.log("AFS", nodes)
   const nodesById = d3.group(nodes, (d: any) => d.id);
 
   nodesById.forEach((nodes, id) => {
     nodes.forEach((node: any, i: number) => {
-
 
       const features = node.features;
       const lines = [];
@@ -322,12 +320,10 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
         lines.push(features)
       }
       const tooltipText = lines.join('<br>');
-      console.log("QWE")
-      console.log(tooltipText)
 
       const tooltip = svg
         .append('foreignObject')
-        .attr('x', (i - 1) * offset + node.x + 100)  
+        .attr('x', (i - 2.5) * offset + node.x + 100)  
         .attr('y', node.y - 100)  
         .attr('width', 700)
         .attr('height', 500)
@@ -343,17 +339,16 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
       if (!node.svgElement) {
         
         node.svgElement = svg.append("circle")
-          .attr("cx", (node.x - offset))
+          .attr("cx", (node.x + ((node.graphIndex - 2.5) * offset)))
           .attr("cy", (node.y + 10))
           .attr("r", 10)
-          .attr("fill", "#69b3a2");
+          .attr("fill", "transparent");
       }
 
       node.tooltip = tooltip;
      
       //here's the interaction part for paths that connect between graphs
       node.svgElement.on("mouseover", function() {
-        console.log("on")
         node.tooltip.style('visibility', 'visible');
         if (node.links) {
         node.links.forEach((link: any) => {
@@ -371,8 +366,7 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
       });
     });
   });
-  console.log("feature vis done")
-  console.log("HI", nodes)
+
 }
 
 
@@ -389,8 +383,6 @@ function calculateAverage(arr: number[]): number {
 }
 
 export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset: number, height: number) {
-  console.log("AWD")
-  console.log(nodes);
 
 
   const nodesById = d3.group(nodes, (d: any) => d.id);
@@ -409,8 +401,8 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
       if (i < nodes.length - 1) {
         const nextNode = nodes[i + 1];
         if (nextNode[0] != null && nextNode[0].graphIndex == 3) { return; }
-        const xOffset1 = (node.graphIndex - 1) * offset;
-        const xOffset2 = (nextNode.graphIndex - 1) * offset;
+        const xOffset1 = (node.graphIndex - 2.5) * offset;
+        const xOffset2 = (nextNode.graphIndex - 2.5) * offset;
 
         if (!nextNode.links) {
           nextNode.links = [];
@@ -463,10 +455,10 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
               lowerIndexBlue++;
             }
 
-            const stroke_width = calculateAverage(node.features) * 1;
+            const stroke_width = calculateAverage(node.features);
             
             const path = svg.append("path")
-              .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${neighborControlX} ${neighborControlY} ${neighborNode.x + (neighborNode.graphIndex - 1) * offset} ${neighborNode.y + 10}`)
+              .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${neighborControlX} ${neighborControlY} ${neighborNode.x + (neighborNode.graphIndex - 2.5) * offset} ${neighborNode.y + 10}`)
               .style("stroke", "blue")
               .style("opacity", 0.1)
               .style("stroke-width", stroke_width)
@@ -497,7 +489,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
         
       } else {
         node.svgElement = svg.append("circle")
-          .attr("cx", node.x + (i - 1) * offset)
+          .attr("cx", node.x + (i - 2.5) * offset)
           .attr("cy", node.y + 10)
           .attr("r", 10)
           .style("fill", "#69b3a2");
