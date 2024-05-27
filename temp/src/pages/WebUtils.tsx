@@ -421,14 +421,19 @@ export function visualizeGraph(path: string) {
                     let index = 0;
                     data.nodes.forEach((node: any) => {
                         node.graphIndex = 0;
+                        
 
                         if (value != null) {
                             //node.features = value.subarray(64 * node.id, 64 * (node.id + 1))
                         }
                         allNodes.push(node);
                     });
+                    featureVisualizer(svg, allNodes, offset);
                 });
-            featureVisualizer(svg, allNodes, offset);
+          
+
+            
+    
         }
     };
 

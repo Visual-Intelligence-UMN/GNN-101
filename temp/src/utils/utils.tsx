@@ -311,14 +311,19 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
   nodesById.forEach((nodes, id) => {
     nodes.forEach((node: any, i: number) => {
 
+
       const features = node.features;
       const lines = [];
       if (features.length > 7) {
         for (let j = 0; j < features.length; j += 8) {
           lines.push(features.slice(j, j + 8).join(' '));
         }
-      } else {lines.push(features)}
+      } else {
+        lines.push(features)
+      }
       const tooltipText = lines.join('<br>');
+      console.log("QWE")
+      console.log(tooltipText)
 
       const tooltip = svg
         .append('foreignObject')
@@ -336,18 +341,19 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
         .html(tooltipText);
 
       if (!node.svgElement) {
-        node.svgElement = svg.append("rect")
-          .attr("x", (node.x))
-          .attr("y", (node.y))
-          .attr("width", node.width)
-          .attr("height", node.height)
-          .attr("fill", "none");
+        
+        node.svgElement = svg.append("circle")
+          .attr("cx", (node.x - offset))
+          .attr("cy", (node.y + 10))
+          .attr("r", 10)
+          .attr("fill", "#69b3a2");
       }
 
       node.tooltip = tooltip;
      
       //here's the interaction part for paths that connect between graphs
       node.svgElement.on("mouseover", function() {
+        console.log("on")
         node.tooltip.style('visibility', 'visible');
         if (node.links) {
         node.links.forEach((link: any) => {
@@ -365,6 +371,8 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
       });
     });
   });
+  console.log("feature vis done")
+  console.log("HI", nodes)
 }
 
 
