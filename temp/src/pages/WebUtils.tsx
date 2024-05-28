@@ -547,7 +547,10 @@ export function visualizeMatrix(path: string) {
                     [],
                     features,
                     myColor,
-                    5
+                    5,
+                    graph.length,
+                    x.bandwidth(),
+                    true
                 );
             })
             .on("mouseout", function (event) {
@@ -570,7 +573,10 @@ export function visualizeMatrix(path: string) {
                     [],
                     features,
                     myColor,
-                    -5
+                    -5,
+                    graph.length,
+                    x.bandwidth(),
+                    false
                 );
             })
             .on("mouseout", function (event, d) {

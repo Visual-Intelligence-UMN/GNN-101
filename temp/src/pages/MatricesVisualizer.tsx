@@ -18,7 +18,7 @@ import {
     mousemove,
     mouseleave,
     HeatmapData,
-    mouseoverEvent,
+    mouseoverEvent
 } from "@/utils/matUtils";
 import {visualizeMatrix} from "./WebUtils";
 
@@ -62,7 +62,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
 
                 final = intmData.final;
 
-                console.log("pooling", intmData.global_mean_pool);
+                console.log("pooling", intmData.pooling);
 
                 console.log(
                     "conv1",
@@ -167,25 +167,34 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                     .on("mouseover", mouseover)
                     .on("mousemove", mousemove)
                     .on("mouseleave", mouseleave);
+                
+                console.log("x-bandwidth", x.bandwidth());
+                console.log("y-bandwidth", y.bandwidth());
+
+                const sqSize = y.bandwidth();
+                const gridNum = graphs[0].length;
 
                 g.selectAll(".x-axis text")
                     .on("mouseover", function (event) {
                         console.log("EVENT", event);
                         const element = event.target as SVGGraphicsElement;
                         console.log("ELEMENT", element);
-                        mouseoverEvent(element, this, i, conv1, conv2, conv3, final, features, myColor, 5);
+                        mouseoverEvent(element, this, i, conv1, conv2, conv3, final, features, myColor, 5, gridNum, sqSize, true);
                     })
                     .on("mouseout", function (event) {
                         const element = event.target as SVGGraphicsElement;
                         removeEffect(element);
                         d3.select("#tmp").remove();
+                        d3.select(".ihmp").remove();
                     });
 
                 g.selectAll(".y-axis text")
                     .on("mouseover", function (event, d) {
                         const element = event.target as SVGGraphicsElement;
                         console.log("ELEMENT", element);
-                        mouseoverEvent(element, this, i, conv1, conv2, conv3, final, features, myColor, -5);
+
+                        mouseoverEvent(element, this, i, conv1, conv2, conv3, final, features, myColor, -5, gridNum, sqSize, false);
+                        //interactWithHeatmap(element, x.bandwidth(), graphs[0].length);
                     })
                     .on("mouseout", function (event, d) {
                         const element = event.target as SVGGraphicsElement;

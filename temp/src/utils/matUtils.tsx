@@ -48,6 +48,39 @@ export function get_cood_locations(data: any, locations: any) {
     return locations;
 }
 
+function interactRowCol(
+    xAxis:boolean,
+    tooltipG:any,
+    sqSize:number,
+    gridNum:number
+){
+    if(!xAxis){
+        tooltipG
+            .append("rect")
+            .attr("x",0)
+            .attr("y",-sqSize/2)
+            .attr("width", sqSize*gridNum+2)
+            .attr("height", sqSize)
+            .attr("fill","red")
+            .attr("opacity", 1)
+            .attr("stroke", "black")
+            .attr("class", "tooltips")
+            .attr("stroke-width", 0.1);
+    }else{
+        tooltipG
+            .append("rect")
+            .attr("x",-sqSize/2)
+            .attr("y",-sqSize*gridNum-2)
+            .attr("width", sqSize)
+            .attr("height", sqSize*gridNum+2)
+            .attr("fill","red")
+            .attr("opacity", 1)
+            .attr("stroke", "black")
+            .attr("class", "tooltips")
+            .attr("stroke-width", 0.1);
+    }
+}
+
 export function tooltipBars64(
     target: any,
     i: number,
@@ -59,7 +92,10 @@ export function tooltipBars64(
     tooltipG: any,
     cellSize: number,
     yOffset: number,
-    myColor: any
+    myColor: any,
+    gridNum: number,
+    sqSize: number,
+    xAxis:boolean
 ) {
     let t = d3.select(target).text();
     let num = Number(t);
@@ -103,7 +139,7 @@ export function tooltipBars64(
                 k++;
             }
         }
-
+        interactRowCol(xAxis, tooltipG, sqSize, gridNum);
         d3.selectAll(".tooltips").raise();
     }
 }
@@ -114,7 +150,10 @@ export function tooltipBars7(
     tooltipG: any,
     cellSize: number,
     yOffset: number,
-    myColor: any
+    myColor: any,
+    xAxis:boolean,
+    sqSize:number,
+    gridNum:number
 ) {
     let t = d3.select(target).text();
     let num = Number(t);
@@ -130,7 +169,7 @@ export function tooltipBars7(
             .attr("y", yOffset * cellSize)
             .attr("width", cellSize)
             .attr("height", 20)
-            .attr("class", "tool")
+            .attr("class", "tooltips")
             .attr("fill", myColor(cate))
             .attr("opacity", 1)
             .attr("stroke", "black")
@@ -139,7 +178,8 @@ export function tooltipBars7(
         console.log("node feature", features[num]);
         k++;
     }
-    d3.selectAll(".tool").raise();
+    interactRowCol(xAxis, tooltipG, sqSize, gridNum);
+    d3.selectAll(".tooltips").raise();
 }
 
 export function featureTooltip(
@@ -228,7 +268,10 @@ export function mouseoverEvent(
     final: any,
     features: any,
     myColor: any,
-    offset: number
+    offset: number,
+    gridNum: number,
+    sqSize: number,
+    xAxis: boolean
 ) {
     console.log("ELEMENT", element);
     const bbox = element.getBBox();
@@ -250,6 +293,9 @@ export function mouseoverEvent(
     const adjustedY = cy + translate[1] - 10; // 上移10以放置于文本上方
     const cellSize = 5; // 每个格子的尺寸
 
+    //-----------------interaction with text label and heatmap----------------------
+
+
     if (d3.select(target).attr("class") != "first") {
         // 创建一个8x8的矩阵tooltip
         const matrixSize = 8;
@@ -266,11 +312,14 @@ export function mouseoverEvent(
             tooltipG,
             cellSize,
             offset,
-            myColor
+            myColor,
+            gridNum,
+            sqSize,
+            xAxis
         );
     } else {
         const tooltipG = featureTooltip(element, adjustedX, adjustedY);
-        tooltipBars7(target, features, tooltipG, 10, offset, myColor);
+        tooltipBars7(target, features, tooltipG, 10, offset, myColor, xAxis, sqSize, gridNum);
     }
 
     d3.select(element).style("fill", "red").style("font-weight", "bold");

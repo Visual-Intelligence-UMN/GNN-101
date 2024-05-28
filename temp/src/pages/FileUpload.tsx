@@ -152,7 +152,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps>=({graph_path, dataComm, change
         </div>
 
       ) : (
-        <p>No data available</p>
+        <p>No data available, please click "Click to Predict" to get the prediction result. </p>
       )}
     </div>
     <hr className="border-t border-gray-300 my-4"></hr>
