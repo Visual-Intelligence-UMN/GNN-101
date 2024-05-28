@@ -92,9 +92,10 @@ class GCN(torch.nn.Module):
         outputs['conv3'] = x
         # 2. Readout layer
         x = global_mean_pool(x, batch)  # [batch_size, hidden_channels]
-
+        outputs["pooling"] = x
         # 3. Apply a final classifier
         x = F.dropout(x, p=0.5, training=self.training)
+        outputs["dropout"] = x
         x = self.lin(x)
         outputs['final'] = x
         return outputs
@@ -183,7 +184,7 @@ torch.onnx.export(model,               # model being run
                   opset_version=17,    # the ONNX version to export the model to
                 #   do_constant_folding=True,  # whether to execute constant folding for optimization
                   input_names = ['x', 'edge_index', 'batch'],   # the model's input names
-                  output_names=['conv1', 'conv2', 'conv3', 'final'],
+                  output_names=['conv1', 'conv2', 'conv3', 'pooling','dropout','final'],
                   dynamic_axes={'x': {0: 'num_nodes'},
                                 'edge_index': {1: 'num_edges'},
                                 'batch': {0: 'num_nodes'},
