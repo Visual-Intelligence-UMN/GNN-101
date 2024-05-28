@@ -93,7 +93,7 @@ export function tooltipBars64(
                     .attr("x", k * cellSize - 75 * cellSize)
                     .attr("y", yOffset * cellSize)
                     .attr("width", cellSize)
-                    .attr("height", 10)
+                    .attr("height", 20)
                     .attr("fill", myColor(c))
                     .attr("opacity", 1)
                     .attr("stroke", "black")
@@ -126,10 +126,11 @@ export function tooltipBars7(
 
         tooltipG
             .append("rect")
-            .attr("x", k * cellSize - 21 * cellSize)
+            .attr("x", k * cellSize - 5 * cellSize)
             .attr("y", yOffset * cellSize)
             .attr("width", cellSize)
-            .attr("height", 10)
+            .attr("height", 20)
+            .attr("class", "tool")
             .attr("fill", myColor(cate))
             .attr("opacity", 1)
             .attr("stroke", "black")
@@ -138,6 +139,7 @@ export function tooltipBars7(
         console.log("node feature", features[num]);
         k++;
     }
+    d3.selectAll(".tool").raise();
 }
 
 export function featureTooltip(
@@ -181,7 +183,7 @@ export function crossConnectionMatrices(
         let plocation = deepClone(locations);
 
         //draw path one - one
-        for (let i = 0; i < plocation.length; i++) {
+        for (let i = 0; i < plocation.length - graphs[0].length; i++) {
             d3.select(".mats")
                 .append("path")
                 .attr("d", d3.line()([olocations[i], plocation[i]]))
@@ -246,7 +248,7 @@ export function mouseoverEvent(
 
     const adjustedX = cx + translate[0];
     const adjustedY = cy + translate[1] - 10; // 上移10以放置于文本上方
-    const cellSize = 2; // 每个格子的尺寸
+    const cellSize = 5; // 每个格子的尺寸
 
     if (d3.select(target).attr("class") != "first") {
         // 创建一个8x8的矩阵tooltip
@@ -268,7 +270,7 @@ export function mouseoverEvent(
         );
     } else {
         const tooltipG = featureTooltip(element, adjustedX, adjustedY);
-        tooltipBars7(target, features, tooltipG, cellSize, offset, myColor);
+        tooltipBars7(target, features, tooltipG, 10, offset, myColor);
     }
 
     d3.select(element).style("fill", "red").style("font-weight", "bold");

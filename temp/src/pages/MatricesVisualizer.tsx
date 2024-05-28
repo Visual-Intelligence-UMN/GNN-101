@@ -20,7 +20,7 @@ import {
     HeatmapData,
     mouseoverEvent,
 } from "@/utils/matUtils";
-import {visualizeMatrix} from "./webUtils";
+import {visualizeMatrix} from "./WebUtils";
 
 interface MatricesVisualizerProps {
     graph_path: string;

@@ -13,7 +13,7 @@ import {
     ButtonChain,
     ViewSwitch,
     GraphAnalysisViewer,
-} from "./webUtils";
+} from "./WebUtils";
 
 export default function Home() {
     const [graphData, setGraphData] = useState<any>(null);
@@ -91,7 +91,7 @@ export default function Home() {
                             <div className="flex gap-x-4">
                                 <div className="flex gap-x-4">
                                     <h2 className="text-xl font-semibold">
-                                        Network Visualization
+                                        Graphs Visualization
                                     </h2>
                                     <Hint
                                         text={"Change the View of GNN model"}

@@ -8,7 +8,7 @@ import {
     process,
 } from "../utils/utils";
 import { IntmData } from "./FileUpload";
-import { visualizeGraph } from "./webUtils";
+import { visualizeGraph } from "./WebUtils";
 
 interface GraphVisualizerProps {
     graph_path: string;

@@ -2,7 +2,7 @@ import React, { useState, ChangeEvent } from 'react';
 import * as ort from 'onnxruntime-web';
 import { analyzeGraph, softmax, loadModel,load_json } from '@/utils/utils';
 import { path } from 'd3';
-import { Hint, PredictionVisualizer } from './webUtils';
+import { Hint, PredictionVisualizer } from './WebUtils';
 
 interface GraphData {
   x: number[][];
@@ -114,7 +114,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps>=({graph_path, dataComm, change
       onClick={classifyGraph}
       className="mb-4 bg-red-200 border border-gray-300 hover:border-black hover:bg-red-300 text-black py-1 px-2 rounded"
       >
-        Classify a Graph
+        Click to Predict! 
       </button>
       <br />
       </div>

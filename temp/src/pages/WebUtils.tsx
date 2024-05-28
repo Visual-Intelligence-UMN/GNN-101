@@ -67,6 +67,9 @@ export const GraphAnalysisViewer: React.FC<GraphAnalysisViewerProps> = ({
                 <div>
                     <div className="flex flex-row flex-wrap items-center">
                         <div className="mr-4">
+                            <text className="font-bold">Graph Information</text>{" "}
+                        </div>
+                        <div className="mr-4">
                             <text className="font-semibold">Node Count</text>:{" "}
                             {data.node_count}
                         </div>
