@@ -521,7 +521,7 @@ export async function process() {
 export async function loadModel() {
   let session: any;
   try {
-    session = await ort.InferenceSession.create("./gnn_model.onnx", { executionProviders: ['wasm'] });
+    session = await ort.InferenceSession.create("./gnn_model2.onnx", { executionProviders: ['wasm'] });
     console.log("Model loaded successfully");
   } catch (error) {
     console.log("Load model failed", error);

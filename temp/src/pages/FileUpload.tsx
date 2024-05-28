@@ -22,6 +22,8 @@ export interface IntmData{
   conv1: Float32Array;
   conv2: Float32Array;
   conv3: Float32Array;
+  pooling: Float32Array;
+  dropout: Float32Array;
   final: Float32Array;
 }
 
@@ -76,7 +78,10 @@ const ClassifyGraph: React.FC<ClassifyGraphProps>=({graph_path, dataComm, change
         console.log(outputMap.conv3.cpuData);
 
         console.log("Pooling");
-        console.log(outputMap);
+        console.log(outputMap.pooling.cpuData);
+
+        console.log("Dropout");
+        console.log(outputMap.dropout.cpuData);
         
         console.log("Final");
         console.log(outputTensor);
@@ -88,7 +93,9 @@ const ClassifyGraph: React.FC<ClassifyGraphProps>=({graph_path, dataComm, change
         const intmData: IntmData= {
           conv1: outputMap.conv1.cpuData,
           conv2: outputMap.conv2.cpuData,
-          conv3: outputMap.conv2.cpuData,
+          conv3: outputMap.conv3.cpuData,
+          pooling: outputMap.pooling.cpuData,
+          dropout: outputMap.dropout.cpuData,
           final: outputTensor.cpuData
         };
 
