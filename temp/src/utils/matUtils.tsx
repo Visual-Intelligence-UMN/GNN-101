@@ -1,8 +1,10 @@
+import { off } from "process";
 import {
     deepClone,
     get_cood_from_parent,
     uniqueArray,
     get_category_node,
+    drawPoints,
 } from "./utils";
 import * as d3 from "d3";
 
@@ -145,7 +147,7 @@ export function tooltipBars64(
 }
 
 export function tooltipBars7(
-    target: any,
+    num: number,
     features: any,
     tooltipG: any,
     cellSize: number,
@@ -155,9 +157,6 @@ export function tooltipBars7(
     sqSize:number,
     gridNum:number
 ) {
-    let t = d3.select(target).text();
-    let num = Number(t);
-    console.log("TEXT", t);
     let k = 0;
     for (let i = 0; i < 7; i++) {
         const cate = get_category_node(features[num]) * 100;
@@ -183,14 +182,12 @@ export function tooltipBars7(
 }
 
 export function featureTooltip(
-    element: any,
     adjustedX: number,
     adjustedY: number
 ) {
     const tooltipG = d3
-        .select(element.parentNode as SVGGElement)
+        .select(".mats")
         .append("g")
-        .attr("class", "matrix-tooltip")
         .attr("x", adjustedX)
         .attr("y", adjustedY)
         .raise();
@@ -201,7 +198,8 @@ export function featureTooltip(
 export function crossConnectionMatrices(
     graphs: any,
     locations: any,
-    offsetMat: number
+    offsetMat: number,
+    pathMatrix: any
 ) {
     const cood1 = get_cood_from_parent(".mats", "rect");
     console.log("FINAL coord", cood1);
@@ -300,7 +298,7 @@ export function mouseoverEvent(
         // 创建一个8x8的矩阵tooltip
         const matrixSize = 8;
 
-        const tooltipG = featureTooltip(element, adjustedX, adjustedY);
+        const tooltipG = featureTooltip(adjustedX, adjustedY);
         tooltipBars64(
             target,
             i,
@@ -318,9 +316,83 @@ export function mouseoverEvent(
             xAxis
         );
     } else {
-        const tooltipG = featureTooltip(element, adjustedX, adjustedY);
+        const tooltipG = featureTooltip(adjustedX, adjustedY);
         tooltipBars7(target, features, tooltipG, 10, offset, myColor, xAxis, sqSize, gridNum);
     }
 
     d3.select(element).style("fill", "red").style("font-weight", "bold");
 }
+
+
+export function visualizeFeatures(
+    locations: any,
+    features: any,
+    myColor: any,
+    conv1: any,
+    conv2: any,
+    conv3: any,
+    final: any
+){
+    //initial visualizer
+    for (let i = 0; i < locations.length; i++) {
+        locations[i][0] += 25;
+        locations[i][1] += 2;
+    }
+    console.log("obs", locations);
+    //drawPoints(".mats","red",locations);
+    //using locations to find the positions for first feature visualizers
+    for(let i=0; i<locations.length; i++){
+        const cate = get_category_node(features[i]) * 100;
+        const g = d3.select(".mats")
+            .append("g")
+        for(let j=0; j<7; j++){
+            const fVis = g
+                .append("rect")
+                .attr("x", locations[i][0]+5*j)
+                .attr("y", locations[i][1])
+                .attr("width", 5)
+                .attr("height", 10)
+                .attr("fill", myColor(cate))
+                .attr("opacity", 1)
+                .attr("stroke", "black");
+        }    
+    }
+    //GCNCov Visualizer
+    const gcnFeatures = [conv1, conv2, conv3];
+    console.log("gcnf", gcnFeatures);
+    console.log("CONV1",conv1)
+    for(let k=0; k<3; k++){
+        for(let i=0; i<locations.length; i++){
+            locations[i][0] += 64 * (k) + 100;
+        }
+        //drawPoints(".mats","red",locations);
+        const gcnFeature = gcnFeatures[k];
+        for(let i=0; i<locations.length; i++){
+            //const cate = get_category_node(features[i]) * 100;
+            const g = d3.select(".mats")
+                .append("g");
+            
+            console.log("new", gcnFeature);
+            
+            //loop through each node
+                let nodeMat = gcnFeature[i];
+                console.log("nodeMat", i, nodeMat);
+                for(let m=0; m<nodeMat.length; m++){
+                    g
+                        .append("rect")
+                        .attr("x", locations[i][0]+2*m)
+                        .attr("y", locations[i][1])
+                        .attr("width", 2)
+                        .attr("height", 10)
+                        .attr("fill", myColor(nodeMat[m] * 1000))
+                        .attr("opacity", 1)
+                        .attr("stroke", "gray")
+                        .attr("stroke-width", 0.1);
+                    } 
+        }
+    }
+
+}
+
+
+
