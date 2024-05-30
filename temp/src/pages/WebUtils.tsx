@@ -372,19 +372,8 @@ export function visualizeGraph(path: string) {
                 .join("circle")
                 .attr("r", 10)
                 .style("fill", "#69b3a2");
-
-            const parallelogram = svg
-                .append("path")
-                .attr(
-                    "d",
-                    `M${offset * 0.1}, ${height / 4} L${offset * 0.9}, ${
-                        height / 7
-                    } L${offset * 0.9}, ${height / 1.3} L${offset * 0.1}, ${
-                        height / 1.2
-                    } Z`
-                )
-                .attr("stroke", "black")
-                .attr("fill", "none");
+                
+            
 
             // Define the simulation
             const simulation = d3
@@ -431,6 +420,50 @@ export function visualizeGraph(path: string) {
                         }
                         allNodes.push(node);
                     });
+                    let maxXDistance = 0;
+            let maxYDistance = 0;
+            data.nodes.forEach((node1: any) => {
+                data.nodes.forEach((node2: any) => {
+                    if (node1 !== node2) {
+                        const xDistance = Math.abs(node1.x - node2.x);
+                        const yDistance = Math.abs(node1.y - node2.y);
+    
+                        if (xDistance > maxXDistance) {
+                          maxXDistance = xDistance;
+                        }
+    
+                        if (yDistance > maxYDistance) {
+                          maxYDistance = yDistance;
+                        }
+                      }
+                });
+            });
+            const graphWidth = maxXDistance + 20
+            const graphHeight = maxYDistance + 20;
+
+            const point1 = { x: offset * 0.1, y: height / 4 };
+            const point2 = { x: 0.9 * offset, y: height / 7 };
+            const point3 = { x: 0.9 * offset, y: height / 1.3 };
+            const point4 = { x: offset * 0.1, y: height / 1.2 };
+
+            const x_dist = Math.abs(point1.x - point2.x);
+            const y_dist = Math.abs(point1.y - point4.y)
+            const centerX = (point1.x + point3.x) / 2;
+            const centerY = (point1.y + point3.y) / 2;
+            let scaleX = (graphWidth / (538.12));
+            let scaleY = (graphHeight / (512.63));
+            let transform = `translate(${centerX}, ${centerY}) scale(${scaleX}, ${scaleY}) translate(${-centerX}, ${-centerY})`;
+            if (graphWidth < x_dist && graphHeight < y_dist) {
+                scaleX = 1
+                scaleY = 1
+                transform = `translate(scale(${scaleX}, ${scaleY})`;
+              }
+            const parallelogram = svg
+                .append("polygon")  
+                .attr("points", `${point1.x},${point1.y} ${point2.x},${point2.y} ${point3.x},${point3.y} ${point4.x},${point4.y}`)
+                .attr("stroke", "black")
+                .attr("fill", "none")
+                .attr('transform',transform);
                     featureVisualizer(svg, allNodes, offset);
                 });
           
