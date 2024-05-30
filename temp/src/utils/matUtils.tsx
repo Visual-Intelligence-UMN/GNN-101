@@ -198,8 +198,7 @@ export function featureTooltip(
 export function crossConnectionMatrices(
     graphs: any,
     locations: any,
-    offsetMat: number,
-    pathMatrix: any
+    offsetMat: number
 ) {
     const cood1 = get_cood_from_parent(".mats", "rect");
     console.log("FINAL coord", cood1);
@@ -331,15 +330,17 @@ export function visualizeFeatures(
     conv1: any,
     conv2: any,
     conv3: any,
-    final: any
+    final: any,
+    graph:any
 ){
     //initial visualizer
     for (let i = 0; i < locations.length; i++) {
         locations[i][0] += 25;
         locations[i][1] += 2;
     }
-    console.log("obs", locations);
-    //drawPoints(".mats","red",locations);
+    //draw cross connections for first layer and second layer
+    drawCrossConnection(graph, locations, 35, 102);
+    
     //using locations to find the positions for first feature visualizers
     for(let i=0; i<locations.length; i++){
         const cate = get_category_node(features[i]) * 100;
@@ -354,16 +355,18 @@ export function visualizeFeatures(
                 .attr("height", 10)
                 .attr("fill", myColor(cate))
                 .attr("opacity", 1)
-                .attr("stroke", "black");
+                .attr("stroke", "gray")
+                .attr("stroke-width",0.1);
         }    
     }
     //GCNCov Visualizer
     const gcnFeatures = [conv1, conv2, conv3];
     console.log("gcnf", gcnFeatures);
-    console.log("CONV1",conv1)
+    console.log("CONV1",conv1);
     for(let k=0; k<3; k++){
         for(let i=0; i<locations.length; i++){
-            locations[i][0] += 64 * (k) + 100;
+            if(k!=0){locations[i][0] += 2*64 + 100;}
+            else{ locations[i][0] += 7*2 + 100 + 25;}
         }
         //drawPoints(".mats","red",locations);
         const gcnFeature = gcnFeatures[k];
@@ -388,11 +391,49 @@ export function visualizeFeatures(
                         .attr("opacity", 1)
                         .attr("stroke", "gray")
                         .attr("stroke-width", 0.1);
-                    } 
+                } 
+            //drawPoints(".mats", "red", locations);
         }
+        if(k!=2){drawCrossConnection(graph, locations, 62 * 2, 102);}
     }
-
+    //drawPoints(".mats", "red", blocations);
 }
 
+function drawCrossConnection(graph:any, locations:any, firstVisSize: number, gapSize: number){
+    let alocations = deepClone(locations);
+    for(let i=0; i<alocations.length; i++){
+        alocations[i][0] += firstVisSize;
+        alocations[i][1] += 5;
+    }
+    let blocations = deepClone(alocations);
+    for(let i=0; i<blocations.length; i++){
+        blocations[i][0] += gapSize;
+    }
+    //draw one-one paths
+    for(let i=0; i<alocations.length; i++){
+        d3
+            .select(".mats")
+            .append("path")
+            .attr("d", d3.line()([alocations[i], blocations[i]]))
+            .attr("stroke", "black")
+            .attr("opacity", 0.2)
+            .attr("fill", "none");
+    }
+    //draw one-multiple paths
+    for(let i=0; i<graph.length; i++){
+        for(let j=0; j<graph[0].length; j++){
+            if(graph[i][j]==1){
+                d3
+                    .select(".mats")
+                    .append("path")
+                    .attr("d", d3.line()([alocations[i], blocations[j]]))
+                    .attr("stroke", "black")
+                    .attr("opacity", 0.2)
+                    .attr("fill", "none");
+            }
+        }
+    }
+    d3.selectAll("path").lower();
+}
 
 

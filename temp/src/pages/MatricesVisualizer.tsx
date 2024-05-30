@@ -213,7 +213,8 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 conv1,
                 conv2,
                 conv3,
-                final
+                final,
+                graph
             );
         };
 
