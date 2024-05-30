@@ -52,6 +52,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
             let conv1: number[][] = [],
                 conv2: number[][] = [],
                 conv3: number[][] = [],
+                pooling: number[] = [],
                 final = null;
 
             console.log("intmData", intmData);
@@ -60,7 +61,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 conv1 = splitIntoMatrices(intmData.conv1);
                 conv2 = splitIntoMatrices(intmData.conv2);
                 conv3 = splitIntoMatrices(intmData.conv3);
-
+                pooling = intmData.pooling;
                 final = intmData.final;
 
                 console.log("pooling", intmData.pooling);
@@ -76,6 +77,8 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                     final
                 );
             }
+
+            console.log("from mat vis pooling", pooling);
 
             console.log("path ", graph_path);
             let allNodes: any[] = [];
@@ -213,6 +216,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 conv1,
                 conv2,
                 conv3,
+                pooling,
                 final,
                 graph
             );

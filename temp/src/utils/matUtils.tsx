@@ -330,6 +330,7 @@ export function visualizeFeatures(
     conv1: any,
     conv2: any,
     conv3: any,
+    pooling: any,
     final: any,
     graph:any
 ){
@@ -387,7 +388,7 @@ export function visualizeFeatures(
                         .attr("y", locations[i][1])
                         .attr("width", 2)
                         .attr("height", 10)
-                        .attr("fill", myColor(nodeMat[m] * 1000))
+                        .attr("fill", myColor(Math.abs(nodeMat[m]) * 1000))
                         .attr("opacity", 1)
                         .attr("stroke", "gray")
                         .attr("stroke-width", 0.1);
@@ -395,6 +396,62 @@ export function visualizeFeatures(
             //drawPoints(".mats", "red", locations);
         }
         if(k!=2){drawCrossConnection(graph, locations, 62 * 2, 102);}
+        else{
+            let oLocations = deepClone(locations);
+            //find edge points
+            locations[0][0] += 64*2;
+            locations[locations.length-1][0] += 64*2;
+            locations[locations.length-1][1] += 10;
+            const two = [
+                locations[0], 
+                locations[locations.length-1]
+            ];
+            //find mid point
+            const midY = (locations[locations.length-1][1] - locations[0][1])/2
+            //all paths should connect to mid point
+            const one = [
+                [
+                    locations[0][0] + 102,
+                    midY
+                ]
+            ];
+            //drawPoints(".mats", "red", one);
+            //draw the pooling layer
+            console.log("from feature vis", pooling);
+            for(let i=0; i<pooling.length; i++){
+                const g = d3.select(".mats").append("g");
+                g
+                    .append("rect")
+                    .attr("x", locations[0][0] + 102 + 2*i)
+                    .attr("y", midY-5)
+                    .attr("width", 2)
+                    .attr("height", 10)
+                    .attr("fill", myColor(Math.abs(pooling[i]) * 1000))
+                    .attr("opacity", 1)
+                    .attr("stroke", "gray")
+                    .attr("stroke-width", 0.1);
+            }
+            //draw the cross connections btw last GCN layer and pooling layer
+            
+            //do some transformations on the original locations
+            for(let i=0; i<oLocations.length; i++){
+                oLocations[i][0] += 2*64;
+                oLocations[i][1] += 5;
+            }
+            //drawPoints(".mats", "red", oLocations);
+            //connnnnnnnect!!!
+            for(let i=0; i<oLocations.length; i++){
+                d3
+                    .select(".mats")
+                    .append("path")
+                    .attr("d", d3.line()([oLocations[i], one[0]]))
+                    .attr("stroke", "black")
+                    .attr("opacity", 0.05)
+                    .attr("fill", "none");
+            }
+            //send all paths to the back
+            d3.selectAll("path").lower();
+        }
     }
     //drawPoints(".mats", "red", blocations);
 }
@@ -416,7 +473,7 @@ function drawCrossConnection(graph:any, locations:any, firstVisSize: number, gap
             .append("path")
             .attr("d", d3.line()([alocations[i], blocations[i]]))
             .attr("stroke", "black")
-            .attr("opacity", 0.2)
+            .attr("opacity", 0.05)
             .attr("fill", "none");
     }
     //draw one-multiple paths
@@ -428,11 +485,12 @@ function drawCrossConnection(graph:any, locations:any, firstVisSize: number, gap
                     .append("path")
                     .attr("d", d3.line()([alocations[i], blocations[j]]))
                     .attr("stroke", "black")
-                    .attr("opacity", 0.2)
+                    .attr("opacity", 0.05)
                     .attr("fill", "none");
             }
         }
     }
+    
     d3.selectAll("path").lower();
 }
 
