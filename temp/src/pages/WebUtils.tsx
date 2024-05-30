@@ -339,7 +339,7 @@ export const Hint: React.FC<HintProps> = ({ text }) => {
 export function visualizeGraph(path: string) {
     const init = async (data: any) => {
         let allNodes: any[] = [];
-        const offset = 800;
+        const offset = 1000;
         const margin = { top: 10, right: 30, bottom: 30, left: 40 };
         const width = 6 * offset - margin.left - margin.right;
         const height = 1000 - margin.top - margin.bottom;
