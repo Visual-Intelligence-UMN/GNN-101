@@ -51,31 +51,31 @@ export function get_cood_locations(data: any, locations: any) {
 }
 
 function interactRowCol(
-    xAxis:boolean,
-    tooltipG:any,
-    sqSize:number,
-    gridNum:number
-){
-    if(!xAxis){
+    xAxis: boolean,
+    tooltipG: any,
+    sqSize: number,
+    gridNum: number
+) {
+    if (!xAxis) {
         tooltipG
             .append("rect")
-            .attr("x",0)
-            .attr("y",-sqSize/2)
-            .attr("width", sqSize*gridNum+2)
+            .attr("x", 0)
+            .attr("y", -sqSize / 2)
+            .attr("width", sqSize * gridNum + 2)
             .attr("height", sqSize)
-            .attr("fill","red")
+            .attr("fill", "red")
             .attr("opacity", 1)
             .attr("stroke", "black")
             .attr("class", "tooltips")
             .attr("stroke-width", 0.1);
-    }else{
+    } else {
         tooltipG
             .append("rect")
-            .attr("x",-sqSize/2)
-            .attr("y",-sqSize*gridNum-2)
+            .attr("x", -sqSize / 2)
+            .attr("y", -sqSize * gridNum - 2)
             .attr("width", sqSize)
-            .attr("height", sqSize*gridNum+2)
-            .attr("fill","red")
+            .attr("height", sqSize * gridNum + 2)
+            .attr("fill", "red")
             .attr("opacity", 1)
             .attr("stroke", "black")
             .attr("class", "tooltips")
@@ -97,7 +97,7 @@ export function tooltipBars64(
     myColor: any,
     gridNum: number,
     sqSize: number,
-    xAxis:boolean
+    xAxis: boolean
 ) {
     let t = d3.select(target).text();
     let num = Number(t);
@@ -153,9 +153,9 @@ export function tooltipBars7(
     cellSize: number,
     yOffset: number,
     myColor: any,
-    xAxis:boolean,
-    sqSize:number,
-    gridNum:number
+    xAxis: boolean,
+    sqSize: number,
+    gridNum: number
 ) {
     let k = 0;
     for (let i = 0; i < 7; i++) {
@@ -181,10 +181,7 @@ export function tooltipBars7(
     d3.selectAll(".tooltips").raise();
 }
 
-export function featureTooltip(
-    adjustedX: number,
-    adjustedY: number
-) {
+export function featureTooltip(adjustedX: number, adjustedY: number) {
     const tooltipG = d3
         .select(".mats")
         .append("g")
@@ -292,7 +289,6 @@ export function mouseoverEvent(
 
     //-----------------interaction with text label and heatmap----------------------
 
-
     if (d3.select(target).attr("class") != "first") {
         // 创建一个8x8的矩阵tooltip
         const matrixSize = 8;
@@ -316,12 +312,21 @@ export function mouseoverEvent(
         );
     } else {
         const tooltipG = featureTooltip(adjustedX, adjustedY);
-        tooltipBars7(target, features, tooltipG, 10, offset, myColor, xAxis, sqSize, gridNum);
+        tooltipBars7(
+            target,
+            features,
+            tooltipG,
+            10,
+            offset,
+            myColor,
+            xAxis,
+            sqSize,
+            gridNum
+        );
     }
 
     d3.select(element).style("fill", "red").style("font-weight", "bold");
 }
-
 
 export function visualizeFeatures(
     locations: any,
@@ -332,8 +337,8 @@ export function visualizeFeatures(
     conv3: any,
     pooling: any,
     final: any,
-    graph:any
-){
+    graph: any
+) {
     //initial visualizer
     for (let i = 0; i < locations.length; i++) {
         locations[i][0] += 25;
@@ -341,135 +346,88 @@ export function visualizeFeatures(
     }
     //draw cross connections for first layer and second layer
     drawCrossConnection(graph, locations, 35, 102);
-    
+
     //using locations to find the positions for first feature visualizers
-    for(let i=0; i<locations.length; i++){
+    for (let i = 0; i < locations.length; i++) {
         const cate = get_category_node(features[i]) * 100;
-        const g = d3.select(".mats")
-            .append("g")
-        for(let j=0; j<7; j++){
+        const g = d3.select(".mats").append("g");
+        for (let j = 0; j < 7; j++) {
             const fVis = g
                 .append("rect")
-                .attr("x", locations[i][0]+5*j)
+                .attr("x", locations[i][0] + 5 * j)
                 .attr("y", locations[i][1])
                 .attr("width", 5)
                 .attr("height", 10)
                 .attr("fill", myColor(cate))
                 .attr("opacity", 1)
                 .attr("stroke", "gray")
-                .attr("stroke-width",0.1);
-        }    
+                .attr("stroke-width", 0.1);
+        }
     }
     //GCNCov Visualizer
     const gcnFeatures = [conv1, conv2, conv3];
     console.log("gcnf", gcnFeatures);
-    console.log("CONV1",conv1);
-    for(let k=0; k<3; k++){
-        for(let i=0; i<locations.length; i++){
-            if(k!=0){locations[i][0] += 2*64 + 100;}
-            else{ locations[i][0] += 7*2 + 100 + 25;}
+    console.log("CONV1", conv1);
+    for (let k = 0; k < 3; k++) {
+        for (let i = 0; i < locations.length; i++) {
+            if (k != 0) {
+                locations[i][0] += 2 * 64 + 100;
+            } else {
+                locations[i][0] += 7 * 2 + 100 + 25;
+            }
         }
         //drawPoints(".mats","red",locations);
         const gcnFeature = gcnFeatures[k];
-        for(let i=0; i<locations.length; i++){
+        for (let i = 0; i < locations.length; i++) {
             //const cate = get_category_node(features[i]) * 100;
-            const g = d3.select(".mats")
-                .append("g");
-            
+            const g = d3.select(".mats").append("g");
+
             console.log("new", gcnFeature);
-            
+
             //loop through each node
-                let nodeMat = gcnFeature[i];
-                console.log("nodeMat", i, nodeMat);
-                for(let m=0; m<nodeMat.length; m++){
-                    g
-                        .append("rect")
-                        .attr("x", locations[i][0]+2*m)
-                        .attr("y", locations[i][1])
-                        .attr("width", 2)
-                        .attr("height", 10)
-                        .attr("fill", myColor(Math.abs(nodeMat[m]) * 1000))
-                        .attr("opacity", 1)
-                        .attr("stroke", "gray")
-                        .attr("stroke-width", 0.1);
-                } 
-            //drawPoints(".mats", "red", locations);
-        }
-        if(k!=2){drawCrossConnection(graph, locations, 62 * 2, 102);}
-        else{
-            let oLocations = deepClone(locations);
-            //find edge points
-            locations[0][0] += 64*2;
-            locations[locations.length-1][0] += 64*2;
-            locations[locations.length-1][1] += 10;
-            const two = [
-                locations[0], 
-                locations[locations.length-1]
-            ];
-            //find mid point
-            const midY = (locations[locations.length-1][1] - locations[0][1])/2
-            //all paths should connect to mid point
-            const one = [
-                [
-                    locations[0][0] + 102,
-                    midY
-                ]
-            ];
-            //drawPoints(".mats", "red", one);
-            //draw the pooling layer
-            console.log("from feature vis", pooling);
-            for(let i=0; i<pooling.length; i++){
-                const g = d3.select(".mats").append("g");
-                g
-                    .append("rect")
-                    .attr("x", locations[0][0] + 102 + 2*i)
-                    .attr("y", midY-5)
+            let nodeMat = gcnFeature[i];
+            console.log("nodeMat", i, nodeMat);
+            for (let m = 0; m < nodeMat.length; m++) {
+                g.append("rect")
+                    .attr("x", locations[i][0] + 2 * m)
+                    .attr("y", locations[i][1])
                     .attr("width", 2)
                     .attr("height", 10)
-                    .attr("fill", myColor(Math.abs(pooling[i]) * 1000))
+                    .attr("fill", myColor(nodeMat[m] * 1000))
                     .attr("opacity", 1)
                     .attr("stroke", "gray")
                     .attr("stroke-width", 0.1);
             }
-            //draw the cross connections btw last GCN layer and pooling layer
-            
-            //do some transformations on the original locations
-            for(let i=0; i<oLocations.length; i++){
-                oLocations[i][0] += 2*64;
-                oLocations[i][1] += 5;
-            }
-            //drawPoints(".mats", "red", oLocations);
-            //connnnnnnnect!!!
-            for(let i=0; i<oLocations.length; i++){
-                d3
-                    .select(".mats")
-                    .append("path")
-                    .attr("d", d3.line()([oLocations[i], one[0]]))
-                    .attr("stroke", "black")
-                    .attr("opacity", 0.05)
-                    .attr("fill", "none");
-            }
-            //send all paths to the back
-            d3.selectAll("path").lower();
+            //drawPoints(".mats", "red", locations);
+        }
+        if (k != 2) {
+            drawCrossConnection(graph, locations, 62 * 2, 102);
+        } else {
+            //visualize pooling layer
+            drawPoolingVis(locations, pooling, myColor);
         }
     }
     //drawPoints(".mats", "red", blocations);
 }
 
-function drawCrossConnection(graph:any, locations:any, firstVisSize: number, gapSize: number){
+function drawCrossConnection(
+    graph: any,
+    locations: any,
+    firstVisSize: number,
+    gapSize: number
+) {
     let alocations = deepClone(locations);
-    for(let i=0; i<alocations.length; i++){
+    for (let i = 0; i < alocations.length; i++) {
         alocations[i][0] += firstVisSize;
         alocations[i][1] += 5;
     }
     let blocations = deepClone(alocations);
-    for(let i=0; i<blocations.length; i++){
+    for (let i = 0; i < blocations.length; i++) {
         blocations[i][0] += gapSize;
     }
     //draw one-one paths
-    for(let i=0; i<alocations.length; i++){
-        d3
-            .select(".mats")
+    for (let i = 0; i < alocations.length; i++) {
+        d3.select(".mats")
             .append("path")
             .attr("d", d3.line()([alocations[i], blocations[i]]))
             .attr("stroke", "black")
@@ -477,11 +435,10 @@ function drawCrossConnection(graph:any, locations:any, firstVisSize: number, gap
             .attr("fill", "none");
     }
     //draw one-multiple paths
-    for(let i=0; i<graph.length; i++){
-        for(let j=0; j<graph[0].length; j++){
-            if(graph[i][j]==1){
-                d3
-                    .select(".mats")
+    for (let i = 0; i < graph.length; i++) {
+        for (let j = 0; j < graph[0].length; j++) {
+            if (graph[i][j] == 1) {
+                d3.select(".mats")
                     .append("path")
                     .attr("d", d3.line()([alocations[i], blocations[j]]))
                     .attr("stroke", "black")
@@ -490,8 +447,53 @@ function drawCrossConnection(graph:any, locations:any, firstVisSize: number, gap
             }
         }
     }
-    
+
     d3.selectAll("path").lower();
 }
 
+function drawPoolingVis(locations: any, pooling: number[], myColor: any) {
+    let oLocations = deepClone(locations);
+    //find edge points
+    locations[0][0] += 64 * 2;
+    locations[locations.length - 1][0] += 64 * 2;
+    locations[locations.length - 1][1] += 10;
+    const two = [locations[0], locations[locations.length - 1]];
+    //find mid point
+    const midY = (locations[locations.length - 1][1] - locations[0][1]) / 2;
+    //all paths should connect to mid point
+    const one = [[locations[0][0] + 102, midY]];
+    //drawPoints(".mats", "red", one);
+    //draw the pooling layer
+    console.log("from feature vis", pooling);
+    for (let i = 0; i < pooling.length; i++) {
+        const g = d3.select(".mats").append("g");
+        g.append("rect")
+            .attr("x", locations[0][0] + 102 + 2 * i)
+            .attr("y", midY - 5)
+            .attr("width", 2)
+            .attr("height", 10)
+            .attr("fill", myColor(pooling[i] * 1000))
+            .attr("opacity", 1)
+            .attr("stroke", "gray")
+            .attr("stroke-width", 0.1);
+    }
+    //draw the cross connections btw last GCN layer and pooling layer
 
+    //do some transformations on the original locations
+    for (let i = 0; i < oLocations.length; i++) {
+        oLocations[i][0] += 2 * 64;
+        oLocations[i][1] += 5;
+    }
+    //drawPoints(".mats", "red", oLocations);
+    //connnnnnnnect!!!
+    for (let i = 0; i < oLocations.length; i++) {
+        d3.select(".mats")
+            .append("path")
+            .attr("d", d3.line()([oLocations[i], one[0]]))
+            .attr("stroke", "black")
+            .attr("opacity", 0.05)
+            .attr("fill", "none");
+    }
+    //send all paths to the back
+    d3.selectAll("path").lower();
+}

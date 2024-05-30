@@ -150,10 +150,16 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 printAxisTextCoordinates();
 
                 // Build color scale
+                // var myColor = d3
+                //     .scaleLinear<string>()
+                //     .range(["white", "#69b3a2"])
+                //     .domain([1, 100]);
+
                 var myColor = d3
                     .scaleLinear<string>()
-                    .range(["white", "#69b3a2"])
-                    .domain([1, 100]);
+                    .domain([-100, 0, 100])
+                    .range(["orange", "white", "#69b3a2"])
+                    
 
                 const data = matrix_to_hmap(graph);
                 console.log("accepted data:", data);
