@@ -81,7 +81,7 @@ export const GraphAnalysisViewer: React.FC<GraphAnalysisViewerProps> = ({
                             <text className="font-semibold">
                                 Average Node Degree
                             </text>
-                            : {roundToTwo(data.avg_node_degree)}
+                            : {roundToTwo(data.avg_node_degree / 2)}
                         </div>
                         <div className="mr-4">
                             <text className="font-semibold">

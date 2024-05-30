@@ -18,7 +18,8 @@ import {
     mousemove,
     mouseleave,
     HeatmapData,
-    mouseoverEvent
+    mouseoverEvent,
+    visualizeFeatures
 } from "@/utils/matUtils";
 import {visualizeMatrix} from "./WebUtils";
 
@@ -45,12 +46,12 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
     }
 
     useEffect(() => {
-        const init = async (graphs: any[], features: any[][]) => {
+        const init = async (graph: any, features: any[][]) => {
             const offsetMat = 100;
 
-            let conv1: number[][][],
-                conv2: number[][][],
-                conv3: number[][][],
+            let conv1: number[][] = [],
+                conv2: number[][] = [],
+                conv3: number[][] = [],
                 final = null;
 
             console.log("intmData", intmData);
@@ -78,16 +79,20 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
 
             console.log("path ", graph_path);
             let allNodes: any[] = [];
-            const gLen = graphs.length;
+            const gLen = graph.length;
             const gridSize = 300;
             const margin = { top: 10, right: 80, bottom: 30, left: 80 };
             const width = (gridSize + margin.left + margin.right) * gLen;
             const height = (gridSize + margin.top + margin.bottom) * 2;
 
             let locations: number[][] = [];
+            
+            //prepare for path matrix
+            let pathMatrix = Array.from({ length: graph.length }, () => []);
+            console.log("pathMat", pathMatrix);
 
             // Append the SVG object to the body of the page
-            console.log("GRAPHS", graphs);
+            console.log("GRAPH", graph);
             d3.select("#matvis").selectAll("svg").remove();
             const svg = d3
                 .select("#matvis")
@@ -96,20 +101,18 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 .attr("width", width)
                 .attr("height", height);
 
-            graphs.forEach((gData, i) => {
-                console.log("i", i);
-                const xOffset = i * gridSize + 50;
+                const xOffset = 0 * gridSize + 50;
                 const g = svg
                     .append("g")
                     .attr(
                         "transform",
-                        `translate(${xOffset + i * offsetMat},${margin.top})`
+                        `translate(${xOffset + 0 * offsetMat},${margin.top})`
                     );
                 //do the real thing: visualize the matrices
                 // set the dimensions and margins of the graph
                 // Labels of row and columns
-                var myGroups = get_axis_gdata(gData);
-                var myVars = get_axis_gdata(gData);
+                var myGroups = get_axis_gdata(graph);
+                var myVars = get_axis_gdata(graph);
 
                 // Build X scales and axis:
                 var x = d3
@@ -130,7 +133,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                     .padding(0.01);
                 g.append("g").attr("class", "y-axis").call(d3.axisLeft(y));
 
-                if (i == 0) {
+                if (0 == 0) {
                     d3.selectAll<SVGTextElement, any>(".x-axis text").classed(
                         "first",
                         true
@@ -149,7 +152,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                     .range(["white", "#69b3a2"])
                     .domain([1, 100]);
 
-                const data = matrix_to_hmap(gData);
+                const data = matrix_to_hmap(graph);
                 console.log("accepted data:", data);
 
                 g.selectAll("rect")
@@ -172,14 +175,14 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 console.log("y-bandwidth", y.bandwidth());
 
                 const sqSize = y.bandwidth();
-                const gridNum = graphs[0].length;
+                const gridNum = graph.length;
 
                 g.selectAll(".x-axis text")
                     .on("mouseover", function (event) {
                         console.log("EVENT", event);
                         const element = event.target as SVGGraphicsElement;
                         console.log("ELEMENT", element);
-                        mouseoverEvent(element, this, i, conv1, conv2, conv3, final, features, myColor, 5, gridNum, sqSize, true);
+                     //   mouseoverEvent(element, this, i, conv1, conv2, conv3, final, features, myColor, 5, gridNum, sqSize, true);
                     })
                     .on("mouseout", function (event) {
                         const element = event.target as SVGGraphicsElement;
@@ -193,7 +196,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                         const element = event.target as SVGGraphicsElement;
                         console.log("ELEMENT", element);
 
-                        mouseoverEvent(element, this, i, conv1, conv2, conv3, final, features, myColor, -5, gridNum, sqSize, false);
+                      //  mouseoverEvent(element, this, i, conv1, conv2, conv3, final, features, myColor, -5, gridNum, sqSize, false);
                         //interactWithHeatmap(element, x.bandwidth(), graphs[0].length);
                     })
                     .on("mouseout", function (event, d) {
@@ -202,8 +205,16 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                     });
                 //getting the coordinates
                 locations = get_cood_locations(data, locations);
-            });
-            crossConnectionMatrices(graphs, locations, offsetMat);
+            //crossConnectionMatrices(graphs, locations, offsetMat, pathMatrix);
+            visualizeFeatures(
+                locations,
+                features,
+                myColor,
+                conv1,
+                conv2,
+                conv3,
+                final
+            );
         };
 
         //VIsualization Pipeline
@@ -224,7 +235,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 const graphsData = await prepMatrices(num, processedData);
                 console.log("gData", graphsData);
                 // Initialize and run D3 visualization with processe  d data
-                await init(graphsData, features);
+                await init(graphsData[0], features);
             } catch (error) {
                 console.error("Error in visualizeGNN:", error);
             } finally {

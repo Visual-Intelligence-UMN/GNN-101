@@ -93,30 +93,23 @@ type Matrix = number[][];
 export function splitIntoMatrices(
     array: number[],
     matrixSize: number = 8
-): Matrix[] {
-    const matrices: Matrix[] = [];
-    const totalElementsInMatrix = matrixSize * matrixSize;
+){
+    // 创建一个空的二维数组
+    let result: number[][] = [];
+    // 计算每个子数组的长度
+    let n = array.length / 64;
+    let subArrayLength = 64;
 
-    if (array.length % totalElementsInMatrix !== 0) {
-        throw new Error(
-            "Array length is not a multiple of the total elements in a matrix."
-        );
+    // 遍历 n 次来创建子数组
+    for (let i = 0; i < n; i++) {
+        // 截取从 i * subArrayLength 开始的 subArrayLength 长度的部分
+        let subArray = array.slice(i * subArrayLength, (i + 1) * subArrayLength);
+        // 将截取的子数组添加到结果数组中
+        result.push(subArray);
     }
 
-    for (let i = 0; i < array.length; i += totalElementsInMatrix) {
-        const matrix: Matrix = [];
-
-        for (let row = 0; row < matrixSize; row++) {
-            const start = i + row * matrixSize;
-            const end = start + matrixSize;
-            matrix.push(array.slice(start, end));
-        }
-
-        matrices.push(matrix);
-    }
-    console.log(matrices);
-
-    return matrices;
+    // 返回生成的二维数组
+    return result;
 }
 
 //get the category of node features in the original input graph
