@@ -329,6 +329,18 @@ export function mouseoverEvent(
     d3.select(element).style("fill", "red").style("font-weight", "bold");
 }
 
+function addLayerName(locations:any, name:string, xOffset:number, yOffset:number){
+    const apt = deepClone(locations[locations.length-1]);
+    apt[0] += xOffset;
+    apt[1] += yOffset;
+    drawPoints(".mats","red", [apt]);
+    d3.select(".mats").append("text")
+        .text(name)
+        .attr("x", apt[0])
+        .attr("y", apt[1])
+        .style("font-size", 7);
+}
+
 export function visualizeFeatures(
     locations: any,
     features: any,
@@ -364,6 +376,9 @@ export function visualizeFeatures(
                 .attr("stroke-width", 0.1);
         }
     }
+    //add layer label for the first one
+    addLayerName(locations, "Features Name", 0, 30);
+
     //GCNCov Visualizer
     const gcnFeatures = [conv1, conv2, conv3];
     console.log("gcnf", gcnFeatures);
@@ -376,6 +391,7 @@ export function visualizeFeatures(
                 locations[i][0] += 7 * 2 + 100 + 25;
             }
         }
+        addLayerName(locations, "GCNConv"+(k+1), 0, 30);
         //drawPoints(".mats","red",locations);
         const gcnFeature = gcnFeatures[k];
         for (let i = 0; i < locations.length; i++) {
@@ -467,8 +483,8 @@ function computeMids(point1: any, point2: any){
     //find mid - x
     const midX = (point1[0]+point2[0])/2;
     const res = [
-        [midX, point1[1]], 
-        [midX, point2[1]]
+        [midX - 20, point1[1]], 
+        [midX + 20, point2[1]]
     ];
     console.log("res", res);
     return res;
@@ -500,6 +516,8 @@ function drawPoolingVis(locations: any, pooling: number[], myColor: any) {
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1);
     }
+    //add text
+    addLayerName(locations, "Pooling", 102, -142);
     //draw the cross connections btw last GCN layer and pooling layer
 
     //do some transformations on the original locations
@@ -550,6 +568,8 @@ function drawTwoLayers(
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1);
     }
+    //add text
+    addLayerName(one, "Model Output", 0, 20);
     //find positions to connect
     let bOne = deepClone(aOne);
     bOne[0][0] -= 102;
@@ -579,6 +599,7 @@ function drawTwoLayers(
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1);
     }
+    addLayerName(aOne, "Prediction Result", 0, 20);
     //connect
     aOne[0][1] += 5;
     let cOne = deepClone(aOne);
