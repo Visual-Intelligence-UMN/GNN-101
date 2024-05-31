@@ -350,7 +350,6 @@ export function visualizeFeatures(
 
     //using locations to find the positions for first feature visualizers
     for (let i = 0; i < locations.length; i++) {
-        const cate = get_category_node(features[i]) * 100;
         const g = d3.select(".mats").append("g");
         for (let j = 0; j < 7; j++) {
             const fVis = g
@@ -359,7 +358,7 @@ export function visualizeFeatures(
                 .attr("y", locations[i][1])
                 .attr("width", 5)
                 .attr("height", 10)
-                .attr("fill", myColor(cate))
+                .attr("fill", myColor(features[i][j] * 100))
                 .attr("opacity", 1)
                 .attr("stroke", "gray")
                 .attr("stroke-width", 0.1);
@@ -437,21 +436,45 @@ function drawCrossConnection(
             .attr("opacity", 0.05)
             .attr("fill", "none");
     }
-    //draw one-multiple paths
+    //draw one-multiple paths - three
+    const curve = d3.line().curve(d3.curveBasis);
     for (let i = 0; i < graph.length; i++) {
         for (let j = 0; j < graph[0].length; j++) {
             if (graph[i][j] == 1) {
+                const hpoint = computeHigherPoint(alocations[i]);
+                const mpoint = computeMidPoint(alocations[i], blocations[i]);
+                const lpoint = computeLowerPoint(blocations[i]);
+                console.log("control points", hpoint, lpoint);
                 d3.select(".mats")
                     .append("path")
-                    .attr("d", d3.line()([alocations[i], blocations[j]]))
+                    .attr("d", curve([alocations[i], hpoint, mpoint, lpoint, blocations[j]]))
                     .attr("stroke", "black")
                     .attr("opacity", 0.05)
                     .attr("fill", "none");
+                drawPoints(".mats", "red", [hpoint, mpoint, lpoint]);
             }
         }
     }
 
     d3.selectAll("path").lower();
+}
+
+function computeLowerPoint(point:any){
+    const x = point[0] - 40;
+    const y = point[1];
+    return [x, y];
+}
+
+function computeMidPoint(point1:any, point2:any){
+    const x = (point2[0] + point1[0]) / 2;
+    const y = (point2[1] + point1[1]) / 2;
+    return [x, y];
+}
+
+function computeHigherPoint(point:any){
+    const x = point[0] + 40;
+    const y = point[1];
+    return [x, y];
 }
 
 function drawPoolingVis(locations: any, pooling: number[], myColor: any) {
