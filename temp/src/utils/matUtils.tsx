@@ -5,6 +5,7 @@ import {
     uniqueArray,
     get_category_node,
     drawPoints,
+    softmax,
 } from "./utils";
 import * as d3 from "d3";
 
@@ -404,7 +405,9 @@ export function visualizeFeatures(
             drawCrossConnection(graph, locations, 62 * 2, 102);
         } else {
             //visualize pooling layer
-            drawPoolingVis(locations, pooling, myColor);
+            let one = drawPoolingVis(locations, pooling, myColor);
+            //visualize last layer and softmax output
+            drawTwoLayers(one, final, myColor);
         }
     }
     //drawPoints(".mats", "red", blocations);
@@ -496,4 +499,71 @@ function drawPoolingVis(locations: any, pooling: number[], myColor: any) {
     }
     //send all paths to the back
     d3.selectAll("path").lower();
+    return one;
+}
+
+//the function to draw the last two layers of the model
+function drawTwoLayers(
+    one:any,
+    final:any,
+    myColor:any
+){
+    //find the next position
+    one[0][0] += (64 * 2 + 102);
+    let aOne = deepClone(one);
+    one[0][1] -= 5;
+    //drawPoints(".mats", "red", one);
+    //visulaize
+    const g = d3.select(".mats").append("g");
+    for (let m = 0; m < final.length; m++) {
+        g.append("rect")
+            .attr("x", one[0][0] + 10 * m)
+            .attr("y", one[0][1])
+            .attr("width", 10)
+            .attr("height", 10)
+            .attr("fill", myColor(final[m] * 1000))
+            .attr("opacity", 1)
+            .attr("stroke", "gray")
+            .attr("stroke-width", 0.1);
+    }
+    //find positions to connect
+    let bOne = deepClone(aOne);
+    bOne[0][0] -= 102;
+    //connect
+    d3
+        .select(".mats")
+        .append("path")
+        .attr("d", d3.line()([aOne[0], bOne[0]]))
+        .attr("stroke", "black")
+        .attr("opacity", 0.05)
+        .attr("fill", "none");
+    //visualize the result
+    aOne[0][0] += 20 + 102;
+    //drawPoints(".mats","red",aOne);
+    aOne[0][1] -= 5;
+    //need replace this by real result after softmax
+    let result = softmax(final);
+    console.log("mat result", result);
+    for (let m = 0; m < result.length; m++) {
+        g.append("rect")
+            .attr("x", aOne[0][0] + 10 * m)
+            .attr("y", aOne[0][1])
+            .attr("width", 10)
+            .attr("height", 10)
+            .attr("fill", myColor(result[m] * 1000))
+            .attr("opacity", 1)
+            .attr("stroke", "gray")
+            .attr("stroke-width", 0.1);
+    }
+    //connect
+    aOne[0][1] += 5;
+    let cOne = deepClone(aOne);
+    cOne[0][0] -= 102;
+    d3
+        .select(".mats")
+        .append("path")
+        .attr("d", d3.line()([aOne[0], cOne[0]]))
+        .attr("stroke", "black")
+        .attr("opacity", 0.05)
+        .attr("fill", "none");
 }
