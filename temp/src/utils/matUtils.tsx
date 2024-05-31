@@ -358,7 +358,7 @@ export function visualizeFeatures(
                 .attr("y", locations[i][1])
                 .attr("width", 5)
                 .attr("height", 10)
-                .attr("fill", myColor(features[i][j] * 100))
+                .attr("fill", myColor(features[i][j] * 1000))
                 .attr("opacity", 1)
                 .attr("stroke", "gray")
                 .attr("stroke-width", 0.1);
@@ -437,44 +437,41 @@ function drawCrossConnection(
             .attr("fill", "none");
     }
     //draw one-multiple paths - three
+    let pts:number[][] = [];
     const curve = d3.line().curve(d3.curveBasis);
     for (let i = 0; i < graph.length; i++) {
         for (let j = 0; j < graph[0].length; j++) {
             if (graph[i][j] == 1) {
-                const hpoint = computeHigherPoint(alocations[i]);
-                const mpoint = computeMidPoint(alocations[i], blocations[i]);
-                const lpoint = computeLowerPoint(blocations[i]);
+                const res = computeMids(alocations[i], blocations[j]);
+                const hpoint = res[0];
+                const lpoint = res[1];
                 console.log("control points", hpoint, lpoint);
                 d3.select(".mats")
                     .append("path")
-                    .attr("d", curve([alocations[i], hpoint, mpoint, lpoint, blocations[j]]))
+                    .attr("d", curve([alocations[i], hpoint, lpoint, blocations[j]]))
                     .attr("stroke", "black")
                     .attr("opacity", 0.05)
                     .attr("fill", "none");
-                drawPoints(".mats", "red", [hpoint, mpoint, lpoint]);
+                pts.push(hpoint);
+                pts.push(lpoint);
+                console.log("odata", alocations[i], blocations[i], "low", lpoint, "high", hpoint);
             }
         }
     }
+    //drawPoints(".mats", "red", pts);
 
     d3.selectAll("path").lower();
 }
 
-function computeLowerPoint(point:any){
-    const x = point[0] - 40;
-    const y = point[1];
-    return [x, y];
-}
-
-function computeMidPoint(point1:any, point2:any){
-    const x = (point2[0] + point1[0]) / 2;
-    const y = (point2[1] + point1[1]) / 2;
-    return [x, y];
-}
-
-function computeHigherPoint(point:any){
-    const x = point[0] + 40;
-    const y = point[1];
-    return [x, y];
+function computeMids(point1: any, point2: any){
+    //find mid - x
+    const midX = (point1[0]+point2[0])/2;
+    const res = [
+        [midX, point1[1]], 
+        [midX, point2[1]]
+    ];
+    console.log("res", res);
+    return res;
 }
 
 function drawPoolingVis(locations: any, pooling: number[], myColor: any) {
@@ -512,10 +509,14 @@ function drawPoolingVis(locations: any, pooling: number[], myColor: any) {
     }
     //drawPoints(".mats", "red", oLocations);
     //connnnnnnnect!!!
+    const curve = d3.line().curve(d3.curveBasis);
     for (let i = 0; i < oLocations.length; i++) {
+        const res = computeMids(oLocations[i], one[0]);
+        const lpoint = res[0];
+        const hpoint = res[1];
         d3.select(".mats")
             .append("path")
-            .attr("d", d3.line()([oLocations[i], one[0]]))
+            .attr("d", curve([oLocations[i], lpoint, hpoint, one[0]]))
             .attr("stroke", "black")
             .attr("opacity", 0.05)
             .attr("fill", "none");
