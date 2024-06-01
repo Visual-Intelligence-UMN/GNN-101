@@ -25,7 +25,7 @@ import {
 } from "@/utils/matUtils";
 
 //Math function:::
-function roundToTwo(num: number): number {
+export function roundToTwo(num: number): number {
     return Math.round(num * 100) / 100;
 }
 

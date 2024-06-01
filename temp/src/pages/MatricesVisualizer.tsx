@@ -19,9 +19,9 @@ import {
     mouseleave,
     HeatmapData,
     mouseoverEvent,
-    visualizeFeatures
+    visualizeFeatures,
 } from "@/utils/matUtils";
-import {visualizeMatrix} from "./WebUtils";
+import { roundToTwo, visualizeMatrix } from "./WebUtils";
 
 interface MatricesVisualizerProps {
     graph_path: string;
@@ -89,7 +89,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
             const height = (gridSize + margin.top + margin.bottom) * 2;
 
             let locations: number[][] = [];
-            
+
             //prepare for path matrix
             let pathMatrix = Array.from({ length: graph.length }, () => []);
             console.log("pathMat", pathMatrix);
@@ -104,157 +104,159 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 .attr("width", width)
                 .attr("height", height);
 
-                const xOffset = 0 * gridSize + 50;
-                const g = svg
-                    .append("g")
-                    .attr(
-                        "transform",
-                        `translate(${xOffset + 0 * offsetMat},${margin.top})`
-                    );
-                //do the real thing: visualize the matrices
-                // set the dimensions and margins of the graph
-                // Labels of row and columns
-                var myGroups = get_axis_gdata(graph);
-                var myVars = get_axis_gdata(graph);
+            const xOffset = 0 * gridSize + 50;
+            const g = svg
+                .append("g")
+                .attr(
+                    "transform",
+                    `translate(${xOffset + 0 * offsetMat},${margin.top})`
+                );
+            //do the real thing: visualize the matrices
+            // set the dimensions and margins of the graph
+            // Labels of row and columns
+            var myGroups = get_axis_gdata(graph);
+            var myVars = get_axis_gdata(graph);
 
-                // Build X scales and axis:
-                var x = d3
-                    .scaleBand()
-                    .range([0, gridSize])
-                    .domain(myGroups)
-                    .padding(0.01);
-                g.append("g")
-                    .attr("class", "x-axis")
-                    .attr("transform", `translate(0,${gridSize})`)
-                    .call(d3.axisBottom(x));
+            // Build X scales and axis:
+            var x = d3
+                .scaleBand()
+                .range([0, gridSize])
+                .domain(myGroups)
+                .padding(0.01);
+            g.append("g")
+                .attr("class", "x-axis")
+                .attr("transform", `translate(0,${gridSize})`)
+                .call(d3.axisBottom(x));
 
-                // Build Y scales and axis:
-                var y = d3
-                    .scaleBand()
-                    .range([0, gridSize])
-                    .domain(myVars)
-                    .padding(0.01);
-                g.append("g").attr("class", "y-axis").call(d3.axisLeft(y));
+            // Build Y scales and axis:
+            var y = d3
+                .scaleBand()
+                .range([0, gridSize])
+                .domain(myVars)
+                .padding(0.01);
+            g.append("g").attr("class", "y-axis").call(d3.axisLeft(y));
 
-                if (0 == 0) {
-                    d3.selectAll<SVGTextElement, any>(".x-axis text").classed(
-                        "first",
-                        true
-                    );
-                    d3.selectAll<SVGTextElement, any>(".y-axis text").classed(
-                        "first",
-                        true
-                    );
-                }
+            if (0 == 0) {
+                d3.selectAll<SVGTextElement, any>(".x-axis text").classed(
+                    "first",
+                    true
+                );
+                d3.selectAll<SVGTextElement, any>(".y-axis text").classed(
+                    "first",
+                    true
+                );
+            }
 
-                printAxisTextCoordinates();
+            printAxisTextCoordinates();
 
-                // Build color scale
-                // var myColor = d3
-                //     .scaleLinear<string>()
-                //     .range(["white", "#69b3a2"])
-                //     .domain([1, 100]);
+            var myColor = d3
+                .scaleLinear<string>()
+                .domain([-0.25, 0, 0.25])
+                .range(["orange", "white", "#69b3a2"]);
 
-                var myColor = d3
-                    .scaleLinear<string>()
-                    .domain([-100, 0, 100])
-                    .range(["orange", "white", "#69b3a2"])
-                    
+            const data = matrix_to_hmap(graph);
+            console.log("accepted data:", data);
 
-                const data = matrix_to_hmap(graph);
-                console.log("accepted data:", data);
+            //legend
+            let dummies = [];
+            for (let i = -1; i <= 1; i += 0.05) {
+                dummies.push(i);
+            }
+            const g0 = d3
+                .select("#matvis")
+                .append("svg")
+                .attr("class", "legend")
+                .attr("width", 500)
+                .attr("height", 100);
 
-                //legend
-                let dummies = [];
-                for(let i=-200; i<=210; i+=10){
-                    dummies.push(i);
-                }
-                const g0 = d3
-                    .select("#matvis")
-                    .append("svg")
-                    .attr("class", "legend")
-                    .attr("width", 500)
-                    .attr("height", 50);
-                console.log("Dummies", dummies);
-                g0
-                    .selectAll(".rect")
-                    .data(dummies)
-                    .enter()
-                    .append("rect")
-                    .attr("width", 10)
-                    .attr("height", 10)
-                    .attr("x",(d:number, i:number)=>{return i*10})
-                    .attr("y", 0)
-                    .style("fill", (d:number)=>myColor(d))
-                    .style("stroke-width", 1)
-                    .style("stroke", "grey")
-                    .style("opacity", 0.8).raise();
+            console.log("Dummies", dummies);
 
-                    for(let i=-200; i<=210; i+=10){
-                        g0.select(".legend")
-                    .append("text")
-                    .attr("x", i * 10)
-                    .attr("y", 20)
-                    .attr('transform', 'rotate(-90, 100, 100)')
-                    .style("fill", "black")
-                    .text(i)
-                    .attr("text-anchor", "start")
-                    .style("alignment-baseline", "middle")
-                    }
-                
-                    
-                    
+            g0.selectAll(".rect")
+                .data(dummies)
+                .enter()
+                .append("rect")
+                .attr("width", 10)
+                .attr("height", 10)
+                .attr("x", (d: number, i: number) => {
+                    return i * 10;
+                })
+                .attr("y", 0)
+                .style("fill", (d: number) => myColor(d))
+                .style("stroke-width", 1)
+                .style("stroke", "grey")
+                .style("opacity", 0.8)
+                .raise();
 
-                g.selectAll("rect")
-                    .data(data, (d: any) => d.group + ":" + d.variable)
-                    .enter()
-                    .append("rect")
-                    .attr("x", (d: HeatmapData) => x(d.group)!)
-                    .attr("y", (d: HeatmapData) => y(d.variable)!)
-                    .attr("width", x.bandwidth())
-                    .attr("height", y.bandwidth())
-                    .style("fill", (d: HeatmapData) => myColor(d.value))
-                    .style("stroke-width", 1)
-                    .style("stroke", "grey")
-                    .style("opacity", 0.8)
-                    .on("mouseover", mouseover)
-                    .on("mousemove", mousemove)
-                    .on("mouseleave", mouseleave);
-                
-                console.log("x-bandwidth", x.bandwidth());
-                console.log("y-bandwidth", y.bandwidth());
+            const offsetText = 10;
+            const format = d3.format(".2f");
+            
 
-                const sqSize = y.bandwidth();
-                const gridNum = graph.length;
+            g0.selectAll(".label")
+                .data(dummies)
+                .enter()
+                .append("text")
+                .attr("x", (d, i) => i * offsetText - 20) 
+                .attr("y", 5) 
+                .attr("text-anchor", "end") 
+                .attr("transform", (d, i) => `rotate(-90, ${i * offsetText}, 0)`)
+                .style("font-size", "5px")
+                .text((d) => format(d));
 
-                g.selectAll(".x-axis text")
-                    .on("mouseover", function (event) {
-                        console.log("EVENT", event);
-                        const element = event.target as SVGGraphicsElement;
-                        console.log("ELEMENT", element);
-                     //   mouseoverEvent(element, this, i, conv1, conv2, conv3, final, features, myColor, 5, gridNum, sqSize, true);
-                    })
-                    .on("mouseout", function (event) {
-                        const element = event.target as SVGGraphicsElement;
-                        removeEffect(element);
-                        d3.select("#tmp").remove();
-                        d3.select(".ihmp").remove();
-                    });
+            g0
+                .append("text")
+                .text("Color Scheme")
+                .attr("x", 200)
+                .attr("y", 50)
+                .attr("text-anchor", "middle")
+                .attr("font-size", 10);
 
-                g.selectAll(".y-axis text")
-                    .on("mouseover", function (event, d) {
-                        const element = event.target as SVGGraphicsElement;
-                        console.log("ELEMENT", element);
+            g.selectAll("rect")
+                .data(data, (d: any) => d.group + ":" + d.variable)
+                .enter()
+                .append("rect")
+                .attr("x", (d: HeatmapData) => x(d.group)!)
+                .attr("y", (d: HeatmapData) => y(d.variable)!)
+                .attr("width", x.bandwidth())
+                .attr("height", y.bandwidth())
+                .style("fill", (d: HeatmapData) => myColor(d.value / 250))
+                .style("stroke-width", 1)
+                .style("stroke", "grey")
+                .style("opacity", 0.8)
+                .on("mouseover", mouseover)
+                .on("mousemove", mousemove)
+                .on("mouseleave", mouseleave);
 
-                      //  mouseoverEvent(element, this, i, conv1, conv2, conv3, final, features, myColor, -5, gridNum, sqSize, false);
-                        //interactWithHeatmap(element, x.bandwidth(), graphs[0].length);
-                    })
-                    .on("mouseout", function (event, d) {
-                        const element = event.target as SVGGraphicsElement;
-                        removeEffect(element);
-                    });
-                //getting the coordinates
-                locations = get_cood_locations(data, locations);
+            console.log("x-bandwidth", x.bandwidth());
+            console.log("y-bandwidth", y.bandwidth());
+
+            g.selectAll(".x-axis text")
+                .on("mouseover", function (event) {
+                    console.log("EVENT", event);
+                    const element = event.target as SVGGraphicsElement;
+                    console.log("ELEMENT", element);
+                    //   mouseoverEvent(element, this, i, conv1, conv2, conv3, final, features, myColor, 5, gridNum, sqSize, true);
+                })
+                .on("mouseout", function (event) {
+                    const element = event.target as SVGGraphicsElement;
+                    removeEffect(element);
+                    d3.select("#tmp").remove();
+                    d3.select(".ihmp").remove();
+                });
+
+            g.selectAll(".y-axis text")
+                .on("mouseover", function (event, d) {
+                    const element = event.target as SVGGraphicsElement;
+                    console.log("ELEMENT", element);
+
+                    //  mouseoverEvent(element, this, i, conv1, conv2, conv3, final, features, myColor, -5, gridNum, sqSize, false);
+                    //interactWithHeatmap(element, x.bandwidth(), graphs[0].length);
+                })
+                .on("mouseout", function (event, d) {
+                    const element = event.target as SVGGraphicsElement;
+                    removeEffect(element);
+                });
+            //getting the coordinates
+            locations = get_cood_locations(data, locations);
             //crossConnectionMatrices(graphs, locations, offsetMat, pathMatrix);
             visualizeFeatures(
                 locations,

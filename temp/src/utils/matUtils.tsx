@@ -126,7 +126,7 @@ export function tooltipBars64(
 
         for (let i = 0; i < matrixSize; i++) {
             for (let j = 0; j < matrixSize; j++) {
-                let c: number = mat[i][j] * 1000;
+                let c: number = mat[i][j];
                 tooltipG
                     .append("rect")
                     .attr("x", k * cellSize - 75 * cellSize)
@@ -333,7 +333,7 @@ function addLayerName(locations:any, name:string, xOffset:number, yOffset:number
     const apt = deepClone(locations[locations.length-1]);
     apt[0] += xOffset;
     apt[1] += yOffset;
-    drawPoints(".mats","red", [apt]);
+    //drawPoints(".mats","red", [apt]);
     d3.select(".mats").append("text")
         .text(name)
         .attr("x", apt[0])
@@ -370,7 +370,7 @@ export function visualizeFeatures(
                 .attr("y", locations[i][1])
                 .attr("width", 5)
                 .attr("height", 10)
-                .attr("fill", myColor(features[i][j] * 1000))
+                .attr("fill", myColor(features[i][j]))
                 .attr("opacity", 1)
                 .attr("stroke", "gray")
                 .attr("stroke-width", 0.1);
@@ -409,7 +409,7 @@ export function visualizeFeatures(
                     .attr("y", locations[i][1])
                     .attr("width", 2)
                     .attr("height", 10)
-                    .attr("fill", myColor(nodeMat[m] * 1000))
+                    .attr("fill", myColor(nodeMat[m]))
                     .attr("opacity", 1)
                     .attr("stroke", "gray")
                     .attr("stroke-width", 0.1);
@@ -496,7 +496,6 @@ function drawPoolingVis(locations: any, pooling: number[], myColor: any) {
     locations[0][0] += 64 * 2;
     locations[locations.length - 1][0] += 64 * 2;
     locations[locations.length - 1][1] += 10;
-    const two = [locations[0], locations[locations.length - 1]];
     //find mid point
     const midY = (locations[locations.length - 1][1] - locations[0][1]) / 2;
     //all paths should connect to mid point
@@ -511,7 +510,7 @@ function drawPoolingVis(locations: any, pooling: number[], myColor: any) {
             .attr("y", midY - 5)
             .attr("width", 2)
             .attr("height", 10)
-            .attr("fill", myColor(pooling[i] * 1000))
+            .attr("fill", myColor(pooling[i]))
             .attr("opacity", 1)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1);
@@ -563,7 +562,7 @@ function drawTwoLayers(
             .attr("y", one[0][1])
             .attr("width", 10)
             .attr("height", 10)
-            .attr("fill", myColor(final[m] * 1000))
+            .attr("fill", myColor(final[m]))
             .attr("opacity", 1)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1);
@@ -594,7 +593,7 @@ function drawTwoLayers(
             .attr("y", aOne[0][1])
             .attr("width", 10)
             .attr("height", 10)
-            .attr("fill", myColor(result[m] * 1000))
+            .attr("fill", myColor(result[m]))
             .attr("opacity", 1)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1);

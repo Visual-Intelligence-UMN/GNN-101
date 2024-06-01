@@ -307,7 +307,7 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
   const nodesById = d3.group(nodes, (d: any) => d.id);
 
   const myColor = d3.scaleLinear<string>()
-    .domain([-100, 0, 100])
+    .domain([-0.25, 0, 0.25])
     .range(["orange", "white", "#69b3a2"]);
 
   nodesById.forEach((nodes, id) => {
@@ -328,7 +328,7 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
         .attr("y", (d: any, i: number) => (i) * 5)  
         .attr("width", 20)
         .attr("height", 5)
-        .style("fill", (d: number) => myColor(d * 1000))
+        .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 1)
         .style("stroke", "grey")
         .style("opacity", 0.8);
