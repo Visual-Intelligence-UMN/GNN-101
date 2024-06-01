@@ -339,7 +339,7 @@ export const Hint: React.FC<HintProps> = ({ text }) => {
 export function visualizeGraph(path: string) {
     const init = async (data: any) => {
         let allNodes: any[] = [];
-        const offset = 1000;
+        const offset = 600;
         const margin = { top: 10, right: 30, bottom: 30, left: 40 };
         const width = 6 * offset - margin.left - margin.right;
         const height = 1000 - margin.top - margin.bottom;
@@ -393,8 +393,8 @@ export function visualizeGraph(path: string) {
                         .id((d: any) => d.id)
                         .distance(10)
                 )
-                .force("charge", d3.forceManyBody().strength(-400))
-                .force("center", d3.forceCenter(width / 2, height / 2))
+                .force("charge", d3.forceManyBody().strength(-150))
+                .force("center", d3.forceCenter(width / 2, height / 3.5))
                 .on("tick", function ticked() {
                     link.attr("x1", (d: any) => d.source.x)
                         .attr("y1", (d: any) => d.source.y)
@@ -452,10 +452,10 @@ export function visualizeGraph(path: string) {
             const graphWidth = maxXDistance + 20
             const graphHeight = maxYDistance + 20;
 
-            const point1 = { x: offset * 0.1, y: height / 4 };
-            const point2 = { x: 0.9 * offset, y: height / 7 };
-            const point3 = { x: 0.9 * offset, y: height / 1.3 };
-            const point4 = { x: offset * 0.1, y: height / 1.2 };
+            const point1 = { x: 0, y: height / 8 };
+            const point2 = { x: 0.9 * offset, y: height / 20 };
+            const point3 = { x: 0.9 * offset, y: height / 1.7 };
+            const point4 = { x: 0, y: height / 1.5 };
 
             const x_dist = Math.abs(point1.x - point2.x);
             const y_dist = Math.abs(point1.y - point4.y)

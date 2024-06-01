@@ -351,6 +351,7 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
           .attr("r", 10)
           .attr("fill", "transparent");
       }
+      node.svgElement.raise();
 
       node.svgElement.on("mouseover", function() {
         featureGroup.style('visibility', 'visible');
@@ -440,7 +441,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
              const neighborControlX = (node.x + xOffset1 + neighborNode.x + xOffset2) / 2;
              let neighborControlY;
 
-             if ((node.y + 10 + neighborNode.y + 10) / 2 < height / 2) {
+             if ((node.y + 10 + neighborNode.y + 10) / 2 < height / 3.5) {
                neighborControlY = (node.y + 10 + neighborNode.y + 10) / 2 - 30 - upperIndex * 10;
                upperIndex++;
              } else {
@@ -473,7 +474,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
               const controlX = (node.x + xOffset1 + nextNode.x + xOffsetNext) / 2;
               let controlY;
   
-              if ((node.y + 10 + nextNode.y + 10) / 2 < height / 2) {
+              if ((node.y + 10 + nextNode.y + 10) / 2 < height / 3.5) {
                 controlY = Math.min(node.y + 10, nextNode.y + 10) - 50 - upperIndex * 10; 
                 upperIndex++;
               } else {
@@ -513,7 +514,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
 
           const path = svg.append("path")
           .attr("d", `M ${node.x + xOffset1} ${node.y + 10} L ${nextNode.x + xOffset2} ${nextNode.y + 10}`)
-           .style("stroke", "red")
+           .style("stroke", "blue")
            .style("opacity", 0.1)
            .style("stroke-width", calculateAverage(node.features))
            .style("fill", "none");
