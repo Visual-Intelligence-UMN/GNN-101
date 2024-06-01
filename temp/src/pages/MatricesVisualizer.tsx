@@ -52,6 +52,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
             let conv1: number[][] = [],
                 conv2: number[][] = [],
                 conv3: number[][] = [],
+                pooling: number[] = [],
                 final = null;
 
             console.log("intmData", intmData);
@@ -60,7 +61,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 conv1 = splitIntoMatrices(intmData.conv1);
                 conv2 = splitIntoMatrices(intmData.conv2);
                 conv3 = splitIntoMatrices(intmData.conv3);
-
+                pooling = intmData.pooling;
                 final = intmData.final;
 
                 console.log("pooling", intmData.pooling);
@@ -77,12 +78,14 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 );
             }
 
+            console.log("from mat vis pooling", pooling);
+
             console.log("path ", graph_path);
             let allNodes: any[] = [];
             const gLen = graph.length;
             const gridSize = 300;
             const margin = { top: 10, right: 80, bottom: 30, left: 80 };
-            const width = (gridSize + margin.left + margin.right) * gLen;
+            const width = (gridSize + margin.left + margin.right) * gLen - 6000;
             const height = (gridSize + margin.top + margin.bottom) * 2;
 
             let locations: number[][] = [];
@@ -147,13 +150,60 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 printAxisTextCoordinates();
 
                 // Build color scale
+                // var myColor = d3
+                //     .scaleLinear<string>()
+                //     .range(["white", "#69b3a2"])
+                //     .domain([1, 100]);
+
                 var myColor = d3
                     .scaleLinear<string>()
-                    .range(["white", "#69b3a2"])
-                    .domain([1, 100]);
+                    .domain([-100, 0, 100])
+                    .range(["orange", "white", "#69b3a2"])
+                    
 
                 const data = matrix_to_hmap(graph);
                 console.log("accepted data:", data);
+
+                //legend
+                let dummies = [];
+                for(let i=-200; i<=210; i+=10){
+                    dummies.push(i);
+                }
+                const g0 = d3
+                    .select("#matvis")
+                    .append("svg")
+                    .attr("class", "legend")
+                    .attr("width", 500)
+                    .attr("height", 50);
+                console.log("Dummies", dummies);
+                g0
+                    .selectAll(".rect")
+                    .data(dummies)
+                    .enter()
+                    .append("rect")
+                    .attr("width", 10)
+                    .attr("height", 10)
+                    .attr("x",(d:number, i:number)=>{return i*10})
+                    .attr("y", 0)
+                    .style("fill", (d:number)=>myColor(d))
+                    .style("stroke-width", 1)
+                    .style("stroke", "grey")
+                    .style("opacity", 0.8).raise();
+
+                    for(let i=-200; i<=210; i+=10){
+                        g0.select(".legend")
+                    .append("text")
+                    .attr("x", i * 10)
+                    .attr("y", 20)
+                    .attr('transform', 'rotate(-90, 100, 100)')
+                    .style("fill", "black")
+                    .text(i)
+                    .attr("text-anchor", "start")
+                    .style("alignment-baseline", "middle")
+                    }
+                
+                    
+                    
 
                 g.selectAll("rect")
                     .data(data, (d: any) => d.group + ":" + d.variable)
@@ -213,7 +263,9 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 conv1,
                 conv2,
                 conv3,
-                final
+                pooling,
+                final,
+                graph
             );
         };
 

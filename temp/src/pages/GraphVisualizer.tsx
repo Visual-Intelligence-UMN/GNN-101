@@ -39,7 +39,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
       console.log("path", graph_path);
       let allNodes: any[] = [];
-      const offset = 800;
+      const offset = 1000;
       const margin = { top: 10, right: 30, bottom: 30, left: 40 };
       const width = 6 * offset - margin.left - margin.right;
       const height = 1000 - margin.top - margin.bottom;
@@ -155,7 +155,6 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                   if (node1 !== node2) {
                     const xDistance = Math.abs(node1.x - node2.x);
                     const yDistance = Math.abs(node1.y - node2.y);
-
                     if (xDistance > maxXDistance) {
                       maxXDistance = xDistance;
                     }
@@ -181,7 +180,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
               const centerY = (point1.y + point3.y) / 2;
 
 
-              let scaleX = (graphWidth / (538.12));
+              let scaleX = (graphWidth / (700));
               let scaleY = (graphHeight / (512.63));
               let transform = `translate(${centerX}, ${centerY}) scale(${scaleX}, ${scaleY}) translate(${-centerX}, ${-centerY})`;
 

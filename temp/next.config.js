@@ -4,7 +4,7 @@ const CopyPlugin = require("copy-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
-  reactStrictMode: true,
+  reactStrictMode: false,
   //distDir: 'build',
   webpack: (config, {}) => {
     config.resolve.extensions.push(".ts", ".tsx");
