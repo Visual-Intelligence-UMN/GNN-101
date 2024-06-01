@@ -86,7 +86,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
             const gridSize = 300;
             const margin = { top: 10, right: 80, bottom: 30, left: 80 };
             const width = (gridSize + margin.left + margin.right) * gLen - 6000;
-            const height = (gridSize + margin.top + margin.bottom) * 2;
+            const height = (gridSize + margin.top + margin.bottom) * 2 - 200;
 
             let locations: number[][] = [];
 
