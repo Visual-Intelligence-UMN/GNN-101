@@ -317,6 +317,8 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
       const featureGroup = svg.append("g")
         .attr("transform", `translate(${(i - 2.5) * offset + node.x + 100}, ${node.y - 100})`);
 
+       
+
 
       featureGroup.selectAll("rect")
         .data(features)
@@ -330,6 +332,17 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
         .style("stroke-width", 1)
         .style("stroke", "grey")
         .style("opacity", 0.8);
+
+      featureGroup.append("text")
+        .attr("x", 10)  
+        .attr("y", 3)  
+        .attr("dy", ".35em")  
+        .text(node.id)
+        .style("font-size", "15px")
+        .style("fill", "black")
+        .style("text-anchor", "middle");  
+
+      node.featureGroup = featureGroup;  
 
       if (!node.svgElement) {
         node.svgElement = svg.append("circle")
@@ -346,12 +359,23 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
             link.style("opacity", 1);
           });
         }
+        if (node.relatedNodes) {
+          node.relatedNodes.forEach((n: any) => {
+            n.featureGroup.style('visibility', 'visible')
+
+          })
+        }
       }).on("mouseout", function() {
         featureGroup.style('visibility', 'hidden');
         if (node.links) {
           node.links.forEach((link: any) => {
             link.style("opacity", 0.1);
           });
+        }
+        if (node.relatedNodes) {
+          node.relatedNodes.forEach((n: any) => {
+            n.featureGroup.style('visibility', 'hidden')
+          })
         }
       });
 
@@ -386,6 +410,9 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
       if (!node.links) {
         node.links = [];
       }
+      if (!node.relatedNodes) {
+        node.relatedNodes = []
+      }
 
         const xOffset1 = (graphIndex - 2.5) * offset;
         const xOffset2 = (graphIndex - 1.5) * offset;
@@ -406,6 +433,10 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
              if (!neighborNode.links) {
                neighborNode.links = [];
              }
+             if (!neighborNode.relatedNodes) {
+              neighborNode.relatedNodes = [];
+             }
+            
              const neighborControlX = (node.x + xOffset1 + neighborNode.x + xOffset2) / 2;
              let neighborControlY;
 
@@ -428,6 +459,8 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
 
              node.links.push(path);
              neighborNode.links.push(path);
+             neighborNode.relatedNodes.push(node);
+      
            }
           })
           
@@ -459,7 +492,12 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
               if (!nextNode.links) {
                 nextNode.links = [];
               }
+              if (!nextNode.relatedNodes) {
+                nextNode.relatedNodes = [];
+              }
               nextNode.links.push(path);
+
+              nextNode.relatedNodes.push(node);
             }
           })
         }
@@ -494,106 +532,6 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
  }
 
 
-      
-
-//       if (i < nodes.length - 1) {
-//         const nextNode = nodes[i + 1];
-//         const xOffset1 = (node.graphIndex - 2.5) * offset;
-//         const xOffset2 = (nextNode.graphIndex - 2.5) * offset;
-
-//         if (!nextNode.links) {
-//           nextNode.links = [];
-//         }
-
-//         const controlX = (node.x + xOffset1 + nextNode.x + xOffset2) / 2;
-//         let controlY;
-
-//         if ((node.y + 10 + nextNode.y + 10) / 2 < height / 2) {
-//           controlY = Math.min(node.y + 10, nextNode.y + 10) - 50 - upperIndex * 10; 
-//           upperIndex++;
-//         } else {
-//           controlY = Math.max(node.y + 10, nextNode.y + 10) + 50 + lowerIndex * 10; 
-//           lowerIndex++;
-//         }
-
-//         const path = svg.append("path")
-//           .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${controlX} ${controlY} ${nextNode.x + xOffset2} ${nextNode.y + 10}`)
-//           .style("stroke", "red")
-//           .style("opacity", 0.1)
-//           .style("stroke-width", calculateAverage(node.features))
-//           .style("fill", "none");
-
-//         node.links.push(path);
-//         nextNode.links.push(path);
-
-//         let drawnLinks = new Set();
-
-//         const nextGraphLinks = graphs[nextNode.graphIndex].links;
-
-//         nextGraphLinks.forEach((link: any) => {
-//           const sortedIds = [link.source.id, link.target.id].sort();
-//           const linkId = sortedIds.join("-");
-
-//           if ((link.source.id === nextNode.id || link.target.id === nextNode.id) && !drawnLinks.has(linkId)) {
-//             drawnLinks.add(linkId);
-
-//             const neighborNode = link.source.id === nextNode.id ? link.target : link.source;
-//             if (!neighborNode.links) {
-//               neighborNode.links = [];
-//             }
-//             const neighborControlX = (node.x + xOffset1 + neighborNode.x + xOffset2) / 2;
-//             let neighborControlY;
-
-//             if ((node.y + 10 + neighborNode.y + 10) / 2 < height / 2) {
-//               neighborControlY = (node.y + 10 + neighborNode.y + 10) / 2 - 30 - upperIndexBlue * 10;
-//               upperIndexBlue++;
-//             } else {
-//               neighborControlY = (node.y + 10 + neighborNode.y + 10) / 2 + 30 + lowerIndexBlue * 10;
-//               lowerIndexBlue++;
-//             }
-
-//             const stroke_width = calculateAverage(node.features);
-            
-//             const path = svg.append("path")
-//               .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${neighborControlX} ${neighborControlY} ${neighborNode.x + (neighborNode.graphIndex - 2.5) * offset} ${neighborNode.y + 10}`)
-//               .style("stroke", "blue")
-//               .style("opacity", 0.1)
-//               .style("stroke-width", stroke_width)
-//               .style("fill", "none")
-
-//             node.links.push(path);
-//             neighborNode.links.push(path);
-//           }
-//         });
-
-//         //cover original nodes to avoid rendering order issue, may need fix later
-//         node.svgElement = svg.append("circle")
-//           .attr("cx", node.x + xOffset1)
-//           .attr("cy", node.y + 10)
-//           .attr("r", 10)
-//           .style("fill", "#69b3a2");
-       
-        
-//       } else {
-//         node.svgElement = svg.append("circle")
-//           .attr("cx", node.x + (i - 2.5) * offset)
-//           .attr("cy", node.y + 10)
-//           .attr("r", 10)
-//           .style("fill", "#69b3a2");
-//         node.svgElement.on("mouseover", function() {
-//           const stroke_width = calculateAverage(node.features) * 4;
-//           node.links.forEach((link: any) => {
-//             link.style("stroke-width", (stroke_width)).style("opacity", 1);
-//           });
-//         }).on("mouseout", function() {
-//           node.links.forEach((link: any) => {
-//             link.style("stroke-width", 10).style("opacity", 0.1);
-//           });
-//         });
-//       }
-//     });
-//   });
-// }
 
 export function deepClone(obj: any) {
     return JSON.parse(JSON.stringify(obj));
