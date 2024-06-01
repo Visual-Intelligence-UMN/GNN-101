@@ -335,7 +335,7 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
 
       featureGroup.append("text")
         .attr("x", 10)  
-        .attr("y", 3)  
+        .attr("y", -8)  
         .attr("dy", ".35em")  
         .text(node.id)
         .style("font-size", "15px")
