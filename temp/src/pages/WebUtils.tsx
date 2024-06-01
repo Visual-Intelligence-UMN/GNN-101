@@ -372,6 +372,14 @@ export function visualizeGraph(path: string) {
                 .join("circle")
                 .attr("r", 10)
                 .style("fill", "#69b3a2");
+
+            const labels = g1
+                .selectAll("text")
+                .data(data.nodes)
+                .join("text")
+                .attr("dx", -6)
+                .attr("dy", "0.5em")
+                .text((d: any) => d.name)    
                 
             
 
@@ -407,6 +415,9 @@ export function visualizeGraph(path: string) {
                         "cy",
                         (d: any) => d.y
                     );
+
+                    labels.attr("x", (d: any) => d.x)
+                          .attr("y", (d: any) => d.y);
                 })
                 .on("end", function ended() {
                     let value = null;

@@ -56,7 +56,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
         console.log("i", i);
         console.log(data);
 
-        if (data.nodes) {
+
           const xOffset = (i - 2.5) * offset;
           const g1 = svg
             .append("g")
@@ -141,14 +141,17 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                   );
                 }
                 if (value != null && i === 3) {
-                  node.features = value[index];
+                  node.features.push(value[index]);
                   index = index + 1;
+                }
+                if (value != null && i === 4) {
+                  node.features = [0];
                 }
                 allNodes.push(node);
               });
               let maxXDistance = 0;
               let maxYDistance = 0;
-              const limitedNodes = data.nodes.slice(0, 17);
+              const limitedNodes = data.nodes.slice(0, 17); // Why is it 17?
 
               limitedNodes.forEach((node1: any) => {
                 limitedNodes.forEach((node2: any) => {
@@ -197,6 +200,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                 .attr("fill", "none")
                 .attr('transform', transform);
               console.log(scaleX)
+    
               
                 if (i === graphs.length - 2) {
 
@@ -207,47 +211,14 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                   offset,
                   height
                 );
-
-
-                featureVisualizer(svg, allNodes, offset);
+                
+                
               }
+              featureVisualizer(svg, allNodes, offset);
             });
-        } else if (data.grids) {
-          console.log("Processing grid graph", data);
-
-          const allGrids: any[] = [];
-          const cellSize = offset / 64;
-
-          const gridGroup = svg
-            .append("g")
-            .attr("transform", `translate(${offset * 1.5},${offset / 10})`);
-
-          const grid = gridGroup
-            .selectAll("rect")
-            .data(data.grids)
-            .join("rect")
-            .attr("width", cellSize)
-            .attr("height", cellSize)
-            .attr("stroke", "black")
-            .attr("fill", "none")
-            .attr("x", (d, index) => 3 * offset - index * cellSize)
-            .attr("y", offset / 2.5);
-
-          data.grids.forEach((grid: any, index: number) => {
-            grid.graphIndex = i;
-            grid.row = 0;
-            grid.col = index;
-            grid.x = index * cellSize + offset;
-            grid.y = offset / 2.5;
-            grid.width = cellSize;
-            grid.height = cellSize;
-            allGrids.push(grid);
-          });
-          //connectGridGraphs(allGrids,allNodes,svg,graphs,offset,height)
-          featureVisualizer(svg, allGrids, offset);
+            
         }
-      });
-    };
+  )}
 
     const visualizeGNN = async (num: number) => {
       try {
