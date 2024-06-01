@@ -456,8 +456,8 @@ export function visualizeGraph(path: string) {
             if (graphWidth < x_dist && graphHeight < y_dist) {
                 scaleX = 1
                 scaleY = 1
-                transform = `translate(scale(${scaleX}, ${scaleY})`;
-              }
+                transform = `scale(${scaleX}, ${scaleY})`;
+            }
             const parallelogram = svg
                 .append("polygon")  
                 .attr("points", `${point1.x},${point1.y} ${point2.x},${point2.y} ${point3.x},${point3.y} ${point4.x},${point4.y}`)
