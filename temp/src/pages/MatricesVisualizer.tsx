@@ -83,9 +83,10 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
             console.log("path ", graph_path);
             let allNodes: any[] = [];
             const gLen = graph.length;
+            console.log("gLen", gLen);
             const gridSize = 300;
             const margin = { top: 10, right: 80, bottom: 30, left: 80 };
-            const width = (gridSize + margin.left + margin.right) * gLen - 6000;
+            const width = 20 * gLen + 50 + 6 * 102 + 1200;
             const height = (gridSize + margin.top + margin.bottom) * 2 - 200;
 
             let locations: number[][] = [];
