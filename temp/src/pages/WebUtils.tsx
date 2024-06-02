@@ -148,7 +148,7 @@ export const DescriptionPanel = () => {
     return (
         <Panel
             defaultSize={30}
-            minSize={20}
+            minSize={0}
             className="overflow-y-scroll"
             style={{ overflow: "auto" }}
         >
