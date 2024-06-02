@@ -77,8 +77,15 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             .selectAll("circle")
             .data(data.nodes)
             .join("circle")
-            .attr("r", 10)
+            .attr("r", 13)
             .style("fill", "#69b3a2");
+
+          const labels = g1
+            .selectAll("text")
+            .data(data.nodes)
+            .join("text")
+            .text((d: any) => d.id) 
+            .attr("font-size", `15px`);    
 
 
           // Define the simulation
@@ -113,6 +120,8 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                 "cy",
                 (d: any) => d.y
               );
+              labels.attr("x", (d: any) => d.x - 6)
+              .attr("y", (d: any) => d.y + 6);
             })
             .on("end", function ended() {
               let value = null;

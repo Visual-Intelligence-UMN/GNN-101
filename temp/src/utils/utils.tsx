@@ -310,45 +310,57 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
     .domain([-0.25, 0, 0.25])
     .range(["orange", "white", "#69b3a2"]);
 
+  // Array to keep track of occupied positions
+  const occupiedPositions: { x: number; y: number; width: number }[] = [];
+
   nodesById.forEach((nodes, id) => {
     nodes.forEach((node: any, i: number) => {
       const features = node.features;
+      let xPos = (i - 2.5) * offset + node.x + 100;
+      let yPos = node.y - 100;
+      const featureWidth = 15;
+
+      // Check and adjust yPos if it overlaps with existing featureGroups
+      occupiedPositions.forEach(pos => {
+        if (Math.abs(xPos - pos.x) < 15) {
+          xPos = pos.x + pos.width + 20; // Adjust y position to avoid overlap
+        }
+      });
+
+      // Add the new position to the occupied positions array
+      occupiedPositions.push({ x: xPos, y: yPos, width: featureWidth });
 
       const featureGroup = svg.append("g")
-        .attr("transform", `translate(${(i - 2.5) * offset + node.x + 100}, ${node.y - 100})`);
-
-       
-
+        .attr("transform", `translate(${xPos - 15}, ${yPos})`);
 
       featureGroup.selectAll("rect")
         .data(features)
         .enter()
         .append("rect")
-        .attr("x", 0)  
-        .attr("y", (d: any, i: number) => (i) * 5)  
-        .attr("width", 20)
-        .attr("height", 5)
+        .attr("x", 0)
+        .attr("y", (d: any, i: number) => i * 3)
+        .attr("width", 15)
+        .attr("height", 3)
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 1)
         .style("stroke", "grey")
         .style("opacity", 0.8);
 
       featureGroup.append("text")
-        .attr("x", 10)  
-        .attr("y", -8)  
-        .attr("dy", ".35em")  
+        .attr("x", 10)
+        .attr("y", -8)
+        .attr("dy", ".35em")
         .text(node.id)
         .style("font-size", "15px")
         .style("fill", "black")
-        .style("text-anchor", "middle");  
+        .style("text-anchor", "middle");
 
-      node.featureGroup = featureGroup;  
-
+      node.featureGroup = featureGroup;
       if (!node.svgElement) {
         node.svgElement = svg.append("circle")
-          .attr("cx", (node.x + ((node.graphIndex - 2.5) * offset)))
-          .attr("cy", (node.y + 10))
-          .attr("r", 10)
+          .attr("cx", node.x + ((node.graphIndex - 2.5) * offset))
+          .attr("cy", node.y + 10)
+          .attr("r", 13)
           .attr("fill", "transparent");
       }
       node.svgElement.raise();
@@ -362,21 +374,20 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
         }
         if (node.relatedNodes) {
           node.relatedNodes.forEach((n: any) => {
-            n.featureGroup.style('visibility', 'visible')
-
-          })
+            n.featureGroup.style('visibility', 'visible');
+          });
         }
       }).on("mouseout", function() {
         featureGroup.style('visibility', 'hidden');
         if (node.links) {
           node.links.forEach((link: any) => {
-            link.style("opacity", 0.1);
+            link.style("opacity", 0.05);
           });
         }
         if (node.relatedNodes) {
           node.relatedNodes.forEach((n: any) => {
-            n.featureGroup.style('visibility', 'hidden')
-          })
+            n.featureGroup.style('visibility', 'hidden');
+          });
         }
       });
 
@@ -385,19 +396,18 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
   });
 }
 
-
 function calculateAverage(arr: number[]): number {
   const sum = arr.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
   const average = sum / arr.length;
-
-  if (average * 100 < 1 || average > 0.1) {
-    return 1;
-  }
-  return average * 100;
+  return average * 10;
 }
 
 export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset: number, height: number) {
   const nodesByIndex = d3.group(nodes, (d: any) => d.graphIndex);
+
+  const myColor = d3.scaleLinear<string>()
+    .domain([-0.25, 0, 0.25])
+    .range(["red", "purple", "blue"]);
 
 
   nodesByIndex.forEach((nodes, graphIndex) => {
@@ -405,8 +415,6 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
     let upperIndex = 0;
     let lowerIndex = 0;
     nodes.forEach((node: any, i) => {
-
-      
 
       if (!node.links) {
         node.links = [];
@@ -438,30 +446,25 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
               neighborNode.relatedNodes = [];
              }
             
-             const neighborControlX = (node.x + xOffset1 + neighborNode.x + xOffset2) / 2;
-             let neighborControlY;
+              const controlX1 = node.x + xOffset1 + (neighborNode.x + xOffset2 - node.x - xOffset1) * 0.3;
+              const controlY1 = node.y + 10;
+              const controlX2 = node.x + xOffset1 + (neighborNode.x + xOffset2 - node.x - xOffset1) * 0.7;
+              const controlY2 = neighborNode.y + 10;
 
-             if ((node.y + 10 + neighborNode.y + 10) / 2 < height / 3.5) {
-               neighborControlY = (node.y + 10 + neighborNode.y + 10) / 2 - 30 - upperIndex * 10;
-               upperIndex++;
-             } else {
-               neighborControlY = (node.y + 10 + neighborNode.y + 10) / 2 + 30 + lowerIndex * 10;
-               lowerIndex++;
-             }
+              const color = calculateAverage(node.features);
 
-             const stroke_width = calculateAverage(node.features);
-            
-             const path = svg.append("path")
-               .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${neighborControlX} ${neighborControlY} ${neighborNode.x + (neighborNode.graphIndex - 2.5) * offset} ${neighborNode.y + 10}`)
-               .style("stroke", "blue")
-               .style("opacity", 0.1)
-               .style("stroke-width", stroke_width)
-               .style("fill", "none")
+              const path = svg.append("path")
+                .attr("d", `M ${node.x + xOffset1} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${neighborNode.x + (neighborNode.graphIndex - 2.5) * offset} ${neighborNode.y + 10}`)
+                .style("stroke", myColor(color))
+                .style("opacity", 0.07)
+                .style("stroke-width", 1)
+                .style("fill", "none");
 
-             node.links.push(path);
-             neighborNode.links.push(path);
-             neighborNode.relatedNodes.push(node);
-      
+
+              node.links.push(path);
+              neighborNode.links.push(path);
+              neighborNode.relatedNodes.push(node);
+        
            }
           })
           
@@ -470,23 +473,20 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
           nextNode.forEach((nextNode: any) => {
             if (node.id === nextNode.id) {
               const xOffsetNext = (graphIndex + 1 - 2.5) * offset;
-  
-              const controlX = (node.x + xOffset1 + nextNode.x + xOffsetNext) / 2;
-              let controlY;
-  
-              if ((node.y + 10 + nextNode.y + 10) / 2 < height / 3.5) {
-                controlY = Math.min(node.y + 10, nextNode.y + 10) - 50 - upperIndex * 10; 
-                upperIndex++;
-              } else {
-                controlY = Math.max(node.y + 10, nextNode.y + 10) + 50 + lowerIndex * 10; 
-                lowerIndex++;
-              }
-  
+
+              const controlX1 = node.x + xOffset1 + (nextNode.x + xOffsetNext - node.x - xOffset1) * 0.3;
+              const controlY1 = node.y + 10;
+              const controlX2 = node.x + xOffset1 + (nextNode.x + xOffsetNext - node.x - xOffset1) * 0.7;
+              const controlY2 = nextNode.y + 10;
+
+
+            const color = calculateAverage(node.features);
+
               const path = svg.append("path")
-                .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${controlX} ${controlY} ${nextNode.x + xOffsetNext} ${nextNode.y + 10}`)
-                .style("stroke", "red")
-                .style("opacity", 0.1)
-                .style("stroke-width", calculateAverage(node.features))
+                .attr("d", `M ${node.x + xOffset1} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffsetNext} ${nextNode.y + 10}`)
+                .style("stroke", myColor(color))
+                .style("opacity", 0.07)
+                .style("stroke-width", 1)
                 .style("fill", "none");
   
               node.links.push(path);
@@ -505,19 +505,24 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
       
         
       } else {  
-        
+          const color = calculateAverage(node.features)
    
           
           const nextLayer = graphs[graphIndex + 1];
           if (nextLayer) {
             let nextNode = nextLayer.nodes[0];
 
-          const path = svg.append("path")
-          .attr("d", `M ${node.x + xOffset1} ${node.y + 10} L ${nextNode.x + xOffset2} ${nextNode.y + 10}`)
-           .style("stroke", "blue")
-           .style("opacity", 0.1)
-           .style("stroke-width", calculateAverage(node.features))
-           .style("fill", "none");
+            const controlX1 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.3;
+            const controlY1 = node.y + 10;
+            const controlX2 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.7;
+            const controlY2 = nextNode.y + 10;
+  
+            const path = svg.append("path")
+              .attr("d", `M ${node.x + xOffset1} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffset2} ${nextNode.y + 10}`)
+              .style("stroke", myColor(color))
+              .style("opacity", 0.07)
+              .style("stroke-width", 1)
+              .style("fill", "none");
            
           node.links.push(path);
           if (!nextNode.links) {
