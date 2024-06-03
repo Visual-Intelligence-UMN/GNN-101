@@ -278,7 +278,7 @@ export async function prep_graphs(g_num: number, data: any) {
       };
       graphs.push(graphData);
   }
-  for (var i = 0; i < 2; i++) {
+  for (var i = 0; i < 3; i++) {
     var node: NodeType = {
       id: 0,
       name: " ",

@@ -6,6 +6,7 @@ import {
   connectCrossGraphNodes,
   featureVisualizer,
   process,
+  softmax,
 } from "../utils/utils";
 import { IntmData } from "./FileUpload";
 import { visualizeGraph } from "./WebUtils";
@@ -64,6 +65,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
               "transform",
               `translate(${xOffset},${margin.top})`
             );
+
 
           // Initialize the links
           const link = g1
@@ -142,6 +144,9 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                 if (i === 4) {
                   value = intmData.final;
                 }
+                if (i === 5) {
+                  value = intmData.final;
+                }
               }
               data.nodes.forEach((node: any) => {
                 node.graphIndex = i;
@@ -153,7 +158,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                   );
                 }
   
-                if (value != null && i === 4) {
+                if (value != null && i >= 4) {
                   node.features.push(value[index]);
                   index = index + 1;
                 }
@@ -223,9 +228,31 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                 );
                 
                 
+                
               }
               featureVisualizer(svg, allNodes, offset);
             });
+
+            let text = " ";
+            if (i <= 2) {
+              text = `GCNGconv${i + 1}`
+            }
+            if (i === 3) {
+              text = "Pooling"
+            }
+            if (i === 4) {
+              text = "Model Output"
+            }
+            if (i === 5) {
+              text = "Prediction Result"
+            }
+
+            g1
+              .append("text")
+              .attr("x", offset * 2.5)
+              .attr("y", height / 1.5)
+              .attr("text-anchor", "start")
+              .text(text);
             
         }
   )}
