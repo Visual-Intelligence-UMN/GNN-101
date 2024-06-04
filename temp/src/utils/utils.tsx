@@ -19,7 +19,7 @@ export function drawPoints(cName:string, color:string, points: number[][]): void
       .append("circle")
       .attr("cx", d => d[0])
       .attr("cy", d => d[1])
-      .attr("r", 1) // the raidus of the point
+      .attr("r", 3) // the raidus of the point
       .attr("fill", color); // set color to color
 }
 

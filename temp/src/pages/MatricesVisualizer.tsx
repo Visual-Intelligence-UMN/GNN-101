@@ -9,6 +9,8 @@ import {
     load_json,
     matrix_to_hmap,
     get_axis_gdata,
+    get_cood_from_parent,
+    drawPoints,
 } from "../utils/utils";
 import {
     crossConnectionMatrices,
@@ -46,7 +48,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
     }
 
     useEffect(() => {
-        const init = async (graph: any, features: any[][]) => {
+        const init = async (graph: any, features: any[][], nodeAttrs:string[]) => {
             const offsetMat = 100;
 
             let conv1: number[][] = [],
@@ -270,10 +272,43 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 final,
                 graph
             );
+            //visualize node attributes
+            const textCood = get_cood_from_parent(".y-axis", "text");
+            console.log("textCood", textCood);
+            //drawPoints(".mats", "red", textCood);
+            //get the node attr as an array
+
+            //for y-axis
+            for(let i=0; i<textCood.length; i++){
+                d3.select(".mats")
+                    .append("text")
+                    .attr("x", textCood[i][0] + 20)
+                    .attr("y", textCood[i][1] + 22.5)
+                    .attr("font-size", "10px")
+                    .text(nodeAttrs[i]);
+            }
+            //for x-axis
+            const rectCood = get_cood_from_parent(".mats", "rect");
+            console.log("rectCood", rectCood);
+            const step = graph.length;
+            let xTextCood = [];
+            for(let i=(step-1); i<graph.length * graph.length; i+=step){
+                xTextCood.push(rectCood[i]);
+            }
+            console.log("xTextCood", xTextCood);
+            //drawPoints(".mats", "red", xTextCood);
+            for(let i=0; i<xTextCood.length; i++){
+                d3.select(".mats")
+                    .append("text")
+                    .attr("x", xTextCood[i][0]-2.5)
+                    .attr("y", xTextCood[i][1]+60)
+                    .attr("font-size", "10px")
+                    .text(nodeAttrs[i]);
+            }
         };
 
         //VIsualization Pipeline
-        const visualizeGNN = async (num: number) => {
+        const visualizeGNN = async () => {
             try {
                 setIsLoading(true);
                 // Process data
@@ -281,16 +316,46 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 const data = await load_json(graph_path);
                 console.log("data matvis", data);
 
+                //node attributes extraction
+                console.log("data.x", data.x);
+                let nodeAttrs = []
+                for(let i=0; i<data.x.length; i++){
+                    const idx = data.x[i].findIndex((element:number) => element===1);
+                    console.log("attr", i, idx);
+                    let attr = "C";
+                    switch(idx){
+                        case 1:
+                            attr="N";
+                            break;
+                        case 2:
+                            attr="O";
+                            break;
+                        case 3:
+                            attr="F";
+                            break;
+                        case 4:
+                            attr="I";
+                            break;
+                        case 5:
+                            attr="Cl";
+                            break;
+                        case 6:
+                            attr="Br";
+                            break;
+                    }
+                    nodeAttrs.push(attr);
+                }
+
+                console.log("node attr array", nodeAttrs);
+
                 //accept the features from original json file
                 const features = await get_features_origin(data);
                 console.log("o features", features);
 
                 const processedData = await graph_to_matrix(data);
                 console.log("pData matvis", processedData);
-                const graphsData = await prepMatrices(num, processedData);
-                console.log("gData", graphsData);
                 // Initialize and run D3 visualization with processe  d data
-                await init(graphsData[0], features);
+                await init(processedData, features, nodeAttrs);
             } catch (error) {
                 console.error("Error in visualizeGNN:", error);
             } finally {
@@ -301,7 +366,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
         if (intmData == null || changed) {
             visualizeMatrix(graph_path);
         } else {
-            visualizeGNN(4);
+            visualizeGNN();
         }
         console.log("i fire once");
     }, [graph_path, intmData, changed]);
