@@ -23,6 +23,7 @@ import {
     mouseoverEvent,
     visualizeFeatures,
     drawNodeAttributes,
+    getNodeAttributes,
 } from "@/utils/matUtils";
 import { roundToTwo, visualizeMatrix } from "./WebUtils";
 
@@ -287,33 +288,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
 
                 //node attributes extraction
                 console.log("data.x", data.x);
-                let nodeAttrs = []
-                for(let i=0; i<data.x.length; i++){
-                    const idx = data.x[i].findIndex((element:number) => element===1);
-                    console.log("attr", i, idx);
-                    let attr = "C";
-                    switch(idx){
-                        case 1:
-                            attr="N";
-                            break;
-                        case 2:
-                            attr="O";
-                            break;
-                        case 3:
-                            attr="F";
-                            break;
-                        case 4:
-                            attr="I";
-                            break;
-                        case 5:
-                            attr="Cl";
-                            break;
-                        case 6:
-                            attr="Br";
-                            break;
-                    }
-                    nodeAttrs.push(attr);
-                }
+                const nodeAttrs = getNodeAttributes(data);
 
                 console.log("node attr array", nodeAttrs);
 

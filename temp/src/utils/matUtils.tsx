@@ -9,7 +9,38 @@ import {
 } from "./utils";
 import * as d3 from "d3";
 
-export function drawNodeAttributes(nodeAttrs: any, graph:any){
+export function getNodeAttributes(data: any) {
+    let nodeAttrs = [];
+    for (let i = 0; i < data.x.length; i++) {
+        const idx = data.x[i].findIndex((element: number) => element === 1);
+        console.log("attr", i, idx);
+        let attr = "C";
+        switch (idx) {
+            case 1:
+                attr = "N";
+                break;
+            case 2:
+                attr = "O";
+                break;
+            case 3:
+                attr = "F";
+                break;
+            case 4:
+                attr = "I";
+                break;
+            case 5:
+                attr = "Cl";
+                break;
+            case 6:
+                attr = "Br";
+                break;
+        }
+        nodeAttrs.push(attr);
+    }
+    return nodeAttrs;
+}
+
+export function drawNodeAttributes(nodeAttrs: any, graph: any) {
     //visualize node attributes
     const textCood = get_cood_from_parent(".y-axis", "text");
     console.log("textCood", textCood);
@@ -17,7 +48,7 @@ export function drawNodeAttributes(nodeAttrs: any, graph:any){
     //get the node attr as an array
 
     //for y-axis
-    for(let i=0; i<textCood.length; i++){
+    for (let i = 0; i < textCood.length; i++) {
         d3.select(".mats")
             .append("text")
             .attr("x", textCood[i][0] + 20)
@@ -30,16 +61,16 @@ export function drawNodeAttributes(nodeAttrs: any, graph:any){
     console.log("rectCood", rectCood);
     const step = graph.length;
     let xTextCood = [];
-    for(let i=(step-1); i<graph.length * graph.length; i+=step){
+    for (let i = step - 1; i < graph.length * graph.length; i += step) {
         xTextCood.push(rectCood[i]);
     }
     console.log("xTextCood", xTextCood);
     //drawPoints(".mats", "red", xTextCood);
-    for(let i=0; i<xTextCood.length; i++){
+    for (let i = 0; i < xTextCood.length; i++) {
         d3.select(".mats")
             .append("text")
-            .attr("x", xTextCood[i][0]-2.5)
-            .attr("y", xTextCood[i][1]+60)
+            .attr("x", xTextCood[i][0] - 2.5)
+            .attr("y", xTextCood[i][1] + 60)
             .attr("font-size", "10px")
             .text(nodeAttrs[i]);
     }
@@ -365,12 +396,18 @@ export function mouseoverEvent(
     d3.select(element).style("fill", "red").style("font-weight", "bold");
 }
 
-function addLayerName(locations:any, name:string, xOffset:number, yOffset:number){
-    const apt = deepClone(locations[locations.length-1]);
+function addLayerName(
+    locations: any,
+    name: string,
+    xOffset: number,
+    yOffset: number
+) {
+    const apt = deepClone(locations[locations.length - 1]);
     apt[0] += xOffset;
     apt[1] += yOffset;
     //drawPoints(".mats","red", [apt]);
-    d3.select(".mats").append("text")
+    d3.select(".mats")
+        .append("text")
         .text(name)
         .attr("x", apt[0])
         .attr("y", apt[1])
@@ -427,7 +464,7 @@ export function visualizeFeatures(
                 locations[i][0] += 7 * 2 + 100 + 25;
             }
         }
-        addLayerName(locations, "GCNConv"+(k+1), 0, 30);
+        addLayerName(locations, "GCNConv" + (k + 1), 0, 30);
         //drawPoints(".mats","red",locations);
         const gcnFeature = gcnFeatures[k];
         for (let i = 0; i < locations.length; i++) {
@@ -489,7 +526,7 @@ function drawCrossConnection(
             .attr("fill", "none");
     }
     //draw one-multiple paths - three
-    let pts:number[][] = [];
+    let pts: number[][] = [];
     const curve = d3.line().curve(d3.curveBasis);
     for (let i = 0; i < graph.length; i++) {
         for (let j = 0; j < graph[0].length; j++) {
@@ -500,13 +537,24 @@ function drawCrossConnection(
                 console.log("control points", hpoint, lpoint);
                 d3.select(".mats")
                     .append("path")
-                    .attr("d", curve([alocations[i], hpoint, lpoint, blocations[j]]))
+                    .attr(
+                        "d",
+                        curve([alocations[i], hpoint, lpoint, blocations[j]])
+                    )
                     .attr("stroke", "black")
                     .attr("opacity", 0.05)
                     .attr("fill", "none");
                 pts.push(hpoint);
                 pts.push(lpoint);
-                console.log("odata", alocations[i], blocations[i], "low", lpoint, "high", hpoint);
+                console.log(
+                    "odata",
+                    alocations[i],
+                    blocations[i],
+                    "low",
+                    lpoint,
+                    "high",
+                    hpoint
+                );
             }
         }
     }
@@ -515,12 +563,12 @@ function drawCrossConnection(
     d3.selectAll("path").lower();
 }
 
-function computeMids(point1: any, point2: any){
+function computeMids(point1: any, point2: any) {
     //find mid - x
-    const midX = (point1[0]+point2[0])/2;
+    const midX = (point1[0] + point2[0]) / 2;
     const res = [
-        [midX - 20, point1[1]], 
-        [midX + 20, point2[1]]
+        [midX - 20, point1[1]],
+        [midX + 20, point2[1]],
     ];
     console.log("res", res);
     return res;
@@ -580,13 +628,9 @@ function drawPoolingVis(locations: any, pooling: number[], myColor: any) {
 }
 
 //the function to draw the last two layers of the model
-function drawTwoLayers(
-    one:any,
-    final:any,
-    myColor:any
-){
+function drawTwoLayers(one: any, final: any, myColor: any) {
     //find the next position
-    one[0][0] += (64 * 2 + 102);
+    one[0][0] += 64 * 2 + 102;
     let aOne = deepClone(one);
     one[0][1] -= 5;
     //drawPoints(".mats", "red", one);
@@ -609,8 +653,7 @@ function drawTwoLayers(
     let bOne = deepClone(aOne);
     bOne[0][0] -= 102;
     //connect
-    d3
-        .select(".mats")
+    d3.select(".mats")
         .append("path")
         .attr("d", d3.line()([aOne[0], bOne[0]]))
         .attr("stroke", "black")
@@ -639,8 +682,7 @@ function drawTwoLayers(
     aOne[0][1] += 5;
     let cOne = deepClone(aOne);
     cOne[0][0] -= 102;
-    d3
-        .select(".mats")
+    d3.select(".mats")
         .append("path")
         .attr("d", d3.line()([aOne[0], cOne[0]]))
         .attr("stroke", "black")
