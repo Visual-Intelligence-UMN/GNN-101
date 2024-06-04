@@ -22,6 +22,8 @@ import {
     mouseleave,
     HeatmapData,
     mouseoverEvent,
+    drawNodeAttributes,
+    getNodeAttributes,
 } from "@/utils/matUtils";
 
 //Math function:::
@@ -502,7 +504,7 @@ export function visualizeGraph(path: string) {
 //-------------------------------------------------------------
 //single matrix visualizer
 export function visualizeMatrix(path: string) {
-    const init = async (graph: any, features: any) => {
+    const init = async (graph: any, features: any, nodeAttrs: any) => {
         const gridSize = 300;
         const margin = { top: 10, right: 80, bottom: 30, left: 80 };
         const width = gridSize + margin.left + margin.right;
@@ -626,6 +628,8 @@ export function visualizeMatrix(path: string) {
                 const element = event.target as SVGGraphicsElement;
                 removeEffect(element);
             });
+        
+            drawNodeAttributes(nodeAttrs, graph);
     };
 
     const visualizeMat = async (path: string) => {
@@ -633,6 +637,7 @@ export function visualizeMatrix(path: string) {
         //console.log("o features", features);
         try {
             const data = await load_json(path);
+            const nodeAttrs = getNodeAttributes(data);
             const features = await get_features_origin(data);
             console.log("VIS features", features);
             const processedData = await graph_to_matrix(data);
@@ -640,7 +645,7 @@ export function visualizeMatrix(path: string) {
             //const graphsData = await prepMatrices(1, processedData);
             //console.log("VIS gData", graphsData);
             // Initialize and run D3 visualization with processe  d data
-            await init(processedData, features);
+            await init(processedData, features, nodeAttrs);
         } catch (error) {
             console.log("Error in single matrix visualizer", error);
         }
