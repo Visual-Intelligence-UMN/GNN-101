@@ -362,35 +362,35 @@ export function mouseoverEvent(
         const matrixSize = 8;
 
         const tooltipG = featureTooltip(adjustedX, adjustedY);
-        tooltipBars64(
-            target,
-            i,
-            conv1,
-            conv2,
-            conv3,
-            final,
-            matrixSize,
-            tooltipG,
-            cellSize,
-            offset,
-            myColor,
-            gridNum,
-            sqSize,
-            xAxis
-        );
+        // tooltipBars64(
+        //     target,
+        //     i,
+        //     conv1,
+        //     conv2,
+        //     conv3,
+        //     final,
+        //     matrixSize,
+        //     tooltipG,
+        //     cellSize,
+        //     offset,
+        //     myColor,
+        //     gridNum,
+        //     sqSize,
+        //     xAxis
+        // );
     } else {
         const tooltipG = featureTooltip(adjustedX, adjustedY);
-        tooltipBars7(
-            target,
-            features,
-            tooltipG,
-            10,
-            offset,
-            myColor,
-            xAxis,
-            sqSize,
-            gridNum
-        );
+        // tooltipBars7(
+        //     target,
+        //     features,
+        //     tooltipG,
+        //     10,
+        //     offset,
+        //     myColor,
+        //     xAxis,
+        //     sqSize,
+        //     gridNum
+        // );
     }
 
     d3.select(element).style("fill", "red").style("font-weight", "bold");
