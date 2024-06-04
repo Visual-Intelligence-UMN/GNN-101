@@ -22,6 +22,7 @@ import {
     HeatmapData,
     mouseoverEvent,
     visualizeFeatures,
+    drawNodeAttributes,
 } from "@/utils/matUtils";
 import { roundToTwo, visualizeMatrix } from "./WebUtils";
 
@@ -272,39 +273,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 final,
                 graph
             );
-            //visualize node attributes
-            const textCood = get_cood_from_parent(".y-axis", "text");
-            console.log("textCood", textCood);
-            //drawPoints(".mats", "red", textCood);
-            //get the node attr as an array
-
-            //for y-axis
-            for(let i=0; i<textCood.length; i++){
-                d3.select(".mats")
-                    .append("text")
-                    .attr("x", textCood[i][0] + 20)
-                    .attr("y", textCood[i][1] + 22.5)
-                    .attr("font-size", "10px")
-                    .text(nodeAttrs[i]);
-            }
-            //for x-axis
-            const rectCood = get_cood_from_parent(".mats", "rect");
-            console.log("rectCood", rectCood);
-            const step = graph.length;
-            let xTextCood = [];
-            for(let i=(step-1); i<graph.length * graph.length; i+=step){
-                xTextCood.push(rectCood[i]);
-            }
-            console.log("xTextCood", xTextCood);
-            //drawPoints(".mats", "red", xTextCood);
-            for(let i=0; i<xTextCood.length; i++){
-                d3.select(".mats")
-                    .append("text")
-                    .attr("x", xTextCood[i][0]-2.5)
-                    .attr("y", xTextCood[i][1]+60)
-                    .attr("font-size", "10px")
-                    .text(nodeAttrs[i]);
-            }
+            drawNodeAttributes(nodeAttrs, graph);
         };
 
         //VIsualization Pipeline
