@@ -669,66 +669,66 @@ export function analyzeGraph(graphData: any) {
 }
 
 
-export function removeDuplicate(links: LinkType[]): LinkType[] {
-  const edges: number[][] = []; 
-  let new_source;
-  let new_target;
-  let type;
-  let new_relation : LinkType;
-  let list = [];
-  let new_links: LinkType[] = [];
-  let index = 0;
+// export function removeDuplicate(links: LinkType[]): LinkType[] {
+//   const edges: number[][] = []; 
+//   let new_source;
+//   let new_target;
+//   let type;
+//   let new_relation : LinkType;
+//   let list = [];
+//   let new_links: LinkType[] = [];
+//   let index = 0;
 
 
-  for (let i = 0; i < links.length; i++) {
-    const source = links[i].source;
-    const target = links[i].target;
-    let isInEdge: boolean = false;
-    if (source > target) {
-      list = [target, source];
-    } else {
-      list = [source, target];
-    }
+//   for (let i = 0; i < links.length; i++) {
+//     const source = links[i].source;
+//     const target = links[i].target;
+//     let isInEdge: boolean = false;
+//     if (source > target) {
+//       list = [target, source];
+//     } else {
+//       list = [source, target];
+//     }
   
-    for (let j = 0; j < edges.length; j++) {
+//     for (let j = 0; j < edges.length; j++) {
 
-      if (edges[j][0] === list[0] && edges[j][1] === list[1]) {
-        isInEdge = true;
-      }
-    }
+//       if (edges[j][0] === list[0] && edges[j][1] === list[1]) {
+//         isInEdge = true;
+//       }
+//     }
     
-    if (!isInEdge) {
-      edges.push(list);
-      new_source = links[i].source;
-      new_target = links[i].target;
-      type = links[i].type;
-      new_relation = {
-        source: new_source,
-        target: new_target,
-        type: type
-      }
-      new_links.push(new_relation);
-      if (links[i].type === "double") {
-        new_relation = {
-          source: new_target,
-          target: new_source,
-          type: type
-        }
-        new_links.push(new_relation);
-      }
-      if (links[i].type === "triple") {
-        new_links.push(new_relation);
-        new_relation = {
-          source: new_target,
-          target: new_source,
-          type: type
-        }
-        new_links.push(new_relation);
-      }
-    }
-    if (links.length === 0) {
-      new_links = links
-    }
-  }
-  return new_links;
-}
+//     if (!isInEdge) {
+//       edges.push(list);
+//       new_source = links[i].source;
+//       new_target = links[i].target;
+//       type = links[i].type;
+//       new_relation = {
+//         source: new_source,
+//         target: new_target,
+//         type: type
+//       }
+//       new_links.push(new_relation);
+//       if (links[i].type === "double") {
+//         new_relation = {
+//           source: new_target,
+//           target: new_source,
+//           type: type
+//         }
+//         new_links.push(new_relation);
+//       }
+//       if (links[i].type === "triple") {
+//         new_links.push(new_relation);
+//         new_relation = {
+//           source: new_target,
+//           target: new_source,
+//           type: type
+//         }
+//         new_links.push(new_relation);
+//       }
+//     }
+//     if (links.length === 0) {
+//       new_links = links
+//     }
+//   }
+//   return new_links;
+// }
