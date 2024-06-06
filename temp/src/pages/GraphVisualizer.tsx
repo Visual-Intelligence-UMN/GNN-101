@@ -6,7 +6,6 @@ import {
   prep_graphs,
   connectCrossGraphNodes,
   featureVisualizer,
-  removeDuplicate,
   process,
   softmax,
 } from "../utils/utils";
@@ -218,15 +217,14 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
               const centerX = (point1.x + point3.x) / 2;
               const centerY = (point1.y + point3.y) / 2;
 
+              const tolerance = 140;
 
-              let scaleX = (graphWidth / (700));
-              let scaleY = (graphHeight / (512.63));
+              let scaleX = ((graphWidth + tolerance + 20) / x_dist);
+              let scaleY = ((graphHeight + tolerance + 20) / y_dist);
               let transform = `translate(${centerX}, ${centerY}) scale(${scaleX}, ${scaleY}) translate(${-centerX}, ${-centerY})`;
 
-              if (graphWidth < x_dist && graphHeight < y_dist) {
-                scaleX = 1
-                scaleY = 1
-                transform = `scale(${scaleX}, ${scaleY})`;
+              if (graphWidth + tolerance < x_dist && graphHeight + tolerance < y_dist) {
+                transform = `scale(1, 1)`;
               }
               console.log('distances', x_dist, y_dist)
               const parallelogram = svg
@@ -237,8 +235,28 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                 .attr('transform', transform);
               console.log(scaleX)
 
+  
+              let text = " ";
+              if (i <= 2) {
+                text = `GCNGconv${i + 1}`
+              }
+              if (i === 3) {
+                text = "Pooling"
+              }
+              if (i === 4) {
+                text = "Model Output"
+              }
+              if (i === 5) {
+                text = "Prediction Result"
+              }
+              const textElement = svg.append("text")
+              .attr("x", centerX)
+              .attr("y", point4.y + 30) // position the text 30px below the bottom of the parallelogram
+              .attr("text-anchor", "middle") // center the text horizontally
+              .attr("fill", "black") // set the text color to black
+              .attr("font-size", "15px") // set the font size to 15px
+              .text(text);
               
-    
               
                 if (i === graphs.length - 2) {
 
@@ -256,27 +274,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
               featureVisualizer(svg, allNodes, offset);
             });
 
-            let text = " ";
-            if (i <= 2) {
-              text = `GCNGconv${i + 1}`
-            }
-            if (i === 3) {
-              text = "Pooling"
-            }
-            if (i === 4) {
-              text = "Model Output"
-            }
-            if (i === 5) {
-              text = "Prediction Result"
-            }
-
-            g1
-              .append("text")
-              .attr("x", offset * 2.5)
-              .attr("y", height / 1.5)
-              .attr("text-anchor", "start")
-              .text(text);
-            
+           
         }
   )}
 
