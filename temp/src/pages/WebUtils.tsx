@@ -394,23 +394,36 @@ export function visualizeGraph(path: string) {
                         .id((d: any) => d.id)
                         .distance(10)
                 )
-                .force("charge", d3.forceManyBody().strength(-150))
-                .force("center", d3.forceCenter(width / 2, height / 3.5))
+                .force("center", d3.forceCenter(width / 2, height / 2.8))
+                .force("collide", d3.forceCollide().radius(20).strength(0.8))
+                .force("aromatic", d3.forceManyBody().strength((d: any) => (d.is_aromatic ? -210: -100)).theta(0.9))
                 .on("tick", function ticked() {
-                    link.attr("x1", (d: any) => d.source.x)
-                        .attr("y1", (d: any) => d.source.y)
-                        .attr("x2", (d: any) => d.target.x)
-                        .attr("y2", (d: any) => d.target.y)
-                        .attr("transform", function (d: any) {
-                            // Calculate the offset for each link
-                            const dx = d.target.x - d.source.x;
-                            const dy = d.target.y - d.source.y;
-                            const dr = Math.sqrt(dx * dx + dy * dy);
-                            const offsetX = 5 * (dy / dr);
-                            const offsetY = 5 * (-dx / dr);
-
-                            return `translate(${offsetX}, ${offsetY})`;
-                        });
+                  link.attr("x1", (d: any) => d.source.x)
+                    .attr("y1", (d: any) => d.source.y)
+                    .attr("x2", (d: any) => d.target.x)
+                    .attr("y2", (d: any) => d.target.y)
+                    .attr("transform", function (d: any) {
+                      if (d.type === "double") {
+                        const dx = d.target.x - d.source.x;
+                        const dy = d.target.y - d.source.y;
+                        const dr = Math.sqrt(dx * dx + dy * dy);
+                        const offsetX = 5 * (dy / dr);
+                        const offsetY = 5 * (-dx / dr);
+                        return `translate(${offsetX}, ${offsetY})`;
+                      } 
+                      else {
+                        return null;
+                      }
+                    })
+                    .style("stroke", function (d: any) {
+                      if (d.type === "aromatic") {
+                        return "purple";
+                      }
+                      else {
+                        return "#aaa";
+                      }
+                    }) ;
+    
 
                     node.attr("cx", (d: any) => d.x).attr(
                         "cy",
@@ -422,7 +435,6 @@ export function visualizeGraph(path: string) {
                 })
                 .on("end", function ended() {
                     let value = null;
-                    let index = 0;
                     data.nodes.forEach((node: any) => {
                         node.graphIndex = 0;
                         

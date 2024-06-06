@@ -20,6 +20,9 @@ def data_to_json(data):
         edge_index_list = data.edge_index.tolist()  # Convert to [2] and then to list
         json_data['edge_index'] = edge_index_list
 
+    if data.edge_attr is not None:
+        json_data['edge_attr'] = data.edge_attr
+
     # Convert labels to a list
     if data.y is not None:
         json_data['y'] = data.y.tolist()  

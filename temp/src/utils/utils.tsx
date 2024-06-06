@@ -207,21 +207,21 @@ export type NodeType = {
   id: number;
   name: string;
   features: number[];
+  is_aromatic: boolean;
 };
 
 export type LinkType = {
   source: number;
   target: number;
+  type: string;
 };
 
 export async function data_prep(o_data: any) {
 
-  
 
   let final_data = {
     nodes: [] as NodeType[],
     links: [] as LinkType[],
-
   };
 
   const atom_map: { [key: string]: string } = {
@@ -234,33 +234,75 @@ export async function data_prep(o_data: any) {
     "0,0,0,0,0,0,1": "Br"
   };
 
+  const edge_map: {[key: string]: string } = {
+    "1,0,0,0": "aromatic",
+    "0,1,0,0": "single",
+    "0,0,1,0": "double",
+    "0,0,0,1": "triple"
+  }
+
   try {
     var data = await load_json(o_data);
     var nodes = data.x;
     var edges = data.edge_index;
+    var edge_attr = data.edge_attr;
+
+
+    // identify if the node is aromatic
+    // store all aromatic node id to a set
+    let aromatic_node_index_set = new Set();
+    if (edge_attr) {
+      
+      for (var i = 0; i < edge_attr.length; i++) {
+        if (edge_attr[i][0] === 1) {
+          if (!aromatic_node_index_set.has(edges[0][i])) {
+            aromatic_node_index_set.add(edges[0][i]);
+          }
+          if (!aromatic_node_index_set.has(edges[1][i])) {
+            aromatic_node_index_set.add(edges[1][i]);
+          }
+        }
+      }
+  }
+    var is_aromatic;
+    var edge_type;
+
 
     for (var i = 0; i < nodes.length; i++) {
       var feature_str = nodes[i].join(',');
       var atom_name = atom_map[feature_str] || "Unknown";
+      if (aromatic_node_index_set.has(i)) {
+        is_aromatic = true;
+      } else {
+        is_aromatic = false;
+      }
+  
       var new_node = {
         id: i,
         name: atom_name,
-        features: nodes[i]
+        features: nodes[i],
+        is_aromatic: is_aromatic
       }
       final_data.nodes.push(new_node);
     }
 
     for (var i = 0; i < edges[0].length; i++) {
+      if (edge_attr) {
+        var edge_attr_string = edge_attr[i].join(',');
+      }
+      edge_type = edge_map[edge_attr_string] || "Unknown"
+      
+      
       var new_relation = {
         source: edges[0][i],
-        target: edges[1][i]
+        target: edges[1][i],
+        type: edge_type
       }
       final_data.links.push(new_relation);
       console.log(new_relation);
     }
 
 
-    
     return final_data;
   } catch (error) {
     console.error('There has been an error in data_prep:', error);
@@ -283,6 +325,7 @@ export async function prep_graphs(g_num: number, data: any) {
       id: 0,
       name: " ",
       features: [0],
+      is_aromatic: false
     } 
 
     var node_array = [];
@@ -291,6 +334,7 @@ export async function prep_graphs(g_num: number, data: any) {
      var links: LinkType = {
        source: 0,
        target: 0,
+       type: "single"
      }
     var graphData = {};
       graphData = {
@@ -299,7 +343,7 @@ export async function prep_graphs(g_num: number, data: any) {
       }
       graphs.push(graphData);
     }
-    console.log("QWE",graphs)
+
   return graphs;
 }
 
@@ -622,4 +666,69 @@ export function analyzeGraph(graphData: any) {
     has_loop: hasLoop.size > 0,
     is_directed: isDirected,
   };
+}
+
+
+export function removeDuplicate(links: LinkType[]): LinkType[] {
+  const edges: number[][] = []; 
+  let new_source;
+  let new_target;
+  let type;
+  let new_relation : LinkType;
+  let list = [];
+  let new_links: LinkType[] = [];
+  let index = 0;
+
+
+  for (let i = 0; i < links.length; i++) {
+    const source = links[i].source;
+    const target = links[i].target;
+    let isInEdge: boolean = false;
+    if (source > target) {
+      list = [target, source];
+    } else {
+      list = [source, target];
+    }
+  
+    for (let j = 0; j < edges.length; j++) {
+
+      if (edges[j][0] === list[0] && edges[j][1] === list[1]) {
+        isInEdge = true;
+      }
+    }
+    
+    if (!isInEdge) {
+      edges.push(list);
+      new_source = links[i].source;
+      new_target = links[i].target;
+      type = links[i].type;
+      new_relation = {
+        source: new_source,
+        target: new_target,
+        type: type
+      }
+      new_links.push(new_relation);
+      if (links[i].type === "double") {
+        new_relation = {
+          source: new_target,
+          target: new_source,
+          type: type
+        }
+        new_links.push(new_relation);
+      }
+      if (links[i].type === "triple") {
+        new_links.push(new_relation);
+        new_relation = {
+          source: new_target,
+          target: new_source,
+          type: type
+        }
+        new_links.push(new_relation);
+      }
+    }
+    if (links.length === 0) {
+      new_links = links
+    }
+  }
+  return new_links;
 }
