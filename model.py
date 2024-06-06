@@ -13,6 +13,7 @@ print(torch.__version__)
 from torch_geometric.datasets import TUDataset
 #
 dataset = TUDataset(root='data/TUDataset', name='MUTAG')
+print(dataset[0])
 #
 print()
 print(f'Dataset: {dataset}:')
@@ -205,6 +206,10 @@ def data_to_json(data):
     if data.edge_index is not None:
         edge_index_list = data.edge_index.tolist()  # Convert to [2] and then to list
         json_data['edge_index'] = edge_index_list
+
+    if data.edge_attrs is not None:
+        edge_attr_list = data.edge_attr.tolist()
+        json_data['edge_attr'] = edge_attr_list    
     
     # Convert labels to a list
     if data.y is not None:
@@ -215,7 +220,11 @@ def data_to_json(data):
     
     
     return json_data
+
+
+
+
 json_data = data_to_json(dataset[0])
-with open('input_graph.json', 'w') as f:
-        json.dump(json_data, f, indent=4)
+with open(f'temp/public/json_data/input_graph{0}.json', 'w') as f:
+    json.dump(json_data, f, indent=4)
 # %%
