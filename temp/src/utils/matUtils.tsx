@@ -423,7 +423,8 @@ export function visualizeFeatures(
     conv3: any,
     pooling: any,
     final: any,
-    graph: any
+    graph: any,
+    adjList: any
 ) {
     //a data structure to store all feature vis information
     interface FrameDS{
@@ -585,6 +586,20 @@ export function visualizeFeatures(
         if(fr!=null){
             fr.style.opacity = "1";
         }
+
+        //frame interactions
+        let prevVis = adjList[node];
+        let prevLayer:any = null;
+        
+        if(Number(layerID)==0)prevLayer=frames["features"];
+        else if(Number(layerID)==1)prevLayer=frames["GCNConv1"];
+        else if(Number(layerID)==2)prevLayer=frames["GCNConv2"];
+        console.log("prev", layerID, prevVis, prevLayer);
+        if(prevLayer!=null){
+            prevVis.forEach((vis:number)=>{
+                prevLayer[vis].style.opacity = "1";
+            });
+        }
         
     });
     d3.selectAll(".featureVis").on("mouseout", function(event, d){
@@ -606,6 +621,20 @@ export function visualizeFeatures(
         else fr = frames["GCNConv3"][node];
         if(fr!=null){
             fr.style.opacity = "0";
+        }
+
+        //frame interactions
+        let prevVis = adjList[node];
+        let prevLayer:any = null;
+        
+        if(Number(layerID)==0)prevLayer=frames["features"];
+        else if(Number(layerID)==1)prevLayer=frames["GCNConv1"];
+        else if(Number(layerID)==2)prevLayer=frames["GCNConv2"];
+        console.log("prev", layerID, prevVis, prevLayer);
+        if(prevLayer!=null){
+            prevVis.forEach((vis:number)=>{
+                prevLayer[vis].style.opacity = "0";
+            });
         }
     });
 }

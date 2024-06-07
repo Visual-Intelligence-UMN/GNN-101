@@ -61,19 +61,19 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
         const init = async (graph: any, features: any[][], nodeAttrs:string[]) => {
             //a data structure to record the link relationship
             //fill up the linkMap
-            let singleLinkMap:number[][] = Array.from({ length: graph.length }, () => []);
+            let adjList:number[][] = Array.from({ length: graph.length }, () => []);
             for(let i=0; i<graph.length; i++){
                 //push itself to the linkMap
-                singleLinkMap[i].push(i);
+                adjList[i].push(i);
                 for(let j=0; j<graph[0].length; j++){
                     if(graph[i][j]==1){
                         //push its neighbors to linkMap
-                        singleLinkMap[i].push(j);
+                        adjList[i].push(j);
                     }
                 }
-                console.log("GRAPH i", i, singleLinkMap[i]);
+                console.log("GRAPH i", i, adjList[i]);
             }
-            console.log("GRAPH LINKS", singleLinkMap);
+            console.log("GRAPH LINKS", adjList);
             
 
             const offsetMat = 100;
@@ -297,7 +297,8 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 conv3,
                 pooling,
                 final,
-                graph
+                graph,
+                adjList
             );
             drawNodeAttributes(nodeAttrs, graph);
         };
