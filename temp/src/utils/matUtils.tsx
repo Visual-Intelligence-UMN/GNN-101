@@ -558,7 +558,7 @@ export function visualizeFeatures(
             console.log("grouped grouped", paths);
         } else {
             //visualize pooling layer
-            let one = drawPoolingVis(locations, pooling, myColor);
+            let one = drawPoolingVis(locations, pooling, myColor, frames);
             //visualize last layer and softmax output
             drawTwoLayers(one, final, myColor);
         }
@@ -718,7 +718,7 @@ function computeMids(point1: any, point2: any) {
     return res;
 }
 
-function drawPoolingVis(locations: any, pooling: number[], myColor: any) {
+function drawPoolingVis(locations: any, pooling: number[], myColor: any, frames: any) {
     let oLocations = deepClone(locations);
     //find edge points
     locations[0][0] += 64 * 2;
@@ -781,7 +781,7 @@ function drawPoolingVis(locations: any, pooling: number[], myColor: any) {
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("layerID", 4)
-        .attr("class", "frame");
+        .attr("class", "poolingFrame");
     //send all paths to the back
     d3.selectAll("path").lower();
 
@@ -795,6 +795,11 @@ function drawPoolingVis(locations: any, pooling: number[], myColor: any) {
         }
         //interaction with frame
         f.attr("opacity", 1);
+        //d3.selectAll('[layerID="3"][class="frame"]').attr("opacity", 1);
+        const layerFrames = frames["GCNConv3"];
+        layerFrames.forEach((frame: HTMLElement) => {
+            frame.style.opacity = '1';  
+        });
     });
 
     g.on("mouseout", function(event, d){
@@ -805,6 +810,11 @@ function drawPoolingVis(locations: any, pooling: number[], myColor: any) {
         }
         //interaction with frame
         f.attr("opacity", 0);
+        //d3.selectAll('[layerID="3"][class="frame"]').attr("opacity", 0);
+        const layerFrames = frames["GCNConv3"];
+        layerFrames.forEach((frame: HTMLElement) => {
+            frame.style.opacity = '0';  
+        });
     });
     
     return one;
@@ -858,10 +868,12 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
     //add interaction
     g.on("mouseover",function(event, d){
         d3.select(".path1").attr("opacity", 1);
+        d3.select(".poolingFrame").attr("opacity", 1);
         f.attr("opacity", 1);
     });
     g.on("mouseout",function(event, d){
         d3.select(".path1").attr("opacity", 0.02);
+        d3.select(".poolingFrame").attr("opacity", 0);
         f.attr("opacity", 0);
     });
     //visualize the result
@@ -911,10 +923,12 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
         //add interaction
     g1.on("mouseover",function(event, d){
         d3.select(".path2").attr("opacity", 1);
+        f.attr("opacity", 1);
         f1.attr("opacity", 1);
     });
     g1.on("mouseout",function(event, d){
         d3.select(".path2").attr("opacity", 0.02);
+        f.attr("opacity", 0);
         f1.attr("opacity", 0);
     });
 }
