@@ -425,6 +425,19 @@ export function visualizeFeatures(
     final: any,
     graph: any
 ) {
+    //a data structure to store all feature vis information
+    interface FrameDS{
+        features:any[],
+        GCNConv1:any[],
+        GCNConv2:any[],
+        GCNConv3:any[],
+    }
+    var frames:FrameDS = {
+        features:[],
+        GCNConv1:[],
+        GCNConv2:[],
+        GCNConv3:[]
+    }
     //initial visualizer
     for (let i = 0; i < locations.length; i++) {
         locations[i][0] += 25;
@@ -452,11 +465,33 @@ export function visualizeFeatures(
                 .attr("stroke", "gray")
                 .attr("stroke-width", 0.1);
         }
+        //draw frame
+        const f = g.append("rect")
+            .attr("x", locations[i][0])
+            .attr("y", locations[i][1])
+            .attr("width", 5 * 7)
+            .attr("height", 10)
+            .attr("fill", "none")
+            .attr("opacity", 0)
+            .attr("stroke", "black")
+            .attr("stroke-width", 1)
+            .attr("node", i)
+            .attr("layerID", 0);
+        frames["features"].push(f.node());
         //add mouse event
         g.on("mouseover", function(event, d){
             const layerID = d3.select(this).attr("layerID");
             const node = d3.select(this).attr("node");
             console.log("Current layerID and node", layerID, node);
+            const fr = frames["features"][Number(node)];
+            fr.style.opacity = "1";
+        });
+        g.on("mouseout", function(event, d){
+            const layerID = d3.select(this).attr("layerID");
+            const node = d3.select(this).attr("node");
+            console.log("Current layerID and node", layerID, node);
+            const fr = frames["features"][Number(node)];
+            fr.style.opacity = "0";
         });
     }
     //add layer label for the first one
@@ -498,6 +533,23 @@ export function visualizeFeatures(
                     .attr("stroke", "gray")
                     .attr("stroke-width", 0.1);
             }
+            //draw frame
+            const f = g.append("rect")
+                .attr("x", locations[i][0])
+                .attr("y", locations[i][1])
+                .attr("width", 2 * 64)
+                .attr("height", 10)
+                .attr("fill", "none")
+                .attr("opacity", 0)
+                .attr("stroke", "black")
+                .attr("stroke-width", 1)
+                .attr("node", i)
+                .attr("layerID", k+1)
+                .attr("class", "frame");
+            //havent figure out how to optimize this code..
+            if(k==0)frames["GCNConv1"].push(f.node());
+            if(k==1)frames["GCNConv2"].push(f.node());
+            if(k==2) frames["GCNConv3"].push(f.node());
             //drawPoints(".mats", "red", locations);
         }
         if (k != 2) {
@@ -513,6 +565,7 @@ export function visualizeFeatures(
     }
     //drawPoints(".mats", "red", blocations);
     d3.selectAll(".featureVis").on("mouseover", function(event, d){
+        //paths interactions
         const layerID = Number(d3.select(this).attr("layerID")) - 1;
         const node = Number(d3.select(this).attr("node"));
         console.log("Current layerID and node", layerID, node);
@@ -523,17 +576,36 @@ export function visualizeFeatures(
                 div.style.opacity = '1';  
             });
         }
+        //feature vis interactions
+        //feature self interaction
+        let fr:any = null;
+        if(layerID==0)fr = frames["GCNConv1"][node];
+        else if(layerID==1)fr = frames["GCNConv2"][node];
+        else fr = frames["GCNConv3"][node];
+        if(fr!=null){
+            fr.style.opacity = "1";
+        }
+        
     });
     d3.selectAll(".featureVis").on("mouseout", function(event, d){
         const layerID = Number(d3.select(this).attr("layerID")) - 1;
         const node = Number(d3.select(this).attr("node"));
         console.log("Current layerID and node", layerID, node);
+        //paths interactions
         if(paths!=null){
             console.log("grouped", paths[layerID][node]);
             const changePaths = paths[layerID][node];
             changePaths.forEach((div: HTMLElement) => {
                 div.style.opacity = '0.05';  
             });
+        }
+        //feature self interaction
+        let fr:any = null;
+        if(layerID==0)fr = frames["GCNConv1"][node];
+        else if(layerID==1)fr = frames["GCNConv2"][node];
+        else fr = frames["GCNConv3"][node];
+        if(fr!=null){
+            fr.style.opacity = "0";
         }
     });
 }
@@ -698,16 +770,31 @@ function drawPoolingVis(locations: any, pooling: number[], myColor: any) {
         
         paths.push(path.node());
     }
+    //draw frame
+    const f = g.append("rect")
+        .attr("x", locations[0][0] + 102)
+        .attr("y", midY - 5)
+        .attr("width", 2 * 64)
+        .attr("height", 10)
+        .attr("fill", "none")
+        .attr("opacity", 0)
+        .attr("stroke", "black")
+        .attr("stroke-width", 1)
+        .attr("layerID", 4)
+        .attr("class", "frame");
     //send all paths to the back
     d3.selectAll("path").lower();
 
     g.on("mouseover", function(event, d){
         console.log("over",paths);
+        //interaction with paths
         if(paths!=null){
             paths.forEach((div: HTMLElement) => {
                 div.style.opacity = '1';  
             });
         }
+        //interaction with frame
+        f.attr("opacity", 1);
     });
 
     g.on("mouseout", function(event, d){
@@ -716,6 +803,8 @@ function drawPoolingVis(locations: any, pooling: number[], myColor: any) {
                 div.style.opacity = '0.05';  
             });
         }
+        //interaction with frame
+        f.attr("opacity", 0);
     });
     
     return one;
@@ -741,6 +830,18 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1);
     }
+    //draw frame
+    const f = g.append("rect")
+        .attr("x", one[0][0])
+        .attr("y", one[0][1])
+        .attr("width", 2 * 10)
+        .attr("height", 10)
+        .attr("fill", "none")
+        .attr("opacity", 0)
+        .attr("stroke", "black")
+        .attr("stroke-width", 1)
+        .attr("layerID", 4)
+        .attr("class", "frame");
     //add text
     addLayerName(one, "Model Output", 0, 20);
     //find positions to connect
@@ -757,9 +858,11 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
     //add interaction
     g.on("mouseover",function(event, d){
         d3.select(".path1").attr("opacity", 1);
+        f.attr("opacity", 1);
     });
     g.on("mouseout",function(event, d){
         d3.select(".path1").attr("opacity", 0.02);
+        f.attr("opacity", 0);
     });
     //visualize the result
     aOne[0][0] += 20 + 102;
@@ -781,6 +884,18 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
             .attr("stroke-width", 0.1);
     }
     addLayerName(aOne, "Prediction Result", 0, 20);
+    //draw frame
+    const f1 = g.append("rect")
+        .attr("x", aOne[0][0])
+        .attr("y", aOne[0][1])
+        .attr("width", 2 * 10)
+        .attr("height", 10)
+        .attr("fill", "none")
+        .attr("opacity", 0)
+        .attr("stroke", "black")
+        .attr("stroke-width", 1)
+        .attr("layerID", 4)
+        .attr("class", "frame");
     //connect
     aOne[0][1] += 5;
     let cOne = deepClone(aOne);
@@ -796,8 +911,10 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
         //add interaction
     g1.on("mouseover",function(event, d){
         d3.select(".path2").attr("opacity", 1);
+        f1.attr("opacity", 1);
     });
     g1.on("mouseout",function(event, d){
         d3.select(".path2").attr("opacity", 0.02);
+        f1.attr("opacity", 0);
     });
 }
