@@ -27,6 +27,14 @@ import {
 } from "@/utils/matUtils";
 import { roundToTwo, visualizeMatrix } from "./WebUtils";
 
+
+interface LinkMap{
+    // n * m matrix, where n represents the number of featureVis and m means the link
+    firstLayerLinks: number[][]; 
+    secondLayerLinks: number[][]; 
+    thirdLayerLinks: number[][]; 
+}
+
 interface MatricesVisualizerProps {
     graph_path: string;
     intmData: any;
@@ -51,6 +59,23 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
 
     useEffect(() => {
         const init = async (graph: any, features: any[][], nodeAttrs:string[]) => {
+            //a data structure to record the link relationship
+            //fill up the linkMap
+            let singleLinkMap:number[][] = Array.from({ length: graph.length }, () => []);
+            for(let i=0; i<graph.length; i++){
+                //push itself to the linkMap
+                singleLinkMap[i].push(i);
+                for(let j=0; j<graph[0].length; j++){
+                    if(graph[i][j]==1){
+                        //push its neighbors to linkMap
+                        singleLinkMap[i].push(j);
+                    }
+                }
+                console.log("GRAPH i", i, singleLinkMap[i]);
+            }
+            console.log("GRAPH LINKS", singleLinkMap);
+            
+
             const offsetMat = 100;
 
             let conv1: number[][] = [],

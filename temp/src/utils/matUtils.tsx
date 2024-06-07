@@ -430,12 +430,16 @@ export function visualizeFeatures(
         locations[i][0] += 25;
         locations[i][1] += 2;
     }
-    //draw cross connections for first layer and second layer
-    drawCrossConnection(graph, locations, 35, 102);
+    //draw cross connections for features layer and first GCNConv layer
+    drawCrossConnection(graph, locations, 35, 102, 0);
 
     //using locations to find the positions for first feature visualizers
     for (let i = 0; i < locations.length; i++) {
-        const g = d3.select(".mats").append("g");
+        const g = d3.select(".mats")
+                    .append("g")
+                    .attr("node", i)
+                    .attr("layerID", 0);
+
         for (let j = 0; j < 7; j++) {
             const fVis = g
                 .append("rect")
@@ -448,11 +452,18 @@ export function visualizeFeatures(
                 .attr("stroke", "gray")
                 .attr("stroke-width", 0.1);
         }
+        //add mouse event
+        g.on("mouseover", function(event, d){
+            const layerID = d3.select(this).attr("layerID");
+            const node = d3.select(this).attr("node");
+            console.log("Current layerID and node", layerID, node);
+        });
     }
     //add layer label for the first one
     addLayerName(locations, "Features Name", 0, 30);
 
     //GCNCov Visualizer
+    let paths:any;
     const gcnFeatures = [conv1, conv2, conv3];
     console.log("gcnf", gcnFeatures);
     console.log("CONV1", conv1);
@@ -469,7 +480,7 @@ export function visualizeFeatures(
         const gcnFeature = gcnFeatures[k];
         for (let i = 0; i < locations.length; i++) {
             //const cate = get_category_node(features[i]) * 100;
-            const g = d3.select(".mats").append("g");
+            const g = d3.select(".mats").append("g").attr("class","featureVis").attr("node",i).attr("layerID", k+1);
 
             console.log("new", gcnFeature);
 
@@ -490,7 +501,9 @@ export function visualizeFeatures(
             //drawPoints(".mats", "red", locations);
         }
         if (k != 2) {
-            drawCrossConnection(graph, locations, 62 * 2, 102);
+            // visualize cross connections btw 1st, 2nd, 3rd GCNConv
+            paths = drawCrossConnection(graph, locations, 62 * 2, 102, k+1);
+            console.log("grouped grouped", paths);
         } else {
             //visualize pooling layer
             let one = drawPoolingVis(locations, pooling, myColor);
@@ -499,14 +512,40 @@ export function visualizeFeatures(
         }
     }
     //drawPoints(".mats", "red", blocations);
+    d3.selectAll(".featureVis").on("mouseover", function(event, d){
+        const layerID = Number(d3.select(this).attr("layerID")) - 1;
+        const node = Number(d3.select(this).attr("node"));
+        console.log("Current layerID and node", layerID, node);
+        if(paths!=null){
+            console.log("grouped", paths[layerID][node]);
+            const changePaths = paths[layerID][node];
+            changePaths.forEach((div: HTMLElement) => {
+                div.style.opacity = '1';  
+            });
+        }
+    });
+    d3.selectAll(".featureVis").on("mouseout", function(event, d){
+        const layerID = Number(d3.select(this).attr("layerID")) - 1;
+        const node = Number(d3.select(this).attr("node"));
+        console.log("Current layerID and node", layerID, node);
+        if(paths!=null){
+            console.log("grouped", paths[layerID][node]);
+            const changePaths = paths[layerID][node];
+            changePaths.forEach((div: HTMLElement) => {
+                div.style.opacity = '0.05';  
+            });
+        }
+    });
 }
 
 function drawCrossConnection(
     graph: any,
     locations: any,
     firstVisSize: number,
-    gapSize: number
+    gapSize: number,
+    layerID: number
 ) {
+    console.log("layerID", layerID);
     let alocations = deepClone(locations);
     for (let i = 0; i < alocations.length; i++) {
         alocations[i][0] += firstVisSize;
@@ -516,6 +555,7 @@ function drawCrossConnection(
     for (let i = 0; i < blocations.length; i++) {
         blocations[i][0] += gapSize;
     }
+    console.log("location length", alocations.length);
     //draw one-one paths
     for (let i = 0; i < alocations.length; i++) {
         d3.select(".mats")
@@ -523,7 +563,9 @@ function drawCrossConnection(
             .attr("d", d3.line()([alocations[i], blocations[i]]))
             .attr("stroke", "black")
             .attr("opacity", 0.05)
-            .attr("fill", "none");
+            .attr("fill", "none")
+            .attr("endingNode", i)
+            .attr("layerID", layerID);
     }
     //draw one-multiple paths - three
     let pts: number[][] = [];
@@ -543,7 +585,9 @@ function drawCrossConnection(
                     )
                     .attr("stroke", "black")
                     .attr("opacity", 0.05)
-                    .attr("fill", "none");
+                    .attr("fill", "none")
+                    .attr("endingNode",j)
+                    .attr("layerID",layerID);
                 pts.push(hpoint);
                 pts.push(lpoint);
                 console.log(
@@ -561,6 +605,34 @@ function drawCrossConnection(
     //drawPoints(".mats", "red", pts);
 
     d3.selectAll("path").lower();
+
+    //group all path elements by LayerID and Ending Node
+    interface GroupedPaths {
+        [layerID: string]: {
+            [endingNode: string]: SVGPathElement[];
+        };
+    }
+    const paths = d3.selectAll<SVGPathElement, any>("path");
+
+    const groupedPaths: GroupedPaths = paths.nodes().reduce((acc: GroupedPaths, path: SVGPathElement) => {
+        const layerID: string = path.getAttribute('layerID') || '';  // 确保 layerID 和 endingNode 不是 null
+        const endingNode: string = path.getAttribute('endingNode') || '';
+
+        if (!acc[layerID]) {
+            acc[layerID] = {};
+        }
+
+        if (!acc[layerID][endingNode]) {
+            acc[layerID][endingNode] = [];
+        }
+
+        acc[layerID][endingNode].push(path);
+
+        return acc;
+    }, {});
+    console.log("groupedPath",groupedPaths);
+    return groupedPaths;
+
 }
 
 function computeMids(point1: any, point2: any) {
@@ -587,8 +659,8 @@ function drawPoolingVis(locations: any, pooling: number[], myColor: any) {
     //drawPoints(".mats", "red", one);
     //draw the pooling layer
     console.log("from feature vis", pooling);
+    const g = d3.select(".mats").append("g").attr("class", "pooling");
     for (let i = 0; i < pooling.length; i++) {
-        const g = d3.select(".mats").append("g");
         g.append("rect")
             .attr("x", locations[0][0] + 102 + 2 * i)
             .attr("y", midY - 5)
@@ -611,19 +683,41 @@ function drawPoolingVis(locations: any, pooling: number[], myColor: any) {
     //drawPoints(".mats", "red", oLocations);
     //connnnnnnnect!!!
     const curve = d3.line().curve(d3.curveBasis);
+    const paths:any[] = [];
+    const mats = d3.select(".mats");
     for (let i = 0; i < oLocations.length; i++) {
         const res = computeMids(oLocations[i], one[0]);
         const lpoint = res[0];
         const hpoint = res[1];
-        d3.select(".mats")
+        const path = mats
             .append("path")
             .attr("d", curve([oLocations[i], lpoint, hpoint, one[0]]))
             .attr("stroke", "black")
             .attr("opacity", 0.05)
             .attr("fill", "none");
+        
+        paths.push(path.node());
     }
     //send all paths to the back
     d3.selectAll("path").lower();
+
+    g.on("mouseover", function(event, d){
+        console.log("over",paths);
+        if(paths!=null){
+            paths.forEach((div: HTMLElement) => {
+                div.style.opacity = '1';  
+            });
+        }
+    });
+
+    g.on("mouseout", function(event, d){
+        if(paths!=null){
+            paths.forEach((div: HTMLElement) => {
+                div.style.opacity = '0.05';  
+            });
+        }
+    });
+    
     return one;
 }
 
@@ -658,7 +752,15 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
         .attr("d", d3.line()([aOne[0], bOne[0]]))
         .attr("stroke", "black")
         .attr("opacity", 0.05)
-        .attr("fill", "none");
+        .attr("fill", "none")
+        .attr("class", "path1");
+    //add interaction
+    g.on("mouseover",function(event, d){
+        d3.select(".path1").attr("opacity", 1);
+    });
+    g.on("mouseout",function(event, d){
+        d3.select(".path1").attr("opacity", 0.02);
+    });
     //visualize the result
     aOne[0][0] += 20 + 102;
     //drawPoints(".mats","red",aOne);
@@ -666,8 +768,9 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
     //need replace this by real result after softmax
     let result = softmax(final);
     console.log("mat result", result);
+    const g1 = d3.select(".mats").append("g");
     for (let m = 0; m < result.length; m++) {
-        g.append("rect")
+        g1.append("rect")
             .attr("x", aOne[0][0] + 10 * m)
             .attr("y", aOne[0][1])
             .attr("width", 10)
@@ -687,5 +790,14 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
         .attr("d", d3.line()([aOne[0], cOne[0]]))
         .attr("stroke", "black")
         .attr("opacity", 0.05)
-        .attr("fill", "none");
+        .attr("fill", "none")
+        .attr("class", "path2");
+    
+        //add interaction
+    g1.on("mouseover",function(event, d){
+        d3.select(".path2").attr("opacity", 1);
+    });
+    g1.on("mouseout",function(event, d){
+        d3.select(".path2").attr("opacity", 0.02);
+    });
 }
