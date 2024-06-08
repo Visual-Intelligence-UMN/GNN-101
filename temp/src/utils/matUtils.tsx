@@ -426,6 +426,21 @@ export function visualizeFeatures(
     graph: any,
     adjList: any
 ) {
+    //drawPoints(".mats", "red", locations);
+    //draw frames on matrix
+    let matFrames:SVGElement[] = []; //a 
+    for(let i=0; i<locations.length; i++){
+        const r = d3.select(".mats").append("rect")
+        .attr("x", locations[i][0] - 300 + (300/graph.length)/2)
+        .attr("y", locations[i][1])
+        .attr("height", 300/graph.length)
+        .attr("width", 300)
+        .attr("fill", "red")
+        .attr("opacity", 0);
+
+        matFrames.push(r.node() as SVGElement);
+    }
+    console.log("matFrames", matFrames);
     //a data structure to store all feature vis information
     interface FrameDS{
         features:any[],
@@ -486,6 +501,13 @@ export function visualizeFeatures(
             console.log("Current layerID and node", layerID, node);
             const fr = frames["features"][Number(node)];
             fr.style.opacity = "1";
+
+            //matrix frame interaction
+            const matf = matFrames[Number(node)];
+            if(matf!=null){
+                matf.style.opacity = "0.2";
+                matf.style.fill = "yellow";
+            }
         });
         g.on("mouseout", function(event, d){
             const layerID = d3.select(this).attr("layerID");
@@ -493,6 +515,12 @@ export function visualizeFeatures(
             console.log("Current layerID and node", layerID, node);
             const fr = frames["features"][Number(node)];
             fr.style.opacity = "0";
+
+            //matrix frame interaction
+            const matf = matFrames[Number(node)];
+            if(matf!=null){
+                matf.style.opacity = "0";
+            }
         });
     }
     //add layer label for the first one
@@ -600,7 +628,19 @@ export function visualizeFeatures(
                 prevLayer[vis].style.opacity = "1";
             });
         }
-        
+
+        //matrix frame interaction
+        if(matFrames!=null){
+            prevVis.forEach((vis:number)=>{
+                if (vis == node && matFrames[vis]) {
+                    matFrames[vis].style.fill = "yellow";  
+                    matFrames[vis].style.opacity = "0.5";
+                } else{
+                    matFrames[vis].style.fill = "blue";  
+                    matFrames[vis].style.opacity = "0.5";
+                }
+            });
+        }
     });
     d3.selectAll(".featureVis").on("mouseout", function(event, d){
         const layerID = Number(d3.select(this).attr("layerID")) - 1;
@@ -634,6 +674,15 @@ export function visualizeFeatures(
         if(prevLayer!=null){
             prevVis.forEach((vis:number)=>{
                 prevLayer[vis].style.opacity = "0";
+            });
+        }
+
+        //matrix frame interaction
+        if(matFrames!=null){
+            prevVis.forEach((vis:number)=>{
+                if (matFrames[vis]) {
+                    matFrames[vis].style.opacity = "0";
+                } 
             });
         }
     });
