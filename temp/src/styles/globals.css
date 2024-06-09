@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 :root {
+  --tw-gradient-stops: #4158D0 0%, #C850C0 50%, #DF849F 71%, #FFCC70 100%;
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
@@ -30,4 +31,29 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+
+.text-gradient-stroke {
+  position: relative;
+  
+}
+
+.text-gradient-stroke::before {
+  content: attr(data-text);
+  position: fixed;
+  z-index: 10;
+  color: white;
+  -webkit-text-stroke: 2px transparent;
+}
+
+.text-gradient-stroke::after {
+  content: attr(data-text);
+  position: relative;
+  z-index: 20;
+  background: linear-gradient(to right, var(--tw-gradient-stops));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 2px var(--tw-gradient-stops);
 }

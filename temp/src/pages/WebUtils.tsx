@@ -464,17 +464,15 @@ export function visualizeGraph(path: string) {
             });
             const graphWidth = maxXDistance + 20
             const graphHeight = maxYDistance + 20;
-            console.log("graphWidth", graphWidth, "graphHeight", graphHeight)
             const point1 = { x: 0, y: height / 8 };
             const point2 = { x: 0.9 * offset, y: height / 20 };
             const point3 = { x: 0.9 * offset, y: height / 1.7 };
             const point4 = { x: 0, y: height / 1.5 };
-            const tolerance = 80;
+            const tolerance = 120;
 
             const x_dist = Math.abs(point1.x - point2.x);
             const y_dist = Math.abs(point1.y - point4.y)
 
-            console.log('x_dist', x_dist, 'y_dist', y_dist)
 
             const centerX = (point1.x + point3.x) / 2;
             const centerY = (point1.y + point3.y) / 2;
@@ -482,9 +480,7 @@ export function visualizeGraph(path: string) {
             let scaleY = ((graphHeight + tolerance) / y_dist);
             let transform = `translate(${centerX}, ${centerY}) scale(${scaleX}, ${scaleY}) translate(${-centerX}, ${-centerY})`;
             if (graphWidth + tolerance < x_dist && graphHeight + tolerance < y_dist) {
-                scaleX = 1
-                scaleY = 1
-                transform = `scale(${scaleX}, ${scaleY})`;
+                transform = `scale(1, 1)`;
             }
             const parallelogram = svg
                 .append("polygon")  

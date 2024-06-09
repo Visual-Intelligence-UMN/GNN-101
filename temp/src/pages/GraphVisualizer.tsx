@@ -226,14 +226,12 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
               if (graphWidth + tolerance < x_dist && graphHeight + tolerance < y_dist) {
                 transform = `scale(1, 1)`;
               }
-              console.log('distances', x_dist, y_dist)
               const parallelogram = svg
                 .append("polygon")  
                 .attr("points", `${point1.x},${point1.y} ${point2.x},${point2.y} ${point3.x},${point3.y} ${point4.x},${point4.y}`)
                 .attr("stroke", "black")
                 .attr("fill", "none")
                 .attr('transform', transform);
-              console.log(scaleX)
 
   
               let text = " ";
