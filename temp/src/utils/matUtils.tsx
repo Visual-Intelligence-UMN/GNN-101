@@ -422,11 +422,18 @@ function findAbsMax(arr: number[]) {
     return max;
 }
 
-function buildBinaryLegend(myColor: any, val1:number, val2:number, label: string, x: number, y: number) {
+function buildBinaryLegend(
+    myColor: any,
+    val1: number,
+    val2: number,
+    label: string,
+    x: number,
+    y: number
+) {
     let dummies = [val1, val2];
 
     const g0 = d3
-        .select(".mats")  
+        .select(".mats")
         .append("g")
         .attr("transform", `translate(${x}, ${y}) scale(0.7)`);
 
@@ -467,16 +474,22 @@ function buildBinaryLegend(myColor: any, val1:number, val2:number, label: string
         .attr("font-size", 7.5);
 }
 
-function buildLegend(myColor: any, absVal: number, label: string, x: number, y: number) {
+function buildLegend(
+    myColor: any,
+    absVal: number,
+    label: string,
+    x: number,
+    y: number
+) {
     let dummies = [];
     absVal = Math.ceil(absVal * 10) / 10;
-    let step = absVal/10;
+    let step = absVal / 10;
     for (let i = -absVal; i <= absVal + 0.1; i += step) {
         dummies.push(i);
     }
 
     const g0 = d3
-        .select(".mats")  
+        .select(".mats")
         .append("g")
         .attr("transform", `translate(${x}, ${y}) scale(0.7)`);
 
@@ -528,39 +541,41 @@ export function visualizeFeatures(
     final: any,
     graph: any,
     adjList: any,
-    maxVals:any
+    maxVals: any
 ) {
     console.log("Received", maxVals);
     //drawPoints(".mats", "red", locations);
     //draw frames on matrix
-    let matFrames:SVGElement[] = []; //a 
-    for(let i=0; i<locations.length; i++){
-        const r = d3.select(".mats").append("rect")
-        .attr("x", locations[i][0] - 300 + (300/graph.length)/2)
-        .attr("y", locations[i][1])
-        .attr("height", 300/graph.length)
-        .attr("width", 300)
-        .attr("fill", "red")
-        .attr("opacity", 0)
-        .attr("stroke", "blue")
-        .attr("stroke-width", 1);
+    let matFrames: SVGElement[] = []; //a
+    for (let i = 0; i < locations.length; i++) {
+        const r = d3
+            .select(".mats")
+            .append("rect")
+            .attr("x", locations[i][0] - 300 + 300 / graph.length / 2)
+            .attr("y", locations[i][1])
+            .attr("height", 300 / graph.length)
+            .attr("width", 300)
+            .attr("fill", "red")
+            .attr("opacity", 0)
+            .attr("stroke", "blue")
+            .attr("stroke-width", 1);
 
         matFrames.push(r.node() as SVGElement);
     }
     console.log("matFrames", matFrames);
     //a data structure to store all feature vis information
-    interface FrameDS{
-        features:any[],
-        GCNConv1:any[],
-        GCNConv2:any[],
-        GCNConv3:any[],
+    interface FrameDS {
+        features: any[];
+        GCNConv1: any[];
+        GCNConv2: any[];
+        GCNConv3: any[];
     }
-    var frames:FrameDS = {
-        features:[],
-        GCNConv1:[],
-        GCNConv2:[],
-        GCNConv3:[]
-    }
+    var frames: FrameDS = {
+        features: [],
+        GCNConv1: [],
+        GCNConv2: [],
+        GCNConv3: [],
+    };
     var schemeLocations = [];
     //initial visualizer
     for (let i = 0; i < locations.length; i++) {
@@ -572,10 +587,11 @@ export function visualizeFeatures(
 
     //using locations to find the positions for first feature visualizers
     for (let i = 0; i < locations.length; i++) {
-        const g = d3.select(".mats")
-                    .append("g")
-                    .attr("node", i)
-                    .attr("layerID", 0);
+        const g = d3
+            .select(".mats")
+            .append("g")
+            .attr("node", i)
+            .attr("layerID", 0);
 
         for (let j = 0; j < 7; j++) {
             const fVis = g
@@ -590,7 +606,8 @@ export function visualizeFeatures(
                 .attr("stroke-width", 0.1);
         }
         //draw frame
-        const f = g.append("rect")
+        const f = g
+            .append("rect")
             .attr("x", locations[i][0])
             .attr("y", locations[i][1])
             .attr("width", 5 * 7)
@@ -604,13 +621,11 @@ export function visualizeFeatures(
         frames["features"].push(f.node());
 
         //find last location
-        if(i==locations.length-1)schemeLocations.push([
-            locations[i][0],
-            350
-        ]);
+        if (i == locations.length - 1)
+            schemeLocations.push([locations[i][0], 350]);
 
         //add mouse event
-        g.on("mouseover", function(event, d){
+        g.on("mouseover", function (event, d) {
             const layerID = d3.select(this).attr("layerID");
             const node = d3.select(this).attr("node");
             console.log("Current layerID and node", layerID, node);
@@ -619,12 +634,12 @@ export function visualizeFeatures(
 
             //matrix frame interaction
             const matf = matFrames[Number(node)];
-            if(matf!=null){
+            if (matf != null) {
                 matf.style.opacity = "0.2";
                 matf.style.fill = "yellow";
             }
         });
-        g.on("mouseout", function(event, d){
+        g.on("mouseout", function (event, d) {
             const layerID = d3.select(this).attr("layerID");
             const node = d3.select(this).attr("node");
             console.log("Current layerID and node", layerID, node);
@@ -633,7 +648,7 @@ export function visualizeFeatures(
 
             //matrix frame interaction
             const matf = matFrames[Number(node)];
-            if(matf!=null){
+            if (matf != null) {
                 matf.style.opacity = "0";
             }
         });
@@ -643,7 +658,7 @@ export function visualizeFeatures(
     addLayerName(locations, "Features Name", 0, 30);
 
     //GCNCov Visualizer
-    let paths:any;
+    let paths: any;
     const gcnFeatures = [conv1, conv2, conv3];
     console.log("gcnf", gcnFeatures);
     console.log("CONV1", conv1);
@@ -660,7 +675,12 @@ export function visualizeFeatures(
         const gcnFeature = gcnFeatures[k];
         for (let i = 0; i < locations.length; i++) {
             //const cate = get_category_node(features[i]) * 100;
-            const g = d3.select(".mats").append("g").attr("class","featureVis").attr("node",i).attr("layerID", k+1);
+            const g = d3
+                .select(".mats")
+                .append("g")
+                .attr("class", "featureVis")
+                .attr("node", i)
+                .attr("layerID", k + 1);
 
             console.log("new", gcnFeature);
 
@@ -679,7 +699,8 @@ export function visualizeFeatures(
                     .attr("stroke-width", 0.1);
             }
             //draw frame
-            const f = g.append("rect")
+            const f = g
+                .append("rect")
                 .attr("x", locations[i][0])
                 .attr("y", locations[i][1])
                 .attr("width", 2 * 64)
@@ -689,152 +710,185 @@ export function visualizeFeatures(
                 .attr("stroke", "black")
                 .attr("stroke-width", 1)
                 .attr("node", i)
-                .attr("layerID", k+1)
+                .attr("layerID", k + 1)
                 .attr("class", "frame");
             //havent figure out how to optimize this code..
-            if(k==0)frames["GCNConv1"].push(f.node());
-            if(k==1)frames["GCNConv2"].push(f.node());
-            if(k==2) frames["GCNConv3"].push(f.node());
+            if (k == 0) frames["GCNConv1"].push(f.node());
+            if (k == 1) frames["GCNConv2"].push(f.node());
+            if (k == 2) frames["GCNConv3"].push(f.node());
             //drawPoints(".mats", "red", locations);
-            if(i==locations.length-1){
-                schemeLocations.push([
-                    locations[i][0],
-                    350
-                ]);
+            if (i == locations.length - 1) {
+                schemeLocations.push([locations[i][0], 350]);
             }
         }
-        
+
         if (k != 2) {
             // visualize cross connections btw 1st, 2nd, 3rd GCNConv
-            paths = drawCrossConnection(graph, locations, 62 * 2, 102, k+1);
+            paths = drawCrossConnection(graph, locations, 62 * 2, 102, k + 1);
             console.log("grouped grouped", paths);
         } else {
             //visualize pooling layer
             let one = drawPoolingVis(locations, pooling, myColor, frames);
-            console.log("ONE",one);
-            schemeLocations.push([
-                one[0][0],
-                350
-            ])
+            console.log("ONE", one);
+            schemeLocations.push([one[0][0], 350]);
             //visualize last layer and softmax output
             let aOne = drawTwoLayers(one, final, myColor);
             console.log("AAA", aOne);
-            if(aOne!=undefined){
-            schemeLocations.push([
-                aOne[0][0],
-                350
-            ]);
+            if (aOne != undefined) {
+                schemeLocations.push([aOne[0][0], 350]);
             }
-            schemeLocations.push([
-                aOne[1][0]-20,
-                350
-            ]);
+            schemeLocations.push([aOne[1][0] - 20, 350]);
         }
         console.log("schemeLocations", schemeLocations);
         //drawPoints(".mats", "red", schemeLocations);
         //let max1 = findAbsMax(maxVals.conv1);
         let result = softmax(final);
         console.log("debug", schemeLocations);
-        buildBinaryLegend(myColor, 0, 1, "Features Color Scheme", schemeLocations[0][0], schemeLocations[0][1]);
-        buildLegend(myColor, maxVals.conv1, "GCNConv1 Color Scheme", schemeLocations[1][0], schemeLocations[1][1]);
-        buildLegend(myColor, maxVals.conv2, "GCNConv2 Color Scheme", schemeLocations[1][0] + 230, schemeLocations[1][1]);
-        buildLegend(myColor, maxVals.conv3, "GCNConv3 Color Scheme", schemeLocations[1][0] + 230*2, schemeLocations[1][1]);
-        buildLegend(myColor, maxVals.pooling, "Pooling Color Scheme", schemeLocations[1][0] + 230*3, schemeLocations[1][1]);
-      
-        buildBinaryLegend(myColor, final[0], final[1], "Model Output Color Scheme", schemeLocations[1][0] + 230*4, schemeLocations[1][1]);
-        buildBinaryLegend(myColor, result[0], result[1], "Result Color Scheme", schemeLocations[1][0] + 230*4.5, schemeLocations[1][1]);
+        buildBinaryLegend(
+            myColor,
+            0,
+            1,
+            "Features Color Scheme",
+            schemeLocations[0][0],
+            schemeLocations[0][1]
+        );
+        buildLegend(
+            myColor,
+            maxVals.conv1,
+            "GCNConv1 Color Scheme",
+            schemeLocations[1][0],
+            schemeLocations[1][1]
+        );
+        buildLegend(
+            myColor,
+            maxVals.conv2,
+            "GCNConv2 Color Scheme",
+            schemeLocations[1][0] + 230,
+            schemeLocations[1][1]
+        );
+        buildLegend(
+            myColor,
+            maxVals.conv3,
+            "GCNConv3 Color Scheme",
+            schemeLocations[1][0] + 230 * 2,
+            schemeLocations[1][1]
+        );
+        buildLegend(
+            myColor,
+            maxVals.pooling,
+            "Pooling Color Scheme",
+            schemeLocations[1][0] + 230 * 3,
+            schemeLocations[1][1]
+        );
+
+        buildBinaryLegend(
+            myColor,
+            final[0],
+            final[1],
+            "Model Output Color Scheme",
+            schemeLocations[1][0] + 230 * 4,
+            schemeLocations[1][1]
+        );
+        buildBinaryLegend(
+            myColor,
+            result[0],
+            result[1],
+            "Result Color Scheme",
+            schemeLocations[1][0] + 230 * 4.5,
+            schemeLocations[1][1]
+        );
     }
     //drawPoints(".mats", "red", blocations);
-    d3.selectAll(".featureVis").on("mouseover", function(event, d){
+    d3.selectAll(".featureVis").on("mouseover", function (event, d) {
         //paths interactions
         const layerID = Number(d3.select(this).attr("layerID")) - 1;
         const node = Number(d3.select(this).attr("node"));
         console.log("Current layerID and node", layerID, node);
-        if(paths!=null){
+        if (paths != null) {
             console.log("grouped", paths[layerID][node]);
             const changePaths = paths[layerID][node];
             changePaths.forEach((div: HTMLElement) => {
-                div.style.opacity = '1';  
+                div.style.opacity = "1";
             });
         }
         //feature vis interactions
         //feature self interaction
-        let fr:any = null;
-        if(layerID==0)fr = frames["GCNConv1"][node];
-        else if(layerID==1)fr = frames["GCNConv2"][node];
+        let fr: any = null;
+        if (layerID == 0) fr = frames["GCNConv1"][node];
+        else if (layerID == 1) fr = frames["GCNConv2"][node];
         else fr = frames["GCNConv3"][node];
-        if(fr!=null){
+        if (fr != null) {
             fr.style.opacity = "1";
         }
 
         //frame interactions
         let prevVis = adjList[node];
-        let prevLayer:any = null;
-        
-        if(Number(layerID)==0)prevLayer=frames["features"];
-        else if(Number(layerID)==1)prevLayer=frames["GCNConv1"];
-        else if(Number(layerID)==2)prevLayer=frames["GCNConv2"];
+        let prevLayer: any = null;
+
+        if (Number(layerID) == 0) prevLayer = frames["features"];
+        else if (Number(layerID) == 1) prevLayer = frames["GCNConv1"];
+        else if (Number(layerID) == 2) prevLayer = frames["GCNConv2"];
         console.log("prev", layerID, prevVis, prevLayer);
-        if(prevLayer!=null){
-            prevVis.forEach((vis:number)=>{
+        if (prevLayer != null) {
+            prevVis.forEach((vis: number) => {
                 prevLayer[vis].style.opacity = "1";
             });
         }
 
         //matrix frame interaction
-        if(matFrames!=null){
-            prevVis.forEach((vis:number)=>{
+        if (matFrames != null) {
+            prevVis.forEach((vis: number) => {
                 if (vis == node && matFrames[vis]) {
-                    matFrames[vis].style.fill = "yellow";  
+                    matFrames[vis].style.fill = "yellow";
                     matFrames[vis].style.opacity = "0.5";
-                } else{
-                    matFrames[vis].style.fill = "blue";  
+                } else {
+                    matFrames[vis].style.fill = "blue";
                     matFrames[vis].style.opacity = "0.5";
                 }
             });
         }
     });
-    d3.selectAll(".featureVis").on("mouseout", function(event, d){
+    d3.selectAll(".featureVis").on("mouseout", function (event, d) {
         const layerID = Number(d3.select(this).attr("layerID")) - 1;
         const node = Number(d3.select(this).attr("node"));
         console.log("Current layerID and node", layerID, node);
         //paths interactions
-        if(paths!=null){
+        if (paths != null) {
             console.log("grouped", paths[layerID][node]);
             const changePaths = paths[layerID][node];
             changePaths.forEach((div: HTMLElement) => {
-                div.style.opacity = '0.05';  
+                div.style.opacity = "0.05";
             });
         }
         //feature self interaction
-        let fr:any = null;
-        if(layerID==0)fr = frames["GCNConv1"][node];
-        else if(layerID==1)fr = frames["GCNConv2"][node];
+        let fr: any = null;
+        if (layerID == 0) fr = frames["GCNConv1"][node];
+        else if (layerID == 1) fr = frames["GCNConv2"][node];
         else fr = frames["GCNConv3"][node];
-        if(fr!=null){
+        if (fr != null) {
             fr.style.opacity = "0";
         }
 
         //frame interactions
         let prevVis = adjList[node];
-        let prevLayer:any = null;
-        
-        if(Number(layerID)==0)prevLayer=frames["features"];
-        else if(Number(layerID)==1)prevLayer=frames["GCNConv1"];
-        else if(Number(layerID)==2)prevLayer=frames["GCNConv2"];
+        let prevLayer: any = null;
+
+        if (Number(layerID) == 0) prevLayer = frames["features"];
+        else if (Number(layerID) == 1) prevLayer = frames["GCNConv1"];
+        else if (Number(layerID) == 2) prevLayer = frames["GCNConv2"];
         console.log("prev", layerID, prevVis, prevLayer);
-        if(prevLayer!=null){
-            prevVis.forEach((vis:number)=>{
+        if (prevLayer != null) {
+            prevVis.forEach((vis: number) => {
                 prevLayer[vis].style.opacity = "0";
             });
         }
 
         //matrix frame interaction
-        if(matFrames!=null){
-            prevVis.forEach((vis:number)=>{
+        if (matFrames != null) {
+            prevVis.forEach((vis: number) => {
                 if (matFrames[vis]) {
                     matFrames[vis].style.opacity = "0";
-                } 
+                }
             });
         }
     });
@@ -888,8 +942,8 @@ function drawCrossConnection(
                     .attr("stroke", "black")
                     .attr("opacity", 0.05)
                     .attr("fill", "none")
-                    .attr("endingNode",j)
-                    .attr("layerID",layerID);
+                    .attr("endingNode", j)
+                    .attr("layerID", layerID);
                 pts.push(hpoint);
                 pts.push(lpoint);
                 console.log(
@@ -916,25 +970,26 @@ function drawCrossConnection(
     }
     const paths = d3.selectAll<SVGPathElement, any>("path");
 
-    const groupedPaths: GroupedPaths = paths.nodes().reduce((acc: GroupedPaths, path: SVGPathElement) => {
-        const layerID: string = path.getAttribute('layerID') || '';  // 确保 layerID 和 endingNode 不是 null
-        const endingNode: string = path.getAttribute('endingNode') || '';
+    const groupedPaths: GroupedPaths = paths
+        .nodes()
+        .reduce((acc: GroupedPaths, path: SVGPathElement) => {
+            const layerID: string = path.getAttribute("layerID") || ""; // 确保 layerID 和 endingNode 不是 null
+            const endingNode: string = path.getAttribute("endingNode") || "";
 
-        if (!acc[layerID]) {
-            acc[layerID] = {};
-        }
+            if (!acc[layerID]) {
+                acc[layerID] = {};
+            }
 
-        if (!acc[layerID][endingNode]) {
-            acc[layerID][endingNode] = [];
-        }
+            if (!acc[layerID][endingNode]) {
+                acc[layerID][endingNode] = [];
+            }
 
-        acc[layerID][endingNode].push(path);
+            acc[layerID][endingNode].push(path);
 
-        return acc;
-    }, {});
-    console.log("groupedPath",groupedPaths);
+            return acc;
+        }, {});
+    console.log("groupedPath", groupedPaths);
     return groupedPaths;
-
 }
 
 function computeMids(point1: any, point2: any) {
@@ -948,7 +1003,12 @@ function computeMids(point1: any, point2: any) {
     return res;
 }
 
-function drawPoolingVis(locations: any, pooling: number[], myColor: any, frames: any) {
+function drawPoolingVis(
+    locations: any,
+    pooling: number[],
+    myColor: any,
+    frames: any
+) {
     let oLocations = deepClone(locations);
     //find edge points
     locations[0][0] += 64 * 2;
@@ -985,7 +1045,7 @@ function drawPoolingVis(locations: any, pooling: number[], myColor: any, frames:
     //drawPoints(".mats", "red", oLocations);
     //connnnnnnnect!!!
     const curve = d3.line().curve(d3.curveBasis);
-    const paths:any[] = [];
+    const paths: any[] = [];
     const mats = d3.select(".mats");
     for (let i = 0; i < oLocations.length; i++) {
         const res = computeMids(oLocations[i], one[0]);
@@ -997,11 +1057,12 @@ function drawPoolingVis(locations: any, pooling: number[], myColor: any, frames:
             .attr("stroke", "black")
             .attr("opacity", 0.05)
             .attr("fill", "none");
-        
+
         paths.push(path.node());
     }
     //draw frame
-    const f = g.append("rect")
+    const f = g
+        .append("rect")
         .attr("x", locations[0][0] + 102)
         .attr("y", midY - 5)
         .attr("width", 2 * 64)
@@ -1015,12 +1076,12 @@ function drawPoolingVis(locations: any, pooling: number[], myColor: any, frames:
     //send all paths to the back
     d3.selectAll("path").lower();
 
-    g.on("mouseover", function(event, d){
-        console.log("over",paths);
+    g.on("mouseover", function (event, d) {
+        console.log("over", paths);
         //interaction with paths
-        if(paths!=null){
+        if (paths != null) {
             paths.forEach((div: HTMLElement) => {
-                div.style.opacity = '1';  
+                div.style.opacity = "1";
             });
         }
         //interaction with frame
@@ -1028,14 +1089,14 @@ function drawPoolingVis(locations: any, pooling: number[], myColor: any, frames:
         //d3.selectAll('[layerID="3"][class="frame"]').attr("opacity", 1);
         const layerFrames = frames["GCNConv3"];
         layerFrames.forEach((frame: HTMLElement) => {
-            frame.style.opacity = '1';  
+            frame.style.opacity = "1";
         });
     });
 
-    g.on("mouseout", function(event, d){
-        if(paths!=null){
+    g.on("mouseout", function (event, d) {
+        if (paths != null) {
             paths.forEach((div: HTMLElement) => {
-                div.style.opacity = '0.05';  
+                div.style.opacity = "0.05";
             });
         }
         //interaction with frame
@@ -1043,10 +1104,10 @@ function drawPoolingVis(locations: any, pooling: number[], myColor: any, frames:
         //d3.selectAll('[layerID="3"][class="frame"]').attr("opacity", 0);
         const layerFrames = frames["GCNConv3"];
         layerFrames.forEach((frame: HTMLElement) => {
-            frame.style.opacity = '0';  
+            frame.style.opacity = "0";
         });
     });
-    
+
     return one;
 }
 
@@ -1071,7 +1132,8 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
             .attr("stroke-width", 0.1);
     }
     //draw frame
-    const f = g.append("rect")
+    const f = g
+        .append("rect")
         .attr("x", one[0][0])
         .attr("y", one[0][1])
         .attr("width", 2 * 10)
@@ -1096,12 +1158,12 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
         .attr("fill", "none")
         .attr("class", "path1");
     //add interaction
-    g.on("mouseover",function(event, d){
+    g.on("mouseover", function (event, d) {
         d3.select(".path1").attr("opacity", 1);
         d3.select(".poolingFrame").attr("opacity", 1);
         f.attr("opacity", 1);
     });
-    g.on("mouseout",function(event, d){
+    g.on("mouseout", function (event, d) {
         d3.select(".path1").attr("opacity", 0.02);
         d3.select(".poolingFrame").attr("opacity", 0);
         f.attr("opacity", 0);
@@ -1125,9 +1187,26 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1);
     }
+    drawPoints(".mats", "red", aOne);
+    //add labels
+    g1.append("text")
+        .attr("x", aOne[0][0] + 5)
+        .attr("y", aOne[0][1])
+        .attr("font-size", "5px")
+        .attr("transform", "rotate(-45," + (aOne[0][0])+ "," + aOne[0][1] + ")")
+        .text("Non-Mutagenic");
+
+    g1.append("text")
+        .attr("x", aOne[0][0] + 15)
+        .attr("y", aOne[0][1])
+        .attr("font-size", "5px")
+        .attr("transform", "rotate(-45," + (aOne[0][0] +10)+ "," + aOne[0][1] + ")")
+        .text("Mutagenic");
+
     addLayerName(aOne, "Prediction Result", 0, 20);
     //draw frame
-    const f1 = g.append("rect")
+    const f1 = g
+        .append("rect")
         .attr("x", aOne[0][0])
         .attr("y", aOne[0][1])
         .attr("width", 2 * 10)
@@ -1149,14 +1228,14 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
         .attr("opacity", 0.05)
         .attr("fill", "none")
         .attr("class", "path2");
-    
-        //add interaction
-    g1.on("mouseover",function(event, d){
+
+    //add interaction
+    g1.on("mouseover", function (event, d) {
         d3.select(".path2").attr("opacity", 1);
         f.attr("opacity", 1);
         f1.attr("opacity", 1);
     });
-    g1.on("mouseout",function(event, d){
+    g1.on("mouseout", function (event, d) {
         d3.select(".path2").attr("opacity", 0.02);
         f.attr("opacity", 0);
         f1.attr("opacity", 0);
