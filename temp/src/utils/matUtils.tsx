@@ -544,7 +544,30 @@ export function visualizeFeatures(
     maxVals: any
 ) {
     console.log("Received", maxVals);
-    //drawPoints(".mats", "red", locations);
+    
+    let colLocations = [];
+    for(let i=0; i<graph.length; i++){
+        const x = locations[0][0] - (300/graph.length) * i - (300/graph.length/2);
+        const y = locations[0][1];
+        colLocations.push([x, y]);
+    }
+    //drawPoints(".mats", "red", colLocations);
+    let colFrames: SVGElement[] = []; //a
+    for (let i = 0; i < colLocations.length; i++) {
+        const r = d3
+            .select(".mats")
+            .append("rect")
+            .attr("x", colLocations[i][0])
+            .attr("y", colLocations[i][1]+3)
+            .attr("height", 300)
+            .attr("width", 300 / graph.length)
+            .attr("fill", "red")
+            .attr("opacity", 0)
+            .attr("stroke", "none")
+            .attr("stroke-width", 1);
+
+        colFrames.push(r.node() as SVGElement);
+    }
     //draw frames on matrix
     let matFrames: SVGElement[] = []; //a
     for (let i = 0; i < locations.length; i++) {
@@ -552,7 +575,7 @@ export function visualizeFeatures(
             .select(".mats")
             .append("rect")
             .attr("x", locations[i][0] - 300 + 300 / graph.length / 2)
-            .attr("y", locations[i][1])
+            .attr("y", locations[i][1]+3)
             .attr("height", 300 / graph.length)
             .attr("width", 300)
             .attr("fill", "red")
@@ -839,13 +862,17 @@ export function visualizeFeatures(
         if (matFrames != null) {
             prevVis.forEach((vis: number) => {
                 if (vis == node && matFrames[vis]) {
-                    matFrames[vis].style.fill = "yellow";
-                    matFrames[vis].style.opacity = "0.5";
+                    // matFrames[vis].style.fill = "yellow";
+                    // matFrames[vis].style.opacity = "0.5";
                 } else {
                     matFrames[vis].style.fill = "blue";
                     matFrames[vis].style.opacity = "0.5";
                 }
             });
+        }
+
+        if(colFrames!=null){
+            colFrames[node].style.opacity = "0.5";
         }
     });
     d3.selectAll(".featureVis").on("mouseout", function (event, d) {
@@ -890,6 +917,10 @@ export function visualizeFeatures(
                     matFrames[vis].style.opacity = "0";
                 }
             });
+        }
+
+        if(colFrames!=null){
+            colFrames[node].style.opacity = "0";
         }
     });
 }
@@ -1187,7 +1218,7 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1);
     }
-    drawPoints(".mats", "red", aOne);
+    //drawPoints(".mats", "red", aOne);
     //add labels
     g1.append("text")
         .attr("x", aOne[0][0] + 5)
