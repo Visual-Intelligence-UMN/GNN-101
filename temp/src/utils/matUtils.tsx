@@ -470,7 +470,8 @@ function buildBinaryLegend(myColor: any, val1:number, val2:number, label: string
 function buildLegend(myColor: any, absVal: number, label: string, x: number, y: number) {
     let dummies = [];
     absVal = Math.ceil(absVal * 10) / 10;
-    for (let i = -absVal; i <= absVal + 0.1; i += 0.1) {
+    let step = absVal/10;
+    for (let i = -absVal; i <= absVal + 0.1; i += step) {
         dummies.push(i);
     }
 
