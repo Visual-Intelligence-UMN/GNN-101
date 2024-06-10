@@ -14,7 +14,7 @@ import {
     ViewSwitch,
     GraphAnalysisViewer,
 } from "./WebUtils";
-import {Inter} from '@next/font/google';
+import {Inter} from 'next/font/google';
 
 const inter = Inter({
     variable: '--font-inter',

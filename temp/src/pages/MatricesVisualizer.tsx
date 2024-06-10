@@ -27,12 +27,81 @@ import {
 } from "@/utils/matUtils";
 import { roundToTwo, visualizeMatrix } from "./WebUtils";
 
+//find absolute max value in an 1d array
+function findAbsMax(arr: number[]) {
+    let max: number = Math.abs(Math.max(...arr));
+    let min: number = Math.abs(Math.min(...arr));
+    if (min > max) return min;
+    return max;
+}
 
-interface LinkMap{
+function buildLegend(myColor: any, absVal: number, label:string, xOffset:number, yOffset:number) {
+    let dummies = [];
+    absVal = Math.ceil(absVal * 10)/10;
+    for (let i = -absVal; i <= absVal+0.1; i += 0.1) {
+        dummies.push(i);
+    }
+    const g0 = d3
+        .select("#matvis")
+        .append("svg")
+        .attr("class", "legend")
+        .attr("width", 500)
+        .attr("height", 100);
+
+    console.log("Dummies", dummies);
+
+    g0.selectAll(".rect")
+        .data(dummies)
+        .enter()
+        .append("rect")
+        .attr("width", 10)
+        .attr("height", 10)
+        .attr("x", (d: number, i: number) => {
+            return i * 10 + xOffset;
+        })
+        .attr("y", yOffset)
+        .style("fill", (d: number) => myColor(d))
+        .style("stroke-width", 1)
+        .style("stroke", "grey")
+        .style("opacity", 0.8)
+        .raise();
+
+    const offsetText = 10;
+    const format = d3.format(".2f");
+
+    g0.selectAll(".label")
+        .data(dummies)
+        .enter()
+        .append("text")
+        .attr("x", (d, i) => i * offsetText - 20 + xOffset)
+        .attr("y", 5+yOffset)
+        .attr("text-anchor", "end")
+        .attr("transform", (d, i) => `rotate(-90, ${i * offsetText}, 0)`)
+        .style("font-size", "5px")
+        .text((d) => format(d));
+
+    g0.append("text")
+        .text(label)
+        .attr("x", ((absVal*2)/0.1 - label.length*7.5)/2 + absVal*150 + xOffset)
+        .attr("y", 50+yOffset)
+        .attr("text-anchor", "left")
+        .attr("font-size", 7.5);
+}
+
+interface ColorSchemeValues {
+    conv1: number;
+    conv2: number;
+    conv3: number;
+    pooling: number;
+    dropout: number;
+    final: number;
+}
+
+interface LinkMap {
     // n * m matrix, where n represents the number of featureVis and m means the link
-    firstLayerLinks: number[][]; 
-    secondLayerLinks: number[][]; 
-    thirdLayerLinks: number[][]; 
+    firstLayerLinks: number[][];
+    secondLayerLinks: number[][];
+    thirdLayerLinks: number[][];
 }
 
 interface MatricesVisualizerProps {
@@ -58,15 +127,23 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
     }
 
     useEffect(() => {
-        const init = async (graph: any, features: any[][], nodeAttrs:string[]) => {
+        const init = async (
+            graph: any,
+            features: any[][],
+            nodeAttrs: string[]
+        ) => {
+            let colorSchemeTable: any = null;
             //a data structure to record the link relationship
             //fill up the linkMap
-            let adjList:number[][] = Array.from({ length: graph.length }, () => []);
-            for(let i=0; i<graph.length; i++){
+            let adjList: number[][] = Array.from(
+                { length: graph.length },
+                () => []
+            );
+            for (let i = 0; i < graph.length; i++) {
                 //push itself to the linkMap
                 adjList[i].push(i);
-                for(let j=0; j<graph[0].length; j++){
-                    if(graph[i][j]==1){
+                for (let j = 0; j < graph[0].length; j++) {
+                    if (graph[i][j] == 1) {
                         //push its neighbors to linkMap
                         adjList[i].push(j);
                     }
@@ -74,7 +151,6 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 console.log("GRAPH i", i, adjList[i]);
             }
             console.log("GRAPH LINKS", adjList);
-            
 
             const offsetMat = 100;
 
@@ -86,6 +162,29 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
 
             console.log("intmData", intmData);
             if (intmData != null) {
+                //max abs find
+                let conv1Max = findAbsMax(intmData.conv1);
+                console.log("conv1Max", conv1Max);
+                let conv2Max = findAbsMax(intmData.conv2);
+                console.log("conv2Max", conv2Max);
+                let conv3Max = findAbsMax(intmData.conv3);
+                console.log("conv3Max", conv3Max);
+                let poolingMax = findAbsMax(intmData.pooling);
+                console.log("poolingMax", poolingMax);
+                let dropMax = findAbsMax(intmData.dropout);
+                console.log("dropMax", dropMax);
+                let finalMax = findAbsMax(intmData.final);
+                console.log("finalMax", finalMax);
+
+                colorSchemeTable = {
+                    conv1: conv1Max,
+                    conv2: conv2Max,
+                    conv3: conv3Max,
+                    pooling: poolingMax,
+                    dropout: dropMax,
+                    final: finalMax,
+                };
+
                 console.log("From Visualizer:", intmData);
                 conv1 = splitIntoMatrices(intmData.conv1);
                 conv2 = splitIntoMatrices(intmData.conv2);
@@ -187,59 +286,6 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
             const data = matrix_to_hmap(graph);
             console.log("accepted data:", data);
 
-            //legend
-            let dummies = [];
-            for (let i = -1; i <= 1; i += 0.05) {
-                dummies.push(i);
-            }
-            const g0 = d3
-                .select("#matvis")
-                .append("svg")
-                .attr("class", "legend")
-                .attr("width", 500)
-                .attr("height", 100);
-
-            console.log("Dummies", dummies);
-
-            g0.selectAll(".rect")
-                .data(dummies)
-                .enter()
-                .append("rect")
-                .attr("width", 10)
-                .attr("height", 10)
-                .attr("x", (d: number, i: number) => {
-                    return i * 10;
-                })
-                .attr("y", 0)
-                .style("fill", (d: number) => myColor(d))
-                .style("stroke-width", 1)
-                .style("stroke", "grey")
-                .style("opacity", 0.8)
-                .raise();
-
-            const offsetText = 10;
-            const format = d3.format(".2f");
-            
-
-            g0.selectAll(".label")
-                .data(dummies)
-                .enter()
-                .append("text")
-                .attr("x", (d, i) => i * offsetText - 20) 
-                .attr("y", 5) 
-                .attr("text-anchor", "end") 
-                .attr("transform", (d, i) => `rotate(-90, ${i * offsetText}, 0)`)
-                .style("font-size", "5px")
-                .text((d) => format(d));
-
-            g0
-                .append("text")
-                .text("Color Scheme")
-                .attr("x", 200)
-                .attr("y", 50)
-                .attr("text-anchor", "middle")
-                .attr("font-size", 10);
-
             g.selectAll("rect")
                 .data(data, (d: any) => d.group + ":" + d.variable)
                 .enter()
@@ -298,7 +344,8 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 pooling,
                 final,
                 graph,
-                adjList
+                adjList,
+                colorSchemeTable
             );
             drawNodeAttributes(nodeAttrs, graph);
         };

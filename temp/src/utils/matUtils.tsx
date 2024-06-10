@@ -414,6 +414,108 @@ function addLayerName(
         .style("font-size", 7);
 }
 
+//find absolute max value in an 1d array
+function findAbsMax(arr: number[]) {
+    let max: number = Math.abs(Math.max(...arr));
+    let min: number = Math.abs(Math.min(...arr));
+    if (min > max) return min;
+    return max;
+}
+
+function buildBinaryLegend(myColor: any, val1:number, val2:number, label: string, x: number, y: number) {
+    let dummies = [val1, val2];
+
+    const g0 = d3
+        .select(".mats")  
+        .append("g")
+        .attr("transform", `translate(${x}, ${y}) scale(0.7)`);
+
+    console.log("Dummies", dummies);
+
+    g0.selectAll(".rect")
+        .data(dummies)
+        .enter()
+        .append("rect")
+        .attr("width", 10)
+        .attr("height", 10)
+        .attr("x", (d: number, i: number) => i * 10)
+        .attr("y", 0)
+        .style("fill", (d: number) => myColor(d))
+        .style("stroke-width", 1)
+        .style("stroke", "grey")
+        .style("opacity", 0.8);
+
+    const offsetText = 10;
+    const format = d3.format(".2f");
+
+    g0.selectAll(".label")
+        .data(dummies)
+        .enter()
+        .append("text")
+        .attr("x", (d, i) => i * offsetText - 20)
+        .attr("y", 5)
+        .attr("text-anchor", "end")
+        .attr("transform", (d, i) => `rotate(-90, ${i * offsetText}, 0)`)
+        .style("font-size", "5px")
+        .text((d) => format(d));
+
+    g0.append("text")
+        .text(label)
+        .attr("x", 10)
+        .attr("y", 50)
+        .attr("text-anchor", "center")
+        .attr("font-size", 7.5);
+}
+
+function buildLegend(myColor: any, absVal: number, label: string, x: number, y: number) {
+    let dummies = [];
+    absVal = Math.ceil(absVal * 10) / 10;
+    for (let i = -absVal; i <= absVal + 0.1; i += 0.1) {
+        dummies.push(i);
+    }
+
+    const g0 = d3
+        .select(".mats")  
+        .append("g")
+        .attr("transform", `translate(${x}, ${y}) scale(0.7)`);
+
+    console.log("Dummies", dummies);
+
+    g0.selectAll(".rect")
+        .data(dummies)
+        .enter()
+        .append("rect")
+        .attr("width", 10)
+        .attr("height", 10)
+        .attr("x", (d: number, i: number) => i * 10)
+        .attr("y", 0)
+        .style("fill", (d: number) => myColor(d))
+        .style("stroke-width", 1)
+        .style("stroke", "grey")
+        .style("opacity", 0.8);
+
+    const offsetText = 10;
+    const format = d3.format(".2f");
+
+    g0.selectAll(".label")
+        .data(dummies)
+        .enter()
+        .append("text")
+        .attr("x", (d, i) => i * offsetText - 20)
+        .attr("y", 5)
+        .attr("text-anchor", "end")
+        .attr("transform", (d, i) => `rotate(-90, ${i * offsetText}, 0)`)
+        .style("font-size", "5px")
+        .text((d) => format(d));
+
+    g0.append("text")
+        .text(label)
+        .attr("x", absVal * 10)
+        .attr("y", 50)
+        .attr("text-anchor", "center")
+        .attr("font-size", 7.5);
+}
+
 export function visualizeFeatures(
     locations: any,
     features: any,
@@ -424,8 +526,10 @@ export function visualizeFeatures(
     pooling: any,
     final: any,
     graph: any,
-    adjList: any
+    adjList: any,
+    maxVals:any
 ) {
+    console.log("Received", maxVals);
     //drawPoints(".mats", "red", locations);
     //draw frames on matrix
     let matFrames:SVGElement[] = []; //a 
@@ -436,7 +540,9 @@ export function visualizeFeatures(
         .attr("height", 300/graph.length)
         .attr("width", 300)
         .attr("fill", "red")
-        .attr("opacity", 0);
+        .attr("opacity", 0)
+        .attr("stroke", "blue")
+        .attr("stroke-width", 1);
 
         matFrames.push(r.node() as SVGElement);
     }
@@ -454,6 +560,7 @@ export function visualizeFeatures(
         GCNConv2:[],
         GCNConv3:[]
     }
+    var schemeLocations = [];
     //initial visualizer
     for (let i = 0; i < locations.length; i++) {
         locations[i][0] += 25;
@@ -494,6 +601,13 @@ export function visualizeFeatures(
             .attr("node", i)
             .attr("layerID", 0);
         frames["features"].push(f.node());
+
+        //find last location
+        if(i==locations.length-1)schemeLocations.push([
+            locations[i][0],
+            350
+        ]);
+
         //add mouse event
         g.on("mouseover", function(event, d){
             const layerID = d3.select(this).attr("layerID");
@@ -523,6 +637,7 @@ export function visualizeFeatures(
             }
         });
     }
+    //drawPoints(".mats", "red", schemeLocations);
     //add layer label for the first one
     addLayerName(locations, "Features Name", 0, 30);
 
@@ -580,7 +695,14 @@ export function visualizeFeatures(
             if(k==1)frames["GCNConv2"].push(f.node());
             if(k==2) frames["GCNConv3"].push(f.node());
             //drawPoints(".mats", "red", locations);
+            if(i==locations.length-1){
+                schemeLocations.push([
+                    locations[i][0],
+                    350
+                ]);
+            }
         }
+        
         if (k != 2) {
             // visualize cross connections btw 1st, 2nd, 3rd GCNConv
             paths = drawCrossConnection(graph, locations, 62 * 2, 102, k+1);
@@ -588,9 +710,38 @@ export function visualizeFeatures(
         } else {
             //visualize pooling layer
             let one = drawPoolingVis(locations, pooling, myColor, frames);
+            console.log("ONE",one);
+            schemeLocations.push([
+                one[0][0],
+                350
+            ])
             //visualize last layer and softmax output
-            drawTwoLayers(one, final, myColor);
+            let aOne = drawTwoLayers(one, final, myColor);
+            console.log("AAA", aOne);
+            if(aOne!=undefined){
+            schemeLocations.push([
+                aOne[0][0],
+                350
+            ]);
+            }
+            schemeLocations.push([
+                aOne[1][0]-20,
+                350
+            ]);
         }
+        console.log("schemeLocations", schemeLocations);
+        //drawPoints(".mats", "red", schemeLocations);
+        //let max1 = findAbsMax(maxVals.conv1);
+        let result = softmax(final);
+        console.log("debug", schemeLocations);
+        buildBinaryLegend(myColor, 0, 1, "Features Color Scheme", schemeLocations[0][0], schemeLocations[0][1]);
+        buildLegend(myColor, maxVals.conv1, "GCNConv1 Color Scheme", schemeLocations[1][0], schemeLocations[1][1]);
+        buildLegend(myColor, maxVals.conv2, "GCNConv2 Color Scheme", schemeLocations[1][0] + 230, schemeLocations[1][1]);
+        buildLegend(myColor, maxVals.conv3, "GCNConv3 Color Scheme", schemeLocations[1][0] + 230*2, schemeLocations[1][1]);
+        buildLegend(myColor, maxVals.pooling, "Pooling Color Scheme", schemeLocations[1][0] + 230*3, schemeLocations[1][1]);
+      
+        buildBinaryLegend(myColor, final[0], final[1], "Model Output Color Scheme", schemeLocations[1][0] + 230*4, schemeLocations[1][1]);
+        buildBinaryLegend(myColor, result[0], result[1], "Result Color Scheme", schemeLocations[1][0] + 230*4.5, schemeLocations[1][1]);
     }
     //drawPoints(".mats", "red", blocations);
     d3.selectAll(".featureVis").on("mouseover", function(event, d){
@@ -958,7 +1109,7 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
     aOne[0][0] += 20 + 102;
     //drawPoints(".mats","red",aOne);
     aOne[0][1] -= 5;
-    //need replace this by real result after softmax
+
     let result = softmax(final);
     console.log("mat result", result);
     const g1 = d3.select(".mats").append("g");
@@ -1009,4 +1160,6 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
         f.attr("opacity", 0);
         f1.attr("opacity", 0);
     });
+
+    return [aOne[0], cOne[0]];
 }
