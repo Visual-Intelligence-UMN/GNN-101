@@ -561,13 +561,14 @@ export function visualizeFeatures(
             .attr("y", colLocations[i][1]+3)
             .attr("height", 300)
             .attr("width", 300 / graph.length)
-            .attr("fill", "red")
+            .attr("fill", "none")
             .attr("opacity", 0)
-            .attr("stroke", "none")
-            .attr("stroke-width", 1);
+            .attr("stroke", "black")
+            .attr("stroke-width", 2);
 
         colFrames.push(r.node() as SVGElement);
     }
+    colFrames.reverse();
     //draw frames on matrix
     let matFrames: SVGElement[] = []; //a
     for (let i = 0; i < locations.length; i++) {
@@ -578,10 +579,10 @@ export function visualizeFeatures(
             .attr("y", locations[i][1]+3)
             .attr("height", 300 / graph.length)
             .attr("width", 300)
-            .attr("fill", "red")
+            .attr("fill", "none")
             .attr("opacity", 0)
-            .attr("stroke", "blue")
-            .attr("stroke-width", 1);
+            .attr("stroke", "black")
+            .attr("stroke-width", 2);
 
         matFrames.push(r.node() as SVGElement);
     }
@@ -656,10 +657,10 @@ export function visualizeFeatures(
             fr.style.opacity = "1";
 
             //matrix frame interaction
-            const matf = matFrames[Number(node)];
+            const matf = matFrames[graph.length - Number(node)];
             if (matf != null) {
                 matf.style.opacity = "0.2";
-                matf.style.fill = "yellow";
+                //matf.style.fill = "yellow";
             }
         });
         g.on("mouseout", function (event, d) {
@@ -670,7 +671,7 @@ export function visualizeFeatures(
             fr.style.opacity = "0";
 
             //matrix frame interaction
-            const matf = matFrames[Number(node)];
+            const matf = matFrames[graph.length - Number(node)];
             if (matf != null) {
                 matf.style.opacity = "0";
             }
@@ -865,14 +866,14 @@ export function visualizeFeatures(
                     // matFrames[vis].style.fill = "yellow";
                     // matFrames[vis].style.opacity = "0.5";
                 } else {
-                    matFrames[vis].style.fill = "blue";
-                    matFrames[vis].style.opacity = "0.5";
+                    //matFrames[vis].style.fill = "blue";
+                    matFrames[vis].style.opacity = "1";
                 }
             });
         }
 
         if(colFrames!=null){
-            colFrames[node].style.opacity = "0.5";
+            colFrames[node].style.opacity = "1";
         }
     });
     d3.selectAll(".featureVis").on("mouseout", function (event, d) {
