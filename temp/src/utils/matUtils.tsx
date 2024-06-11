@@ -657,10 +657,9 @@ export function visualizeFeatures(
             fr.style.opacity = "1";
 
             //matrix frame interaction
-            const matf = matFrames[graph.length - Number(node)];
+            const matf = matFrames[Number(node)];
             if (matf != null) {
-                matf.style.opacity = "0.2";
-                //matf.style.fill = "yellow";
+                matf.style.opacity = "1";
             }
         });
         g.on("mouseout", function (event, d) {
@@ -671,7 +670,7 @@ export function visualizeFeatures(
             fr.style.opacity = "0";
 
             //matrix frame interaction
-            const matf = matFrames[graph.length - Number(node)];
+            const matf = matFrames[Number(node)];
             if (matf != null) {
                 matf.style.opacity = "0";
             }
