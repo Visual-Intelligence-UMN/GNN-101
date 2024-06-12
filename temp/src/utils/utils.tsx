@@ -347,18 +347,18 @@ export async function prep_graphs(g_num: number, data: any) {
   return graphs;
 }
 
-export function featureVisualizer(svg: any, nodes: any[], offset: number) {
+export const myColor = d3.scaleLinear<string>()
+.domain([-0.25, 0, 0.25])
+.range(["orange", "white", "#69b3a2"]);
+
+export function featureVisualizer(svg: any, nodes: any[], offset: number, height: number) {
   const nodesById = d3.group(nodes, (d: any) => d.id);
-
-  const myColor = d3.scaleLinear<string>()
-    .domain([-0.25, 0, 0.25])
-    .range(["orange", "white", "#69b3a2"]);
-
   // Array to keep track of occupied positions
   const occupiedPositions: { x: number; y: number }[] = [];
 
   nodesById.forEach((nodes, id) => {
     nodes.forEach((node: any, i: number) => {
+      
       const features = node.features;
       
       let xPos = (i - 2.5) * offset + node.x;
@@ -374,6 +374,8 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
       // Add the new position to the occupied positions array
       occupiedPositions.push({ x: xPos, y: yPos });
 
+      if (node.graphIndex <= 2) {
+
       const featureGroup = svg.append("g")
         .attr("transform", `translate(${xPos - 7.5}, ${yPos})`);
 
@@ -382,7 +384,7 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
         .enter()
         .append("rect")
         .attr("x", 0)
-        .attr("y", (d: any, i: number) => i * 3)
+        .attr("y", (d: any, i: number) => i * 3 + 5)
         .attr("width", 15)
         .attr("height", 3)
         .style("fill", (d: number) => myColor(d))
@@ -392,25 +394,23 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
 
       featureGroup.append("text")
         .attr("x", 10)
-        .attr("y", 200)
+        .attr("y", node.features.length * 3 + 10)
         .attr("dy", ".35em")
         .text(node.id)
-        .style("font-size", "15px")
+        .style("font-size", "12px")
         .style("fill", "black")
-        .style("text-anchor", "middle");
+        .style("text-anchor", "middle")
 
       node.featureGroup = featureGroup;
 
       node.svgElement = svg.append("circle")
         .attr("cx", node.x + ((node.graphIndex - 2.5) * offset))
         .attr("cy", node.y + 10)
-        .attr("r", 13)
+        .attr("r", 17)
         .attr("fill", "transparent")
         .attr("stroke", "#69b3a2")
         .attr("stroke-width", 1)
         .node();
-
-
 
       node.svgElement.addEventListener("mouseover", function(this: any) {
         featureGroup.style('visibility', 'visible');
@@ -434,7 +434,7 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
 
         if (node.links) {
           node.links.forEach((link: any) => {
-            link.style("opacity", 0.05);
+            link.style("opacity", 0.03);
           });
         }
 
@@ -447,6 +447,58 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
       });
 
       featureGroup.style('visibility', 'hidden');
+    } else {
+
+      let rectHeight = 5
+      if (node.graphIndex >= 4) {
+        rectHeight = 20;
+
+      }
+      let groupCentralHeight = rectHeight * features.length / 2;
+      let offset = groupCentralHeight - (height / 11);
+    
+      const featureGroup = svg.append("g")
+          .attr("transform", `translate(${xPos - 7.5}, ${yPos - offset})`);
+      
+    featureGroup.selectAll("rect")
+      .data(features)
+      .enter()
+      .append("rect")
+      .attr("x", -10)
+      .attr("y", (d: any, i: number) => i * rectHeight - 100)
+      .attr("width", 35)
+      .attr("height", rectHeight)
+      .style("fill", (d: number) => myColor(d))
+      .style("stroke-width", 1)
+      .style("stroke", "grey")
+      .style("opacity", 0.8);
+
+
+
+      node.featureGroup = featureGroup;
+
+      node.featureGroup.on("mouseover", function() {
+        if (node.links) {
+          node.links.forEach((link: any) => {
+            link.style("opacity", 1);
+          });
+        }
+      })
+      node.featureGroup.on("mouseout", function() {
+        if (node.links) {
+          node.links.forEach((link: any) => {
+            link.style("opacity", 0.03);
+          });
+        }
+      })
+
+
+
+
+
+        
+
+    }
     });
   });
 }
@@ -457,7 +509,7 @@ function calculateAverage(arr: number[]): number {
   return average * 10;
 }
 
-export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset: number, height: number) {
+export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset: number) {
   const nodesByIndex = d3.group(nodes, (d: any) => d.graphIndex);
 
   const myColor = d3.scaleLinear<string>()
@@ -509,9 +561,9 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
               const color = calculateAverage(node.features);
 
               const path = svg.append("path")
-                .attr("d", `M ${node.x + xOffset1 + 12} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${neighborNode.x + (neighborNode.graphIndex - 2.5) * offset} ${neighborNode.y + 10}`)
+                .attr("d", `M ${node.x + xOffset1 + 16} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${neighborNode.x + (neighborNode.graphIndex - 2.5) * offset - 16} ${neighborNode.y + 10}`)
                 .style("stroke", myColor(color))
-                .style("opacity", 0.07)
+                .style("opacity", 0.03)
                 .style("stroke-width", 1)
                 .style("fill", "none");
 
@@ -538,9 +590,9 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
             const color = calculateAverage(node.features);
 
               const path = svg.append("path")
-                .attr("d", `M ${node.x + xOffset1 + 12} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffsetNext} ${nextNode.y + 10}`)
+                .attr("d", `M ${node.x + xOffset1 + 16} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffsetNext - 16} ${nextNode.y + 10}`)
                 .style("stroke", myColor(color))
-                .style("opacity", 0.07)
+                .style("opacity", 0.03)
                 .style("stroke-width", 1)
                 .style("fill", "none");
   
@@ -573,7 +625,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
             const controlY2 = nextNode.y + 10;
   
             const path = svg.append("path")
-              .attr("d", `M ${node.x + xOffset1 + 12} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffset2} ${nextNode.y + 10}`)
+              .attr("d", `M ${node.x + xOffset1 + 16} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 16} ${nextNode.y + 10}`)
               .style("stroke", myColor(color))
               .style("opacity", 0.07)
               .style("stroke-width", 1)
@@ -680,66 +732,3 @@ export function analyzeGraph(graphData: any) {
 }
 
 
-// export function removeDuplicate(links: LinkType[]): LinkType[] {
-//   const edges: number[][] = []; 
-//   let new_source;
-//   let new_target;
-//   let type;
-//   let new_relation : LinkType;
-//   let list = [];
-//   let new_links: LinkType[] = [];
-//   let index = 0;
-
-
-//   for (let i = 0; i < links.length; i++) {
-//     const source = links[i].source;
-//     const target = links[i].target;
-//     let isInEdge: boolean = false;
-//     if (source > target) {
-//       list = [target, source];
-//     } else {
-//       list = [source, target];
-//     }
-  
-//     for (let j = 0; j < edges.length; j++) {
-
-//       if (edges[j][0] === list[0] && edges[j][1] === list[1]) {
-//         isInEdge = true;
-//       }
-//     }
-    
-//     if (!isInEdge) {
-//       edges.push(list);
-//       new_source = links[i].source;
-//       new_target = links[i].target;
-//       type = links[i].type;
-//       new_relation = {
-//         source: new_source,
-//         target: new_target,
-//         type: type
-//       }
-//       new_links.push(new_relation);
-//       if (links[i].type === "double") {
-//         new_relation = {
-//           source: new_target,
-//           target: new_source,
-//           type: type
-//         }
-//         new_links.push(new_relation);
-//       }
-//       if (links[i].type === "triple") {
-//         new_links.push(new_relation);
-//         new_relation = {
-//           source: new_target,
-//           target: new_source,
-//           type: type
-//         }
-//         new_links.push(new_relation);
-//       }
-//     }
-//     if (links.length === 0) {
-//       new_links = links
-//     }
-//   }
-//   return new_links;
-// }
