@@ -372,9 +372,10 @@ export function visualizeGraph(path: string) {
                 .selectAll("circle")
                 .data(data.nodes)
                 .join("circle")
-                .attr("r", 13)
+                .attr("r", 17)
                 .style("stroke", "#69b3a2")
                 .style("fill", "white")
+                
 
             const labels = g1
                 .selectAll("text")
@@ -489,7 +490,7 @@ export function visualizeGraph(path: string) {
                 .attr("stroke", "black")
                 .attr("fill", "none")
                 .attr('transform',transform);
-                    featureVisualizer(svg, allNodes, offset);
+                    featureVisualizer(svg, allNodes, offset, height);
                 });
           
 

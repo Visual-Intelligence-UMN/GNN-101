@@ -7,6 +7,7 @@ import {
   connectCrossGraphNodes,
   featureVisualizer,
   process,
+  myColor,
   softmax,
 } from "../utils/utils";
 import { IntmData } from "./FileUpload";
@@ -84,17 +85,20 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             .selectAll("circle")
             .data(data.nodes)
             .join("circle")
-            .attr("r", 13)
+            .attr("r", 17)
             .style("fill", "white")
             .style("stroke", "#69b3a2")
             .style("stroke-width", 1)
+            .style("stroke-opacity", 1);
 
+
+          
           const labels = g1
             .selectAll("text")
             .data(data.nodes)
             .join("text")
             .text((d: any) => d.id) 
-            .attr("font-size", `15px`);    
+            .attr("font-size", `17px`);    
 
 
           // Define the simulation
@@ -265,13 +269,12 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                   svg,
                   graphs,
                   offset,
-                  height
                 );
                 
                 
                 
               }
-              featureVisualizer(svg, allNodes, offset);
+              featureVisualizer(svg, allNodes, offset, height);
             });
 
            
