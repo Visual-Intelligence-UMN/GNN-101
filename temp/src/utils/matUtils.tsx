@@ -433,10 +433,13 @@ function buildBinaryLegend(
     y: number,
     layer: any
 ) {
+    layer.selectAll(".binary-legend").remove();
+
     let dummies = [val1, val2];
 
     const g0 = layer
         .append("g")
+        .attr("class", "binary-legend")
         .attr("transform", `translate(${x}, ${y}) scale(0.7)`);
 
     console.log("Dummies", dummies);
@@ -474,6 +477,8 @@ function buildBinaryLegend(
         .attr("y", 50)
         .attr("text-anchor", "center")
         .attr("font-size", 7.5);
+
+    return g0.node() as SVGElement;
 }
 
 function buildLegend(
@@ -484,6 +489,7 @@ function buildLegend(
     y: number,
     layer:any
 ) {
+    layer.selectAll(".legend").remove();
     let dummies = [];
     absVal = Math.ceil(absVal * 10) / 10;
     let step = absVal / 10;
@@ -493,7 +499,8 @@ function buildLegend(
 
     const g0 = layer
         .append("g")
-        .attr("transform", `translate(${x}, ${y}) scale(0.7)`);
+        .attr("transform", `translate(${x}, ${y}) scale(0.7)`)
+        .attr("class", "legend");
 
     console.log("Dummies", dummies);
 
@@ -530,6 +537,8 @@ function buildLegend(
         .attr("y", 50)
         .attr("text-anchor", "center")
         .attr("font-size", 7.5);
+
+    return g0.node() as SVGElement;
 }
 
 
@@ -582,6 +591,8 @@ export function visualizeFeatures(
     detailView:any,
     setDetailView:any
 ) {
+    //table that manage color schemes
+    let colorSchemesTable:SVGElement[] = [];
     //control detail view
     let dview = false;
     //control lock and unlock
@@ -662,6 +673,7 @@ export function visualizeFeatures(
     .attr("layerNum", 0);
     for (let i = 0; i < locations.length; i++) {
         const g = firstLayer.append("g")
+            .attr("class", "oFeature")
             .attr("node", i)
             .attr("layerID", 0);
 
@@ -831,7 +843,7 @@ export function visualizeFeatures(
         const l5 = d3.select("g[layerNum='5']");
         const l6 = d3.select("g[layerNum='6']");
 
-        buildBinaryLegend(
+        const scheme1  = buildBinaryLegend(
             myColor,
             0,
             1,
@@ -840,7 +852,7 @@ export function visualizeFeatures(
             schemeLocations[0][1],
             firstLayer
         );
-        buildLegend(
+        const scheme2 = buildLegend(
             myColor,
             maxVals.conv1,
             "GCNConv1 Color Scheme",
@@ -848,16 +860,15 @@ export function visualizeFeatures(
             schemeLocations[1][1],
             l1
         );
-        buildLegend(
+        const scheme3 = buildLegend(
             myColor,
             maxVals.conv2,
             "GCNConv2 Color Scheme",
             schemeLocations[1][0] + 230,
             schemeLocations[1][1],
             l2
-        
         );
-        buildLegend(
+        const scheme4 = buildLegend(
             myColor,
             maxVals.conv3,
             "GCNConv3 Color Scheme",
@@ -865,7 +876,7 @@ export function visualizeFeatures(
             schemeLocations[1][1],
             l3
         );
-        buildLegend(
+        const scheme5 = buildLegend(
             myColor,
             maxVals.pooling,
             "Pooling Color Scheme",
@@ -873,9 +884,7 @@ export function visualizeFeatures(
             schemeLocations[1][1],
             l4
         );
-
-        console.log("ll", l5, l6);
-        buildBinaryLegend(
+        const scheme6 = buildBinaryLegend(
             myColor,
             final[0],
             final[1],
@@ -884,7 +893,7 @@ export function visualizeFeatures(
             schemeLocations[1][1],
             l5
         );
-        buildBinaryLegend(
+        const scheme7 = buildBinaryLegend(
             myColor,
             result[0],
             result[1],
@@ -893,6 +902,13 @@ export function visualizeFeatures(
             schemeLocations[1][1],
             l6
         );
+
+        //test
+        //scheme1.style.opacity = "0.2";
+
+        colorSchemesTable = [scheme1, scheme2, scheme3, scheme4, scheme5, scheme6, scheme7];
+        
+        //colorSchemesTable[0].style.opacity = "0.1";
     }
     let recordLayerID:number = -1;
     d3.select(".mats").on("click", function(event, d){
@@ -913,11 +929,17 @@ export function visualizeFeatures(
         d3.selectAll(".frame").style("opacity", 0);
         //recover opacity of feature visualizers
         d3.selectAll(".featureVis").style("opacity", 1);
+        d3.selectAll(".oFeature").style("opacity", 1);
         //recover layers positions
         if(recordLayerID>=0){
             translateLayers(recordLayerID, -500);
             recordLayerID = -1;
         }
+
+        //recover color schemes opacity
+        colorSchemesTable.forEach((d, i)=>{
+            d.style.opacity = "1";
+        })
     });
     d3.selectAll(".featureVis").on("click", function(event, d){
         //state
@@ -931,7 +953,7 @@ export function visualizeFeatures(
         d3.selectAll("path").style("opacity", 0);
         //transparent other feature visualizers
         d3.selectAll(".featureVis").style("opacity", 0.2);
-
+        d3.selectAll(".oFeature").style("opacity", 0.2);
         //translate each layer
         const layerID = Number(d3.select(this).attr("layerID")) - 1;
         const node = Number(d3.select(this).attr("node"));
@@ -941,7 +963,13 @@ export function visualizeFeatures(
         //record the layerID
         recordLayerID = layerID;
 
-        
+        //reduce color schemes opacity
+        console.log("CST before modification", colorSchemesTable);
+            colorSchemesTable.forEach((d, i) => {
+                console.log(`Before modification: Element ${i} opacity`, d.style.opacity);
+                d.style.opacity = "0.2";
+                console.log(`After modification: Element ${i} opacity`, d.style.opacity);
+            });
     });
     d3.selectAll(".featureVis").on("mouseover", function (event, d) {
         //if not in the state of lock
