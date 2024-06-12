@@ -10,6 +10,7 @@ import {
 import * as d3 from "d3";
 import { useEffect, useState } from "react";
 
+//get node attributes from graph data
 export function getNodeAttributes(data: any) {
     let nodeAttrs = [];
     for (let i = 0; i < data.x.length; i++) {
@@ -41,6 +42,7 @@ export function getNodeAttributes(data: any) {
     return nodeAttrs;
 }
 
+//draw node attributes on the matrix
 export function drawNodeAttributes(nodeAttrs: any, graph: any) {
     //visualize node attributes
     const textCood = get_cood_from_parent(".y-axis", "text");
@@ -83,29 +85,6 @@ export interface HeatmapData {
     value: number;
 }
 
-// Three function that change the tooltip when user hover / move / leave a cell
-export const mouseover = (event: MouseEvent, d: { value: number }) => {
-    d3.select(event.currentTarget as HTMLElement)
-        .style("stroke", "black")
-        .style("opacity", 1);
-};
-
-export const mousemove = (event: MouseEvent, d: { value: number }) => {
-    const rect = (event.target as HTMLElement).getBoundingClientRect();
-};
-
-export const mouseleave = (event: MouseEvent, d: { value: number }) => {
-    d3.select(event.currentTarget as HTMLElement)
-        .style("stroke", "grey")
-        .style("opacity", 0.8);
-};
-
-export function removeEffect(element: any) {
-    d3.select(".matrix-tooltip").remove(); // 移除矩阵tooltip
-
-    d3.select(element).style("fill", "black").style("font-weight", "normal");
-}
-
 export function get_cood_locations(data: any, locations: any) {
     console.log("DATA", Math.sqrt(data.length));
     const nCol = Math.sqrt(data.length);
@@ -119,137 +98,6 @@ export function get_cood_locations(data: any, locations: any) {
     return locations;
 }
 
-function interactRowCol(
-    xAxis: boolean,
-    tooltipG: any,
-    sqSize: number,
-    gridNum: number
-) {
-    if (!xAxis) {
-        tooltipG
-            .append("rect")
-            .attr("x", 0)
-            .attr("y", -sqSize / 2)
-            .attr("width", sqSize * gridNum + 2)
-            .attr("height", sqSize)
-            .attr("fill", "red")
-            .attr("opacity", 1)
-            .attr("stroke", "black")
-            .attr("class", "tooltips")
-            .attr("stroke-width", 0.1);
-    } else {
-        tooltipG
-            .append("rect")
-            .attr("x", -sqSize / 2)
-            .attr("y", -sqSize * gridNum - 2)
-            .attr("width", sqSize)
-            .attr("height", sqSize * gridNum + 2)
-            .attr("fill", "red")
-            .attr("opacity", 1)
-            .attr("stroke", "black")
-            .attr("class", "tooltips")
-            .attr("stroke-width", 0.1);
-    }
-}
-
-export function tooltipBars64(
-    target: any,
-    i: number,
-    conv1: any,
-    conv2: any,
-    conv3: any,
-    final: any,
-    matrixSize: number,
-    tooltipG: any,
-    cellSize: number,
-    yOffset: number,
-    myColor: any,
-    gridNum: number,
-    sqSize: number,
-    xAxis: boolean
-) {
-    let t = d3.select(target).text();
-    let num = Number(t);
-    console.log("TEXT", t);
-
-    //how to determine the layer?
-    let layer = null;
-    if (i == 1) {
-        layer = conv1;
-    } else if (i == 2) {
-        layer = conv2;
-    } else if (i == 3) {
-        layer = conv3;
-    } else if (i == 4) {
-        layer = final;
-    } else {
-        layer = null;
-    }
-    if (layer != null) {
-        let mat = layer[num];
-
-        console.log("MAT", mat);
-
-        let k = 0;
-
-        for (let i = 0; i < matrixSize; i++) {
-            for (let j = 0; j < matrixSize; j++) {
-                let c: number = mat[i][j];
-                tooltipG
-                    .append("rect")
-                    .attr("x", k * cellSize - 75 * cellSize)
-                    .attr("y", yOffset * cellSize)
-                    .attr("width", cellSize)
-                    .attr("height", 20)
-                    .attr("fill", myColor(c))
-                    .attr("opacity", 1)
-                    .attr("stroke", "black")
-                    .attr("class", "tooltips")
-                    .attr("stroke-width", 0.1);
-
-                k++;
-            }
-        }
-        interactRowCol(xAxis, tooltipG, sqSize, gridNum);
-        d3.selectAll(".tooltips").raise();
-    }
-}
-
-export function tooltipBars7(
-    num: number,
-    features: any,
-    tooltipG: any,
-    cellSize: number,
-    yOffset: number,
-    myColor: any,
-    xAxis: boolean,
-    sqSize: number,
-    gridNum: number
-) {
-    let k = 0;
-    for (let i = 0; i < 7; i++) {
-        const cate = get_category_node(features[num]) * 100;
-        console.log("CATE", cate);
-
-        tooltipG
-            .append("rect")
-            .attr("x", k * cellSize - 5 * cellSize)
-            .attr("y", yOffset * cellSize)
-            .attr("width", cellSize)
-            .attr("height", 20)
-            .attr("class", "tooltips")
-            .attr("fill", myColor(cate))
-            .attr("opacity", 1)
-            .attr("stroke", "black")
-            .attr("stroke-width", 1);
-
-        console.log("node feature", features[num]);
-        k++;
-    }
-    interactRowCol(xAxis, tooltipG, sqSize, gridNum);
-    d3.selectAll(".tooltips").raise();
-}
-
 export function featureTooltip(adjustedX: number, adjustedY: number) {
     const tooltipG = d3
         .select(".mats")
@@ -261,142 +109,7 @@ export function featureTooltip(adjustedX: number, adjustedY: number) {
     return tooltipG;
 }
 
-export function crossConnectionMatrices(
-    graphs: any,
-    locations: any,
-    offsetMat: number
-) {
-    const cood1 = get_cood_from_parent(".mats", "rect");
-    console.log("FINAL coord", cood1);
-    if (graphs.length > 1) {
-        //calculate the offset
-        for (let i = 0; i < locations.length; i++) {
-            locations[i][0] += 10;
-            locations[i][1] += 10;
-        }
-        //drawPoints(".mats","red",locations);
-
-        let olocations = deepClone(locations);
-
-        //we also need to find another locations array
-        for (let i = 0; i < locations.length; i++) {
-            locations[i][0] += offsetMat - 15;
-        }
-
-        let plocation = deepClone(locations);
-
-        //draw path one - one
-        for (let i = 0; i < plocation.length - graphs[0].length; i++) {
-            d3.select(".mats")
-                .append("path")
-                .attr("d", d3.line()([olocations[i], plocation[i]]))
-                .attr("stroke", "black")
-                .attr("opacity", 0.2)
-                .attr("fill", "none");
-        }
-
-        //fdraw path one - multiple
-        const drawGraph = graphs[0];
-        for (let k = 0; k < 3; k++) {
-            for (let i = 0; i < drawGraph.length; i++) {
-                for (let j = 0; j < drawGraph[0].length; j++) {
-                    if (drawGraph[i][j] == 1) {
-                        d3.select(".mats")
-                            .append("path")
-                            .attr(
-                                "d",
-                                d3.line()([
-                                    olocations[i + drawGraph.length * k],
-                                    plocation[j + drawGraph.length * k],
-                                ])
-                            )
-                            .attr("stroke", "black")
-                            .attr("opacity", 0.2)
-                            .attr("fill", "none");
-                    }
-                }
-            }
-        }
-        d3.selectAll("path").lower();
-    }
-}
-
-export function mouseoverEvent(
-    element: any,
-    target: any,
-    i: number,
-    conv1: any,
-    conv2: any,
-    conv3: any,
-    final: any,
-    features: any,
-    myColor: any,
-    offset: number,
-    gridNum: number,
-    sqSize: number,
-    xAxis: boolean
-) {
-    console.log("ELEMENT", element);
-    const bbox = element.getBBox();
-    const cx = bbox.x + bbox.width / 2;
-    const cy = bbox.y + bbox.height / 2;
-
-    const transformAttr = d3
-        .select(element.parentNode as SVGElement)
-        .attr("transform");
-    let translate = [0, 0]; // 默认为无位移
-    if (transformAttr) {
-        const matches = transformAttr.match(/translate\(([^,]+),([^)]+)\)/);
-        if (matches) {
-            translate = matches.slice(1).map(Number);
-        }
-    }
-
-    const adjustedX = cx + translate[0];
-    const adjustedY = cy + translate[1] - 10; // 上移10以放置于文本上方
-    const cellSize = 5; // 每个格子的尺寸
-
-    //-----------------interaction with text label and heatmap----------------------
-
-    if (d3.select(target).attr("class") != "first") {
-        // 创建一个8x8的矩阵tooltip
-        const matrixSize = 8;
-
-        const tooltipG = featureTooltip(adjustedX, adjustedY);
-        // tooltipBars64(
-        //     target,
-        //     i,
-        //     conv1,
-        //     conv2,
-        //     conv3,
-        //     final,
-        //     matrixSize,
-        //     tooltipG,
-        //     cellSize,
-        //     offset,
-        //     myColor,
-        //     gridNum,
-        //     sqSize,
-        //     xAxis
-        // );
-    } else {
-        const tooltipG = featureTooltip(adjustedX, adjustedY);
-        // tooltipBars7(
-        //     target,
-        //     features,
-        //     tooltipG,
-        //     10,
-        //     offset,
-        //     myColor,
-        //     xAxis,
-        //     sqSize,
-        //     gridNum
-        // );
-    }
-
-    d3.select(element).style("fill", "red").style("font-weight", "bold");
-}
-
+//add layer name to the SVG
 function addLayerName(
     locations: any,
     name: string,
@@ -416,14 +129,7 @@ function addLayerName(
         .style("font-size", 7);
 }
 
-//find absolute max value in an 1d array
-function findAbsMax(arr: number[]) {
-    let max: number = Math.abs(Math.max(...arr));
-    let min: number = Math.abs(Math.min(...arr));
-    if (min > max) return min;
-    return max;
-}
-
+//draw a legend for a binary output layer
 function buildBinaryLegend(
     myColor: any,
     val1: number,
@@ -481,6 +187,7 @@ function buildBinaryLegend(
     return g0.node() as SVGElement;
 }
 
+//draw a legend for regular color scheme
 function buildLegend(
     myColor: any,
     absVal: number,
@@ -541,41 +248,37 @@ function buildLegend(
     return g0.node() as SVGElement;
 }
 
-
+//the function that helps you to translate layers
 function translateLayers(layerID:number, gap:number){
     for (let i = layerID + 1; i < 7; i++) {
-        // 选择 layerNum 为 i 的组元素，并将其向右移动 500px
+        // select layer
         d3.select(`g[layerNum="${i}"]`)
             .attr("transform", function() {
-                // 获取当前的 transform 属性值
+                // get current transformation
                 let currentTransform = d3.select(this).attr("transform");
                 
-                // 如果 currentTransform 为 null 或 undefined，使用默认值
                 if (!currentTransform) {
                     currentTransform = "translate(0, 0)";
                 }
                 
-                // 解析出当前的 x, y 平移值
                 let translateMatch = currentTransform.match(/translate\(([^)]+)\)/);
+                // do the translation
                 if (translateMatch) {
                     let translate = translateMatch[1].split(",");
                     let x = parseFloat(translate[0]);
                     let y = parseFloat(translate[1]);
                     
-                    // 将 x 值增加 500
                     x += gap;
                     
-                    // 返回新的 transform 属性值
                     return `translate(${x}, ${y})`;
                 } else {
-                    // 如果解析失败，返回默认的 transform 属性值
-                    return "translate(500, 0)";
+                    return `translate(${gap}, 0)`;
                 }
             });
     }
 }
 
-
+//draw all feature visualizers for original features and GCNConv
 export function visualizeFeatures(
     locations: any,
     features: any,
@@ -646,7 +349,7 @@ export function visualizeFeatures(
         matFrames.push(r.node() as SVGElement);
     }
     console.log("matFrames", matFrames);
-    //a data structure to store all feature vis information
+    //a data structure to store all feature vis frames information
     interface FrameDS {
         features: any[];
         GCNConv1: any[];
@@ -843,6 +546,7 @@ export function visualizeFeatures(
         let result = softmax(final);
         console.log("debug", schemeLocations);
 
+        //select layers
         const l1 = d3.select("g[layerNum='1']");
         const l2 = d3.select("g[layerNum='2']");
         const l3 = d3.select("g[layerNum='3']");
@@ -919,9 +623,9 @@ export function visualizeFeatures(
     }
     let recordLayerID:number = -1;
     d3.select(".mats").on("click", function(event, d){
-        if (!d3.select(event.target).classed("featureVis")
-            &&!d3.select(event.target).classed("pooling")
-            &&!d3.select(event.target).classed("twoLayer")){
+        if (!(d3.select(event.target).classed("featureVis"))
+            &&!(d3.select(event.target).classed("pooling"))
+            &&!(d3.select(event.target).classed("twoLayer"))){
                 dview=false;
                 lock=false;
         }
@@ -939,7 +643,7 @@ export function visualizeFeatures(
         d3.selectAll(".oFeature").style("opacity", 1);
         //recover layers positions
         if(recordLayerID>=0){
-            translateLayers(recordLayerID, -500);
+            translateLayers(recordLayerID, -300);
             recordLayerID = -1;
         }
 
@@ -949,44 +653,46 @@ export function visualizeFeatures(
         })
     });
     d3.selectAll(".featureVis").on("click", function(event, d){
-        //state
-        lock = true;
-        event.stopPropagation();
-        dview = true;
-        console.log("click! - fVis", dview, lock);
-        //lock all feature visualizers and transparent paths
-        d3.select(".pooling").style("pointer-events", "none").style("opacity", 0.2);
-        d3.selectAll(".twoLayer").style("pointer-events", "none").style("opacity", 0.2);
-        d3.selectAll("path").style("opacity", 0);
-        //transparent other feature visualizers
-        d3.selectAll(".featureVis").style("opacity", 0.2);
-        d3.selectAll(".oFeature").style("opacity", 0.2);
-        //translate each layer
-        const layerID = Number(d3.select(this).attr("layerID")) - 1;
-        const node = Number(d3.select(this).attr("node"));
-        console.log("Current layerID and node", layerID, node);
-        translateLayers(layerID, 500);
+        if(lock!=true){
+            //state
+            lock = true;
+            event.stopPropagation();
+            dview = true;
+            console.log("click! - fVis", dview, lock);
+            //lock all feature visualizers and transparent paths
+            d3.select(".pooling").style("pointer-events", "none").style("opacity", 0.2);
+            d3.selectAll(".twoLayer").style("pointer-events", "none").style("opacity", 0.2);
+            d3.selectAll("path").style("opacity", 0);
+            //transparent other feature visualizers
+            d3.selectAll(".featureVis").style("opacity", 0.2);
+            d3.selectAll(".oFeature").style("opacity", 0.2);
+            //translate each layer
+            const layerID = Number(d3.select(this).attr("layerID")) - 1;
+            const node = Number(d3.select(this).attr("node"));
+            console.log("Current layerID and node", layerID, node);
+            translateLayers(layerID, 300);
 
-        //record the layerID
-        recordLayerID = layerID;
+            //record the layerID
+            recordLayerID = layerID;
 
-        //reduce color schemes opacity
-        console.log("CST before modification", colorSchemesTable);
-        colorSchemesTable.forEach((d, i) => {
-            console.log(`Before modification: Element ${i} opacity`, d.style.opacity);
-            d.style.opacity = "0.2";
-            console.log(`After modification: Element ${i} opacity`, d.style.opacity);
-        });
-        //choose the right color schemes to display
-        colorSchemesTable[layerID].style.opacity = "1";
-        colorSchemesTable[layerID+1].style.opacity = "1";
-        //choose the right feature viusualizers to display
-        let neighbors = adjList[node]; 
-        for(let i=0; i<neighbors.length; i++){ //display pre layer
-            let cur = neighbors[i];
-            featureVisTable[layerID][cur].style.opacity = "1";
+            //reduce color schemes opacity
+            console.log("CST before modification", colorSchemesTable);
+            colorSchemesTable.forEach((d, i) => {
+                console.log(`Before modification: Element ${i} opacity`, d.style.opacity);
+                d.style.opacity = "0.2";
+                console.log(`After modification: Element ${i} opacity`, d.style.opacity);
+            });
+            //choose the right color schemes to display
+            colorSchemesTable[layerID].style.opacity = "1";
+            colorSchemesTable[layerID+1].style.opacity = "1";
+            //choose the right feature viusualizers to display
+            let neighbors = adjList[node]; 
+            for(let i=0; i<neighbors.length; i++){ //display pre layer
+                let cur = neighbors[i];
+                featureVisTable[layerID][cur].style.opacity = "1";
+            }
+            featureVisTable[layerID+1][node].style.opacity = "1";//display current node
         }
-        featureVisTable[layerID+1][node].style.opacity = "1";//display current node
     });
     d3.selectAll(".featureVis").on("mouseover", function (event, d) {
         //if not in the state of lock
@@ -1096,6 +802,7 @@ export function visualizeFeatures(
     });
 }
 
+//draw cross connections between feature visualizers
 function drawCrossConnection(
     graph: any,
     locations: any,
@@ -1205,6 +912,7 @@ function computeMids(point1: any, point2: any) {
     return res;
 }
 
+//draw pooling visualizer
 function drawPoolingVis(
     locations: any,
     pooling: number[],
@@ -1448,4 +1156,79 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
     });
 
     return [aOne[0], cOne[0]];
+}
+
+
+//warn: below are some functions that need to be updated
+
+// Three function that change the tooltip when user hover / move / leave a cell
+export const mouseover = (event: MouseEvent, d: { value: number }) => {
+    d3.select(event.currentTarget as HTMLElement)
+        .style("stroke", "black")
+        .style("opacity", 1);
+};
+
+export const mousemove = (event: MouseEvent, d: { value: number }) => {
+    const rect = (event.target as HTMLElement).getBoundingClientRect();
+};
+
+export const mouseleave = (event: MouseEvent, d: { value: number }) => {
+    d3.select(event.currentTarget as HTMLElement)
+        .style("stroke", "grey")
+        .style("opacity", 0.8);
+};
+
+export function removeEffect(element: any) {
+    d3.select(".matrix-tooltip").remove(); // remove tooltip
+
+    d3.select(element).style("fill", "black").style("font-weight", "normal");
+}
+
+export function mouseoverEvent(
+    element: any,
+    target: any,
+    i: number,
+    conv1: any,
+    conv2: any,
+    conv3: any,
+    final: any,
+    features: any,
+    myColor: any,
+    offset: number,
+    gridNum: number,
+    sqSize: number,
+    xAxis: boolean
+) {
+    console.log("ELEMENT", element);
+    const bbox = element.getBBox();
+    const cx = bbox.x + bbox.width / 2;
+    const cy = bbox.y + bbox.height / 2;
+
+    const transformAttr = d3
+        .select(element.parentNode as SVGElement)
+        .attr("transform");
+    let translate = [0, 0]; // no translation for default
+    if (transformAttr) {
+        const matches = transformAttr.match(/translate\(([^,]+),([^)]+)\)/);
+        if (matches) {
+            translate = matches.slice(1).map(Number);
+        }
+    }
+
+    const adjustedX = cx + translate[0];
+    const adjustedY = cy + translate[1] - 10; 
+    const cellSize = 5; // size for each grid
+
+    //-----------------interaction with text label and heatmap----------------------
+
+    if (d3.select(target).attr("class") != "first") {
+        // 8*8 matrix
+        const matrixSize = 8;
+
+        const tooltipG = featureTooltip(adjustedX, adjustedY);
+    } else {
+        const tooltipG = featureTooltip(adjustedX, adjustedY);
+    }
+
+    d3.select(element).style("fill", "red").style("font-weight", "bold");
 }

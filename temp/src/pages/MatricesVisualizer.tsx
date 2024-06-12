@@ -13,7 +13,6 @@ import {
     drawPoints,
 } from "../utils/utils";
 import {
-    crossConnectionMatrices,
     get_cood_locations,
     removeEffect,
     mouseover,
