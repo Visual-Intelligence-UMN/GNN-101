@@ -591,6 +591,8 @@ export function visualizeFeatures(
     detailView:any,
     setDetailView:any
 ) {
+    //table that manage all feature visualizers for GCNConv
+    let featureVisTable:SVGElement[][] = [[],[],[],[]];
     //table that manage color schemes
     let colorSchemesTable:SVGElement[] = [];
     //control detail view
@@ -739,6 +741,9 @@ export function visualizeFeatures(
                 matf.style.opacity = "0";
             }
         });
+
+        //push feature visualizer into the table
+        featureVisTable[0].push(g.node() as SVGElement);
     }
     //drawPoints(".mats", "red", schemeLocations);
     //add layer label for the first one
@@ -811,8 +816,10 @@ export function visualizeFeatures(
             if (i == locations.length - 1) {
                 schemeLocations.push([locations[i][0], 350]);
             }
-        }
 
+            featureVisTable[k+1].push(g.node() as SVGElement);
+        }
+        console.log("FVT", featureVisTable);
         if (k != 2) {
             // visualize cross connections btw 1st, 2nd, 3rd GCNConv
             paths = drawCrossConnection(graph, locations, 62 * 2, 102, k + 1);
@@ -973,6 +980,13 @@ export function visualizeFeatures(
         //choose the right color schemes to display
         colorSchemesTable[layerID].style.opacity = "1";
         colorSchemesTable[layerID+1].style.opacity = "1";
+        //choose the right feature viusualizers to display
+        let neighbors = adjList[node]; 
+        for(let i=0; i<neighbors.length; i++){ //display pre layer
+            let cur = neighbors[i];
+            featureVisTable[layerID][cur].style.opacity = "1";
+        }
+        featureVisTable[layerID+1][node].style.opacity = "1";//display current node
     });
     d3.selectAll(".featureVis").on("mouseover", function (event, d) {
         //if not in the state of lock
