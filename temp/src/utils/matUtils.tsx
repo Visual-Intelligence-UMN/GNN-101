@@ -965,11 +965,14 @@ export function visualizeFeatures(
 
         //reduce color schemes opacity
         console.log("CST before modification", colorSchemesTable);
-            colorSchemesTable.forEach((d, i) => {
-                console.log(`Before modification: Element ${i} opacity`, d.style.opacity);
-                d.style.opacity = "0.2";
-                console.log(`After modification: Element ${i} opacity`, d.style.opacity);
-            });
+        colorSchemesTable.forEach((d, i) => {
+            console.log(`Before modification: Element ${i} opacity`, d.style.opacity);
+            d.style.opacity = "0.2";
+            console.log(`After modification: Element ${i} opacity`, d.style.opacity);
+        });
+        //choose the right color schemes to display
+        colorSchemesTable[layerID].style.opacity = "1";
+        colorSchemesTable[layerID+1].style.opacity = "1";
     });
     d3.selectAll(".featureVis").on("mouseover", function (event, d) {
         //if not in the state of lock
