@@ -64,6 +64,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [detailView, setDetailView] = useState(false);
     //const lastIntmData = useRef(intmData);
 
     // This is really messy but init will stay at the top to remain in the scope of all functions
@@ -292,7 +293,9 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 final,
                 graph,
                 adjList,
-                colorSchemeTable
+                colorSchemeTable,
+                detailView,
+                setDetailView
             );
             drawNodeAttributes(nodeAttrs, graph);
         };
