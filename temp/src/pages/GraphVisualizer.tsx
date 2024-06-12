@@ -85,7 +85,9 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             .data(data.nodes)
             .join("circle")
             .attr("r", 13)
-            .style("fill", "#69b3a2");
+            .style("fill", "white")
+            .style("stroke", "#69b3a2")
+            .style("stroke-width", 1)
 
           const labels = g1
             .selectAll("text")

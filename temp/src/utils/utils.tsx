@@ -355,27 +355,27 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
     .range(["orange", "white", "#69b3a2"]);
 
   // Array to keep track of occupied positions
-  const occupiedPositions: { x: number; y: number; width: number }[] = [];
+  const occupiedPositions: { x: number; y: number }[] = [];
 
   nodesById.forEach((nodes, id) => {
     nodes.forEach((node: any, i: number) => {
       const features = node.features;
-      let xPos = (i - 2.5) * offset + node.x + 100;
-      let yPos = node.y - 100;
-      const featureWidth = 15;
+      
+      let xPos = (i - 2.5) * offset + node.x;
+      let yPos = node.y + 25;
 
-      // Check and adjust yPos if it overlaps with existing featureGroups
+       // Check and adjust yPos if it overlaps with existing featureGroups
       occupiedPositions.forEach(pos => {
-        if (Math.abs(xPos - pos.x) < 15) {
-          xPos = pos.x + pos.width + 20; // Adjust y position to avoid overlap
+        if (Math.abs(xPos - pos.x) < 20) {
+          xPos = pos.x + 20; 
         }
       });
 
       // Add the new position to the occupied positions array
-      occupiedPositions.push({ x: xPos, y: yPos, width: featureWidth });
+      occupiedPositions.push({ x: xPos, y: yPos });
 
       const featureGroup = svg.append("g")
-        .attr("transform", `translate(${xPos - 15}, ${yPos})`);
+        .attr("transform", `translate(${xPos - 7.5}, ${yPos})`);
 
       featureGroup.selectAll("rect")
         .data(features)
@@ -392,7 +392,7 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
 
       featureGroup.append("text")
         .attr("x", 10)
-        .attr("y", -8)
+        .attr("y", 200)
         .attr("dy", ".35em")
         .text(node.id)
         .style("font-size", "15px")
@@ -400,17 +400,22 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
         .style("text-anchor", "middle");
 
       node.featureGroup = featureGroup;
-      if (!node.svgElement) {
-        node.svgElement = svg.append("circle")
-          .attr("cx", node.x + ((node.graphIndex - 2.5) * offset))
-          .attr("cy", node.y + 10)
-          .attr("r", 13)
-          .attr("fill", "transparent");
-      }
-      node.svgElement.raise();
 
-      node.svgElement.on("mouseover", function() {
+      node.svgElement = svg.append("circle")
+        .attr("cx", node.x + ((node.graphIndex - 2.5) * offset))
+        .attr("cy", node.y + 10)
+        .attr("r", 13)
+        .attr("fill", "transparent")
+        .attr("stroke", "#69b3a2")
+        .attr("stroke-width", 1)
+        .node();
+
+
+
+      node.svgElement.addEventListener("mouseover", function(this: any) {
         featureGroup.style('visibility', 'visible');
+        d3.select(this).attr("stroke-width", 3); // Change stroke-width on mouseover
+
         if (node.links) {
           node.links.forEach((link: any) => {
             link.style("opacity", 1);
@@ -418,18 +423,24 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number) {
         }
         if (node.relatedNodes) {
           node.relatedNodes.forEach((n: any) => {
+            d3.select(n.svgElement).attr("stroke-width", 3);
             n.featureGroup.style('visibility', 'visible');
           });
         }
-      }).on("mouseout", function() {
+      })
+      node.svgElement.addEventListener("mouseout", function(this: any) {
         featureGroup.style('visibility', 'hidden');
+        d3.select(this).attr("stroke-width", 1); // Reset stroke-width on mouseout
+
         if (node.links) {
           node.links.forEach((link: any) => {
             link.style("opacity", 0.05);
           });
         }
+
         if (node.relatedNodes) {
           node.relatedNodes.forEach((n: any) => {
+            d3.select(n.svgElement).attr("stroke-width", 1);
             n.featureGroup.style('visibility', 'hidden');
           });
         }
@@ -498,14 +509,14 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
               const color = calculateAverage(node.features);
 
               const path = svg.append("path")
-                .attr("d", `M ${node.x + xOffset1} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${neighborNode.x + (neighborNode.graphIndex - 2.5) * offset} ${neighborNode.y + 10}`)
+                .attr("d", `M ${node.x + xOffset1 + 12} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${neighborNode.x + (neighborNode.graphIndex - 2.5) * offset} ${neighborNode.y + 10}`)
                 .style("stroke", myColor(color))
                 .style("opacity", 0.07)
                 .style("stroke-width", 1)
                 .style("fill", "none");
 
 
-              node.links.push(path);
+
               neighborNode.links.push(path);
               neighborNode.relatedNodes.push(node);
         
@@ -527,13 +538,13 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
             const color = calculateAverage(node.features);
 
               const path = svg.append("path")
-                .attr("d", `M ${node.x + xOffset1} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffsetNext} ${nextNode.y + 10}`)
+                .attr("d", `M ${node.x + xOffset1 + 12} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffsetNext} ${nextNode.y + 10}`)
                 .style("stroke", myColor(color))
                 .style("opacity", 0.07)
                 .style("stroke-width", 1)
                 .style("fill", "none");
   
-              node.links.push(path);
+      
               if (!nextNode.links) {
                 nextNode.links = [];
               }
@@ -562,13 +573,13 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
             const controlY2 = nextNode.y + 10;
   
             const path = svg.append("path")
-              .attr("d", `M ${node.x + xOffset1} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffset2} ${nextNode.y + 10}`)
+              .attr("d", `M ${node.x + xOffset1 + 12} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffset2} ${nextNode.y + 10}`)
               .style("stroke", myColor(color))
               .style("opacity", 0.07)
               .style("stroke-width", 1)
               .style("fill", "none");
            
-          node.links.push(path);
+  
           if (!nextNode.links) {
             nextNode.links = [];
           }

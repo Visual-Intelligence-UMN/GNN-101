@@ -373,7 +373,8 @@ export function visualizeGraph(path: string) {
                 .data(data.nodes)
                 .join("circle")
                 .attr("r", 13)
-                .style("fill", "#69b3a2");
+                .style("stroke", "#69b3a2")
+                .style("fill", "white")
 
             const labels = g1
                 .selectAll("text")
