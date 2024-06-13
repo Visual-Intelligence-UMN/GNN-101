@@ -10,6 +10,7 @@ import {
 } from "./utils";
 import * as d3 from "d3";
 import { useEffect, useState } from "react";
+import { create, all, MathJsStatic, Matrix } from 'mathjs';
 
 //get node attributes from graph data
 export function getNodeAttributes(data: any) {
@@ -745,9 +746,10 @@ export function visualizeFeatures(
             for(let i=0; i<adjList.length; i++){
                 dList.push(adjList[i].length);
             }
-            //compute x'
-            let X = null;
-            let featuresTable = [features, conv1, conv2, conv3];
+            //compute x
+            const math = create(all, {});
+            let featuresTable = [features, conv1, conv2];
+            let X = new Array(featuresTable[layerID][node].length).fill(0);
             let mulValues = []; //an array to store all multiplier values
             for(let i=0; i<adjList[node].length; i++){
                 //find multipliers
@@ -755,21 +757,29 @@ export function visualizeFeatures(
                 let node_j = adjList[node_i][i];
                 let mulV = 1/Math.sqrt(dList[node_i] * dList[node_j]);
                 mulValues.push(mulV);
+                //compute x'
+                console.log("compute x loop", featuresTable[layerID][node_j]);
+                const prepMat = [...featuresTable[layerID][node_j]];
+                let matA = math.matrix(prepMat);
+                X = math.add(math.multiply(prepMat, mulV), X);
             }
-            console.log("compute x'", mulValues, dList);
-            let dummy:number[] = new Array(64).fill(0);
+            const dummy: number[] = X;
 
-            dummy = dummy.map(() => Math.random()*2-1);
+            console.log("compute x'", mulValues, dList, layerID, X.toString(), dummy);
+        
             const g = d3.select(".mats").append("g")
                 .attr("class", "procVis");
-            
+            let w = 2;
+            if(layerID==0){w = 5;console.log("compute x 0")}
+            else w = 2;
             setTimeout(()=>{
                 //draw feature visualizer
                 for (let m = 0; m < dummy.length; m++) {
+                    
                     g.append("rect")
-                        .attr("x", coordFeatureVis[0] + 2 * m)
+                        .attr("x", coordFeatureVis[0] + w * m)
                         .attr("y", coordFeatureVis[1] - 5)
-                        .attr("width", 2)
+                        .attr("width", w)
                         .attr("height", 10)
                         .attr("fill", myColor(dummy[m]))
                         .attr("opacity", 0)
@@ -783,7 +793,7 @@ export function visualizeFeatures(
                     .append("rect")
                     .attr("x", coordFeatureVis[0])
                     .attr("y", coordFeatureVis[1]-5)
-                    .attr("width", 2 * 64)
+                    .attr("width", w * dummy.length)
                     .attr("height", 10)
                     .attr("fill", "none")
                     .attr("opacity", 0)
