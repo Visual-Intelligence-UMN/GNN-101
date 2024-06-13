@@ -69,34 +69,34 @@ export const GraphAnalysisViewer: React.FC<GraphAnalysisViewerProps> = ({
                 <div>
                     <div className="flex flex-row flex-wrap items-center">
                         <div className="mr-4">
-                            <text className="font-bold">Graph Information</text>{" "}
+                            <span className="font-bold">Graph Information</span>{" "}
                         </div>
                         <div className="mr-4">
-                            <text className="font-semibold">Node Count</text>:{" "}
+                            <span className="font-semibold">Node Count</span>:{" "}
                             {data.node_count}
                         </div>
                         <div className="mr-4">
-                            <text className="font-semibold">Edge Count</text>:{" "}
+                            <span className="font-semibold">Edge Count</span>:{" "}
                             {data.is_directed ? data.edge_count : data.edge_count/2}
                         </div>
                         <div className="mr-4">
-                            <text className="font-semibold">
+                            <span className="font-semibold">
                                 Average Node Degree
-                            </text>
+                            </span>
                             : {roundToTwo(data.avg_node_degree / 2)}
                         </div>
                         <div className="mr-4">
-                            <text className="font-semibold">
+                            <span className="font-semibold">
                                 Has Isolated Node
-                            </text>
+                            </span>
                             : {data.has_isolated_node ? "Yes" : "No"}
                         </div>
                         <div className="mr-4">
-                            <text className="font-semibold">Has Loop</text>:{" "}
+                            <span className="font-semibold">Has Loop</span>:{" "}
                             {data.has_loop ? "Yes" : "No"}
                         </div>
                         <div className="mr-4">
-                            <text className="font-semibold">Is Directed</text>:{" "}
+                            <span className="font-semibold">Is Directed</span>:{" "}
                             {data.is_directed ? "Yes" : "No"}
                         </div>
                     </div>
