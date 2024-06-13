@@ -34,7 +34,22 @@ g.layerVis {
 
 path {
   transition: all;
-  transition-duration: 4s;
+  transition-duration: 1s;
+}
+
+.frame {
+  transition: all;
+  transition-duration: 1s;
+}
+
+.colFrame {
+  transition: all;
+  transition-duration: 1s;
+}
+
+.rowFrame {
+  transition: all;
+  transition-duration: 1s;
 }
 
 @layer utilities {

@@ -637,10 +637,7 @@ export function visualizeFeatures(
                 lock=false;
         }
         console.log("click!", dview, lock);
-        //recover all feature visualizers and paths
-        d3.select(".pooling").style("pointer-events", "auto").style("opacity", 1);
-        d3.selectAll(".twoLayer").style("pointer-events", "auto").style("opacity",1);
-        d3.selectAll("path").style("opacity", 0.05);
+        
         //recover all frames
         d3.selectAll(".colFrame").style("opacity", 0);
         d3.selectAll(".rowFrame").style("opacity", 0);
@@ -654,10 +651,18 @@ export function visualizeFeatures(
             recordLayerID = -1;
         }
 
+        //recover all feature visualizers and paths
+        setTimeout(() => {
+            d3.select(".pooling").style("pointer-events", "auto").style("opacity", 1);
+            d3.selectAll(".twoLayer").style("pointer-events", "auto").style("opacity",1);
+            d3.selectAll("path").style("opacity", 0.05);
+        }, 1750);
+
         //recover color schemes opacity
         colorSchemesTable.forEach((d, i)=>{
             d.style.opacity = "1";
-        })
+        });
+
     });
     d3.selectAll(".featureVis").on("click", function(event, d){
         if(lock!=true){
@@ -677,8 +682,9 @@ export function visualizeFeatures(
             const layerID = Number(d3.select(this).attr("layerID")) - 1;
             const node = Number(d3.select(this).attr("node"));
             console.log("Current layerID and node", layerID, node);
-            translateLayers(layerID, 300);
-
+            setTimeout(()=>{
+                translateLayers(layerID, 300);
+            }, 1750);
             //record the layerID
             recordLayerID = layerID;
 
@@ -698,7 +704,11 @@ export function visualizeFeatures(
                 let cur = neighbors[i];
                 featureVisTable[layerID][cur].style.opacity = "1";
             }
-            featureVisTable[layerID+1][node].style.opacity = "1";//display current node
+            let curNode = featureVisTable[layerID+1][node];
+            curNode.style.opacity = "1";//display current node
+
+            //calculation process visualizer
+            
         }
     });
     d3.selectAll(".featureVis").on("mouseover", function (event, d) {
