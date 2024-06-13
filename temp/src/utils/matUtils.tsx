@@ -6,6 +6,7 @@ import {
     get_category_node,
     drawPoints,
     softmax,
+    get_coordination,
 } from "./utils";
 import * as d3 from "d3";
 import { useEffect, useState } from "react";
@@ -276,6 +277,20 @@ function translateLayers(layerID:number, gap:number){
                 }
             });
     }
+}
+
+
+function calculatePrevFeatureVisPos(featureVisTable:any, layerID: number, node:number){
+    let coord = get_coordination(featureVisTable[layerID][node]);
+    //minor position adjustment
+    if(layerID==0){
+        coord[0] += (35)/2;
+    }else{
+        coord[0] += 64;
+    }
+    coord[1] += 10;
+    console.log("coord", coord);
+    return coord;
 }
 
 //draw all feature visualizers for original features and GCNConv
@@ -663,6 +678,9 @@ export function visualizeFeatures(
             d.style.opacity = "1";
         });
 
+        //remove calculation process visualizer
+        d3.selectAll(".procVis").remove();
+
     });
     d3.selectAll(".featureVis").on("click", function(event, d){
         if(lock!=true){
@@ -699,16 +717,102 @@ export function visualizeFeatures(
             colorSchemesTable[layerID].style.opacity = "1";
             colorSchemesTable[layerID+1].style.opacity = "1";
             //choose the right feature viusualizers to display
+            let posList = []; //a list to manage all position from the previous layer feature vis
             let neighbors = adjList[node]; 
             for(let i=0; i<neighbors.length; i++){ //display pre layer
                 let cur = neighbors[i];
                 featureVisTable[layerID][cur].style.opacity = "1";
+
+                //find position and save it
+                let c = calculatePrevFeatureVisPos(featureVisTable, layerID, cur);
+                posList.push(c);
             }
             let curNode = featureVisTable[layerID+1][node];
             curNode.style.opacity = "1";//display current node
-
+ 
             //calculation process visualizer
+            let coord = calculatePrevFeatureVisPos(featureVisTable, layerID, node);
+            console.log("coord", coord);
+            //drawPoints(".mats", "red", posList);
             
+            //find position for intermediate feature vis 
+            let coordFeatureVis = deepClone(coord);
+            coordFeatureVis[0] += 102;
+            
+            //TODO: implment the feature visualizer for intermediate output
+            let dummy:number[] = new Array(64).fill(0);
+
+            dummy = dummy.map(() => Math.random()*2-1);
+            const g = d3.select(".mats").append("g")
+                .attr("class", "procVis");
+            
+            setTimeout(()=>{
+                //draw feature visualizer
+                for (let m = 0; m < dummy.length; m++) {
+                    g.append("rect")
+                        .attr("x", coordFeatureVis[0] + 2 * m)
+                        .attr("y", coordFeatureVis[1] - 5)
+                        .attr("width", 2)
+                        .attr("height", 10)
+                        .attr("fill", myColor(dummy[m]))
+                        .attr("opacity", 0)
+                        .attr("stroke", "gray")
+                        .attr("stroke-width", 0.1)
+                        .attr("class", "procVis");
+                }
+
+                //draw frame
+                g
+                    .append("rect")
+                    .attr("x", coordFeatureVis[0])
+                    .attr("y", coordFeatureVis[1]-5)
+                    .attr("width", 2 * 64)
+                    .attr("height", 10)
+                    .attr("fill", "none")
+                    .attr("opacity", 0)
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 1)
+                    .attr("class", "procVis");
+
+                //path connect - connect prev layer feature vis to intermediate feature vis
+                const curve = d3.line().curve(d3.curveBasis);
+                for(let i=0; i<posList.length; i++){
+                    const res = computeMids(posList[i], coordFeatureVis);
+                    const hpoint = res[0];
+                    const lpoint = res[1];
+                    console.log("control points", hpoint, lpoint);
+                    d3.select(".mats")
+                        .append("path")
+                        .attr(
+                            "d",
+                            curve([posList[i], hpoint, lpoint, coordFeatureVis])
+                        )
+                        .attr("stroke", "black")
+                        .attr("opacity", 0)
+                        .attr("fill", "none")
+                        .attr("class", "procVis");
+
+                    //draw multipliers
+                    let x = (coordFeatureVis[0] - posList[i][0])/2 + posList[i][0];
+                    let y = (coordFeatureVis[1] - posList[i][1])/2 + posList[i][1];
+                    console.log("text point", x, y, posList[i][0], posList[i][1]);
+                    d3
+                        .select(".mats")
+                        .append("text")
+                        .text((Math.random()/10).toFixed(2))
+                        .attr("x", x-2)
+                        .attr("y", y-2)
+                        .attr("text-anchor", "middle")
+                        .attr("font-size", 7.5)
+                        .attr("class", "procVis")
+                        .attr("opacity", 0);
+                }
+                d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
+            }, 2500
+            );
+            
+
+            //path connect - connect intermediate feature vis to current feature vis
         }
     });
     d3.selectAll(".featureVis").on("mouseover", function (event, d) {
