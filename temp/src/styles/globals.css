@@ -27,6 +27,16 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+g.layerVis {
+  transition-property: transform;
+  transition-duration: 2s;
+}
+
+path {
+  transition: all;
+  transition-duration: 4s;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

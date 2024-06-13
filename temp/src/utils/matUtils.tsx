@@ -252,7 +252,7 @@ function buildLegend(
 function translateLayers(layerID:number, gap:number){
     for (let i = layerID + 1; i < 7; i++) {
         // select layer
-        d3.select(`g[layerNum="${i}"]`)
+        d3.select(`g#layerNum_${i}`)
             .attr("transform", function() {
                 // get current transformation
                 let currentTransform = d3.select(this).attr("transform");
@@ -375,7 +375,7 @@ export function visualizeFeatures(
     const firstLayer = d3
     .select(".mats")
     .append("g")
-    .attr("layerNum", 0);
+    .attr('id', "layerNum_0");
     for (let i = 0; i < locations.length; i++) {
         const g = firstLayer.append("g")
             .attr("class", "oFeature")
@@ -462,7 +462,8 @@ export function visualizeFeatures(
         const layer = d3
         .select(".mats")
         .append("g")
-        .attr("layerNum", k+1);
+        .attr("class", "layerVis")
+        .attr('id', `layerNum_${k+1}`);
         for (let i = 0; i < locations.length; i++) {
             if (k != 0) {
                 locations[i][0] += 2 * 64 + 100;
@@ -470,8 +471,8 @@ export function visualizeFeatures(
                 locations[i][0] += 7 * 2 + 100 + 25;
             }
         }
-        let str = "[layerNum='"+(k+1)+"']";
-        addLayerName(locations, "GCNConv" + (k + 1), 0, 30, d3.select(str));
+
+        addLayerName(locations, "GCNConv" + (k + 1), 0, 30, d3.select(`g#layerNum_${k+1}`));
         //drawPoints(".mats","red",locations);
         const gcnFeature = gcnFeatures[k];
         for (let i = 0; i < locations.length; i++) {
@@ -547,12 +548,18 @@ export function visualizeFeatures(
         console.log("debug", schemeLocations);
 
         //select layers
-        const l1 = d3.select("g[layerNum='1']");
-        const l2 = d3.select("g[layerNum='2']");
-        const l3 = d3.select("g[layerNum='3']");
-        const l4 = d3.select("g[layerNum='4']");
-        const l5 = d3.select("g[layerNum='5']");
-        const l6 = d3.select("g[layerNum='6']");
+        // const l1 = d3.select("g[layerNum='1']");
+        // const l2 = d3.select("g[layerNum='2']");
+        // const l3 = d3.select("g[layerNum='3']");
+        // const l4 = d3.select("g[layerNum='4']");
+        // const l5 = d3.select("g[layerNum='5']");
+        // const l6 = d3.select("g[layerNum='6']");
+        const l1 = d3.select(`g#layerNum_1`);
+        const l2 = d3.select(`g#layerNum_2`);
+        const l3 = d3.select(`g#layerNum_3`);
+        const l4 = d3.select(`g#layerNum_4`);
+        const l5 = d3.select(`g#layerNum_5`);
+        const l6 = d3.select(`g#layerNum_6`);
 
         const scheme1  = buildBinaryLegend(
             myColor,
@@ -931,7 +938,7 @@ function drawPoolingVis(
     //drawPoints(".mats", "red", one);
     //draw the pooling layer
     console.log("from feature vis", pooling);
-    const gg = d3.select(".mats").append("g").attr("layerNum", 4);
+    const gg = d3.select(".mats").append("g").attr('class', 'layerVis').attr('id', "layerNum_4");
     const g = gg.append("g").attr("class", "pooling");
     for (let i = 0; i < pooling.length; i++) {
         g.append("rect")
@@ -1030,7 +1037,7 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
     one[0][1] -= 5;
     //drawPoints(".mats", "red", one);
     //visulaize
-    const g = d3.select(".mats").append("g").attr("class","twoLayer").attr("layerNum", 5);
+    const g = d3.select(".mats").append("g").attr("class","twoLayer layerVis").attr('id', "layerNum_5");
     for (let m = 0; m < final.length; m++) {
         g.append("rect")
             .attr("x", one[0][0] + 10 * m)
@@ -1087,7 +1094,7 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
 
     let result = softmax(final);
     console.log("mat result", result);
-    const g1 = d3.select(".mats").append("g").attr("class", "twoLayer").attr("layerNum", 6);
+    const g1 = d3.select(".mats").append("g").attr("class", "twoLayer layerVis").attr('id', "layerNum_6");
     for (let m = 0; m < result.length; m++) {
         g1.append("rect")
             .attr("x", aOne[0][0] + 10 * m)
