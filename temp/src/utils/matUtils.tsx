@@ -319,6 +319,7 @@ export function visualizeFeatures(
     let lock = false;
     console.log("state", detailView);
     console.log("Received", maxVals);
+    console.log("adjList", adjList);
     
     let colLocations = [];
     for(let i=0; i<graph.length; i++){
@@ -563,12 +564,6 @@ export function visualizeFeatures(
         console.log("debug", schemeLocations);
 
         //select layers
-        // const l1 = d3.select("g[layerNum='1']");
-        // const l2 = d3.select("g[layerNum='2']");
-        // const l3 = d3.select("g[layerNum='3']");
-        // const l4 = d3.select("g[layerNum='4']");
-        // const l5 = d3.select("g[layerNum='5']");
-        // const l6 = d3.select("g[layerNum='6']");
         const l1 = d3.select(`g#layerNum_1`);
         const l2 = d3.select(`g#layerNum_2`);
         const l3 = d3.select(`g#layerNum_3`);
@@ -645,13 +640,12 @@ export function visualizeFeatures(
     }
     let recordLayerID:number = -1;
     d3.select(".mats").on("click", function(event, d){
-        if (!(d3.select(event.target).classed("featureVis"))
-            &&!(d3.select(event.target).classed("pooling"))
-            &&!(d3.select(event.target).classed("twoLayer"))){
-                dview=false;
-                lock=false;
-        }
+        
         console.log("click!", dview, lock);
+
+        //remove calculation process visualizer
+        d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 0);
+        setTimeout(()=>{d3.selectAll(".procVis").remove();}, 1250);
         
         //recover all frames
         d3.selectAll(".colFrame").style("opacity", 0);
@@ -678,8 +672,13 @@ export function visualizeFeatures(
             d.style.opacity = "1";
         });
 
-        //remove calculation process visualizer
-        d3.selectAll(".procVis").remove();
+        // unlock the visualization system
+        if (!(d3.select(event.target).classed("featureVis"))
+            &&!(d3.select(event.target).classed("pooling"))
+            &&!(d3.select(event.target).classed("twoLayer"))){
+                dview=false;
+                lock=false;
+        }
 
     });
     d3.selectAll(".featureVis").on("click", function(event, d){
@@ -740,6 +739,24 @@ export function visualizeFeatures(
             coordFeatureVis[0] += 102;
             
             //TODO: implment the feature visualizer for intermediate output
+            //data processing for features aggregation and multipliers calculation
+            //build a list for d_i and d_j for look-up
+            let dList = []; //a list store all nodes' neigbors information(already plus one)
+            for(let i=0; i<adjList.length; i++){
+                dList.push(adjList[i].length);
+            }
+            //compute x'
+            let X = null;
+            let featuresTable = [features, conv1, conv2, conv3];
+            let mulValues = []; //an array to store all multiplier values
+            for(let i=0; i<adjList[node].length; i++){
+                //find multipliers
+                let node_i = node;
+                let node_j = adjList[node_i][i];
+                let mulV = 1/Math.sqrt(dList[node_i] * dList[node_j]);
+                mulValues.push(mulV);
+            }
+            console.log("compute x'", mulValues, dList);
             let dummy:number[] = new Array(64).fill(0);
 
             dummy = dummy.map(() => Math.random()*2-1);
@@ -799,7 +816,7 @@ export function visualizeFeatures(
                     d3
                         .select(".mats")
                         .append("text")
-                        .text((Math.random()/10).toFixed(2))
+                        .text(mulValues[i].toFixed(2))
                         .attr("x", x-2)
                         .attr("y", y-2)
                         .attr("text-anchor", "middle")
