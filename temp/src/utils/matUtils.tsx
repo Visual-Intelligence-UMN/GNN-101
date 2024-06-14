@@ -1558,15 +1558,15 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
 
     //add interaction
     g1.on("mouseover", function (event, d) {
-        d3.select(".path2").attr("opacity", 1);
-        d3.select("[fr='1']").attr("opacity", 1);
-        f1.attr("opacity", 1);
+        d3.select(".path2").style("opacity", 1);
+        d3.select("[fr='1']").style("opacity", 1);
+        f1.style("opacity", 1);
         console.log("f", f, f1);
     });
     g1.on("mouseout", function (event, d) {
-        d3.select(".path2").attr("opacity", 0.02);
-        d3.select("[fr='1']").attr("opacity", 0);
-        f1.attr("opacity", 0);
+        d3.select(".path2").style("opacity", 0.02);
+        d3.select("[fr='1']").style("opacity", 0);
+        f1.style("opacity", 0);
     });
 
     return {"locations":[aOne[0], cOne[0]], "g":g, "g1":g1};
