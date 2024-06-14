@@ -737,7 +737,7 @@ export function visualizeFeatures(
         d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 0);
         setTimeout(() => {
             d3.selectAll(".procVis").remove();
-        }, 1250);
+        }, 2000);
 
         //recover all frames
         d3.selectAll(".colFrame").style("opacity", 0);
@@ -848,7 +848,7 @@ export function visualizeFeatures(
                 node
             );
             console.log("coord", coord);
-            //drawPoints(".mats", "red", posList);
+            
 
             //find position for intermediate feature vis
             let coordFeatureVis = deepClone(coord);
@@ -964,6 +964,61 @@ export function visualizeFeatures(
                         .attr("class", "procVis")
                         .attr("opacity", 0);
                 }
+
+                
+                
+                //determine if we need upper-curves or lower-curves
+                let curveDir = -1; //true -> -1; false -> 1
+                const midNode = adjList.length / 2;
+                if(node<midNode)curveDir = 1;
+                console.log("curveDir", curveDir);
+
+                //draw paths from intermediate result -> final result
+                const layerBias = bias[layerID];
+                //find start locations and end locations
+                const coordStartPoint: [number, number] = [
+                    coordFeatureVis[0],
+                    coordFeatureVis[1] + 2.5 * curveDir
+                ];
+                const coordFinalPoint: [number, number] = [
+                    coord[0] + 400,
+                    coord[1] + 2.5 * curveDir
+                ];
+                const coordMidPoint: [number, number] = [
+                    coordStartPoint[0] + (102+128)/2,
+                    coordStartPoint[1] + curveDir * 100
+                ];
+                //draw paths
+                //drawPoints(".mats", "red", p);
+                const lineGenerator = d3.line<[number, number]>()
+                                        .curve(d3.curveBasis)
+                                        .x(d => d[0])
+                                        .y(d => d[1]);
+                for(let i=0; i<64; i++){
+                    let s: [number, number] = [
+                        coordStartPoint[0] + 2 * i,
+                        coordStartPoint[1]
+                    ];
+                    let m: [number, number] = [
+                        coordMidPoint[0] + 2 * i,
+                        coordMidPoint[1]
+                    ];
+                    let e: [number, number] = [
+                        coordFinalPoint[0] + 2 * i,
+                        coordFinalPoint[1]
+                    ];
+                    d3.select(".mats")
+                            .append("path")
+                            .attr(
+                                "d",
+                                lineGenerator([s, m, e])
+                            )
+                            .attr("stroke", myColor(layerBias[i]))
+                            .attr("opacity", 0)
+                            .attr("fill", "none")
+                            .attr("class", "procVis");
+                }
+                d3.selectAll("path").lower();
                 d3.selectAll(".procVis")
                     .transition()
                     .duration(1000)
