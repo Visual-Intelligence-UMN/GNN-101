@@ -609,7 +609,9 @@ export function visualizeFeatures(
             console.log("ONE", one);
             schemeLocations.push([one[0][0], 350]);
             //visualize last layer and softmax output
-            let aOne = drawTwoLayers(one, final, myColor);
+            const tlPack = drawTwoLayers(one, final, myColor);
+            let aOne = tlPack["locations"];
+            outputVis = tlPack["g"];
             console.log("AAA", aOne);
             if (aOne != undefined) {
                 schemeLocations.push([aOne[0][0], 350]);
@@ -1127,6 +1129,7 @@ export function visualizeFeatures(
         }
     });
     
+    //pooling visualizer click interaction
     if (poolingVis != null) {
         
         poolingVis.on("click", function (event, d) {
@@ -1176,6 +1179,21 @@ export function visualizeFeatures(
                 
 
             }
+        });
+    }
+
+    //model output visualizer click interaction
+    if(outputVis!=null){
+        outputVis.on("mouseover", function (event, d) {
+            const a = d3.select(".path1").style("opacity", 1);
+            const b = d3.select(".poolingFrame").style("opacity", 1);
+            const c = d3.select("#fr1").style("opacity", 1);
+            console.log("mouse in", a, b, c)
+        });
+        outputVis.on("mouseout", function (event, d) {
+            d3.select(".path1").style("opacity", 0.02);
+            d3.select(".poolingFrame").style("opacity", 0);
+            d3.select("#fr1").style("opacity", 0);
         });
     }
 }
@@ -1459,16 +1477,16 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
         .attr("class", "path1")
         .attr("id", "path1");
     //add interaction
-    g.on("mouseover", function (event, d) {
-        d3.select(".path1").attr("opacity", 1);
-        d3.select(".poolingFrame").attr("opacity", 1);
-        d3.select("#fr1").attr("opacity", 1);
-    });
-    g.on("mouseout", function (event, d) {
-        d3.select(".path1").attr("opacity", 0.02);
-        d3.select(".poolingFrame").attr("opacity", 0);
-        d3.select("#fr1").attr("opacity", 0);
-    });
+    // g.on("mouseover", function (event, d) {
+    //     d3.select(".path1").attr("opacity", 1);
+    //     d3.select(".poolingFrame").attr("opacity", 1);
+    //     d3.select("#fr1").attr("opacity", 1);
+    // });
+    // g.on("mouseout", function (event, d) {
+    //     d3.select(".path1").attr("opacity", 0.02);
+    //     d3.select(".poolingFrame").attr("opacity", 0);
+    //     d3.select("#fr1").attr("opacity", 0);
+    // });
     //visualize the result
     aOne[0][0] += 20 + 102;
     //drawPoints(".mats","red",aOne);
@@ -1513,7 +1531,7 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
 
     addLayerName(aOne, "Prediction Result", 0, 20, g1);
     //draw frame
-    const f1 = g
+    const f1 = g1
         .append("rect")
         .attr("x", aOne[0][0])
         .attr("y", aOne[0][1])
@@ -1551,7 +1569,7 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
         f1.attr("opacity", 0);
     });
 
-    return [aOne[0], cOne[0]];
+    return {"locations":[aOne[0], cOne[0]], "g":g, "g1":g1};
 }
 
 //warn: below are some functions that need to be updated
