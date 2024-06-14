@@ -474,6 +474,12 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           featureGroup.raise();
           d3.select(this).attr("stroke-width", 3);
 
+          if (node.links) {
+            node.links.forEach((link: any) => {
+              link.style("opacity", 0.7);
+            });
+          }
+
           
           if (node.relatedNodes) {
             node.relatedNodes.forEach((n: any) => {
@@ -506,8 +512,6 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           hideAllLinks(allNodes);
           event.stopPropagation(); // Prevent the click event from bubbling up
           
-
-
           if (movedNode === node) {
             return; // Do nothing if the node is already moved
           }
