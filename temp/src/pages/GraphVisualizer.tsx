@@ -14,6 +14,7 @@ import { IntmData } from "./FileUpload";
 import { visualizeGraph } from "./WebUtils";
 
 
+
 interface GraphVisualizerProps {
   graph_path: string;
   intmData: null | IntmData;
@@ -55,50 +56,52 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
         .append("svg")
         .attr("width", width)
         .attr("height", height);
+        
 
       graphs.forEach((data, i) => {
         console.log("i", i);
         console.log(data);
 
-
-          const xOffset = (i - 2.5) * offset;
-          const g1 = svg
-            .append("g")
-            .attr(
-              "transform",
-              `translate(${xOffset},${margin.top})`
-            );
-
-
-
-
+        const xOffset = (i - 2.5) * offset;
+        const g1 = svg
+          .append("g")
           
-          // Initialize the links
-          const link = g1
-            .selectAll("line")
-            .data(data.links)
-            .join("line")
-            .style("stroke", "#aaa");
-
-          // Initialize the nodes
-          const node = g1
-            .selectAll("circle")
-            .data(data.nodes)
-            .join("circle")
-            .attr("r", 17)
-            .style("fill", "white")
-            .style("stroke", "#69b3a2")
-            .style("stroke-width", 1)
-            .style("stroke-opacity", 1);
-
-
+          .attr("transform", `translate(${xOffset},${margin.top})`)
+          .attr("layerNum", i)
           
-          const labels = g1
-            .selectAll("text")
-            .data(data.nodes)
-            .join("text")
-            .text((d: any) => d.id) 
-            .attr("font-size", `17px`);    
+        
+
+
+
+        // Initialize the links
+        const link = g1
+          .selectAll("line")
+          .data(data.links)
+          .join("line")
+          .style("stroke", "#aaa");
+
+        // Initialize the nodes
+        const node = g1
+          .selectAll("circle")
+          .data(data.nodes)
+          .join("circle")
+          .attr("r", 17)
+          .style("fill", "white")
+          .style("stroke", "#69b3a2")
+          .style("stroke-width", 1)
+          .style("stroke-opacity", 1)
+          .attr("opacity", 1)
+          
+
+
+
+        const labels = g1
+          .selectAll("text")
+          .data(data.nodes)
+          .join("text")
+          .text((d: any) => d.id)
+          .attr("font-size", `17px`);
+
 
 
           // Define the simulation
@@ -115,6 +118,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             .force("center", d3.forceCenter(width / 2, height / 2.8))
             .force("collide", d3.forceCollide().radius(20).strength(0.8))
             .force("aromatic", d3.forceManyBody().strength((d: any) => (d.is_aromatic ? -210: -100)).theta(0.9))
+        
             .on("tick", function ticked() {
               link.attr("x1", (d: any) => d.source.x)
                 .attr("y1", (d: any) => d.source.y)
@@ -238,6 +242,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                 .attr("stroke", "black")
                 .attr("fill", "none")
                 .attr('transform', transform);
+              
 
   
               let text = " ";
@@ -273,13 +278,35 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                 
                 
                 
-              }
+              
+              svg.selectAll("circle")
+              .attr("opacity", 0);
+              svg.selectAll("text")
+              .attr("opacity", 0);
               featureVisualizer(svg, allNodes, offset, height);
+
+             
+
+              }
+
+
             });
 
-           
+ 
         }
-  )}
+
+        
+        
+
+  )
+  const layerNum1Groups = svg.selectAll("g")
+    .filter(function(this: any) {
+        return +d3.select(this).attr("layerNum") === 1;
+    });
+
+console.log(layerNum1Groups);
+
+}
 
     const visualizeGNN = async (num: number) => {
       try {

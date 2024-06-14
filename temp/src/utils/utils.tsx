@@ -352,31 +352,79 @@ export const myColor = d3.scaleLinear<string>()
 .range(["orange", "white", "#69b3a2"]);
 
 export function featureVisualizer(svg: any, nodes: any[], offset: number, height: number) {
-  const nodesById = d3.group(nodes, (d: any) => d.id);
-  // Array to keep track of occupied positions
-  const occupiedPositions: { x: number; y: number }[] = [];
+  
 
-  nodesById.forEach((nodes, id) => {
+  const nodesByIndex = d3.group(nodes, (d: any) => d.graphIndex);
+  // Array to keep track of occupied positions
+  if (!nodesByIndex.has(5)) {
+    const nodesWithGraphIndex4 = nodesByIndex.get(4);
+    if (nodesWithGraphIndex4) {
+
+        const nodesWithGraphIndex5 = nodesWithGraphIndex4.map(node => {
+            const newNode = { ...node, graphIndex: 5 };
+            return newNode;
+        });
+
+        nodesByIndex.set(5, nodesWithGraphIndex5);
+    }
+}
+
+
+  nodesByIndex.forEach((nodes, graphIndex) => {
+
+
+    const occupiedPositions: { x: number; y: number }[] = [];
+    const xOffset = (graphIndex - 2.5) * offset
+    if (graphIndex === 5){
+      console.log("5")
+    }
+
+    const g2 = svg.append("g")
+      .attr("layerNum", graphIndex)
+      .attr("transform", `translate(${xOffset},10)`)
     nodes.forEach((node: any, i: number) => {
       
+          
+     
       const features = node.features;
       
-      let xPos = (i - 2.5) * offset + node.x;
+      let xPos = node.x;
       let yPos = node.y + 25;
 
-       // Check and adjust yPos if it overlaps with existing featureGroups
+
       occupiedPositions.forEach(pos => {
         if (Math.abs(xPos - pos.x) < 20) {
           xPos = pos.x + 20; 
         }
       });
 
-      // Add the new position to the occupied positions array
+   
       occupiedPositions.push({ x: xPos, y: yPos });
 
-      if (node.graphIndex <= 2) {
+      if (graphIndex <= 2) {
+        
 
-      const featureGroup = svg.append("g")
+       
+
+        node.svgElement = g2.append("circle")
+        .attr("cx", node.x)
+        .attr("cy", node.y)
+        .attr("r", 17)
+        .attr("fill", "white")
+        .attr("stroke", "#69b3a2")
+        .attr("stroke-width", 1)
+        .attr("stroke-opacity", 1)
+        .attr("opacity", 1)
+        .node()
+
+        node.text = g2.append("text")  
+        .attr("x", node.x - 6)
+        .attr("y", node.y + 6)
+        .join("text")
+        .text(node.id)
+        .attr("font-size", `17px`);
+
+      const featureGroup = g2.append("g")
         .attr("transform", `translate(${xPos - 7.5}, ${yPos})`);
 
       featureGroup.selectAll("rect")
@@ -390,7 +438,7 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number, height
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 1)
         .style("stroke", "grey")
-        .style("opacity", 0.8);
+        .style("opacity", 1);
 
       featureGroup.append("text")
         .attr("x", 10)
@@ -403,17 +451,19 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number, height
 
       node.featureGroup = featureGroup;
 
-      node.svgElement = svg.append("circle")
-        .attr("cx", node.x + ((node.graphIndex - 2.5) * offset))
-        .attr("cy", node.y + 10)
-        .attr("r", 17)
-        .attr("fill", "transparent")
-        .attr("stroke", "#69b3a2")
-        .attr("stroke-width", 1)
-        .node();
+      
+
+     
+
+   
+
+
+
 
       node.svgElement.addEventListener("mouseover", function(this: any) {
+        
         featureGroup.style('visibility', 'visible');
+        featureGroup.raise()
         d3.select(this).attr("stroke-width", 3); // Change stroke-width on mouseover
 
         if (node.links) {
@@ -425,12 +475,14 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number, height
           node.relatedNodes.forEach((n: any) => {
             d3.select(n.svgElement).attr("stroke-width", 3);
             n.featureGroup.style('visibility', 'visible');
+            n.featureGroup.raise()
           });
         }
       })
       node.svgElement.addEventListener("mouseout", function(this: any) {
         featureGroup.style('visibility', 'hidden');
-        d3.select(this).attr("stroke-width", 1); // Reset stroke-width on mouseout
+      
+        d3.select(this).attr("stroke-width", 1); 
 
         if (node.links) {
           node.links.forEach((link: any) => {
@@ -448,6 +500,7 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number, height
 
       featureGroup.style('visibility', 'hidden');
     } else {
+      
 
       let rectHeight = 5
       if (node.graphIndex >= 4) {
@@ -455,10 +508,10 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number, height
 
       }
       let groupCentralHeight = rectHeight * features.length / 2;
-      let offset = groupCentralHeight - (height / 11);
+      let offset = groupCentralHeight - (height / 10);
     
-      const featureGroup = svg.append("g")
-          .attr("transform", `translate(${xPos - 7.5}, ${yPos - offset})`);
+      const featureGroup = g2.append("g")
+          .attr("transform", `translate(${node.x - 7.5}, ${node.y - offset})`);
       
     featureGroup.selectAll("rect")
       .data(features)
@@ -501,6 +554,9 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number, height
     }
     });
   });
+
+
+
 }
 
 function calculateAverage(arr: number[]): number {
