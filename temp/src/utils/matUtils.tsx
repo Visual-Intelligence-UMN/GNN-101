@@ -712,60 +712,62 @@ export function visualizeFeatures(
     let poolingOverEvent:any = null;
     let poolingOutEvent:any = null;
     d3.select(".mats").on("click", function (event, d) {
-        console.log("click!", dview, lock);
+        if(lock){
+            console.log("click!", dview, lock);
 
-        //remove calculation process visualizer
-        d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 0);
-        setTimeout(() => {
-            d3.selectAll(".procVis").remove();
-        }, 2000);
+            //remove calculation process visualizer
+            d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 0);
+            setTimeout(() => {
+                d3.selectAll(".procVis").remove();
+            }, 2000);
 
-        //recover all frames
-        d3.selectAll(".colFrame").style("opacity", 0);
-        d3.selectAll(".rowFrame").style("opacity", 0);
-        d3.selectAll(".frame").style("opacity", 0);
-        //recover opacity of feature visualizers
-        d3.selectAll(".featureVis").style("opacity", 1);
-        d3.selectAll(".oFeature").style("opacity", 1);
-        //recover layers positions
-        if(transState=="GCNConv"){
-        if (recordLayerID >= 0) {
-            translateLayers(recordLayerID, -300);
-            recordLayerID = -1;
-        }
-        }else if(transState=="pooling"){
-            translateLayers(3, -300);
-            //recover events
-            if(poolingOutEvent)poolingVis?.on("mouseout", poolingOutEvent);
-            if(poolingOverEvent)poolingVis?.on("mouseover", poolingOverEvent);
-            //recover frame
-            d3.select(".poolingFrame").style("opacity", 0);
-        }
+            //recover all frames
+            d3.selectAll(".colFrame").style("opacity", 0);
+            d3.selectAll(".rowFrame").style("opacity", 0);
+            d3.selectAll(".frame").style("opacity", 0);
+            //recover opacity of feature visualizers
+            d3.selectAll(".featureVis").style("opacity", 1);
+            d3.selectAll(".oFeature").style("opacity", 1);
+            //recover layers positions
+            if(transState=="GCNConv"){
+            if (recordLayerID >= 0) {
+                translateLayers(recordLayerID, -300);
+                recordLayerID = -1;
+            }
+            }else if(transState=="pooling"){
+                translateLayers(3, -300);
+                //recover events
+                if(poolingOutEvent)poolingVis?.on("mouseout", poolingOutEvent);
+                if(poolingOverEvent)poolingVis?.on("mouseover", poolingOverEvent);
+                //recover frame
+                d3.select(".poolingFrame").style("opacity", 0);
+            }
 
-        //recover all feature visualizers and paths
-        setTimeout(() => {
-            d3.select(".pooling")
-                .style("pointer-events", "auto")
-                .style("opacity", 1);
-            d3.selectAll(".twoLayer")
-                .style("pointer-events", "auto")
-                .style("opacity", 1);
-            d3.selectAll("path").style("opacity", 0.05);
-        }, 1750);
+            //recover all feature visualizers and paths
+            setTimeout(() => {
+                d3.select(".pooling")
+                    .style("pointer-events", "auto")
+                    .style("opacity", 1);
+                d3.selectAll(".twoLayer")
+                    .style("pointer-events", "auto")
+                    .style("opacity", 1);
+                d3.selectAll("path").style("opacity", 0.05);
+            }, 1750);
 
-        //recover color schemes opacity
-        colorSchemesTable.forEach((d, i) => {
-            d.style.opacity = "1";
-        });
+            //recover color schemes opacity
+            colorSchemesTable.forEach((d, i) => {
+                d.style.opacity = "1";
+            });
 
-        // unlock the visualization system
-        if (
-            !d3.select(event.target).classed("featureVis") &&
-            !d3.select(event.target).classed("pooling") &&
-            !d3.select(event.target).classed("twoLayer")
-        ) {
-            dview = false;
-            lock = false;
+            // unlock the visualization system
+            if (
+                !d3.select(event.target).classed("featureVis") &&
+                !d3.select(event.target).classed("pooling") &&
+                !d3.select(event.target).classed("twoLayer")
+            ) {
+                dview = false;
+                lock = false;
+            }
         }
     });
     d3.selectAll(".featureVis").on("click", function (event, d) {
@@ -1440,7 +1442,8 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
         .attr("stroke-width", 1)
         .attr("layerID", 4)
         .attr("class", "frame")
-        .attr("fr", 1);
+        .attr("fr", 1)
+        .attr("id", "fr1");
     //add text
     addLayerName(one, "Model Output", 0, 20, g);
     //find positions to connect
@@ -1453,17 +1456,18 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
         .attr("stroke", "black")
         .attr("opacity", 0.05)
         .attr("fill", "none")
-        .attr("class", "path1");
+        .attr("class", "path1")
+        .attr("id", "path1");
     //add interaction
     g.on("mouseover", function (event, d) {
         d3.select(".path1").attr("opacity", 1);
         d3.select(".poolingFrame").attr("opacity", 1);
-        f.attr("opacity", 1);
+        d3.select("#fr1").attr("opacity", 1);
     });
     g.on("mouseout", function (event, d) {
         d3.select(".path1").attr("opacity", 0.02);
         d3.select(".poolingFrame").attr("opacity", 0);
-        f.attr("opacity", 0);
+        d3.select("#fr1").attr("opacity", 0);
     });
     //visualize the result
     aOne[0][0] += 20 + 102;
