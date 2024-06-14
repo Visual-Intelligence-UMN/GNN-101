@@ -304,41 +304,6 @@ function calculatePrevFeatureVisPos(
     return coord;
 }
 
-function load_json_sync(filePath: string): any {
-    const data = fs.readFileSync(filePath, "utf-8");
-    return JSON.parse(data);
-}
-
-// async function loadWeights() {
-//     //weights data preparation
-//     let weights:any = []; //DS to manage weights for each layer
-//     let bias:any = []; //DS to manage bias for each layer
-//     load_json("./weights.json")
-//     .then(weightsJSON => {
-//         console.log("weightsJSON", weightsJSON);
-//         console.log("weights", weightsJSON["onnx::MatMul_311"]);
-//         weights = [
-//             weightsJSON["onnx::MatMul_311"],
-//             weightsJSON["onnx::MatMul_314"],
-//             weightsJSON["onnx::MatMul_317"],
-//             weightsJSON["lin.weight"]
-//         ];
-//         bias = [
-//             weightsJSON["conv1.bias"],
-//             weightsJSON["conv2.bias"],
-//             weightsJSON["conv3.bias"],
-//             weightsJSON["lin.bias"]
-//         ];
-//         console.log("weights array", weights, bias);
-//         return {"weights": weights, "bias":bias};
-//     })
-//     .catch(error => {
-//         console.error("Error loading JSON:", error);
-//     });
-//     console.log("weights array outside", weights, bias);
-//     return null;
-// }
-
 function loadWeights() {
     // weights data preparation
     let weights: any = []; // DS to manage weights for each layer
@@ -380,6 +345,8 @@ export function visualizeFeatures(
     detailView: any,
     setDetailView: any
 ) {
+    let poolingVis = null; //to manage pooling visualizer
+    let outputVis = null; //to manage model output
     //load weights and bias
     const dataPackage = loadWeights();
     console.log("weights, data", dataPackage);
@@ -629,7 +596,16 @@ export function visualizeFeatures(
             console.log("grouped grouped", paths);
         } else {
             //visualize pooling layer
-            let one = drawPoolingVis(locations, pooling, myColor, frames);
+            const poolingPack = drawPoolingVis(
+                locations,
+                pooling,
+                myColor,
+                frames,
+                colorSchemesTable
+            );
+            let one = poolingPack["one"];
+            poolingVis = poolingPack["g"];
+            console.log("poolingVis", poolingVis);
             console.log("ONE", one);
             schemeLocations.push([one[0][0], 350]);
             //visualize last layer and softmax output
@@ -730,6 +706,11 @@ export function visualizeFeatures(
         //colorSchemesTable[0].style.opacity = "0.1";
     }
     let recordLayerID: number = -1;
+    // a state to controls the recover event
+    let transState = "GCNConv";
+    //save events for poolingVis
+    let poolingOverEvent:any = null;
+    let poolingOutEvent:any = null;
     d3.select(".mats").on("click", function (event, d) {
         console.log("click!", dview, lock);
 
@@ -747,9 +728,18 @@ export function visualizeFeatures(
         d3.selectAll(".featureVis").style("opacity", 1);
         d3.selectAll(".oFeature").style("opacity", 1);
         //recover layers positions
+        if(transState=="GCNConv"){
         if (recordLayerID >= 0) {
             translateLayers(recordLayerID, -300);
             recordLayerID = -1;
+        }
+        }else if(transState=="pooling"){
+            translateLayers(3, -300);
+            //recover events
+            if(poolingOutEvent)poolingVis?.on("mouseout", poolingOutEvent);
+            if(poolingOverEvent)poolingVis?.on("mouseover", poolingOverEvent);
+            //recover frame
+            d3.select(".poolingFrame").style("opacity", 0);
         }
 
         //recover all feature visualizers and paths
@@ -781,6 +771,7 @@ export function visualizeFeatures(
     d3.selectAll(".featureVis").on("click", function (event, d) {
         if (lock != true) {
             //state
+            transState = "GCNConv";
             lock = true;
             event.stopPropagation();
             dview = true;
@@ -848,7 +839,6 @@ export function visualizeFeatures(
                 node
             );
             console.log("coord", coord);
-            
 
             //find position for intermediate feature vis
             let coordFeatureVis = deepClone(coord);
@@ -878,7 +868,10 @@ export function visualizeFeatures(
                 let matA = math.matrix(prepMat);
                 X = math.add(math.multiply(prepMat, mulV), X);
             }
-            const dummy: number[] = math.multiply(math.transpose(weights[layerID]),X);
+            const dummy: number[] = math.multiply(
+                math.transpose(weights[layerID]),
+                X
+            );
 
             console.log(
                 "compute x'",
@@ -965,12 +958,10 @@ export function visualizeFeatures(
                         .attr("opacity", 0);
                 }
 
-                
-                
                 //determine if we need upper-curves or lower-curves
                 let curveDir = -1; //true -> -1; false -> 1
                 const midNode = adjList.length / 2;
-                if(node<midNode)curveDir = 1;
+                if (node < midNode) curveDir = 1;
                 console.log("curveDir", curveDir);
 
                 //draw paths from intermediate result -> final result
@@ -978,45 +969,44 @@ export function visualizeFeatures(
                 //find start locations and end locations
                 const coordStartPoint: [number, number] = [
                     coordFeatureVis[0],
-                    coordFeatureVis[1] + 2.5 * curveDir
+                    coordFeatureVis[1] + 2.5 * curveDir,
                 ];
                 const coordFinalPoint: [number, number] = [
                     coord[0] + 400,
-                    coord[1] + 2.5 * curveDir
+                    coord[1] + 2.5 * curveDir,
                 ];
                 const coordMidPoint: [number, number] = [
-                    coordStartPoint[0] + (102+128)/2,
-                    coordStartPoint[1] + curveDir * 100
+                    coordStartPoint[0] + (102 + 128) / 2,
+                    coordStartPoint[1] + curveDir * 100,
                 ];
                 //draw paths
                 //drawPoints(".mats", "red", p);
-                const lineGenerator = d3.line<[number, number]>()
-                                        .curve(d3.curveBasis)
-                                        .x(d => d[0])
-                                        .y(d => d[1]);
-                for(let i=0; i<64; i++){
+                const lineGenerator = d3
+                    .line<[number, number]>()
+                    .curve(d3.curveBasis)
+                    .x((d) => d[0])
+                    .y((d) => d[1]);
+                for (let i = 0; i < 64; i++) {
                     let s: [number, number] = [
                         coordStartPoint[0] + 2 * i,
-                        coordStartPoint[1]
+                        coordStartPoint[1],
                     ];
                     let m: [number, number] = [
                         coordMidPoint[0] + 2 * i,
-                        coordMidPoint[1]
+                        coordMidPoint[1],
                     ];
                     let e: [number, number] = [
                         coordFinalPoint[0] + 2 * i,
-                        coordFinalPoint[1]
+                        coordFinalPoint[1],
                     ];
                     d3.select(".mats")
-                            .append("path")
-                            .attr(
-                                "d",
-                                lineGenerator([s, m, e])
-                            )
-                            .attr("stroke", myColor(layerBias[i]))
-                            .attr("opacity", 0)
-                            .attr("fill", "none")
-                            .attr("class", "procVis");
+                        .append("path")
+                        .attr("d", lineGenerator([s, m, e]))
+                        .attr("stroke", myColor(layerBias[i]))
+                        .attr("stroke-width", 1)
+                        .attr("opacity", 0)
+                        .attr("fill", "none")
+                        .attr("class", "procVis");
                 }
                 d3.selectAll("path").lower();
                 d3.selectAll(".procVis")
@@ -1134,6 +1124,58 @@ export function visualizeFeatures(
             }
         }
     });
+    
+    if (poolingVis != null) {
+        
+        poolingVis.on("click", function (event, d) {
+            transState = "pooling";
+            poolingOverEvent = poolingVis.on("mouseover");
+            poolingOutEvent = poolingVis.on("mouseout");
+            poolingVis.on("mouseover", null);
+            poolingVis.on("mouseout", null);
+            console.log("f3 1", frames["GCNConv3"][3]) 
+            frames["GCNConv3"][3].style.opacity = "1";
+            console.log("f3 2", frames["GCNConv3"][3])
+            if (lock != true) {
+                //d3.select(this).style("pointer-events", "none");
+                //state
+                lock = true;
+                event.stopPropagation();
+                dview = true;
+                console.log("click! - fVis", dview, lock);
+                
+                //lock all feature visualizers and transparent paths
+                d3.selectAll("[class='frame'][layerID='3']").style("opacity", 1);
+                d3.select(".pooling")
+                    .style("pointer-events", "none");
+                d3.selectAll(".twoLayer")
+                    .style("pointer-events", "none")
+                    .style("opacity", 0.2);
+                d3.selectAll("path").style("opacity", 0);
+                //transparent other feature visualizers
+                d3.selectAll(".featureVis").style("opacity", 0.2);
+                d3.selectAll(".oFeature").style("opacity", 0.2);
+                //translate each layer
+                const layerID = 3;
+
+                setTimeout(() => {
+                    translateLayers(layerID, 300);
+                }, 1750);
+                d3.select(".poolingFrame").style("opacity", 1);
+                //transparent other color schemes
+                for(let i=0; i<3; i++)colorSchemesTable[i].style.opacity = "0.2";
+                //display the features we want to display
+                //display the frame we want to display
+                console.log("FST click", frames);
+                for(let i=0; i<adjList.length; i++){
+                    featureVisTable[3][i].style.opacity = "1";
+                    
+                }
+                
+
+            }
+        });
+    }
 }
 
 //draw cross connections between feature visualizers
@@ -1251,7 +1293,8 @@ function drawPoolingVis(
     locations: any,
     pooling: number[],
     myColor: any,
-    frames: any
+    frames: any,
+    colorSchemesTable: any
 ) {
     let oLocations = deepClone(locations);
     //find edge points
@@ -1334,7 +1377,7 @@ function drawPoolingVis(
             });
         }
         //interaction with frame
-        f.attr("opacity", 1);
+        d3.select(".poolingFrame").style("opacity", 1);
         //d3.selectAll('[layerID="3"][class="frame"]').attr("opacity", 1);
         const layerFrames = frames["GCNConv3"];
         layerFrames.forEach((frame: HTMLElement) => {
@@ -1349,7 +1392,7 @@ function drawPoolingVis(
             });
         }
         //interaction with frame
-        f.attr("opacity", 0);
+        d3.select(".poolingFrame").style("opacity", 0);
         //d3.selectAll('[layerID="3"][class="frame"]').attr("opacity", 0);
         const layerFrames = frames["GCNConv3"];
         layerFrames.forEach((frame: HTMLElement) => {
@@ -1357,7 +1400,7 @@ function drawPoolingVis(
         });
     });
 
-    return one;
+    return { one: one, g: g };
 }
 
 //the function to draw the last two layers of the model
