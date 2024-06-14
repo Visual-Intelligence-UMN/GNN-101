@@ -12,7 +12,6 @@ import {
 } from "../utils/utils";
 import { IntmData } from "./FileUpload";
 import { visualizeGraph } from "./WebUtils";
-import { shiftGElements } from "@/utils/graphUtils"
 
 
 
@@ -66,7 +65,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
         const xOffset = (i - 2.5) * offset;
         const g1 = svg
           .append("g")
-          
+          .attr("class", "layerVis") 
           .attr("transform", `translate(${xOffset},${margin.top})`)
           .attr("layerNum", i)
           
@@ -301,7 +300,6 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
         
 
   )
-
 
 }
 
