@@ -4,6 +4,7 @@ import * as ort from "onnxruntime-web";
 import { env } from "onnxruntime-web";
 import { features } from 'process';
 import { HeatmapData } from "@/utils/matUtils";
+import { shiftGElements } from "@/utils/graphUtils"
 
 env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
@@ -451,16 +452,34 @@ export function featureVisualizer(svg: any, nodes: any[], offset: number, height
 
       node.featureGroup = featureGroup;
 
-      
+      let moved = false; 
 
-     
-
+      node.svgElement.addEventListener("click", function(this: any) {
+        svg.selectAll("g[layerNum]")
+            .filter((d: any, i: any, nodes: any) => {
+              const layerNum = d3.select(nodes[i]).attr("layerNum");
+              return layerNum !== null && parseInt(layerNum) > node.graphIndex;
+            })
+            .attr("transform", function(this: any) {
+              const currentTransform = d3.select(this).attr("transform");
+              if (currentTransform) {
+                const currentXMatch = currentTransform.match(/translate\(([^,]+),/);
+                if (currentXMatch && currentXMatch[1]) {
+                  const currentX = parseInt(currentXMatch[1]);
+                  return moved ? `translate(${currentX - 600},10)` : `translate(${currentX + 600},10)`;
+                }
+              }
+              return moved ? "translate(0,10)" : "translate(600,10)"; // Default fallback
+            });
+          moved = !moved; // Toggle the moved state
+        });
+  
    
 
 
-
-
       node.svgElement.addEventListener("mouseover", function(this: any) {
+      
+
         
         featureGroup.style('visibility', 'visible');
         featureGroup.raise()

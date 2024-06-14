@@ -12,6 +12,7 @@ import {
 } from "../utils/utils";
 import { IntmData } from "./FileUpload";
 import { visualizeGraph } from "./WebUtils";
+import { shiftGElements } from "@/utils/graphUtils"
 
 
 
@@ -294,17 +295,13 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
  
         }
+        
 
         
         
 
   )
-  const layerNum1Groups = svg.selectAll("g")
-    .filter(function(this: any) {
-        return +d3.select(this).attr("layerNum") === 1;
-    });
 
-console.log(layerNum1Groups);
 
 }
 
