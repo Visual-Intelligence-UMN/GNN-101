@@ -7,10 +7,12 @@ import {
     drawPoints,
     softmax,
     get_coordination,
+    load_json,
 } from "./utils";
 import * as d3 from "d3";
 import { useEffect, useState } from "react";
-import { create, all, MathJsStatic, Matrix } from 'mathjs';
+import { create, all, MathJsStatic, Matrix } from "mathjs";
+import fs from "fs";
 
 //get node attributes from graph data
 export function getNodeAttributes(data: any) {
@@ -117,7 +119,7 @@ function addLayerName(
     name: string,
     xOffset: number,
     yOffset: number,
-    layer:any
+    layer: any
 ) {
     const apt = deepClone(locations[locations.length - 1]);
     apt[0] += xOffset;
@@ -172,12 +174,15 @@ function buildBinaryLegend(
         .data(dummies)
         .enter()
         .append("text")
-        .attr("x", (d:number, i:number) => i * offsetText - 20)
+        .attr("x", (d: number, i: number) => i * offsetText - 20)
         .attr("y", 5)
         .attr("text-anchor", "end")
-        .attr("transform", (d:number, i:number) => `rotate(-90, ${i * offsetText}, 0)`)
+        .attr(
+            "transform",
+            (d: number, i: number) => `rotate(-90, ${i * offsetText}, 0)`
+        )
         .style("font-size", "5px")
-        .text((d:number) => format(d));
+        .text((d: number) => format(d));
 
     g0.append("text")
         .text(label)
@@ -196,7 +201,7 @@ function buildLegend(
     label: string,
     x: number,
     y: number,
-    layer:any
+    layer: any
 ) {
     layer.selectAll(".legend").remove();
     let dummies = [];
@@ -233,12 +238,15 @@ function buildLegend(
         .data(dummies)
         .enter()
         .append("text")
-        .attr("x", (d:number, i:number) => i * offsetText - 20)
+        .attr("x", (d: number, i: number) => i * offsetText - 20)
         .attr("y", 5)
         .attr("text-anchor", "end")
-        .attr("transform", (d:number, i:number) => `rotate(-90, ${i * offsetText}, 0)`)
+        .attr(
+            "transform",
+            (d: number, i: number) => `rotate(-90, ${i * offsetText}, 0)`
+        )
         .style("font-size", "5px")
-        .text((d:number) => format(d));
+        .text((d: number) => format(d));
 
     g0.append("text")
         .text(label)
@@ -251,47 +259,109 @@ function buildLegend(
 }
 
 //the function that helps you to translate layers
-function translateLayers(layerID:number, gap:number){
+function translateLayers(layerID: number, gap: number) {
     for (let i = layerID + 1; i < 7; i++) {
         // select layer
-        d3.select(`g#layerNum_${i}`)
-            .attr("transform", function() {
-                // get current transformation
-                let currentTransform = d3.select(this).attr("transform");
-                
-                if (!currentTransform) {
-                    currentTransform = "translate(0, 0)";
-                }
-                
-                let translateMatch = currentTransform.match(/translate\(([^)]+)\)/);
-                // do the translation
-                if (translateMatch) {
-                    let translate = translateMatch[1].split(",");
-                    let x = parseFloat(translate[0]);
-                    let y = parseFloat(translate[1]);
-                    
-                    x += gap;
-                    
-                    return `translate(${x}, ${y})`;
-                } else {
-                    return `translate(${gap}, 0)`;
-                }
-            });
+        d3.select(`g#layerNum_${i}`).attr("transform", function () {
+            // get current transformation
+            let currentTransform = d3.select(this).attr("transform");
+
+            if (!currentTransform) {
+                currentTransform = "translate(0, 0)";
+            }
+
+            let translateMatch = currentTransform.match(/translate\(([^)]+)\)/);
+            // do the translation
+            if (translateMatch) {
+                let translate = translateMatch[1].split(",");
+                let x = parseFloat(translate[0]);
+                let y = parseFloat(translate[1]);
+
+                x += gap;
+
+                return `translate(${x}, ${y})`;
+            } else {
+                return `translate(${gap}, 0)`;
+            }
+        });
     }
 }
 
-
-function calculatePrevFeatureVisPos(featureVisTable:any, layerID: number, node:number){
+function calculatePrevFeatureVisPos(
+    featureVisTable: any,
+    layerID: number,
+    node: number
+) {
     let coord = get_coordination(featureVisTable[layerID][node]);
     //minor position adjustment
-    if(layerID==0){
-        coord[0] += (35)/2;
-    }else{
+    if (layerID == 0) {
+        coord[0] += 35 / 2;
+    } else {
         coord[0] += 64;
     }
     coord[1] += 10;
     console.log("coord", coord);
     return coord;
+}
+
+function load_json_sync(filePath: string): any {
+    const data = fs.readFileSync(filePath, "utf-8");
+    return JSON.parse(data);
+}
+
+// async function loadWeights() {
+//     //weights data preparation
+//     let weights:any = []; //DS to manage weights for each layer
+//     let bias:any = []; //DS to manage bias for each layer
+//     load_json("./weights.json")
+//     .then(weightsJSON => {
+//         console.log("weightsJSON", weightsJSON);
+//         console.log("weights", weightsJSON["onnx::MatMul_311"]);
+//         weights = [
+//             weightsJSON["onnx::MatMul_311"],
+//             weightsJSON["onnx::MatMul_314"],
+//             weightsJSON["onnx::MatMul_317"],
+//             weightsJSON["lin.weight"]
+//         ];
+//         bias = [
+//             weightsJSON["conv1.bias"],
+//             weightsJSON["conv2.bias"],
+//             weightsJSON["conv3.bias"],
+//             weightsJSON["lin.bias"]
+//         ];
+//         console.log("weights array", weights, bias);
+//         return {"weights": weights, "bias":bias};
+//     })
+//     .catch(error => {
+//         console.error("Error loading JSON:", error);
+//     });
+//     console.log("weights array outside", weights, bias);
+//     return null;
+// }
+
+function loadWeights() {
+    // weights data preparation
+    let weights: any = []; // DS to manage weights for each layer
+    let bias: any = []; // DS to manage bias for each layer
+
+    const weightsJSON: any = require("../../public/weights.json");
+    console.log("weightsJSON", weightsJSON);
+    console.log("weights", weightsJSON["onnx::MatMul_311"]);
+
+    weights = [
+        weightsJSON["onnx::MatMul_311"],
+        weightsJSON["onnx::MatMul_314"],
+        weightsJSON["onnx::MatMul_317"],
+        weightsJSON["lin.weight"],
+    ];
+    bias = [
+        weightsJSON["conv1.bias"],
+        weightsJSON["conv2.bias"],
+        weightsJSON["conv3.bias"],
+        weightsJSON["lin.bias"],
+    ];
+    console.log("weights array", weights, bias);
+    return { weights: weights, bias: bias };
 }
 
 //draw all feature visualizers for original features and GCNConv
@@ -307,13 +377,19 @@ export function visualizeFeatures(
     graph: any,
     adjList: any,
     maxVals: any,
-    detailView:any,
-    setDetailView:any
+    detailView: any,
+    setDetailView: any
 ) {
+    //load weights and bias
+    const dataPackage = loadWeights();
+    console.log("weights, data", dataPackage);
+    const weights = dataPackage["weights"];
+    const bias = dataPackage["bias"];
+    console.log("weights, data", weights, bias);
     //table that manage all feature visualizers for GCNConv
-    let featureVisTable:SVGElement[][] = [[],[],[],[]];
+    let featureVisTable: SVGElement[][] = [[], [], [], []];
     //table that manage color schemes
-    let colorSchemesTable:SVGElement[] = [];
+    let colorSchemesTable: SVGElement[] = [];
     //control detail view
     let dview = false;
     //control lock and unlock
@@ -321,10 +397,11 @@ export function visualizeFeatures(
     console.log("state", detailView);
     console.log("Received", maxVals);
     console.log("adjList", adjList);
-    
+
     let colLocations = [];
-    for(let i=0; i<graph.length; i++){
-        const x = locations[0][0] - (300/graph.length) * i - (300/graph.length/2);
+    for (let i = 0; i < graph.length; i++) {
+        const x =
+            locations[0][0] - (300 / graph.length) * i - 300 / graph.length / 2;
         const y = locations[0][1];
         colLocations.push([x, y]);
     }
@@ -335,7 +412,7 @@ export function visualizeFeatures(
             .select(".mats")
             .append("rect")
             .attr("x", colLocations[i][0])
-            .attr("y", colLocations[i][1]+3)
+            .attr("y", colLocations[i][1] + 3)
             .attr("height", 300)
             .attr("width", 300 / graph.length)
             .attr("fill", "none")
@@ -354,7 +431,7 @@ export function visualizeFeatures(
             .select(".mats")
             .append("rect")
             .attr("x", locations[i][0] - 300 + 300 / graph.length / 2)
-            .attr("y", locations[i][1]+3)
+            .attr("y", locations[i][1] + 3)
             .attr("height", 300 / graph.length)
             .attr("width", 300)
             .attr("fill", "none")
@@ -389,12 +466,10 @@ export function visualizeFeatures(
     drawCrossConnection(graph, locations, 35, 102, 0);
 
     //using locations to find the positions for first feature visualizers
-    const firstLayer = d3
-    .select(".mats")
-    .append("g")
-    .attr('id', "layerNum_0");
+    const firstLayer = d3.select(".mats").append("g").attr("id", "layerNum_0");
     for (let i = 0; i < locations.length; i++) {
-        const g = firstLayer.append("g")
+        const g = firstLayer
+            .append("g")
             .attr("class", "oFeature")
             .attr("node", i)
             .attr("layerID", 0);
@@ -434,7 +509,7 @@ export function visualizeFeatures(
         //add mouse event
         g.on("mouseover", function (event, d) {
             //if not in the state of lock
-            if(!lock){
+            if (!lock) {
                 const layerID = d3.select(this).attr("layerID");
                 const node = d3.select(this).attr("node");
                 console.log("Current layerID and node", layerID, node);
@@ -467,7 +542,7 @@ export function visualizeFeatures(
     }
     //drawPoints(".mats", "red", schemeLocations);
     //add layer label for the first one
-    
+
     addLayerName(locations, "Features Name", 0, 30, firstLayer);
 
     //GCNCov Visualizer
@@ -477,10 +552,10 @@ export function visualizeFeatures(
     console.log("CONV1", conv1);
     for (let k = 0; k < 3; k++) {
         const layer = d3
-        .select(".mats")
-        .append("g")
-        .attr("class", "layerVis")
-        .attr('id', `layerNum_${k+1}`);
+            .select(".mats")
+            .append("g")
+            .attr("class", "layerVis")
+            .attr("id", `layerNum_${k + 1}`);
         for (let i = 0; i < locations.length; i++) {
             if (k != 0) {
                 locations[i][0] += 2 * 64 + 100;
@@ -489,12 +564,19 @@ export function visualizeFeatures(
             }
         }
 
-        addLayerName(locations, "GCNConv" + (k + 1), 0, 30, d3.select(`g#layerNum_${k+1}`));
+        addLayerName(
+            locations,
+            "GCNConv" + (k + 1),
+            0,
+            30,
+            d3.select(`g#layerNum_${k + 1}`)
+        );
         //drawPoints(".mats","red",locations);
         const gcnFeature = gcnFeatures[k];
         for (let i = 0; i < locations.length; i++) {
             //const cate = get_category_node(features[i]) * 100;
-            const g = layer.append("g")
+            const g = layer
+                .append("g")
                 .attr("class", "featureVis")
                 .attr("node", i)
                 .attr("layerID", k + 1);
@@ -538,7 +620,7 @@ export function visualizeFeatures(
                 schemeLocations.push([locations[i][0], 350]);
             }
 
-            featureVisTable[k+1].push(g.node() as SVGElement);
+            featureVisTable[k + 1].push(g.node() as SVGElement);
         }
         console.log("FVT", featureVisTable);
         if (k != 2) {
@@ -572,7 +654,7 @@ export function visualizeFeatures(
         const l5 = d3.select(`g#layerNum_5`);
         const l6 = d3.select(`g#layerNum_6`);
 
-        const scheme1  = buildBinaryLegend(
+        const scheme1 = buildBinaryLegend(
             myColor,
             0,
             1,
@@ -635,19 +717,28 @@ export function visualizeFeatures(
         //test
         //scheme1.style.opacity = "0.2";
 
-        colorSchemesTable = [scheme1, scheme2, scheme3, scheme4, scheme5, scheme6, scheme7];
-        
+        colorSchemesTable = [
+            scheme1,
+            scheme2,
+            scheme3,
+            scheme4,
+            scheme5,
+            scheme6,
+            scheme7,
+        ];
+
         //colorSchemesTable[0].style.opacity = "0.1";
     }
-    let recordLayerID:number = -1;
-    d3.select(".mats").on("click", function(event, d){
-        
+    let recordLayerID: number = -1;
+    d3.select(".mats").on("click", function (event, d) {
         console.log("click!", dview, lock);
 
         //remove calculation process visualizer
         d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 0);
-        setTimeout(()=>{d3.selectAll(".procVis").remove();}, 1250);
-        
+        setTimeout(() => {
+            d3.selectAll(".procVis").remove();
+        }, 1250);
+
         //recover all frames
         d3.selectAll(".colFrame").style("opacity", 0);
         d3.selectAll(".rowFrame").style("opacity", 0);
@@ -656,42 +747,51 @@ export function visualizeFeatures(
         d3.selectAll(".featureVis").style("opacity", 1);
         d3.selectAll(".oFeature").style("opacity", 1);
         //recover layers positions
-        if(recordLayerID>=0){
+        if (recordLayerID >= 0) {
             translateLayers(recordLayerID, -300);
             recordLayerID = -1;
         }
 
         //recover all feature visualizers and paths
         setTimeout(() => {
-            d3.select(".pooling").style("pointer-events", "auto").style("opacity", 1);
-            d3.selectAll(".twoLayer").style("pointer-events", "auto").style("opacity",1);
+            d3.select(".pooling")
+                .style("pointer-events", "auto")
+                .style("opacity", 1);
+            d3.selectAll(".twoLayer")
+                .style("pointer-events", "auto")
+                .style("opacity", 1);
             d3.selectAll("path").style("opacity", 0.05);
         }, 1750);
 
         //recover color schemes opacity
-        colorSchemesTable.forEach((d, i)=>{
+        colorSchemesTable.forEach((d, i) => {
             d.style.opacity = "1";
         });
 
         // unlock the visualization system
-        if (!(d3.select(event.target).classed("featureVis"))
-            &&!(d3.select(event.target).classed("pooling"))
-            &&!(d3.select(event.target).classed("twoLayer"))){
-                dview=false;
-                lock=false;
+        if (
+            !d3.select(event.target).classed("featureVis") &&
+            !d3.select(event.target).classed("pooling") &&
+            !d3.select(event.target).classed("twoLayer")
+        ) {
+            dview = false;
+            lock = false;
         }
-
     });
-    d3.selectAll(".featureVis").on("click", function(event, d){
-        if(lock!=true){
+    d3.selectAll(".featureVis").on("click", function (event, d) {
+        if (lock != true) {
             //state
             lock = true;
             event.stopPropagation();
             dview = true;
             console.log("click! - fVis", dview, lock);
             //lock all feature visualizers and transparent paths
-            d3.select(".pooling").style("pointer-events", "none").style("opacity", 0.2);
-            d3.selectAll(".twoLayer").style("pointer-events", "none").style("opacity", 0.2);
+            d3.select(".pooling")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".twoLayer")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
             d3.selectAll("path").style("opacity", 0);
             //transparent other feature visualizers
             d3.selectAll(".featureVis").style("opacity", 0.2);
@@ -700,7 +800,7 @@ export function visualizeFeatures(
             const layerID = Number(d3.select(this).attr("layerID")) - 1;
             const node = Number(d3.select(this).attr("node"));
             console.log("Current layerID and node", layerID, node);
-            setTimeout(()=>{
+            setTimeout(() => {
                 translateLayers(layerID, 300);
             }, 1750);
             //record the layerID
@@ -709,41 +809,56 @@ export function visualizeFeatures(
             //reduce color schemes opacity
             console.log("CST before modification", colorSchemesTable);
             colorSchemesTable.forEach((d, i) => {
-                console.log(`Before modification: Element ${i} opacity`, d.style.opacity);
+                console.log(
+                    `Before modification: Element ${i} opacity`,
+                    d.style.opacity
+                );
                 d.style.opacity = "0.2";
-                console.log(`After modification: Element ${i} opacity`, d.style.opacity);
+                console.log(
+                    `After modification: Element ${i} opacity`,
+                    d.style.opacity
+                );
             });
             //choose the right color schemes to display
             colorSchemesTable[layerID].style.opacity = "1";
-            colorSchemesTable[layerID+1].style.opacity = "1";
+            colorSchemesTable[layerID + 1].style.opacity = "1";
             //choose the right feature viusualizers to display
             let posList = []; //a list to manage all position from the previous layer feature vis
-            let neighbors = adjList[node]; 
-            for(let i=0; i<neighbors.length; i++){ //display pre layer
+            let neighbors = adjList[node];
+            for (let i = 0; i < neighbors.length; i++) {
+                //display pre layer
                 let cur = neighbors[i];
                 featureVisTable[layerID][cur].style.opacity = "1";
 
                 //find position and save it
-                let c = calculatePrevFeatureVisPos(featureVisTable, layerID, cur);
+                let c = calculatePrevFeatureVisPos(
+                    featureVisTable,
+                    layerID,
+                    cur
+                );
                 posList.push(c);
             }
-            let curNode = featureVisTable[layerID+1][node];
-            curNode.style.opacity = "1";//display current node
- 
+            let curNode = featureVisTable[layerID + 1][node];
+            curNode.style.opacity = "1"; //display current node
+
             //calculation process visualizer
-            let coord = calculatePrevFeatureVisPos(featureVisTable, layerID, node);
+            let coord = calculatePrevFeatureVisPos(
+                featureVisTable,
+                layerID,
+                node
+            );
             console.log("coord", coord);
             //drawPoints(".mats", "red", posList);
-            
-            //find position for intermediate feature vis 
+
+            //find position for intermediate feature vis
             let coordFeatureVis = deepClone(coord);
             coordFeatureVis[0] += 102;
-            
+
             //TODO: implment the feature visualizer for intermediate output
             //data processing for features aggregation and multipliers calculation
             //build a list for d_i and d_j for look-up
             let dList = []; //a list store all nodes' neigbors information(already plus one)
-            for(let i=0; i<adjList.length; i++){
+            for (let i = 0; i < adjList.length; i++) {
                 dList.push(adjList[i].length);
             }
             //compute x
@@ -751,11 +866,11 @@ export function visualizeFeatures(
             let featuresTable = [features, conv1, conv2];
             let X = new Array(featuresTable[layerID][node].length).fill(0);
             let mulValues = []; //an array to store all multiplier values
-            for(let i=0; i<adjList[node].length; i++){
+            for (let i = 0; i < adjList[node].length; i++) {
                 //find multipliers
                 let node_i = node;
                 let node_j = adjList[node_i][i];
-                let mulV = 1/Math.sqrt(dList[node_i] * dList[node_j]);
+                let mulV = 1 / Math.sqrt(dList[node_i] * dList[node_j]);
                 mulValues.push(mulV);
                 //compute x'
                 console.log("compute x loop", featuresTable[layerID][node_j]);
@@ -763,19 +878,26 @@ export function visualizeFeatures(
                 let matA = math.matrix(prepMat);
                 X = math.add(math.multiply(prepMat, mulV), X);
             }
-            const dummy: number[] = X;
+            const dummy: number[] = math.multiply(math.transpose(weights[layerID]),X);
 
-            console.log("compute x'", mulValues, dList, layerID, X.toString(), dummy);
-        
-            const g = d3.select(".mats").append("g")
-                .attr("class", "procVis");
+            console.log(
+                "compute x'",
+                mulValues,
+                dList,
+                layerID,
+                X.toString(),
+                dummy
+            );
+
+            const g = d3.select(".mats").append("g").attr("class", "procVis");
             let w = 2;
-            if(layerID==0){w = 5;console.log("compute x 0")}
-            else w = 2;
-            setTimeout(()=>{
+            if (dummy.length < 64) {
+                w = 5;
+                console.log("compute x 0");
+            } else w = 2;
+            setTimeout(() => {
                 //draw feature visualizer
                 for (let m = 0; m < dummy.length; m++) {
-                    
                     g.append("rect")
                         .attr("x", coordFeatureVis[0] + w * m)
                         .attr("y", coordFeatureVis[1] - 5)
@@ -789,10 +911,9 @@ export function visualizeFeatures(
                 }
 
                 //draw frame
-                g
-                    .append("rect")
+                g.append("rect")
                     .attr("x", coordFeatureVis[0])
-                    .attr("y", coordFeatureVis[1]-5)
+                    .attr("y", coordFeatureVis[1] - 5)
                     .attr("width", w * dummy.length)
                     .attr("height", 10)
                     .attr("fill", "none")
@@ -803,7 +924,7 @@ export function visualizeFeatures(
 
                 //path connect - connect prev layer feature vis to intermediate feature vis
                 const curve = d3.line().curve(d3.curveBasis);
-                for(let i=0; i<posList.length; i++){
+                for (let i = 0; i < posList.length; i++) {
                     const res = computeMids(posList[i], coordFeatureVis);
                     const hpoint = res[0];
                     const lpoint = res[1];
@@ -820,31 +941,41 @@ export function visualizeFeatures(
                         .attr("class", "procVis");
 
                     //draw multipliers
-                    let x = (coordFeatureVis[0] - posList[i][0])/2 + posList[i][0];
-                    let y = (coordFeatureVis[1] - posList[i][1])/2 + posList[i][1];
-                    console.log("text point", x, y, posList[i][0], posList[i][1]);
-                    d3
-                        .select(".mats")
+                    let x =
+                        (coordFeatureVis[0] - posList[i][0]) / 2 +
+                        posList[i][0];
+                    let y =
+                        (coordFeatureVis[1] - posList[i][1]) / 2 +
+                        posList[i][1];
+                    console.log(
+                        "text point",
+                        x,
+                        y,
+                        posList[i][0],
+                        posList[i][1]
+                    );
+                    d3.select(".mats")
                         .append("text")
                         .text(mulValues[i].toFixed(2))
-                        .attr("x", x-2)
-                        .attr("y", y-2)
+                        .attr("x", x - 2)
+                        .attr("y", y - 2)
                         .attr("text-anchor", "middle")
                         .attr("font-size", 7.5)
                         .attr("class", "procVis")
                         .attr("opacity", 0);
                 }
-                d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
-            }, 2500
-            );
-            
+                d3.selectAll(".procVis")
+                    .transition()
+                    .duration(1000)
+                    .attr("opacity", 1);
+            }, 2500);
 
             //path connect - connect intermediate feature vis to current feature vis
         }
     });
     d3.selectAll(".featureVis").on("mouseover", function (event, d) {
         //if not in the state of lock
-        if(!lock){
+        if (!lock) {
             //paths interactions
             const layerID = Number(d3.select(this).attr("layerID")) - 1;
             const node = Number(d3.select(this).attr("node"));
@@ -893,13 +1024,13 @@ export function visualizeFeatures(
                 });
             }
 
-            if(colFrames!=null){
+            if (colFrames != null) {
                 colFrames[node].style.opacity = "1";
             }
         }
     });
     d3.selectAll(".featureVis").on("mouseout", function (event, d) {
-        if(!lock){
+        if (!lock) {
             const layerID = Number(d3.select(this).attr("layerID")) - 1;
             const node = Number(d3.select(this).attr("node"));
             console.log("Current layerID and node", layerID, node);
@@ -943,7 +1074,7 @@ export function visualizeFeatures(
                 });
             }
 
-            if(colFrames!=null){
+            if (colFrames != null) {
                 colFrames[node].style.opacity = "0";
             }
         }
@@ -1079,7 +1210,11 @@ function drawPoolingVis(
     //drawPoints(".mats", "red", one);
     //draw the pooling layer
     console.log("from feature vis", pooling);
-    const gg = d3.select(".mats").append("g").attr('class', 'layerVis').attr('id', "layerNum_4");
+    const gg = d3
+        .select(".mats")
+        .append("g")
+        .attr("class", "layerVis")
+        .attr("id", "layerNum_4");
     const g = gg.append("g").attr("class", "pooling");
     for (let i = 0; i < pooling.length; i++) {
         g.append("rect")
@@ -1178,7 +1313,11 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
     one[0][1] -= 5;
     //drawPoints(".mats", "red", one);
     //visulaize
-    const g = d3.select(".mats").append("g").attr("class","twoLayer layerVis").attr('id', "layerNum_5");
+    const g = d3
+        .select(".mats")
+        .append("g")
+        .attr("class", "twoLayer layerVis")
+        .attr("id", "layerNum_5");
     for (let m = 0; m < final.length; m++) {
         g.append("rect")
             .attr("x", one[0][0] + 10 * m)
@@ -1235,7 +1374,11 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
 
     let result = softmax(final);
     console.log("mat result", result);
-    const g1 = d3.select(".mats").append("g").attr("class", "twoLayer layerVis").attr('id', "layerNum_6");
+    const g1 = d3
+        .select(".mats")
+        .append("g")
+        .attr("class", "twoLayer layerVis")
+        .attr("id", "layerNum_6");
     for (let m = 0; m < result.length; m++) {
         g1.append("rect")
             .attr("x", aOne[0][0] + 10 * m)
@@ -1253,14 +1396,17 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
         .attr("x", aOne[0][0] + 5)
         .attr("y", aOne[0][1])
         .attr("font-size", "5px")
-        .attr("transform", "rotate(-45," + (aOne[0][0])+ "," + aOne[0][1] + ")")
+        .attr("transform", "rotate(-45," + aOne[0][0] + "," + aOne[0][1] + ")")
         .text("Non-Mutagenic");
 
     g1.append("text")
         .attr("x", aOne[0][0] + 15)
         .attr("y", aOne[0][1])
         .attr("font-size", "5px")
-        .attr("transform", "rotate(-45," + (aOne[0][0] +10)+ "," + aOne[0][1] + ")")
+        .attr(
+            "transform",
+            "rotate(-45," + (aOne[0][0] + 10) + "," + aOne[0][1] + ")"
+        )
         .text("Mutagenic");
 
     addLayerName(aOne, "Prediction Result", 0, 20, g1);
@@ -1305,7 +1451,6 @@ function drawTwoLayers(one: any, final: any, myColor: any) {
 
     return [aOne[0], cOne[0]];
 }
-
 
 //warn: below are some functions that need to be updated
 
@@ -1364,7 +1509,7 @@ export function mouseoverEvent(
     }
 
     const adjustedX = cx + translate[0];
-    const adjustedY = cy + translate[1] - 10; 
+    const adjustedY = cy + translate[1] - 10;
     const cellSize = 5; // size for each grid
 
     //-----------------interaction with text label and heatmap----------------------
