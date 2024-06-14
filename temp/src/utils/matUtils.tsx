@@ -743,6 +743,8 @@ export function visualizeFeatures(
                 if(poolingOverEvent)poolingVis?.on("mouseover", poolingOverEvent);
                 //recover frame
                 d3.select(".poolingFrame").style("opacity", 0);
+            }else {
+                translateLayers(5, -300);
             }
 
             //recover all feature visualizers and paths
@@ -1195,6 +1197,32 @@ export function visualizeFeatures(
             d3.select(".poolingFrame").style("opacity", 0);
             d3.select("#fr1").style("opacity", 0);
         });
+        outputVis.on("click", function(event, d){
+            if (lock != true) {
+                //state
+                transState = "output";
+                lock = true;
+                event.stopPropagation();
+                dview = true;
+                console.log("click! - fVis", dview, lock);
+                //lock all feature visualizers and transparent paths
+                d3.select(".pooling")
+                    .style("pointer-events", "none")
+                    .style("opacity", 0.2);
+                d3.selectAll(".twoLayer")
+                    .style("pointer-events", "none");
+                d3.selectAll("path").style("opacity", 0);
+                //transparent other feature visualizers
+                d3.selectAll(".featureVis").style("opacity", 0.2);
+                d3.selectAll(".oFeature").style("opacity", 0.2);
+                //translate each layer
+                const layerID = 5;
+                setTimeout(() => {
+                    translateLayers(layerID, 300);
+                }, 1750);
+                for(let i=0; i<layerID; i++)colorSchemesTable[i].style.opacity = "0.2";
+            }
+        })
     }
 }
 
