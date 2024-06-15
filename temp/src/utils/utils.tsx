@@ -376,17 +376,36 @@ function showAllLinks(nodes: any) {
 })
 }
 
+function resetNodes(allNodes: any[]) {
+  allNodes.forEach(node => {
+    if (node.graphIndex <= 2) {
+    if (node.featureGroup) {
+      node.featureGroup.style("visibility", "hidden")
+    }
+    if (node.svgElement) {
+      d3.select(node.svgElement).attr("stroke-width", 1);
+    }
+    if (node.relatedNodes) {
+      node.relatedNodes.forEach((relatedNode: any) => {
+        d3.select(relatedNode.svgElement).attr("stroke-width", 1);
+      });
+    }
+  }
+  });
+}
 
-export function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number) {
+
+
+export function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, final: any) {
 
   const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex);
 
-  // Array to keep track of occupied positions
   if (!nodesByIndex.has(5)) {
     const nodesWithGraphIndex4 = nodesByIndex.get(4);
     if (nodesWithGraphIndex4) {
       const nodesWithGraphIndex5 = nodesWithGraphIndex4.map(node => {
         const newNode = { ...node, graphIndex: 5 };
+        newNode.features = softmax(final)
         return newNode;
       });
 
@@ -422,6 +441,9 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
       });
 
       occupiedPositions.push({ x: xPos, y: yPos });
+
+      // Add isClicked flag
+      node.isClicked = false;
 
       if (graphIndex <= 2) {
         node.svgElement = g2.append("circle")
@@ -470,48 +492,61 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
         node.featureGroup = featureGroup;
 
         node.svgElement.addEventListener("mouseover", function(this: any) {
-          featureGroup.style('visibility', 'visible');
-          featureGroup.raise();
-          d3.select(this).attr("stroke-width", 3);
+          if (!node.isClicked) {
+            featureGroup.style('visibility', 'visible');
+            featureGroup.raise();
+            d3.select(this).attr("stroke-width", 3);
+
+            if (node.links) {
+              node.links.forEach((link: any) => {
+                link.style("opacity", 0.7);
+              });
+            }
+
+            if (node.relatedNodes) {
+              node.relatedNodes.forEach((n: any) => {
+                d3.select(n.svgElement).attr("stroke-width", 3);
+                n.featureGroup.style('visibility', 'visible');
+                n.featureGroup.raise();
+              });
+            }
+          }
+        });
+
+        node.svgElement.addEventListener("mouseout", function(this: any) {
+          if (!node.isClicked) {
+            featureGroup.style('visibility', 'hidden');
+            d3.select(this).attr("stroke-width", 1);
+
+            if (node.links) {
+              node.links.forEach((link: any) => {
+                link.style("opacity", 0.07);
+              });
+            }
+
+            if (node.relatedNodes) {
+              node.relatedNodes.forEach((n: any) => {
+                d3.select(n.svgElement).attr("stroke-width", 1);
+                n.featureGroup.style('visibility', 'hidden');
+              });
+            }
+          }
+        });
+
+        node.svgElement.addEventListener("click", function(event: any) {
+          hideAllLinks(allNodes);
 
           if (node.links) {
             node.links.forEach((link: any) => {
               link.style("opacity", 0.7);
             });
           }
-
           
-          if (node.relatedNodes) {
-            node.relatedNodes.forEach((n: any) => {
-              d3.select(n.svgElement).attr("stroke-width", 3);
-              n.featureGroup.style('visibility', 'visible');
-              n.featureGroup.raise();
-            });
-          }
-        });
-
-        node.svgElement.addEventListener("mouseout", function(this: any) {
-          featureGroup.style('visibility', 'hidden');
-          d3.select(this).attr("stroke-width", 1);
-
-          if (node.links) {
-            node.links.forEach((link: any) => {
-              link.style("opacity", 0.07);
-            });
-          }
-
-          if (node.relatedNodes) {
-            node.relatedNodes.forEach((n: any) => {
-              d3.select(n.svgElement).attr("stroke-width", 1);
-              n.featureGroup.style('visibility', 'hidden');
-            });
-          }
-        });
-
-        node.svgElement.addEventListener("click", function(event: any) {
-          hideAllLinks(allNodes);
           event.stopPropagation(); // Prevent the click event from bubbling up
-          
+
+          // Set isClicked flag
+          node.isClicked = true;
+
           if (movedNode === node) {
             return; // Do nothing if the node is already moved
           }
@@ -534,12 +569,12 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
                 }
                 return "translate(0,10)"; // Default fallback
               });
+            movedNode.isClicked = false; // Reset isClicked flag for the previously moved node
             movedNode = null;
           }
 
           // Move the clicked node and its layer
           svg.selectAll("g[layerNum]")
-          
             .filter((d: any, i: any, nodes: any) => {
               const layerNum = d3.select(nodes[i]).attr("layerNum");
               return layerNum !== null && parseInt(layerNum) > 0 && parseInt(layerNum) >= node.graphIndex;
@@ -587,28 +622,32 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
         node.featureGroup = featureGroup;
 
         node.featureGroup.on("mouseover", function() {
-          if (node.links) {
-            node.links.forEach((link: any) => {
-              link.style("opacity", 1);
-            });
+          if (!node.isClicked) {
+            if (node.links) {
+              node.links.forEach((link: any) => {
+                link.style("opacity", 1);
+              });
+            }
           }
         });
 
         node.featureGroup.on("mouseout", function() {
-          if (node.links) {
-            node.links.forEach((link: any) => {
-              link.style("opacity", 0.07);
-            });
+          if (!node.isClicked) {
+            if (node.links) {
+              node.links.forEach((link: any) => {
+                link.style("opacity", 0.07);
+              });
+            }
           }
         });
       }
     });
   });
 
-  // Add a global click event to the document to reset the moved node
+  // Add a global click event to the document to reset the moved node and isClicked flag
   document.addEventListener("click", function() {
-    showAllLinks(allNodes)
-    
+    showAllLinks(allNodes);
+
     if (movedNode) {
       svg.selectAll("g[layerNum]")
         .filter((d: any, i: any, nodes: any) => {
@@ -626,9 +665,11 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           }
           return "translate(0,10)"; // Default fallback
         });
+      movedNode.isClicked = false; // Reset isClicked flag for the previously moved node
       movedNode = null;
+      resetNodes(allNodes);
     }
-  });
+  }, { capture: true });
 }
 
 

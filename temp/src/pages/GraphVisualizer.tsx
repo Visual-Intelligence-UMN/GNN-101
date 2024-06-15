@@ -283,7 +283,9 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
               .attr("opacity", 0);
               svg.selectAll("text")
               .attr("opacity", 0);
-              featureVisualizer(svg, allNodes, offset, height);
+              if (intmData && intmData.final) {
+                featureVisualizer(svg, allNodes, offset, height, intmData.final);
+              }
 
              
 
