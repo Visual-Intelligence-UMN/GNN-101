@@ -16,7 +16,8 @@ import {
     computeMids,
     drawTwoLayers,
     drawMatrixPreparation,
-    drawNodeFeatures
+    drawNodeFeatures,
+    drawGCNConv
 } from "./matFeaturesUtils"
 import * as d3 from "d3";
 import { create, all } from "mathjs";
@@ -117,202 +118,19 @@ export function visualizeFeatures(
         }
     });
     
-    
-    //GCNCov Visualizer
-    let paths: any;
-    const gcnFeatures = [conv1, conv2, conv3];
-    console.log("gcnf", gcnFeatures);
-    console.log("CONV1", conv1);
-    for (let k = 0; k < 3; k++) {
-        const layer = d3
-            .select(".mats")
-            .append("g")
-            .attr("class", "layerVis")
-            .attr("id", `layerNum_${k + 1}`);
-        for (let i = 0; i < locations.length; i++) {
-            if (k != 0) {
-                locations[i][0] += 2 * 64 + 100;
-            } else {
-                locations[i][0] += 7 * 2 + 100 + 25;
-            }
-        }
+    //-----------------------------------GCNConv LAYERS-----------------------------------------------
+    const GCNConvPackage = drawGCNConv(conv1, conv2, conv3, locations, myColor, frames, schemeLocations, featureVisTable, pooling, graph, colorSchemesTable, poolingVis, outputVis, final, firstLayer, maxVals);
+    locations = GCNConvPackage.locations;
+    frames = GCNConvPackage.frames;
+    schemeLocations = GCNConvPackage.schemeLocations;
+    featureVisTable = GCNConvPackage.featureVisTable;
+    colorSchemesTable = GCNConvPackage.colorSchemesTable;
+    poolingVis = GCNConvPackage.poolingVis;
+    outputVis = GCNConvPackage.outputVis;
+    maxVals = GCNConvPackage.maxVals;
+    let paths = GCNConvPackage.paths;
 
-        addLayerName(
-            locations,
-            "GCNConv" + (k + 1),
-            0,
-            30,
-            d3.select(`g#layerNum_${k + 1}`)
-        );
-        //drawPoints(".mats","red",locations);
-        const gcnFeature = gcnFeatures[k];
-        for (let i = 0; i < locations.length; i++) {
-            //const cate = get_category_node(features[i]) * 100;
-            const g = layer
-                .append("g")
-                .attr("class", "featureVis")
-                .attr("node", i)
-                .attr("layerID", k + 1);
-
-            console.log("new", gcnFeature);
-
-            //loop through each node
-            let nodeMat = gcnFeature[i];
-            console.log("nodeMat", i, nodeMat);
-            for (let m = 0; m < nodeMat.length; m++) {
-                g.append("rect")
-                    .attr("x", locations[i][0] + 2 * m)
-                    .attr("y", locations[i][1])
-                    .attr("width", 2)
-                    .attr("height", 10)
-                    .attr("fill", myColor(nodeMat[m]))
-                    .attr("opacity", 1)
-                    .attr("stroke", "gray")
-                    .attr("stroke-width", 0.1);
-            }
-            //draw frame
-            const f = g
-                .append("rect")
-                .attr("x", locations[i][0])
-                .attr("y", locations[i][1])
-                .attr("width", 2 * 64)
-                .attr("height", 10)
-                .attr("fill", "none")
-                .attr("opacity", 0)
-                .attr("stroke", "black")
-                .attr("stroke-width", 1)
-                .attr("node", i)
-                .attr("layerID", k + 1)
-                .attr("class", "frame");
-            //havent figure out how to optimize this code..
-            if (k == 0) frames["GCNConv1"].push(f.node());
-            if (k == 1) frames["GCNConv2"].push(f.node());
-            if (k == 2) frames["GCNConv3"].push(f.node());
-            //drawPoints(".mats", "red", locations);
-            if (i == locations.length - 1) {
-                schemeLocations.push([locations[i][0], 350]);
-            }
-
-            featureVisTable[k + 1].push(g.node() as SVGElement);
-        }
-        console.log("FVT", featureVisTable);
-        if (k != 2) {
-            // visualize cross connections btw 1st, 2nd, 3rd GCNConv
-            paths = drawCrossConnection(graph, locations, 62 * 2, 102, k + 1);
-            console.log("grouped grouped", paths);
-        } else {
-            //visualize pooling layer
-            const poolingPack = drawPoolingVis(
-                locations,
-                pooling,
-                myColor,
-                frames,
-                colorSchemesTable
-            );
-            let one = poolingPack["one"];
-            poolingVis = poolingPack["g"];
-            console.log("poolingVis", poolingVis);
-            console.log("ONE", one);
-            schemeLocations.push([one[0][0], 350]);
-            //visualize last layer and softmax output
-            const tlPack = drawTwoLayers(one, final, myColor);
-            let aOne = tlPack["locations"];
-            outputVis = tlPack["g"];
-            console.log("AAA", aOne);
-            if (aOne != undefined) {
-                schemeLocations.push([aOne[0][0], 350]);
-            }
-            schemeLocations.push([aOne[1][0] - 20, 350]);
-        }
-        console.log("schemeLocations", schemeLocations);
-        //drawPoints(".mats", "red", schemeLocations);
-        //let max1 = findAbsMax(maxVals.conv1);
-        let result = softmax(final);
-        console.log("debug", schemeLocations);
-
-        //select layers
-        const l1 = d3.select(`g#layerNum_1`);
-        const l2 = d3.select(`g#layerNum_2`);
-        const l3 = d3.select(`g#layerNum_3`);
-        const l4 = d3.select(`g#layerNum_4`);
-        const l5 = d3.select(`g#layerNum_5`);
-        const l6 = d3.select(`g#layerNum_6`);
-
-        const scheme1 = buildBinaryLegend(
-            myColor,
-            0,
-            1,
-            "Features Color Scheme",
-            schemeLocations[0][0],
-            schemeLocations[0][1],
-            firstLayer
-        );
-        const scheme2 = buildLegend(
-            myColor,
-            maxVals.conv1,
-            "GCNConv1 Color Scheme",
-            schemeLocations[1][0],
-            schemeLocations[1][1],
-            l1
-        );
-        const scheme3 = buildLegend(
-            myColor,
-            maxVals.conv2,
-            "GCNConv2 Color Scheme",
-            schemeLocations[1][0] + 230,
-            schemeLocations[1][1],
-            l2
-        );
-        const scheme4 = buildLegend(
-            myColor,
-            maxVals.conv3,
-            "GCNConv3 Color Scheme",
-            schemeLocations[1][0] + 230 * 2,
-            schemeLocations[1][1],
-            l3
-        );
-        const scheme5 = buildLegend(
-            myColor,
-            maxVals.pooling,
-            "Pooling Color Scheme",
-            schemeLocations[1][0] + 230 * 3,
-            schemeLocations[1][1],
-            l4
-        );
-        const scheme6 = buildBinaryLegend(
-            myColor,
-            final[0],
-            final[1],
-            "Model Output Color Scheme",
-            schemeLocations[1][0] + 230 * 4,
-            schemeLocations[1][1],
-            l5
-        );
-        const scheme7 = buildBinaryLegend(
-            myColor,
-            result[0],
-            result[1],
-            "Result Color Scheme",
-            schemeLocations[1][0] + 230 * 4.5,
-            schemeLocations[1][1],
-            l6
-        );
-
-        //test
-        //scheme1.style.opacity = "0.2";
-
-        colorSchemesTable = [
-            scheme1,
-            scheme2,
-            scheme3,
-            scheme4,
-            scheme5,
-            scheme6,
-            scheme7,
-        ];
-
-        //colorSchemesTable[0].style.opacity = "0.1";
-    }
+    //-----------------------------------INTERACTIONS EVENTS MANAGEMENT-----------------------------------------------
     let recordLayerID: number = -1;
     // a state to controls the recover event
     let transState = "GCNConv";
@@ -740,7 +558,7 @@ export function visualizeFeatures(
     //pooling visualizer click interaction
     if (poolingVis != null) {
         
-        poolingVis.on("click", function (event, d) {
+        poolingVis.on("click", function (event:any, d:any) {
             transState = "pooling";
             poolingOverEvent = poolingVis.on("mouseover");
             poolingOutEvent = poolingVis.on("mouseout");
@@ -792,18 +610,18 @@ export function visualizeFeatures(
 
     //model output visualizer click interaction
     if(outputVis!=null){
-        outputVis.on("mouseover", function (event, d) {
+        outputVis.on("mouseover", function (event:any, d:any) {
             const a = d3.select(".path1").style("opacity", 1);
             const b = d3.select(".poolingFrame").style("opacity", 1);
             const c = d3.select("#fr1").style("opacity", 1);
             console.log("mouse in", a, b, c)
         });
-        outputVis.on("mouseout", function (event, d) {
+        outputVis.on("mouseout", function (event:any, d:any) {
             d3.select(".path1").style("opacity", 0.02);
             d3.select(".poolingFrame").style("opacity", 0);
             d3.select("#fr1").style("opacity", 0);
         });
-        outputVis.on("click", function(event, d){
+        outputVis.on("click", function(event:any, d:any){
             if (lock != true) {
                 //state
                 transState = "output";
