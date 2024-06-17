@@ -105,9 +105,9 @@ export function detailedViewRecovery(
         if (poolingOverEvent) poolingVis?.on("mouseover", poolingOverEvent);
         //recover frame
         d3.select(".poolingFrame").style("opacity", 0);
-    } else if(transState == "result"){
+    } else if (transState == "result") {
         translateLayers(5, -300);
-    } else{
+    } else {
         translateLayers(4, -300);
     }
 
@@ -275,18 +275,18 @@ export function featureVisMouseOut(
 }
 
 export function featureVisClick(
-    layerID:number,
-    node:number,
-    recordLayerID:number,
-    colorSchemesTable:any,
-    adjList:any,
-    featureVisTable:any,
-    features:any,
-    conv1:any,
-    conv2:any,
-    bias:any,
-    myColor:any,
-    weights:any
+    layerID: number,
+    node: number,
+    recordLayerID: number,
+    colorSchemesTable: any,
+    adjList: any,
+    featureVisTable: any,
+    features: any,
+    conv1: any,
+    conv2: any,
+    bias: any,
+    myColor: any,
+    weights: any
 ) {
     console.log("Current layerID and node", layerID, node);
     setTimeout(() => {
@@ -297,7 +297,7 @@ export function featureVisClick(
 
     //reduce color schemes opacity
     console.log("CST before modification", colorSchemesTable);
-    colorSchemesTable.forEach((d:any, i:any) => {
+    colorSchemesTable.forEach((d: any, i: any) => {
         console.log(
             `Before modification: Element ${i} opacity`,
             d.style.opacity
@@ -479,11 +479,85 @@ export function featureVisClick(
         d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
     }, 2500);
 
+    return {
+        recordLayerID: recordLayerID,
+        colorSchemesTable: colorSchemesTable,
+        featureVisTable: featureVisTable,
+        features: features,
+    };
+}
+
+export function poolingVisClick(
+    colorSchemesTable: any,
+    adjList: any,
+    featureVisTable: any
+) {
+    //lock all feature visualizers and transparent paths
+    d3.selectAll("[class='frame'][layerID='3']").style("opacity", 1);
+    d3.select(".pooling").style("pointer-events", "none");
+    d3.selectAll(".twoLayer")
+        .style("pointer-events", "none")
+        .style("opacity", 0.2);
+    d3.selectAll("path").style("opacity", 0);
+    //transparent other feature visualizers
+    d3.selectAll(".featureVis").style("opacity", 0.2);
+    d3.selectAll(".oFeature").style("opacity", 0.2);
+    //translate each layer
+    const layerID = 3;
+
+    setTimeout(() => {
+        translateLayers(layerID, 300);
+    }, 1750);
+    d3.select(".poolingFrame").style("opacity", 1);
+    //transparent other color schemes
+    for (let i = 0; i < 3; i++) colorSchemesTable[i].style.opacity = "0.2";
+    //display the features we want to display
+    //display the frame we want to display
+    console.log("FST click", frames);
+    for (let i = 0; i < adjList.length; i++) {
+        featureVisTable[3][i].style.opacity = "1";
+    }
 
     return {
-        "recordLayerID":recordLayerID,
-        "colorSchemesTable":colorSchemesTable,
-        "featureVisTable":featureVisTable,
-        "features":features
+        colorSchemesTable: colorSchemesTable,
+        featureVisTable: featureVisTable,
     };
+}
+
+export function outputVisClick(resultVis: any, colorSchemesTable: any) {
+    d3.selectAll(".twoLayer").style("pointer-events", "none");
+    d3.selectAll("path").style("opacity", 0);
+    //transparent other feature visualizers
+    d3.selectAll(".featureVis").style("opacity", 0.2);
+    d3.selectAll(".oFeature").style("opacity", 0.2);
+    resultVis?.style("opacity", 0.2);
+    //translate each layer
+    const layerID = 4;
+    setTimeout(() => {
+        translateLayers(layerID, 300);
+    }, 1750);
+    for (let i = 0; i < layerID; i++)
+        colorSchemesTable[i].style.opacity = "0.2";
+    colorSchemesTable[colorSchemesTable.length - 1].style.opacity = "0.2";
+    return {
+        resultVis: resultVis,
+        colorSchemesTable: colorSchemesTable,
+    };
+}
+
+export function resultVisClick(colorSchemesTable: any) {
+    d3.select(".pooling").style("pointer-events", "none").style("opacity", 0.2);
+    d3.selectAll(".twoLayer").style("pointer-events", "none");
+    d3.selectAll("path").style("opacity", 0);
+    //transparent other feature visualizers
+    d3.selectAll(".featureVis").style("opacity", 0.2);
+    d3.selectAll(".oFeature").style("opacity", 0.2);
+    //translate each layer
+    const layerID = 5;
+    setTimeout(() => {
+        translateLayers(layerID, 300);
+    }, 1750);
+    for (let i = 0; i < layerID; i++)
+        colorSchemesTable[i].style.opacity = "0.2";
+    return colorSchemesTable;
 }

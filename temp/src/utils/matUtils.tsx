@@ -21,7 +21,7 @@ import {
 } from "./matFeaturesUtils"
 import * as d3 from "d3";
 import { create, all } from "mathjs";
-import { detailedViewRecovery, featureVisClick, featureVisMouseOut, featureVisMouseOver, oFeatureMouseOut, oFeatureMouseOver } from "./matEventsUtils";
+import { detailedViewRecovery, featureVisClick, featureVisMouseOut, featureVisMouseOver, oFeatureMouseOut, oFeatureMouseOver, outputVisClick, poolingVisClick, resultVisClick } from "./matEventsUtils";
 
 //features visualization pipeline: draw all feature visualizers for original features and GCNConv
 export function visualizeFeatures(
@@ -42,7 +42,7 @@ export function visualizeFeatures(
     //--------------------------------DATA PREP MANAGEMENT--------------------------------
     let poolingVis = null; //to manage pooling visualizer
     let outputVis = null; //to manage model output
-    let resultVis = null; //tp manage result visualizer
+    let resultVis:any = null; //tp manage result visualizer
     //load weights and bias
     const dataPackage = loadWeights();
     console.log("weights, data", dataPackage);
@@ -220,36 +220,11 @@ export function visualizeFeatures(
                 event.stopPropagation();
                 dview = true;
                 console.log("click! - fVis", dview, lock);
-                
-                //lock all feature visualizers and transparent paths
-                d3.selectAll("[class='frame'][layerID='3']").style("opacity", 1);
-                d3.select(".pooling")
-                    .style("pointer-events", "none");
-                d3.selectAll(".twoLayer")
-                    .style("pointer-events", "none")
-                    .style("opacity", 0.2);
-                d3.selectAll("path").style("opacity", 0);
-                //transparent other feature visualizers
-                d3.selectAll(".featureVis").style("opacity", 0.2);
-                d3.selectAll(".oFeature").style("opacity", 0.2);
-                //translate each layer
-                const layerID = 3;
-
-                setTimeout(() => {
-                    translateLayers(layerID, 300);
-                }, 1750);
-                d3.select(".poolingFrame").style("opacity", 1);
-                //transparent other color schemes
-                for(let i=0; i<3; i++)colorSchemesTable[i].style.opacity = "0.2";
-                //display the features we want to display
-                //display the frame we want to display
-                console.log("FST click", frames);
-                for(let i=0; i<adjList.length; i++){
-                    featureVisTable[3][i].style.opacity = "1";
-                    
-                }
-                
-
+                //click event
+                const poolingVisPack = poolingVisClick(colorSchemesTable, adjList, featureVisTable);
+                //update variables
+                colorSchemesTable = poolingVisPack.colorSchemesTable;
+                featureVisTable = poolingVisPack.featureVisTable;
             }
         });
     }
@@ -276,21 +251,10 @@ export function visualizeFeatures(
                 dview = true;
                 console.log("click! - fVis", dview, lock);
                 //lock all feature visualizers and transparent paths
-                
-                d3.selectAll(".twoLayer")
-                    .style("pointer-events", "none");
-                d3.selectAll("path").style("opacity", 0);
-                //transparent other feature visualizers
-                d3.selectAll(".featureVis").style("opacity", 0.2);
-                d3.selectAll(".oFeature").style("opacity", 0.2);
-                resultVis?.style("opacity", 0.2);
-                //translate each layer
-                const layerID = 4;
-                setTimeout(() => {
-                    translateLayers(layerID, 300);
-                }, 1750);
-                for(let i=0; i<layerID; i++)colorSchemesTable[i].style.opacity = "0.2";
-                colorSchemesTable[colorSchemesTable.length-1].style.opacity = "0.2";
+                const outputVisPack = outputVisClick(resultVis, colorSchemesTable);
+                //update variables
+                resultVis = outputVisPack.resultVis;
+                colorSchemesTable = outputVisPack.colorSchemesTable;
             }
         })
     }
@@ -316,21 +280,7 @@ export function visualizeFeatures(
                 dview = true;
                 console.log("click! - fVis", dview, lock);
                 //lock all feature visualizers and transparent paths
-                d3.select(".pooling")
-                    .style("pointer-events", "none")
-                    .style("opacity", 0.2);
-                d3.selectAll(".twoLayer")
-                    .style("pointer-events", "none");
-                d3.selectAll("path").style("opacity", 0);
-                //transparent other feature visualizers
-                d3.selectAll(".featureVis").style("opacity", 0.2);
-                d3.selectAll(".oFeature").style("opacity", 0.2);
-                //translate each layer
-                const layerID = 5;
-                setTimeout(() => {
-                    translateLayers(layerID, 300);
-                }, 1750);
-                for(let i=0; i<layerID; i++)colorSchemesTable[i].style.opacity = "0.2";
+                colorSchemesTable = resultVisClick(colorSchemesTable);
             }
         })
     }
