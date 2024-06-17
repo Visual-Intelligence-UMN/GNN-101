@@ -21,13 +21,6 @@ import {
     drawNodeAttributes,
     getNodeAttributes
 } from "../utils/matHelperUtils";
-import {
-    removeEffect,
-    mouseover,
-    mousemove,
-    mouseleave,
-    mouseoverEvent
-} from "../utils/matInteractionUtils";
 import { roundToTwo, visualizeMatrix } from "./WebUtils";
 
 //find absolute max value in an 1d array
@@ -248,10 +241,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 .style("fill", (d: HeatmapData) => myColor(d.value / 250))
                 .style("stroke-width", 1)
                 .style("stroke", "grey")
-                .style("opacity", 0.8)
-                .on("mouseover", mouseover)
-                .on("mousemove", mousemove)
-                .on("mouseleave", mouseleave);
+                .style("opacity", 0.8);
 
             console.log("x-bandwidth", x.bandwidth());
             console.log("y-bandwidth", y.bandwidth());
@@ -261,11 +251,9 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                     console.log("EVENT", event);
                     const element = event.target as SVGGraphicsElement;
                     console.log("ELEMENT", element);
-                    //   mouseoverEvent(element, this, i, conv1, conv2, conv3, final, features, myColor, 5, gridNum, sqSize, true);
                 })
                 .on("mouseout", function (event) {
                     const element = event.target as SVGGraphicsElement;
-                    removeEffect(element);
                     d3.select("#tmp").remove();
                     d3.select(".ihmp").remove();
                 });
@@ -274,13 +262,10 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 .on("mouseover", function (event, d) {
                     const element = event.target as SVGGraphicsElement;
                     console.log("ELEMENT", element);
-
-                    //  mouseoverEvent(element, this, i, conv1, conv2, conv3, final, features, myColor, -5, gridNum, sqSize, false);
                     //interactWithHeatmap(element, x.bandwidth(), graphs[0].length);
                 })
                 .on("mouseout", function (event, d) {
                     const element = event.target as SVGGraphicsElement;
-                    removeEffect(element);
                 });
             //getting the coordinates
             locations = get_cood_locations(data, locations);

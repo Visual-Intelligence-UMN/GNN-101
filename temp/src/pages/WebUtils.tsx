@@ -19,8 +19,7 @@ import {
     removeEffect,
     mouseover,
     mousemove,
-    mouseleave,
-    mouseoverEvent
+    mouseleave
 } from "@/utils/matInteractionUtils";
 import {
     HeatmapData,
@@ -600,21 +599,6 @@ export function visualizeMatrix(path: string) {
                 console.log("EVENT", event);
                 const element = event.target as SVGGraphicsElement;
                 console.log("ELEMENT", element);
-                mouseoverEvent(
-                    element,
-                    this,
-                    0,
-                    [],
-                    [],
-                    [],
-                    [],
-                    features,
-                    myColor,
-                    5,
-                    graph.length,
-                    x.bandwidth(),
-                    true
-                );
             })
             .on("mouseout", function (event) {
                 const element = event.target as SVGGraphicsElement;
@@ -626,21 +610,6 @@ export function visualizeMatrix(path: string) {
             .on("mouseover", function (event, d) {
                 const element = event.target as SVGGraphicsElement;
                 console.log("ELEMENT", element);
-                mouseoverEvent(
-                    element,
-                    this,
-                    0,
-                    [],
-                    [],
-                    [],
-                    [],
-                    features,
-                    myColor,
-                    -5,
-                    graph.length,
-                    x.bandwidth(),
-                    false
-                );
             })
             .on("mouseout", function (event, d) {
                 const element = event.target as SVGGraphicsElement;
