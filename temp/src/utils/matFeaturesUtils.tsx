@@ -106,6 +106,7 @@ export function drawCrossConnection(
     return groupedPaths;
 }
 
+//compute mid point for basis curve drawing
 export function computeMids(point1: any, point2: any) {
     //find mid - x
     const midX = (point1[0] + point2[0]) / 2;
@@ -118,13 +119,130 @@ export function computeMids(point1: any, point2: any) {
 }
 
 //draw aid utils for matrix visualization(column and row frames)
-export function drawMatrixPreparation(){
+export function drawMatrixPreparation(graph:any, locations:any){
+    let colLocations = [];
+    for (let i = 0; i < graph.length; i++) {
+        const x =
+            locations[0][0] - (300 / graph.length) * i - 300 / graph.length / 2;
+        const y = locations[0][1];
+        colLocations.push([x, y]);
+    }
+    //drawPoints(".mats", "red", colLocations);
+    let colFrames: SVGElement[] = []; //a
+    for (let i = 0; i < colLocations.length; i++) {
+        const r = d3
+            .select(".mats")
+            .append("rect")
+            .attr("x", colLocations[i][0])
+            .attr("y", colLocations[i][1] + 3)
+            .attr("height", 300)
+            .attr("width", 300 / graph.length)
+            .attr("fill", "none")
+            .attr("opacity", 0)
+            .attr("stroke", "black")
+            .attr("stroke-width", 2)
+            .attr("class", "colFrame");
 
+        colFrames.push(r.node() as SVGElement);
+    }
+    colFrames.reverse();
+    //draw frames on matrix
+    let matFrames: SVGElement[] = []; //a
+    for (let i = 0; i < locations.length; i++) {
+        const r = d3
+            .select(".mats")
+            .append("rect")
+            .attr("x", locations[i][0] - 300 + 300 / graph.length / 2)
+            .attr("y", locations[i][1] + 3)
+            .attr("height", 300 / graph.length)
+            .attr("width", 300)
+            .attr("fill", "none")
+            .attr("opacity", 0)
+            .attr("stroke", "black")
+            .attr("stroke-width", 2)
+            .attr("class", "rowFrame");
+
+        matFrames.push(r.node() as SVGElement);
+    }
+    console.log("matFrames", matFrames);
+    return {"colFrames":colFrames, "matFrames":matFrames};
 }
 
 //draw data original feature
-export function drawNodeFeatures(){
+export function drawNodeFeatures(
+    locations:any,
+    graph:any,
+    myColor:any,
+    features:any,
+    frames:any,
+    schemeLocations:any,
+    featureVisTable:any
+){
+    //initial visualizer
+    for (let i = 0; i < locations.length; i++) {
+        locations[i][0] += 25;
+        locations[i][1] += 2;
+    }
+    //draw cross connections for features layer and first GCNConv layer
+    drawCrossConnection(graph, locations, 35, 102, 0);
 
+    //using locations to find the positions for first feature visualizers
+    const firstLayer = d3.select(".mats").append("g").attr("id", "layerNum_0");
+    for (let i = 0; i < locations.length; i++) {
+        const g = firstLayer
+            .append("g")
+            .attr("class", "oFeature")
+            .attr("node", i)
+            .attr("layerID", 0);
+
+        for (let j = 0; j < 7; j++) {
+            const fVis = g
+                .append("rect")
+                .attr("x", locations[i][0] + 5 * j)
+                .attr("y", locations[i][1])
+                .attr("width", 5)
+                .attr("height", 10)
+                .attr("fill", myColor(features[i][j]))
+                .attr("opacity", 1)
+                .attr("stroke", "gray")
+                .attr("stroke-width", 0.1);
+        }
+        //draw frame
+        const f = g
+            .append("rect")
+            .attr("x", locations[i][0])
+            .attr("y", locations[i][1])
+            .attr("width", 5 * 7)
+            .attr("height", 10)
+            .attr("fill", "none")
+            .attr("opacity", 0)
+            .attr("stroke", "black")
+            .attr("stroke-width", 1)
+            .attr("node", i)
+            .attr("layerID", 0)
+            .attr("class", "frame");
+        frames["features"].push(f.node());
+
+        //find last location
+        if (i == locations.length - 1)
+            schemeLocations.push([locations[i][0], 350]);
+
+        
+
+        //push feature visualizer into the table
+        featureVisTable[0].push(g.node() as SVGElement);
+    }
+    //drawPoints(".mats", "red", schemeLocations);
+    //add layer label for the first one
+
+    addLayerName(locations, "Graph Features", 0, 30, firstLayer);
+    return {
+        "locations":locations,
+        "frames":frames,
+        "schemeLocations":schemeLocations,
+        "featureVisTable":featureVisTable,
+        "firstLayer":firstLayer
+    };
 }
 
 //draw intermediate features from GCNConv process
