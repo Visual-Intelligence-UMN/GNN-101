@@ -259,6 +259,7 @@ export function drawGCNConv(
 ) {
     //GCNCov Visualizer
     let paths: any;
+    let resultVis = null;
     const gcnFeatures = [conv1, conv2, conv3];
     console.log("gcnf", gcnFeatures);
     console.log("CONV1", conv1);
@@ -357,6 +358,7 @@ export function drawGCNConv(
             const tlPack = drawTwoLayers(one, final, myColor);
             let aOne = tlPack["locations"];
             outputVis = tlPack["g"];
+            resultVis = tlPack["g1"];
             console.log("AAA", aOne);
             if (aOne != undefined) {
                 schemeLocations.push([aOne[0][0], 350]);
@@ -462,7 +464,8 @@ export function drawGCNConv(
         "outputVis":outputVis,
         "firstLayer":firstLayer,
         "maxVals":maxVals,
-        "paths":paths
+        "paths":paths,
+        "resultVis":resultVis
     }
 }
 
@@ -701,7 +704,8 @@ export function drawTwoLayers(one: any, final: any, myColor: any) {
         .attr("stroke-width", 1)
         .attr("layerID", 4)
         .attr("class", "frame")
-        .attr("fr", 2);
+        .attr("fr", 2)
+        .attr("id", "fr2");
     //connect
     aOne[0][1] += 5;
     let cOne = deepClone(aOne);
