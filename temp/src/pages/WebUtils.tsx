@@ -20,11 +20,14 @@ import {
     mouseover,
     mousemove,
     mouseleave,
+    mouseoverEvent
+} from "@/utils/matInteractionUtils";
+import {
     HeatmapData,
-    mouseoverEvent,
     drawNodeAttributes,
-    getNodeAttributes,
-} from "@/utils/matUtils";
+    getNodeAttributes
+} from "../utils/matHelperUtils";
+
 
 //Math function:::
 export function roundToTwo(num: number): number {
@@ -490,7 +493,8 @@ export function visualizeGraph(path: string) {
                 .attr("stroke", "black")
                 .attr("fill", "none")
                 .attr('transform',transform);
-                    featureVisualizer(svg, allNodes, offset, height);
+                    //here has an issue
+                    featureVisualizer(svg, allNodes, offset, height, null);
                 });
           
 

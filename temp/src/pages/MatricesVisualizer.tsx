@@ -13,17 +13,21 @@ import {
     drawPoints,
 } from "../utils/utils";
 import {
+    visualizeFeatures
+} from "@/utils/matUtils";
+import {
     get_cood_locations,
+    HeatmapData,
+    drawNodeAttributes,
+    getNodeAttributes
+} from "../utils/matHelperUtils";
+import {
     removeEffect,
     mouseover,
     mousemove,
     mouseleave,
-    HeatmapData,
-    mouseoverEvent,
-    visualizeFeatures,
-    drawNodeAttributes,
-    getNodeAttributes,
-} from "@/utils/matUtils";
+    mouseoverEvent
+} from "../utils/matInteractionUtils";
 import { roundToTwo, visualizeMatrix } from "./WebUtils";
 
 //find absolute max value in an 1d array
