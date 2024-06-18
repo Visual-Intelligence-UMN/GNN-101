@@ -5,12 +5,9 @@ import {
     splitIntoMatrices,
     get_features_origin,
     graph_to_matrix,
-    prepMatrices,
     load_json,
     matrix_to_hmap,
-    get_axis_gdata,
-    get_cood_from_parent,
-    drawPoints,
+    get_axis_gdata
 } from "../utils/utils";
 import {
     visualizeFeatures

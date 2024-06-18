@@ -1,26 +1,10 @@
+import { loadWeights } from "./matHelperUtils"
 import {
-    deepClone,
-    softmax
-} from "./utils";
-import {
-    addLayerName,
-    buildBinaryLegend,
-    buildLegend,
-    translateLayers,
-    calculatePrevFeatureVisPos,
-    loadWeights
-} from "./matHelperUtils"
-import {
-    drawCrossConnection,
-    drawPoolingVis,
-    computeMids,
-    drawTwoLayers,
     drawMatrixPreparation,
     drawNodeFeatures,
     drawGCNConv
 } from "./matFeaturesUtils"
 import * as d3 from "d3";
-import { create, all } from "mathjs";
 import { detailedViewRecovery, featureVisClick, featureVisMouseOut, featureVisMouseOver, oFeatureMouseOut, oFeatureMouseOver, outputVisClick, poolingVisClick, resultVisClick } from "./matEventsUtils";
 
 //features visualization pipeline: draw all feature visualizers for original features and GCNConv
