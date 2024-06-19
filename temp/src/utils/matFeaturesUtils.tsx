@@ -258,6 +258,7 @@ export function drawGCNConv(
     maxVals: any
 ) {
     //GCNCov Visualizer
+    let one = null;
     let paths: any;
     let resultVis = null;
     const gcnFeatures = [conv1, conv2, conv3];
@@ -349,7 +350,7 @@ export function drawGCNConv(
                 frames,
                 colorSchemesTable
             );
-            let one = poolingPack["one"];
+            one = poolingPack["one"];
             poolingVis = poolingPack["g"];
             console.log("poolingVis", poolingVis);
             console.log("ONE", one);
@@ -422,22 +423,22 @@ export function drawGCNConv(
         );
         const scheme6 = buildBinaryLegend(
             myColor,
-            final[0],
-            final[1],
-            "Model Output Color Scheme",
+            result[0],
+            result[1],
+            "Result Color Scheme",
             schemeLocations[1][0] + 230 * 4,
             schemeLocations[1][1],
             l5
         );
-        const scheme7 = buildBinaryLegend(
-            myColor,
-            result[0],
-            result[1],
-            "Result Color Scheme",
-            schemeLocations[1][0] + 230 * 4.5,
-            schemeLocations[1][1],
-            l6
-        );
+        // const scheme7 = buildBinaryLegend(
+        //     myColor,
+        //     result[0],
+        //     result[1],
+        //     "Result Color Scheme",
+        //     schemeLocations[1][0] + 230 * 4.5,
+        //     schemeLocations[1][1],
+        //     l6
+        // );
 
         //test
         //scheme1.style.opacity = "0.2";
@@ -448,8 +449,7 @@ export function drawGCNConv(
             scheme3,
             scheme4,
             scheme5,
-            scheme6,
-            scheme7,
+            scheme6
         ];
 
         //colorSchemesTable[0].style.opacity = "0.1";
@@ -465,7 +465,8 @@ export function drawGCNConv(
         "firstLayer":firstLayer,
         "maxVals":maxVals,
         "paths":paths,
-        "resultVis":resultVis
+        "resultVis":resultVis,
+        "one":one
     }
 }
 
@@ -591,6 +592,7 @@ export function drawTwoLayers(one: any, final: any, myColor: any) {
     let aOne = deepClone(one);
     one[0][1] -= 5;
     //drawPoints(".mats", "red", one);
+    let result = softmax(final);
     //visulaize
     const g = d3
         .select(".mats")
@@ -603,11 +605,30 @@ export function drawTwoLayers(one: any, final: any, myColor: any) {
             .attr("y", one[0][1])
             .attr("width", 10)
             .attr("height", 10)
-            .attr("fill", myColor(final[m]))
+            .attr("fill", myColor(result[m]))
             .attr("opacity", 1)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1);
     }
+
+    //add labels
+    g.append("text")
+        .attr("x", one[0][0] + 5)
+        .attr("y", one[0][1])
+        .attr("font-size", "5px")
+        .attr("transform", "rotate(-45," + one[0][0] + "," + one[0][1] + ")")
+        .text("Non-Mutagenic");
+
+    g.append("text")
+        .attr("x", one[0][0] + 15)
+        .attr("y", one[0][1])
+        .attr("font-size", "5px")
+        .attr(
+            "transform",
+            "rotate(-45," + (one[0][0] + 10) + "," + one[0][1] + ")"
+        )
+        .text("Mutagenic");
+
     //draw frame
     const f = g
         .append("rect")
@@ -624,7 +645,7 @@ export function drawTwoLayers(one: any, final: any, myColor: any) {
         .attr("fr", 1)
         .attr("id", "fr1");
     //add text
-    addLayerName(one, "Model Output", 0, 20, g);
+    addLayerName(one, "Prediction Result", 0, 20, g);
     //find positions to connect
     let bOne = deepClone(aOne);
     bOne[0][0] -= 102;
@@ -637,99 +658,71 @@ export function drawTwoLayers(one: any, final: any, myColor: any) {
         .attr("fill", "none")
         .attr("class", "path1")
         .attr("id", "path1");
-    //add interaction
-    // g.on("mouseover", function (event, d) {
-    //     d3.select(".path1").attr("opacity", 1);
-    //     d3.select(".poolingFrame").attr("opacity", 1);
-    //     d3.select("#fr1").attr("opacity", 1);
-    // });
-    // g.on("mouseout", function (event, d) {
-    //     d3.select(".path1").attr("opacity", 0.02);
-    //     d3.select(".poolingFrame").attr("opacity", 0);
-    //     d3.select("#fr1").attr("opacity", 0);
-    // });
     //visualize the result
     aOne[0][0] += 20 + 102;
     //drawPoints(".mats","red",aOne);
     aOne[0][1] -= 5;
 
-    let result = softmax(final);
+    
     console.log("mat result", result);
-    const g1 = d3
-        .select(".mats")
-        .append("g")
-        .attr("class", "twoLayer layerVis")
-        .attr("id", "layerNum_6");
-    for (let m = 0; m < result.length; m++) {
-        g1.append("rect")
-            .attr("x", aOne[0][0] + 10 * m)
-            .attr("y", aOne[0][1])
-            .attr("width", 10)
-            .attr("height", 10)
-            .attr("fill", myColor(result[m]))
-            .attr("opacity", 1)
-            .attr("stroke", "gray")
-            .attr("stroke-width", 0.1);
-    }
-    //drawPoints(".mats", "red", aOne);
-    //add labels
-    g1.append("text")
-        .attr("x", aOne[0][0] + 5)
-        .attr("y", aOne[0][1])
-        .attr("font-size", "5px")
-        .attr("transform", "rotate(-45," + aOne[0][0] + "," + aOne[0][1] + ")")
-        .text("Non-Mutagenic");
+    // const g1 = d3
+    //     .select(".mats")
+    //     .append("g")
+    //     .attr("class", "twoLayer layerVis")
+    //     .attr("id", "layerNum_6");
+    // for (let m = 0; m < result.length; m++) {
+    //     g1.append("rect")
+    //         .attr("x", aOne[0][0] + 10 * m)
+    //         .attr("y", aOne[0][1])
+    //         .attr("width", 10)
+    //         .attr("height", 10)
+    //         .attr("fill", myColor(result[m]))
+    //         .attr("opacity", 1)
+    //         .attr("stroke", "gray")
+    //         .attr("stroke-width", 0.1);
+    // }
+    // //drawPoints(".mats", "red", aOne)
 
-    g1.append("text")
-        .attr("x", aOne[0][0] + 15)
-        .attr("y", aOne[0][1])
-        .attr("font-size", "5px")
-        .attr(
-            "transform",
-            "rotate(-45," + (aOne[0][0] + 10) + "," + aOne[0][1] + ")"
-        )
-        .text("Mutagenic");
-
-    addLayerName(aOne, "Prediction Result", 0, 20, g1);
-    //draw frame
-    const f1 = g1
-        .append("rect")
-        .attr("x", aOne[0][0])
-        .attr("y", aOne[0][1])
-        .attr("width", 2 * 10)
-        .attr("height", 10)
-        .attr("fill", "none")
-        .attr("opacity", 0)
-        .attr("stroke", "black")
-        .attr("stroke-width", 1)
-        .attr("layerID", 4)
-        .attr("class", "frame")
-        .attr("fr", 2)
-        .attr("id", "fr2");
-    //connect
-    aOne[0][1] += 5;
+    // addLayerName(aOne, "Prediction Result", 0, 20, g1);
+    // //draw frame
+    // const f1 = g1
+    //     .append("rect")
+    //     .attr("x", aOne[0][0])
+    //     .attr("y", aOne[0][1])
+    //     .attr("width", 2 * 10)
+    //     .attr("height", 10)
+    //     .attr("fill", "none")
+    //     .attr("opacity", 0)
+    //     .attr("stroke", "black")
+    //     .attr("stroke-width", 1)
+    //     .attr("layerID", 4)
+    //     .attr("class", "frame")
+    //     .attr("fr", 2)
+    //     .attr("id", "fr2");
+    // //connect
+    // aOne[0][1] += 5;
     let cOne = deepClone(aOne);
-    cOne[0][0] -= 102;
-    d3.select(".mats")
-        .append("path")
-        .attr("d", d3.line()([aOne[0], cOne[0]]))
-        .attr("stroke", "black")
-        .attr("opacity", 0.05)
-        .attr("fill", "none")
-        .attr("class", "path2");
+    // cOne[0][0] -= 102;
+    // d3.select(".mats")
+    //     .append("path")
+    //     .attr("d", d3.line()([aOne[0], cOne[0]]))
+    //     .attr("stroke", "black")
+    //     .attr("opacity", 0.05)
+    //     .attr("fill", "none")
+    //     .attr("class", "path2");
 
-    //add interaction
-    g1.on("mouseover", function (event, d) {
-        d3.select(".path2").style("opacity", 1);
-        d3.select("[fr='1']").style("opacity", 1);
-        f1.style("opacity", 1);
-        console.log("f", f, f1);
-    });
-    g1.on("mouseout", function (event, d) {
-        d3.select(".path2").style("opacity", 0.02);
-        d3.select("[fr='1']").style("opacity", 0);
-        f1.style("opacity", 0);
-    });
+    // //add interaction
+    // g1.on("mouseover", function (event, d) {
+    //     d3.select(".path2").style("opacity", 1);
+    //     d3.select("[fr='1']").style("opacity", 1);
+    //     f1.style("opacity", 1);
+    //     console.log("f", f, f1);
+    // });
+    // g1.on("mouseout", function (event, d) {
+    //     d3.select(".path2").style("opacity", 0.02);
+    //     d3.select("[fr='1']").style("opacity", 0);
+    //     f1.style("opacity", 0);
+    // });
 
-    return { locations: [aOne[0], cOne[0]], g: g, g1: g1 };
+    return { locations: [aOne[0], cOne[0]], g: g, g1: null };
 }

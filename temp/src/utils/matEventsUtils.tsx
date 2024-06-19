@@ -1,4 +1,4 @@
-import { deepClone, drawPoints } from "./utils";
+import { deepClone, drawPoints, get_cood_from_parent } from "./utils";
 import { translateLayers, calculatePrevFeatureVisPos } from "./matHelperUtils";
 import { computeMids } from "./matFeaturesUtils";
 import * as d3 from "d3";
@@ -573,6 +573,8 @@ export function featureVisClick(
 
         //draw paths
         //drawPoints(".mats", "red", p);
+
+        
         for (let i = 0; i < 64; i++) {
             let s: [number, number] = [
                 coordStartPoint[0] + 2 * i,
@@ -675,7 +677,24 @@ export function poolingVisClick(
     };
 }
 
-export function outputVisClick(resultVis: any, colorSchemesTable: any) {
+export function outputVisClick(
+    resultVis: any, 
+    colorSchemesTable: any,
+    one: any,
+    result: any,
+    myColor: any
+) {
+    const poolingPt = get_cood_from_parent(".mats", ".pooling");
+    poolingPt[0][0] += 64;
+    
+    
+    poolingPt[0][1] += 10;
+    one = deepClone(poolingPt);
+    
+    one[0][1] -= 5;
+    let end = deepClone(poolingPt);
+    //drawPoints(".mats", "red", poolingPt);
+    end[0][1] += 300;
     d3.selectAll(".twoLayer").style("pointer-events", "none");
     d3.selectAll("path").style("opacity", 0);
     //transparent other feature visualizers
@@ -687,28 +706,92 @@ export function outputVisClick(resultVis: any, colorSchemesTable: any) {
     setTimeout(() => {
         translateLayers(layerID, 300);
     }, 1750);
+             
+    //locations calculation
+    //find the next position
+    one[0][0] += 125;
+    let aOne = deepClone(one);
+    //one[0][1] -= 5;
+    setTimeout(()=>{
+        const g1 = d3
+        .select(".mats")
+        .append("g")
+        .attr("class", "procVis");
+        for (let m = 0; m < result.length; m++) {
+            g1.append("rect")
+                .attr("x", one[0][0] + 10 * m)
+                .attr("y", one[0][1])
+                .attr("width", 10)
+                .attr("height", 10)
+                .attr("fill", myColor(result[m]))
+                .attr("opacity", 1)
+                .attr("stroke", "gray")
+                .attr("stroke-width", 0.1)
+                .attr("class", "procVis");
+        }
+        //drawPoints(".mats", "red", aOne)
+        //draw frame
+        const f1 = g1
+            .append("rect")
+            .attr("x", one[0][0])
+            .attr("y", one[0][1])
+            .attr("width", 2 * 10)
+            .attr("height", 10)
+            .attr("fill", "none")
+            .attr("opacity", 0)
+            .attr("stroke", "black")
+            .attr("stroke-width", 1)
+            .attr("layerID", 4)
+            .attr("class", "procVis")
+            .attr("fr", 2)
+            .attr("id", "fr2");
+        //connect!
+        one[0][1] += 5;
+        d3.select(".mats")
+        .append("path")
+        .attr("d", d3.line()([one[0], poolingPt[0]]))
+        .attr("stroke", "black")
+        .attr("opacity", 0.05)
+        .attr("fill", "none")
+        .attr("class", "procVis")
+        .attr("id", "path1");
+        const endPt = [
+            one[0][0]+(300),
+            one[0][1]
+        ]
+        d3.select(".mats")
+        .append("path")
+        .attr("d", d3.line()([one[0], endPt]))
+        .attr("stroke", "black")
+        .attr("opacity", 0.05)
+        .attr("fill", "none")
+        .attr("class", "procVis")
+        .attr("id", "path1");
+        d3.selectAll("path").lower();
+    }, 2000)
+    
     for (let i = 0; i < layerID; i++)
         colorSchemesTable[i].style.opacity = "0.2";
-    colorSchemesTable[colorSchemesTable.length - 1].style.opacity = "0.2";
+   // colorSchemesTable[colorSchemesTable.length - 1].style.opacity = "0.2";
     return {
         resultVis: resultVis,
         colorSchemesTable: colorSchemesTable,
     };
 }
 
-export function resultVisClick(colorSchemesTable: any) {
-    d3.select(".pooling").style("pointer-events", "none").style("opacity", 0.2);
-    d3.selectAll(".twoLayer").style("pointer-events", "none");
-    d3.selectAll("path").style("opacity", 0);
-    //transparent other feature visualizers
-    d3.selectAll(".featureVis").style("opacity", 0.2);
-    d3.selectAll(".oFeature").style("opacity", 0.2);
-    //translate each layer
-    const layerID = 5;
-    setTimeout(() => {
-        translateLayers(layerID, 300);
-    }, 1750);
-    for (let i = 0; i < layerID; i++)
-        colorSchemesTable[i].style.opacity = "0.2";
-    return colorSchemesTable;
-}
+// export function resultVisClick(colorSchemesTable: any) {
+//     d3.select(".pooling").style("pointer-events", "none").style("opacity", 0.2);
+//     d3.selectAll(".twoLayer").style("pointer-events", "none");
+//     d3.selectAll("path").style("opacity", 0);
+//     //transparent other feature visualizers
+//     d3.selectAll(".featureVis").style("opacity", 0.2);
+//     d3.selectAll(".oFeature").style("opacity", 0.2);
+//     //translate each layer
+//     const layerID = 5;
+//     setTimeout(() => {
+//         translateLayers(layerID, 300);
+//     }, 1750);
+//     for (let i = 0; i < layerID; i++)
+//         colorSchemesTable[i].style.opacity = "0.2";
+//     return colorSchemesTable;
+// }

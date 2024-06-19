@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import * as ort from "onnxruntime-web";
 import { env } from "onnxruntime-web";
 import { features } from 'process';
-import { HeatmapData } from "@/utils/matUtils";
+// import { HeatmapData } from "@/utils/matUtils";
 import { shiftGElements } from "@/utils/graphUtils"
 
 env.wasm.wasmPaths = {
