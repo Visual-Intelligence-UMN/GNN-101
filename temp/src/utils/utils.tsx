@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import * as ort from "onnxruntime-web";
 import { env } from "onnxruntime-web";
 import { features } from 'process';
-import { shiftGElements } from "@/utils/graphUtils"
+import { hideAllLinks, showAllLinks, resetNodes, reduceNodeOpacity, resetNodeOpacity} from "@/utils/graphUtils"
 
 env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
@@ -353,45 +353,6 @@ export const myColor = d3.scaleLinear<string>()
 
 
 
-function hideAllLinks(nodes: any) {
-  nodes.forEach((node: any) => {
-    if (node.links) {
-      node.links.forEach((link: any) => {
-        link.style("opacity", 0);
-      })
-
-    }
-})
-}
-
-function showAllLinks(nodes: any) {
-  nodes.forEach((node: any) => {
-    if (node.links) {
-      node.links.forEach((link: any) => {
-        link.style("opacity", 0.07);
-      })
-
-    }
-})
-}
-
-function resetNodes(allNodes: any[]) {
-  allNodes.forEach(node => {
-    if (node.graphIndex <= 2) {
-    if (node.featureGroup) {
-      node.featureGroup.style("visibility", "hidden")
-    }
-    if (node.svgElement) {
-      d3.select(node.svgElement).attr("stroke-width", 1);
-    }
-    if (node.relatedNodes) {
-      node.relatedNodes.forEach((relatedNode: any) => {
-        d3.select(relatedNode.svgElement).attr("stroke-width", 1);
-      });
-    }
-  }
-  });
-}
 
 
 
@@ -461,7 +422,8 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .attr("y", node.y + 6)
           .join("text")
           .text(node.id)
-          .attr("font-size", `17px`);
+          .attr("font-size", `17px`)
+          .attr("opacity", 1);
 
         const featureGroup = g2.append("g")
           .attr("transform", `translate(${xPos - 7.5}, ${yPos})`);
@@ -501,19 +463,24 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
                 link.style("opacity", 0.7);
               });
             }
+            let relatedNodes: any = []
 
             if (node.relatedNodes) {
               node.relatedNodes.forEach((n: any) => {
                 d3.select(n.svgElement).attr("stroke-width", 3);
                 n.featureGroup.style('visibility', 'visible');
                 n.featureGroup.raise();
+                relatedNodes = node.relatedNodes;
               });
             }
+            reduceNodeOpacity(allNodes, relatedNodes, node);
           }
         });
 
         node.svgElement.addEventListener("mouseout", function(this: any) {
+          
           if (!node.isClicked) {
+            resetNodeOpacity(allNodes);
             featureGroup.style('visibility', 'hidden');
             d3.select(this).attr("stroke-width", 1);
 
@@ -534,12 +501,14 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
         node.svgElement.addEventListener("click", function(event: any) {
           hideAllLinks(allNodes);
-
-          if (node.links) {
-            node.links.forEach((link: any) => {
-              link.style("opacity", 0.7);
-            });
+          let relatedNodes: any = [];
+          if (node.relatedNodes) {
+            relatedNodes = node.relatedNotes;
           }
+
+          reduceNodeOpacity(allNodes, node.relatedNodes, node);
+          
+
           
           event.stopPropagation(); // Prevent the click event from bubbling up
 
@@ -563,7 +532,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
                   const currentXMatch = currentTransform.match(/translate\(([^,]+),/);
                   if (currentXMatch && currentXMatch[1]) {
                     const currentX = parseInt(currentXMatch[1]);
-                    return `translate(${currentX - 600},10)`;
+                    return `translate(${currentX - 300},10)`;
                   }
                 }
                 return "translate(0,10)"; // Default fallback
@@ -584,10 +553,10 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
                 const currentXMatch = currentTransform.match(/translate\(([^,]+),/);
                 if (currentXMatch && currentXMatch[1]) {
                   const currentX = parseInt(currentXMatch[1]);
-                  return `translate(${currentX + 600},10)`;
+                  return `translate(${currentX + 300},10)`;
                 }
               }
-              return "translate(600,10)"; // Default fallback
+              return "translate(300,10)"; // Default fallback
             });
           movedNode = node; // Update the moved node
         });
@@ -595,7 +564,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
         featureGroup.style('visibility', 'hidden');
       } else {
 
-        let rectHeight = 5;
+        let rectHeight = 2;
         if (node.graphIndex >= 4) {
           rectHeight = 20;
         }
@@ -645,7 +614,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
   // Add a global click event to the document to reset the moved node and isClicked flag
   document.addEventListener("click", function() {
-    showAllLinks(allNodes);
+   
 
     if (movedNode) {
       svg.selectAll("g[layerNum]")
@@ -659,15 +628,22 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             const currentXMatch = currentTransform.match(/translate\(([^,]+),/);
             if (currentXMatch && currentXMatch[1]) {
               const currentX = parseInt(currentXMatch[1]);
-              return `translate(${currentX - 600},10)`;
+              return `translate(${currentX - 300},10)`;
             }
           }
           return "translate(0,10)"; // Default fallback
         });
       movedNode.isClicked = false; // Reset isClicked flag for the previously moved node
       movedNode = null;
+
+      showAllLinks(allNodes);
       resetNodes(allNodes);
+      resetNodeOpacity(allNodes);
+      
+    
     }
+
+
   }, { capture: true });
 }
 

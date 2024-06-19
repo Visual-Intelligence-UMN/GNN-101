@@ -32,10 +32,11 @@ g.layerVis {
   transition-duration: 2s;
 }
 
-path {
+path, text, svgElement {
   transition: all;
   transition-duration: 1s;
 }
+
 
 .frame {
   transition: all;
@@ -82,3 +83,6 @@ path {
   color: transparent;
   -webkit-text-stroke: 2px var(--tw-gradient-stops);
 }
+
+
+

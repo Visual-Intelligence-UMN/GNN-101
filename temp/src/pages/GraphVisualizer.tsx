@@ -217,10 +217,10 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
               const graphWidth = maxXDistance + 20
               const graphHeight = maxYDistance + 20;
               
-              const point1 = { x: offset * (i), y: height / 8};
-              const point2 = { x: (0.9 + i) * offset, y: height / 20};
-              const point3 = { x: (0.9 + i) * offset, y: height / 1.7};
-              const point4 = { x: (offset) * (i), y: height / 1.5};
+              const point1 = { x: 3.0 * offset, y: height / 8};
+              const point2 = { x: 2.9 * offset, y: height / 20};
+              const point3 = { x: 2.9 * offset, y: height / 1.7};
+              const point4 = { x: 3.0 * offset, y: height / 1.5};
 
               const x_dist = Math.abs(point1.x - point2.x);
               const y_dist = Math.abs(point1.y - point4.y)
@@ -236,7 +236,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
               if (graphWidth + tolerance < x_dist && graphHeight + tolerance < y_dist) {
                 transform = `scale(1, 1)`;
               }
-              const parallelogram = svg
+              const parallelogram = g1
                 .append("polygon")  
                 .attr("points", `${point1.x},${point1.y} ${point2.x},${point2.y} ${point3.x},${point3.y} ${point4.x},${point4.y}`)
                 .attr("stroke", "black")
@@ -258,9 +258,9 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
               if (i === 5) {
                 text = "Prediction Result"
               }
-              const textElement = svg.append("text")
-              .attr("x", centerX)
-              .attr("y", point4.y + 30) // position the text 30px below the bottom of the parallelogram
+              const textElement = g1.append("text")
+              .attr("x", point1.x)
+              .attr("y", point4.y + 100) // position the text 30px below the bottom of the parallelogram
               .attr("text-anchor", "middle") // center the text horizontally
               .attr("fill", "black") // set the text color to black
               .attr("font-size", "15px") // set the font size to 15px
