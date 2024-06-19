@@ -1,11 +1,13 @@
 import Head from "next/head";
 import React, { useEffect, useRef, useState } from "react";
+import { Scrollbar } from 'react-scrollbars-custom';
 import GraphVisualizer from "./GraphVisualizer";
 import ClassifyGraph, { IntmData } from "./FileUpload";
+import { CSSTransition } from 'react-transition-group';
 import MatricesVisualizer from "./MatricesVisualizer";
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels";
 import {
-    DescriptionPanel,
+    Sidebar,
     GraphSelector,
     graph_list_generate,
     ViewSelector,
@@ -14,13 +16,20 @@ import {
     ViewSwitch,
     GraphAnalysisViewer,
 } from "./WebUtils";
-import {Inter} from 'next/font/google';
+import { Tooltip } from "react-tooltip";
+import { Inter } from '@next/font/google';
 
-const inter = Inter({
+export const inter = Inter({
+    variable: '--font-inter',
+    weight: '500',
+    subsets: ['latin-ext'],
+})
+
+export const inter2 = Inter({
     variable: '--font-inter',
     weight: '200',
     subsets: ['latin-ext'],
-  })
+})
 
 
 export default function Home() {
@@ -32,8 +41,9 @@ export default function Home() {
     const [path, setPath] = useState("./json_data/input_graph0.json");
     const [isMat, setIsMat] = useState(true);
     const [changedG, setChangedG] = useState(true);
-    const [step, setStep] = useState(0);
-    
+    const [step, setStep] = useState(2);
+    const [showGraphAnalysis, setShowGraphAnalysis] = useState(false);
+
     //intermediate output
     const [intmData, setIntmData] = useState<IntmData | null>(null);
 
@@ -50,51 +60,80 @@ export default function Home() {
     }
 
 
+    // useEffect(() => {
+    //     if (step < 2) {
+    //         const timer = setTimeout(() => {
+    //             setStep(step + 1);
+    //         }, 3500); // Change text every 3 seconds
+    //         return () => clearTimeout(timer);
+    //     }
+    // }, [step]);
     useEffect(() => {
-        if (step < 2) {
-            const timer = setTimeout(() => {
-                setStep(step + 1);
-            }, 3500); // Change text every 3 seconds
-            return () => clearTimeout(timer);
-        }
-    }, [step]);
+        (document.body.style as any).zoom = "67%";
 
+    }, []);
     return (
         <main className={inter.className}>
             {step === 0 &&
-                <div className="bg-white min-h-screen flex justify-center items-center">
-                    <h1 className="animate-dissolve text-6xl font-bold text-gradient-stroke" data-text="Welcome to a Graph Neural Network Visualizer"/>
+                <div style={{ paddingTop: '15%' }} className="bg-white min-h-screen flex justify-center items-center">
+                    <h1 className="animate-dissolve text-6xl  font-bold text-gradient-stroke" data-text="Welcome to a Graph Neural Network Visualizer" />
                 </div>}
             {step === 1 &&
-                <div className="bg-white min-h-screen flex justify-center items-center">
-                    <h1 className="animate-dissolve text-6xl font-bold text-gradient-stroke" data-text="Developed solely for your experience"/>
+                <div style={{ paddingTop: '15%' }} className="bg-white min-h-screen flex justify-center items-center">
+                    <h1 className="animate-dissolve text-6xl font-bold text-gradient-stroke" data-text="Developed solely for your experience" />
                 </div>}
             {step === 2 &&
                 <div className="bg-white min-h-screen text-black">
-                    <PanelGroup direction="horizontal">
-                        <DescriptionPanel />
-                        <PanelResizeHandle className="w-1 bg-gray-200" />
+                    <PanelGroup direction="horizontal" >
+                        <div className='sidebar'  >
+                            <Scrollbar noScrollX={true} removeTracksWhenNotUsed={true} maximalThumbYSize={80} disableTrackYWidthCompensation={true} trackClickBehavior={"jump" as any}
+
+                                trackYProps={{
+                                    style: {
+                                        width: '15px',
+                                        borderRadius: '10px',
+                                        backgroundColor: '#f0f0f0',
+                                        top: '0',
+                                        bottom: '0',
+                                    }
+                                }}
+                                thumbYProps={{
+                                    style: {
+                                        backgroundColor: '#d9d9d9',
+                                        borderRadius: '10px',
+                                        boxShadow: '0 5px 6px rgba(0, 0, 0, 0.25)',
+                                    }
+                                }}
+                            >
+
+
+                                <Sidebar />
+                            </Scrollbar>
+                        </div>
+
+
                         <Panel className="ml-4">
                             <Head>
                                 <title>Graph Neural Network Visualization</title>
                             </Head>
-                            <div className="flex gap-x-4">
-                                <h1 className="text-2xl font-bold">
-                                    Graph Neural Network Visualization
+                            <div className="flex gap-x-2 items-center" style={{ paddingTop: '40px' }}>
+                                <h1 className="text-2xl font-extra-black">
+                                    GNN Model
                                 </h1>
-                                <p className="transform translate-y-[5px]">
-                                    A GNN model to help you classify Mutagen and
-                                    Non-Mutagen
+                                <div className={inter2.className}>
+                                <p className="transform translate-y-[3px] text-xl ml-10" style={{fontWeight:0}}>
+                                    A binary graph classification model
                                 </p>
+                                </div>
                             </div>
                             <hr className="border-t border-gray-300 my-4"></hr>
                             {changedG ? <></> : <ButtonChain />}
-                            <div className="flex gap-x-4">
+                            <div className="flex gap-x-4 items-center">
                                 <div>
                                     <h2 className="text-xl font-semibold">Data</h2>
                                 </div>
-                                <div className="flex gap-x-4">
-                                    <Hint text={"select a graph"} />
+                                <div className="flex items-center gap-x-4">
+                                    <Hint text={"Select a graph"} />
                                     <div>
                                         <GraphSelector
                                             selectedGraph={selectedGraph}
@@ -106,9 +145,26 @@ export default function Home() {
                                             graphList={graphList}
                                         />
                                     </div>
+                                    <button
+                                        className="transition-transform duration-500 ease-in-out text-2xl"
+                                        style={{ transform: `rotate(${showGraphAnalysis ? '90deg' : '0deg'})` }}
+                                        onClick={() => setShowGraphAnalysis(!showGraphAnalysis)}
+                                        data-tooltip-content={'Click on me to see graph information'}
+                                        data-tooltip-id='tooltip'
+                                    > ⏵ 
+                                        <Tooltip data-tooltip-id='tooltip' />
+                                    </button>
                                 </div>
                             </div>
-                            <GraphAnalysisViewer path={path} />
+
+                            <CSSTransition in={showGraphAnalysis}
+                                timeout={300}
+                                classNames="graph"
+                                unmountOnExit>
+                                <GraphAnalysisViewer path={path} />
+                            </CSSTransition>
+
+
                             <ClassifyGraph
                                 graph_path={path}
                                 dataComm={handleDataComm}
@@ -117,13 +173,13 @@ export default function Home() {
                             />
                             {isMat ? (
                                 <>
-                                    <div className="flex gap-x-4">
+                                    <div className="flex gap-x-4 items-center">
                                         <div className="flex gap-x-4">
                                             <h2 className="text-xl font-semibold">
                                                 Graphs Visualization
                                             </h2>
                                             <Hint
-                                                text={"Change the View of GNN model"}
+                                                text={"Change the view of GNN model"}
                                             />
                                         </div>
                                         <div>
@@ -143,6 +199,7 @@ export default function Home() {
                                             />
                                         </div>
                                     </div>
+
                                     <GraphVisualizer
                                         graph_path={selectedGraph}
                                         intmData={intmData}
@@ -191,5 +248,3 @@ export default function Home() {
         </main>
     );
 }
-
-
