@@ -1,27 +1,20 @@
+import { loadWeights } from "./matHelperUtils"
 import {
-    deepClone,
-    softmax
-} from "./utils";
-import {
-    addLayerName,
-    buildBinaryLegend,
-    buildLegend,
-    translateLayers,
-    calculatePrevFeatureVisPos,
-    loadWeights
-} from "./matHelperUtils"
-import {
-    drawCrossConnection,
-    drawPoolingVis,
-    computeMids,
-    drawTwoLayers,
     drawMatrixPreparation,
     drawNodeFeatures,
     drawGCNConv
 } from "./matFeaturesUtils"
 import * as d3 from "d3";
-import { create, all } from "mathjs";
-import { detailedViewRecovery, featureVisClick, featureVisMouseOut, featureVisMouseOver, oFeatureMouseOut, oFeatureMouseOver, outputVisClick, poolingVisClick, resultVisClick } from "./matEventsUtils";
+import { 
+    detailedViewRecovery, 
+    featureVisClick, 
+    featureVisMouseOut, 
+    featureVisMouseOver, 
+    oFeatureMouseOut, 
+    oFeatureMouseOver, 
+    outputVisClick, 
+    poolingVisClick, 
+} from "./matEventsUtils";
 
 //features visualization pipeline: draw all feature visualizers for original features and GCNConv
 export function visualizeFeatures(
@@ -102,6 +95,7 @@ export function visualizeFeatures(
     resultVis = GCNConvPackage.resultVis;
     maxVals = GCNConvPackage.maxVals;
     let paths = GCNConvPackage.paths;
+    let one = GCNConvPackage.one;
 
     //-----------------------------------INTERACTIONS EVENTS MANAGEMENT-----------------------------------------------
     //added interactions
@@ -251,7 +245,7 @@ export function visualizeFeatures(
                 dview = true;
                 console.log("click! - fVis", dview, lock);
                 //lock all feature visualizers and transparent paths
-                const outputVisPack = outputVisClick(resultVis, colorSchemesTable);
+                const outputVisPack = outputVisClick(resultVis, colorSchemesTable, one, final, myColor);
                 //update variables
                 resultVis = outputVisPack.resultVis;
                 colorSchemesTable = outputVisPack.colorSchemesTable;
@@ -259,31 +253,31 @@ export function visualizeFeatures(
         })
     }
 
-    if(resultVis != null){
-        resultVis.on("mouseover", function (event:any, d:any) {
-            const a = d3.select(".path2").style("opacity", 1);
-            const b = d3.select("#fr2").style("opacity", 1);
-            const c = d3.select("#fr1").style("opacity", 1);
-            console.log("mouse in", a, b, c)
-        });
-        resultVis.on("mouseout", function (event:any, d:any) {
-            d3.select(".path2").style("opacity", 0.02);
-            d3.select("#fr2").style("opacity", 0);
-            d3.select("#fr1").style("opacity", 0);
-        });
-        resultVis.on("click", function(event:any, d:any){
-            if (lock != true) {
-                //state
-                transState = "result";
-                lock = true;
-                event.stopPropagation();
-                dview = true;
-                console.log("click! - fVis", dview, lock);
-                //lock all feature visualizers and transparent paths
-                colorSchemesTable = resultVisClick(colorSchemesTable);
-            }
-        })
-    }
+    // if(resultVis != null){
+    //     resultVis.on("mouseover", function (event:any, d:any) {
+    //         const a = d3.select(".path2").style("opacity", 1);
+    //         const b = d3.select("#fr2").style("opacity", 1);
+    //         const c = d3.select("#fr1").style("opacity", 1);
+    //         console.log("mouse in", a, b, c)
+    //     });
+    //     resultVis.on("mouseout", function (event:any, d:any) {
+    //         d3.select(".path2").style("opacity", 0.02);
+    //         d3.select("#fr2").style("opacity", 0);
+    //         d3.select("#fr1").style("opacity", 0);
+    //     });
+    //     resultVis.on("click", function(event:any, d:any){
+    //         if (lock != true) {
+    //             //state
+    //             transState = "result";
+    //             lock = true;
+    //             event.stopPropagation();
+    //             dview = true;
+    //             console.log("click! - fVis", dview, lock);
+    //             //lock all feature visualizers and transparent paths
+    //             colorSchemesTable = resultVisClick(colorSchemesTable);
+    //         }
+    //     })
+    //}
 
 
 

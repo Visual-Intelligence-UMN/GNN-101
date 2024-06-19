@@ -1,21 +1,6 @@
-import { deepClone, softmax } from "./utils";
-import {
-    addLayerName,
-    buildBinaryLegend,
-    buildLegend,
-    translateLayers,
-    calculatePrevFeatureVisPos,
-    loadWeights,
-} from "./matHelperUtils";
-import {
-    drawCrossConnection,
-    drawPoolingVis,
-    computeMids,
-    drawTwoLayers,
-    drawMatrixPreparation,
-    drawNodeFeatures,
-    drawGCNConv,
-} from "./matFeaturesUtils";
+import { deepClone, drawPoints, get_cood_from_parent } from "./utils";
+import { translateLayers, calculatePrevFeatureVisPos } from "./matHelperUtils";
+import { computeMids } from "./matFeaturesUtils";
 import * as d3 from "d3";
 import { create, all } from "mathjs";
 
@@ -95,7 +80,7 @@ export function detailedViewRecovery(
     //recover layers positions
     if (transState == "GCNConv") {
         if (recordLayerID >= 0) {
-            translateLayers(recordLayerID, -300);
+            translateLayers(recordLayerID, -500);
             recordLayerID = -1;
         }
     } else if (transState == "pooling") {
@@ -290,7 +275,7 @@ export function featureVisClick(
 ) {
     console.log("Current layerID and node", layerID, node);
     setTimeout(() => {
-        translateLayers(layerID, 300);
+        translateLayers(layerID, 500);
     }, 1750);
     //record the layerID
     recordLayerID = layerID;
@@ -364,19 +349,19 @@ export function featureVisClick(
 
     const g = d3.select(".mats").append("g").attr("class", "procVis");
     let w = 2;
-    if (dummy.length < 64) {
+    if (X.length < 64) {
         w = 5;
         console.log("compute x 0");
     } else w = 2;
     setTimeout(() => {
         //draw feature visualizer
-        for (let m = 0; m < dummy.length; m++) {
+        for (let m = 0; m < X.length; m++) {
             g.append("rect")
                 .attr("x", coordFeatureVis[0] + w * m)
                 .attr("y", coordFeatureVis[1] - 5)
                 .attr("width", w)
                 .attr("height", 10)
-                .attr("fill", myColor(dummy[m]))
+                .attr("fill", myColor(X[m]))
                 .attr("opacity", 0)
                 .attr("stroke", "gray")
                 .attr("stroke-width", 0.1)
@@ -387,7 +372,7 @@ export function featureVisClick(
         g.append("rect")
             .attr("x", coordFeatureVis[0])
             .attr("y", coordFeatureVis[1] - 5)
-            .attr("width", w * dummy.length)
+            .attr("width", w * X.length)
             .attr("height", 10)
             .attr("fill", "none")
             .attr("opacity", 0)
@@ -425,56 +410,224 @@ export function featureVisClick(
                 .attr("opacity", 0);
         }
 
+        coordFeatureVis[0] += 102 + 2 * 64;
+
+        // weight matrix * vector visualzier
+        for (let m = 0; m < dummy.length; m++) {
+            g.append("rect")
+                .attr("x", coordFeatureVis[0] + 2 * m)
+                .attr("y", coordFeatureVis[1] - 5)
+                .attr("width", w)
+                .attr("height", 10)
+                .attr("fill", myColor(dummy[m]))
+                .attr("opacity", 0)
+                .attr("stroke", "gray")
+                .attr("stroke-width", 0.1)
+                .attr("class", "procVis");
+        }
+
+        //draw frame
+        g.append("rect")
+            .attr("x", coordFeatureVis[0])
+            .attr("y", coordFeatureVis[1] - 5)
+            .attr("width", 2 * dummy.length)
+            .attr("height", 10)
+            .attr("fill", "none")
+            .attr("opacity", 0)
+            .attr("stroke", "black")
+            .attr("stroke-width", 1)
+            .attr("class", "procVis");
+
         //determine if we need upper-curves or lower-curves
         let curveDir = -1; //true -> -1; false -> 1
         const midNode = adjList.length / 2;
         if (node < midNode) curveDir = 1;
         console.log("curveDir", curveDir);
-
         //draw paths from intermediate result -> final result
         const layerBias = bias[layerID];
-        //find start locations and end locations
-        const coordStartPoint: [number, number] = [
-            coordFeatureVis[0],
-            coordFeatureVis[1] + 2.5 * curveDir,
+
+        coordFeatureVis[1] += curveDir * 50;
+
+        // bias visualzier
+        for (let m = 0; m < layerBias.length; m++) {
+            g.append("rect")
+                .attr("x", coordFeatureVis[0] + 2 * m)
+                .attr("y", coordFeatureVis[1] - 5)
+                .attr("width", w)
+                .attr("height", 10)
+                .attr("fill", myColor(layerBias[m]))
+                .attr("opacity", 0)
+                .attr("stroke", "gray")
+                .attr("stroke-width", 0.1)
+                .attr("class", "procVis");
+        }
+
+        //draw frame
+        g.append("rect")
+            .attr("x", coordFeatureVis[0])
+            .attr("y", coordFeatureVis[1] - 5)
+            .attr("width", 2 * layerBias.length)
+            .attr("height", 10)
+            .attr("fill", "none")
+            .attr("opacity", 0)
+            .attr("stroke", "black")
+            .attr("stroke-width", 1)
+            .attr("class", "procVis");
+
+        //draw paths from WMVisualizer and Bias Visualizer to final output
+        const wmCoord: [number, number] = [
+            coordFeatureVis[0] + 128,
+            coordFeatureVis[1] - curveDir * 50,
         ];
-        const coordFinalPoint: [number, number] = [
-            coord[0] + 400,
-            coord[1] + 2.5 * curveDir,
+
+        const biasCoord: [number, number] = [
+            coordFeatureVis[0] + 128,
+            coordFeatureVis[1],
         ];
-        const coordMidPoint: [number, number] = [
-            coordStartPoint[0] + (102 + 128) / 2,
-            coordStartPoint[1] + curveDir * 100,
-        ];
-        //draw paths
-        //drawPoints(".mats", "red", p);
+
+        let c = calculatePrevFeatureVisPos(featureVisTable, layerID, node);
+
+        const nextCoord: [number, number] = [c[0] + 500 + 102, c[1]];
+
+        //drawPoints(".mats", "red", [nextCoord]);
+
         const lineGenerator = d3
             .line<[number, number]>()
             .curve(d3.curveBasis)
             .x((d) => d[0])
             .y((d) => d[1]);
+
+        const midX0 = (wmCoord[0] + nextCoord[0]) / 2;
+        const midX1 = (biasCoord[0] + nextCoord[0]) / 2;
+
+        const res00: [number, number] = [midX0 - 20, wmCoord[1]];
+        const res01: [number, number] = [midX0 + 20, nextCoord[1]];
+
+        const res10: [number, number] = [midX1 - 20, biasCoord[1]];
+        const res11: [number, number] = [midX1 + 20, nextCoord[1]];
+
+        d3.select(".mats")
+            .append("path")
+            .attr("d", lineGenerator([wmCoord, res00, res01, nextCoord]))
+            .attr("stroke", "black")
+            .attr("opacity", 1)
+            .attr("fill", "none")
+            .attr("class", "procVis");
+
+        d3.select(".mats")
+            .append("path")
+            .attr("d", lineGenerator([biasCoord, res10, res11, nextCoord]))
+            .attr("stroke", "black")
+            .attr("opacity", 1)
+            .attr("fill", "none")
+            .attr("class", "procVis");
+
+            const svg = d3.select(".mats");
+
+            // 圆心坐标和半径
+            const cx = midX1;
+            const cy = (wmCoord[1]+biasCoord[1])/2;
+            const radius = 5;
+    
+            // 创建圆形
+            svg.append("circle")
+                .attr("cx", cx)
+                .attr("cy", cy)
+                .attr("r", radius)
+                .attr("stroke", "black")
+                .attr("fill", "white")
+                .attr("class", "procVis");
+    
+            svg.append("text")
+                .attr("x", cx-5)
+                .attr("y", cy+5)
+                .text("+").attr("class", "procVis");
+
+                const cx1 = nextCoord[0] - 15;
+                const cy1 = nextCoord[1];
+        
+                svg.append("circle")
+                    .attr("cx", cx1)
+                    .attr("cy", cy1)
+                    .attr("r", radius)
+                    .attr("stroke", "black")
+                    .attr("fill", "white").attr("class", "procVis");
+        
+                svg.append("text")
+                .attr("x", cx1)
+                .attr("y", cy1+3)
+                .text("f").style("text-anchor","middle").style("font-size","6").attr("class", "procVis");
+
+        //find start locations and end locations
+        const coordStartPoint: [number, number] = [
+            wmCoord[0] - 128*2-102,
+            wmCoord[1] - 2.5 * curveDir,
+        ];
+        const coordFinalPoint: [number, number] = [
+            wmCoord[0]-128,
+            wmCoord[1] - 2.5 * curveDir,
+        ];
+        
+        let startCoordList:any[] = [];
+        let endCoordList:any[] = [];
+
+        //draw paths
+        //drawPoints(".mats", "red", p);
+
+        
         for (let i = 0; i < 64; i++) {
             let s: [number, number] = [
                 coordStartPoint[0] + 2 * i,
                 coordStartPoint[1],
             ];
-            let m: [number, number] = [
-                coordMidPoint[0] + 2 * i,
-                coordMidPoint[1],
-            ];
             let e: [number, number] = [
                 coordFinalPoint[0] + 2 * i,
                 coordFinalPoint[1],
             ];
-            d3.select(".mats")
-                .append("path")
-                .attr("d", lineGenerator([s, m, e]))
-                .attr("stroke", myColor(layerBias[i]))
-                .attr("stroke-width", 1)
-                .attr("opacity", 0)
-                .attr("fill", "none")
-                .attr("class", "procVis");
+
+            startCoordList.push(s);
+            endCoordList.push(e);
         }
+        //drawPoints(".mats", "red", endCoordList);
+        //draw paths
+        const Xt = math.transpose(weights[layerID]);
+        function drawPaths(i:number) {
+            const Wi = Xt[i];
+
+            for (let j = 0; j < 64; j++) {
+                let s = startCoordList[j];
+                let m = [s[0] + 2 * i + (102 + 128) / 2, s[1] - curveDir * 100];
+                let e = endCoordList[i];
+                d3.select(".mats")
+                    .append("path")
+                    .attr("d", lineGenerator([s, m, e]))
+                    .attr("stroke", myColor(Wi[j]))
+                    .attr("stroke-width", 1)
+                    .attr("opacity", 1)
+                    .attr("fill", "none")
+                    .attr("class", "procVis")
+                    .attr("id", `tempath${i}`)
+                    .lower();
+            }
+
+            //d3.selectAll(`#tempath${i}`).transition().duration(100).attr("opacity", 1);
+
+            setTimeout(() => {
+                d3.selectAll(`#tempath${i}`).remove();
+                i++;
+            }, 250); // 移除路径前等待2秒
+        }
+        
+        let i = 0;
+        const intervalID = setInterval(() => {
+            drawPaths(i);
+            i++;
+            console.log("i", i);
+            if (i >= 64) {
+                clearInterval(intervalID);
+            }
+        }, 250); // 每2秒执行一次drawPaths
+
         d3.selectAll("path").lower();
         d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
     }, 2500);
@@ -524,7 +677,24 @@ export function poolingVisClick(
     };
 }
 
-export function outputVisClick(resultVis: any, colorSchemesTable: any) {
+export function outputVisClick(
+    resultVis: any, 
+    colorSchemesTable: any,
+    one: any,
+    result: any,
+    myColor: any
+) {
+    const poolingPt = get_cood_from_parent(".mats", ".pooling");
+    poolingPt[0][0] += 64;
+    
+    
+    poolingPt[0][1] += 10;
+    one = deepClone(poolingPt);
+    
+    one[0][1] -= 5;
+    let end = deepClone(poolingPt);
+    //drawPoints(".mats", "red", poolingPt);
+    end[0][1] += 300;
     d3.selectAll(".twoLayer").style("pointer-events", "none");
     d3.selectAll("path").style("opacity", 0);
     //transparent other feature visualizers
@@ -536,28 +706,92 @@ export function outputVisClick(resultVis: any, colorSchemesTable: any) {
     setTimeout(() => {
         translateLayers(layerID, 300);
     }, 1750);
+             
+    //locations calculation
+    //find the next position
+    one[0][0] += 125;
+    let aOne = deepClone(one);
+    //one[0][1] -= 5;
+    setTimeout(()=>{
+        const g1 = d3
+        .select(".mats")
+        .append("g")
+        .attr("class", "procVis");
+        for (let m = 0; m < result.length; m++) {
+            g1.append("rect")
+                .attr("x", one[0][0] + 10 * m)
+                .attr("y", one[0][1])
+                .attr("width", 10)
+                .attr("height", 10)
+                .attr("fill", myColor(result[m]))
+                .attr("opacity", 1)
+                .attr("stroke", "gray")
+                .attr("stroke-width", 0.1)
+                .attr("class", "procVis");
+        }
+        //drawPoints(".mats", "red", aOne)
+        //draw frame
+        const f1 = g1
+            .append("rect")
+            .attr("x", one[0][0])
+            .attr("y", one[0][1])
+            .attr("width", 2 * 10)
+            .attr("height", 10)
+            .attr("fill", "none")
+            .attr("opacity", 0)
+            .attr("stroke", "black")
+            .attr("stroke-width", 1)
+            .attr("layerID", 4)
+            .attr("class", "procVis")
+            .attr("fr", 2)
+            .attr("id", "fr2");
+        //connect!
+        one[0][1] += 5;
+        d3.select(".mats")
+        .append("path")
+        .attr("d", d3.line()([one[0], poolingPt[0]]))
+        .attr("stroke", "black")
+        .attr("opacity", 0.05)
+        .attr("fill", "none")
+        .attr("class", "procVis")
+        .attr("id", "path1");
+        const endPt = [
+            one[0][0]+(300),
+            one[0][1]
+        ]
+        d3.select(".mats")
+        .append("path")
+        .attr("d", d3.line()([one[0], endPt]))
+        .attr("stroke", "black")
+        .attr("opacity", 0.05)
+        .attr("fill", "none")
+        .attr("class", "procVis")
+        .attr("id", "path1");
+        d3.selectAll("path").lower();
+    }, 2000)
+    
     for (let i = 0; i < layerID; i++)
         colorSchemesTable[i].style.opacity = "0.2";
-    colorSchemesTable[colorSchemesTable.length - 1].style.opacity = "0.2";
+   // colorSchemesTable[colorSchemesTable.length - 1].style.opacity = "0.2";
     return {
         resultVis: resultVis,
         colorSchemesTable: colorSchemesTable,
     };
 }
 
-export function resultVisClick(colorSchemesTable: any) {
-    d3.select(".pooling").style("pointer-events", "none").style("opacity", 0.2);
-    d3.selectAll(".twoLayer").style("pointer-events", "none");
-    d3.selectAll("path").style("opacity", 0);
-    //transparent other feature visualizers
-    d3.selectAll(".featureVis").style("opacity", 0.2);
-    d3.selectAll(".oFeature").style("opacity", 0.2);
-    //translate each layer
-    const layerID = 5;
-    setTimeout(() => {
-        translateLayers(layerID, 300);
-    }, 1750);
-    for (let i = 0; i < layerID; i++)
-        colorSchemesTable[i].style.opacity = "0.2";
-    return colorSchemesTable;
-}
+// export function resultVisClick(colorSchemesTable: any) {
+//     d3.select(".pooling").style("pointer-events", "none").style("opacity", 0.2);
+//     d3.selectAll(".twoLayer").style("pointer-events", "none");
+//     d3.selectAll("path").style("opacity", 0);
+//     //transparent other feature visualizers
+//     d3.selectAll(".featureVis").style("opacity", 0.2);
+//     d3.selectAll(".oFeature").style("opacity", 0.2);
+//     //translate each layer
+//     const layerID = 5;
+//     setTimeout(() => {
+//         translateLayers(layerID, 300);
+//     }, 1750);
+//     for (let i = 0; i < layerID; i++)
+//         colorSchemesTable[i].style.opacity = "0.2";
+//     return colorSchemesTable;
+// }
