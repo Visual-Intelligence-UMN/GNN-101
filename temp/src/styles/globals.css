@@ -20,11 +20,11 @@
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+      to top,
+      rgb(236, 236, 236),
+      white
+    );
+     background-color: white;
 }
 
 g.layerVis {
@@ -62,7 +62,7 @@ path, text, svgElement {
 
 .text-gradient-stroke {
   position: relative;
-  
+
 }
 
 .text-gradient-stroke::before {
@@ -83,6 +83,61 @@ path, text, svgElement {
   color: transparent;
   -webkit-text-stroke: 2px var(--tw-gradient-stops);
 }
+.full-screen-container {
+  min-height: 100vh; /* Set the minimum height to 100% of the viewport height */
+}
 
+.sidebar {
+  top: 0;
+  position:relative;
+  left: 0;
+  width: 400px; 
+  height: 1200px; 
+  background-color: #f8f8f8; 
+  padding: 10px; 
+  overflow-y: auto; 
+  overflow-x:hidden
 
+}
 
+.graph-enter {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+.graph-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.graph-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.graph-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 200ms, transform 300ms;
+}
+
+path {
+  transition: all;
+  transition-duration: 1s;
+}
+
+.frame {
+  transition: all;
+  transition-duration: 1s;
+}
+
+.colFrame {
+  transition: all;
+  transition-duration: 1s;
+}
+
+.rowFrame {
+  transition: all;
+  transition-duration: 1s;
+}

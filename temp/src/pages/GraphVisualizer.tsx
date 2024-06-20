@@ -19,12 +19,14 @@ interface GraphVisualizerProps {
   graph_path: string;
   intmData: null | IntmData;
   changed: boolean;
+  predicted: boolean;
 }
 
 const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
   graph_path,
   intmData,
   changed,
+  predicted,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -322,7 +324,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
         setIsLoading(false);
       }
     };
-    if (intmData == null || changed) {
+    if ((intmData == null || changed) && !predicted) {
       visualizeGraph(graph_path);
     } else {
       visualizeGNN(3);

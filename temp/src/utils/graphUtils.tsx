@@ -1,5 +1,7 @@
 import * as d3 from "d3";
 import { calculateAverage, myColor } from "./utils";
+import { inter } from "@/pages";
+
 
 
 export function hideAllLinks(nodes: any) {
