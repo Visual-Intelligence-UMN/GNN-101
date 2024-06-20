@@ -114,7 +114,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({ graph_path, dataComm, cha
         <div>
           <hr className="border-t border-gray-300 my-4"></hr>
           <div className="flex gap-x-4 items-center mb-2">
-            <div className="flex gap-x-4 justify-center">
+            <div className="flex gap-x-4 justify-center items-center">
               <h1 className="text-xl font-semibold">Predictions</h1>
               <Hint text='Press the "Classify a Graph" to predict' />
             </div>

@@ -61,10 +61,10 @@ export default function Home() {
 
 
     useEffect(() => {
-        if (step < 2) {
+        if (step < 1) {
             const timer = setTimeout(() => {
                 setStep(step + 1);
-            }, 3500); // Change text every 3 seconds
+            }, 3500); 
             return () => clearTimeout(timer);
         }
     }, [step]);
@@ -79,12 +79,8 @@ export default function Home() {
                 <div style={{ paddingTop: '15%' }} className="bg-white min-h-screen flex justify-center items-center">
                     <h1 className="animate-dissolve text-6xl  font-bold text-gradient-stroke" data-text="Welcome to a Graph Neural Network Visualizer" />
                 </div>}
-            {step === 1 &&
-                <div style={{ paddingTop: '15%' }} className="bg-white min-h-screen flex justify-center items-center">
-                    <h1 className="animate-dissolve text-6xl font-bold text-gradient-stroke" data-text="Developed solely for your experience" />
-                </div>}
             </div>
-            {step === 2 &&
+            {step === 1 &&
                 <div className="bg-white min-h-screen text-black">
                     <PanelGroup direction="horizontal" >
                         <div className='sidebar'  >
