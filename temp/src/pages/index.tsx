@@ -41,13 +41,18 @@ export default function Home() {
     const [path, setPath] = useState("./json_data/input_graph0.json");
     const [isMat, setIsMat] = useState(true);
     const [changedG, setChangedG] = useState(true);
-    const [step, setStep] = useState(0);
+    const [step, setStep] = useState(1);
     const [showGraphAnalysis, setShowGraphAnalysis] = useState(false);
+    const [predicted, setPredicted] = useState(false);
 
     //intermediate output
     const [intmData, setIntmData] = useState<IntmData | null>(null);
 
     const graphList = graph_list_generate(3);
+
+    function handlePrediction(data: boolean) {
+        setPredicted(data);
+    }
 
     function handleDataComm(data: any) {
         setIntmData(data);
@@ -60,14 +65,14 @@ export default function Home() {
     }
 
 
-    useEffect(() => {
-        if (step < 1) {
-            const timer = setTimeout(() => {
-                setStep(step + 1);
-            }, 3500); 
-            return () => clearTimeout(timer);
-        }
-    }, [step]);
+    // useEffect(() => {
+    //     if (step < 1) {
+    //         const timer = setTimeout(() => {
+    //             setStep(step + 1);
+    //         }, 3500); 
+    //         return () => clearTimeout(timer);
+    //     }
+    // }, [step]);
     useEffect(() => {
         (document.body.style as any).zoom = "67%";
 
@@ -75,10 +80,10 @@ export default function Home() {
     return (
         <main className={inter.className}>
             <div className={inter2.className}>
-            {step === 0 &&
-                <div style={{ paddingTop: '15%' }} className="bg-white min-h-screen flex justify-center items-center">
-                    <h1 className="animate-dissolve text-6xl  font-bold text-gradient-stroke" data-text="Welcome to a Graph Neural Network Visualizer" />
-                </div>}
+                {step === 0 &&
+                    <div style={{ paddingTop: '15%' }} className="bg-white min-h-screen flex justify-center items-center">
+                        <h1 className="animate-dissolve text-6xl  font-bold text-gradient-stroke" data-text="Welcome to a Graph Neural Network Visualizer" />
+                    </div>}
             </div>
             {step === 1 &&
                 <div className="bg-white min-h-screen text-black">
@@ -119,11 +124,31 @@ export default function Home() {
                                     GNN Model
                                 </h1>
                                 <div className={inter2.className}>
-                                <p className="transform translate-y-[3px] text-xl ml-10" style={{fontWeight:0}}>
-                                    A binary graph classification model
-                                </p>
+                                    <p className="transform translate-y-[3px] text-xl ml-10" style={{ fontWeight: 0 }}>
+                                        A binary graph classification model
+                                    </p>
+                                </div>
+                                <div className='flex items-center'>
+                                    <button
+                                        className="transition-transform duration-500 ease-in-out text-2xl ml-6 mt-2"
+                                        style={{ transform: `rotate(${showGraphAnalysis ? '90deg' : '0deg'})`, transformOrigin: 'center' }}
+                                        onClick={() => setShowGraphAnalysis(!showGraphAnalysis)}
+                                        data-tooltip-content={'See more options'}
+                                        data-tooltip-id='tooltip'
+                                    > ⏵
+                                        <Tooltip data-tooltip-id='tooltip' />
+                                    </button>
+                                    
                                 </div>
                             </div>
+                            <CSSTransition in={showGraphAnalysis}
+                                        timeout={300}
+                                        classNames="graph"
+                                        unmountOnExit>
+                                        <h1>
+                                            More options here
+                                        </h1>
+                                    </CSSTransition>
                             <hr className="border-t border-gray-300 my-4"></hr>
                             {changedG ? <></> : <ButtonChain />}
                             <div className="flex gap-x-4 items-center">
@@ -143,24 +168,11 @@ export default function Home() {
                                             graphList={graphList}
                                         />
                                     </div>
-                                    <button
-                                        className="transition-transform duration-500 ease-in-out text-2xl"
-                                        style={{ transform: `rotate(${showGraphAnalysis ? '90deg' : '0deg'})` }}
-                                        onClick={() => setShowGraphAnalysis(!showGraphAnalysis)}
-                                        data-tooltip-content={'Click on me to see graph information'}
-                                        data-tooltip-id='tooltip'
-                                    > ⏵ 
-                                        <Tooltip data-tooltip-id='tooltip' />
-                                    </button>
+
                                 </div>
                             </div>
 
-                            <CSSTransition in={showGraphAnalysis}
-                                timeout={300}
-                                classNames="graph"
-                                unmountOnExit>
-                                <GraphAnalysisViewer path={path} />
-                            </CSSTransition>
+                            <GraphAnalysisViewer path={path} />
 
 
                             <ClassifyGraph
@@ -168,6 +180,9 @@ export default function Home() {
                                 dataComm={handleDataComm}
                                 changedComm={handleChangedComm}
                                 changed={changedG}
+                                onPrediction={handlePrediction}
+                                predicted={predicted}
+
                             />
                             {isMat ? (
                                 <>
@@ -182,7 +197,9 @@ export default function Home() {
                                         </div>
                                         <div>
                                             <ViewSwitch
+                                            
                                                 handleChange={(e) => {
+                                                    
                                                     if (e === true) {
                                                         setIsMat(true);
                                                         console.log("mat true", isMat);
@@ -202,6 +219,7 @@ export default function Home() {
                                         graph_path={selectedGraph}
                                         intmData={intmData}
                                         changed={changedG}
+                                        predicted={predicted}
                                     />
                                 </>
                             ) : (
@@ -236,6 +254,7 @@ export default function Home() {
                                         graph_path={selectedGraph}
                                         intmData={intmData}
                                         changed={changedG}
+                                        predicted={predicted}
                                     />
                                 </>
                             )}

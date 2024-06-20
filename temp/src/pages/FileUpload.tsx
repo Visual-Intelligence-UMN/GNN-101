@@ -16,6 +16,8 @@ interface ClassifyGraphProps {
   dataComm: Function;
   changedComm: Function;
   changed: boolean;
+  onPrediction: Function;
+  predicted: boolean;
 }
 
 export interface IntmData {
@@ -28,11 +30,12 @@ export interface IntmData {
 }
 
 // parameter will be the user input for json file
-const ClassifyGraph: React.FC<ClassifyGraphProps> = ({ graph_path, dataComm, changedComm, changed }) => {
+const ClassifyGraph: React.FC<ClassifyGraphProps> = ({ graph_path, dataComm, changedComm, changed, onPrediction, predicted}) => {
   const [probabilities, setProbabilities] = useState<number[]>([]);
   const [graphName, setGraphName] = useState("None");
 
   const classifyGraph = async () => {
+    onPrediction(true)
     console.log("start classifying....a");
     const session = await loadModel();
     const graphData: GraphData = await load_json(graph_path);
