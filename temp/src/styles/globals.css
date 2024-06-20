@@ -96,3 +96,23 @@ body {
   transform: translateY(-10px);
   transition: opacity 200ms, transform 300ms;
 }
+
+path {
+  transition: all;
+  transition-duration: 1s;
+}
+
+.frame {
+  transition: all;
+  transition-duration: 1s;
+}
+
+.colFrame {
+  transition: all;
+  transition-duration: 1s;
+}
+
+.rowFrame {
+  transition: all;
+  transition-duration: 1s;
+}
