@@ -3,7 +3,16 @@ import * as d3 from "d3";
 import * as ort from "onnxruntime-web";
 import { env } from "onnxruntime-web";
 import { features } from 'process';
-import { hideAllLinks, showAllLinks, resetNodes, reduceNodeOpacity, resetNodeOpacity, calculationVisualizer} from "@/utils/graphUtils"
+import { 
+  hideAllLinks, 
+  showAllLinks, 
+  resetNodes, 
+  reduceNodeOpacity, 
+  calculationVisualizer, 
+  highlightNodes,
+  documentClickHandler,
+  nodeClickHandler
+} from "@/utils/graphUtils"
 
 env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
@@ -356,9 +365,7 @@ export const myColor = d3.scaleLinear<string>()
 
 
 export function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, final: any) {
-
-  const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex);
-
+  const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex); //somehow doesn't include the node in the last layer
   if (!nodesByIndex.has(5)) {
     const nodesWithGraphIndex4 = nodesByIndex.get(4);
     if (nodesWithGraphIndex4) {
@@ -366,26 +373,35 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
         const newNode = { ...node, graphIndex: 5 };
         newNode.features = softmax(final)
         return newNode;
-      });
+      }); // manually add the last layer 
 
       nodesByIndex.set(5, nodesWithGraphIndex5);
     }
   }
 
+
+  interface FeatureGroupLocation {
+    xPos: number;
+    yPos: number;
+  }
   let movedNode: any = null;
+  let moveOffset = 300;
+  let isClicked = false; // if isClicked is true, all mouseover/out operation would be banned and some certain functions would be called
+
+
+
 
   nodesByIndex.forEach((nodes, graphIndex) => {
 
-    const occupiedPositions: { x: number; y: number }[] = [];
+    const occupiedPositions: { x: number; y: number }[] = []; 
     const xOffset = (graphIndex - 2.5) * offset;
-    if (graphIndex === 5) {
-      console.log("5");
-    }
 
     const g2 = svg.append("g")
       .attr("layerNum", graphIndex)
       .attr("class", "layerVis") 
       .attr("transform", `translate(${xOffset},10)`);
+
+
 
     nodes.forEach((node: any, i: number) => {
 
@@ -393,6 +409,9 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
       let xPos = node.x;
       let yPos = node.y + 25;
 
+
+
+      // collision detection. if the locaion is occupied, add 20 to the x coordination
       occupiedPositions.forEach(pos => {
         if (Math.abs(xPos - pos.x) < 20) {
           xPos = pos.x + 20;
@@ -401,10 +420,11 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
       occupiedPositions.push({ x: xPos, y: yPos });
 
-      // Add isClicked flag
-      node.isClicked = false;
 
       if (graphIndex <= 2) {
+        // featureGroup in the convolutional layers and the last three layers are different.
+
+        // add svgElement to each node simplify the interaction process (maybe)
         node.svgElement = g2.append("circle")
           .attr("cx", node.x)
           .attr("cy", node.y)
@@ -414,7 +434,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .attr("stroke-width", 1)
           .attr("stroke-opacity", 1)
           .attr("opacity", 1)
-          .node();
+          .node(); // make the svgElement a DOM element (the original on method somehow doesn't work)
 
         node.text = g2.append("text")
           .attr("x", node.x - 6)
@@ -450,64 +470,30 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .style("fill", "black")
           .style("text-anchor", "middle");
 
-        node.featureGroup = featureGroup;
+        featureGroup.style('visibility', 'hidden');  
 
-
-        interface FeatureGroupLocation {
-          xPos: number;
-          yPos: number;
-        }
-        
         
         yPos = yPos + 3 * node.features.length;
-
         let featureGroupLocation: FeatureGroupLocation = {xPos, yPos};
-        node.featureGroupLocation = featureGroupLocation;
 
+        node.featureGroup = featureGroup;
+        node.featureGroupLocation = featureGroupLocation; // this will be used in calculationvisualizer
+
+
+
+        // interaction added
         node.svgElement.addEventListener("mouseover", function(this: any) {
-          if (!node.isClicked) {
-            featureGroup.style('visibility', 'visible');
-            featureGroup.raise();
-            d3.select(this).attr("stroke-width", 3);
-
-            if (node.links) {
-              node.links.forEach((link: any) => {
-                link.style("opacity", 0.7);
-              });
-            }
-            let relatedNodes: any = []
-
+          if (!isClicked) {
+            highlightNodes(node);
             if (node.relatedNodes) {
-              node.relatedNodes.forEach((n: any) => {
-                d3.select(n.svgElement).attr("stroke-width", 3);
-                n.featureGroup.style('visibility', 'visible');
-                n.featureGroup.raise();
-                relatedNodes = node.relatedNodes;
-              });
-            }
-            reduceNodeOpacity(allNodes, relatedNodes, node);
+              reduceNodeOpacity(allNodes, node.relatedNodes, node);
+              } 
           }
         });
 
         node.svgElement.addEventListener("mouseout", function(this: any) {
-          
-          if (!node.isClicked) {
-            resetNodeOpacity(allNodes);
-            featureGroup.style('visibility', 'hidden');
-            d3.select(this).attr("stroke-width", 1);
-
-            if (node.links) {
-              node.links.forEach((link: any) => {
-                link.style("opacity", 0.07);
-              });
-            }
-
-            if (node.relatedNodes) {
-              node.relatedNodes.forEach((n: any) => {
-                d3.select(n.svgElement).attr("stroke-width", 1);
-                n.featureGroup.style('visibility', 'hidden');
-              });
-            }
+          if (!isClicked) {
+            resetNodes(allNodes);
           }
         });
 
@@ -518,15 +504,10 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           if (node.relatedNodes) {
             relatedNodes = node.relatedNodes;
           }
-
           reduceNodeOpacity(allNodes, relatedNodes, node);
           
-
-          
           event.stopPropagation(); // Prevent the click event from bubbling up
-
-          // Set isClicked flag
-          node.isClicked = true;
+          isClicked = true;
 
           if (movedNode === node) {
             return; // Do nothing if the node is already moved
@@ -534,49 +515,22 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
           if (movedNode) {
             // Move back the previously moved node and its layer
-            svg.selectAll("g[layerNum]")
-              .filter((d: any, i: any, nodes: any) => {
-                const layerNum = d3.select(nodes[i]).attr("layerNum");
-                return layerNum !== null && parseInt(layerNum) > 0 && parseInt(layerNum) >= movedNode.graphIndex;
-              })
-              .attr("transform", function(this: any) {
-                const currentTransform = d3.select(this).attr("transform");
-                if (currentTransform) {
-                  const currentXMatch = currentTransform.match(/translate\(([^,]+),/);
-                  if (currentXMatch && currentXMatch[1]) {
-                    const currentX = parseInt(currentXMatch[1]);
-                    return `translate(${currentX - 300},10)`;
-                  }
-                }
-                return "translate(0,10)"; // Default fallback
-              });
-            movedNode.isClicked = false; // Reset isClicked flag for the previously moved node
+            nodeClickHandler(svg, movedNode, moveOffset, -1)
+            isClicked = false; // Reset isClicked flag for the previously moved node
             movedNode = null;
           }
-
+          
           // Move the clicked node and its layer
-          svg.selectAll("g[layerNum]")
-            .filter((d: any, i: any, nodes: any) => {
-              const layerNum = d3.select(nodes[i]).attr("layerNum");
-              return layerNum !== null && parseInt(layerNum) > 0 && parseInt(layerNum) >= node.graphIndex;
-            })
-            .attr("transform", function(this: any) {
-              const currentTransform = d3.select(this).attr("transform");
-              if (currentTransform) {
-                const currentXMatch = currentTransform.match(/translate\(([^,]+),/);
-                if (currentXMatch && currentXMatch[1]) {
-                  const currentX = parseInt(currentXMatch[1]);
-                  return `translate(${currentX + 300},10)`;
-                }
-              }
-              return "translate(300,10)"; // Default fallback
-            });
+          nodeClickHandler(svg, node, moveOffset, 1);
           movedNode = node; // Update the moved node
         });
 
-        featureGroup.style('visibility', 'hidden');
+
+
+        
       } else {
 
+        // for the pooling layer(graphIndex = 3), the rectHeight = 2, for the other 2 layers, rectHeight = 20;
         let rectHeight = 2;
         if (node.graphIndex >= 4) {
           rectHeight = 20;
@@ -591,7 +545,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .data(features)
           .enter()
           .append("rect")
-          .attr("x", -10)
+          .attr("x", -10) //adjust x and y coordination so it locates in the middle of the graph
           .attr("y", (d: any, i: number) => i * rectHeight - 100)
           .attr("width", 35)
           .attr("height", rectHeight)
@@ -602,8 +556,10 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
         node.featureGroup = featureGroup;
 
+
+        // add interaction. In the 
         node.featureGroup.on("mouseover", function() {
-          if (!node.isClicked) {
+          if (!isClicked) {
             if (node.links) {
               node.links.forEach((link: any) => {
                 link.style("opacity", 1);
@@ -613,7 +569,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
         });
 
         node.featureGroup.on("mouseout", function() {
-          if (!node.isClicked) {
+          if (!isClicked) {
             if (node.links) {
               node.links.forEach((link: any) => {
                 link.style("opacity", 0.07);
@@ -627,36 +583,14 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
   // Add a global click event to the document to reset the moved node and isClicked flag
   document.addEventListener("click", function() {
-   
-
     if (movedNode) {
-      svg.selectAll("g[layerNum]")
-        .filter((d: any, i: any, nodes: any) => {
-          const layerNum = d3.select(nodes[i]).attr("layerNum");
-          return layerNum !== null && parseInt(layerNum) > 0 && parseInt(layerNum) >= movedNode.graphIndex;
-        })
-        .attr("transform", function(this: any) {
-          const currentTransform = d3.select(this).attr("transform");
-          if (currentTransform) {
-            const currentXMatch = currentTransform.match(/translate\(([^,]+),/);
-            if (currentXMatch && currentXMatch[1]) {
-              const currentX = parseInt(currentXMatch[1]);
-              return `translate(${currentX - 300},10)`;
-            }
-          }
-          return "translate(0,10)"; // Default fallback
-        });
-      movedNode.isClicked = false; // Reset isClicked flag for the previously moved node
-
+      documentClickHandler(svg, movedNode, moveOffset);
+      isClicked = false; 
       movedNode = null;
       showAllLinks(allNodes);
       resetNodes(allNodes);
-      resetNodeOpacity(allNodes);
-
-    
+      resetNodes(allNodes);
     }
-
-
   }, { capture: true });
 }
 
