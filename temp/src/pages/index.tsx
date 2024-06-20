@@ -41,7 +41,7 @@ export default function Home() {
     const [path, setPath] = useState("./json_data/input_graph0.json");
     const [isMat, setIsMat] = useState(true);
     const [changedG, setChangedG] = useState(true);
-    const [step, setStep] = useState(2);
+    const [step, setStep] = useState(0);
     const [showGraphAnalysis, setShowGraphAnalysis] = useState(false);
 
     //intermediate output
@@ -60,14 +60,14 @@ export default function Home() {
     }
 
 
-    // useEffect(() => {
-    //     if (step < 2) {
-    //         const timer = setTimeout(() => {
-    //             setStep(step + 1);
-    //         }, 3500); // Change text every 3 seconds
-    //         return () => clearTimeout(timer);
-    //     }
-    // }, [step]);
+    useEffect(() => {
+        if (step < 2) {
+            const timer = setTimeout(() => {
+                setStep(step + 1);
+            }, 3500); // Change text every 3 seconds
+            return () => clearTimeout(timer);
+        }
+    }, [step]);
     useEffect(() => {
         (document.body.style as any).zoom = "67%";
 
