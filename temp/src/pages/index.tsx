@@ -63,6 +63,12 @@ export default function Home() {
         setChangedG(data);
         console.log("SET Changed!", data);
     }
+    function handleGraphSelection(e: React.ChangeEvent<HTMLSelectElement>): void {
+        setSelectedGraph(e.target.value);
+        setPath(e.target.value);
+        setChangedG(true);
+        setPredicted(false); // Reset the prediction state
+    }
 
 
     // useEffect(() => {
@@ -160,11 +166,7 @@ export default function Home() {
                                     <div>
                                         <GraphSelector
                                             selectedGraph={selectedGraph}
-                                            handleChange={(e: any) => {
-                                                setSelectedGraph(e.target.value);
-                                                setPath(e.target.value);
-                                                setChangedG(true);
-                                            }}
+                                            handleChange={handleGraphSelection}
                                             graphList={graphList}
                                         />
                                     </div>

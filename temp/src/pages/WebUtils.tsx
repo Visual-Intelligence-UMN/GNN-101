@@ -110,7 +110,7 @@ export const GraphAnalysisViewer: React.FC<GraphAnalysisViewerProps> = ({
     );
 };
 
-//button chain on the general UI
+//button chain on the general UI    
 export const ButtonChain = () => {
     const [selectedButtons, setSelectedButtons] = useState([false, false, false, false, false, false, false]);
     
