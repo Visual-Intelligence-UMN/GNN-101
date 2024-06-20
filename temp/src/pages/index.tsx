@@ -156,7 +156,7 @@ export default function Home() {
                                         </h1>
                                     </CSSTransition>
                             <hr className="border-t border-gray-300 my-4"></hr>
-                            {changedG ? <></> : <ButtonChain />}
+                            <ButtonChain />
                             <div className="flex gap-x-4 items-center">
                                 <div>
                                     <h2 className="text-xl font-semibold">Data</h2>
