@@ -161,7 +161,7 @@ export function visualizeFeatures(
             //translate each layer
             const layerID = Number(d3.select(this).attr("layerID")) - 1;
             const node = Number(d3.select(this).attr("node"));
-            const featureVisPack = featureVisClick(layerID, node, recordLayerID, colorSchemesTable, adjList, featureVisTable, features, conv1, conv2, bias, myColor, weights);
+            const featureVisPack = featureVisClick(layerID, node, recordLayerID, colorSchemesTable, adjList, featureVisTable, features, conv1, conv2, bias, myColor, weights, lock);
             // update variables
             recordLayerID = featureVisPack.recordLayerID;
             colorSchemesTable = featureVisPack.colorSchemesTable;
