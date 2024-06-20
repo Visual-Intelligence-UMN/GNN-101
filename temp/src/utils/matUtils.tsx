@@ -33,6 +33,8 @@ export function visualizeFeatures(
     setDetailView: any
 ) {
     //--------------------------------DATA PREP MANAGEMENT--------------------------------
+    let intervalID:any = null; // to manage animation controls
+    
     let poolingVis = null; //to manage pooling visualizer
     let outputVis = null; //to manage model output
     let resultVis:any = null; //tp manage result visualizer
@@ -137,8 +139,15 @@ export function visualizeFeatures(
             poolingOutEvent = recoverPackage.poolingOutEvent;
             poolingOverEvent = recoverPackage.poolingOverEvent;
             colorSchemesTable = recoverPackage.colorSchemesTable;
+            console.log("interval .mats", intervalID);
+            clearInterval(intervalID);
         }
     });
+
+function setIntervalID(id:any) {
+    intervalID = id;
+    console.log("Interval ID set to:", intervalID);
+}
     d3.selectAll(".featureVis").on("click", function (event, d) {
         if (lock != true) {
             //state
@@ -161,12 +170,14 @@ export function visualizeFeatures(
             //translate each layer
             const layerID = Number(d3.select(this).attr("layerID")) - 1;
             const node = Number(d3.select(this).attr("node"));
-            const featureVisPack = featureVisClick(layerID, node, recordLayerID, colorSchemesTable, adjList, featureVisTable, features, conv1, conv2, bias, myColor, weights, lock);
+            const featureVisPack = featureVisClick(layerID, node, recordLayerID, colorSchemesTable, adjList, featureVisTable, features, conv1, conv2, bias, myColor, weights, lock, setIntervalID);
             // update variables
             recordLayerID = featureVisPack.recordLayerID;
             colorSchemesTable = featureVisPack.colorSchemesTable;
             featureVisTable = featureVisPack.featureVisTable;
             features = featureVisPack.features;
+            intervalID = featureVisPack.getIntervalID();
+            console.log("interval", intervalID);
             //path connect - connect intermediate feature vis to current feature vis
         }
     });
