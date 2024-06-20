@@ -48,12 +48,14 @@ interface MatricesVisualizerProps {
     graph_path: string;
     intmData: any;
     changed: boolean;
+    predicted: boolean;
 }
 
 const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
     graph_path,
     intmData,
     changed,
+    predicted,
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -315,7 +317,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
             }
         };
 
-        if (intmData == null || changed) {
+        if ((intmData == null || changed) && !predicted) {
             visualizeMatrix(graph_path);
         } else {
             visualizeGNN();
