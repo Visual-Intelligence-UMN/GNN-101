@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import * as ort from "onnxruntime-web";
 import { env } from "onnxruntime-web";
 import { features } from 'process';
-import { hideAllLinks, showAllLinks, resetNodes, reduceNodeOpacity, resetNodeOpacity} from "@/utils/graphUtils"
+import { hideAllLinks, showAllLinks, resetNodes, reduceNodeOpacity, resetNodeOpacity, calculationVisualizer} from "@/utils/graphUtils"
 
 env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
@@ -355,7 +355,6 @@ export const myColor = d3.scaleLinear<string>()
 
 
 
-
 export function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, final: any) {
 
   const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex);
@@ -428,6 +427,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
         const featureGroup = g2.append("g")
           .attr("transform", `translate(${xPos - 7.5}, ${yPos})`);
 
+  
         featureGroup.selectAll("rect")
           .data(features)
           .enter()
@@ -451,6 +451,18 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .style("text-anchor", "middle");
 
         node.featureGroup = featureGroup;
+
+
+        interface FeatureGroupLocation {
+          xPos: number;
+          yPos: number;
+        }
+        
+        
+        yPos = yPos + 3 * node.features.length;
+
+        let featureGroupLocation: FeatureGroupLocation = {xPos, yPos};
+        node.featureGroupLocation = featureGroupLocation;
 
         node.svgElement.addEventListener("mouseover", function(this: any) {
           if (!node.isClicked) {
@@ -501,12 +513,13 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
         node.svgElement.addEventListener("click", function(event: any) {
           hideAllLinks(allNodes);
+          calculationVisualizer(node, svg, offset);
           let relatedNodes: any = [];
           if (node.relatedNodes) {
-            relatedNodes = node.relatedNotes;
+            relatedNodes = node.relatedNodes;
           }
 
-          reduceNodeOpacity(allNodes, node.relatedNodes, node);
+          reduceNodeOpacity(allNodes, relatedNodes, node);
           
 
           
@@ -634,12 +647,12 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           return "translate(0,10)"; // Default fallback
         });
       movedNode.isClicked = false; // Reset isClicked flag for the previously moved node
-      movedNode = null;
 
+      movedNode = null;
       showAllLinks(allNodes);
       resetNodes(allNodes);
       resetNodeOpacity(allNodes);
-      
+
     
     }
 
@@ -649,7 +662,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
 
 
-function calculateAverage(arr: number[]): number {
+export function calculateAverage(arr: number[]): number {
   const sum = arr.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
   const average = sum / arr.length;
   return average * 10;
