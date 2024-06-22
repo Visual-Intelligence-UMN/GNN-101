@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import { calculateAverage, myColor } from "./utils";
+import { loadWeights } from "./matHelperUtils";
 import { inter } from "@/pages";
 
 
@@ -107,7 +108,14 @@ export function resetNodes(allNodes: any[]) {
   }
 
 
-  export function calculationVisualizer(node: any, svg: any, offset: number) {
+  export function calculationVisualizer(node: any, svg: any, offset: number, normalizedAdjMatrix: any[], isClicked: boolean) {
+    if (isClicked || normalizedAdjMatrix == null) { //doesn't work currently
+      return;
+    }
+    const { weights, bias } = loadWeights();
+
+    let biasData = bias[node.graphIndex]; //might cause an issue when the first layer is added 
+    
     const g3 = svg.append("g")
       .attr("class", "layerVis")
       .attr("transform", `translate(${(node.graphIndex - 3.5) * offset}, 10)`);
@@ -134,14 +142,19 @@ export function resetNodes(allNodes: any[]) {
     const pathColor = d3.scaleLinear<string>()
       .domain([-0.25, 0, 0.25])
       .range(["red", "purple", "blue"]);
+
   
-    let data = node.features; // to be determined
+    let calculatedData: any[] = [];
+    for (let i = 0; i < node.features.length; i++) {
+      calculatedData.push(node.features[i] - biasData[i])
+    }
+   
   
     const originalFeatureGroup = g3.append("g")
       .attr("transform", `translate(${xPos + 400}, ${yPos - 64 * 3 - 5})`);
   
     originalFeatureGroup.selectAll("rect")
-      .data(data)
+      .data(node.features)
       .enter()
       .append("rect")
       .attr("x", 0)
@@ -168,7 +181,7 @@ export function resetNodes(allNodes: any[]) {
       .attr("transform", `translate(${xPos + 600}, ${yPos - 64 * 3 - 5})`);
   
     aggregatedFeatureGroup.selectAll("rect")
-      .data(data)
+      .data(calculatedData)
       .enter()
       .append("rect")
       .attr("x", start_x)
@@ -195,7 +208,7 @@ export function resetNodes(allNodes: any[]) {
       .attr("transform", `translate(${xPos + 650}, ${yPos - 64 * 3 - 75})`);
   
     BiasGroup.selectAll("rect")
-      .data(data)
+      .data(biasData)
       .enter()
       .append("rect")
       .attr("x", start_x)
@@ -306,19 +319,15 @@ export function resetNodes(allNodes: any[]) {
     .style("text-anchor", "middle");  
   }, 1500);
 
-    
-
-
-    weightAnimation(svg, startCoordList, endCoordList);
+    weightAnimation(svg, startCoordList, endCoordList, weights[node.graphIndex]); // may cause problems when the first layer is added 
   }
 
 
-
-export function nodeClickHandler(svg: any, node: any, moveOffset: number, indicator: number) {
+export function moveNextLayer(svg: any, node: any, moveOffset: number, indicator: number) {
 
   if (!svg.selectAll) {
     svg = d3.select(svg);
-  }
+  } // when svg is passed into a function, it should be selected again
 
   svg.selectAll("g[layerNum]")
   .filter((d: any, i: any, nodes: any) => {
@@ -338,7 +347,7 @@ export function nodeClickHandler(svg: any, node: any, moveOffset: number, indica
   });
 }
 
-function weightAnimation(svg: any, startCoordList: number[], endCoordList: number[]) {
+function weightAnimation(svg: any, startCoordList: number[], endCoordList: number[], weights: any[]) {
   let i = 0
   let intervalID: any;
   let isAnimating = true; 
@@ -361,7 +370,7 @@ function weightAnimation(svg: any, startCoordList: number[], endCoordList: numbe
           isAnimating
       );
       i++;
-      if (i >= 64 ) {
+      if (i >= 64) {
           clearInterval(intervalID);
       }
   }, 250); 
@@ -427,32 +436,65 @@ function GraphViewDrawPaths(
 
 
 
-export function documentClickHandler(svg: any, movedNode: any, moveOffset: number) {
 
-  if (!svg.selectAll) {
-    svg = d3.select(svg);
+
+export function aggregationCalculator(graphs: any[]) {
+
+  
+  let data = graphs[0];
+  let adjList: number[][] = Array.from(
+    { length: data.nodes.length },
+    () => []
+);
+for (let i = 0; i < data.nodes.length; i++) {
+    //push itself to the linkMap
+    adjList[i].push(i);
+    for (let j = 0; j < data.links.length; j++) {
+        if (data.links[j].source == i) {
+            //push its neighbors to linkMap
+            adjList[i].push(data.links[j].target);
+      }
+    }
   }
-  svg.selectAll(".vis-component")
-    .style("opacity", 0);
+  const nodeCount = data.nodes.length;
+  const edgePairs = data.links;
+  const degreeMap = new Array(nodeCount).fill(0);
+  for (let i = 0; i < edgePairs.length; i++) {
+    const source = edgePairs[i].source;
+    const target = edgePairs[i].target;
 
-  svg.selectAll("g[layerNum]")
-        .filter((d: any, i: any, nodes: any) => {
-          const layerNum = d3.select(nodes[i]).attr("layerNum");
-          return layerNum !== null && parseInt(layerNum) > 0 && parseInt(layerNum) >= movedNode.graphIndex;
-        })
-        .attr("transform", function(this: any) {
-          const currentTransform = d3.select(this).attr("transform");
-          if (currentTransform) {
-            const currentXMatch = currentTransform.match(/translate\(([^,]+),/);
-            if (currentXMatch && currentXMatch[1]) {
-              const currentX = parseInt(currentXMatch[1]);
-              return `translate(${currentX - moveOffset},10)`;
-            }
-          }
-          return "translate(0,10)"; // Default fallback
-        });
+    degreeMap[source]++;
+    degreeMap[target]++;
+  }
+  for (let i = 0; i < degreeMap.length; i++) {
+    degreeMap[i] = degreeMap[i] / 2
+  }
+
+  console.log("FAW", adjList, degreeMap);
+
+  let adjMatrix = Array.from({ length: nodeCount }, () => new Array(nodeCount).fill(0));
+
+
+  for (let i = 0; i < nodeCount; i++) {
+    for (let j = 0; j < adjList[i].length; j++) {
+      const neighbor = adjList[i][j];
+      adjMatrix[i][neighbor] = 1; 
+    }
+  }
+
+
+  let degreeMatrix = new Array(nodeCount).fill(0).map((_, i) => 1 / Math.sqrt(degreeMap[i]));
+
+  let normalizedAdjMatrix = Array.from({ length: nodeCount }, () => new Array(nodeCount).fill(0));
+  for (let i = 0; i < nodeCount; i++) {
+    for (let j = 0; j < nodeCount; j++) {
+      if (adjMatrix[i][j] !== 0) {
+        normalizedAdjMatrix[i][j] = degreeMatrix[i] * adjMatrix[i][j] * degreeMatrix[j];
+      }
+    }
+  }
+  return normalizedAdjMatrix;
+
 }
-
-
 
 

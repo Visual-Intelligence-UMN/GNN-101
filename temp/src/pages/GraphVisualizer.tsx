@@ -12,6 +12,8 @@ import {
 } from "../utils/utils";
 import { IntmData } from "./FileUpload";
 import { visualizeGraph } from "./WebUtils";
+import { aggregationCalculator } from "@/utils/graphUtils";
+import { sources } from "next/dist/compiled/webpack/webpack";
 
 
 
@@ -41,7 +43,6 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
       if (intmData != null) {
         console.log("From Visualizer:", intmData);
       }
-
       console.log("path", graph_path);
       let allNodes: any[] = [];
       const offset = 600;
@@ -69,10 +70,6 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           .attr("transform", `translate(${xOffset},${margin.top})`)
           .attr("layerNum", i)
           
-        
-
-
-
         // Initialize the links
         const link = g1
           .selectAll("line")
@@ -92,9 +89,6 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           .style("stroke-opacity", 1)
           .attr("opacity", 1)
           
-
-
-
         const labels = g1
           .selectAll("text")
           .data(data.nodes)
@@ -267,31 +261,23 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
               .text(text);
               
               // doesn't show the text, need to be fixed 
-                if (i === graphs.length - 2) {
-
-                connectCrossGraphNodes(
+                if (i === graphs.length - 2) { // 6 layers in total, call the connect when reaching the last layer of convolutional layer.
+                connectCrossGraphNodes( // in this function the connection of last two layers will be drwan
                   allNodes,
                   svg,
                   graphs,
                   offset,
                 );
 
-
-
-
-                
               // since in the featureVisualizer each node has its own svgElement, circles here are made transparent
-              
               svg.selectAll("circle")
               .attr("opacity", 0);
               svg.selectAll("text")
               .attr("opacity", 0);
               if (intmData && intmData.final) {
-                featureVisualizer(svg, allNodes, offset, height, intmData.final); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
+                featureVisualizer(svg, allNodes, offset, height, intmData.final, graphs); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
                }
-
-             
-
+            
               }
 
 
