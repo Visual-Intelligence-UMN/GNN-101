@@ -1,77 +1,10 @@
 import {
     deepClone,
+    drawPoints,
     get_cood_from_parent,
     get_coordination
 } from "./utils";
 import * as d3 from "d3";
-
-function createArc(radius: number, startAngle: number, endAngle: number): d3.Arc<any, d3.DefaultArcObject> {
-    return d3.arc()
-        .innerRadius(radius)
-        .outerRadius(radius)
-        .startAngle(-Math.PI / 2)  // Start from the bottom (facing left)
-        .endAngle(Math.PI / 2)     // End at the top (facing right)
-        .padAngle(0);  // Adjust padding if necessary
-}
-
-
-
-export function drawPaths(
-    i:number,
-    lock:boolean,
-    Xt:any,
-    startCoordList:any,
-    endCoordList:any,
-    curveDir:any,
-    myColor:any
-) {
-    if(lock){
-    const Wi = Xt[i];
-
-    for (let j = 0; j < 64; j++) {
-        let s = startCoordList[63 - j];
-        let e = endCoordList[i];
-        let centerX = (s[0] + e[0]) / 2;
-        let centerY = (s[1] + e[1]) / 2;
-        let radius = (e[0] - s[0])/2;
-        let startAngle = Math.atan2(s[1] - centerY, s[0] - centerX);
-        let endAngle = Math.atan2(e[1] - centerY, e[0] - centerX);
-
-        if (curveDir > 0 && startAngle > endAngle) {
-            endAngle += 2 * Math.PI;
-        } else if (curveDir < 0 && startAngle < endAngle) {
-            startAngle += 2 * Math.PI;
-        }
-
-        const arcData = {
-            innerRadius: radius,  // Radius of the arc
-            outerRadius: radius,
-            startAngle: Math.PI,  // Start at the left (180 degrees)
-            endAngle: 0,          // End at the right (0 degrees)
-        };
-    
-
-        const arc = createArc(radius, startAngle, endAngle);
-
-        d3.select(".mats")
-            .append("path")
-            .attr("d", arc(arcData))  // Pass the arcData object directly
-            .attr("stroke", myColor(Wi[63 - j]))
-            .attr("stroke-width", 1)
-            .attr("opacity", 1)
-            .attr("fill", "none")
-            .attr("class", "procVis")
-            .attr("id", `tempath${i}`)
-            .attr("transform", `translate(${centerX}, ${centerY})`)
-            .lower();
-    }
-
-    setTimeout(() => {
-        d3.selectAll(`#tempath${i}`).remove();
-        i++;
-    }, 250); 
-    }
-}
 
 //get node attributes from graph data
 export function getNodeAttributes(data: any) {
@@ -151,7 +84,6 @@ export interface HeatmapData {
 export function get_cood_locations(data: any, locations: any) {
     console.log("DATA", Math.sqrt(data.length));
     const nCol = Math.sqrt(data.length);
-    const cood = get_cood_from_parent(".y-axis", "text");
     //here's the data processing for getting locations
     const cood1 = get_cood_from_parent(".mats", "rect");
     const currMat = cood1.slice(-(nCol * nCol));

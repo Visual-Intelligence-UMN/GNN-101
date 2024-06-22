@@ -15,6 +15,7 @@ import {
     outputVisClick, 
     poolingVisClick, 
 } from "./matEventsUtils";
+import { drawPoints } from "./utils";
 
 //features visualization pipeline: draw all feature visualizers for original features and GCNConv
 export function visualizeFeatures(
@@ -32,6 +33,7 @@ export function visualizeFeatures(
     detailView: any,
     setDetailView: any
 ) {
+    //drawPoints(".mats", "red", locations);
     //--------------------------------DATA PREP MANAGEMENT--------------------------------
     let intervalID:any = null; // to manage animation controls
     
@@ -263,35 +265,6 @@ function setIntervalID(id:any) {
             }
         })
     }
-
-    // if(resultVis != null){
-    //     resultVis.on("mouseover", function (event:any, d:any) {
-    //         const a = d3.select(".path2").style("opacity", 1);
-    //         const b = d3.select("#fr2").style("opacity", 1);
-    //         const c = d3.select("#fr1").style("opacity", 1);
-    //         console.log("mouse in", a, b, c)
-    //     });
-    //     resultVis.on("mouseout", function (event:any, d:any) {
-    //         d3.select(".path2").style("opacity", 0.02);
-    //         d3.select("#fr2").style("opacity", 0);
-    //         d3.select("#fr1").style("opacity", 0);
-    //     });
-    //     resultVis.on("click", function(event:any, d:any){
-    //         if (lock != true) {
-    //             //state
-    //             transState = "result";
-    //             lock = true;
-    //             event.stopPropagation();
-    //             dview = true;
-    //             console.log("click! - fVis", dview, lock);
-    //             //lock all feature visualizers and transparent paths
-    //             colorSchemesTable = resultVisClick(colorSchemesTable);
-    //         }
-    //     })
-    //}
-
-
-
 }
 
 

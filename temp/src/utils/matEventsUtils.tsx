@@ -3,7 +3,6 @@ import { translateLayers, calculatePrevFeatureVisPos } from "./matHelperUtils";
 import { computeMids } from "./matFeaturesUtils";
 import * as d3 from "d3";
 import { create, all } from "mathjs";
-import { drawPaths } from "./matHelperUtils";
 
 //graph feature events interactions - mouseover
 export function oFeatureMouseOver(
@@ -570,11 +569,11 @@ export function featureVisClick(
         for (let i = 0; i < 64; i++) {
             let s: [number, number] = [
                 coordStartPoint[0] + 2 * i,
-                coordStartPoint[1],
+                coordStartPoint[1]
             ];
             let e: [number, number] = [
                 coordFinalPoint[0] + 2 * i,
-                coordFinalPoint[1],
+                coordStartPoint[1]
             ];
 
             startCoordList.push(s);
@@ -586,21 +585,36 @@ export function featureVisClick(
         const Xt = math.transpose(weights[layerID]);
         let i = 0;
         intervalID = setInterval(() => {
-            drawPaths(
-                i,
-                lock,
-                Xt,
-                startCoordList,
-                endCoordList,
-                curveDir,
-                myColor
-            );
+            d3.selectAll("#tempath").remove();
+            
+            const Xv = Xt[i];
+            for(let j=0; j<64; j++){
+                const s1 = startCoordList[j];
+                const e1 = endCoordList[i];
+                //drawPoints(".mats", "red", [s1, e1]);
+                console.log("se", [s1, e1])
+                d3.select(".mats")
+                .append("path")
+                .attr('d', function () { 
+                    return ['M', s1[0], s1[1],  // 移动到起点
+                    'A', 
+                    (e1[0] - s1[0])/2, ',',  // 弧线的X半径
+                    (e1[0] - s1[0])/4, 0, 0, ',',  // 弧线的Y半径和其他参数
+                    e1[0] > s1[0] ? 1 : 0, ',', // 大圆弧标志
+                    e1[0], ',', e1[1]]  // 终点
+                    .join(' '); 
+                }).attr("class", "procVis")
+                .attr("id", "tempath")
+                .style("fill", "none") 
+                .attr("stroke", myColor(Xv[j]));
+            }
+            d3.selectAll("path").lower();
             i++;
             console.log("i", i);
             if (i >= 64 || !lock) {
                 clearInterval(intervalID);
             }
-        }, 250); // 每2秒执行一次drawPaths
+        }, 250); 
 
         setIntervalID(intervalID); 
         d3.selectAll("path").lower();
