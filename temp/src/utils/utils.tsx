@@ -496,7 +496,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             resetNodes(allNodes);
           }
         });
-
+        if (node.graphIndex != 0) {
         node.svgElement.addEventListener("click", function(event: any) {
           hideAllLinks(allNodes);
           calculationVisualizer(node, svg, offset);
@@ -524,6 +524,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           nodeClickHandler(svg, node, moveOffset, 1);
           movedNode = node; // Update the moved node
         });
+      }
 
 
 

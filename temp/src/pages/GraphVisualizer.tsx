@@ -19,14 +19,12 @@ interface GraphVisualizerProps {
   graph_path: string;
   intmData: null | IntmData;
   changed: boolean;
-  predicted: boolean;
 }
 
 const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
   graph_path,
   intmData,
   changed,
-  predicted,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -268,7 +266,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
               .attr("font-size", "15px") // set the font size to 15px
               .text(text);
               
-              
+              // doesn't show the text, need to be fixed 
                 if (i === graphs.length - 2) {
 
                 connectCrossGraphNodes(
@@ -277,17 +275,20 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                   graphs,
                   offset,
                 );
+
+
+
+
                 
-                
-                
+              // since in the featureVisualizer each node has its own svgElement, circles here are made transparent
               
               svg.selectAll("circle")
               .attr("opacity", 0);
               svg.selectAll("text")
               .attr("opacity", 0);
               if (intmData && intmData.final) {
-                featureVisualizer(svg, allNodes, offset, height, intmData.final);
-              }
+                featureVisualizer(svg, allNodes, offset, height, intmData.final); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
+               }
 
              
 
@@ -324,7 +325,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
         setIsLoading(false);
       }
     };
-    if ((intmData == null || changed) && !predicted) {
+    if (intmData == null || changed) {
       visualizeGraph(graph_path);
     } else {
       visualizeGNN(3);
