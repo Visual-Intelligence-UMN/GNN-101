@@ -158,7 +158,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
             const gridSize = 300;
             const margin = { top: 10, right: 80, bottom: 30, left: 80 };
             const width = 20 * gLen + 50 + 6 * 102 + 1200;
-            const height = (gridSize + margin.top + margin.bottom) * 2 - 200;
+            const height = (gridSize + margin.top + margin.bottom) * 2;
 
             let locations: number[][] = [];
 
@@ -197,7 +197,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 .padding(0.01);
             g.append("g")
                 .attr("class", "x-axis")
-                .attr("transform", `translate(0,${gridSize})`)
+                .attr("transform", `translate(0,${gridSize+50})`)
                 .call(d3.axisBottom(x));
 
             // Build Y scales and axis:
@@ -206,7 +206,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 .range([0, gridSize])
                 .domain(myVars)
                 .padding(0.01);
-            g.append("g").attr("class", "y-axis").call(d3.axisLeft(y));
+            g.append("g").attr("class", "y-axis").call(d3.axisLeft(y)).attr("transform", `translate(0,50)`);
 
             if (0 == 0) {
                 d3.selectAll<SVGTextElement, any>(".x-axis text").classed(
@@ -234,7 +234,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 .enter()
                 .append("rect")
                 .attr("x", (d: HeatmapData) => x(d.group)!)
-                .attr("y", (d: HeatmapData) => y(d.variable)!)
+                .attr("y", (d: HeatmapData) => y(d.variable)! + 50)
                 .attr("width", x.bandwidth())
                 .attr("height", y.bandwidth())
                 .style("fill", (d: HeatmapData) => myColor(d.value / 250))
@@ -263,7 +263,6 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 .on("mouseout", function (event, d) {
                     const element = event.target as SVGGraphicsElement;
                 });
-            //getting the coordinates
             locations = get_cood_locations(data, locations);
             //crossConnectionMatrices(graphs, locations, offsetMat, pathMatrix);
             visualizeFeatures(
@@ -280,7 +279,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 colorSchemeTable,
                 detailView
             );
-            drawNodeAttributes(nodeAttrs, graph);
+            drawNodeAttributes(nodeAttrs, graph, 50);
         };
 
         //VIsualization Pipeline

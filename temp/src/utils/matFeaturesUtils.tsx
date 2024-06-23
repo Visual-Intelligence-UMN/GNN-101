@@ -386,7 +386,7 @@ export function drawGCNConv(
             1,
             "Features Color Scheme",
             schemeLocations[0][0],
-            schemeLocations[0][1],
+            schemeLocations[0][1]+50,
             firstLayer
         );
         const scheme2 = buildLegend(
@@ -394,7 +394,7 @@ export function drawGCNConv(
             maxVals.conv1,
             "GCNConv1 Color Scheme",
             schemeLocations[1][0],
-            schemeLocations[1][1],
+            schemeLocations[1][1]+50,
             l1
         );
         const scheme3 = buildLegend(
@@ -402,7 +402,7 @@ export function drawGCNConv(
             maxVals.conv2,
             "GCNConv2 Color Scheme",
             schemeLocations[1][0] + 230,
-            schemeLocations[1][1],
+            schemeLocations[1][1]+50,
             l2
         );
         const scheme4 = buildLegend(
@@ -410,7 +410,7 @@ export function drawGCNConv(
             maxVals.conv3,
             "GCNConv3 Color Scheme",
             schemeLocations[1][0] + 230 * 2,
-            schemeLocations[1][1],
+            schemeLocations[1][1]+50,
             l3
         );
         const scheme5 = buildLegend(
@@ -418,7 +418,7 @@ export function drawGCNConv(
             maxVals.pooling,
             "Pooling Color Scheme",
             schemeLocations[1][0] + 230 * 3,
-            schemeLocations[1][1],
+            schemeLocations[1][1]+50,
             l4
         );
         const scheme6 = buildBinaryLegend(
@@ -427,7 +427,7 @@ export function drawGCNConv(
             result[1],
             "Result Color Scheme",
             schemeLocations[1][0] + 230 * 4,
-            schemeLocations[1][1],
+            schemeLocations[1][1]+50,
             l5
         );
 

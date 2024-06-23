@@ -40,7 +40,7 @@ export function getNodeAttributes(data: any) {
 }
 
 //draw node attributes on the matrix
-export function drawNodeAttributes(nodeAttrs: any, graph: any) {
+export function drawNodeAttributes(nodeAttrs: any, graph: any, offset: number) {
     //visualize node attributes
     const textCood = get_cood_from_parent(".y-axis", "text");
     console.log("textCood", textCood);
@@ -52,7 +52,7 @@ export function drawNodeAttributes(nodeAttrs: any, graph: any) {
         d3.select(".mats")
             .append("text")
             .attr("x", textCood[i][0] + 20)
-            .attr("y", textCood[i][1] + 22.5)
+            .attr("y", textCood[i][1] + 22.5+offset)
             .attr("font-size", "10px")
             .text(nodeAttrs[i]);
     }

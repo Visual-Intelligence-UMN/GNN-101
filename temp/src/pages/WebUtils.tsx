@@ -707,7 +707,7 @@ export function visualizeMatrix(path: string) {
                 removeEffect(element);
             });
         
-            drawNodeAttributes(nodeAttrs, graph);
+            drawNodeAttributes(nodeAttrs, graph, 0);
     };
 
     const visualizeMat = async (path: string) => {

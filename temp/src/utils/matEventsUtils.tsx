@@ -363,6 +363,7 @@ export function featureVisClick(
     //drawPoints(".mats", "red", [playBtnCoord]);
     let startCoordList: any[] = [];
         let endCoordList: any[] = [];
+        let curveDir = 1; //true -> -1; false -> 1
     setTimeout(() => {
         //draw feature visualizer
         for (let m = 0; m < X.length; m++) {
@@ -449,9 +450,9 @@ export function featureVisClick(
             .attr("class", "procVis");
 
         //determine if we need upper-curves or lower-curves
-        let curveDir = -1; //true -> -1; false -> 1
+       
         const midNode = adjList.length / 2;
-        if (node < midNode) curveDir = 1;
+        if (node < midNode) curveDir = -1;
         console.log("curveDir", curveDir);
         //draw paths from intermediate result -> final result
         const layerBias = bias[layerID];
@@ -573,7 +574,7 @@ export function featureVisClick(
 
         for (let i = 0; i < 64; i++) {
             let s: [number, number] = [
-                coordStartPoint[0] + 2 * i,
+                coordStartPoint[0] + w * i,
                 coordStartPoint[1],
             ];
             let e: [number, number] = [
@@ -589,6 +590,7 @@ export function featureVisClick(
         let mm: any = [];
         const Xt = math.transpose(weights[layerID]);
         let i = 0;
+        
         intervalID = setInterval(() => {
             d3.selectAll("#tempath").remove();
 
@@ -596,6 +598,10 @@ export function featureVisClick(
             for (let j = 0; j < 64; j++) {
                 const s1 = startCoordList[j];
                 const e1 = endCoordList[i];
+                let pathDir = e1[0] > s1[0] ? 0 : 1;
+                if(curveDir==1){
+                    pathDir = e1[0] > s1[0] ? 1 : 0;
+                }
                 //drawPoints(".mats", "red", [s1, e1]);
                 console.log("se", [s1, e1]);
                 d3.select(".mats")
@@ -612,7 +618,7 @@ export function featureVisClick(
                             0,
                             0,
                             ",", 
-                            e1[0] > s1[0] ? 1 : 0,
+                            pathDir,
                             ",", 
                             e1[0],
                             ",",
@@ -680,6 +686,10 @@ export function featureVisClick(
             for (let j = 0; j < 64; j++) {
                 const s1 = startCoordList[j];
                 const e1 = endCoordList[i];
+                let pathDir = e1[0] > s1[0] ? 0 : 1;
+                if(curveDir==1){
+                    pathDir = e1[0] > s1[0] ? 1 : 0;
+                }
                 console.log("se", [s1, e1]);
                 d3.select(".mats")
                     .append("path")
@@ -695,7 +705,7 @@ export function featureVisClick(
                             0,
                             0,
                             ",", 
-                            e1[0] > s1[0] ? 1 : 0,
+                            pathDir,
                             ",", 
                             e1[0],
                             ",",
