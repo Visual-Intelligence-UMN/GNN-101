@@ -1,8 +1,10 @@
 // UTILS FILE BECAUSE WE HAVE SO MANY HELPER FUNCTIONS
 import * as d3 from "d3";
+
+import { loadWeights } from "./matHelperUtils";
 import * as ort from "onnxruntime-web";
 import { env } from "onnxruntime-web";
-import { aggregationCalculator } from "@/utils/graphUtils";
+import { aggregationCalculator, matrixMultiplication } from "@/utils/graphUtils";
 import { features } from 'process';
 import { 
   hideAllLinks, 
@@ -98,7 +100,7 @@ export function printAxisTextCoordinates(): void {
 
 
 //Split a large 1d array into a 1d array with multiple 8*8 matrices
-type Matrix = number[][];
+
 
 export function splitIntoMatrices(
     array: number[],
@@ -365,6 +367,7 @@ export const myColor = d3.scaleLinear<string>()
 
 
 export function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, final: any, graphs: any[]) {
+  const {weights, bias} = loadWeights();
   const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex); //somehow doesn't include the node in the last layer
   if (!nodesByIndex.has(5)) {
     const nodesWithGraphIndex4 = nodesByIndex.get(4);
@@ -379,7 +382,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
     }
   }
 
-  let normalizedAdjMatrix: any[] = []
+  let normalizedAdjMatrix: any = []
   if (graphs.length != 0) {
     normalizedAdjMatrix = aggregationCalculator(graphs);
   }
@@ -398,6 +401,34 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
 
   nodesByIndex.forEach((nodes, graphIndex) => { // iterate through each graphs
+    let currentWeights = weights[graphIndex];
+    let aggregatedDataMap: any[] = [];
+    let calculatedDataMap: any[] = []
+
+    // do some calculation that sill be used in the animation
+    if (graphs.length != 0 && graphIndex > 0 && graphIndex < 3) {
+
+     let {weights, bias} = loadWeights()
+     let featureMap: number[][] = [];
+     const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex);
+     nodesByIndex.forEach((nodes, index) => { 
+       if (index === graphIndex - 1) {
+         nodes.forEach((n) => { 
+           featureMap.push(n.features)
+         })
+         }
+       })
+
+       aggregatedDataMap = matrixMultiplication(normalizedAdjMatrix, featureMap)
+       calculatedDataMap = matrixMultiplication(aggregatedDataMap, currentWeights)
+       console.log("VAE",featureMap,aggregatedDataMap,calculatedDataMap)
+       
+      }
+
+      
+
+
+
 
     const occupiedPositions: { x: number; y: number }[] = []; 
     const xOffset = (graphIndex - 2.5) * offset;
@@ -501,7 +532,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
         if (node.graphIndex != 0) {
           node.svgElement.addEventListener("click", function(event: any) {
             hideAllLinks(allNodes);
-            calculationVisualizer(node, svg, offset, normalizedAdjMatrix, isClicked);
+            calculationVisualizer(node, currentWeights, bias, aggregatedDataMap, calculatedDataMap, svg, offset, isClicked);
             
             let relatedNodes: any = [];
             if (node.relatedNodes) {
