@@ -470,7 +470,7 @@ export function drawPoolingVis(
     locations[locations.length - 1][0] += 64 * 2;
     locations[locations.length - 1][1] += 10;
     //find mid point
-    const midY = (locations[locations.length - 1][1] - locations[0][1]) / 2;
+    const midY = (locations[locations.length - 1][1] - locations[0][1]) / 2 + 50;
     //all paths should connect to mid point
     const one = [[locations[0][0] + 102, midY]];
     //drawPoints(".mats", "red", one);
