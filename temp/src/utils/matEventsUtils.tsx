@@ -356,6 +356,13 @@ export function featureVisClick(
         console.log("compute x 0");
     } else w = 2;
     let intervalID: any;
+    const playBtnCoord = [
+        coordFeatureVis[0] + w * X.length + 50,
+        coordFeatureVis[1],
+    ];
+    //drawPoints(".mats", "red", [playBtnCoord]);
+    let startCoordList: any[] = [];
+        let endCoordList: any[] = [];
     setTimeout(() => {
         //draw feature visualizer
         for (let m = 0; m < X.length; m++) {
@@ -527,7 +534,6 @@ export function featureVisClick(
 
         const svg = d3.select(".mats");
 
-        // 圆心坐标和半径
         const cx = midX1;
         const cy = (wmCoord[1] + biasCoord[1]) / 2;
         const radius = 5;
@@ -560,8 +566,7 @@ export function featureVisClick(
             wmCoord[1] - 2.5 * curveDir,
         ];
 
-        let startCoordList: any[] = [];
-        let endCoordList: any[] = [];
+        
 
         //draw paths
         //drawPoints(".mats", "red", p);
@@ -588,25 +593,37 @@ export function featureVisClick(
             d3.selectAll("#tempath").remove();
 
             const Xv = Xt[i];
-            for(let j=0; j<64; j++){
+            for (let j = 0; j < 64; j++) {
                 const s1 = startCoordList[j];
                 const e1 = endCoordList[i];
                 //drawPoints(".mats", "red", [s1, e1]);
-                console.log("se", [s1, e1])
+                console.log("se", [s1, e1]);
                 d3.select(".mats")
-                .append("path")
-                .attr('d', function () { 
-                    return ['M', s1[0], s1[1],  // 移动到起点
-                    'A', 
-                    (e1[0] - s1[0])/2, ',',  // 弧线的X半径
-                    (e1[0] - s1[0])/4, 0, 0, ',',  // 弧线的Y半径和其他参数
-                    e1[0] > s1[0] ? 1 : 0, ',', // 大圆弧标志
-                    e1[0], ',', e1[1]]  // 终点
-                    .join(' '); 
-                }).attr("class", "procVis")
-                .attr("id", "tempath")
-                .style("fill", "none") 
-                .attr("stroke", myColor(Xv[j]));
+                    .append("path")
+                    .attr("d", function () {
+                        return [
+                            "M",
+                            s1[0],
+                            s1[1], 
+                            "A",
+                            (e1[0] - s1[0]) / 2,
+                            ",", 
+                            (e1[0] - s1[0]) / 4,
+                            0,
+                            0,
+                            ",", 
+                            e1[0] > s1[0] ? 1 : 0,
+                            ",", 
+                            e1[0],
+                            ",",
+                            e1[1],
+                        ] 
+                            .join(" ");
+                    })
+                    .attr("class", "procVis")
+                    .attr("id", "tempath")
+                    .style("fill", "none")
+                    .attr("stroke", myColor(Xv[j]));
             }
             d3.selectAll("path").lower();
             i++;
@@ -616,7 +633,7 @@ export function featureVisClick(
             }
         }, 250); // 每2秒执行一次drawPaths
 
-        setIntervalID(intervalID); 
+        setIntervalID(intervalID);
         d3.selectAll("path").lower();
         d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
     }, 2500);
@@ -625,6 +642,83 @@ export function featureVisClick(
         console.log("return intervalID", intervalID);
         return intervalID;
     }
+    const btn = d3.select(".mats").append("g");
+    const radius = 5;
+    const btnX = playBtnCoord[0];
+    const btnY = playBtnCoord[1];
+    btn
+        .append("circle")
+        .attr("cx", btnX)
+        .attr("cy", btnY)
+        .attr("r", radius)
+        .attr("id", "btn")
+        .attr("stroke", "black")
+        .attr("fill", "white")
+        .attr("class", "procVis");
+
+    btn.append("text")
+        .attr("x", btnX)
+        .attr("y", btnY + 3)
+        .text("P")
+        .attr("id", "btn")
+        .style("text-anchor", "middle")
+        .style("font-size", "6")
+        .attr("class", "procVis");
+    btn.on("click", function (event: any, d: any) {
+        console.log("btn");
+        event.stopPropagation();
+        if (intervalID) {
+        clearInterval(intervalID);
+    }
+
+    const Xt = math.transpose(weights[layerID]);
+        let i = 0;
+        intervalID = setInterval(() => {
+            d3.selectAll("#tempath").remove();
+
+            const Xv = Xt[i];
+            for (let j = 0; j < 64; j++) {
+                const s1 = startCoordList[j];
+                const e1 = endCoordList[i];
+                console.log("se", [s1, e1]);
+                d3.select(".mats")
+                    .append("path")
+                    .attr("d", function () {
+                        return [
+                            "M",
+                            s1[0],
+                            s1[1], 
+                            "A",
+                            (e1[0] - s1[0]) / 2,
+                            ",", 
+                            (e1[0] - s1[0]) / 4,
+                            0,
+                            0,
+                            ",", 
+                            e1[0] > s1[0] ? 1 : 0,
+                            ",", 
+                            e1[0],
+                            ",",
+                            e1[1],
+                        ] 
+                            .join(" ");
+                    })
+                    .attr("class", "procVis")
+                    .attr("id", "tempath")
+                    .style("fill", "none")
+                    .attr("stroke", myColor(Xv[j]));
+            }
+            d3.selectAll("path").lower();
+            i++;
+            console.log("i", i);
+            if (i >= 64 || !lock) {
+                clearInterval(intervalID);
+            }
+        }, 250); 
+
+        setIntervalID(intervalID);
+        d3.selectAll("path").lower();
+    });
 
     return {
         getIntervalID: getIntervalID,
