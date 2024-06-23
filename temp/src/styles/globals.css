@@ -93,7 +93,7 @@ path, text, svgElement, rect {
   left: 0;
   width: 400px; 
   height: 1200px; 
-  background-color: #f8f8f8; 
+  background-color: white; 
   padding: 10px; 
   overflow-y: auto; 
   overflow-x:hidden

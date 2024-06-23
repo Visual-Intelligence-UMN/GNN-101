@@ -13,6 +13,7 @@ import {
     ViewSelector,
     Hint,
     ButtonChain,
+    ModelButtonChain,
     ViewSwitch,
     GraphAnalysisViewer,
 } from "./WebUtils";
@@ -31,6 +32,11 @@ export const inter2 = Inter({
     subsets: ['latin-ext'],
 })
 
+export const inter3 = Inter({
+    variable: '--font-inter',
+    weight: '400',
+    subsets: ['latin-ext'],
+})
 
 export default function Home() {
     const [graphData, setGraphData] = useState<any>(null);
@@ -42,9 +48,8 @@ export default function Home() {
     const [isMat, setIsMat] = useState(true);
     const [changedG, setChangedG] = useState(true);
     const [step, setStep] = useState(1);
-    const [showGraphAnalysis, setShowGraphAnalysis] = useState(false);
+    const [show, setShow] = useState(false);
     const [predicted, setPredicted] = useState(false);
-
     //intermediate output
     const [intmData, setIntmData] = useState<IntmData | null>(null);
 
@@ -52,6 +57,7 @@ export default function Home() {
 
     function handlePrediction(data: boolean) {
         setPredicted(data);
+
     }
 
     function handleDataComm(data: any) {
@@ -67,10 +73,10 @@ export default function Home() {
         setSelectedGraph(e.target.value);
         setPath(e.target.value);
         setChangedG(true);
-        setPredicted(false); // Reset the prediction state
+        setPredicted(false); 
     }
 
-
+    // For now leave this commented out
     // useEffect(() => {
     //     if (step < 1) {
     //         const timer = setTimeout(() => {
@@ -137,8 +143,8 @@ export default function Home() {
                                 <div className='flex items-center'>
                                     <button
                                         className="transition-transform duration-500 ease-in-out text-2xl ml-6 mt-2"
-                                        style={{ transform: `rotate(${showGraphAnalysis ? '90deg' : '0deg'})`, transformOrigin: 'center' }}
-                                        onClick={() => setShowGraphAnalysis(!showGraphAnalysis)}
+                                        style={{ transform: `rotate(${show ? '90deg' : '0deg'})`, transformOrigin: 'center' }}
+                                        onClick={() => setShow(!show)}
                                         data-tooltip-content={'See more options'}
                                         data-tooltip-id='tooltip'
                                     > ⏵
@@ -147,23 +153,21 @@ export default function Home() {
                                     
                                 </div>
                             </div>
-                            <CSSTransition in={showGraphAnalysis}
+                            <CSSTransition in={show}
                                         timeout={300}
                                         classNames="graph"
                                         unmountOnExit>
-                                        <h1>
-                                            More options here
-                                        </h1>
+                                            <ModelButtonChain/>
                                     </CSSTransition>
                             <hr className="border-t border-gray-300 my-4"></hr>
                             <ButtonChain />
-                            <div className="flex gap-x-4 items-center">
+                            <div className="flex gap-x-4 items-center mb-3  ">
                                 <div>
                                     <h2 className="text-xl font-semibold">Data</h2>
                                 </div>
-                                <div className="flex items-center gap-x-4">
+                                <div className="flex items-center gap-x-4 ">
                                     <Hint text={"Select a graph"} />
-                                    <div>
+                                    <div className={inter3.className}>
                                         <GraphSelector
                                             selectedGraph={selectedGraph}
                                             handleChange={handleGraphSelection}
@@ -199,7 +203,6 @@ export default function Home() {
                                         </div>
                                         <div>
                                             <ViewSwitch
-                                            
                                                 handleChange={(e) => {
                                                     
                                                     if (e === true) {

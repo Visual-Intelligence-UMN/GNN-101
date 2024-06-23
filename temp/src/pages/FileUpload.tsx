@@ -113,7 +113,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({ graph_path, dataComm, cha
 
   return (
     <div>
-      {probabilities && (changed) && (
+      {changed && !predicted && (
         <div>
           <hr className="border-t border-gray-300 my-4"></hr>
           <div className="flex gap-x-4 items-center mb-2">
@@ -131,10 +131,12 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({ graph_path, dataComm, cha
               <br />
             </div>
           </div>
+          <p>No data available, please click "Click to Predict" to get the prediction result. </p>
         </div>
+        
       )}
       <div>
-        {probabilities && (!changed) && probabilities.length === 2 ? (
+        {predicted && probabilities.length === 2 && (
           <div>
             <div className="flex gap-x-4 items-center my-4">
               <div className="flex gap-x-4">
@@ -157,9 +159,6 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({ graph_path, dataComm, cha
             </div>
             <p>Classification Result for: {graphName}</p>
           </div>
-
-        ) : (
-          <p>No data available, please click "Click to Predict" to get the prediction result. </p>
         )}
       </div>
       <hr className="border-t border-gray-300 my-4"></hr>
