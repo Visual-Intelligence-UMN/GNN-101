@@ -436,18 +436,6 @@ export function drawGCNConv(
             schemeLocations[1][1],
             l5
         );
-        // const scheme7 = buildBinaryLegend(
-        //     myColor,
-        //     result[0],
-        //     result[1],
-        //     "Result Color Scheme",
-        //     schemeLocations[1][0] + 230 * 4.5,
-        //     schemeLocations[1][1],
-        //     l6
-        // );
-
-        //test
-        //scheme1.style.opacity = "0.2";
 
         colorSchemesTable = [
             scheme1,
@@ -457,8 +445,6 @@ export function drawGCNConv(
             scheme5,
             scheme6
         ];
-
-        //colorSchemesTable[0].style.opacity = "0.1";
     }
     return {
         "locations":locations,
@@ -671,64 +657,7 @@ export function drawTwoLayers(one: any, final: any, myColor: any) {
 
     
     console.log("mat result", result);
-    // const g1 = d3
-    //     .select(".mats")
-    //     .append("g")
-    //     .attr("class", "twoLayer layerVis")
-    //     .attr("id", "layerNum_6");
-    // for (let m = 0; m < result.length; m++) {
-    //     g1.append("rect")
-    //         .attr("x", aOne[0][0] + 10 * m)
-    //         .attr("y", aOne[0][1])
-    //         .attr("width", 10)
-    //         .attr("height", 10)
-    //         .attr("fill", myColor(result[m]))
-    //         .attr("opacity", 1)
-    //         .attr("stroke", "gray")
-    //         .attr("stroke-width", 0.1);
-    // }
-    // //drawPoints(".mats", "red", aOne)
-
-    // addLayerName(aOne, "Prediction Result", 0, 20, g1);
-    // //draw frame
-    // const f1 = g1
-    //     .append("rect")
-    //     .attr("x", aOne[0][0])
-    //     .attr("y", aOne[0][1])
-    //     .attr("width", 2 * 10)
-    //     .attr("height", 10)
-    //     .attr("fill", "none")
-    //     .attr("opacity", 0)
-    //     .attr("stroke", "black")
-    //     .attr("stroke-width", 1)
-    //     .attr("layerID", 4)
-    //     .attr("class", "frame")
-    //     .attr("fr", 2)
-    //     .attr("id", "fr2");
-    // //connect
-    // aOne[0][1] += 5;
     let cOne = deepClone(aOne);
-    // cOne[0][0] -= 102;
-    // d3.select(".mats")
-    //     .append("path")
-    //     .attr("d", d3.line()([aOne[0], cOne[0]]))
-    //     .attr("stroke", "black")
-    //     .attr("opacity", 0.05)
-    //     .attr("fill", "none")
-    //     .attr("class", "path2");
-
-    // //add interaction
-    // g1.on("mouseover", function (event, d) {
-    //     d3.select(".path2").style("opacity", 1);
-    //     d3.select("[fr='1']").style("opacity", 1);
-    //     f1.style("opacity", 1);
-    //     console.log("f", f, f1);
-    // });
-    // g1.on("mouseout", function (event, d) {
-    //     d3.select(".path2").style("opacity", 0.02);
-    //     d3.select("[fr='1']").style("opacity", 0);
-    //     f1.style("opacity", 0);
-    // });
 
     return { locations: [aOne[0], cOne[0]], g: g, g1: null };
 }

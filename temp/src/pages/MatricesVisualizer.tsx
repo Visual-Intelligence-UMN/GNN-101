@@ -242,18 +242,6 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 .style("stroke-width", 1)
                 .style("stroke", "grey")
                 .style("opacity", 0.8);
-            
-                const xyValues = data.map((d: HeatmapData) => {
-                    return [
-                      x(d.group)!,
-                      y(d.variable)!
-                    ];
-                  });
-                  
-                  console.log("xy",xyValues);
-drawPoints(".mats", "red", locations);
-            console.log("x-bandwidth", x.bandwidth());
-            console.log("y-bandwidth", y.bandwidth());
 
             g.selectAll(".x-axis text")
                 .on("mouseover", function (event) {
@@ -291,8 +279,7 @@ drawPoints(".mats", "red", locations);
                 graph,
                 adjList,
                 colorSchemeTable,
-                detailView,
-                setDetailView
+                detailView
             );
             drawNodeAttributes(nodeAttrs, graph);
         };

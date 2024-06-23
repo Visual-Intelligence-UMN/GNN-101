@@ -30,8 +30,7 @@ export function visualizeFeatures(
     graph: any,
     adjList: any,
     maxVals: any,
-    detailView: any,
-    setDetailView: any
+    detailView: any
 ) {
     //drawPoints(".mats", "red", locations);
     //--------------------------------DATA PREP MANAGEMENT--------------------------------
