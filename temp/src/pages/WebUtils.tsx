@@ -436,6 +436,9 @@ export function visualizeGraph(path: string) {
         const width = 6 * offset - margin.left - margin.right;
         const height = 1000 - margin.top - margin.bottom;
 
+
+
+
         // Append the SVG object to the body of the page
         d3.select("#my_dataviz").selectAll("svg").remove();
         const svg = d3
@@ -581,7 +584,7 @@ export function visualizeGraph(path: string) {
                 .attr("fill", "none")
                 .attr('transform',transform);
                     //here has an issue
-                    featureVisualizer(svg, allNodes, offset, height, null);
+                    featureVisualizer(svg, allNodes, offset, height, null, []);
                 });
           
 

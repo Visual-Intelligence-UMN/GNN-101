@@ -32,7 +32,7 @@ g.layerVis {
   transition-duration: 2s;
 }
 
-path, text, svgElement {
+path, text, svgElement, rect {
   transition: all;
   transition-duration: 1s;
 }
