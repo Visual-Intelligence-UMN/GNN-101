@@ -1,5 +1,7 @@
 import * as d3 from "d3";
 import { calculateAverage, myColor } from "./utils";
+import { loadWeights } from "./matHelperUtils";
+import { create, all, matrix } from "mathjs";
 import { inter } from "@/pages";
 
 
@@ -107,7 +109,14 @@ export function resetNodes(allNodes: any[]) {
   }
 
 
-  export function calculationVisualizer(node: any, svg: any, offset: number) {
+  export function calculationVisualizer(node: any, currentWeights: any, bias: any, aggregatedDataMap: any[], calculatedDataMap: any[], svg: any, offset: number, isClicked: boolean) {
+    if (isClicked || aggregatedDataMap == null || calculatedDataMap == null) { //doesn't work currently
+      return;
+    }
+
+
+    let biasData = bias[node.graphIndex]; //might cause an issue when the first layer is added 
+    
     const g3 = svg.append("g")
       .attr("class", "layerVis")
       .attr("transform", `translate(${(node.graphIndex - 3.5) * offset}, 10)`);
@@ -133,15 +142,17 @@ export function resetNodes(allNodes: any[]) {
   
     const pathColor = d3.scaleLinear<string>()
       .domain([-0.25, 0, 0.25])
-      .range(["red", "purple", "blue"]);
+      .range(["red", "purple", "blue"]); //to be determined
+
+      
+    const aggregatedData = aggregatedDataMap[node.id];
+
   
-    let data = node.features; // to be determined
-  
-    const originalFeatureGroup = g3.append("g")
+    const aggregatedFeatureGroup = g3.append("g")
       .attr("transform", `translate(${xPos + 400}, ${yPos - 64 * 3 - 5})`);
   
-    originalFeatureGroup.selectAll("rect")
-      .data(data)
+    aggregatedFeatureGroup.selectAll("rect")
+      .data(aggregatedData)
       .enter()
       .append("rect")
       .attr("x", 0)
@@ -162,13 +173,16 @@ export function resetNodes(allNodes: any[]) {
         startCoordList.push(s)
       }  
   
-    intermediateFeatureGroups.push(originalFeatureGroup);
+    intermediateFeatureGroups.push(aggregatedFeatureGroup);
 
-    const aggregatedFeatureGroup = g3.append("g")
+
+    const calculatedData = calculatedDataMap[node.id]
+
+    const calculatedFeatureGroup = g3.append("g")
       .attr("transform", `translate(${xPos + 600}, ${yPos - 64 * 3 - 5})`);
   
-    aggregatedFeatureGroup.selectAll("rect")
-      .data(data)
+    calculatedFeatureGroup.selectAll("rect")
+      .data(calculatedData)
       .enter()
       .append("rect")
       .attr("x", start_x)
@@ -182,20 +196,20 @@ export function resetNodes(allNodes: any[]) {
 
     for (let i = 0; i < 64; i++) {
       let s: [number, number] = [
-          start_x + xPos + 615 + (node.graphIndex - 3.5) * offset,
+          start_x + xPos + 600 + (node.graphIndex - 3.5) * offset,
           yPos - i * 3 - 5 + 12,
       ];  
       endCoordList.push(s)
     }
 
-    intermediateFeatureGroups.push(aggregatedFeatureGroup);
+    intermediateFeatureGroups.push(calculatedFeatureGroup);
 
 
     const BiasGroup = g3.append("g")
       .attr("transform", `translate(${xPos + 650}, ${yPos - 64 * 3 - 75})`);
   
     BiasGroup.selectAll("rect")
-      .data(data)
+      .data(biasData)
       .enter()
       .append("rect")
       .attr("x", start_x)
@@ -306,19 +320,15 @@ export function resetNodes(allNodes: any[]) {
     .style("text-anchor", "middle");  
   }, 1500);
 
-    
-
-
-    weightAnimation(svg, startCoordList, endCoordList);
+    weightAnimation(svg, startCoordList, endCoordList, currentWeights); // may cause problems when the first layer is added 
   }
 
 
-
-export function nodeClickHandler(svg: any, node: any, moveOffset: number, indicator: number) {
+export function moveNextLayer(svg: any, node: any, moveOffset: number, indicator: number) {
 
   if (!svg.selectAll) {
     svg = d3.select(svg);
-  }
+  } // when svg is passed into a function, it should be selected again
 
   svg.selectAll("g[layerNum]")
   .filter((d: any, i: any, nodes: any) => {
@@ -338,10 +348,12 @@ export function nodeClickHandler(svg: any, node: any, moveOffset: number, indica
   });
 }
 
-function weightAnimation(svg: any, startCoordList: number[], endCoordList: number[]) {
+function weightAnimation(svg: any, startCoordList: number[], endCoordList: number[], weights: any[]) {
   let i = 0
   let intervalID: any;
   let isAnimating = true; 
+  const math = create(all, {});
+  const Xt = math.transpose(weights);
 
   document.addEventListener('click', () => {
     isAnimating = false; 
@@ -354,6 +366,8 @@ function weightAnimation(svg: any, startCoordList: number[], endCoordList: numbe
   setTimeout(() => {
     intervalID = setInterval(() => {
       GraphViewDrawPaths(
+          Xt,
+          myColor,
           i,
           startCoordList,
           endCoordList,
@@ -361,7 +375,7 @@ function weightAnimation(svg: any, startCoordList: number[], endCoordList: numbe
           isAnimating
       );
       i++;
-      if (i >= 64 ) {
+      if (i >= 64) {
           clearInterval(intervalID);
       }
   }, 250); 
@@ -373,6 +387,8 @@ function weightAnimation(svg: any, startCoordList: number[], endCoordList: numbe
 }
 
 function GraphViewDrawPaths(
+  Xt: any,
+  myColor: any,
   i: number,
   startCoordList: any,
   endCoordList: any,
@@ -388,6 +404,7 @@ function GraphViewDrawPaths(
   if (!svg.selectAll) {
     svg = d3.select(svg);
   }
+  const Wi = Xt[i];
   for (let j = 0; j < 64; j++) {
     let s = startCoordList[63 - j];
     let e = endCoordList[i];
@@ -412,7 +429,7 @@ function GraphViewDrawPaths(
 
     svg.append("path")
       .attr("d", path.toString())
-      .attr("stroke", "grey")
+      .attr("stroke", myColor(Wi[63 - j]))
       .attr("stroke-width", 1)
       .attr("opacity", 1)
       .attr("fill", "none")
@@ -427,32 +444,90 @@ function GraphViewDrawPaths(
 
 
 
-export function documentClickHandler(svg: any, movedNode: any, moveOffset: number) {
 
-  if (!svg.selectAll) {
-    svg = d3.select(svg);
+
+export function aggregationCalculator(graphs: any[]) {
+
+
+  
+  let data = graphs[0];
+  const nodeCount = data.nodes.length;
+  const edgePairs = data.links;
+  let adjList: number[][] = Array.from(
+    { length: nodeCount },
+    () => []
+  );
+  let checked: number[] = [];
+  for (let i = 0; i < nodeCount; i++) {
+    // Push itself to the adjList
+    adjList[i].push(i);
+    for (let j = 0; j < edgePairs.length; j++) {
+      if (data.links[j].source.id === i) {
+        // Push its neighbors to adjList
+        adjList[i].push(data.links[j].target.id);
+      }
+    }
   }
-  svg.selectAll(".vis-component")
-    .style("opacity", 0);
 
-  svg.selectAll("g[layerNum]")
-        .filter((d: any, i: any, nodes: any) => {
-          const layerNum = d3.select(nodes[i]).attr("layerNum");
-          return layerNum !== null && parseInt(layerNum) > 0 && parseInt(layerNum) >= movedNode.graphIndex;
-        })
-        .attr("transform", function(this: any) {
-          const currentTransform = d3.select(this).attr("transform");
-          if (currentTransform) {
-            const currentXMatch = currentTransform.match(/translate\(([^,]+),/);
-            if (currentXMatch && currentXMatch[1]) {
-              const currentX = parseInt(currentXMatch[1]);
-              return `translate(${currentX - moveOffset},10)`;
-            }
-          }
-          return "translate(0,10)"; // Default fallback
-        });
+  const degreeMap = new Array(nodeCount).fill(0);
+  for (let i = 0; i < edgePairs.length; i++) {
+    if (!checked.includes(edgePairs[i].target.id)) {
+      const source = edgePairs[i].source.id;
+      const target = edgePairs[i].target.id;
+
+      degreeMap[source]++;
+      degreeMap[target]++;
+      checked.push(edgePairs[i].target.id);
+    }
+  }
+
+  let adjMatrix = Array.from({ length: nodeCount }, () => new Array(nodeCount).fill(0));
+
+
+  for (let i = 0; i < nodeCount; i++) {
+    for (let j = 0; j < adjList[i].length; j++) {
+      const neighbor = adjList[i][j];
+      adjMatrix[i][neighbor] = 1; 
+    }
+  }
+
+
+  let degreeMatrix = new Array(nodeCount).fill(0).map((_, i) => 1 / Math.sqrt(degreeMap[i]));
+
+  let normalizedAdjMatrix = Array.from({ length: nodeCount }, () => new Array(nodeCount).fill(0));
+  for (let i = 0; i < nodeCount; i++) {
+    for (let j = 0; j < nodeCount; j++) {
+      if (adjMatrix[i][j] !== 0) {
+        normalizedAdjMatrix[i][j] = degreeMatrix[i] * adjMatrix[i][j] * degreeMatrix[j];
+      }
+    }
+  }
+  return normalizedAdjMatrix;
+
 }
 
+export function matrixMultiplication(matrix_a: any[], matrix_b: any[]) {
 
+  const rowsA = matrix_a.length;
+    const colsA = matrix_a[0].length;
+    const rowsB = matrix_b.length;
+    const colsB = matrix_b[0].length;
 
+    if (colsA !== rowsB) {
+      console.log("can't do")
+      return matrix_a;
+       
+    }
 
+    const result: any[][] = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+
+    for (let i = 0; i < rowsA; i++) {
+        for (let j = 0; j < colsB; j++) {
+            for (let k = 0; k < colsA; k++) {
+                result[i][j] += matrix_a[i][k] * matrix_b[k][j];
+            }
+        }
+    }
+
+    return result;
+}

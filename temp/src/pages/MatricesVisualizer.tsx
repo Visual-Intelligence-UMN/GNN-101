@@ -7,8 +7,7 @@ import {
     graph_to_matrix,
     load_json,
     matrix_to_hmap,
-    get_axis_gdata,
-    drawPoints
+    get_axis_gdata
 } from "../utils/utils";
 import {
     visualizeFeatures

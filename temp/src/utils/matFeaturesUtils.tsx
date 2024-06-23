@@ -1,4 +1,4 @@
-import { deepClone, drawPoints, softmax } from "./utils";
+import { deepClone, softmax } from "./utils";
 import { addLayerName, buildBinaryLegend, buildLegend } from "./matHelperUtils";
 import * as d3 from "d3";
 
@@ -129,7 +129,7 @@ export function drawMatrixPreparation(graph: any, locations: any) {
             .select(".mats")
             .append("rect")
             .attr("x", colLocations[i][0])
-            .attr("y", colLocations[i][1])
+            .attr("y", colLocations[i][1] + 3)
             .attr("height", 300)
             .attr("width", 300 / graph.length)
             .attr("fill", "none")
@@ -143,14 +143,12 @@ export function drawMatrixPreparation(graph: any, locations: any) {
     colFrames.reverse();
     //draw frames on matrix
     let matFrames: SVGElement[] = []; //a
-    let w = locations[1][1] - locations[0][1];
-    console.log("rect w", w);
     for (let i = 0; i < locations.length; i++) {
         const r = d3
             .select(".mats")
             .append("rect")
             .attr("x", locations[i][0] - 300 + 300 / graph.length / 2)
-            .attr("y", locations[i][1]-2)
+            .attr("y", locations[i][1] + 3)
             .attr("height", 300 / graph.length)
             .attr("width", 300)
             .attr("fill", "none")
@@ -161,7 +159,6 @@ export function drawMatrixPreparation(graph: any, locations: any) {
 
         matFrames.push(r.node() as SVGElement);
     }
-    console.log("frame locations", locations)
     console.log("matFrames", matFrames);
     return { colFrames: colFrames, matFrames: matFrames };
 }
@@ -176,13 +173,11 @@ export function drawNodeFeatures(
     schemeLocations: any,
     featureVisTable: any
 ) {
-    //drawPoints(".mats", "red", locations);
     //initial visualizer
     for (let i = 0; i < locations.length; i++) {
         locations[i][0] += 25;
         locations[i][1] += 2;
     }
-    
     //draw cross connections for features layer and first GCNConv layer
     drawCrossConnection(graph, locations, 35, 102, 0);
 
@@ -262,7 +257,6 @@ export function drawGCNConv(
     firstLayer: any,
     maxVals: any
 ) {
-    //drawPoints(".mats", "red", locations);
     //GCNCov Visualizer
     let one = null;
     let paths: any;
