@@ -171,7 +171,17 @@ export const ButtonChain = () => {
         </div>
     );
 };
- 
+export const ModelButtonChain = () => {
+    return (
+        <div className="flex items-center space-x-4">
+            <button>Model 1</button>
+            <button>Model 2</button>
+            <button>Model 3</button>
+            <button>Model 4</button>
+
+        </div>
+    )
+}
 
 import {Inter} from '@next/font/google';
 
@@ -249,7 +259,15 @@ export const GraphSelector: React.FC<GraphSelectorProps> = ({
     graphList,
 }) => {
     return (
-        <select value={selectedGraph} onChange={handleChange}>
+        <select value={selectedGraph} onChange={handleChange} style={{
+            boxShadow: 'inset 1px 2px 3px rgba(0, 0, 0, 0.25)',
+            height: '30px', 
+            width: "120px",
+            textAlign:"left",
+            verticalAlign:"bottom",
+            backgroundColor:"#F9F7F7",
+            color:"#7A7A7A",
+        }}>
             {graphList.map((item, index) => (
                 <option key={index} value={item}>
                     Graph {index}
@@ -302,6 +320,7 @@ export const PredictionVisualizer: React.FC<PredictionVisualizerProps> = ({
             .text(function (d, i) {
                 return roundToTwo(d * 100);
             })
+            .attr("dx", "5") 
             .attr("x", function (d, i) {
                 return d * 200;
             })
