@@ -79,7 +79,7 @@ export const GraphAnalysisViewer: React.FC<GraphAnalysisViewerProps> = ({
                         </div>
                         <div className="mr-4">
                             <text className="font-semibold">Edge Count</text>:{" "}
-                            {data.is_directed ? data.edge_count : data.edge_count/2}
+                            {data.is_directed ? data.edge_count : data.edge_count / 2}
                         </div>
                         <div className="mr-4">
                             <text className="font-semibold">
@@ -111,59 +111,67 @@ export const GraphAnalysisViewer: React.FC<GraphAnalysisViewerProps> = ({
 };
 
 //button chain on the general UI    
-export const ButtonChain = () => {
-    const [selectedButtons, setSelectedButtons] = useState([false, false, false, false, false, false, false]);
+export const ButtonChain = ({ selectedButtons, setSelectedButtons, predicted }: { selectedButtons: any[], setSelectedButtons: Function, predicted: boolean }) => {
     
     const handleButtonClick = (index: number) => {
-        setSelectedButtons((prevSelectedButtons) => {
-            const updatedButtons = [...prevSelectedButtons];
-            updatedButtons[index] = !updatedButtons[index];
-            return updatedButtons;
+        setSelectedButtons((prevSelectedLayers: any[]) => {
+            const updatedLayers = [...prevSelectedLayers];
+            updatedLayers[index] = !(updatedLayers[index]);
+            
+            return updatedLayers;
         });
     };
     return (
-        <div className="flex gap-x-4 items-center" style={{marginBottom:'20px'}}>
+        <div className="flex gap-x-4 items-center" style={{ marginBottom: '20px' }}>
             <div>
                 <h2 className="text-xl font-semibold">Model Architecture</h2>
             </div>
             <div>
                 <div className="flex items-center justify-center gap-x-2">
-                    <div style={{marginRight:'7px'}}>
-                        <Hint text={"Here's the Architecture of the GNN"} />
+                    <div style={{ marginRight: '7px' }}>
+                        <Hint text={"Interact with me after you predict!"} />
                     </div>
-                    <button 
-                    className={`bg-gray-200 border border-gray-300 hover:border-black hover:bg-gray-300 text-black py-1 px-2 rounded ${selectedButtons[0] ? 'outline outline-2 outline-black bg-gray-300' : ''}`}
-                    onClick={() => handleButtonClick(0)}>
+                     {/* Since input is not shown during the predicted phase, it is disabled */}
+                    <button
+                        disabled={!predicted}
+                        className={`cursor-default bg-gray-200 border border-gray-300 text-black py-1 px-2 rounded `}
+                        >
                         Input
                     </button>
-                    <button 
-                    className={`bg-yellow-200 border border-gray-300 hover:border-black hover:bg-yellow-300 text-black py-1 px-2 rounded ${selectedButtons[1] ? 'outline outline-2 outline-black bg-yellow-300' : ''}`}
-                    onClick={() => handleButtonClick(1)}>
+                    <button
+                        disabled={!predicted}
+                        className={`bg-yellow-200 border border-gray-300 ${predicted ? 'hover:border-black hover:bg-yellow-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[1] ? 'outline outline-2 outline-black bg-yellow-300' : ''}`}
+                        onClick={() => handleButtonClick(1)}>
                         GNNConv1
                     </button>
-                    <button 
-                    className={`bg-yellow-200 border border-gray-300 hover:border-black hover:bg-yellow-300 text-black py-1 px-2 rounded ${selectedButtons[2] ? 'outline outline-2 outline-black bg-yellow-300' : ''}`}
-                    onClick={() => handleButtonClick(2)}>
+                    <button
+                        disabled={!predicted}
+                        className={`bg-yellow-200 border border-gray-300 ${predicted ? 'hover:border-black hover:bg-yellow-300': ''} text-black py-1 px-2 rounded ${selectedButtons[2] ? 'outline outline-2 outline-black bg-yellow-300' : ''}`}
+                        onClick={() => handleButtonClick(2)}>
                         GNNConv2
                     </button>
-                    <button 
-                    className={`bg-yellow-200 border border-gray-300 hover:border-black hover:bg-yellow-300 text-black py-1 px-2 rounded ${selectedButtons[3] ? 'outline outline-2 outline-black bg-yellow-300' : ''}`}
-                    onClick={() => handleButtonClick(3)}>
+                    <button
+                        disabled={!predicted}
+                        className={`bg-yellow-200 border border-gray-300 ${predicted ? 'hover:border-black hover:bg-yellow-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[3] ? 'outline outline-2 outline-black bg-yellow-300' : ''}`}
+                        onClick={() => handleButtonClick(3)}>
                         GNNConv3
                     </button>
-                    <button 
-                    className={`bg-blue-200 border border-gray-300 hover:border-black hover:bg-blue-300 text-black py-1 px-2 rounded ${selectedButtons[4] ? 'outline outline-2 outline-black bg-blue-300' : ''}`}
-                    onClick={() => handleButtonClick(4)}>
+                    <button
+                        disabled={!predicted}
+                        className={`bg-blue-200 border border-gray-300 ${predicted ? 'hover:border-black hover:bg-blue-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[4] ? 'outline outline-2 outline-black bg-blue-300' : ''}`}
+                        onClick={() => handleButtonClick(4)}>
                         Global Mean Pooling
                     </button>
-                    <button 
-                        className={`bg-green-200 border border-gray-300 hover:border-black hover:bg-green-300 text-black py-1 px-2 rounded ${selectedButtons[5] ? 'outline outline-2 outline-black bg-green-300' : ''}`}
+                    <button
+                        disabled={!predicted}
+                        className={`bg-green-200 border border-gray-300 ${predicted ? 'hover:border-black hover:bg-green-300': ''} text-black py-1 px-2 rounded ${selectedButtons[5] ? 'outline outline-2 outline-black bg-green-300' : ''}`}
                         onClick={() => handleButtonClick(5)}>
                         FC
                     </button>
-                    <button 
-                    className={`bg-gray-200 border border-gray-300 hover:border-black hover:bg-gray-300 text-black py-1 px-2 rounded ${selectedButtons[6] ? 'outline outline-2 outline-black bg-gray-300' : ''}`}
-                    onClick={() => handleButtonClick(6)}>
+                    <button
+                        disabled={!predicted}
+                        className={`bg-gray-200 border border-gray-300 ${predicted ? 'hover:border-black hover:bg-gray-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[6] ? 'outline outline-2 outline-black bg-gray-300' : ''}`}
+                        onClick={() => handleButtonClick(6)}>
                         Output
                     </button>
                 </div>
@@ -183,57 +191,57 @@ export const ModelButtonChain = () => {
     )
 }
 
-import {Inter} from '@next/font/google';
+import { Inter } from '@next/font/google';
 
 const inter = Inter({
     variable: '--font-inter',
     weight: '400',
     subsets: ['latin-ext'],
-  })
-  export const Sidebar = () => {
+})
+export const Sidebar = () => {
     return (
-        
-        
-            <div className="sidebar" style={{height:'100%'}}>
-                <main className={inter.className} style={{paddingRight: '60px'}}>
+
+
+        <div className="sidebar" style={{ height: '100%' }}>
+            <main className={inter.className} style={{ paddingRight: '60px' }}>
                 <h1 className="text-2xl font-black text-center text-3xl">WHAT is an GNN model?</h1>
                 <p className="text-center text-lg">This is a paragraph explaining the GNN model. The quick brown fox jumps over the lazy dog.
-                The quick brown fox jumps over the lazy dog.
-                The quick brown fox jumps over the lazy dog.
-                The quick brown fox jumps over the lazy dog.
-                The quick brown fox jumps over the lazy dog.
-                The quick brown fox jumps over the lazy dog.
-                The quick brown fox jumps over the lazy dog.
+                    The quick brown fox jumps over the lazy dog.
+                    The quick brown fox jumps over the lazy dog.
+                    The quick brown fox jumps over the lazy dog.
+                    The quick brown fox jumps over the lazy dog.
+                    The quick brown fox jumps over the lazy dog.
+                    The quick brown fox jumps over the lazy dog.
 
                 </p>
 
                 <h1 className="text-2xl font-black text-center text-3xl">How to interact with this demo?</h1>
                 <p className="text-center text-lg">This is a paragraph explaining how to interact with the demo.
-                The quick brown fox jumps over the lazy dog.
-                The quick brown fox jumps over the lazy dog.
-                The quick brown fox jumps over the lazy dog.
-                The quick brown fox jumps over the lazy dog.
-                The quick brown fox jumps over the lazy dog.</p>
+                    The quick brown fox jumps over the lazy dog.
+                    The quick brown fox jumps over the lazy dog.
+                    The quick brown fox jumps over the lazy dog.
+                    The quick brown fox jumps over the lazy dog.
+                    The quick brown fox jumps over the lazy dog.</p>
                 <h1 className="text-2xl font-black text-center text-3xl">How to interact with this demo?</h1>
                 <p className="text-center text-lg">This is a paragraph explaining how to interact with the demo.
-                The quick brown fox jumps over the lazy dog.
-                The quick brown fox jumps over the lazy dog.
-                The quick brown fox jumps over the lazy dog.
-                The quick brown fox jumps over the lazy dog.
-                The quick brown fox jumps over the lazy dog.</p>
+                    The quick brown fox jumps over the lazy dog.
+                    The quick brown fox jumps over the lazy dog.
+                    The quick brown fox jumps over the lazy dog.
+                    The quick brown fox jumps over the lazy dog.
+                    The quick brown fox jumps over the lazy dog.</p>
                 <h1 className="text-2xl font-black text-center text-3xl">How to interact with this demo?</h1>
                 <p className="text-center text-lg">This is a paragraph explaining how to interact with the demo.
-                The quick brown fox jumps over the lazy dog.
-                The quick brown fox jumps over the lazy dog.
-                The quick brown fox jumps over the lazy dog.
-                The quick brown fox jumps over the lazy dog.
-                The quick brown fox jumps over the lazy dog.</p>
+                    The quick brown fox jumps over the lazy dog.
+                    The quick brown fox jumps over the lazy dog.
+                    The quick brown fox jumps over the lazy dog.
+                    The quick brown fox jumps over the lazy dog.
+                    The quick brown fox jumps over the lazy dog.</p>
             </main>
-            </div>
+        </div>
 
-      
+
     );
-  };
+};
 
 //helper function for graph selector, generate a list of graphs to select
 export function graph_list_generate(num: number) {
@@ -261,12 +269,12 @@ export const GraphSelector: React.FC<GraphSelectorProps> = ({
     return (
         <select value={selectedGraph} onChange={handleChange} style={{
             boxShadow: 'inset 1px 2px 3px rgba(0, 0, 0, 0.25)',
-            height: '30px', 
+            height: '30px',
             width: "120px",
-            textAlign:"left",
-            verticalAlign:"bottom",
-            backgroundColor:"#F9F7F7",
-            color:"#7A7A7A",
+            textAlign: "left",
+            verticalAlign: "bottom",
+            backgroundColor: "#F9F7F7",
+            color: "#7A7A7A",
         }}>
             {graphList.map((item, index) => (
                 <option key={index} value={item}>
@@ -320,7 +328,7 @@ export const PredictionVisualizer: React.FC<PredictionVisualizerProps> = ({
             .text(function (d, i) {
                 return roundToTwo(d * 100);
             })
-            .attr("dx", "5") 
+            .attr("dx", "5")
             .attr("x", function (d, i) {
                 return d * 200;
             })
@@ -348,7 +356,7 @@ export const ViewSwitch: React.FC<ViewSwitchProps> = ({
     current,
 }) => {
     return (
-        
+
         <div className="relative inline-block w-20 h-8 select-none rounded-full overflow-hidden">
             {/* Input remains hidden but is functional for toggle */}
             <input
@@ -366,9 +374,8 @@ export const ViewSwitch: React.FC<ViewSwitchProps> = ({
             >
                 {/* Only one span for the slider circle */}
                 <span
-                    className={`cursor-pointer absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow transform transition-all duration-300 ease-in-out ${
-                        current ? "translate-x-12" : ""
-                    }`}
+                    className={`cursor-pointer absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow transform transition-all duration-300 ease-in-out ${current ? "translate-x-12" : ""
+                        }`}
                 ></span>
             </label>
         </div>
@@ -418,9 +425,9 @@ export const Hint: React.FC<HintProps> = ({ text }) => {
             data-tooltip-id='tooltip'
             className='items-center justify-center'
         >
-                <span className="inline-block bg-gray-300 rounded-full w-6 h-6 flex items-center justify-center text-black cursor-default">
-                    ?
-                </span>
+            <span className="inline-block bg-gray-300 rounded-full w-6 h-6 flex items-center justify-center text-black cursor-default">
+                ?
+            </span>
             <Tooltip id="tooltip" />
         </span>
     );
@@ -468,16 +475,16 @@ export function visualizeGraph(path: string) {
                 .attr("r", 17)
                 .style("stroke", "#69b3a2")
                 .style("fill", "white")
-                
+
 
             const labels = g1
                 .selectAll("text")
                 .data(data.nodes)
                 .join("text")
-                .text((d: any) => d.name)    
-                .attr("font-size", `20px`);  
-                
-            
+                .text((d: any) => d.name)
+                .attr("font-size", `20px`);
+
+
 
             // Define the simulation
             const simulation = d3
@@ -491,34 +498,34 @@ export function visualizeGraph(path: string) {
                 )
                 .force("center", d3.forceCenter(width / 2, height / 2.8))
                 .force("collide", d3.forceCollide().radius(20).strength(0.8))
-                .force("aromatic", d3.forceManyBody().strength((d: any) => (d.is_aromatic ? -210: -100)).theta(0.9))
+                .force("aromatic", d3.forceManyBody().strength((d: any) => (d.is_aromatic ? -210 : -100)).theta(0.9))
                 .on("tick", function ticked() {
-                  link.attr("x1", (d: any) => d.source.x)
-                    .attr("y1", (d: any) => d.source.y)
-                    .attr("x2", (d: any) => d.target.x)
-                    .attr("y2", (d: any) => d.target.y)
-                    .attr("transform", function (d: any) {
-                      if (d.type === "double") {
-                        const dx = d.target.x - d.source.x;
-                        const dy = d.target.y - d.source.y;
-                        const dr = Math.sqrt(dx * dx + dy * dy);
-                        const offsetX = 5 * (dy / dr);
-                        const offsetY = 5 * (-dx / dr);
-                        return `translate(${offsetX}, ${offsetY})`;
-                      } 
-                      else {
-                        return null;
-                      }
-                    })
-                    .style("stroke", function (d: any) {
-                      if (d.type === "aromatic") {
-                        return "purple";
-                      }
-                      else {
-                        return "#aaa";
-                      }
-                    }) ;
-    
+                    link.attr("x1", (d: any) => d.source.x)
+                        .attr("y1", (d: any) => d.source.y)
+                        .attr("x2", (d: any) => d.target.x)
+                        .attr("y2", (d: any) => d.target.y)
+                        .attr("transform", function (d: any) {
+                            if (d.type === "double") {
+                                const dx = d.target.x - d.source.x;
+                                const dy = d.target.y - d.source.y;
+                                const dr = Math.sqrt(dx * dx + dy * dy);
+                                const offsetX = 5 * (dy / dr);
+                                const offsetY = 5 * (-dx / dr);
+                                return `translate(${offsetX}, ${offsetY})`;
+                            }
+                            else {
+                                return null;
+                            }
+                        })
+                        .style("stroke", function (d: any) {
+                            if (d.type === "aromatic") {
+                                return "purple";
+                            }
+                            else {
+                                return "#aaa";
+                            }
+                        });
+
 
                     node.attr("cx", (d: any) => d.x).attr(
                         "cy",
@@ -526,13 +533,13 @@ export function visualizeGraph(path: string) {
                     );
 
                     labels.attr("x", (d: any) => d.x - 6)
-                          .attr("y", (d: any) => d.y + 6);
+                        .attr("y", (d: any) => d.y + 6);
                 })
                 .on("end", function ended() {
                     let value = null;
                     data.nodes.forEach((node: any) => {
                         node.graphIndex = 0;
-                        
+
 
                         if (value != null) {
                             //node.features = value.subarray(64 * node.id, 64 * (node.id + 1))
@@ -540,56 +547,56 @@ export function visualizeGraph(path: string) {
                         allNodes.push(node);
                     });
                     let maxXDistance = 0;
-            let maxYDistance = 0;
-            data.nodes.forEach((node1: any) => {
-                data.nodes.forEach((node2: any) => {
-                    if (node1 !== node2) {
-                        const xDistance = Math.abs(node1.x - node2.x);
-                        const yDistance = Math.abs(node1.y - node2.y);
-    
-                        if (xDistance > maxXDistance) {
-                          maxXDistance = xDistance;
-                        }
-    
-                        if (yDistance > maxYDistance) {
-                          maxYDistance = yDistance;
-                        }
-                      }
-                });
-            });
-            const graphWidth = maxXDistance + 20
-            const graphHeight = maxYDistance + 20;
-            const point1 = { x: 0, y: height / 8 };
-            const point2 = { x: 0.9 * offset, y: height / 20 };
-            const point3 = { x: 0.9 * offset, y: height / 1.7 };
-            const point4 = { x: 0, y: height / 1.5 };
-            const tolerance = 120;
+                    let maxYDistance = 0;
+                    data.nodes.forEach((node1: any) => {
+                        data.nodes.forEach((node2: any) => {
+                            if (node1 !== node2) {
+                                const xDistance = Math.abs(node1.x - node2.x);
+                                const yDistance = Math.abs(node1.y - node2.y);
 
-            const x_dist = Math.abs(point1.x - point2.x);
-            const y_dist = Math.abs(point1.y - point4.y)
+                                if (xDistance > maxXDistance) {
+                                    maxXDistance = xDistance;
+                                }
+
+                                if (yDistance > maxYDistance) {
+                                    maxYDistance = yDistance;
+                                }
+                            }
+                        });
+                    });
+                    const graphWidth = maxXDistance + 20
+                    const graphHeight = maxYDistance + 20;
+                    const point1 = { x: 0, y: height / 8 };
+                    const point2 = { x: 0.9 * offset, y: height / 20 };
+                    const point3 = { x: 0.9 * offset, y: height / 1.7 };
+                    const point4 = { x: 0, y: height / 1.5 };
+                    const tolerance = 120;
+
+                    const x_dist = Math.abs(point1.x - point2.x);
+                    const y_dist = Math.abs(point1.y - point4.y)
 
 
-            const centerX = (point1.x + point3.x) / 2;
-            const centerY = (point1.y + point3.y) / 2;
-            let scaleX = ((graphWidth + tolerance) / x_dist);
-            let scaleY = ((graphHeight + tolerance) / y_dist);
-            let transform = `translate(${centerX}, ${centerY}) scale(${scaleX}, ${scaleY}) translate(${-centerX}, ${-centerY})`;
-            if (graphWidth + tolerance < x_dist && graphHeight + tolerance < y_dist) {
-                transform = `scale(1, 1)`;
-            }
-            const parallelogram = svg
-                .append("polygon")  
-                .attr("points", `${point1.x},${point1.y} ${point2.x},${point2.y} ${point3.x},${point3.y} ${point4.x},${point4.y}`)
-                .attr("stroke", "black")
-                .attr("fill", "none")
-                .attr('transform',transform);
+                    const centerX = (point1.x + point3.x) / 2;
+                    const centerY = (point1.y + point3.y) / 2;
+                    let scaleX = ((graphWidth + tolerance) / x_dist);
+                    let scaleY = ((graphHeight + tolerance) / y_dist);
+                    let transform = `translate(${centerX}, ${centerY}) scale(${scaleX}, ${scaleY}) translate(${-centerX}, ${-centerY})`;
+                    if (graphWidth + tolerance < x_dist && graphHeight + tolerance < y_dist) {
+                        transform = `scale(1, 1)`;
+                    }
+                    const parallelogram = svg
+                        .append("polygon")
+                        .attr("points", `${point1.x},${point1.y} ${point2.x},${point2.y} ${point3.x},${point3.y} ${point4.x},${point4.y}`)
+                        .attr("stroke", "black")
+                        .attr("fill", "none")
+                        .attr('transform', transform);
                     //here has an issue
                     featureVisualizer(svg, allNodes, offset, height, null, []);
                 });
-          
 
-            
-    
+
+
+
         }
     };
 
@@ -706,8 +713,8 @@ export function visualizeMatrix(path: string) {
                 const element = event.target as SVGGraphicsElement;
                 removeEffect(element);
             });
-        
-            drawNodeAttributes(nodeAttrs, graph, 0);
+
+        drawNodeAttributes(nodeAttrs, graph, 0);
     };
 
     const visualizeMat = async (path: string) => {

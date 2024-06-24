@@ -6,8 +6,6 @@ import {
   prep_graphs,
   connectCrossGraphNodes,
   featureVisualizer,
-  process,
-  myColor,
   softmax,
 } from "../utils/utils";
 import { IntmData } from "./FileUpload";
@@ -21,24 +19,27 @@ interface GraphVisualizerProps {
   graph_path: string;
   intmData: null | IntmData;
   changed: boolean;
-  predicted: boolean
+  predicted: boolean;
+  selectedButtons: boolean[];
 }
 
 const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
   graph_path,
   intmData,
   changed,
-  predicted
+  predicted,
+  selectedButtons,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const lastIntmData = useRef(intmData);
+  const svgRef = useRef<SVGSVGElement | null>(null);
 
   console.log("updated", intmData);
   if (intmData != null) {
     console.log("From Visualizer:", intmData);
   }
-
+  
   useEffect(() => {
     const init = async (graphs: any[]) => {
       console.log("intmData", intmData);
@@ -59,7 +60,10 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
         .append("svg")
         .attr("width", width)
         .attr("height", height);
+      
         
+      svgRef.current = svg.node();
+
 
       graphs.forEach((data, i) => {
         console.log("i", i);
@@ -255,12 +259,16 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                 text = "Prediction Result"
               }
               const textElement = g1.append("text")
+              .attr("class", "layer-label")
               .attr("x", point1.x)
-              .attr("y", point4.y + 100) // position the text 30px below the bottom of the parallelogram
-              .attr("text-anchor", "middle") // center the text horizontally
-              .attr("fill", "black") // set the text color to black
-              .attr("font-size", "15px") // set the font size to 15px
-              .text(text);
+              .attr("y", point4.y + 100)
+              .attr("text-anchor", "middle")
+              .attr("fill", "black")
+              .attr("font-size", "15px")
+              .text(text)
+              .attr("font-weight", "normal")
+              .attr('opacity', 0.5);
+
               
               // doesn't show the text, need to be fixed 
                 if (i === graphs.length - 2) { // 6 layers in total, call the connect when reaching the last layer of convolutional layer.
@@ -274,27 +282,19 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
               // since in the featureVisualizer each node has its own svgElement, circles here are made transparent
               svg.selectAll("circle")
               .attr("opacity", 0);
-              svg.selectAll("text")
-              .attr("opacity", 0);
+              
               if (intmData && intmData.final) {
                 featureVisualizer(svg, allNodes, offset, height, intmData.final, graphs); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
                }
             
               }
 
-
             });
+            setIsLoading(false);
 
- 
         }
-        
 
-        
-        
-
-  )
-
-}
+  )};
 
     const visualizeGNN = async (num: number) => {
       try {
@@ -320,6 +320,40 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
     }
     console.log("i fire once");
   }, [graph_path, intmData]);
+  const updateTextElements = (svg: SVGSVGElement, selectedButtons: boolean[]) => {
+    d3.select(svg)
+      .selectAll(".layerVis")
+      .each(function(d, i) {
+        const g1 = d3.select(this);
+        
+        g1.selectAll("text.layer-label")
+          .transition() 
+          .duration(140)  
+          .style("opacity", () => {
+            if ((i <= 2 && selectedButtons[i + 1]) ||
+                (i === 3 && selectedButtons[4]) ||
+                (i === 4 && selectedButtons[5]) ||
+                (i === 5 && selectedButtons[6])) {
+              return 1;  
+            }
+            return 0.5;  
+          })
+          .attr("font-size", () => {
+            if ((i <= 2 && selectedButtons[i + 1]) ||
+                (i === 3 && selectedButtons[4]) ||
+                (i === 4 && selectedButtons[5]) ||
+                (i === 5 && selectedButtons[6])) {
+              return "18px";  
+            }
+            return "15px";  
+          });
+      });
+  };
+  useEffect(() => {
+    if (svgRef.current && !isLoading) {
+      updateTextElements(svgRef.current, selectedButtons);
+    }
+  }, [selectedButtons, isLoading]);
 
   return (
     <div

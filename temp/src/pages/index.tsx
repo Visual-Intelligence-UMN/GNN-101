@@ -52,6 +52,7 @@ export default function Home() {
     const [predicted, setPredicted] = useState(false);
     //intermediate output
     const [intmData, setIntmData] = useState<IntmData | null>(null);
+    const [selectedButtons, setSelectedButtons] = useState([false, false, false, false, false, false, false]);
 
     const graphList = graph_list_generate(3);
 
@@ -160,7 +161,7 @@ export default function Home() {
                                             <ModelButtonChain/>
                                     </CSSTransition>
                             <hr className="border-t border-gray-300 my-4"></hr>
-                            <ButtonChain />
+                            <ButtonChain selectedButtons={selectedButtons} setSelectedButtons={setSelectedButtons} predicted={predicted}/>
                             <div className="flex gap-x-4 items-center mb-3  ">
                                 <div>
                                     <h2 className="text-xl font-semibold">Data</h2>
@@ -225,6 +226,7 @@ export default function Home() {
                                         intmData={intmData}
                                         changed={changedG}
                                         predicted={predicted}
+                                        selectedButtons={selectedButtons}
                                     />
                                 </>
                             ) : (
