@@ -80,7 +80,7 @@ export function detailedViewRecovery(
     //recover layers positions
     if (transState == "GCNConv") {
         if (recordLayerID >= 0) {
-            translateLayers(recordLayerID, -500);
+            translateLayers(recordLayerID, -(102*3 + 5*64*2));
             recordLayerID = -1;
         }
     } else if (transState == "pooling") {
@@ -275,9 +275,12 @@ export function featureVisClick(
     lock: boolean,
     setIntervalID: (id: any) => void
 ) {
+    const rectH = 15;
+    const rectW = 5;
+    const rectW7 = 10;
     console.log("Current layerID and node", layerID, node);
     setTimeout(() => {
-        translateLayers(layerID, 500);
+        translateLayers(layerID, 102*3 + 5*64*2);
     }, 1750);
     //record the layerID
     recordLayerID = layerID;
@@ -350,11 +353,11 @@ export function featureVisClick(
     console.log("compute x'", mulValues, dList, layerID, X.toString(), dummy);
 
     const g = d3.select(".mats").append("g").attr("class", "procVis");
-    let w = 2;
+    let w = 5;
     if (X.length < 64) {
-        w = 5;
+        w = 10;
         console.log("compute x 0");
-    } else w = 2;
+    } else w = 5;
     let intervalID: any;
     const playBtnCoord = [
         coordFeatureVis[0] + w * X.length + 50,
@@ -369,9 +372,9 @@ export function featureVisClick(
         for (let m = 0; m < X.length; m++) {
             g.append("rect")
                 .attr("x", coordFeatureVis[0] + w * m)
-                .attr("y", coordFeatureVis[1] - 5)
+                .attr("y", coordFeatureVis[1] - rectH/2)
                 .attr("width", w)
-                .attr("height", 10)
+                .attr("height", rectH)
                 .attr("fill", myColor(X[m]))
                 .attr("opacity", 0)
                 .attr("stroke", "gray")
@@ -382,9 +385,9 @@ export function featureVisClick(
         //draw frame
         g.append("rect")
             .attr("x", coordFeatureVis[0])
-            .attr("y", coordFeatureVis[1] - 5)
+            .attr("y", coordFeatureVis[1] - rectH/2)
             .attr("width", w * X.length)
-            .attr("height", 10)
+            .attr("height", rectH)
             .attr("fill", "none")
             .attr("opacity", 0)
             .attr("stroke", "black")
@@ -421,15 +424,15 @@ export function featureVisClick(
                 .attr("opacity", 0);
         }
 
-        coordFeatureVis[0] += 102 + 2 * 64;
+        coordFeatureVis[0] += 102 + rectW * 64;
 
         // weight matrix * vector visualzier
         for (let m = 0; m < dummy.length; m++) {
             g.append("rect")
-                .attr("x", coordFeatureVis[0] + 2 * m)
-                .attr("y", coordFeatureVis[1] - 5)
-                .attr("width", w)
-                .attr("height", 10)
+                .attr("x", coordFeatureVis[0] + rectW * m)
+                .attr("y", coordFeatureVis[1] - rectH/2)
+                .attr("width", rectW)
+                .attr("height", rectH)
                 .attr("fill", myColor(dummy[m]))
                 .attr("opacity", 0)
                 .attr("stroke", "gray")
@@ -440,9 +443,9 @@ export function featureVisClick(
         //draw frame
         g.append("rect")
             .attr("x", coordFeatureVis[0])
-            .attr("y", coordFeatureVis[1] - 5)
-            .attr("width", 2 * dummy.length)
-            .attr("height", 10)
+            .attr("y", coordFeatureVis[1] - rectH/2)
+            .attr("width", rectW * dummy.length)
+            .attr("height", rectH)
             .attr("fill", "none")
             .attr("opacity", 0)
             .attr("stroke", "black")
@@ -462,10 +465,10 @@ export function featureVisClick(
         // bias visualzier
         for (let m = 0; m < layerBias.length; m++) {
             g.append("rect")
-                .attr("x", coordFeatureVis[0] + 2 * m)
-                .attr("y", coordFeatureVis[1] - 5)
-                .attr("width", w)
-                .attr("height", 10)
+                .attr("x", coordFeatureVis[0] + rectW* m)
+                .attr("y", coordFeatureVis[1] - rectH/2)
+                .attr("width", rectW)
+                .attr("height", rectH)
                 .attr("fill", myColor(layerBias[m]))
                 .attr("opacity", 0)
                 .attr("stroke", "gray")
@@ -476,9 +479,9 @@ export function featureVisClick(
         //draw frame
         g.append("rect")
             .attr("x", coordFeatureVis[0])
-            .attr("y", coordFeatureVis[1] - 5)
-            .attr("width", 2 * layerBias.length)
-            .attr("height", 10)
+            .attr("y", coordFeatureVis[1] - rectH/2)
+            .attr("width", rectW * layerBias.length)
+            .attr("height", rectH)
             .attr("fill", "none")
             .attr("opacity", 0)
             .attr("stroke", "black")
@@ -487,18 +490,18 @@ export function featureVisClick(
 
         //draw paths from WMVisualizer and Bias Visualizer to final output
         const wmCoord: [number, number] = [
-            coordFeatureVis[0] + 128,
+            coordFeatureVis[0] + rectW*64,
             coordFeatureVis[1] - curveDir * 50,
         ];
 
         const biasCoord: [number, number] = [
-            coordFeatureVis[0] + 128,
+            coordFeatureVis[0] +rectW*64,
             coordFeatureVis[1],
         ];
 
         let c = calculatePrevFeatureVisPos(featureVisTable, layerID, node);
 
-        const nextCoord: [number, number] = [c[0] + 500 + 102, c[1]];
+        const nextCoord: [number, number] = [c[0] + 102*3 + 5*64*2+102, c[1]];
 
         //drawPoints(".mats", "red", [nextCoord]);
 
@@ -559,18 +562,18 @@ export function featureVisClick(
 
         //find start locations and end locations
         const coordStartPoint: [number, number] = [
-            wmCoord[0] - 128 * 2 - 102,
-            wmCoord[1] - 2.5 * curveDir,
+            wmCoord[0] - rectW*64 * 2 - 102,
+            wmCoord[1] - rectH/2 * curveDir,
         ];
         const coordFinalPoint: [number, number] = [
-            wmCoord[0] - 128,
-            wmCoord[1] - 2.5 * curveDir,
+            wmCoord[0] - rectW*64,
+            wmCoord[1] - rectH/2 * curveDir,
         ];
 
         
 
         //draw paths
-        //drawPoints(".mats", "red", p);
+        
 
         for (let i = 0; i < 64; i++) {
             let s: [number, number] = [
@@ -578,7 +581,7 @@ export function featureVisClick(
                 coordStartPoint[1],
             ];
             let e: [number, number] = [
-                coordFinalPoint[0] + 2 * i,
+                coordFinalPoint[0] + rectW * i,
                 coordFinalPoint[1],
             ];
 
@@ -637,6 +640,8 @@ export function featureVisClick(
             if (i >= 64 || !lock) {
                 clearInterval(intervalID);
             }
+    //        drawPoints(".mats", "red", [coordStartPoint, coordFinalPoint]);
+       // d3.selectAll("circle").raise();
         }, 250); // 每2秒执行一次drawPaths
 
         setIntervalID(intervalID);
@@ -730,6 +735,7 @@ export function featureVisClick(
         d3.selectAll("path").lower();
     });
 
+
     return {
         getIntervalID: getIntervalID,
         recordLayerID: recordLayerID,
@@ -783,13 +789,14 @@ export function outputVisClick(
     result: any,
     myColor: any
 ) {
+    const rectH = 15;
     const poolingPt = get_cood_from_parent(".mats", ".pooling");
     poolingPt[0][0] += 64;
 
     poolingPt[0][1] += 10;
     one = deepClone(poolingPt);
 
-    one[0][1] -= 5;
+    one[0][1] -= rectH/2;
     let end = deepClone(poolingPt);
     //drawPoints(".mats", "red", poolingPt);
     end[0][1] += 300;
@@ -807,17 +814,17 @@ export function outputVisClick(
 
     //locations calculation
     //find the next position
-    one[0][0] += 125;
+    one[0][0] += 225;
     let aOne = deepClone(one);
     //one[0][1] -= 5;
     setTimeout(() => {
         const g1 = d3.select(".mats").append("g").attr("class", "procVis");
         for (let m = 0; m < result.length; m++) {
             g1.append("rect")
-                .attr("x", one[0][0] + 10 * m)
+                .attr("x", one[0][0] + rectH * m)
                 .attr("y", one[0][1])
-                .attr("width", 10)
-                .attr("height", 10)
+                .attr("width", rectH)
+                .attr("height", rectH)
                 .attr("fill", myColor(result[m]))
                 .attr("opacity", 1)
                 .attr("stroke", "gray")
@@ -830,8 +837,8 @@ export function outputVisClick(
             .append("rect")
             .attr("x", one[0][0])
             .attr("y", one[0][1])
-            .attr("width", 2 * 10)
-            .attr("height", 10)
+            .attr("width", 2 * rectH)
+            .attr("height", rectH)
             .attr("fill", "none")
             .attr("opacity", 0)
             .attr("stroke", "black")
@@ -841,7 +848,7 @@ export function outputVisClick(
             .attr("fr", 2)
             .attr("id", "fr2");
         //connect!
-        one[0][1] += 5;
+        one[0][1] += rectH/2;
         d3.select(".mats")
             .append("path")
             .attr("d", d3.line()([one[0], poolingPt[0]]))

@@ -1,4 +1,4 @@
-import { deepClone, softmax } from "./utils";
+import { deepClone, drawPoints, softmax } from "./utils";
 import { addLayerName, buildBinaryLegend, buildLegend } from "./matHelperUtils";
 import * as d3 from "d3";
 
@@ -10,16 +10,19 @@ export function drawCrossConnection(
     gapSize: number,
     layerID: number
 ) {
+    const rectH = 15;
     console.log("layerID", layerID);
     let alocations = deepClone(locations);
     for (let i = 0; i < alocations.length; i++) {
         alocations[i][0] += firstVisSize;
-        alocations[i][1] += 5;
+        alocations[i][1] += rectH/2;
     }
+    
     let blocations = deepClone(alocations);
     for (let i = 0; i < blocations.length; i++) {
         blocations[i][0] += gapSize;
     }
+   // drawPoints(".mats", "red", blocations);
     console.log("location length", alocations.length);
     //draw one-one paths
     for (let i = 0; i < alocations.length; i++) {
@@ -118,7 +121,7 @@ export function drawMatrixPreparation(graph: any, locations: any) {
     let colLocations = [];
     for (let i = 0; i < graph.length; i++) {
         const x =
-            locations[0][0] - (300 / graph.length) * i - 300 / graph.length / 2;
+            locations[0][0] - (400 / graph.length) * i - 400 / graph.length / 2;
         const y = locations[0][1];
         colLocations.push([x, y]);
     }
@@ -129,9 +132,9 @@ export function drawMatrixPreparation(graph: any, locations: any) {
             .select(".mats")
             .append("rect")
             .attr("x", colLocations[i][0])
-            .attr("y", colLocations[i][1] + 3)
-            .attr("height", 300)
-            .attr("width", 300 / graph.length)
+            .attr("y", colLocations[i][1])
+            .attr("height", 400)
+            .attr("width", 400 / graph.length)
             .attr("fill", "none")
             .attr("opacity", 0)
             .attr("stroke", "black")
@@ -147,10 +150,10 @@ export function drawMatrixPreparation(graph: any, locations: any) {
         const r = d3
             .select(".mats")
             .append("rect")
-            .attr("x", locations[i][0] - 300 + 300 / graph.length / 2)
-            .attr("y", locations[i][1] + 3)
-            .attr("height", 300 / graph.length)
-            .attr("width", 300)
+            .attr("x", locations[i][0] - 400 + 400 / graph.length / 2)
+            .attr("y", locations[i][1])
+            .attr("height", 400 / graph.length)
+            .attr("width", 400)
             .attr("fill", "none")
             .attr("opacity", 0)
             .attr("stroke", "black")
@@ -179,10 +182,12 @@ export function drawNodeFeatures(
         locations[i][1] += 2;
     }
     //draw cross connections for features layer and first GCNConv layer
-    drawCrossConnection(graph, locations, 35, 102, 0);
+    drawCrossConnection(graph, locations, 7*10, 102, 0);
 
     //using locations to find the positions for first feature visualizers
     const firstLayer = d3.select(".mats").append("g").attr("id", "layerNum_0");
+    const rectW = 10;
+    const rectH = 15;
     for (let i = 0; i < locations.length; i++) {
         const g = firstLayer
             .append("g")
@@ -193,10 +198,10 @@ export function drawNodeFeatures(
         for (let j = 0; j < 7; j++) {
             const fVis = g
                 .append("rect")
-                .attr("x", locations[i][0] + 5 * j)
+                .attr("x", locations[i][0] + rectW * j)
                 .attr("y", locations[i][1])
-                .attr("width", 5)
-                .attr("height", 10)
+                .attr("width", rectW)
+                .attr("height", rectH)
                 .attr("fill", myColor(features[i][j]))
                 .attr("opacity", 1)
                 .attr("stroke", "gray")
@@ -207,8 +212,8 @@ export function drawNodeFeatures(
             .append("rect")
             .attr("x", locations[i][0])
             .attr("y", locations[i][1])
-            .attr("width", 5 * 7)
-            .attr("height", 10)
+            .attr("width", rectW * 7)
+            .attr("height", rectH)
             .attr("fill", "none")
             .attr("opacity", 0)
             .attr("stroke", "black")
@@ -265,6 +270,8 @@ export function drawGCNConv(
     console.log("gcnf", gcnFeatures);
     console.log("CONV1", conv1);
     for (let k = 0; k < 3; k++) {
+        const rectH = 15;
+        const rectW = 5;
         const layer = d3
             .select(".mats")
             .append("g")
@@ -272,9 +279,9 @@ export function drawGCNConv(
             .attr("id", `layerNum_${k + 1}`);
         for (let i = 0; i < locations.length; i++) {
             if (k != 0) {
-                locations[i][0] += 2 * 64 + 100;
+                locations[i][0] += rectW * 64 + 100;
             } else {
-                locations[i][0] += 7 * 2 + 100 + 25;
+                locations[i][0] += 7 * rectW + 100 + 25;
             }
         }
 
@@ -287,6 +294,7 @@ export function drawGCNConv(
         );
         //drawPoints(".mats","red",locations);
         const gcnFeature = gcnFeatures[k];
+        
         for (let i = 0; i < locations.length; i++) {
             //const cate = get_category_node(features[i]) * 100;
             const g = layer
@@ -302,10 +310,10 @@ export function drawGCNConv(
             console.log("nodeMat", i, nodeMat);
             for (let m = 0; m < nodeMat.length; m++) {
                 g.append("rect")
-                    .attr("x", locations[i][0] + 2 * m)
+                    .attr("x", locations[i][0] + rectW * m)
                     .attr("y", locations[i][1])
-                    .attr("width", 2)
-                    .attr("height", 10)
+                    .attr("width", rectW)
+                    .attr("height", rectH)
                     .attr("fill", myColor(nodeMat[m]))
                     .attr("opacity", 1)
                     .attr("stroke", "gray")
@@ -316,8 +324,8 @@ export function drawGCNConv(
                 .append("rect")
                 .attr("x", locations[i][0])
                 .attr("y", locations[i][1])
-                .attr("width", 2 * 64)
-                .attr("height", 10)
+                .attr("width", rectW * 64)
+                .attr("height", rectH)
                 .attr("fill", "none")
                 .attr("opacity", 0)
                 .attr("stroke", "black")
@@ -339,7 +347,7 @@ export function drawGCNConv(
         console.log("FVT", featureVisTable);
         if (k != 2) {
             // visualize cross connections btw 1st, 2nd, 3rd GCNConv
-            paths = drawCrossConnection(graph, locations, 62 * 2, 102, k + 1);
+            paths = drawCrossConnection(graph, locations, 62 * rectW, 102, k + 1);
             console.log("grouped grouped", paths);
         } else {
             //visualize pooling layer
@@ -380,13 +388,15 @@ export function drawGCNConv(
         const l5 = d3.select(`g#layerNum_5`);
         const l6 = d3.select(`g#layerNum_6`);
 
+        const schemeOffset = 150;
+
         const scheme1 = buildBinaryLegend(
             myColor,
             0,
             1,
             "Features Color Scheme",
             schemeLocations[0][0],
-            schemeLocations[0][1]+50,
+            schemeLocations[0][1]+schemeOffset,
             firstLayer
         );
         const scheme2 = buildLegend(
@@ -394,31 +404,31 @@ export function drawGCNConv(
             maxVals.conv1,
             "GCNConv1 Color Scheme",
             schemeLocations[1][0],
-            schemeLocations[1][1]+50,
+            schemeLocations[1][1]+schemeOffset,
             l1
         );
         const scheme3 = buildLegend(
             myColor,
             maxVals.conv2,
             "GCNConv2 Color Scheme",
-            schemeLocations[1][0] + 230,
-            schemeLocations[1][1]+50,
+            schemeLocations[1][0] + 400,
+            schemeLocations[1][1]+schemeOffset,
             l2
         );
         const scheme4 = buildLegend(
             myColor,
             maxVals.conv3,
             "GCNConv3 Color Scheme",
-            schemeLocations[1][0] + 230 * 2,
-            schemeLocations[1][1]+50,
+            schemeLocations[1][0] + 400 * 2,
+            schemeLocations[1][1]+schemeOffset,
             l3
         );
         const scheme5 = buildLegend(
             myColor,
             maxVals.pooling,
             "Pooling Color Scheme",
-            schemeLocations[1][0] + 230 * 3,
-            schemeLocations[1][1]+50,
+            schemeLocations[1][0] + 400 * 3,
+            schemeLocations[1][1]+schemeOffset,
             l4
         );
         const scheme6 = buildBinaryLegend(
@@ -426,8 +436,8 @@ export function drawGCNConv(
             result[0],
             result[1],
             "Result Color Scheme",
-            schemeLocations[1][0] + 230 * 4,
-            schemeLocations[1][1]+50,
+            schemeLocations[1][0] + 400 * 4,
+            schemeLocations[1][1]+schemeOffset,
             l5
         );
 
@@ -464,15 +474,17 @@ export function drawPoolingVis(
     frames: any,
     colorSchemesTable: any
 ) {
+    const rectH = 15;
+    const rectW = 5;
     let oLocations = deepClone(locations);
     //find edge points
-    locations[0][0] += 64 * 2;
-    locations[locations.length - 1][0] += 64 * 2;
-    locations[locations.length - 1][1] += 10;
+    locations[0][0] += 64 * rectW;
+    locations[locations.length - 1][0] += 64 * rectW;
+    locations[locations.length - 1][1] += rectH;
     //find mid point
     const midY = (locations[locations.length - 1][1] - locations[0][1]) / 2 + 50;
     //all paths should connect to mid point
-    const one = [[locations[0][0] + 102, midY]];
+    const one = [[locations[0][0] + 102, midY+2]];
     //drawPoints(".mats", "red", one);
     //draw the pooling layer
     console.log("from feature vis", pooling);
@@ -484,23 +496,23 @@ export function drawPoolingVis(
     const g = gg.append("g").attr("class", "pooling");
     for (let i = 0; i < pooling.length; i++) {
         g.append("rect")
-            .attr("x", locations[0][0] + 102 + 2 * i)
+            .attr("x", locations[0][0] + 102 + rectW * i)
             .attr("y", midY - 5)
-            .attr("width", 2)
-            .attr("height", 10)
+            .attr("width", rectW)
+            .attr("height", rectH)
             .attr("fill", myColor(pooling[i]))
             .attr("opacity", 1)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1);
     }
     //add text
-    addLayerName(locations, "Pooling", 102, -142, gg);
+    addLayerName(locations, "Pooling", 102, -182, gg);
     //draw the cross connections btw last GCN layer and pooling layer
 
     //do some transformations on the original locations
     for (let i = 0; i < oLocations.length; i++) {
-        oLocations[i][0] += 2 * 64;
-        oLocations[i][1] += 5;
+        oLocations[i][0] += rectW * 64;
+        oLocations[i][1] += rectH/2;
     }
     //drawPoints(".mats", "red", oLocations);
     //connnnnnnnect!!!
@@ -525,8 +537,8 @@ export function drawPoolingVis(
         .append("rect")
         .attr("x", locations[0][0] + 102)
         .attr("y", midY - 5)
-        .attr("width", 2 * 64)
-        .attr("height", 10)
+        .attr("width", rectW * 64)
+        .attr("height", rectH)
         .attr("fill", "none")
         .attr("opacity", 0)
         .attr("stroke", "black")
@@ -573,10 +585,12 @@ export function drawPoolingVis(
 
 //the function to draw the last two layers of the model
 export function drawTwoLayers(one: any, final: any, myColor: any) {
+    const rectH = 15;
+    const rectW = 5;
     //find the next position
-    one[0][0] += 64 * 2 + 102;
+    one[0][0] += 64 * rectW + 102;
     let aOne = deepClone(one);
-    one[0][1] -= 5;
+    one[0][1] -= rectH/2;
     //drawPoints(".mats", "red", one);
     let result = softmax(final);
     //visulaize
@@ -587,10 +601,10 @@ export function drawTwoLayers(one: any, final: any, myColor: any) {
         .attr("id", "layerNum_5");
     for (let m = 0; m < final.length; m++) {
         g.append("rect")
-            .attr("x", one[0][0] + 10 * m)
+            .attr("x", one[0][0] + rectH * m)
             .attr("y", one[0][1])
-            .attr("width", 10)
-            .attr("height", 10)
+            .attr("width", rectH)
+            .attr("height", rectH)
             .attr("fill", myColor(result[m]))
             .attr("opacity", 1)
             .attr("stroke", "gray")
@@ -620,8 +634,8 @@ export function drawTwoLayers(one: any, final: any, myColor: any) {
         .append("rect")
         .attr("x", one[0][0])
         .attr("y", one[0][1])
-        .attr("width", 2 * 10)
-        .attr("height", 10)
+        .attr("width", 2 * rectH)
+        .attr("height", rectH)
         .attr("fill", "none")
         .attr("opacity", 0)
         .attr("stroke", "black")
@@ -631,7 +645,7 @@ export function drawTwoLayers(one: any, final: any, myColor: any) {
         .attr("fr", 1)
         .attr("id", "fr1");
     //add text
-    addLayerName(one, "Prediction Result", 0, 20, g);
+    addLayerName(one, "Prediction Result", 0, 28, g);
     //find positions to connect
     let bOne = deepClone(aOne);
     bOne[0][0] -= 102;
@@ -645,9 +659,9 @@ export function drawTwoLayers(one: any, final: any, myColor: any) {
         .attr("class", "path1")
         .attr("id", "path1");
     //visualize the result
-    aOne[0][0] += 20 + 102;
+    aOne[0][0] += rectH*2 + 102;
     //drawPoints(".mats","red",aOne);
-    aOne[0][1] -= 5;
+    aOne[0][1] -= rectW/2;
 
     
     console.log("mat result", result);

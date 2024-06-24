@@ -111,7 +111,7 @@ export function addLayerName(
         .append("text")
         .text(name)
         .attr("x", apt[0])
-        .attr("y", apt[1])
+        .attr("y", apt[1]).attr("class", "layerName")
         .style("font-size", 7);
 }
 
@@ -277,9 +277,9 @@ export function calculatePrevFeatureVisPos(
     let coord = get_coordination(featureVisTable[layerID][node]);
     //minor position adjustment
     if (layerID == 0) {
-        coord[0] += 35 / 2;
+        coord[0] += 35;
     } else {
-        coord[0] += 64;
+        coord[0] += (64*2.5);
     }
     coord[1] += 10;
     console.log("coord", coord);

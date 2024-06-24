@@ -49,6 +49,7 @@ interface MatricesVisualizerProps {
     intmData: any;
     changed: boolean;
     predicted: boolean;
+    selectedButtons: boolean[];
 }
 
 const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
@@ -56,6 +57,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
     intmData,
     changed,
     predicted,
+    selectedButtons
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -155,9 +157,9 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
             let allNodes: any[] = [];
             const gLen = graph.length;
             console.log("gLen", gLen);
-            const gridSize = 300;
+            const gridSize = 400;
             const margin = { top: 10, right: 80, bottom: 30, left: 80 };
-            const width = 20 * gLen + 50 + 6 * 102 + 1200;
+            const width = 20 * gLen + 50 + 6 * 102 + 1200*2;
             const height = (gridSize + margin.top + margin.bottom) * 2;
 
             let locations: number[][] = [];
@@ -319,6 +321,8 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
         }
         console.log("i fire once");
     }, [graph_path, intmData, changed]);
+
+    
 
     return (
         <div

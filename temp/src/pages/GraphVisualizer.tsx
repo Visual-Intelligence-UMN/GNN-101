@@ -353,6 +353,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
     if (svgRef.current && !isLoading) {
       updateTextElements(svgRef.current, selectedButtons);
     }
+    console.log("selectBtn", selectedButtons);
   }, [selectedButtons, isLoading]);
 
   return (

@@ -1,19 +1,19 @@
-import { loadWeights } from "./matHelperUtils"
+import { loadWeights } from "./matHelperUtils";
 import {
     drawMatrixPreparation,
     drawNodeFeatures,
-    drawGCNConv
-} from "./matFeaturesUtils"
+    drawGCNConv,
+} from "./matFeaturesUtils";
 import * as d3 from "d3";
-import { 
-    detailedViewRecovery, 
-    featureVisClick, 
-    featureVisMouseOut, 
-    featureVisMouseOver, 
-    oFeatureMouseOut, 
-    oFeatureMouseOver, 
-    outputVisClick, 
-    poolingVisClick, 
+import {
+    detailedViewRecovery,
+    featureVisClick,
+    featureVisMouseOut,
+    featureVisMouseOver,
+    oFeatureMouseOut,
+    oFeatureMouseOver,
+    outputVisClick,
+    poolingVisClick,
 } from "./matEventsUtils";
 
 //features visualization pipeline: draw all feature visualizers for original features and GCNConv
@@ -32,11 +32,13 @@ export function visualizeFeatures(
     detailView: any
 ) {
     //--------------------------------DATA PREP MANAGEMENT--------------------------------
-    let intervalID:any = null; // to manage animation controls
-    
+    const translateGap = 102*3 + 5*64*2;
+    const translateGap1 = 102*3 + 5*7+64*5;
+    let intervalID: any = null; // to manage animation controls
+
     let poolingVis = null; //to manage pooling visualizer
     let outputVis = null; //to manage model output
-    let resultVis:any = null; //tp manage result visualizer
+    let resultVis: any = null; //tp manage result visualizer
     //load weights and bias
     const dataPackage = loadWeights();
     console.log("weights, data", dataPackage);
@@ -64,7 +66,7 @@ export function visualizeFeatures(
         GCNConv2: [],
         GCNConv3: [],
     };
-    var schemeLocations:any = [];
+    var schemeLocations: any = [];
     console.log("state", detailView);
     console.log("Received", maxVals);
     console.log("adjList", adjList);
@@ -75,17 +77,41 @@ export function visualizeFeatures(
     let matFrames: SVGElement[] = framePackage.matFrames; //a
 
     //-----------------------------------FIRST LAYER-----------------------------------------------
-    const firstLayerPackage = drawNodeFeatures(locations, graph, myColor, features, frames, schemeLocations, featureVisTable);
+    const firstLayerPackage = drawNodeFeatures(
+        locations,
+        graph,
+        myColor,
+        features,
+        frames,
+        schemeLocations,
+        featureVisTable
+    );
     //updated variables
     locations = firstLayerPackage.locations;
     frames = firstLayerPackage.frames;
     schemeLocations = firstLayerPackage.schemeLocations;
     featureVisTable = firstLayerPackage.featureVisTable;
     const firstLayer = firstLayerPackage.firstLayer;
-    
-    
+
     //-----------------------------------GCNConv LAYERS-----------------------------------------------
-    const GCNConvPackage = drawGCNConv(conv1, conv2, conv3, locations, myColor, frames, schemeLocations, featureVisTable, pooling, graph, colorSchemesTable, poolingVis, outputVis, final, firstLayer, maxVals);
+    const GCNConvPackage = drawGCNConv(
+        conv1,
+        conv2,
+        conv3,
+        locations,
+        myColor,
+        frames,
+        schemeLocations,
+        featureVisTable,
+        pooling,
+        graph,
+        colorSchemesTable,
+        poolingVis,
+        outputVis,
+        final,
+        firstLayer,
+        maxVals
+    );
     locations = GCNConvPackage.locations;
     frames = GCNConvPackage.frames;
     schemeLocations = GCNConvPackage.schemeLocations;
@@ -120,19 +146,29 @@ export function visualizeFeatures(
         frames = pack.frames;
         matFrames = pack.matFrames;
     });
-    
+
     let recordLayerID: number = -1;
     // a state to controls the recover event
     let transState = "GCNConv";
     //save events for poolingVis
-    let poolingOverEvent:any = null;
-    let poolingOutEvent:any = null;
+    let poolingOverEvent: any = null;
+    let poolingOutEvent: any = null;
     d3.select(".mats").on("click", function (event, d) {
-        if (event.target && event.target.id === 'btn') {
+        if (event.target && event.target.id === "btn") {
             return;
         }
-        if(lock){
-            const recoverPackage = detailedViewRecovery(event, dview, lock, transState, recordLayerID, poolingOutEvent, poolingOverEvent, poolingVis, colorSchemesTable);
+        if (lock) {
+            const recoverPackage = detailedViewRecovery(
+                event,
+                dview,
+                lock,
+                transState,
+                recordLayerID,
+                poolingOutEvent,
+                poolingOverEvent,
+                poolingVis,
+                colorSchemesTable
+            );
             //update variables
             dview = recoverPackage.dview;
             lock = recoverPackage.lock;
@@ -146,10 +182,10 @@ export function visualizeFeatures(
         }
     });
 
-function setIntervalID(id:any) {
-    intervalID = id;
-    console.log("Interval ID set to:", intervalID);
-}
+    function setIntervalID(id: any) {
+        intervalID = id;
+        console.log("Interval ID set to:", intervalID);
+    }
     d3.selectAll(".featureVis").on("click", function (event, d) {
         if (lock != true) {
             //state
@@ -172,7 +208,22 @@ function setIntervalID(id:any) {
             //translate each layer
             const layerID = Number(d3.select(this).attr("layerID")) - 1;
             const node = Number(d3.select(this).attr("node"));
-            const featureVisPack = featureVisClick(layerID, node, recordLayerID, colorSchemesTable, adjList, featureVisTable, features, conv1, conv2, bias, myColor, weights, lock, setIntervalID);
+            const featureVisPack = featureVisClick(
+                layerID,
+                node,
+                recordLayerID,
+                colorSchemesTable,
+                adjList,
+                featureVisTable,
+                features,
+                conv1,
+                conv2,
+                bias,
+                myColor,
+                weights,
+                lock,
+                setIntervalID
+            );
             // update variables
             recordLayerID = featureVisPack.recordLayerID;
             colorSchemesTable = featureVisPack.colorSchemesTable;
@@ -189,7 +240,15 @@ function setIntervalID(id:any) {
             //paths interactions
             const layerID = Number(d3.select(this).attr("layerID")) - 1;
             const node = Number(d3.select(this).attr("node"));
-            const featureOverPack = featureVisMouseOver(layerID, node, paths, frames, adjList, matFrames, colFrames);
+            const featureOverPack = featureVisMouseOver(
+                layerID,
+                node,
+                paths,
+                frames,
+                adjList,
+                matFrames,
+                colFrames
+            );
             paths = featureOverPack.paths;
             frames = featureOverPack.frames;
             matFrames = featureOverPack.matFrames;
@@ -200,26 +259,33 @@ function setIntervalID(id:any) {
         if (!lock) {
             const layerID = Number(d3.select(this).attr("layerID")) - 1;
             const node = Number(d3.select(this).attr("node"));
-            const featureOverPack = featureVisMouseOut(layerID, node, paths, frames, adjList, matFrames, colFrames);
+            const featureOverPack = featureVisMouseOut(
+                layerID,
+                node,
+                paths,
+                frames,
+                adjList,
+                matFrames,
+                colFrames
+            );
             paths = featureOverPack.paths;
             frames = featureOverPack.frames;
             matFrames = featureOverPack.matFrames;
             colFrames = featureOverPack.colFrames;
         }
     });
-    
+
     //pooling visualizer click interaction
     if (poolingVis != null) {
-        
-        poolingVis.on("click", function (event:any, d:any) {
+        poolingVis.on("click", function (event: any, d: any) {
             transState = "pooling";
             poolingOverEvent = poolingVis.on("mouseover");
             poolingOutEvent = poolingVis.on("mouseout");
             poolingVis.on("mouseover", null);
             poolingVis.on("mouseout", null);
-            console.log("f3 1", frames["GCNConv3"][3]) 
+            console.log("f3 1", frames["GCNConv3"][3]);
             frames["GCNConv3"][3].style.opacity = "1";
-            console.log("f3 2", frames["GCNConv3"][3])
+            console.log("f3 2", frames["GCNConv3"][3]);
             if (lock != true) {
                 //d3.select(this).style("pointer-events", "none");
                 //state
@@ -228,7 +294,11 @@ function setIntervalID(id:any) {
                 dview = true;
                 console.log("click! - fVis", dview, lock);
                 //click event
-                const poolingVisPack = poolingVisClick(colorSchemesTable, adjList, featureVisTable);
+                const poolingVisPack = poolingVisClick(
+                    colorSchemesTable,
+                    adjList,
+                    featureVisTable
+                );
                 //update variables
                 colorSchemesTable = poolingVisPack.colorSchemesTable;
                 featureVisTable = poolingVisPack.featureVisTable;
@@ -237,19 +307,19 @@ function setIntervalID(id:any) {
     }
 
     //model output visualizer click interaction
-    if(outputVis!=null){
-        outputVis.on("mouseover", function (event:any, d:any) {
+    if (outputVis != null) {
+        outputVis.on("mouseover", function (event: any, d: any) {
             const a = d3.select(".path1").style("opacity", 1);
             const b = d3.select(".poolingFrame").style("opacity", 1);
             const c = d3.select("#fr1").style("opacity", 1);
-            console.log("mouse in", a, b, c)
+            console.log("mouse in", a, b, c);
         });
-        outputVis.on("mouseout", function (event:any, d:any) {
+        outputVis.on("mouseout", function (event: any, d: any) {
             d3.select(".path1").style("opacity", 0.02);
             d3.select(".poolingFrame").style("opacity", 0);
             d3.select("#fr1").style("opacity", 0);
         });
-        outputVis.on("click", function(event:any, d:any){
+        outputVis.on("click", function (event: any, d: any) {
             if (lock != true) {
                 //state
                 transState = "output";
@@ -258,16 +328,17 @@ function setIntervalID(id:any) {
                 dview = true;
                 console.log("click! - fVis", dview, lock);
                 //lock all feature visualizers and transparent paths
-                const outputVisPack = outputVisClick(resultVis, colorSchemesTable, one, final, myColor);
+                const outputVisPack = outputVisClick(
+                    resultVis,
+                    colorSchemesTable,
+                    one,
+                    final,
+                    myColor
+                );
                 //update variables
                 resultVis = outputVisPack.resultVis;
                 colorSchemesTable = outputVisPack.colorSchemesTable;
             }
-        })
+        });
     }
-
 }
-
-
-
-

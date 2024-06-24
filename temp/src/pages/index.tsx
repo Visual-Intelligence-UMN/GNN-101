@@ -262,6 +262,7 @@ export default function Home() {
                                         intmData={intmData}
                                         changed={changedG}
                                         predicted={predicted}
+                                        selectedButtons={selectedButtons}
                                     />
                                 </>
                             )}

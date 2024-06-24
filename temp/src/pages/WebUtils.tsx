@@ -620,7 +620,7 @@ export function visualizeGraph(path: string) {
 //single matrix visualizer
 export function visualizeMatrix(path: string) {
     const init = async (graph: any, features: any, nodeAttrs: any) => {
-        const gridSize = 300;
+        const gridSize = 400;
         const margin = { top: 10, right: 80, bottom: 30, left: 80 };
         const width = gridSize + margin.left + margin.right;
         const height = (gridSize + margin.top + margin.bottom) * 2;
