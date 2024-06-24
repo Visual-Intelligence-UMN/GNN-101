@@ -7,6 +7,7 @@ import {
 import { computeMids } from "./matFeaturesUtils";
 import * as d3 from "d3";
 import { create, all } from "mathjs";
+import { start } from "repl";
 
 //graph feature events interactions - mouseover
 export function oFeatureMouseOver(
@@ -365,12 +366,9 @@ export function featureVisClick(
         console.log("compute x 0");
     } else w = 5;
     let intervalID: any;
-    const playBtnCoord = [
-        coordFeatureVis[0],
-        coordFeatureVis[1] - 50,
-    ];
+    const playBtnCoord = [coordFeatureVis[0], coordFeatureVis[1] - 50];
     //drawPoints(".mats", "red", [playBtnCoord]);
-    let btnPos:any = null;
+    let btnPos: any = null;
     let startCoordList: any[] = [];
     let endCoordList: any[] = [];
     let curveDir = 1; //true -> -1; false -> 1
@@ -432,10 +430,7 @@ export function featureVisClick(
         }
 
         coordFeatureVis[0] += 102 + rectW * 64;
-        btnPos = [
-            coordFeatureVis[0],
-            coordFeatureVis[1] - 50
-        ];
+        btnPos = [coordFeatureVis[0], coordFeatureVis[1] - 50];
 
         // weight matrix * vector visualzier
         for (let m = 0; m < dummy.length; m++) {
@@ -692,8 +687,8 @@ export function featureVisClick(
         if (intervalID) {
             clearInterval(intervalID);
         }
-        
-        if (!isPlaying || currentStep >=64 || currentStep==0) {
+
+        if (!isPlaying || currentStep >= 64 || currentStep == 0) {
             d3.select("text#btn").text("Pause");
             if (currentStep >= 64) {
                 currentStep = 0; // 重置步骤
@@ -749,7 +744,10 @@ export function featureVisClick(
 
             setIntervalID(intervalID);
             isPlaying = true;
-        }else if(isPlaying){d3.select("text#btn").text("Play");isPlaying=false;}
+        } else if (isPlaying) {
+            d3.select("text#btn").text("Play");
+            isPlaying = false;
+        }
         d3.selectAll("path").lower();
     });
 
@@ -807,8 +805,16 @@ export function outputVisClick(
     myColor: any
 ) {
     //drawPoints(".mats", "red", one)
+    let currentStep = 0;
+    let isPlaying = true;
+    let intervalID: any = null;
     const rectH = 15;
     const poolingPt = get_cood_from_parent(".mats", ".pooling");
+
+    let coordForStart = deepClone(poolingPt);
+    coordForStart[0][1] += 15;
+    coordForStart[0][0] -= 64 * 2.5;
+
     poolingPt[0][0] += 64;
     const modelParams = loadWeights();
 
@@ -817,7 +823,7 @@ export function outputVisClick(
 
     one[0][1] -= rectH / 2;
     let end = deepClone(poolingPt);
-    //drawPoints(".mats", "red", poolingPt);
+
     end[0][1] += 300;
     d3.selectAll(".twoLayer").style("pointer-events", "none");
     d3.selectAll("path").style("opacity", 0);
@@ -835,6 +841,22 @@ export function outputVisClick(
     //find the next position
     one[0][0] += 225;
     let aOne = deepClone(one);
+    //locations for paths' starting points
+    let startCoord = [];
+    for (let i = 0; i < 64; i++) {
+        let c = [coordForStart[0][0] + i * 5, coordForStart[0][1]];
+        startCoord.push(c);
+    }
+    //drawPoints(".mats", "red",startCoord);
+    //locations for paths' ending points
+    let endCoord: any = [];
+    for (let m = 0; m < 2; m++) {
+        endCoord.push([
+            one[0][0] + rectH * m + rectH / 2,
+            one[0][1] + rectH,
+        ]);
+    }
+
     //one[0][1] -= 5;
     setTimeout(() => {
         const g1 = d3.select(".mats").append("g").attr("class", "procVis");
@@ -849,7 +871,12 @@ export function outputVisClick(
                 .attr("stroke", "gray")
                 .attr("stroke-width", 0.1)
                 .attr("class", "procVis");
+            endCoord.push([
+                one[0][0] + rectH * m + rectH / 2,
+                one[0][1] + rectH,
+            ]);
         }
+        //drawPoints(".mats", "red", endCoord);
 
         let biasCoord = deepClone(aOne);
         biasCoord[0][0] -= 130 + 2 * rectH;
@@ -918,8 +945,148 @@ export function outputVisClick(
             .attr("fill", "none")
             .attr("class", "procVis")
             .attr("id", "path1");
+
+        intervalID = setInterval(() => {
+            d3.selectAll("#tempath").remove();
+            const Xt = modelParams.weights[3];
+            const Xv = Xt[currentStep];
+            for (let j = 0; j < 64; j++) {
+                const s1 = startCoord[j];
+                const e1 = endCoord[currentStep];
+                let pathDir = e1[0] > s1[0] ? 0 : 1;
+                //drawPoints(".mats", "red", [s1, e1]);
+                console.log("se", [s1, e1]);
+                d3.select(".mats")
+                    .append("path")
+                    .attr("d", function () {
+                        return [
+                            "M",
+                            s1[0],
+                            s1[1],
+                            "A",
+                            (e1[0] - s1[0]) / 2,
+                            ",",
+                            (e1[0] - s1[0]) / 4,
+                            0,
+                            0,
+                            ",",
+                            pathDir,
+                            ",",
+                            e1[0],
+                            ",",
+                            e1[1],
+                        ].join(" ");
+                    })
+                    .attr("class", "procVis")
+                    .attr("id", "tempath")
+                    .style("fill", "none")
+                    .attr("stroke", myColor(Xv[j]));
+            }
+            d3.selectAll("path").lower();
+            currentStep++;
+            console.log("currentStep", currentStep);
+            if (currentStep >= 2) {
+                d3.select("text#btn").text("Play");
+                isPlaying = false;
+                clearInterval(intervalID);
+            }
+            //        drawPoints(".mats", "red", [coordStartPoint, coordFinalPoint]);
+            // d3.selectAll("circle").raise();
+        }, 250); // 每2秒执行一次drawPaths
+
+        //setIntervalID(intervalID);
+        d3.selectAll("path").lower();
+        d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
         d3.selectAll("path").lower();
     }, 2000);
+
+    const btn = d3.select(".mats").append("g");
+    const radius = 10;
+    const btnX = startCoord[0][0];
+    const btnY = startCoord[0][1] - 50;
+    btn.append("circle")
+        .attr("cx", btnX)
+        .attr("cy", btnY)
+        .attr("r", radius)
+        .attr("id", "btn")
+        .attr("stroke", "black")
+        .attr("fill", "white")
+        .attr("class", "procVis");
+
+    btn.append("text")
+        .attr("x", btnX)
+        .attr("y", btnY + 3)
+        .text("Pause")
+        .attr("id", "btn")
+        .style("text-anchor", "middle")
+        .style("font-size", "6")
+        .attr("class", "procVis");
+    btn.on("click", function (event: any, d: any) {
+        console.log("isPlaying", isPlaying);
+        event.stopPropagation();
+        if (intervalID) {
+            clearInterval(intervalID);
+        }
+
+        if (!isPlaying || currentStep >= 2 || currentStep == 0) {
+            d3.select("text#btn").text("Pause");
+            if (currentStep >= 2) {
+                currentStep = 0; // 重置步骤
+            }
+            
+            let i = 0;
+            intervalID = setInterval(() => {
+                d3.selectAll("#tempath").remove();
+                const Xt = modelParams.weights[3];
+                const Xv = Xt[currentStep];
+                for (let j = 0; j < 64; j++) {
+                    const s1 = startCoord[j];
+                    const e1 = endCoord[currentStep];
+                    let pathDir = e1[0] > s1[0] ? 0 : 1;
+                    console.log("se", [s1, e1]);
+                    d3.select(".mats")
+                        .append("path")
+                        .attr("d", function () {
+                            return [
+                                "M",
+                                s1[0],
+                                s1[1],
+                                "A",
+                                (e1[0] - s1[0]) / 2,
+                                ",",
+                                (e1[0] - s1[0]) / 4,
+                                0,
+                                0,
+                                ",",
+                                pathDir,
+                                ",",
+                                e1[0],
+                                ",",
+                                e1[1],
+                            ].join(" ");
+                        })
+                        .attr("class", "procVis")
+                        .attr("id", "tempath")
+                        .style("fill", "none")
+                        .attr("stroke", myColor(Xv[j]));
+                }
+                d3.selectAll("path").lower();
+                currentStep++;
+                console.log("i", currentStep);
+                if (currentStep >= 2) {
+                    d3.select("text#btn").text("Play");
+                    clearInterval(intervalID);
+                }
+            }, 500);
+
+            //   setIntervalID(intervalID);
+            isPlaying = true;
+        } else if (isPlaying) {
+            d3.select("text#btn").text("Play");
+            isPlaying = false;
+        }
+        d3.selectAll("path").lower();
+    });
 
     for (let i = 0; i < layerID; i++)
         colorSchemesTable[i].style.opacity = "0.2";
