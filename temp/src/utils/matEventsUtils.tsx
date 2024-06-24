@@ -1,5 +1,9 @@
 import { deepClone, drawPoints, get_cood_from_parent } from "./utils";
-import { translateLayers, calculatePrevFeatureVisPos } from "./matHelperUtils";
+import {
+    translateLayers,
+    calculatePrevFeatureVisPos,
+    loadWeights,
+} from "./matHelperUtils";
 import { computeMids } from "./matFeaturesUtils";
 import * as d3 from "d3";
 import { create, all } from "mathjs";
@@ -80,7 +84,7 @@ export function detailedViewRecovery(
     //recover layers positions
     if (transState == "GCNConv") {
         if (recordLayerID >= 0) {
-            translateLayers(recordLayerID, -(102*3 + 5*64*2));
+            translateLayers(recordLayerID, -(102 * 3 + 5 * 64 * 2));
             recordLayerID = -1;
         }
     } else if (transState == "pooling") {
@@ -275,12 +279,14 @@ export function featureVisClick(
     lock: boolean,
     setIntervalID: (id: any) => void
 ) {
+    let currentStep = 0;
+    let isPlaying = true;
     const rectH = 15;
     const rectW = 5;
     const rectW7 = 10;
     console.log("Current layerID and node", layerID, node);
     setTimeout(() => {
-        translateLayers(layerID, 102*3 + 5*64*2);
+        translateLayers(layerID, 102 * 3 + 5 * 64 * 2);
     }, 1750);
     //record the layerID
     recordLayerID = layerID;
@@ -360,19 +366,20 @@ export function featureVisClick(
     } else w = 5;
     let intervalID: any;
     const playBtnCoord = [
-        coordFeatureVis[0] + w * X.length + 50,
-        coordFeatureVis[1],
+        coordFeatureVis[0],
+        coordFeatureVis[1] - 50,
     ];
     //drawPoints(".mats", "red", [playBtnCoord]);
+    let btnPos:any = null;
     let startCoordList: any[] = [];
-        let endCoordList: any[] = [];
-        let curveDir = 1; //true -> -1; false -> 1
+    let endCoordList: any[] = [];
+    let curveDir = 1; //true -> -1; false -> 1
     setTimeout(() => {
         //draw feature visualizer
         for (let m = 0; m < X.length; m++) {
             g.append("rect")
                 .attr("x", coordFeatureVis[0] + w * m)
-                .attr("y", coordFeatureVis[1] - rectH/2)
+                .attr("y", coordFeatureVis[1] - rectH / 2)
                 .attr("width", w)
                 .attr("height", rectH)
                 .attr("fill", myColor(X[m]))
@@ -385,7 +392,7 @@ export function featureVisClick(
         //draw frame
         g.append("rect")
             .attr("x", coordFeatureVis[0])
-            .attr("y", coordFeatureVis[1] - rectH/2)
+            .attr("y", coordFeatureVis[1] - rectH / 2)
             .attr("width", w * X.length)
             .attr("height", rectH)
             .attr("fill", "none")
@@ -425,12 +432,16 @@ export function featureVisClick(
         }
 
         coordFeatureVis[0] += 102 + rectW * 64;
+        btnPos = [
+            coordFeatureVis[0],
+            coordFeatureVis[1] - 50
+        ];
 
         // weight matrix * vector visualzier
         for (let m = 0; m < dummy.length; m++) {
             g.append("rect")
                 .attr("x", coordFeatureVis[0] + rectW * m)
-                .attr("y", coordFeatureVis[1] - rectH/2)
+                .attr("y", coordFeatureVis[1] - rectH / 2)
                 .attr("width", rectW)
                 .attr("height", rectH)
                 .attr("fill", myColor(dummy[m]))
@@ -443,7 +454,7 @@ export function featureVisClick(
         //draw frame
         g.append("rect")
             .attr("x", coordFeatureVis[0])
-            .attr("y", coordFeatureVis[1] - rectH/2)
+            .attr("y", coordFeatureVis[1] - rectH / 2)
             .attr("width", rectW * dummy.length)
             .attr("height", rectH)
             .attr("fill", "none")
@@ -453,7 +464,7 @@ export function featureVisClick(
             .attr("class", "procVis");
 
         //determine if we need upper-curves or lower-curves
-       
+
         const midNode = adjList.length / 2;
         if (node < midNode) curveDir = -1;
         console.log("curveDir", curveDir);
@@ -465,8 +476,8 @@ export function featureVisClick(
         // bias visualzier
         for (let m = 0; m < layerBias.length; m++) {
             g.append("rect")
-                .attr("x", coordFeatureVis[0] + rectW* m)
-                .attr("y", coordFeatureVis[1] - rectH/2)
+                .attr("x", coordFeatureVis[0] + rectW * m)
+                .attr("y", coordFeatureVis[1] - rectH / 2)
                 .attr("width", rectW)
                 .attr("height", rectH)
                 .attr("fill", myColor(layerBias[m]))
@@ -479,7 +490,7 @@ export function featureVisClick(
         //draw frame
         g.append("rect")
             .attr("x", coordFeatureVis[0])
-            .attr("y", coordFeatureVis[1] - rectH/2)
+            .attr("y", coordFeatureVis[1] - rectH / 2)
             .attr("width", rectW * layerBias.length)
             .attr("height", rectH)
             .attr("fill", "none")
@@ -490,18 +501,21 @@ export function featureVisClick(
 
         //draw paths from WMVisualizer and Bias Visualizer to final output
         const wmCoord: [number, number] = [
-            coordFeatureVis[0] + rectW*64,
+            coordFeatureVis[0] + rectW * 64,
             coordFeatureVis[1] - curveDir * 50,
         ];
 
         const biasCoord: [number, number] = [
-            coordFeatureVis[0] +rectW*64,
+            coordFeatureVis[0] + rectW * 64,
             coordFeatureVis[1],
         ];
 
         let c = calculatePrevFeatureVisPos(featureVisTable, layerID, node);
 
-        const nextCoord: [number, number] = [c[0] + 102*3 + 5*64*2+102, c[1]];
+        const nextCoord: [number, number] = [
+            c[0] + 102 * 3 + 5 * 64 * 2 + 102,
+            c[1],
+        ];
 
         //drawPoints(".mats", "red", [nextCoord]);
 
@@ -562,18 +576,15 @@ export function featureVisClick(
 
         //find start locations and end locations
         const coordStartPoint: [number, number] = [
-            wmCoord[0] - rectW*64 * 2 - 102,
-            wmCoord[1] - rectH/2 * curveDir,
+            wmCoord[0] - rectW * 64 * 2 - 102,
+            wmCoord[1] - (rectH / 2) * curveDir,
         ];
         const coordFinalPoint: [number, number] = [
-            wmCoord[0] - rectW*64,
-            wmCoord[1] - rectH/2 * curveDir,
+            wmCoord[0] - rectW * 64,
+            wmCoord[1] - (rectH / 2) * curveDir,
         ];
 
-        
-
         //draw paths
-        
 
         for (let i = 0; i < 64; i++) {
             let s: [number, number] = [
@@ -593,16 +604,16 @@ export function featureVisClick(
         let mm: any = [];
         const Xt = math.transpose(weights[layerID]);
         let i = 0;
-        
+
         intervalID = setInterval(() => {
             d3.selectAll("#tempath").remove();
 
-            const Xv = Xt[i];
+            const Xv = Xt[currentStep];
             for (let j = 0; j < 64; j++) {
                 const s1 = startCoordList[j];
-                const e1 = endCoordList[i];
+                const e1 = endCoordList[currentStep];
                 let pathDir = e1[0] > s1[0] ? 0 : 1;
-                if(curveDir==1){
+                if (curveDir == 1) {
                     pathDir = e1[0] > s1[0] ? 1 : 0;
                 }
                 //drawPoints(".mats", "red", [s1, e1]);
@@ -613,21 +624,20 @@ export function featureVisClick(
                         return [
                             "M",
                             s1[0],
-                            s1[1], 
+                            s1[1],
                             "A",
                             (e1[0] - s1[0]) / 2,
-                            ",", 
+                            ",",
                             (e1[0] - s1[0]) / 4,
                             0,
                             0,
-                            ",", 
+                            ",",
                             pathDir,
-                            ",", 
+                            ",",
                             e1[0],
                             ",",
                             e1[1],
-                        ] 
-                            .join(" ");
+                        ].join(" ");
                     })
                     .attr("class", "procVis")
                     .attr("id", "tempath")
@@ -635,13 +645,15 @@ export function featureVisClick(
                     .attr("stroke", myColor(Xv[j]));
             }
             d3.selectAll("path").lower();
-            i++;
-            console.log("i", i);
-            if (i >= 64 || !lock) {
+            currentStep++;
+            console.log("currentStep", currentStep);
+            if (currentStep >= 64 || !lock) {
+                d3.select("text#btn").text("Play");
+                isPlaying = false;
                 clearInterval(intervalID);
             }
-    //        drawPoints(".mats", "red", [coordStartPoint, coordFinalPoint]);
-       // d3.selectAll("circle").raise();
+            //        drawPoints(".mats", "red", [coordStartPoint, coordFinalPoint]);
+            // d3.selectAll("circle").raise();
         }, 250); // 每2秒执行一次drawPaths
 
         setIntervalID(intervalID);
@@ -654,11 +666,10 @@ export function featureVisClick(
         return intervalID;
     }
     const btn = d3.select(".mats").append("g");
-    const radius = 5;
+    const radius = 10;
     const btnX = playBtnCoord[0];
     const btnY = playBtnCoord[1];
-    btn
-        .append("circle")
+    btn.append("circle")
         .attr("cx", btnX)
         .attr("cy", btnY)
         .attr("r", radius)
@@ -670,71 +681,77 @@ export function featureVisClick(
     btn.append("text")
         .attr("x", btnX)
         .attr("y", btnY + 3)
-        .text("P")
+        .text("Pause")
         .attr("id", "btn")
         .style("text-anchor", "middle")
         .style("font-size", "6")
         .attr("class", "procVis");
     btn.on("click", function (event: any, d: any) {
-        console.log("btn");
+        console.log("isPlaying", isPlaying);
         event.stopPropagation();
         if (intervalID) {
-        clearInterval(intervalID);
-    }
+            clearInterval(intervalID);
+        }
+        
+        if (!isPlaying || currentStep >=64 || currentStep==0) {
+            d3.select("text#btn").text("Pause");
+            if (currentStep >= 64) {
+                currentStep = 0; // 重置步骤
+            }
+            const Xt = math.transpose(weights[layerID]);
+            let i = 0;
+            intervalID = setInterval(() => {
+                d3.selectAll("#tempath").remove();
 
-    const Xt = math.transpose(weights[layerID]);
-        let i = 0;
-        intervalID = setInterval(() => {
-            d3.selectAll("#tempath").remove();
-
-            const Xv = Xt[i];
-            for (let j = 0; j < 64; j++) {
-                const s1 = startCoordList[j];
-                const e1 = endCoordList[i];
-                let pathDir = e1[0] > s1[0] ? 0 : 1;
-                if(curveDir==1){
-                    pathDir = e1[0] > s1[0] ? 1 : 0;
+                const Xv = Xt[currentStep];
+                for (let j = 0; j < 64; j++) {
+                    const s1 = startCoordList[j];
+                    const e1 = endCoordList[currentStep];
+                    let pathDir = e1[0] > s1[0] ? 0 : 1;
+                    if (curveDir == 1) {
+                        pathDir = e1[0] > s1[0] ? 1 : 0;
+                    }
+                    console.log("se", [s1, e1]);
+                    d3.select(".mats")
+                        .append("path")
+                        .attr("d", function () {
+                            return [
+                                "M",
+                                s1[0],
+                                s1[1],
+                                "A",
+                                (e1[0] - s1[0]) / 2,
+                                ",",
+                                (e1[0] - s1[0]) / 4,
+                                0,
+                                0,
+                                ",",
+                                pathDir,
+                                ",",
+                                e1[0],
+                                ",",
+                                e1[1],
+                            ].join(" ");
+                        })
+                        .attr("class", "procVis")
+                        .attr("id", "tempath")
+                        .style("fill", "none")
+                        .attr("stroke", myColor(Xv[j]));
                 }
-                console.log("se", [s1, e1]);
-                d3.select(".mats")
-                    .append("path")
-                    .attr("d", function () {
-                        return [
-                            "M",
-                            s1[0],
-                            s1[1], 
-                            "A",
-                            (e1[0] - s1[0]) / 2,
-                            ",", 
-                            (e1[0] - s1[0]) / 4,
-                            0,
-                            0,
-                            ",", 
-                            pathDir,
-                            ",", 
-                            e1[0],
-                            ",",
-                            e1[1],
-                        ] 
-                            .join(" ");
-                    })
-                    .attr("class", "procVis")
-                    .attr("id", "tempath")
-                    .style("fill", "none")
-                    .attr("stroke", myColor(Xv[j]));
-            }
-            d3.selectAll("path").lower();
-            i++;
-            console.log("i", i);
-            if (i >= 64 || !lock) {
-                clearInterval(intervalID);
-            }
-        }, 250); 
+                d3.selectAll("path").lower();
+                currentStep++;
+                console.log("i", currentStep);
+                if (currentStep >= 64 || !lock) {
+                    d3.select("text#btn").text("Play");
+                    clearInterval(intervalID);
+                }
+            }, 250);
 
-        setIntervalID(intervalID);
+            setIntervalID(intervalID);
+            isPlaying = true;
+        }else if(isPlaying){d3.select("text#btn").text("Play");isPlaying=false;}
         d3.selectAll("path").lower();
     });
-
 
     return {
         getIntervalID: getIntervalID,
@@ -789,14 +806,16 @@ export function outputVisClick(
     result: any,
     myColor: any
 ) {
+    //drawPoints(".mats", "red", one)
     const rectH = 15;
     const poolingPt = get_cood_from_parent(".mats", ".pooling");
     poolingPt[0][0] += 64;
+    const modelParams = loadWeights();
 
     poolingPt[0][1] += 10;
     one = deepClone(poolingPt);
 
-    one[0][1] -= rectH/2;
+    one[0][1] -= rectH / 2;
     let end = deepClone(poolingPt);
     //drawPoints(".mats", "red", poolingPt);
     end[0][1] += 300;
@@ -831,7 +850,40 @@ export function outputVisClick(
                 .attr("stroke-width", 0.1)
                 .attr("class", "procVis");
         }
-        //drawPoints(".mats", "red", aOne)
+
+        let biasCoord = deepClone(aOne);
+        biasCoord[0][0] -= 130 + 2 * rectH;
+        biasCoord[0][1] -= 50;
+        const linBias = modelParams.bias[3];
+        for (let m = 0; m < linBias.length; m++) {
+            g1.append("rect")
+                .attr("x", biasCoord[0][0] + rectH * m)
+                .attr("y", biasCoord[0][1])
+                .attr("width", rectH)
+                .attr("height", rectH)
+                .attr("fill", myColor(linBias[m]))
+                .attr("opacity", 1)
+                .attr("stroke", "gray")
+                .attr("stroke-width", 0.1)
+                .attr("class", "procVis");
+        }
+        biasCoord[0][1] += rectH / 2;
+        biasCoord[0][0] += rectH * 2;
+        let feaCoord = [one[0][0], one[0][1] + rectH / 2];
+        drawPoints(".mats", "red", biasCoord);
+        const curve = d3.line().curve(d3.curveBasis);
+        const controlPts = computeMids(biasCoord[0], feaCoord);
+        d3.select(".mats")
+            .append("path")
+            .attr(
+                "d",
+                curve([biasCoord[0], controlPts[0], controlPts[1], feaCoord])
+            )
+            .attr("stroke", "black")
+            .attr("opacity", 0.05)
+            .attr("fill", "none")
+            .attr("class", "procVis")
+            .attr("id", "path1");
         //draw frame
         const f1 = g1
             .append("rect")
@@ -848,7 +900,7 @@ export function outputVisClick(
             .attr("fr", 2)
             .attr("id", "fr2");
         //connect!
-        one[0][1] += rectH/2;
+        one[0][1] += rectH / 2;
         d3.select(".mats")
             .append("path")
             .attr("d", d3.line()([one[0], poolingPt[0]]))
