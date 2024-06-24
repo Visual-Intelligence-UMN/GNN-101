@@ -647,7 +647,7 @@ export function visualizeMatrix(path: string) {
 
         g.append("g")
             .attr("class", "x-axis")
-            .attr("transform", `translate(0,${gridSize})`)
+            .attr("transform", `translate(0,${gridSize+50})`)
             .call(d3.axisBottom(x));
 
         var y = d3
@@ -656,7 +656,7 @@ export function visualizeMatrix(path: string) {
             .domain(myVars)
             .padding(0.01);
 
-        g.append("g").attr("class", "y-axis").call(d3.axisLeft(y));
+        g.append("g").attr("class", "y-axis").attr("transform", "translate(0,50)").call(d3.axisLeft(y));
 
         d3.selectAll<SVGTextElement, any>(".x-axis text").classed(
             "first",
@@ -681,7 +681,7 @@ export function visualizeMatrix(path: string) {
             .enter()
             .append("rect")
             .attr("x", (d: HeatmapData) => x(d.group)!)
-            .attr("y", (d: HeatmapData) => y(d.variable)!)
+            .attr("y", (d: HeatmapData) => y(d.variable)!+50)
             .attr("width", x.bandwidth())
             .attr("height", y.bandwidth())
             .style("fill", (d: HeatmapData) => myColor(d.value))
@@ -714,7 +714,7 @@ export function visualizeMatrix(path: string) {
                 removeEffect(element);
             });
 
-        drawNodeAttributes(nodeAttrs, graph, 0);
+        drawNodeAttributes(nodeAttrs, graph, 50);
     };
 
     const visualizeMat = async (path: string) => {
