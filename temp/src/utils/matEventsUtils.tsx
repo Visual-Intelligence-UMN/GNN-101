@@ -366,12 +366,15 @@ export function featureVisClick(
         console.log("compute x 0");
     } else w = 5;
     let intervalID: any;
-    const playBtnCoord = [coordFeatureVis[0], coordFeatureVis[1] - 50];
+    let curveDir = 1;
+    const midNode = adjList.length / 2;
+    if (node < midNode) curveDir = -1;
+    const playBtnCoord = [coordFeatureVis[0], coordFeatureVis[1] + curveDir * 50];
     //drawPoints(".mats", "red", [playBtnCoord]);
     let btnPos: any = null;
     let startCoordList: any[] = [];
     let endCoordList: any[] = [];
-    let curveDir = 1; //true -> -1; false -> 1
+    //let curveDir = 1; //true -> -1; false -> 1
     setTimeout(() => {
         //draw feature visualizer
         for (let m = 0; m < X.length; m++) {
@@ -880,7 +883,7 @@ export function outputVisClick(
 
         let biasCoord = deepClone(aOne);
         biasCoord[0][0] -= 130 + 2 * rectH;
-        biasCoord[0][1] -= 50;
+        biasCoord[0][1] += 50;
         const linBias = modelParams.bias[3];
         for (let m = 0; m < linBias.length; m++) {
             g1.append("rect")
@@ -953,7 +956,7 @@ export function outputVisClick(
             for (let j = 0; j < 64; j++) {
                 const s1 = startCoord[j];
                 const e1 = endCoord[currentStep];
-                let pathDir = e1[0] > s1[0] ? 0 : 1;
+                let pathDir = e1[0] > s1[0] ? 1 : 0;
                 //drawPoints(".mats", "red", [s1, e1]);
                 console.log("se", [s1, e1]);
                 d3.select(".mats")
@@ -1042,7 +1045,7 @@ export function outputVisClick(
                 for (let j = 0; j < 64; j++) {
                     const s1 = startCoord[j];
                     const e1 = endCoord[currentStep];
-                    let pathDir = e1[0] > s1[0] ? 0 : 1;
+                    let pathDir = e1[0] > s1[0] ? 1 : 0;
                     console.log("se", [s1, e1]);
                     d3.select(".mats")
                         .append("path")
