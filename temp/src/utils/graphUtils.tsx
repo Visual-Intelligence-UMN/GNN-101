@@ -64,7 +64,7 @@ export function highlightNodes(node: any) {
   
 export function resetNodes(allNodes: any[]) {
     allNodes.forEach(node => {
-      if (node.graphIndex <= 2) {
+      if (node.graphIndex <= 3) {
       if (node.featureGroup) {
         node.featureGroup.style("visibility", "hidden")
       }
@@ -115,7 +115,10 @@ export function resetNodes(allNodes: any[]) {
     }
 
 
-    let biasData = bias[node.graphIndex]; //might cause an issue when the first layer is added 
+    let biasData = []
+    if (node.graphIndex) {
+      biasData = bias[node.graphIndex - 1]; //might cause an issue when the first layer is added 
+    }
     
     const g3 = svg.append("g")
       .attr("class", "layerVis")
@@ -150,13 +153,19 @@ export function resetNodes(allNodes: any[]) {
   
     const aggregatedFeatureGroup = g3.append("g")
       .attr("transform", `translate(${xPos + 400}, ${yPos - 64 * 3 - 5})`);
+
+
+    let yOffset = 5;
+    if (node.graphIndex === 1) {
+      yOffset = (64 - 7) * 3 + 5;
+    }  
   
     aggregatedFeatureGroup.selectAll("rect")
       .data(aggregatedData)
       .enter()
       .append("rect")
       .attr("x", 0)
-      .attr("y", (d: any, i: number) => i * 3 + 5)
+      .attr("y", (d: any, i: number) => i * 3 + yOffset)
       .attr("width", 15)
       .attr("height", 3)
       .style("fill", (d: number) => myColor(d))
@@ -291,12 +300,18 @@ export function resetNodes(allNodes: any[]) {
         .style("opacity", 0.7)
         .style("stroke-width", 1)
         .style("fill", "none")
-        .style("opacity", 1);
-  
+        .style("opacity", 0);
+
+      setTimeout(() => {
+          biasToFinal.style("opacity", 1);
+      }, 32000);  
+
+        
       paths.push(biasToFinal);
       node.intermediatePaths = paths;
     }
 
+    //relu 
     g3.append("circle")
       .attr("cx", end_x - 30)
       .attr("cy", end_y)
@@ -318,9 +333,38 @@ export function resetNodes(allNodes: any[]) {
     .attr("class", "vis-component")
     .attr("opacity", 1)
     .style("text-anchor", "middle");  
+
+    // pause and replay
+    const button = g3.append("circle")
+      .attr("cx", end_x - 200)
+      .attr("cy", end_y - 200)
+      .attr("r", 25)
+      .style("fill", "white")
+      .style("stroke", "black")
+      .style("stroke-width", 1)
+      .attr("opacity", 1)
+      .attr("class", "vis-component")
+      .node();
+
+
+
+    const button_discri = g3.append("text")
+    .attr("x", end_x - 200)
+    .attr("y", end_y - 200)
+    .attr("dy", ".50em")
+    .text("pause")
+    .style("font-size", "16px")
+    .style("fill", "black")
+    .attr("class", "vis-component")
+    .attr("opacity", 1)
+    .style("text-anchor", "middle"); 
+    
+    button.addEventListener("click", function(event: any) {
+      d3.select(button_discri).text("play") // need to implement
+    });
   }, 1500);
 
-    weightAnimation(svg, startCoordList, endCoordList, currentWeights); // may cause problems when the first layer is added 
+    weightAnimation(svg, node, startCoordList, endCoordList, currentWeights); 
   }
 
 
@@ -348,7 +392,7 @@ export function moveNextLayer(svg: any, node: any, moveOffset: number, indicator
   });
 }
 
-function weightAnimation(svg: any, startCoordList: number[], endCoordList: number[], weights: any[]) {
+function weightAnimation(svg: any, node: any, startCoordList: number[], endCoordList: number[], weights: any[]) {
   let i = 0
   let intervalID: any;
   let isAnimating = true; 
@@ -378,11 +422,12 @@ function weightAnimation(svg: any, startCoordList: number[], endCoordList: numbe
       if (i >= 64) {
           clearInterval(intervalID);
       }
-  }, 250); 
+  }, 500); 
 
   setIntervalID(intervalID); 
   d3.selectAll("path").lower();
   }, 2000)
+ 
 
 }
 
@@ -439,7 +484,7 @@ function GraphViewDrawPaths(
   setTimeout(() => {
     d3.selectAll(`#tempath${i}`).remove();
     i++;
-  }, 250);
+  }, 500);
 }
 
 
@@ -447,10 +492,7 @@ function GraphViewDrawPaths(
 
 
 export function aggregationCalculator(graphs: any[]) {
-
-
-  
-  let data = graphs[0];
+  let data = graphs[1];
   const nodeCount = data.nodes.length;
   const edgePairs = data.links;
   let adjList: number[][] = Array.from(
@@ -514,8 +556,10 @@ export function matrixMultiplication(matrix_a: any[], matrix_b: any[]) {
     const colsB = matrix_b[0].length;
 
     if (colsA !== rowsB) {
+      console.log(matrix_a.length,matrix_a[0].length)
+      console.log(matrix_b.length,matrix_b[0].length)
       console.log("can't do")
-      return matrix_a;
+      return [];
        
     }
 

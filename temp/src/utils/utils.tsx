@@ -323,6 +323,7 @@ export async function data_prep(o_data: any) {
 export async function prep_graphs(g_num: number, data: any) {
   var graphs = [];
   
+  
   for (var i = 0; i < g_num; i++) {
     var graphData = {};
       graphData = {
@@ -331,7 +332,7 @@ export async function prep_graphs(g_num: number, data: any) {
       };
       graphs.push(graphData);
   }
-  for (var i = 0; i < 3; i++) {
+  for (var i = 0; i < 2; i++) {
     var node: NodeType = {
       id: 0,
       name: " ",
@@ -369,18 +370,7 @@ export const myColor = d3.scaleLinear<string>()
 export function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, final: any, graphs: any[]) {
   const {weights, bias} = loadWeights();
   const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex); //somehow doesn't include the node in the last layer
-  if (!nodesByIndex.has(5)) {
-    const nodesWithGraphIndex4 = nodesByIndex.get(4);
-    if (nodesWithGraphIndex4) {
-      const nodesWithGraphIndex5 = nodesWithGraphIndex4.map(node => {
-        const newNode = { ...node, graphIndex: 5 };
-        newNode.features = softmax(final)
-        return newNode;
-      }); // manually add the last layer 
 
-      nodesByIndex.set(5, nodesWithGraphIndex5);
-    }
-  }
 
   let normalizedAdjMatrix: any = []
   if (graphs.length != 0) {
@@ -401,14 +391,18 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
 
   nodesByIndex.forEach((nodes, graphIndex) => { // iterate through each graphs
-    let currentWeights = weights[graphIndex];
+    
+    
     let aggregatedDataMap: any[] = [];
-    let calculatedDataMap: any[] = []
+    let calculatedDataMap: any[] = [];
+    let currentWeights: any[] = [];
+
 
     // do some calculation that sill be used in the animation
-    if (graphs.length != 0 && graphIndex > 0 && graphIndex < 3) {
+    if (graphs.length != 0 && graphIndex > 0 && graphIndex < 4) {
+    currentWeights = weights[graphIndex - 1];
+      
 
-     let {weights, bias} = loadWeights()
      let featureMap: number[][] = [];
      const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex);
      nodesByIndex.forEach((nodes, index) => { 
@@ -418,11 +412,10 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
          })
          }
        })
-
        aggregatedDataMap = matrixMultiplication(normalizedAdjMatrix, featureMap)
        calculatedDataMap = matrixMultiplication(aggregatedDataMap, currentWeights)
-       console.log("VAE",featureMap,aggregatedDataMap,calculatedDataMap)
-       
+
+
       }
 
       
@@ -431,7 +424,10 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
 
     const occupiedPositions: { x: number; y: number }[] = []; 
-    const xOffset = (graphIndex - 2.5) * offset;
+    let xOffset = (graphIndex - 2.5) * offset;
+    if (graphIndex >= 4) {
+      xOffset = (graphIndex - 2.5) * offset - 25 * (graphIndex * 1.5);
+    }
 
     const g2 = svg.append("g")
       .attr("layerNum", graphIndex)
@@ -456,7 +452,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
       occupiedPositions.push({ x: xPos, y: yPos });
 
 
-      if (graphIndex <= 2) {
+      if (graphIndex <= 3) {
         // featureGroup in the convolutional layers and the last three layers are different.
 
         // add svgElement to each node simplify the interaction process (maybe)
@@ -566,7 +562,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
         // for the pooling layer(graphIndex = 3), the rectHeight = 2, for the other 2 layers, rectHeight = 20;
         let rectHeight = 2;
-        if (node.graphIndex >= 4) {
+        if (node.graphIndex >= 5) {
           rectHeight = 20;
         }
         let groupCentralHeight = rectHeight * features.length / 2;
@@ -611,6 +607,33 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             }
           }
         });
+        node.featureGroup.on("click", function(event: any) {
+          hideAllLinks(allNodes);
+          // calculationVisualizer(node, currentWeights, bias, aggregatedDataMap, calculatedDataMap, svg, offset, isClicked);
+          let relatedNodes: any = [];
+            if (node.relatedNodes) {
+              relatedNodes = node.relatedNodes;
+            } // to make sure relatedNodes is not null
+            reduceNodeOpacity(allNodes, relatedNodes, node);
+            event.stopPropagation(); // Prevent the click event from bubbling up
+            isClicked = true;
+
+            if (movedNode === node) {
+              return; // Do nothing if the node is already moved
+            }
+          
+
+            if (movedNode) {
+              // Move back the previously moved node and its layer
+              moveNextLayer(svg, movedNode, moveOffset, -1)
+              isClicked = false; 
+              movedNode = null;
+            }
+
+            
+            moveNextLayer(svg, node, moveOffset, 1);
+            movedNode = node; // Update the moved node
+        });
       }
     });
   });
@@ -648,8 +671,6 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
 
   nodesByIndex.forEach((nodes, graphIndex) => {
 
-    let upperIndex = 0;
-    let lowerIndex = 0;
     nodes.forEach((node: any, i) => {
 
       if (!node.links) {
@@ -659,10 +680,12 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
         node.relatedNodes = []
       }
 
-        const xOffset1 = (graphIndex - 2.5) * offset;
-        const xOffset2 = (graphIndex - 1.5) * offset;
+        let xOffset1 = (graphIndex - 2.5) * offset;
+        let xOffset2 = (graphIndex - 1.5) * offset;
 
-      if (graphIndex < 2) { 
+  
+
+      if (graphIndex < 3) { 
         
         let drawnLinks = new Set();
 
@@ -742,7 +765,15 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
         
       } else {  
           const color = calculateAverage(node.features)
-   
+
+          xOffset1 = (graphIndex - 2.5) * offset - 150;
+          xOffset2 = (graphIndex - 1.5) * offset - 30 * (graphIndex * 1.5);
+
+          if (graphIndex === 3) {
+            xOffset1 = (graphIndex - 2.5) * offset;
+            
+          }
+          
           
           const nextLayer = graphs[graphIndex + 1];
           if (nextLayer) {

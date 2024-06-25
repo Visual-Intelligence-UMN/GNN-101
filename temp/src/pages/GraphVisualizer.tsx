@@ -68,8 +68,11 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
       graphs.forEach((data, i) => {
         console.log("i", i);
         console.log(data);
-
-        const xOffset = (i - 2.5) * offset;
+        
+        let xOffset = (i - 2.5) * offset;
+        if (i >= 4) {
+          xOffset = (i - 2.5) * offset - 25 * (i * 1.5) ;
+        }
         const g1 = svg
           .append("g")
           .attr("class", "layerVis") 
@@ -102,6 +105,9 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           .text((d: any) => d.id)
           .attr("font-size", `17px`);
 
+        if (i >= 4) {
+          labels.attr("opacity", 0);
+        }
 
 
           // Define the simulation
@@ -157,20 +163,17 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
               let value = null;
               let index = 0;
               if (intmData != null) {
-                if (i === 0) {
+                if (i === 1) {
                   value = intmData.conv1;
                 }
-                if (i === 1) {
+                if (i === 2) {
                   value = intmData.conv2;
                 }
-                if (i === 2) {
+                if (i === 3) {
                   value = intmData.conv3;
                 }
-                if (i === 3) {
-                  value = intmData.pooling;
-                }
                 if (i === 4) {
-                  value = intmData.final;
+                  value = intmData.pooling;
                 }
                 if (i === 5) {
                   let final: any = intmData.final;
@@ -179,15 +182,14 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
               }
               data.nodes.forEach((node: any) => {
                 node.graphIndex = i;
-
-                if (value != null && i <= 3 && value instanceof Float32Array) {
+                if (value != null && i <= 4 && value instanceof Float32Array) {
                   node.features = value.subarray(
                     64 * node.id,
                     64 * (node.id + 1)
                   );
                 }
   
-                if (value != null && i >= 4) {
+                if (value != null && i >= 5) {
                   node.features.push(value[index]);
                   index = index + 1;
                 }
@@ -246,14 +248,14 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
   
               let text = " ";
-              if (i <= 2) {
+              if (i == 0) {
+                text = "Original Graph"
+              }
+              if (i <= 3 && i != 0) {
                 text = `GCNGconv${i + 1}`
               }
-              if (i === 3) {
-                text = "Pooling"
-              }
               if (i === 4) {
-                text = "Model Output"
+                text = "Pooling"
               }
               if (i === 5) {
                 text = "Prediction Result"
@@ -271,7 +273,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
               
               // doesn't show the text, need to be fixed 
-                if (i === graphs.length - 2) { // 6 layers in total, call the connect when reaching the last layer of convolutional layer.
+                if (i === graphs.length - 1) { // 6 layers in total, call the connect when reaching the last layer of convolutional layer.
                 connectCrossGraphNodes( // in this function the connection of last two layers will be drwan
                   allNodes,
                   svg,
@@ -316,7 +318,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
     if ((intmData == null || changed ) && !predicted) {
       visualizeGraph(graph_path);
     } else {
-      visualizeGNN(3);
+      visualizeGNN(4);
     }
     console.log("i fire once");
   }, [graph_path, intmData]);

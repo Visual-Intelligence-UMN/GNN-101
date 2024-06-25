@@ -536,16 +536,7 @@ export function visualizeGraph(path: string) {
                         .attr("y", (d: any) => d.y + 6);
                 })
                 .on("end", function ended() {
-                    let value = null;
-                    data.nodes.forEach((node: any) => {
-                        node.graphIndex = 0;
-
-
-                        if (value != null) {
-                            //node.features = value.subarray(64 * node.id, 64 * (node.id + 1))
-                        }
-                        allNodes.push(node);
-                    });
+                    
                     let maxXDistance = 0;
                     let maxYDistance = 0;
                     data.nodes.forEach((node1: any) => {
