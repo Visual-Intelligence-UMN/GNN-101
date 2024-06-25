@@ -33,6 +33,15 @@ export function roundToTwo(num: number): number {
     return Math.round(num * 100) / 100;
 }
 
+export function chunkArray<T>(inputArray: T[], chunkSize: number): T[][] {
+    const result: T[][] = [];
+    for (let i = 0; i < inputArray.length; i += chunkSize) {
+        const chunk = inputArray.slice(i, i + chunkSize);
+        result.push(chunk);
+    }
+    return result;
+}
+
 interface GraphAnalysisViewerProps {
     path: string;
 }

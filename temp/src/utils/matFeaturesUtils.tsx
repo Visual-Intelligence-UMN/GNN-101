@@ -1,7 +1,8 @@
-import { deepClone, drawPoints, generateRandomArray, softmax } from "./utils";
+import { chunkArray, deepClone, drawPoints, generateRandomArray, preprocessFloat32ArrayToNumber, softmax, transposeMat } from "./utils";
 import { addLayerName, buildBinaryLegend, buildLegend } from "./matHelperUtils";
 import * as d3 from "d3";
 import { roundToTwo } from "@/pages/WebUtils";
+import { create, all, matrix } from "mathjs";
 
 //draw cross connections between feature visualizers
 export function drawCrossConnection(
@@ -373,7 +374,8 @@ export function drawGCNConv(
                 myColor,
                 frames,
                 colorSchemesTable,
-                thirdGCN
+                thirdGCN,
+                conv3
             );
             one = poolingPack["one"];
             poolingVis = poolingPack["g"];
@@ -494,7 +496,8 @@ export function drawPoolingVis(
     myColor: any,
     frames: any,
     colorSchemesTable: any,
-    thirdGCN: any
+    thirdGCN: any,
+    conv3: any
 ) {
     console.log("thirdGCN from pooling vis", thirdGCN);
 
@@ -603,8 +606,16 @@ export function drawPoolingVis(
                 }
 
                 //dummy data
-                const numFromFeatures = generateRandomArray(17, -1, 1);
-                const numFromResult = generateRandomArray(64, -1, 1);
+                console.log("fetch pooling conv3", conv3);
+                const matConv3:any = chunkArray(conv3, 64);
+                console.log("fetch 1", matConv3);
+                const aMat = preprocessFloat32ArrayToNumber(matConv3);
+                console.log("fetch 2", aMat);
+                const matConv3t:any= transposeMat(aMat);
+                console.log("fecth 3", matConv3t);
+                const numFromFeatures:any = matConv3t[id];
+                console.log("fetch 4", numFromFeatures);
+                const numFromResult = pooling;
 
                 //draw rects based on the coordination
                 console.log("oover", yIncr, numRect);
@@ -683,7 +694,7 @@ export function drawPoolingVis(
                         .attr("fill", "black");
                 }
                 // add result rect
-                if (Math.abs(resultVal) < 0.5) {
+                if (Math.abs(numFromResult[id]) < 0.5) {
                     color = "black";
                 } else {
                     color = "white";
@@ -708,9 +719,9 @@ export function drawPoolingVis(
                     .attr("fill", color);
                 // drawPoints(".mats", "red", posNeed);
                 // add divider
-                const lineSPt: [number, number] = [displayX + 10, midYPt];
+                const lineSPt: [number, number] = [displayX + 15, midYPt];
                 const lineEPt: [number, number] = [
-                    displayX + displayXOffset - 10,
+                    displayX + displayXOffset -3,
                     midYPt,
                 ];
                 d3.select(".mats")
@@ -725,7 +736,7 @@ export function drawPoolingVis(
                 const balanceOffset = 15;
                 d3.select(".mats")
                     .append("text")
-                    .attr("x", numBalancePt[0] - 2.5)
+                    .attr("x", numBalancePt[0] - 2.5 - 3)
                     .attr("y", numBalancePt[1] + balanceOffset)
                     .text(nodeNum)
                     .attr("class", "math-displayer")
@@ -733,7 +744,7 @@ export function drawPoolingVis(
                     .attr("fill", "black");
                 d3.select(".mats")
                     .append("text")
-                    .attr("x", numBalancePt[0])
+                    .attr("x", numBalancePt[0] - 3)
                     .attr("y", numBalancePt[1] - balanceOffset + 12.5)
                     .text(1)
                     .attr("class", "math-displayer")
