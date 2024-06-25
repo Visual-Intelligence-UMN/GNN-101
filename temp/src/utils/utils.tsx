@@ -693,7 +693,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
                 .attr("d", `M ${node.x + xOffset1 + 16} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${neighborNode.x + (neighborNode.graphIndex - 2.5) * offset - 16} ${neighborNode.y + 10}`)
                 .style("stroke", myColor(color))
                 .style("opacity", 0.07)
-                .style("stroke-width", 1)
+                .style("stroke-width", 1) 
                 .style("fill", "none");
 
 
