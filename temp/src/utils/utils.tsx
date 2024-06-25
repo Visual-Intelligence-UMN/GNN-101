@@ -639,8 +639,8 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
   });
 
   // Add a global click event to the document to reset the moved node and isClicked flag
-  document.addEventListener("click", function() {
-    if (movedNode) {
+  document.addEventListener("click", function(event: any) {
+    if (movedNode && (!event.target.classList.contains("vis-component"))) {
       svg.selectAll(".vis-component")
         .style("opacity", 0);
       moveNextLayer(svg, movedNode, moveOffset, -1)
