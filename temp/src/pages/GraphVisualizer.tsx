@@ -71,7 +71,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
         
         let xOffset = (i - 2.5) * offset;
         if (i >= 4) {
-          xOffset = (i - 2.5) * offset - 25 * (i * 1.5) ;
+          xOffset = (i - 2.5) * offset - 25 * (i * 1.5);
         }
         const g1 = svg
           .append("g")
@@ -249,10 +249,10 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
   
               let text = " ";
               if (i == 0) {
-                text = "Original Graph"
+                text = "Input"
               }
               if (i <= 3 && i != 0) {
-                text = `GCNGconv${i + 1}`
+                text = `GCNGconv${i}`
               }
               if (i === 4) {
                 text = "Pooling"
@@ -332,7 +332,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           .transition() 
           .duration(140)  
           .style("opacity", () => {
-            if ((i <= 2 && selectedButtons[i + 1]) ||
+            if ((i <= 2 && selectedButtons[i]) ||
                 (i === 3 && selectedButtons[4]) ||
                 (i === 4 && selectedButtons[5]) ||
                 (i === 5 && selectedButtons[6])) {
@@ -341,7 +341,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             return 0.5;  
           })
           .attr("font-size", () => {
-            if ((i <= 2 && selectedButtons[i + 1]) ||
+            if ((i <= 2 && selectedButtons[i]) ||
                 (i === 3 && selectedButtons[4]) ||
                 (i === 4 && selectedButtons[5]) ||
                 (i === 5 && selectedButtons[6])) {
