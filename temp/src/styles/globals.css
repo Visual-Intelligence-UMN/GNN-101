@@ -40,17 +40,22 @@ path, text, svgElement, rect {
 
 .frame {
   transition: all;
-  transition-duration: 1s;
+  transition-duration: 1.5s;
 }
 
 .colFrame {
   transition: all;
-  transition-duration: 1s;
+  transition-duration: 1.5s;
 }
 
 .rowFrame {
   transition: all;
-  transition-duration: 1s;
+  transition-duration: 1.5s;
+}
+
+path {
+  transition: all;
+  transition-duration: 1.5s;
 }
 
 @layer utilities {

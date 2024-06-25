@@ -931,14 +931,14 @@ export function outputVisClick(
             .attr("id", "fr2");
         //connect!
         one[0][1] += rectH / 2;
-        d3.select(".mats")
-            .append("path")
-            .attr("d", d3.line()([one[0], poolingPt[0]]))
-            .attr("stroke", "black")
-            .attr("opacity", 0.05)
-            .attr("fill", "none")
-            .attr("class", "procVis")
-            .attr("id", "path1");
+        // d3.select(".mats")
+        //     .append("path")
+        //     .attr("d", d3.line()([one[0], poolingPt[0]]))
+        //     .attr("stroke", "black")
+        //     .attr("opacity", 0.05)
+        //     .attr("fill", "none")
+        //     .attr("class", "procVis")
+        //     .attr("id", "path1");
         const endPt = [one[0][0] + 300, one[0][1]];
         d3.select(".mats")
             .append("path")
@@ -1006,7 +1006,7 @@ export function outputVisClick(
     const btn = d3.select(".mats").append("g");
     const radius = 10;
     const btnX = startCoord[0][0];
-    const btnY = startCoord[0][1] - 50;
+    const btnY = startCoord[0][1] + 50;
     btn.append("circle")
         .attr("cx", btnX)
         .attr("cy", btnY)
