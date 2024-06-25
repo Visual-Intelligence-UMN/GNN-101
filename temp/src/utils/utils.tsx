@@ -22,6 +22,7 @@ env.wasm.wasmPaths = {
 
 
 export function preprocessFloat32ArrayToNumber(matrix: any): number[][] {
+  // why the matrix here is an array....? 
   let mat = [];
   for(let i=0; i<matrix[0].length; i++){
     let row = [];
@@ -37,13 +38,10 @@ return mat;
 
 export function transposeMat<T>(matrix: T[][]): T[][] {
   console.log("fetch 2.1", matrix)
-
-  // 创建新的二维数组，行数为原矩阵的列数，列数为原矩阵的行数
   const rows = matrix.length;
   const cols = matrix[0].length;
-  const transposed: T[][] = Array.from({ length: cols }, () => new Array<T>(rows)); //问题出在了这一步，这一步会将数组转移到另一个数组里面，也就是一个数组嵌套这float32Array
+  const transposed: T[][] = Array.from({ length: cols }, () => new Array<T>(rows)); 
   console.log("fetch 2.2", transposed)
-  // 填充转置矩阵
   for (let i = 0; i < cols; i++) {
       for (let j = 0; j < rows; j++) {
           transposed[i][j] = matrix[j][i];
