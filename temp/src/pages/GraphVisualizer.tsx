@@ -71,7 +71,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
         
         let xOffset = (i - 2.5) * offset;
         if (i >= 4) {
-          xOffset = (i - 2.5) * offset - 25 * (i * 1.5) ;
+          xOffset = (i - 2.5) * offset - 25 * (i * 1.5);
         }
         const g1 = svg
           .append("g")

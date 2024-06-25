@@ -113,6 +113,7 @@ export function resetNodes(allNodes: any[]) {
     if (isClicked || aggregatedDataMap == null || calculatedDataMap == null) { //doesn't work currently
       return;
     }
+    let isPlaying: boolean = true
 
 
     let biasData = []
@@ -300,11 +301,10 @@ export function resetNodes(allNodes: any[]) {
         .style("opacity", 0.7)
         .style("stroke-width", 1)
         .style("fill", "none")
+        .attr("class", "biasToFinal")
         .style("opacity", 0);
 
-      setTimeout(() => {
-          biasToFinal.style("opacity", 1);
-      }, 32000);  
+
 
         
       paths.push(biasToFinal);
@@ -312,6 +312,7 @@ export function resetNodes(allNodes: any[]) {
     }
 
     //relu 
+    
     g3.append("circle")
       .attr("cx", end_x - 30)
       .attr("cy", end_y)
@@ -333,35 +334,8 @@ export function resetNodes(allNodes: any[]) {
     .attr("class", "vis-component")
     .attr("opacity", 1)
     .style("text-anchor", "middle");  
-
-    // pause and replay
-    const button = g3.append("circle")
-      .attr("cx", end_x - 200)
-      .attr("cy", end_y - 200)
-      .attr("r", 25)
-      .style("fill", "white")
-      .style("stroke", "black")
-      .style("stroke-width", 1)
-      .attr("opacity", 1)
-      .attr("class", "vis-component")
-      .node();
-
-
-
-    const button_discri = g3.append("text")
-    .attr("x", end_x - 200)
-    .attr("y", end_y - 200)
-    .attr("dy", ".50em")
-    .text("pause")
-    .style("font-size", "16px")
-    .style("fill", "black")
-    .attr("class", "vis-component")
-    .attr("opacity", 1)
-    .style("text-anchor", "middle"); 
     
-    button.addEventListener("click", function(event: any) {
-      d3.select(button_discri).text("play") // need to implement
-    });
+  
   }, 1500);
 
     weightAnimation(svg, node, startCoordList, endCoordList, currentWeights); 
@@ -392,10 +366,52 @@ export function moveNextLayer(svg: any, node: any, moveOffset: number, indicator
   });
 }
 
-function weightAnimation(svg: any, node: any, startCoordList: number[], endCoordList: number[], weights: any[]) {
-  let i = 0
+function weightAnimation(svg: any, node: any, startCoordList: number[][], endCoordList: number[][], weights: any) {
+  let i = 0;
   let intervalID: any;
+  let isPlaying = true;
   let isAnimating = true; 
+
+  if (!svg.selectAll) {
+    svg = d3.select(svg);
+  }
+
+  // Pause and replay button
+  const btn = svg.append("g")
+    .attr("class", "button-group");
+  
+  btn.append("circle")
+    .attr("cx", endCoordList[0][0] - 200)
+    .attr("cy", node.y - 200)
+    .attr("r", 25)
+    .style("fill", "white")
+    .style("stroke", "black")
+    .style("stroke-width", 1)
+    .attr("opacity", 1)
+    .attr("class", "vis-component");
+
+  btn.append("text")
+    .attr("x", endCoordList[0][0] - 200)
+    .attr("y", node.y - 200)
+    .attr("dy", ".50em")
+    .text("pause")
+    .style("font-size", "16px")
+    .style("fill", "black")
+    .attr("class", "vis-component button-discri")
+    .attr("opacity", 1)
+    .style("text-anchor", "middle");
+
+  btn.on("click", function(event: any) {
+    event.stopPropagation();
+    isPlaying = !isPlaying;
+    d3.select(".button-discri").text(isPlaying ? "pause" : "play");
+    if (isPlaying) {
+      startAnimation();
+    } else {
+      clearInterval(intervalID);
+    }
+  });
+
   const math = create(all, {});
   const Xt = math.transpose(weights);
 
@@ -403,49 +419,49 @@ function weightAnimation(svg: any, node: any, startCoordList: number[], endCoord
     isAnimating = false; 
   });
 
-  function setIntervalID(id:any) {
-    intervalID = id;
-  }
-
-  setTimeout(() => {
+  function startAnimation() {
+    if (i >= 64) {
+      i = 0;  // Reset the index to replay the animation
+    }
     intervalID = setInterval(() => {
-      GraphViewDrawPaths(
+      if (isAnimating) {
+        GraphViewDrawPaths(
           Xt,
           myColor,
           i,
           startCoordList,
           endCoordList,
           svg,
-          isAnimating
-      );
-      i++;
-      if (i >= 64) {
+          isAnimating,
+          isPlaying
+        );
+        i++;
+        if (i >= 64) {
           clearInterval(intervalID);
+          isPlaying = false;
+          d3.select(".button-discri").text("play");
+          d3.select(".biasToFinal").style("opacity", 1);
+        }
       }
-  }, 500); 
+    }, 500);
+  }
 
-  setIntervalID(intervalID); 
-  d3.selectAll("path").lower();
-  }, 2000)
- 
-
+  setTimeout(() => {
+    startAnimation();
+    d3.selectAll("path").lower();
+  }, 2000);
 }
 
 function GraphViewDrawPaths(
   Xt: any,
   myColor: any,
   i: number,
-  startCoordList: any,
-  endCoordList: any,
+  startCoordList: number[][],
+  endCoordList: number[][],
   svg: any,
-  isAnimating: boolean
+  isAnimating: boolean,
+  isPlaying: boolean
 ) {
-  if (!isAnimating) {
-    d3.selectAll(`#tempath${i}`).remove();
-    return;
-  }
-  
-
   if (!svg.selectAll) {
     svg = d3.select(svg);
   }
@@ -481,14 +497,15 @@ function GraphViewDrawPaths(
       .attr("id", `tempath${i}`);
   }
 
-  setTimeout(() => {
-    d3.selectAll(`#tempath${i}`).remove();
-    i++;
-  }, 500);
+  if (isAnimating) {
+    setTimeout(() => {
+      if (isPlaying) {
+        d3.selectAll(`#tempath${i}`).remove();
+      }
+      i++;
+    }, 500);
+  }
 }
-
-
-
 
 
 export function aggregationCalculator(graphs: any[]) {
