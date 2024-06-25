@@ -134,8 +134,8 @@ export const ButtonChain = ({ selectedButtons, setSelectedButtons, predicted }: 
                      {/* Since input is not shown during the predicted phase, it is disabled */}
                     <button
                         disabled={!predicted}
-                        className={`cursor-default bg-gray-200 border border-gray-300 text-black py-1 px-2 rounded `}
-                        >
+                        className={`bg-gray-200 border border-gray-300 ${predicted ? 'hover:border-black hover:bg-gray-300' : '' } text-black py-1 px-2 rounded ${selectedButtons[0] ? 'outline outline-2 outline-black bg-gray-300' : ''}`}
+                        onClick={() => handleButtonClick(0)}>
                         Input
                     </button>
                     <button
