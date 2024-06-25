@@ -1,6 +1,7 @@
-import { deepClone, drawPoints, softmax } from "./utils";
+import { deepClone, drawPoints, generateRandomArray, softmax } from "./utils";
 import { addLayerName, buildBinaryLegend, buildLegend } from "./matHelperUtils";
 import * as d3 from "d3";
+import { roundToTwo } from "@/pages/WebUtils";
 
 //draw cross connections between feature visualizers
 export function drawCrossConnection(
@@ -15,14 +16,14 @@ export function drawCrossConnection(
     let alocations = deepClone(locations);
     for (let i = 0; i < alocations.length; i++) {
         alocations[i][0] += firstVisSize;
-        alocations[i][1] += rectH/2;
+        alocations[i][1] += rectH / 2;
     }
-    
+
     let blocations = deepClone(alocations);
     for (let i = 0; i < blocations.length; i++) {
         blocations[i][0] += gapSize;
     }
-   // drawPoints(".mats", "red", blocations);
+    // drawPoints(".mats", "red", blocations);
     console.log("location length", alocations.length);
     //draw one-one paths
     for (let i = 0; i < alocations.length; i++) {
@@ -182,7 +183,7 @@ export function drawNodeFeatures(
         locations[i][1] += 2;
     }
     //draw cross connections for features layer and first GCNConv layer
-    drawCrossConnection(graph, locations, 7*10, 102, 0);
+    drawCrossConnection(graph, locations, 7 * 10, 102, 0);
 
     //using locations to find the positions for first feature visualizers
     const firstLayer = d3.select(".mats").append("g").attr("id", "layerNum_0");
@@ -269,7 +270,7 @@ export function drawGCNConv(
     const gcnFeatures = [conv1, conv2, conv3];
     //a table to save all rects in the last GCNConv layer
     const featureChannels = 64;
-    let thirdGCN :any = Array.from({ length: featureChannels }, () => []);
+    let thirdGCN: any = Array.from({ length: featureChannels }, () => []);
     console.log("thirdGCN", thirdGCN);
     console.log("gcnf", gcnFeatures);
     console.log("CONV1", conv1);
@@ -298,7 +299,7 @@ export function drawGCNConv(
         );
         //drawPoints(".mats","red",locations);
         const gcnFeature = gcnFeatures[k];
-        
+
         for (let i = 0; i < locations.length; i++) {
             //const cate = get_category_node(features[i]) * 100;
             const g = layer
@@ -313,7 +314,8 @@ export function drawGCNConv(
             let nodeMat = gcnFeature[i];
             console.log("nodeMat", i, nodeMat);
             for (let m = 0; m < nodeMat.length; m++) {
-                const rect = g.append("rect")
+                const rect = g
+                    .append("rect")
                     .attr("x", locations[i][0] + rectW * m)
                     .attr("y", locations[i][1])
                     .attr("width", rectW)
@@ -323,7 +325,7 @@ export function drawGCNConv(
                     .attr("stroke", "gray")
                     .attr("stroke-width", 0.1);
                 //if it's the last layer, store rect into thirdGCN
-                if(k==2){
+                if (k == 2) {
                     thirdGCN[m].push(rect.node());
                 }
             }
@@ -355,7 +357,13 @@ export function drawGCNConv(
         console.log("FVT", featureVisTable);
         if (k != 2) {
             // visualize cross connections btw 1st, 2nd, 3rd GCNConv
-            paths = drawCrossConnection(graph, locations, 62 * rectW, 102, k + 1);
+            paths = drawCrossConnection(
+                graph,
+                locations,
+                62 * rectW,
+                102,
+                k + 1
+            );
             console.log("grouped grouped", paths);
         } else {
             //visualize pooling layer
@@ -405,7 +413,7 @@ export function drawGCNConv(
             1,
             "Features Color Scheme",
             schemeLocations[0][0],
-            schemeLocations[0][1]+schemeOffset,
+            schemeLocations[0][1] + schemeOffset,
             firstLayer
         );
         const scheme2 = buildLegend(
@@ -413,7 +421,7 @@ export function drawGCNConv(
             maxVals.conv1,
             "GCNConv1 Color Scheme",
             schemeLocations[1][0],
-            schemeLocations[1][1]+schemeOffset,
+            schemeLocations[1][1] + schemeOffset,
             l1
         );
         const scheme3 = buildLegend(
@@ -421,7 +429,7 @@ export function drawGCNConv(
             maxVals.conv2,
             "GCNConv2 Color Scheme",
             schemeLocations[1][0] + 400,
-            schemeLocations[1][1]+schemeOffset,
+            schemeLocations[1][1] + schemeOffset,
             l2
         );
         const scheme4 = buildLegend(
@@ -429,7 +437,7 @@ export function drawGCNConv(
             maxVals.conv3,
             "GCNConv3 Color Scheme",
             schemeLocations[1][0] + 400 * 2,
-            schemeLocations[1][1]+schemeOffset,
+            schemeLocations[1][1] + schemeOffset,
             l3
         );
         const scheme5 = buildLegend(
@@ -437,7 +445,7 @@ export function drawGCNConv(
             maxVals.pooling,
             "Pooling Color Scheme",
             schemeLocations[1][0] + 400 * 3,
-            schemeLocations[1][1]+schemeOffset,
+            schemeLocations[1][1] + schemeOffset,
             l4
         );
         const scheme6 = buildBinaryLegend(
@@ -446,7 +454,7 @@ export function drawGCNConv(
             result[1],
             "Result Color Scheme",
             schemeLocations[1][0] + 400 * 4,
-            schemeLocations[1][1]+schemeOffset,
+            schemeLocations[1][1] + schemeOffset,
             l5
         );
 
@@ -456,26 +464,26 @@ export function drawGCNConv(
             scheme3,
             scheme4,
             scheme5,
-            scheme6
+            scheme6,
         ];
     }
 
     console.log("thirdGCN after filled", thirdGCN);
 
     return {
-        "locations":locations,
-        "frames":frames,
-        "schemeLocations":schemeLocations,
-        "featureVisTable":featureVisTable,
-        "colorSchemesTable":colorSchemesTable,
-        "poolingVis":poolingVis,
-        "outputVis":outputVis,
-        "firstLayer":firstLayer,
-        "maxVals":maxVals,
-        "paths":paths,
-        "resultVis":resultVis,
-        "one":one,
-        "thirdGCN":thirdGCN
+        locations: locations,
+        frames: frames,
+        schemeLocations: schemeLocations,
+        featureVisTable: featureVisTable,
+        colorSchemesTable: colorSchemesTable,
+        poolingVis: poolingVis,
+        outputVis: outputVis,
+        firstLayer: firstLayer,
+        maxVals: maxVals,
+        paths: paths,
+        resultVis: resultVis,
+        one: one,
+        thirdGCN: thirdGCN,
     };
 }
 
@@ -498,9 +506,10 @@ export function drawPoolingVis(
     locations[locations.length - 1][0] += 64 * rectW;
     locations[locations.length - 1][1] += rectH;
     //find mid point
-    const midY = (locations[locations.length - 1][1] - locations[0][1]) / 2 + 50;
+    const midY =
+        (locations[locations.length - 1][1] - locations[0][1]) / 2 + 50;
     //all paths should connect to mid point
-    const one = [[locations[0][0] + 102, midY+2]];
+    const one = [[locations[0][0] + 102, midY + 2]];
     //drawPoints(".mats", "red", one);
     //draw the pooling layer
     console.log("from feature vis", pooling);
@@ -510,6 +519,17 @@ export function drawPoolingVis(
         .attr("class", "layerVis")
         .attr("id", "layerNum_4");
     const g = gg.append("g").attr("class", "pooling");
+
+    //coordination for the math formula display
+    const displayX = locations[0][0] + 102;
+    const displayY = midY - 100;
+
+    //width and height of displayer
+    const displayW = 300;
+    const displayH = 75;
+
+    //drawPoints(".mats", "red", [[displayX, displayY]]);
+
     for (let i = 0; i < pooling.length; i++) {
         g.append("rect")
             .attr("x", locations[0][0] + 102 + rectW * i)
@@ -522,30 +542,219 @@ export function drawPoolingVis(
             .attr("stroke-width", 0.1)
             .attr("class", "poolingRect")
             .attr("id", `${i}`)
-            .on("mouseover", function(event){
-                const id:number = Number(d3.select(this).attr("id"));
+            .on("mouseover", function (event) {
+                const id: number = Number(d3.select(this).attr("id"));
                 console.log("thirdGCN, mouseover", id, thirdGCN[id]);
-                for(let ii=0; ii<thirdGCN.length; ii++){
-                    if(ii!=id){
-                        thirdGCN[ii].forEach((node:any, index:number)=>{
+                for (let ii = 0; ii < thirdGCN.length; ii++) {
+                    if (ii != id) {
+                        thirdGCN[ii].forEach((node: any, index: number) => {
                             node.style.opacity = "0.1";
-                        })
+                            node.style.stroke = "black";
+                        });
                     }
                 }
+                //add displayer
+                d3.select(".mats")
+                    .append("rect")
+                    .attr("x", displayX)
+                    .attr("y", displayY)
+                    .attr("width", displayW)
+                    .attr("height", displayH)
+                    .attr("rx", 10)
+                    .attr("ry", 10)
+                    .style("fill", "white")
+                    .style("stroke", "black")
+                    .style("stroke-width", 2)
+                    .attr("class", "math-displayer")
+                    .lower();
+
+                //add math formula to the math-displayer
+                const nodeNum = thirdGCN[0].length;
+                const rowNum = Math.ceil(nodeNum);
+                const displayYOffset = 10;
+                const displayXOffset = 40;
+
+                let firstCoord = [
+                    displayX + displayXOffset,
+                    displayY + displayYOffset,
+                ];
+
+                //calculate all coordinations for rect and numerical values
+                let numRect = [firstCoord];
+                let xIncr = (displayW - 2 * displayXOffset) / 5;
+                let yIncr = (displayH - 2 * displayY) / rowNum;
+                let iCol = 1;
+                let iRow = 0;
+
+                for (let i = 1; i < nodeNum; i++) {
+                    let c = [
+                        displayX + displayXOffset + iCol * xIncr,
+                        displayY + displayYOffset - iRow * yIncr,
+                    ];
+
+                    numRect.push(c);
+
+                    iCol++;
+                    //if (i+1)%5==0 -> clear iCol && iRow ++
+                    if ((i + 1) % 5 == 0) {
+                        iCol = 0;
+                        iRow++;
+                    }
+                }
+
+                //dummy data
+                const numFromFeatures = generateRandomArray(17, -1, 1);
+                const numFromResult = generateRandomArray(64, -1, 1);
+
+                //draw rects based on the coordination
+                console.log("oover", yIncr, numRect);
+                const rectL = Math.abs(yIncr) - 3;
+                let color = "white";
+                for (let i = 0; i < numRect.length; i++) {
+                    if (Math.abs(numFromFeatures[i]) < 0.5) {
+                        color = "black";
+                    } else {
+                        color = "white";
+                    }
+                    // append rect
+                    d3.select(".mats")
+                        .append("rect")
+                        .attr("x", numRect[i][0])
+                        .attr("y", numRect[i][1])
+                        .attr("width", rectL)
+                        .attr("height", rectL)
+                        .attr("fill", myColor(numFromFeatures[i]))
+                        .attr("class", "math-displayer"); //.raise();
+                    // append text
+                    d3.select(".mats")
+                        .append("text")
+                        .attr("x", numRect[i][0])
+                        .attr("y", numRect[i][1] + rectL / 2)
+                        .text(roundToTwo(numFromFeatures[i]))
+                        .attr("class", "math-displayer")
+                        .attr("font-size", "5")
+                        .attr("fill", color);
+                }
+
+                //find places to place "+"
+                let posPlus = [];
+                for (let i = 0; i < numRect.length; i++) {
+                    let c = [
+                        numRect[i][0] + 17 + rectL,
+                        numRect[i][1] + rectL / 2 + 2,
+                    ];
+                    posPlus.push(c);
+                }
+                //add plus sign to svg
+                for (let i = 0; i < posPlus.length - 1; i++) {
+                    d3.select(".mats")
+                        .append("text")
+                        .attr("x", posPlus[i][0])
+                        .attr("y", posPlus[i][1])
+                        .text("+")
+                        .attr("class", "math-displayer")
+                        .attr("font-size", "10")
+                        .attr("fill", "black");
+                }
+                //                drawPoints(".mats", "red", posPlus);
+                // add result and () signs
+                // find the middle line firtst
+                const midYPt = displayY + displayH / 2;
+                const leftBracketPos = [displayX + displayXOffset - 5, midYPt];
+                const rightBracketPos = [leftBracketPos[0] + 218, midYPt];
+                const equalPos = [rightBracketPos[0] + 15, midYPt];
+                const resultPos = [equalPos[0] + 15, midYPt];
+                const posNeed = [
+                    leftBracketPos,
+                    rightBracketPos,
+                    equalPos,
+                    resultPos,
+                ];
+                const resultVal = 0.77;
+                const textNeed = ["(", ")", "="];
+                for (let i = 0; i < textNeed.length; i++) {
+                    d3.select(".mats")
+                        .append("text")
+                        .attr("x", posNeed[i][0])
+                        .attr("y", posNeed[i][1])
+                        .text(textNeed[i])
+                        .attr("class", "math-displayer")
+                        .attr("font-size", "10")
+                        .attr("fill", "black");
+                }
+                // add result rect
+                if (Math.abs(resultVal) < 0.5) {
+                    color = "black";
+                } else {
+                    color = "white";
+                }
+                // append rect
+                d3.select(".mats")
+                    .append("rect")
+                    .attr("x", resultPos[0])
+                    .attr("y", resultPos[1] - rectL / 2)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .attr("fill", myColor(numFromResult[id]))
+                    .attr("class", "math-displayer"); //.raise();
+                // append text
+                d3.select(".mats")
+                    .append("text")
+                    .attr("x", resultPos[0])
+                    .attr("y", resultPos[1])
+                    .text(roundToTwo(numFromResult[id]))
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "5")
+                    .attr("fill", color);
+                // drawPoints(".mats", "red", posNeed);
+                // add divider
+                const lineSPt: [number, number] = [displayX + 10, midYPt];
+                const lineEPt: [number, number] = [
+                    displayX + displayXOffset - 10,
+                    midYPt,
+                ];
+                d3.select(".mats")
+                    .append("path")
+                    .attr("d", d3.line()([lineSPt, lineEPt]))
+                    .attr("stroke", "black")
+                    .attr("opacity", 1)
+                    .attr("fill", "none")
+                    .attr("class", "math-displayer")
+                    .attr("id", "path1");
+                const numBalancePt = [(lineEPt[0] + lineSPt[0]) / 2, midYPt];
+                const balanceOffset = 15;
+                d3.select(".mats")
+                    .append("text")
+                    .attr("x", numBalancePt[0] - 2.5)
+                    .attr("y", numBalancePt[1] + balanceOffset)
+                    .text(nodeNum)
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "12.5")
+                    .attr("fill", "black");
+                d3.select(".mats")
+                    .append("text")
+                    .attr("x", numBalancePt[0])
+                    .attr("y", numBalancePt[1] - balanceOffset + 12.5)
+                    .text(1)
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "12.5")
+                    .attr("fill", "black");
             })
-            .on("mouseout", function(event){
-                const id:number = Number(d3.select(this).attr("id"));
+            .on("mouseout", function (event) {
+                const id: number = Number(d3.select(this).attr("id"));
                 console.log("thirdGCN, mouseout", id, thirdGCN[id]);
-                for(let ii=0; ii<thirdGCN.length; ii++){
-                    if(ii!=id){
-                        thirdGCN[ii].forEach((node:any, index:number)=>{
+                for (let ii = 0; ii < thirdGCN.length; ii++) {
+                    if (ii != id) {
+                        thirdGCN[ii].forEach((node: any, index: number) => {
                             node.style.opacity = "1";
-                        })
+                            node.style.stroke = "gray";
+                        });
                     }
                 }
-            });;
+                //remove displayer
+                d3.selectAll(".math-displayer").remove();
+            });
     }
-    
 
     //add text
     addLayerName(locations, "Pooling", 102, -182, gg);
@@ -554,7 +763,7 @@ export function drawPoolingVis(
     //do some transformations on the original locations
     for (let i = 0; i < oLocations.length; i++) {
         oLocations[i][0] += rectW * 64;
-        oLocations[i][1] += rectH/2;
+        oLocations[i][1] += rectH / 2;
     }
     //drawPoints(".mats", "red", oLocations);
     //connnnnnnnect!!!
@@ -632,7 +841,7 @@ export function drawTwoLayers(one: any, final: any, myColor: any) {
     //find the next position
     one[0][0] += 64 * rectW + 102;
     let aOne = deepClone(one);
-    one[0][1] -= rectH/2;
+    one[0][1] -= rectH / 2;
     //drawPoints(".mats", "red", one);
     let result = softmax(final);
     //visulaize
@@ -701,11 +910,10 @@ export function drawTwoLayers(one: any, final: any, myColor: any) {
         .attr("class", "path1")
         .attr("id", "path1");
     //visualize the result
-    aOne[0][0] += rectH*2 + 102;
+    aOne[0][0] += rectH * 2 + 102;
     //drawPoints(".mats","red",aOne);
-    aOne[0][1] -= rectW/2;
+    aOne[0][1] -= rectW / 2;
 
-    
     console.log("mat result", result);
     let cOne = deepClone(aOne);
 

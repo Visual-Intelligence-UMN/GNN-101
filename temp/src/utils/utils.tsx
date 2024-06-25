@@ -804,7 +804,13 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
 
  }
 
-
+ export function generateRandomArray(n: number, min: number = 0, max: number = 100): number[] {
+  let result: number[] = new Array(n);
+  for (let i = 0; i < n; i++) {
+      result[i] = (Math.random() * (max - min + 1)) + min;
+  }
+  return result;
+}
 
 export function deepClone(obj: any) {
     return JSON.parse(JSON.stringify(obj));
