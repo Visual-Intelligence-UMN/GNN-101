@@ -121,6 +121,7 @@ export function visualizeFeatures(
     outputVis = GCNConvPackage.outputVis;
     resultVis = GCNConvPackage.resultVis;
     maxVals = GCNConvPackage.maxVals;
+
     let paths = GCNConvPackage.paths;
     let one = GCNConvPackage.one;
 
@@ -276,35 +277,35 @@ export function visualizeFeatures(
     });
 
     //pooling visualizer click interaction
-    if (poolingVis != null) {
-        poolingVis.on("click", function (event: any, d: any) {
-            transState = "pooling";
-            poolingOverEvent = poolingVis.on("mouseover");
-            poolingOutEvent = poolingVis.on("mouseout");
-            poolingVis.on("mouseover", null);
-            poolingVis.on("mouseout", null);
-            console.log("f3 1", frames["GCNConv3"][3]);
-            frames["GCNConv3"][3].style.opacity = "1";
-            console.log("f3 2", frames["GCNConv3"][3]);
-            if (lock != true) {
-                //d3.select(this).style("pointer-events", "none");
-                //state
-                lock = true;
-                event.stopPropagation();
-                dview = true;
-                console.log("click! - fVis", dview, lock);
-                //click event
-                const poolingVisPack = poolingVisClick(
-                    colorSchemesTable,
-                    adjList,
-                    featureVisTable
-                );
-                //update variables
-                colorSchemesTable = poolingVisPack.colorSchemesTable;
-                featureVisTable = poolingVisPack.featureVisTable;
-            }
-        });
-    }
+    // if (poolingVis != null) {
+    //     poolingVis.on("click", function (event: any, d: any) {
+    //         transState = "pooling";
+    //         poolingOverEvent = poolingVis.on("mouseover");
+    //         poolingOutEvent = poolingVis.on("mouseout");
+    //         poolingVis.on("mouseover", null);
+    //         poolingVis.on("mouseout", null);
+    //         console.log("f3 1", frames["GCNConv3"][3]);
+    //         frames["GCNConv3"][3].style.opacity = "1";
+    //         console.log("f3 2", frames["GCNConv3"][3]);
+    //         if (lock != true) {
+    //             //d3.select(this).style("pointer-events", "none");
+    //             //state
+    //             lock = true;
+    //             event.stopPropagation();
+    //             dview = true;
+    //             console.log("click! - fVis", dview, lock);
+    //             //click event
+    //             const poolingVisPack = poolingVisClick(
+    //                 colorSchemesTable,
+    //                 adjList,
+    //                 featureVisTable
+    //             );
+    //             //update variables
+    //             colorSchemesTable = poolingVisPack.colorSchemesTable;
+    //             featureVisTable = poolingVisPack.featureVisTable;
+    //         }
+    //     });
+    // }
 
     //model output visualizer click interaction
     if (outputVis != null) {

@@ -267,6 +267,10 @@ export function drawGCNConv(
     let paths: any;
     let resultVis = null;
     const gcnFeatures = [conv1, conv2, conv3];
+    //a table to save all rects in the last GCNConv layer
+    const featureChannels = 64;
+    let thirdGCN :any = Array.from({ length: featureChannels }, () => []);
+    console.log("thirdGCN", thirdGCN);
     console.log("gcnf", gcnFeatures);
     console.log("CONV1", conv1);
     for (let k = 0; k < 3; k++) {
@@ -309,7 +313,7 @@ export function drawGCNConv(
             let nodeMat = gcnFeature[i];
             console.log("nodeMat", i, nodeMat);
             for (let m = 0; m < nodeMat.length; m++) {
-                g.append("rect")
+                const rect = g.append("rect")
                     .attr("x", locations[i][0] + rectW * m)
                     .attr("y", locations[i][1])
                     .attr("width", rectW)
@@ -318,6 +322,10 @@ export function drawGCNConv(
                     .attr("opacity", 1)
                     .attr("stroke", "gray")
                     .attr("stroke-width", 0.1);
+                //if it's the last layer, store rect into thirdGCN
+                if(k==2){
+                    thirdGCN[m].push(rect.node());
+                }
             }
             //draw frame
             const f = g
@@ -356,7 +364,8 @@ export function drawGCNConv(
                 pooling,
                 myColor,
                 frames,
-                colorSchemesTable
+                colorSchemesTable,
+                thirdGCN
             );
             one = poolingPack["one"];
             poolingVis = poolingPack["g"];
@@ -450,6 +459,9 @@ export function drawGCNConv(
             scheme6
         ];
     }
+
+    console.log("thirdGCN after filled", thirdGCN);
+
     return {
         "locations":locations,
         "frames":frames,
@@ -462,8 +474,9 @@ export function drawGCNConv(
         "maxVals":maxVals,
         "paths":paths,
         "resultVis":resultVis,
-        "one":one
-    }
+        "one":one,
+        "thirdGCN":thirdGCN
+    };
 }
 
 //draw pooling visualizer
@@ -472,8 +485,11 @@ export function drawPoolingVis(
     pooling: number[],
     myColor: any,
     frames: any,
-    colorSchemesTable: any
+    colorSchemesTable: any,
+    thirdGCN: any
 ) {
+    console.log("thirdGCN from pooling vis", thirdGCN);
+
     const rectH = 15;
     const rectW = 5;
     let oLocations = deepClone(locations);
@@ -503,8 +519,34 @@ export function drawPoolingVis(
             .attr("fill", myColor(pooling[i]))
             .attr("opacity", 1)
             .attr("stroke", "gray")
-            .attr("stroke-width", 0.1);
+            .attr("stroke-width", 0.1)
+            .attr("class", "poolingRect")
+            .attr("id", `${i}`)
+            .on("mouseover", function(event){
+                const id:number = Number(d3.select(this).attr("id"));
+                console.log("thirdGCN, mouseover", id, thirdGCN[id]);
+                for(let ii=0; ii<thirdGCN.length; ii++){
+                    if(ii!=id){
+                        thirdGCN[ii].forEach((node:any, index:number)=>{
+                            node.style.opacity = "0.1";
+                        })
+                    }
+                }
+            })
+            .on("mouseout", function(event){
+                const id:number = Number(d3.select(this).attr("id"));
+                console.log("thirdGCN, mouseout", id, thirdGCN[id]);
+                for(let ii=0; ii<thirdGCN.length; ii++){
+                    if(ii!=id){
+                        thirdGCN[ii].forEach((node:any, index:number)=>{
+                            node.style.opacity = "1";
+                        })
+                    }
+                }
+            });;
     }
+    
+
     //add text
     addLayerName(locations, "Pooling", 102, -182, gg);
     //draw the cross connections btw last GCN layer and pooling layer
