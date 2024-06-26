@@ -391,8 +391,8 @@ function weightAnimation(svg: any, node: any, startCoordList: number[][], endCoo
     .attr("class", "vis-component");
 
   btn.append("text")
-    .attr("x", endCoordList[0][0] - 200)
-    .attr("y", node.y - 200)
+    .attr("x", endCoordList[0][0] - 100)
+    .attr("y", node.y - 100)
     .attr("dy", ".50em")
     .text("pause")
     .style("font-size", "16px")
@@ -442,6 +442,7 @@ function weightAnimation(svg: any, node: any, startCoordList: number[][], endCoo
         if (i >= 64) {
           clearInterval(intervalID);
           isPlaying = false;
+          d3.selectAll(`#tempath${i - 1}`).remove();
           d3.select(".button-discri").text("play");
           d3.select(".biasToFinal").style("opacity", 1);
         }
@@ -452,7 +453,6 @@ function weightAnimation(svg: any, node: any, startCoordList: number[][], endCoo
 
   setTimeout(() => {
     startAnimation();
-    d3.selectAll("path").lower();
   }, 2000);
 }
 
