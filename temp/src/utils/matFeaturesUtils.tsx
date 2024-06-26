@@ -759,28 +759,10 @@ export function drawPoolingVis(
                     midYPt,
                 ];
                 d3.select(".mats")
-                    .append("path")
-                    .attr("d", d3.line()([lineSPt, lineEPt]))
-                    .attr("stroke", "black")
-                    .attr("opacity", 1)
-                    .attr("fill", "none")
-                    .attr("class", "math-displayer")
-                    .attr("id", "path1");
-                const numBalancePt = [(lineEPt[0] + lineSPt[0]) / 2, midYPt];
-                const balanceOffset = 15;
-                d3.select(".mats")
                     .append("text")
-                    .attr("x", numBalancePt[0] - 2.5 - 3)
-                    .attr("y", numBalancePt[1] + balanceOffset)
-                    .text(nodeNum)
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "12.5")
-                    .attr("fill", "black");
-                d3.select(".mats")
-                    .append("text")
-                    .attr("x", numBalancePt[0] - 3)
-                    .attr("y", numBalancePt[1] - balanceOffset + 12.5)
-                    .text(1)
+                    .attr("x", lineSPt[0]-10)
+                    .attr("y", lineSPt[1])
+                    .text("Avg")
                     .attr("class", "math-displayer")
                     .attr("font-size", "12.5")
                     .attr("fill", "black");
