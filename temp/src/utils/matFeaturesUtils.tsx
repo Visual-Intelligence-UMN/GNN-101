@@ -3,6 +3,7 @@ import { addLayerName, buildBinaryLegend, buildLegend } from "./matHelperUtils";
 import * as d3 from "d3";
 import { roundToTwo } from "@/pages/WebUtils";
 import { create, all, matrix } from "mathjs";
+import { start } from "repl";
 
 //draw cross connections between feature visualizers
 export function drawCrossConnection(
@@ -127,6 +128,9 @@ export function drawMatrixPreparation(graph: any, locations: any) {
         const y = locations[0][1];
         colLocations.push([x, y]);
     }
+    const ratio = locations[0][1] / 61.875365257263184
+    const startY = locations[0][1] / ratio;
+    const rowHeight = 400 / graph.length;
     //drawPoints(".mats", "red", colLocations);
     let colFrames: SVGElement[] = []; //a
     for (let i = 0; i < colLocations.length; i++) {
@@ -134,7 +138,7 @@ export function drawMatrixPreparation(graph: any, locations: any) {
             .select(".mats")
             .append("rect")
             .attr("x", colLocations[i][0])
-            .attr("y", colLocations[i][1])
+            .attr("y", colLocations[i][1] / ratio)
             .attr("height", 400)
             .attr("width", 400 / graph.length)
             .attr("fill", "none")
@@ -147,21 +151,26 @@ export function drawMatrixPreparation(graph: any, locations: any) {
     }
     colFrames.reverse();
     //draw frames on matrix
+    
+    
     let matFrames: SVGElement[] = []; //a
+    
+
     for (let i = 0; i < locations.length; i++) {
+        
         const r = d3
             .select(".mats")
             .append("rect")
-            .attr("x", locations[i][0] - 400 + 400 / graph.length / 2)
-            .attr("y", locations[i][1])
-            .attr("height", 400 / graph.length)
+            .attr("x", locations[i][0] - 400 + rowHeight / 2)
+            .attr("y", startY + i * rowHeight)
+            .attr("height", rowHeight)
             .attr("width", 400)
             .attr("fill", "none")
             .attr("opacity", 0)
             .attr("stroke", "black")
             .attr("stroke-width", 2)
             .attr("class", "rowFrame");
-
+        
         matFrames.push(r.node() as SVGElement);
     }
     console.log("matFrames", matFrames);
@@ -298,6 +307,7 @@ export function drawGCNConv(
             30,
             d3.select(`g#layerNum_${k + 1}`)
         );
+        
         //drawPoints(".mats","red",locations);
         const gcnFeature = gcnFeatures[k];
 

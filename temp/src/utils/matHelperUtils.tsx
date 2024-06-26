@@ -83,7 +83,6 @@ export interface HeatmapData {
 }
 
 export function get_cood_locations(data: any, locations: any) {
-    console.log("DATA", Math.sqrt(data.length));
     const nCol = Math.sqrt(data.length);
     const cood = get_cood_from_parent(".y-axis", "text");
     //here's the data processing for getting locations
@@ -91,7 +90,6 @@ export function get_cood_locations(data: any, locations: any) {
     const currMat = cood1.slice(-(nCol * nCol));
     const sliced = currMat.slice(-nCol);
     locations = locations.concat(sliced);
-    console.log("LOCATIONS", locations);
     return locations;
 }
 
