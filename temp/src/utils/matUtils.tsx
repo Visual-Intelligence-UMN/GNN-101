@@ -322,6 +322,8 @@ export function visualizeFeatures(
         });
         outputVis.on("click", function (event: any, d: any) {
             if (lock != true) {
+                d3.select(".pooling")
+                .style("pointer-events", "none");
                 //state
                 transState = "output";
                 lock = true;

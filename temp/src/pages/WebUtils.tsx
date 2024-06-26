@@ -33,14 +33,7 @@ export function roundToTwo(num: number): number {
     return Math.round(num * 100) / 100;
 }
 
-export function chunkArray<T>(inputArray: T[], chunkSize: number): T[][] {
-    const result: T[][] = [];
-    for (let i = 0; i < inputArray.length; i += chunkSize) {
-        const chunk = inputArray.slice(i, i + chunkSize);
-        result.push(chunk);
-    }
-    return result;
-}
+
 
 interface GraphAnalysisViewerProps {
     path: string;
@@ -435,7 +428,7 @@ export const Hint: React.FC<HintProps> = ({ text }) => {
             className='items-center justify-center'
         >
             <span className="inline-block bg-gray-300 rounded-full w-6 h-6 flex items-center justify-center text-black cursor-default">
-                ?
+                i
             </span>
             <Tooltip id="tooltip" />
         </span>
