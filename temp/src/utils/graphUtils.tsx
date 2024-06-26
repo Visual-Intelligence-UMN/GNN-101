@@ -109,7 +109,7 @@ export function resetNodes(allNodes: any[]) {
   }
 
 
-  export function calculationVisualizer(node: any, currentWeights: any, bias: any, aggregatedDataMap: any[], calculatedDataMap: any[], svg: any, offset: number, isClicked: boolean) {
+  export function calculationVisualizer(node: any, currentWeights: any, bias: any, normalizedAdjMatrix: any, aggregatedDataMap: any[], calculatedDataMap: any[], svg: any, offset: number, isClicked: boolean) {
     if (isClicked || aggregatedDataMap == null || calculatedDataMap == null) { //doesn't work currently
       return;
     }
@@ -171,6 +171,7 @@ export function resetNodes(allNodes: any[]) {
       .attr("height", 3)
       .style("fill", (d: number) => myColor(d))
       .style("stroke-width", 1)
+      .attr("class", "vis-component")
       .style("stroke", "grey")
       .style("opacity", 1);
 
@@ -202,6 +203,7 @@ export function resetNodes(allNodes: any[]) {
       .style("fill", (d: number) => myColor(d))
       .style("stroke-width", 1)
       .style("stroke", "grey")
+      .attr("class", "vis-component")
       .style("opacity", 1);
 
     for (let i = 0; i < 64; i++) {
@@ -229,6 +231,7 @@ export function resetNodes(allNodes: any[]) {
       .style("fill", (d: number) => myColor(d))
       .style("stroke-width", 1)
       .style("stroke", "grey")
+      .attr("class", "vis-component")
       .style("opacity", 1);
 
   
@@ -240,9 +243,15 @@ export function resetNodes(allNodes: any[]) {
       end_x = xPos + 400;
       end_y = yPos;
     }
+    let adjMatrixSlice: number[] = []; 
+    for (let i = 0; i < normalizedAdjMatrix[node.id].length; i++) {
+      if (normalizedAdjMatrix[node.id][i] != 0) {
+       adjMatrixSlice.push(normalizedAdjMatrix[node.id][i].toFixed(2))
+      }
+    }
     setTimeout(() => {
     if (node.relatedNodes) {
-      node.relatedNodes.forEach((n: any) => {
+      node.relatedNodes.forEach((n: any, i: number) => {
         if (n.featureGroupLocation) {
           start_x = n.featureGroupLocation.xPos;
           start_y = n.featureGroupLocation.yPos;
@@ -251,6 +260,13 @@ export function resetNodes(allNodes: any[]) {
           const controlY = start_y + 100;
   
           let color = calculateAverage(n.features);
+
+          const adjMatrixNum = g3.append("text")
+            .attr("x", start_x + 20)
+            .attr("y", start_y - 10)
+            .text(adjMatrixSlice[i])
+            .attr("opacity", 1)
+            .attr("class", "vis-component");
   
           const originToAggregated = g3.append("path")
             .attr("d", `M${start_x},${start_y} Q${controlX},${controlY} ${end_x},${end_y}`)
@@ -258,9 +274,11 @@ export function resetNodes(allNodes: any[]) {
             .style("opacity", 0.7)
             .style("stroke-width", 1)
             .style("fill", "none")
+            .attr("class", "vis-component")
             .style("opacity", 1);
   
           paths.push(originToAggregated);
+
         }
       });
       
@@ -280,7 +298,9 @@ export function resetNodes(allNodes: any[]) {
         .style("opacity", 0.7)
         .style("stroke-width", 1)
         .style("fill", "none")
+        .attr("class", "vis-component")
         .style("opacity", 1);
+        
   
       paths.push(aggregatedToFinal);
       
@@ -301,6 +321,7 @@ export function resetNodes(allNodes: any[]) {
         .style("opacity", 0.7)
         .style("stroke-width", 1)
         .style("fill", "none")
+        .attr("class", "vis-component")
         .attr("class", "biasToFinal")
         .style("opacity", 0);
 
@@ -404,6 +425,7 @@ function weightAnimation(svg: any, node: any, startCoordList: number[][], endCoo
   btn.on("click", function(event: any) {
     event.stopPropagation();
     isPlaying = !isPlaying;
+    console.log(isPlaying)
     d3.select(".button-discri").text(isPlaying ? "pause" : "play");
     if (isPlaying) {
       startAnimation();
@@ -418,6 +440,9 @@ function weightAnimation(svg: any, node: any, startCoordList: number[][], endCoo
   document.addEventListener('click', () => {
     
     isAnimating = false; 
+    d3.select(".biasToFinal").remove();
+    d3.select(".vis-component").attr("opacity", 0);
+    d3.select(".vis-component").remove();
     
     
   });
@@ -497,6 +522,7 @@ function GraphViewDrawPaths(
       .attr("stroke-width", 1)
       .attr("opacity", 1)
       .attr("fill", "none")
+      .attr("class", "vis-component")
       .attr("id", `tempath${i}`);
   }
 
@@ -531,14 +557,22 @@ export function aggregationCalculator(graphs: any[]) {
 
   const degreeMap = new Array(nodeCount).fill(0);
   for (let i = 0; i < edgePairs.length; i++) {
-    if (!checked.includes(edgePairs[i].target.id)) {
+
       const source = edgePairs[i].source.id;
       const target = edgePairs[i].target.id;
 
       degreeMap[source]++;
       degreeMap[target]++;
-      checked.push(edgePairs[i].target.id);
-    }
+    
+  }
+  for (let i = 0; i < degreeMap.length; i++) {
+    degreeMap[i] = degreeMap[i] / 2 + 1;
+  }
+
+  let degreeMatrix: any;
+  degreeMatrix = Array.from({ length: nodeCount }, () => new Array(nodeCount).fill(0));
+  for (let i = 0; i < nodeCount; i++) {
+    degreeMatrix[i][i] = 1 / Math.sqrt(degreeMap[i]);
   }
 
   let adjMatrix = Array.from({ length: nodeCount }, () => new Array(nodeCount).fill(0));
@@ -552,23 +586,16 @@ export function aggregationCalculator(graphs: any[]) {
   }
 
 
-  let degreeMatrix = new Array(nodeCount).fill(0).map((_, i) => 1 / Math.sqrt(degreeMap[i]));
-
-  let normalizedAdjMatrix = Array.from({ length: nodeCount }, () => new Array(nodeCount).fill(0));
-  for (let i = 0; i < nodeCount; i++) {
-    for (let j = 0; j < nodeCount; j++) {
-      if (adjMatrix[i][j] !== 0) {
-        normalizedAdjMatrix[i][j] = degreeMatrix[i] * adjMatrix[i][j] * degreeMatrix[j];
-      }
-    }
-  }
+ 
+  let normalizedAdjMatrix = matrixMultiplication(degreeMatrix, adjMatrix);
+  normalizedAdjMatrix = matrixMultiplication(normalizedAdjMatrix, degreeMatrix)
   return normalizedAdjMatrix;
 
 }
 
 export function matrixMultiplication(matrix_a: any[], matrix_b: any[]) {
 
-  const rowsA = matrix_a.length;
+    const rowsA = matrix_a.length;
     const colsA = matrix_a[0].length;
     const rowsB = matrix_b.length;
     const colsB = matrix_b[0].length;
