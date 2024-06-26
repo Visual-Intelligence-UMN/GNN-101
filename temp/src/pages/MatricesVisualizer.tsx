@@ -85,6 +85,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 () => []
             );
             for (let i = 0; i < graph.length; i++) {
+                
                 //push itself to the linkMap
                 adjList[i].push(i);
                 for (let j = 0; j < graph[0].length; j++) {
@@ -230,7 +231,6 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
 
             const data = matrix_to_hmap(graph);
             console.log("accepted data:", data);
-
             g.selectAll("rect")
                 .data(data, (d: any) => d.group + ":" + d.variable)
                 .enter()
@@ -282,6 +282,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
                 detailView
             );
             drawNodeAttributes(nodeAttrs, graph, 50);
+            
         };
 
         //VIsualization Pipeline
@@ -321,6 +322,48 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
         }
         console.log("i fire once");
     }, [graph_path, intmData, changed]);
+    const updateTextElements = (svg: SVGSVGElement, selectedButtons: boolean[]) => {
+        d3.select(svg)
+          .selectAll(".layerVis")
+          .each(function(d, i) {
+            const g = d3.select(this);
+            
+            g.selectAll("text.layerName")
+              .transition()
+              .duration(140)
+              .style("opacity", () => {
+                if ( 
+                    (i === 0 && selectedButtons[1]) ||
+                    (i === 1 && selectedButtons[2]) ||  
+                    (i === 2 && selectedButtons[3]) ||  
+                    (i === 3 && selectedButtons[4]) ||  
+                    (i === 4 && selectedButtons[5])) {  
+                  return 1;
+                }
+                return 0.5;
+              })
+              .attr("font-size", () => {
+                if (
+                    (i === 0 && selectedButtons[1]) ||
+                    (i === 1 && selectedButtons[2]) ||
+                    (i === 2 && selectedButtons[3]) ||
+                    (i === 3 && selectedButtons[4]) ||
+                    (i === 4 && selectedButtons[5])) {
+                  return "18px";
+                }
+                return "15px";
+              });
+          });
+      };
+      
+      // In your component:
+      useEffect(() => {
+        const svg = d3.select("#matvis").select("svg.mats").node() as SVGSVGElement;
+        if (svg && !isLoading) {
+          updateTextElements(svg, selectedButtons);
+        }
+        console.log("selectBtn", selectedButtons);
+      }, [selectedButtons, isLoading]);
 
     
 

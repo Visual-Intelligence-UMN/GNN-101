@@ -111,8 +111,10 @@ export function addLayerName(
         .append("text")
         .text(name)
         .attr("x", apt[0])
-        .attr("y", apt[1]).attr("class", "layerName")
-        .style("font-size", 7);
+        .attr("y", apt[1] + 15).attr("class", "layerName")
+        .attr("font-size", "15px")
+        .attr("font-weight", "normal")
+        .attr('opacity', 0.5);
 }
 
 //draw a legend for a binary output layer
