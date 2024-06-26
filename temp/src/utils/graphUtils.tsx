@@ -381,8 +381,8 @@ function weightAnimation(svg: any, node: any, startCoordList: number[][], endCoo
     .attr("class", "button-group");
   
   btn.append("circle")
-    .attr("cx", endCoordList[0][0] - 200)
-    .attr("cy", node.y - 200)
+    .attr("cx", endCoordList[0][0] - 100)
+    .attr("cy", node.y - 100)
     .attr("r", 25)
     .style("fill", "white")
     .style("stroke", "black")
@@ -416,8 +416,10 @@ function weightAnimation(svg: any, node: any, startCoordList: number[][], endCoo
   const Xt = math.transpose(weights);
 
   document.addEventListener('click', () => {
+    
     isAnimating = false; 
-    d3.selectAll("#tempath").remove();
+    
+    
   });
 
   function startAnimation() {
@@ -425,7 +427,7 @@ function weightAnimation(svg: any, node: any, startCoordList: number[][], endCoo
       i = 0;  // Reset the index to replay the animation
     }
     intervalID = setInterval(() => {
-      d3.selectAll("#tempath").remove();
+      d3.selectAll(`#tempath${i - 1}`).remove();
       if (isAnimating) {
         GraphViewDrawPaths(
           Xt,
@@ -444,6 +446,7 @@ function weightAnimation(svg: any, node: any, startCoordList: number[][], endCoo
           d3.select(".biasToFinal").style("opacity", 1);
         }
       }
+
     }, 500);
   }
 
@@ -494,11 +497,12 @@ function GraphViewDrawPaths(
       .attr("stroke-width", 1)
       .attr("opacity", 1)
       .attr("fill", "none")
-      .attr("id", `tempath`);
+      .attr("id", `tempath${i}`);
   }
 
   if (isAnimating) {
     setTimeout(() => {
+      
       i++;
     }, 500);
   }
