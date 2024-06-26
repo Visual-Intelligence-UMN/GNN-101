@@ -1,4 +1,12 @@
-import { chunkArray, deepClone, drawPoints, generateRandomArray, preprocessFloat32ArrayToNumber, softmax, transposeMat } from "./utils";
+import {
+    chunkArray,
+    deepClone,
+    drawPoints,
+    generateRandomArray,
+    preprocessFloat32ArrayToNumber,
+    softmax,
+    transposeMat,
+} from "./utils";
 import { addLayerName, buildBinaryLegend, buildLegend } from "./matHelperUtils";
 import * as d3 from "d3";
 import { roundToTwo } from "@/pages/WebUtils";
@@ -128,7 +136,7 @@ export function drawMatrixPreparation(graph: any, locations: any) {
         const y = locations[0][1];
         colLocations.push([x, y]);
     }
-    const ratio = locations[0][1] / 61.875365257263184
+    const ratio = locations[0][1] / 61.875365257263184;
     const startY = locations[0][1] / ratio;
     const rowHeight = 400 / graph.length;
     //drawPoints(".mats", "red", colLocations);
@@ -151,13 +159,10 @@ export function drawMatrixPreparation(graph: any, locations: any) {
     }
     colFrames.reverse();
     //draw frames on matrix
-    
-    
+
     let matFrames: SVGElement[] = []; //a
-    
 
     for (let i = 0; i < locations.length; i++) {
-        
         const r = d3
             .select(".mats")
             .append("rect")
@@ -170,7 +175,7 @@ export function drawMatrixPreparation(graph: any, locations: any) {
             .attr("stroke", "black")
             .attr("stroke-width", 2)
             .attr("class", "rowFrame");
-        
+
         matFrames.push(r.node() as SVGElement);
     }
     console.log("matFrames", matFrames);
@@ -307,7 +312,7 @@ export function drawGCNConv(
             30,
             d3.select(`g#layerNum_${k + 1}`)
         );
-        
+
         //drawPoints(".mats","red",locations);
         const gcnFeature = gcnFeatures[k];
 
@@ -542,9 +547,10 @@ export function drawPoolingVis(
     const displayH = 75;
 
     //drawPoints(".mats", "red", [[displayX, displayY]]);
-
+    let poolingRects = [];
     for (let i = 0; i < pooling.length; i++) {
-        g.append("rect")
+        const rect = g
+            .append("rect")
             .attr("x", locations[0][0] + 102 + rectW * i)
             .attr("y", midY - 5)
             .attr("width", rectW)
@@ -558,11 +564,29 @@ export function drawPoolingVis(
             .on("mouseover", function (event) {
                 const id: number = Number(d3.select(this).attr("id"));
                 console.log("thirdGCN, mouseover", id, thirdGCN[id]);
+                //interact with pooling vis
+                console.log("poolingRect", poolingRects);
+                if(poolingRects!=null){
+                    for (let ii = 0; ii < poolingRects.length; ii++) {
+                        if (ii != id) {
+                            poolingRects[ii]!.style.opacity = "0.1";
+                        } else {
+                            poolingRects[ii]!.style.strokeWidth = "1.5";
+                            poolingRects[ii]!.style.stroke = "black";
+                        }
+                    }
+                }
+
+                //interact with prev layer
                 for (let ii = 0; ii < thirdGCN.length; ii++) {
                     if (ii != id) {
                         thirdGCN[ii].forEach((node: any, index: number) => {
                             node.style.opacity = "0.1";
+                        });
+                    } else {
+                        thirdGCN[ii].forEach((node: any, index: number) => {
                             node.style.stroke = "black";
+                            node.style.strokeWidth = "1.5";
                         });
                     }
                 }
@@ -617,13 +641,13 @@ export function drawPoolingVis(
 
                 //dummy data
                 console.log("fetch pooling conv3", conv3);
-                const matConv3:any = chunkArray(conv3, 64);
+                const matConv3: any = chunkArray(conv3, 64);
                 console.log("fetch 1", matConv3);
                 const aMat = preprocessFloat32ArrayToNumber(matConv3);
                 console.log("fetch 2", aMat);
-                const matConv3t:any= transposeMat(aMat);
+                const matConv3t: any = transposeMat(aMat);
                 console.log("fecth 3", matConv3t);
-                const numFromFeatures:any = matConv3t[id];
+                const numFromFeatures: any = matConv3t[id];
                 console.log("fetch 4", numFromFeatures);
                 const numFromResult = pooling;
 
@@ -643,7 +667,7 @@ export function drawPoolingVis(
                         .attr("x", numRect[i][0])
                         .attr("y", numRect[i][1])
                         .attr("width", rectL)
-                        .attr("height", rectL)
+                        .attr("height", rectL).style("stroke", "black")
                         .attr("fill", myColor(numFromFeatures[i]))
                         .attr("class", "math-displayer"); //.raise();
                     // append text
@@ -715,7 +739,7 @@ export function drawPoolingVis(
                     .attr("x", resultPos[0])
                     .attr("y", resultPos[1] - rectL / 2)
                     .attr("width", rectL)
-                    .attr("height", rectL)
+                    .attr("height", rectL).style("stroke", "black")
                     .attr("fill", myColor(numFromResult[id]))
                     .attr("class", "math-displayer"); //.raise();
                 // append text
@@ -731,7 +755,7 @@ export function drawPoolingVis(
                 // add divider
                 const lineSPt: [number, number] = [displayX + 15, midYPt];
                 const lineEPt: [number, number] = [
-                    displayX + displayXOffset -3,
+                    displayX + displayXOffset - 3,
                     midYPt,
                 ];
                 d3.select(".mats")
@@ -764,17 +788,34 @@ export function drawPoolingVis(
             .on("mouseout", function (event) {
                 const id: number = Number(d3.select(this).attr("id"));
                 console.log("thirdGCN, mouseout", id, thirdGCN[id]);
-                for (let ii = 0; ii < thirdGCN.length; ii++) {
-                    if (ii != id) {
-                        thirdGCN[ii].forEach((node: any, index: number) => {
-                            node.style.opacity = "1";
-                            node.style.stroke = "gray";
-                        });
+
+                if(poolingRects!=null){
+                    for (let ii = 0; ii < poolingRects.length; ii++) {
+                            poolingRects[ii]!.style.opacity = "1";
+                            poolingRects[ii]!.style.strokeWidth = "0.1";
+                            poolingRects[ii]!.style.stroke = "gray";
                     }
+                }
+
+                for (let ii = 0; ii < thirdGCN.length; ii++) {
+                    //   if (ii != id) {
+                    thirdGCN[ii].forEach((node: any, index: number) => {
+                        node.style.opacity = "1";
+                        node.style.stroke = "gray";
+                        node.style.strokeWidth = "0.1";
+                    });
+                    // }else{
+                    //     thirdGCN[ii].forEach((node: any, index: number) => {
+                    //         node.style.stroke = "gray";
+                    //         node.style.strokeWidth = "1";
+                    //     });
+                    // }
                 }
                 //remove displayer
                 d3.selectAll(".math-displayer").remove();
             });
+        
+        poolingRects.push(rect.node());
     }
 
     //add text
