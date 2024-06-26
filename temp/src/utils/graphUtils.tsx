@@ -417,6 +417,7 @@ function weightAnimation(svg: any, node: any, startCoordList: number[][], endCoo
 
   document.addEventListener('click', () => {
     isAnimating = false; 
+    d3.selectAll("#tempath").remove();
   });
 
   function startAnimation() {
@@ -424,6 +425,7 @@ function weightAnimation(svg: any, node: any, startCoordList: number[][], endCoo
       i = 0;  // Reset the index to replay the animation
     }
     intervalID = setInterval(() => {
+      d3.selectAll("#tempath").remove();
       if (isAnimating) {
         GraphViewDrawPaths(
           Xt,
@@ -432,8 +434,7 @@ function weightAnimation(svg: any, node: any, startCoordList: number[][], endCoo
           startCoordList,
           endCoordList,
           svg,
-          isAnimating,
-          isPlaying
+          isAnimating
         );
         i++;
         if (i >= 64) {
@@ -459,8 +460,7 @@ function GraphViewDrawPaths(
   startCoordList: number[][],
   endCoordList: number[][],
   svg: any,
-  isAnimating: boolean,
-  isPlaying: boolean
+  isAnimating: boolean
 ) {
   if (!svg.selectAll) {
     svg = d3.select(svg);
@@ -494,14 +494,11 @@ function GraphViewDrawPaths(
       .attr("stroke-width", 1)
       .attr("opacity", 1)
       .attr("fill", "none")
-      .attr("id", `tempath${i}`);
+      .attr("id", `tempath`);
   }
 
   if (isAnimating) {
     setTimeout(() => {
-      if (isPlaying) {
-        d3.selectAll(`#tempath${i}`).remove();
-      }
       i++;
     }, 500);
   }
