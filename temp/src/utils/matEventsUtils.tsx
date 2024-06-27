@@ -954,7 +954,7 @@ export function outputVisClick(
                     .attr("class", "procVis")
                     .style("fill", "none")
                     .style("opacity", "0.1")
-                    .attr("stroke", "black");
+                    .attr("stroke", myColor(result[j]));
 
                 temPathMap.push(path.node());
             }
