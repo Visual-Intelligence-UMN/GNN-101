@@ -409,9 +409,8 @@ function weightAnimation(svg: any, node: any, startCoordList: number[][], endCoo
     .style("stroke", "black")
     .style("stroke-width", 1)
     .attr("opacity", 1)
-    .attr("class", "vis-component");
-
-  btn.append("text")
+    .attr("class", "vis-component")
+    .append("text")
     .attr("x", endCoordList[0][0] - 100)
     .attr("y", node.y - 100)
     .attr("dy", ".50em")
@@ -433,7 +432,7 @@ function weightAnimation(svg: any, node: any, startCoordList: number[][], endCoo
       clearInterval(intervalID);
     }
   });
-
+  
   const math = create(all, {});
   const Xt = math.transpose(weights);
 

@@ -560,7 +560,20 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
               } 
           }
         });
+        node.text.on("mouseover", function() {
+          if (!isClicked) {
+            highlightNodes(node);
+            if (node.relatedNodes) {
+              reduceNodeOpacity(allNodes, node.relatedNodes, node);
+            } 
+          }
+        });
 
+        node.text.on("mouseout", function() {
+          if (!isClicked) {
+            resetNodes(allNodes);
+          }
+        });
         node.svgElement.addEventListener("mouseout", function(this: any) {
           if (!isClicked) {
             resetNodes(allNodes);
