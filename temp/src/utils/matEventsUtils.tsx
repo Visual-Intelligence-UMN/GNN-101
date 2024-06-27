@@ -32,6 +32,25 @@ export function oFeatureMouseOver(
     };
 }
 
+export function resultRectMouseover(){
+//  console.log("event.target.classList", event.target.classList);
+const a = d3.select(".path1").style("opacity", 1);
+const b = d3.select(".poolingFrame").style("opacity", 1);
+const c = d3.select("#fr1").style("opacity", 1);
+console.log("mouse in", a, b, c);
+// fr1!.style.opacity = "1";
+// poolingFrame!.style.opacity = "1";
+// path1!.style.opacity = "1";
+console.log("signal!");
+}
+
+export function resultRectMouseout(){
+    d3.select(".path1").style("opacity", 0.02);
+                d3.select(".poolingFrame").style("opacity", 0);
+                d3.select("#fr1").style("opacity", 0);
+                console.log("signal out!");
+}
+
 //graph feature events interactions - mouseout
 export function oFeatureMouseOut(
     layerID: string,
@@ -111,23 +130,12 @@ export function detailedViewRecovery(
         d3.selectAll(".resultRect")
             .style("pointer-events", "auto")
             .on("mouseover", function (event: any, d: any) {
-                console.log("event.target.classList", event.target.classList);
-                const a = d3.select(".path1").style("opacity", 1);
-                const b = d3.select(".poolingFrame").style("opacity", 1);
-                const c = d3.select("#fr1").style("opacity", 1);
-                console.log("mouse in", a, b, c);
-                // fr1!.style.opacity = "1";
-                // poolingFrame!.style.opacity = "1";
-                // path1!.style.opacity = "1";
-                console.log("signal!");
+                resultRectMouseover();
             });
         d3.selectAll(".resultRect")
             .style("pointer-events", "auto")
             .on("mouseout", function (event: any, d: any) {
-                d3.select(".path1").style("opacity", 0.02);
-                d3.select(".poolingFrame").style("opacity", 0);
-                d3.select("#fr1").style("opacity", 0);
-                console.log("signal out!");
+                resultRectMouseout();
             });
 
         d3.selectAll(".twoLayer")
