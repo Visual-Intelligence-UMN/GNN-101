@@ -144,8 +144,8 @@ export function resetNodes(allNodes: any[]) {
     let intermediateFeatureGroups: any = [];
   
     const pathColor = d3.scaleLinear<string>()
-      .domain([-0.25, 0, 0.25])
-      .range(["red", "purple", "blue"]); //to be determined
+    .domain([-0.25, 0, 0.25])
+    .range(["white", "gray", "black"]);
 
       
     const aggregatedData = aggregatedDataMap[node.id];
@@ -215,7 +215,7 @@ export function resetNodes(allNodes: any[]) {
 
 
     const BiasGroup = g3.append("g")
-      .attr("transform", `translate(${xPos + 650}, ${yPos - 64 * 3 - 75})`);
+      .attr("transform", `translate(${xPos + 600}, ${yPos - 64 * 3 - 220})`);
   
     BiasGroup.selectAll("rect")
       .data(biasData)
@@ -249,8 +249,8 @@ export function resetNodes(allNodes: any[]) {
     if (node.relatedNodes) {
       node.relatedNodes.forEach((n: any, i: number) => {
         if (n.featureGroupLocation) {
-          start_x = n.featureGroupLocation.xPos;
-          start_y = n.featureGroupLocation.yPos;
+          start_x = n.featureGroupLocation.xPos + 7.5;
+          start_y = n.featureGroupLocation.yPos + 5;
   
           const controlX = (start_x + end_x) / 2;
           const controlY = start_y + 100;
@@ -280,7 +280,7 @@ export function resetNodes(allNodes: any[]) {
 
       let color;
   
-      start_x = xPos + 600;
+      start_x = xPos + 600 + 15;
       start_y = yPos;
       end_x = xPos + 600 + 300; // the horizontal distance is offset(600) + moveoffset(300)
       end_y = yPos
@@ -300,8 +300,8 @@ export function resetNodes(allNodes: any[]) {
       
 
 
-      start_x = xPos + 650;
-      start_y = yPos - 75;
+      start_x = xPos + 600 + 15;
+      start_y = yPos - 220 + 5;
 
       let control1_x = start_x + (end_x - start_x) * 0.2;
       let control1_y = start_y;
@@ -403,8 +403,9 @@ function weightAnimation(svg: any, node: any, startCoordList: number[][], endCoo
     .style("stroke", "black")
     .style("stroke-width", 1)
     .attr("opacity", 1)
-    .attr("class", "vis-component")
-    .append("text")
+    .attr("class", "vis-component");
+
+  btn.append("text")
     .attr("x", endCoordList[0][0] - 100)
     .attr("y", node.y - 100)
     .attr("dy", ".50em")
@@ -426,7 +427,7 @@ function weightAnimation(svg: any, node: any, startCoordList: number[][], endCoo
       clearInterval(intervalID);
     }
   });
-  
+
   const math = create(all, {});
   const Xt = math.transpose(weights);
 
