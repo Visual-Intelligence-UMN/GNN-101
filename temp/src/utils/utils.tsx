@@ -569,7 +569,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
         if (node.graphIndex != 0) {
           node.svgElement.addEventListener("click", function(event: any) {
             hideAllLinks(allNodes);
-            calculationVisualizer(node, currentWeights, bias, aggregatedDataMap, calculatedDataMap, svg, offset, isClicked);
+            calculationVisualizer(node, currentWeights, bias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, isClicked);
             
             let relatedNodes: any = [];
             if (node.relatedNodes) {
@@ -674,6 +674,8 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             
             moveNextLayer(svg, node, moveOffset, 1);
             movedNode = node; // Update the moved node
+           
+
         });
       }
     });
