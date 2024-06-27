@@ -106,9 +106,34 @@ export function detailedViewRecovery(
         d3.select(".pooling")
             .style("pointer-events", "auto")
             .style("opacity", 1);
+        d3.selectAll(".resultRect").style("pointer-events", "none");
+
+        d3.selectAll(".resultRect")
+            .style("pointer-events", "auto")
+            .on("mouseover", function (event: any, d: any) {
+                console.log("event.target.classList", event.target.classList);
+                const a = d3.select(".path1").style("opacity", 1);
+                const b = d3.select(".poolingFrame").style("opacity", 1);
+                const c = d3.select("#fr1").style("opacity", 1);
+                console.log("mouse in", a, b, c);
+                // fr1!.style.opacity = "1";
+                // poolingFrame!.style.opacity = "1";
+                // path1!.style.opacity = "1";
+                console.log("signal!");
+            });
+        d3.selectAll(".resultRect")
+            .style("pointer-events", "auto")
+            .on("mouseout", function (event: any, d: any) {
+                d3.select(".path1").style("opacity", 0.02);
+                d3.select(".poolingFrame").style("opacity", 0);
+                d3.select("#fr1").style("opacity", 0);
+                console.log("signal out!");
+            });
+
         d3.selectAll(".twoLayer")
             .style("pointer-events", "auto")
             .style("opacity", 1);
+
         d3.selectAll("path").style("opacity", 0.05);
     }, 1750);
 
@@ -369,7 +394,10 @@ export function featureVisClick(
     let curveDir = 1;
     const midNode = adjList.length / 2;
     if (node < midNode) curveDir = -1;
-    const playBtnCoord = [coordFeatureVis[0], coordFeatureVis[1] + curveDir * 50];
+    const playBtnCoord = [
+        coordFeatureVis[0],
+        coordFeatureVis[1] + curveDir * 50,
+    ];
     //drawPoints(".mats", "red", [playBtnCoord]);
     let btnPos: any = null;
     let startCoordList: any[] = [];
@@ -854,10 +882,7 @@ export function outputVisClick(
     //locations for paths' ending points
     let endCoord: any = [];
     for (let m = 0; m < 2; m++) {
-        endCoord.push([
-            one[0][0] + rectH * m + rectH / 2,
-            one[0][1] + rectH,
-        ]);
+        endCoord.push([one[0][0] + rectH * m + rectH / 2, one[0][1] + rectH]);
     }
 
     //one[0][1] -= 5;
@@ -874,17 +899,80 @@ export function outputVisClick(
                 .attr("stroke", "gray")
                 .attr("stroke-width", 0.1)
                 .attr("class", "procVis");
-            endCoord.push([
-                one[0][0] + rectH * m + rectH / 2,
-                one[0][1] + rectH,
-            ]);
+            // endCoord.push([
+            //     one[0][0] + rectH * m + rectH / 2,
+            //     one[0][1],
+            // ]);
         }
         //drawPoints(".mats", "red", endCoord);
-
+        let resultCoord = deepClone(endCoord);
+        resultCoord[0][0] += 300 - rectH * 1.5;
+        resultCoord[1][0] += 300 - rectH * 1.5;
+        console.log("comp coord", resultCoord, endCoord);
+        //     drawPoints(".mats", "red", resultCoord);
         let biasCoord = deepClone(aOne);
         biasCoord[0][0] -= 130 + 2 * rectH;
         biasCoord[0][1] += 50;
         const linBias = modelParams.bias[3];
+
+        let pathMap: any = [];
+
+        for (let j = 0; j < endCoord.length; j++) {
+            let temPathMap = [];
+            for (let i = 0; i < resultCoord.length; i++) {
+                const path = d3
+                    .select(".mats")
+                    .append("path")
+                    .attr("d", function () {
+                        return [
+                            "M",
+                            endCoord[j][0],
+                            endCoord[j][1],
+                            "A",
+                            (resultCoord[i][0] - endCoord[j][0]) / 2,
+                            ",",
+                            (resultCoord[i][0] - endCoord[j][0]) / 4,
+                            0,
+                            0,
+                            ",",
+                            0,
+                            ",",
+                            resultCoord[i][0],
+                            ",",
+                            resultCoord[i][1],
+                        ].join(" ");
+                    })
+                    .attr("class", "procVis")
+                    .style("fill", "none")
+                    .style("opacity", "0.1")
+                    .attr("stroke", "black");
+
+                temPathMap.push(path.node());
+            }
+            pathMap.push(temPathMap);
+        }
+
+        console.log("pathMap", pathMap, d3.selectAll(".resultRect"));
+
+        d3.select(".twoLayer").style("pointer-events", "none");
+
+        d3.selectAll(".resultRect")
+            .style("pointer-events", "auto")
+            .on("mouseover", function (event) {
+                event.stopPropagation();
+                console.log("IN!");
+                const id: number = Number(d3.select(this).attr("id"));
+
+                pathMap[0][id]!.style.opacity = "1";
+                pathMap[1][id]!.style.opacity = "1";
+            })
+            .on("mouseout", function (event) {
+                const id: number = Number(d3.select(this).attr("id"));
+
+                pathMap[0][id]!.style.opacity = "0.1";
+                pathMap[1][id]!.style.opacity = "0.1";
+            });
+
         for (let m = 0; m < linBias.length; m++) {
             g1.append("rect")
                 .attr("x", biasCoord[0][0] + rectH * m)
@@ -897,10 +985,11 @@ export function outputVisClick(
                 .attr("stroke-width", 0.1)
                 .attr("class", "procVis");
         }
+
         biasCoord[0][1] += rectH / 2;
         biasCoord[0][0] += rectH * 2;
         let feaCoord = [one[0][0], one[0][1] + rectH / 2];
-        drawPoints(".mats", "red", biasCoord);
+
         const curve = d3.line().curve(d3.curveBasis);
         const controlPts = computeMids(biasCoord[0], feaCoord);
         d3.select(".mats")
@@ -1036,7 +1125,7 @@ export function outputVisClick(
             if (currentStep >= 2) {
                 currentStep = 0; // 重置步骤
             }
-            
+
             let i = 0;
             intervalID = setInterval(() => {
                 d3.selectAll("#tempath").remove();

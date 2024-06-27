@@ -278,6 +278,11 @@ export function drawGCNConv(
     firstLayer: any,
     maxVals: any
 ) {
+    let path1:any = null;
+    let fr1:any = null;
+    let poolingFrame = null;
+
+
     //GCNCov Visualizer
     let one = null;
     let paths: any;
@@ -394,6 +399,7 @@ export function drawGCNConv(
             );
             one = poolingPack["one"];
             poolingVis = poolingPack["g"];
+            poolingFrame = poolingPack["poolingFrame"];
             console.log("poolingVis", poolingVis);
             console.log("ONE", one);
             schemeLocations.push([one[0][0], 350]);
@@ -402,6 +408,8 @@ export function drawGCNConv(
             let aOne = tlPack["locations"];
             outputVis = tlPack["g"];
             resultVis = tlPack["g1"];
+            path1 = tlPack["path1"];
+            fr1 = tlPack["fr1"];
             console.log("AAA", aOne);
             if (aOne != undefined) {
                 schemeLocations.push([aOne[0][0], 350]);
@@ -501,6 +509,9 @@ export function drawGCNConv(
         resultVis: resultVis,
         one: one,
         thirdGCN: thirdGCN,
+        path1:path1,
+        fr1:fr1,
+        poolingFrame:poolingFrame
     };
 }
 
@@ -515,6 +526,8 @@ export function drawPoolingVis(
     conv3: any
 ) {
     console.log("thirdGCN from pooling vis", thirdGCN);
+
+    let poolingFrame:any = null;
 
     const rectH = 15;
     const rectW = 5;
@@ -828,7 +841,7 @@ export function drawPoolingVis(
         paths.push(path.node());
     }
     //draw frame
-    const f = g
+    poolingFrame = g
         .append("rect")
         .attr("x", locations[0][0] + 102)
         .attr("y", midY - 5)
@@ -875,7 +888,7 @@ export function drawPoolingVis(
         });
     });
 
-    return { one: one, g: g };
+    return { one: one, g: g, poolingFrame:poolingFrame.node() };
 }
 
 //the function to draw the last two layers of the model
@@ -903,7 +916,9 @@ export function drawTwoLayers(one: any, final: any, myColor: any) {
             .attr("fill", myColor(result[m]))
             .attr("opacity", 1)
             .attr("stroke", "gray")
-            .attr("stroke-width", 0.1);
+            .attr("stroke-width", 0.1)
+            .attr("class", "resultRect")
+            .attr("id", `${m}`);
     }
 
     //add labels
@@ -925,7 +940,7 @@ export function drawTwoLayers(one: any, final: any, myColor: any) {
         .text("Mutagenic");
 
     //draw frame
-    const f = g
+    const fr1 = g
         .append("rect")
         .attr("x", one[0][0])
         .attr("y", one[0][1])
@@ -945,7 +960,7 @@ export function drawTwoLayers(one: any, final: any, myColor: any) {
     let bOne = deepClone(aOne);
     bOne[0][0] -= 102;
     //connect
-    d3.select(".mats")
+    const path1 = d3.select(".mats")
         .append("path")
         .attr("d", d3.line()([aOne[0], bOne[0]]))
         .attr("stroke", "black")
@@ -961,5 +976,5 @@ export function drawTwoLayers(one: any, final: any, myColor: any) {
     console.log("mat result", result);
     let cOne = deepClone(aOne);
 
-    return { locations: [aOne[0], cOne[0]], g: g, g1: null };
+    return { locations: [aOne[0], cOne[0]], g: g, g1: null, fr1:fr1.node(), path1:path1.node() };
 }

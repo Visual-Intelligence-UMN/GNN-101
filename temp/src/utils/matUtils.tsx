@@ -32,8 +32,8 @@ export function visualizeFeatures(
     detailView: any
 ) {
     //--------------------------------DATA PREP MANAGEMENT--------------------------------
-    const translateGap = 102*3 + 5*64*2;
-    const translateGap1 = 102*3 + 5*7+64*5;
+    const translateGap = 102 * 3 + 5 * 64 * 2;
+    const translateGap1 = 102 * 3 + 5 * 7 + 64 * 5;
     let intervalID: any = null; // to manage animation controls
 
     let poolingVis = null; //to manage pooling visualizer
@@ -121,6 +121,10 @@ export function visualizeFeatures(
     outputVis = GCNConvPackage.outputVis;
     resultVis = GCNConvPackage.resultVis;
     maxVals = GCNConvPackage.maxVals;
+
+    let path1 = GCNConvPackage.path1;
+    let fr1 = GCNConvPackage.fr1;
+    let poolingFrame = GCNConvPackage.poolingFrame;
 
     let paths = GCNConvPackage.paths;
     let one = GCNConvPackage.one;
@@ -309,39 +313,50 @@ export function visualizeFeatures(
 
     //model output visualizer click interaction
     if (outputVis != null) {
-        outputVis.on("mouseover", function (event: any, d: any) {
-            const a = d3.select(".path1").style("opacity", 1);
-            const b = d3.select(".poolingFrame").style("opacity", 1);
-            const c = d3.select("#fr1").style("opacity", 1);
-            console.log("mouse in", a, b, c);
-        });
-        outputVis.on("mouseout", function (event: any, d: any) {
-            d3.select(".path1").style("opacity", 0.02);
-            d3.select(".poolingFrame").style("opacity", 0);
-            d3.select("#fr1").style("opacity", 0);
-        });
-        outputVis.on("click", function (event: any, d: any) {
-            if (lock != true) {
-                d3.select(".pooling")
-                .style("pointer-events", "none");
-                //state
-                transState = "output";
-                lock = true;
-                event.stopPropagation();
-                dview = true;
-                console.log("click! - fVis", dview, lock);
-                //lock all feature visualizers and transparent paths
-                const outputVisPack = outputVisClick(
-                    resultVis,
-                    colorSchemesTable,
-                    one,
-                    final,
-                    myColor
-                );
-                //update variables
-                resultVis = outputVisPack.resultVis;
-                colorSchemesTable = outputVisPack.colorSchemesTable;
-            }
-        });
+        d3.selectAll(".resultRect")
+            .style("pointer-events", "auto")
+            .on("mouseover", function (event: any, d: any) {
+                console.log("event.target.classList", event.target.classList);
+                const a = d3.select(".path1").style("opacity", 1);
+                const b = d3.select(".poolingFrame").style("opacity", 1);
+                const c = d3.select("#fr1").style("opacity", 1);
+                console.log("mouse in", a, b, c);
+                // fr1!.style.opacity = "1";
+                // poolingFrame!.style.opacity = "1";
+                // path1!.style.opacity = "1";
+                console.log("signal!");
+            });
+        d3.selectAll(".resultRect")
+            .style("pointer-events", "auto")
+            .on("mouseout", function (event: any, d: any) {
+                d3.select(".path1").style("opacity", 0.02);
+                d3.select(".poolingFrame").style("opacity", 0);
+                d3.select("#fr1").style("opacity", 0);
+                console.log("signal out!");
+            });
+        d3.selectAll(".resultRect")
+            .style("pointer-events", "auto")
+            .on("click", function (event: any, d: any) {
+                if (lock != true) {
+                    d3.select(".pooling").style("pointer-events", "none");
+                    //state
+                    transState = "output";
+                    lock = true;
+                    event.stopPropagation();
+                    dview = true;
+                    console.log("click! - fVis", dview, lock);
+                    //lock all feature visualizers and transparent paths
+                    const outputVisPack = outputVisClick(
+                        resultVis,
+                        colorSchemesTable,
+                        one,
+                        final,
+                        myColor
+                    );
+                    //update variables
+                    resultVis = outputVisPack.resultVis;
+                    colorSchemesTable = outputVisPack.colorSchemesTable;
+                }
+            });
     }
 }
