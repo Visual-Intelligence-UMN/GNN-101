@@ -560,7 +560,20 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
               } 
           }
         });
+        node.text.on("mouseover", function() {
+          if (!isClicked) {
+            highlightNodes(node);
+            if (node.relatedNodes) {
+              reduceNodeOpacity(allNodes, node.relatedNodes, node);
+            } 
+          }
+        });
 
+        node.text.on("mouseout", function() {
+          if (!isClicked) {
+            resetNodes(allNodes);
+          }
+        });
         node.svgElement.addEventListener("mouseout", function(this: any) {
           if (!isClicked) {
             resetNodes(allNodes);
@@ -569,7 +582,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
         if (node.graphIndex != 0) {
           node.svgElement.addEventListener("click", function(event: any) {
             hideAllLinks(allNodes);
-            calculationVisualizer(node, currentWeights, bias, aggregatedDataMap, calculatedDataMap, svg, offset, isClicked);
+            calculationVisualizer(node, currentWeights, bias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, isClicked);
             
             let relatedNodes: any = [];
             if (node.relatedNodes) {
@@ -674,6 +687,8 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             
             moveNextLayer(svg, node, moveOffset, 1);
             movedNode = node; // Update the moved node
+           
+
         });
       }
     });

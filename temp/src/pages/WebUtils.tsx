@@ -33,7 +33,14 @@ export function roundToTwo(num: number): number {
     return Math.round(num * 100) / 100;
 }
 
-
+export function chunkArray<T>(inputArray: T[], chunkSize: number): T[][] {
+    const result: T[][] = [];
+    for (let i = 0; i < inputArray.length; i += chunkSize) {
+        const chunk = inputArray.slice(i, i + chunkSize);
+        result.push(chunk);
+    }
+    return result;
+}
 
 interface GraphAnalysisViewerProps {
     path: string;
@@ -428,7 +435,7 @@ export const Hint: React.FC<HintProps> = ({ text }) => {
             className='items-center justify-center'
         >
             <span className="inline-block bg-gray-300 rounded-full w-6 h-6 flex items-center justify-center text-black cursor-default">
-                i
+                ?
             </span>
             <Tooltip id="tooltip" />
         </span>
@@ -559,10 +566,10 @@ export function visualizeGraph(path: string) {
                     });
                     const graphWidth = maxXDistance + 20
                     const graphHeight = maxYDistance + 20;
-                    const point1 = { x: 0, y: height / 8 };
-                    const point2 = { x: 0.9 * offset, y: height / 20 };
-                    const point3 = { x: 0.9 * offset, y: height / 1.7 };
-                    const point4 = { x: 0, y: height / 1.5 };
+                    const point1 = { x: 0.9 * offset - 260, y: height / 8 };
+                    const point2 = { x: 0.8 * offset - 260, y: height / 20 };
+                    const point3 = { x: 0.8 * offset - 260, y: height / 1.7 };
+                    const point4 = { x: 0.9 * offset - 260, y: height / 1.5 };
                     const tolerance = 120;
 
                     const x_dist = Math.abs(point1.x - point2.x);
