@@ -12,7 +12,6 @@ export function hideAllLinks(nodes: any) {
         node.links.forEach((link: any) => {
           link.style("opacity", 0);
         })
-  
       }
   })
   }
@@ -171,7 +170,6 @@ export function resetNodes(allNodes: any[]) {
       .attr("height", 3)
       .style("fill", (d: number) => myColor(d))
       .style("stroke-width", 1)
-      .attr("class", "vis-component")
       .style("stroke", "grey")
       .style("opacity", 1);
 
@@ -203,7 +201,6 @@ export function resetNodes(allNodes: any[]) {
       .style("fill", (d: number) => myColor(d))
       .style("stroke-width", 1)
       .style("stroke", "grey")
-      .attr("class", "vis-component")
       .style("opacity", 1);
 
     for (let i = 0; i < 64; i++) {
@@ -231,7 +228,6 @@ export function resetNodes(allNodes: any[]) {
       .style("fill", (d: number) => myColor(d))
       .style("stroke-width", 1)
       .style("stroke", "grey")
-      .attr("class", "vis-component")
       .style("opacity", 1);
 
   
@@ -261,12 +257,12 @@ export function resetNodes(allNodes: any[]) {
   
           let color = calculateAverage(n.features);
 
-          const adjMatrixNum = g3.append("text")
+          g3.append("text")
             .attr("x", start_x + 20)
             .attr("y", start_y - 10)
             .text(adjMatrixSlice[i])
+            .attr("class", "parameter")
             .attr("opacity", 1)
-            .attr("class", "vis-component");
   
           const originToAggregated = g3.append("path")
             .attr("d", `M${start_x},${start_y} Q${controlX},${controlY} ${end_x},${end_y}`)
@@ -274,7 +270,6 @@ export function resetNodes(allNodes: any[]) {
             .style("opacity", 0.7)
             .style("stroke-width", 1)
             .style("fill", "none")
-            .attr("class", "vis-component")
             .style("opacity", 1);
   
           paths.push(originToAggregated);
@@ -298,7 +293,6 @@ export function resetNodes(allNodes: any[]) {
         .style("opacity", 0.7)
         .style("stroke-width", 1)
         .style("fill", "none")
-        .attr("class", "vis-component")
         .style("opacity", 1);
         
   
@@ -321,7 +315,6 @@ export function resetNodes(allNodes: any[]) {
         .style("opacity", 0.7)
         .style("stroke-width", 1)
         .style("fill", "none")
-        .attr("class", "vis-component")
         .attr("class", "biasToFinal")
         .style("opacity", 0);
 
@@ -341,8 +334,9 @@ export function resetNodes(allNodes: any[]) {
       .style("fill", "white")
       .style("stroke", "black")
       .style("stroke-width", 1)
+      .attr("class", "relu")
       .attr("opacity", 1)
-      .attr("class", "vis-component");
+
       
 
     g3.append("text")
@@ -352,8 +346,8 @@ export function resetNodes(allNodes: any[]) {
     .text("r")
     .style("font-size", "12px")
     .style("fill", "black")
-    .attr("class", "vis-component")
     .attr("opacity", 1)
+    .attr("class", "relu")
     .style("text-anchor", "middle");  
     
   
@@ -440,11 +434,12 @@ function weightAnimation(svg: any, node: any, startCoordList: number[][], endCoo
   document.addEventListener('click', () => {
     
     isAnimating = false; 
-    d3.select(".biasToFinal").remove();
-    d3.select(".vis-component").attr("opacity", 0);
-    d3.select(".vis-component").remove();
-    
-    
+    d3.selectAll(".biasToFinal").remove();
+    d3.selectAll(".vis-component").remove();
+    d3.selectAll(".relu").remove();
+    d3.selectAll(".intermediate-path").remove();
+    d3.selectAll(".parameter").remove();
+
   });
 
   function startAnimation() {
@@ -522,7 +517,7 @@ function GraphViewDrawPaths(
       .attr("stroke-width", 1)
       .attr("opacity", 1)
       .attr("fill", "none")
-      .attr("class", "vis-component")
+      .attr("class", "intermediate-path")
       .attr("id", `tempath${i}`);
   }
 
