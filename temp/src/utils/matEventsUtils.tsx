@@ -35,23 +35,23 @@ export function oFeatureMouseOver(
     };
 }
 
-export function resultRectMouseover(){
-//  console.log("event.target.classList", event.target.classList);
-const a = d3.select(".path1").style("opacity", 1);
-const b = d3.select(".poolingFrame").style("opacity", 1);
-const c = d3.select("#fr1").style("opacity", 1);
-console.log("mouse in", a, b, c);
-// fr1!.style.opacity = "1";
-// poolingFrame!.style.opacity = "1";
-// path1!.style.opacity = "1";
-console.log("signal!");
+export function resultRectMouseover() {
+    //  console.log("event.target.classList", event.target.classList);
+    const a = d3.select(".path1").style("opacity", 1);
+    const b = d3.select(".poolingFrame").style("opacity", 1);
+    const c = d3.select("#fr1").style("opacity", 1);
+    console.log("mouse in", a, b, c);
+    // fr1!.style.opacity = "1";
+    // poolingFrame!.style.opacity = "1";
+    // path1!.style.opacity = "1";
+    console.log("signal!");
 }
 
-export function resultRectMouseout(){
+export function resultRectMouseout() {
     d3.select(".path1").style("opacity", 0.02);
-                d3.select(".poolingFrame").style("opacity", 0);
-                d3.select("#fr1").style("opacity", 0);
-                console.log("signal out!");
+    d3.select(".poolingFrame").style("opacity", 0);
+    d3.select("#fr1").style("opacity", 0);
+    console.log("signal out!");
 }
 
 //graph feature events interactions - mouseout
@@ -103,7 +103,9 @@ export function detailedViewRecovery(
     d3.selectAll(".frame").style("opacity", 0);
     //recover opacity of feature visualizers
     d3.selectAll(".featureVis").style("opacity", 1);
-    d3.selectAll(".oFeature").style("opacity", 1).style("pointer-events", "auto");
+    d3.selectAll(".oFeature")
+        .style("opacity", 1)
+        .style("pointer-events", "auto");
     //recover layers positions
     if (transState == "GCNConv") {
         if (recordLayerID >= 0) {
@@ -316,6 +318,12 @@ export function featureVisClick(
     lock: boolean,
     setIntervalID: (id: any) => void
 ) {
+
+    let biasCoord: [number, number];
+    let res10: [number, number];
+    let res11: [number, number];
+    let nextCoord: [number, number];
+
     let currentStep = 0;
     let isPlaying = true;
     const rectH = 15;
@@ -543,14 +551,14 @@ export function featureVisClick(
             coordFeatureVis[1] - curveDir * 50,
         ];
 
-        const biasCoord: [number, number] = [
+        biasCoord = [
             coordFeatureVis[0] + rectW * 64,
             coordFeatureVis[1],
         ];
 
         let c = calculatePrevFeatureVisPos(featureVisTable, layerID, node);
 
-        const nextCoord: [number, number] = [
+        nextCoord = [
             c[0] + 102 * 3 + 5 * 64 * 2 + 102,
             c[1],
         ];
@@ -569,8 +577,8 @@ export function featureVisClick(
         const res00: [number, number] = [midX0 - 20, wmCoord[1]];
         const res01: [number, number] = [midX0 + 20, nextCoord[1]];
 
-        const res10: [number, number] = [midX1 - 20, biasCoord[1]];
-        const res11: [number, number] = [midX1 + 20, nextCoord[1]];
+        res10 = [midX1 - 20, biasCoord[1]];
+        res11 = [midX1 + 20, nextCoord[1]];
 
         d3.select(".mats")
             .append("path")
@@ -578,16 +586,9 @@ export function featureVisClick(
             .attr("stroke", "black")
             .attr("opacity", 1)
             .attr("fill", "none")
-            .attr("class", "procVis").attr("id", "procPath");;
+            .attr("class", "procVis")
+            .attr("id", "procPath");
 
-        d3.select(".mats")
-            .append("path")
-            .attr("d", lineGenerator([biasCoord, res10, res11, nextCoord]))
-            .attr("stroke", "black")
-            .attr("opacity", 1)
-            .attr("fill", "none")
-            .attr("class", "procVis").attr("id", "procPath");
-        
         d3.selectAll("#procPath").lower();
 
         const svg = d3.select(".mats");
@@ -597,16 +598,16 @@ export function featureVisClick(
         const cy = (wmCoord[1] + biasCoord[1]) / 2;
         const radius = 5;
         const cx1 = nextCoord[0] - 45;
-        const cy1 = nextCoord[1]-15;
+        const cy1 = nextCoord[1] - 15;
 
-        d3.xml("./assets/SVGs/ReLU.svg").then(function(data) {
-            console.log("xml", data.documentElement)
-            const ReLU = relu!.node()!.appendChild(data.documentElement)
+        d3.xml("./assets/SVGs/ReLU.svg").then(function (data) {
+            console.log("xml", data.documentElement);
+            const ReLU = relu!.node()!.appendChild(data.documentElement);
             d3.select(ReLU)
-            .attr("x", cx1)
-            .attr("y", cy1)
-            .attr("class", "procVis")
-            .raise();
+                .attr("x", cx1)
+                .attr("y", cy1)
+                .attr("class", "procVis")
+                .raise();
         });
 
         //find start locations and end locations
@@ -622,11 +623,11 @@ export function featureVisClick(
         //draw paths
         for (let i = 0; i < 64; i++) {
             let s: [number, number] = [
-                coordStartPoint[0] + w * i + w/2,
+                coordStartPoint[0] + w * i + w / 2,
                 coordStartPoint[1],
             ];
             let e: [number, number] = [
-                coordFinalPoint[0] + rectW * i + rectW/2,
+                coordFinalPoint[0] + rectW * i + rectW / 2,
                 coordFinalPoint[1],
             ];
 
@@ -641,7 +642,6 @@ export function featureVisClick(
 
         intervalID = setInterval(() => {
             d3.selectAll("#tempath").remove();
-
             const Xv = Xt[currentStep];
             for (let j = 0; j < 64; j++) {
                 const s1 = startCoordList[j];
@@ -681,14 +681,34 @@ export function featureVisClick(
             d3.selectAll("#tempath").lower();
             currentStep++;
             console.log("currentStep", currentStep);
+
+            if(currentStep >= 64){
+                d3.select(".mats")
+                    .append("path")
+                    .attr("d", lineGenerator([biasCoord, res10, res11, nextCoord]))
+                    .attr("stroke", "black")
+                    .attr("opacity", 1)
+                    .attr("fill", "none")
+                    .attr("class", "procVis biasPath")
+                    .attr("id", "procPath")
+                    .lower();
+            }
+
             if (currentStep >= 64 || !lock) {
-                injectPlayButtonSVG(btn, btnX, btnY - 30, "./assets/SVGs/playBtn_play.svg");
+                injectPlayButtonSVG(
+                    btn,
+                    btnX,
+                    btnY - 30,
+                    "./assets/SVGs/playBtn_play.svg"
+                );
                 isPlaying = false;
                 clearInterval(intervalID);
             }
             //        drawPoints(".mats", "red", [coordStartPoint, coordFinalPoint]);
             // d3.selectAll("circle").raise();
         }, 250); // 每2秒执行一次drawPaths
+
+        
 
         setIntervalID(intervalID);
         d3.selectAll("#tempath").lower();
@@ -704,9 +724,15 @@ export function featureVisClick(
     const btnX = playBtnCoord[0];
     const btnY = playBtnCoord[1];
 
-    injectPlayButtonSVG(btn, btnX, btnY - 30, "./assets/SVGs/playBtn_pause.svg");
+    injectPlayButtonSVG(
+        btn,
+        btnX,
+        btnY - 30,
+        "./assets/SVGs/playBtn_pause.svg"
+    );
 
     btn.on("click", function (event: any, d: any) {
+        d3.select(".biasPath").remove();
         console.log("isPlaying", isPlaying);
         event.stopPropagation();
         if (intervalID) {
@@ -714,20 +740,53 @@ export function featureVisClick(
         }
 
         if (!isPlaying || currentStep >= 64 || currentStep == 0) {
-         //   d3.select("text#btn").text("Pause");
-         btn.selectAll("*").remove();
-         injectPlayButtonSVG(btn, btnX, btnY - 30, "./assets/SVGs/playBtn_pause.svg");
+            //   d3.select("text#btn").text("Pause");
+            btn.selectAll("*").remove();
+            injectPlayButtonSVG(
+                btn,
+                btnX,
+                btnY - 30,
+                "./assets/SVGs/playBtn_pause.svg"
+            );
             if (currentStep >= 64) {
                 currentStep = 0; // 重置步骤
             }
             const Xt = math.transpose(weights[layerID]);
             let i = 0;
             intervalID = setInterval(() => {
-                drawAniPath(Xt, currentStep, startCoordList, endCoordList, curveDir, myColor);
+                drawAniPath(
+                    Xt,
+                    currentStep,
+                    startCoordList,
+                    endCoordList,
+                    curveDir,
+                    myColor
+                );
                 currentStep++;
                 console.log("i", currentStep);
+                if(currentStep>=64){
+                    const lineGenerator = d3
+                        .line<[number, number]>()
+                        .curve(d3.curveBasis)
+                        .x((d) => d[0])
+                        .y((d) => d[1]);
+                     d3.select(".mats")
+                        .append("path")
+                        .attr("d", lineGenerator([biasCoord, res10, res11, nextCoord]))
+                        .attr("stroke", "black")
+                        .attr("opacity", 1)
+                        .attr("fill", "none")
+                        .attr("class", "procVis biasPath")
+                        .attr("id", "procPath")
+                        .lower();
+                }
                 if (currentStep >= 64 || !lock) {
-                    injectPlayButtonSVG(btn, btnX, btnY - 30, "./assets/SVGs/playBtn_play.svg");
+                    injectPlayButtonSVG(
+                        btn,
+                        btnX,
+                        btnY - 30,
+                        "./assets/SVGs/playBtn_play.svg"
+                    );
                     clearInterval(intervalID);
                 }
             }, 250);
@@ -736,7 +795,12 @@ export function featureVisClick(
             isPlaying = true;
         } else if (isPlaying) {
             btn.selectAll("*").remove();
-            injectPlayButtonSVG(btn, btnX, btnY - 30, "./assets/SVGs/playBtn_play.svg");
+            injectPlayButtonSVG(
+                btn,
+                btnX,
+                btnY - 30,
+                "./assets/SVGs/playBtn_play.svg"
+            );
             isPlaying = false;
         }
         d3.selectAll("#tempath").lower();
@@ -836,7 +900,10 @@ export function outputVisClick(
     //locations for paths' starting points
     let startCoord = [];
     for (let i = 0; i < 64; i++) {
-        let c = [coordForStart[0][0] + i * 5 + rectW/2, coordForStart[0][1] - rectH+2];
+        let c = [
+            coordForStart[0][0] + i * 5 + rectW / 2,
+            coordForStart[0][1] - rectH + 2,
+        ];
         startCoord.push(c);
     }
     //drawPoints(".mats", "red",startCoord);
@@ -933,8 +1000,8 @@ export function outputVisClick(
 
                 //find coordination for the math displayer first
                 const displayX = endCoord[1][0] + 30;
-                const displayY = endCoord[1][1] - (displayH+50);
-                drawPoints(".mats", "red", [[displayX, displayY]])
+                const displayY = endCoord[1][1] - (displayH + 50);
+                drawPoints(".mats", "red", [[displayX, displayY]]);
 
                 //add displayer
                 d3.select(".mats")
@@ -951,14 +1018,16 @@ export function outputVisClick(
                     .attr("class", "math-displayer")
                     .lower();
 
-                //data preparation and preprocessing 
+                //data preparation and preprocessing
                 //model outputs and the values after softmax
                 console.log("ouputvis", result);
                 const finalResult = softmax(result);
                 console.log("ouputvis 1", finalResult);
                 //title fetch
                 let title = "Softmax Score for 'Mutagenic'";
-                if(id==0){title="Softmax Score for 'Non-Mutagenic'";}
+                if (id == 0) {
+                    title = "Softmax Score for 'Non-Mutagenic'";
+                }
                 console.log("outputvis title", title);
 
                 //add contents into the math displayer
@@ -966,155 +1035,175 @@ export function outputVisClick(
                 const titleYOffset = 10;
                 const titleXOffset = 50;
                 d3.select(".mats")
-                        .append("text")
-                        .attr("x", displayX+titleXOffset)
-                        .attr("y", displayY+titleYOffset)
-                        .text(title)
-                        .attr("class", "math-displayer")
-                        .attr("font-size", titleYOffset)
-                        .attr("fill","black");
+                    .append("text")
+                    .attr("x", displayX + titleXOffset)
+                    .attr("y", displayY + titleYOffset)
+                    .text(title)
+                    .attr("class", "math-displayer")
+                    .attr("font-size", titleYOffset)
+                    .attr("fill", "black");
                 //add equation
                 //draw fraction
                 //upper part of the fraction
-                const eqXOffset = titleXOffset/2;
-                const eqYOffset = titleYOffset*2.5;
-                const unitSize = eqXOffset/3+3;
+                const eqXOffset = titleXOffset / 2;
+                const eqYOffset = titleYOffset * 2.5;
+                const unitSize = eqXOffset / 3 + 3;
                 const upperOffset = unitSize * 2;
                 d3.select(".mats")
-                        .append("text")
-                        .attr("x", displayX+eqXOffset+upperOffset)
-                        .attr("y", displayY+eqYOffset)
-                        .text("exp(")
-                        .attr("class", "math-displayer")
-                        .attr("font-size", unitSize)
-                        .attr("fill","black");
+                    .append("text")
+                    .attr("x", displayX + eqXOffset + upperOffset)
+                    .attr("y", displayY + eqYOffset)
+                    .text("exp(")
+                    .attr("class", "math-displayer")
+                    .attr("font-size", unitSize)
+                    .attr("fill", "black");
                 d3.select(".mats")
-                        .append("rect")
-                        .attr("x", displayX+eqXOffset+(unitSize)*2.5+upperOffset)
-                        .attr("y", displayY+eqYOffset-unitSize+2)
-                        .attr("width", unitSize)
-                        .attr("height", unitSize)
-                        .style("stroke", "black")
-                        .attr("fill", myColor(result[id]))
-                        .attr("class", "math-displayer").raise();
+                    .append("rect")
+                    .attr(
+                        "x",
+                        displayX + eqXOffset + unitSize * 2.5 + upperOffset
+                    )
+                    .attr("y", displayY + eqYOffset - unitSize + 2)
+                    .attr("width", unitSize)
+                    .attr("height", unitSize)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(result[id]))
+                    .attr("class", "math-displayer")
+                    .raise();
                 d3.select(".mats")
-                        .append("text")
-                        .attr("x", displayX+eqXOffset+(unitSize)*2.5+upperOffset)
-                        .attr("y", displayY+eqYOffset-unitSize/3)
-                        .text(roundToTwo(result[id]))
-                        .attr("class", "math-displayer")
-                        .attr("font-size", unitSize/2)
-                        .attr("fill", "white");
+                    .append("text")
+                    .attr(
+                        "x",
+                        displayX + eqXOffset + unitSize * 2.5 + upperOffset
+                    )
+                    .attr("y", displayY + eqYOffset - unitSize / 3)
+                    .text(roundToTwo(result[id]))
+                    .attr("class", "math-displayer")
+                    .attr("font-size", unitSize / 2)
+                    .attr("fill", "white");
                 d3.select(".mats")
-                        .append("text")
-                        .attr("x", displayX+eqXOffset+unitSize*4+upperOffset)
-                        .attr("y", displayY+eqYOffset)
-                        .text(")")
-                        .attr("class", "math-displayer")
-                        .attr("font-size", unitSize)
-                        .attr("fill","black");
+                    .append("text")
+                    .attr(
+                        "x",
+                        displayX + eqXOffset + unitSize * 4 + upperOffset
+                    )
+                    .attr("y", displayY + eqYOffset)
+                    .text(")")
+                    .attr("class", "math-displayer")
+                    .attr("font-size", unitSize)
+                    .attr("fill", "black");
                 //upper part finished
                 //draw fraction line
-                const startFLPt:[number, number] = [displayX+eqXOffset/2, displayY+eqYOffset+unitSize];
-                const endFLPt:[number, number] = [displayX+eqXOffset+unitSize*10, displayY+eqYOffset+unitSize];
-                const path1 = d3.select(".mats")
-                                .append("path")
-                                .attr("d", d3.line()([startFLPt, endFLPt]))
-                                .attr("stroke", "black")
-                                .attr("opacity", 1)
-                                .attr("fill", "none")
-                                .attr("class", "math-displayer");
+                const startFLPt: [number, number] = [
+                    displayX + eqXOffset / 2,
+                    displayY + eqYOffset + unitSize,
+                ];
+                const endFLPt: [number, number] = [
+                    displayX + eqXOffset + unitSize * 10,
+                    displayY + eqYOffset + unitSize,
+                ];
+                const path1 = d3
+                    .select(".mats")
+                    .append("path")
+                    .attr("d", d3.line()([startFLPt, endFLPt]))
+                    .attr("stroke", "black")
+                    .attr("opacity", 1)
+                    .attr("fill", "none")
+                    .attr("class", "math-displayer");
                 //draw lower part
                 const offsetMul = 2;
                 d3.select(".mats")
-                        .append("text")
-                        .attr("x", displayX+eqXOffset)
-                        .attr("y", displayY+eqYOffset*offsetMul)
-                        .text("exp(")
-                        .attr("class", "math-displayer")
-                        .attr("font-size", unitSize)
-                        .attr("fill","black");
+                    .append("text")
+                    .attr("x", displayX + eqXOffset)
+                    .attr("y", displayY + eqYOffset * offsetMul)
+                    .text("exp(")
+                    .attr("class", "math-displayer")
+                    .attr("font-size", unitSize)
+                    .attr("fill", "black");
                 d3.select(".mats")
-                        .append("rect")
-                        .attr("x", displayX+eqXOffset+(unitSize)*2.5)
-                        .attr("y", displayY+eqYOffset*offsetMul-unitSize+2)
-                        .attr("width", unitSize)
-                        .attr("height", unitSize)
-                        .style("stroke", "black")
-                        .attr("fill", myColor(result[0]))
-                        .attr("class", "math-displayer").raise();
+                    .append("rect")
+                    .attr("x", displayX + eqXOffset + unitSize * 2.5)
+                    .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
+                    .attr("width", unitSize)
+                    .attr("height", unitSize)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(result[0]))
+                    .attr("class", "math-displayer")
+                    .raise();
                 d3.select(".mats")
-                        .append("text")
-                        .attr("x", displayX+eqXOffset+(unitSize)*2.5)
-                        .attr("y", displayY+eqYOffset*offsetMul-unitSize/3)
-                        .text(roundToTwo(result[0]))
-                        .attr("class", "math-displayer")
-                        .attr("font-size", unitSize/2)
-                        .attr("fill", "white");
+                    .append("text")
+                    .attr("x", displayX + eqXOffset + unitSize * 2.5)
+                    .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
+                    .text(roundToTwo(result[0]))
+                    .attr("class", "math-displayer")
+                    .attr("font-size", unitSize / 2)
+                    .attr("fill", "white");
                 d3.select(".mats")
-                        .append("text")
-                        .attr("x", displayX+eqXOffset+unitSize*4)
-                        .attr("y", displayY+eqYOffset*offsetMul)
-                        .text(")+exp(")
-                        .attr("class", "math-displayer")
-                        .attr("font-size", unitSize)
-                        .attr("fill","black");
+                    .append("text")
+                    .attr("x", displayX + eqXOffset + unitSize * 4)
+                    .attr("y", displayY + eqYOffset * offsetMul)
+                    .text(")+exp(")
+                    .attr("class", "math-displayer")
+                    .attr("font-size", unitSize)
+                    .attr("fill", "black");
                 d3.select(".mats")
-                        .append("rect")
-                        .attr("x", displayX+eqXOffset+(unitSize)*7.5)
-                        .attr("y", displayY+eqYOffset*offsetMul-unitSize+2)
-                        .attr("width", unitSize)
-                        .attr("height", unitSize)
-                        .style("stroke", "black")
-                        .attr("fill", myColor(result[1]))
-                        .attr("class", "math-displayer").raise();
+                    .append("rect")
+                    .attr("x", displayX + eqXOffset + unitSize * 7.5)
+                    .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
+                    .attr("width", unitSize)
+                    .attr("height", unitSize)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(result[1]))
+                    .attr("class", "math-displayer")
+                    .raise();
                 d3.select(".mats")
-                        .append("text")
-                        .attr("x", displayX+eqXOffset+(unitSize)*7.5)
-                        .attr("y", displayY+eqYOffset*offsetMul-unitSize/3)
-                        .text(roundToTwo(result[1]))
-                        .attr("class", "math-displayer")
-                        .attr("font-size", unitSize/2)
-                        .attr("fill", "white");
+                    .append("text")
+                    .attr("x", displayX + eqXOffset + unitSize * 7.5)
+                    .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
+                    .text(roundToTwo(result[1]))
+                    .attr("class", "math-displayer")
+                    .attr("font-size", unitSize / 2)
+                    .attr("fill", "white");
                 d3.select(".mats")
-                        .append("text")
-                        .attr("x", displayX+eqXOffset+unitSize*9)
-                        .attr("y", displayY+eqYOffset*offsetMul)
-                        .text(")")
-                        .attr("class", "math-displayer")
-                        .attr("font-size", unitSize)
-                        .attr("fill","black");
+                    .append("text")
+                    .attr("x", displayX + eqXOffset + unitSize * 9)
+                    .attr("y", displayY + eqYOffset * offsetMul)
+                    .text(")")
+                    .attr("class", "math-displayer")
+                    .attr("font-size", unitSize)
+                    .attr("fill", "black");
                 //lower part finished
                 //eq sign and result
                 d3.select(".mats")
-                        .append("text")
-                        .attr("x", endFLPt[0]+unitSize/2)
-                        .attr("y", endFLPt[1])
-                        .text("=")
-                        .attr("class", "math-displayer")
-                        .attr("font-size", unitSize)
-                        .attr("fill","black");
+                    .append("text")
+                    .attr("x", endFLPt[0] + unitSize / 2)
+                    .attr("y", endFLPt[1])
+                    .text("=")
+                    .attr("class", "math-displayer")
+                    .attr("font-size", unitSize)
+                    .attr("fill", "black");
                 d3.select(".mats")
-                        .append("rect")
-                        .attr("x", endFLPt[0]+unitSize*1.5)
-                        .attr("y", endFLPt[1]-unitSize)
-                        .attr("width", unitSize)
-                        .attr("height", unitSize)
-                        .style("stroke", "black")
-                        .attr("fill", myColor(finalResult[id]))
-                        .attr("class", "math-displayer").raise();
+                    .append("rect")
+                    .attr("x", endFLPt[0] + unitSize * 1.5)
+                    .attr("y", endFLPt[1] - unitSize)
+                    .attr("width", unitSize)
+                    .attr("height", unitSize)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(finalResult[id]))
+                    .attr("class", "math-displayer")
+                    .raise();
                 let textColor = "white";
-                if(Math.abs(finalResult[id])<0.5){textColor="black";}
+                if (Math.abs(finalResult[id]) < 0.5) {
+                    textColor = "black";
+                }
                 d3.select(".mats")
-                        .append("text")
-                        .attr("x", endFLPt[0]+unitSize*1.5)
-                        .attr("y", endFLPt[1]-unitSize/2)
-                        .text(roundToTwo(finalResult[id]))
-                        .attr("class", "math-displayer")
-                        .attr("font-size", unitSize/2)
-                        .attr("fill", textColor);
-
-
+                    .append("text")
+                    .attr("x", endFLPt[0] + unitSize * 1.5)
+                    .attr("y", endFLPt[1] - unitSize / 2)
+                    .text(roundToTwo(finalResult[id]))
+                    .attr("class", "math-displayer")
+                    .attr("font-size", unitSize / 2)
+                    .attr("fill", textColor);
             })
             .on("mouseout", function (event) {
                 d3.selectAll(".math-displayer").remove();
@@ -1195,7 +1284,12 @@ export function outputVisClick(
             currentStep++;
             console.log("currentStep", currentStep);
             if (currentStep >= 2) {
-                injectPlayButtonSVG(btn, btnX, btnY, "./assets/SVGs/playBtn_play.svg");
+                injectPlayButtonSVG(
+                    btn,
+                    btnX,
+                    btnY,
+                    "./assets/SVGs/playBtn_play.svg"
+                );
                 isPlaying = false;
                 clearInterval(intervalID);
             }
@@ -1223,7 +1317,12 @@ export function outputVisClick(
 
         if (!isPlaying || currentStep >= 2 || currentStep == 0) {
             btn.selectAll("*").remove();
-            injectPlayButtonSVG(btn, btnX, btnY, "./assets/SVGs/playBtn_pause.svg");
+            injectPlayButtonSVG(
+                btn,
+                btnX,
+                btnY,
+                "./assets/SVGs/playBtn_pause.svg"
+            );
             if (currentStep >= 2) {
                 currentStep = 0; // 重置步骤
             }
@@ -1269,7 +1368,12 @@ export function outputVisClick(
                 console.log("i", currentStep);
                 if (currentStep >= 2) {
                     btn.selectAll("*").remove();
-                    injectPlayButtonSVG(btn, btnX, btnY, "./assets/SVGs/playBtn_play.svg");
+                    injectPlayButtonSVG(
+                        btn,
+                        btnX,
+                        btnY,
+                        "./assets/SVGs/playBtn_play.svg"
+                    );
                     clearInterval(intervalID);
                 }
             }, 500);
@@ -1278,7 +1382,12 @@ export function outputVisClick(
             isPlaying = true;
         } else if (isPlaying) {
             btn.selectAll("*").remove();
-            injectPlayButtonSVG(btn, btnX, btnY, "./assets/SVGs/playBtn_play.svg");
+            injectPlayButtonSVG(
+                btn,
+                btnX,
+                btnY,
+                "./assets/SVGs/playBtn_play.svg"
+            );
             isPlaying = false;
         }
         d3.selectAll("path").lower();
