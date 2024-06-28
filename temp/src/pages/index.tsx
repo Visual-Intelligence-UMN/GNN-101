@@ -2,14 +2,16 @@ import Head from "next/head";
 import React, { useEffect, useRef, useState } from "react";
 import { Scrollbar } from 'react-scrollbars-custom';
 import GraphVisualizer from "./GraphVisualizer";
-import ClassifyGraph, { IntmData } from "./FileUpload";
-import { CSSTransition } from 'react-transition-group';
+import ClassifyGraph from "./FileUpload";
+// import { CSSTransition } from 'react-transition-group';
 import MatricesVisualizer from "./MatricesVisualizer";
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels";
+import { IntmData } from "../types";
+import { graphList, modelList } from "./const";
+
 import {
     Sidebar,
-    GraphSelector,
-    graph_list_generate,
+    Selector,
     ViewSelector,
     Hint,
     ButtonChain,
@@ -39,13 +41,14 @@ export const inter3 = Inter({
 })
 
 export default function Home() {
-    const [graphData, setGraphData] = useState<any>(null);
-    const [selectedGraph, setSelectedGraph] =
-        useState<string>("./input_graph.json");
+
+
+    const [model, setModel] = useState('graph classification');
+    const [selectedGraph, setSelectedGraph] = useState("graph_2");
     const inputRef = useRef<HTMLInputElement>(null);
     const [outputData, setOutputData] = useState(null);
-    const [path, setPath] = useState("./json_data/input_graph0.json");
-    const [isMat, setIsMat] = useState(true);
+
+    const [isGraphView, setIsGraphView] = useState(true);
     const [changedG, setChangedG] = useState(true);
     const [step, setStep] = useState(1);
     const [show, setShow] = useState(false);
@@ -53,28 +56,14 @@ export default function Home() {
     //intermediate output
     const [intmData, setIntmData] = useState<IntmData | null>(null);
     const [selectedButtons, setSelectedButtons] = useState([false, false, false, false, false, false, false]);
+    const [probabilities, setProbabilities] = useState<number[]>([]);
 
-    const graphList = graph_list_generate(3);
 
-    function handlePrediction(data: boolean) {
-        setPredicted(data);
-
-    }
-
-    function handleDataComm(data: any) {
-        setIntmData(data);
-        console.log("SET!", intmData);
-    }
-
-    function handleChangedComm(data: boolean) {
-        setChangedG(data);
-        console.log("SET Changed!", data);
-    }
     function handleGraphSelection(e: React.ChangeEvent<HTMLSelectElement>): void {
         setSelectedGraph(e.target.value);
-        setPath(e.target.value);
         setChangedG(true);
-        setPredicted(false); 
+        setProbabilities([]);
+        setPredicted(false);
     }
 
     // For now leave this commented out
@@ -92,6 +81,10 @@ export default function Home() {
     }, []);
     return (
         <main className={inter.className}>
+            <Head>
+                <title>Graph Neural Network Visualization</title>
+            </Head>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"></link>
             <div className={inter2.className}>
                 {step === 0 &&
                     <div style={{ paddingTop: '15%' }} className="bg-white min-h-screen flex justify-center items-center">
@@ -129,100 +122,94 @@ export default function Home() {
 
 
                         <Panel className="ml-4">
-                            <Head>
-                                <title>Graph Neural Network Visualization</title>
-                            </Head>
+
+                            {/* GNN model */}
                             <div className="flex gap-x-2 items-center" style={{ paddingTop: '40px' }}>
-                                <h1 className="text-2xl font-extra-black">
+                                <h1 className="text-3xl font-black">
                                     GNN Model
                                 </h1>
-                                <div className={inter2.className}>
-                                    <p className="transform translate-y-[3px] text-xl ml-10" style={{ fontWeight: 0 }}>
-                                        A binary graph classification model
-                                    </p>
-                                </div>
-                                <div className='flex items-center'>
-                                    <button
-                                        className="transition-transform duration-500 ease-in-out text-2xl ml-6 mt-2"
-                                        style={{ transform: `rotate(${show ? '90deg' : '0deg'})`, transformOrigin: 'center' }}
-                                        onClick={() => setShow(!show)}
-                                        data-tooltip-content={'See more options'}
-                                        data-tooltip-id='tooltip'
-                                    > ⏵
-                                        <Tooltip data-tooltip-id='tooltip' />
-                                    </button>
-                                    
-                                </div>
+                                <Selector
+                                    selectedOption={model}
+                                    handleChange={(e) => {
+                                        setModel(e.target.value);
+                                        setPredicted(false);
+                                        setProbabilities([]);
+                                    }}
+                                    OptionList={Object.keys(modelList)}
+                                />
+
+                                <ButtonChain selectedButtons={selectedButtons} setSelectedButtons={setSelectedButtons} predicted={predicted} />
                             </div>
-                            <CSSTransition in={show}
-                                        timeout={300}
-                                        classNames="graph"
-                                        unmountOnExit>
-                                            <ModelButtonChain/>
-                                    </CSSTransition>
+                            {/* <CSSTransition in={show}
+                                timeout={300}
+                                classNames="graph"
+                                unmountOnExit>
+                                <ModelButtonChain/>
+                            </CSSTransition> */}
+
+
                             <hr className="border-t border-gray-300 my-4"></hr>
-                            <ButtonChain selectedButtons={selectedButtons} setSelectedButtons={setSelectedButtons} predicted={predicted}/>
+
+                            {/* graph data */}
                             <div className="flex gap-x-4 items-center mb-3  ">
-                                <div>
-                                    <h2 className="text-xl font-semibold">Data</h2>
-                                </div>
+
+                                <h1 className="text-3xl font-black">Input Graph</h1>
+
                                 <div className="flex items-center gap-x-4 ">
                                     <Hint text={"Select a graph"} />
                                     <div className={inter3.className}>
-                                        <GraphSelector
-                                            selectedGraph={selectedGraph}
+                                        <Selector
+                                            selectedOption={selectedGraph}
                                             handleChange={handleGraphSelection}
-                                            graphList={graphList}
+                                            OptionList={Object.keys(graphList)}
                                         />
                                     </div>
+                                </div>
 
+                                <GraphAnalysisViewer path={graphList[selectedGraph]} />
+                            </div>
+
+                            <hr className="border-t border-gray-300 my-4"></hr>
+
+                            <ClassifyGraph
+                                graphPath={graphList[selectedGraph]}
+                                modelPath={modelList[model]}
+                                setChangedG={setChangedG}
+                                setIntmData={setIntmData}
+                                setPredicted={setPredicted}
+                                predicted={predicted}
+                                probabilities={probabilities}
+                                setProbabilities={setProbabilities}
+                            />
+
+                            <hr className="border-t border-gray-300 my-4"></hr>
+
+                            <div className="flex gap-x-4 items-center">
+                                <div className="flex gap-x-4">
+                                    <h2 className="text-3xl font-black">
+                                        Inner Model Visualization
+                                    </h2>
+
+                                </div>
+                                <div className="flex gap-x-4">
+                                    <ViewSwitch
+                                        handleChange={() => {
+                                            setIsGraphView(!isGraphView);
+                                        }}
+                                        checked={isGraphView}
+                                        labels={['Graph View', 'Matrix View']}
+                                    />
+                                    <Hint
+                                        text={"Change the view of GNN model"}
+                                    />
                                 </div>
                             </div>
 
-                            <GraphAnalysisViewer path={path} />
-
-
-                            <ClassifyGraph
-                                graph_path={path}
-                                dataComm={handleDataComm}
-                                changedComm={handleChangedComm}
-                                changed={changedG}
-                                onPrediction={handlePrediction}
-                                predicted={predicted}
-
-                            />
-                            {isMat ? (
+                            {isGraphView ? (
                                 <>
-                                    <div className="flex gap-x-4 items-center">
-                                        <div className="flex gap-x-4">
-                                            <h2 className="text-xl font-semibold">
-                                                Graphs Visualization
-                                            </h2>
-                                            <Hint
-                                                text={"Change the view of GNN model"}
-                                            />
-                                        </div>
-                                        <div>
-                                            <ViewSwitch
-                                                handleChange={(e) => {
-                                                    
-                                                    if (e === true) {
-                                                        setIsMat(true);
-                                                        console.log("mat true", isMat);
-                                                        setChangedG(true);
-                                                    } else {
-                                                        setIsMat(false);
-                                                        console.log("mat false", isMat);
-                                                        setChangedG(true);
-                                                    }
-                                                }}
-                                                current={true}
-                                            />
-                                        </div>
-                                    </div>
 
                                     <GraphVisualizer
-                                        graph_path={selectedGraph}
+                                        graph_path={graphList[selectedGraph]}
                                         intmData={intmData}
                                         changed={changedG}
                                         predicted={predicted}
@@ -231,40 +218,34 @@ export default function Home() {
                                 </>
                             ) : (
                                 <>
-                                    <div className="flex gap-x-4">
-                                        <div className="flex gap-x-4">
-                                            <h2 className="text-xl font-semibold">
-                                                Matrices Visualization
-                                            </h2>
-                                            <Hint
-                                                text={"Change the View of GNN model"}
-                                            />
-                                        </div>
-                                        <div>
-                                            <ViewSwitch
-                                                handleChange={(e) => {
-                                                    if (e === true) {
-                                                        setIsMat(true);
-                                                        console.log("mat true", isMat);
-                                                        setChangedG(true);
-                                                    } else {
-                                                        setIsMat(false);
-                                                        console.log("mat false", isMat);
-                                                        setChangedG(true);
-                                                    }
-                                                }}
-                                                current={false}
-                                            />
-                                        </div>
-                                    </div>
                                     <MatricesVisualizer
-                                        graph_path={selectedGraph}
+                                        graph_path={graphList[selectedGraph]}
                                         intmData={intmData}
                                         changed={changedG}
                                         predicted={predicted}
                                         selectedButtons={selectedButtons}
                                     />
                                 </>
+                            )}
+
+                            {/* overlay text on visualizer when not predicted */}
+                            {probabilities.length==0 && (
+                                <div className="absolute top-1/2 left-1/2 ">
+                                    <h1 className="text-4xl text-gray-300">Model Visualization will show after prediction</h1>
+                                    
+                                    <ClassifyGraph
+                                        graphPath={graphList[selectedGraph]}
+                                        modelPath={modelList[model]}
+                                        setChangedG={setChangedG}
+                                        setIntmData={setIntmData}
+                                        setPredicted={setPredicted}
+                                        predicted={predicted}
+                                        probabilities={probabilities}
+                                        setProbabilities={setProbabilities}
+                                        onlyShownButton={true}
+                                    />
+
+                                </div>
                             )}
                         </Panel>
                     </PanelGroup>
