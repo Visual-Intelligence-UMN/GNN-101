@@ -8,7 +8,6 @@ import {
   featureVisualizer,
   softmax,
 } from "../utils/utils";
-import { IntmData } from "./FileUpload";
 import { visualizeGraph, getInitialCoordinates } from "./WebUtils";
 import { aggregationCalculator } from "@/utils/graphUtils";
 import { sources } from "next/dist/compiled/webpack/webpack";
@@ -17,7 +16,7 @@ import { sources } from "next/dist/compiled/webpack/webpack";
 
 interface GraphVisualizerProps {
   graph_path: string;
-  intmData: null | IntmData;
+  intmData: null | any;
   changed: boolean;
   predicted: boolean;
   selectedButtons: boolean[];
@@ -78,7 +77,8 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           .attr("class", "layerVis") 
           .attr("transform", `translate(${xOffset},${margin.top})`)
           .attr("layerNum", i)
-          
+        
+        
         // Initialize the links
         const link = g1
           .selectAll("line")
@@ -117,42 +117,62 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             node.y = Math.random() * height;
           }
         });
-
-        // Optionally, run a very short simulation to adjust new nodes
         d3.forceSimulation(data.nodes)
-          .force("link", d3.forceLink(data.links).id((d: any) => d.id).distance(10))
-          .force("center", d3.forceCenter(width / 2, height / 2.8))
-          .force("collide", d3.forceCollide().radius(20).strength(0.8))
+          .force("link", d3.forceLink(data.links).id((d: any) => d.id).distance(20))
           .stop()
-          .tick(10);
+        .on("tick", ticked);
+
+
+        function ticked() {
+          link
+            .attr("x1", (d: any) => d.source.x)
+            .attr("y1", (d: any) => d.source.y)
+            .attr("x2", (d: any) => d.target.x)
+            .attr("y2", (d: any) => d.target.y)
+            .attr("transform", function (d: any) {
+              if (d.type === "double") {
+                const dx = d.target.x - d.source.x;
+                const dy = d.target.y - d.source.y;
+                const dr = Math.sqrt(dx * dx + dy * dy);
+                const offsetX = 5 * (dy / dr);
+                const offsetY = 5 * (-dx / dr);
+                return `translate(${offsetX}, ${offsetY})`;
+              } 
+              return null;
+            })
+            .style("stroke", function (d: any) {
+              return d.type === "aromatic" ? "purple" : "#aaa";
+            });
+        
+          node
+            .attr("cx", (d: any) => d.x)
+            .attr("cy", (d: any) => d.y);
+        
+          labels
+            .attr("x", (d: any) => d.x - 6)
+            .attr("y", (d: any) => d.y + 6);
+        }
         updatePositions();
           function updatePositions() {
-            link.attr("x1", (d: any) => d.source.x)
-                .attr("y1", (d: any) => d.source.y)
-                .attr("x2", (d: any) => d.target.x)
-                .attr("y2", (d: any) => d.target.y)
-                .attr("transform", function (d: any) {
-                  if (d.type === "double") {
-                    const dx = d.target.x - d.source.x;
-                    const dy = d.target.y - d.source.y;
-                    const dr = Math.sqrt(dx * dx + dy * dy);
-                    const offsetX = 5 * (dy / dr);
-                    const offsetY = 5 * (-dx / dr);
-                    return `translate(${offsetX}, ${offsetY})`;
-                  } 
-                  else {
-                    return null;
-                  }
-                })
-                .style("stroke", function (d: any) {
-                  if (d.type === "aromatic") {
-                    return "purple";
-                  }
-                  else {
-                    return "#aaa";
-                  }
-                });
-  
+            link
+    .attr("x1", (d: any) => d.source.x)
+    .attr("y1", (d: any) => d.source.y)
+    .attr("x2", (d: any) => d.target.x)
+    .attr("y2", (d: any) => d.target.y)
+    .attr("transform", function (d: any) {
+      if (d.type === "double") {
+        const dx = d.target.x - d.source.x;
+        const dy = d.target.y - d.source.y;
+        const dr = Math.sqrt(dx * dx + dy * dy);
+        const offsetX = 5 * (dy / dr);
+        const offsetY = 5 * (-dx / dr);
+        return `translate(${offsetX}, ${offsetY})`;
+      } 
+      return null;
+    })
+    .style("stroke", function (d: any) {
+      return d.type === "aromatic" ? "purple" : "#aaa";
+    });
             node.attr("cx", (d: any) => d.x)
                 .attr("cy", (d: any) => d.y);
   
