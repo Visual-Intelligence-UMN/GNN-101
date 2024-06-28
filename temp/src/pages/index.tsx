@@ -62,6 +62,7 @@ export default function Home() {
     function handleGraphSelection(e: React.ChangeEvent<HTMLSelectElement>): void {
         setSelectedGraph(e.target.value);
         setChangedG(true);
+        setProbabilities([]);
         setPredicted(false);
     }
 
@@ -131,6 +132,8 @@ export default function Home() {
                                     selectedOption={model}
                                     handleChange={(e) => {
                                         setModel(e.target.value);
+                                        setPredicted(false);
+                                        setProbabilities([]);
                                     }}
                                     OptionList={Object.keys(modelList)}
                                 />
@@ -226,7 +229,7 @@ export default function Home() {
                             )}
 
                             {/* overlay text on visualizer when not predicted */}
-                            {!predicted && (
+                            {probabilities.length==0 && (
                                 <div className="absolute top-1/2 left-1/2 ">
                                     <h1 className="text-4xl text-gray-300">Model Visualization will show after prediction</h1>
                                     
@@ -241,7 +244,7 @@ export default function Home() {
                                         setProbabilities={setProbabilities}
                                         onlyShownButton={true}
                                     />
-                                    
+
                                 </div>
                             )}
                         </Panel>
