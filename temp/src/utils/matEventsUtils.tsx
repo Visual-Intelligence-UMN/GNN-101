@@ -635,13 +635,14 @@ export function featureVisClick(
 
         //draw paths
 
+
         for (let i = 0; i < 64; i++) {
             let s: [number, number] = [
-                coordStartPoint[0] + w * i,
+                coordStartPoint[0] + w * i + w/2,
                 coordStartPoint[1],
             ];
             let e: [number, number] = [
-                coordFinalPoint[0] + rectW * i,
+                coordFinalPoint[0] + rectW * i + rectW/2,
                 coordFinalPoint[1],
             ];
 
@@ -882,6 +883,7 @@ export function outputVisClick(
     let isPlaying = true;
     let intervalID: any = null;
     const rectH = 15;
+    const rectW = 5;
     const poolingPt = get_cood_from_parent(".mats", ".pooling");
 
     let coordForStart = deepClone(poolingPt);
@@ -917,7 +919,7 @@ export function outputVisClick(
     //locations for paths' starting points
     let startCoord = [];
     for (let i = 0; i < 64; i++) {
-        let c = [coordForStart[0][0] + i * 5, coordForStart[0][1]];
+        let c = [coordForStart[0][0] + i * 5 + rectW/2, coordForStart[0][1] - rectH+2];
         startCoord.push(c);
     }
     //drawPoints(".mats", "red",startCoord);
@@ -948,8 +950,8 @@ export function outputVisClick(
         }
         //drawPoints(".mats", "red", endCoord);
         let resultCoord = deepClone(endCoord);
-        resultCoord[0][0] += 300 - rectH * 1.5;
-        resultCoord[1][0] += 300 - rectH * 1.5;
+        resultCoord[0][0] += 300 - rectH * 1.75;
+        resultCoord[1][0] += 300 - rectH * 1.75;
         console.log("comp coord", resultCoord, endCoord);
         //     drawPoints(".mats", "red", resultCoord);
         let biasCoord = deepClone(aOne);
