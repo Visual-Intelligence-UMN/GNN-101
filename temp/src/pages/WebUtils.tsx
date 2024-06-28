@@ -128,7 +128,7 @@ export const ButtonChain = ({ selectedButtons, setSelectedButtons, predicted }: 
     return (
         <div className="flex gap-x-4 items-center" >
             <div className="flex">
-                <h2 className="text-xl ">Architecture </h2>
+                <h2 className="text-xl m-auto">Architecture </h2>
                 <div className="my-1 mx-2">
                     <Hint text={"Click to highlight corresponding layer in Model Visualization"} />
                 </div>
@@ -313,7 +313,7 @@ export const PredictionVisualizer: React.FC<PredictionVisualizerProps> = ({
             .enter()
             .append("text")
             .text(function (d, i) {
-                return roundToTwo(d * 100);
+                return `${roundToTwo(d * 100)}%`;
             })
             .attr("dx", "5")
             .attr("x", function (d, i) {
@@ -323,7 +323,7 @@ export const PredictionVisualizer: React.FC<PredictionVisualizerProps> = ({
                 return i * 25 + 12.5;
             })
             .attr("font-family", "sans-serif")
-            .attr("font-size", "10px")
+            .attr("font-size", "14px")
             .attr("fill", "black")
             .attr("text-anchor", "left");
     }, [result]);
@@ -356,7 +356,7 @@ export const ViewSwitch: React.FC<ViewSwitchProps> = ({
 }) => {
     return (
 
-        <div className="relative inline-block w-40 h-8 select-none rounded-full overflow-hidden">
+        <div className="relative inline-block w-40 h-8 select-none rounded-full overflow-hidden m-auto">
             {/* Input remains hidden but is functional for toggle */}
             <input
                 type="checkbox"
@@ -428,9 +428,7 @@ export const Hint: React.FC<HintProps> = ({ text }) => {
             data-tooltip-id='tooltip'
             className='items-center justify-center my-1'
         >
-            <span className="inline-block bg-gray-100 border-solid border-gray-500 border-2 rounded-full w-6 h-6 flex items-center justify-center cursor-default text-gray-600 ">
-                i
-            </span>
+            <i className="fa fa-info-circle m-auto" style={{fontSize: "28px", color: '#333'}}></i>
             <Tooltip id="tooltip" />
         </span>
     );

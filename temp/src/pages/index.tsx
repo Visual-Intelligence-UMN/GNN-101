@@ -2,11 +2,12 @@ import Head from "next/head";
 import React, { useEffect, useRef, useState } from "react";
 import { Scrollbar } from 'react-scrollbars-custom';
 import GraphVisualizer from "./GraphVisualizer";
-import ClassifyGraph, { IntmData } from "./FileUpload";
+import ClassifyGraph from "./FileUpload";
 // import { CSSTransition } from 'react-transition-group';
 import MatricesVisualizer from "./MatricesVisualizer";
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels";
-import {graphList, modelList} from "./const";
+import { IntmData } from "../types";
+import { graphList, modelList } from "./const";
 
 import {
     Sidebar,
@@ -41,7 +42,7 @@ export const inter3 = Inter({
 
 export default function Home() {
 
-   
+
     const [model, setModel] = useState('graph classification');
     const [selectedGraph, setSelectedGraph] = useState("graph_2");
     const inputRef = useRef<HTMLInputElement>(null);
@@ -55,27 +56,13 @@ export default function Home() {
     //intermediate output
     const [intmData, setIntmData] = useState<IntmData | null>(null);
     const [selectedButtons, setSelectedButtons] = useState([false, false, false, false, false, false, false]);
+    const [probabilities, setProbabilities] = useState<number[]>([]);
 
-   
 
-    function handlePrediction(data: boolean) {
-        setPredicted(data);
-
-    }
-
-    function handleDataComm(data: any) {
-        setIntmData(data);
-        console.log("SET!", intmData);
-    }
-
-    function handleChangedComm(data: boolean) {
-        setChangedG(data);
-        console.log("SET Changed!", data);
-    }
     function handleGraphSelection(e: React.ChangeEvent<HTMLSelectElement>): void {
         setSelectedGraph(e.target.value);
         setChangedG(true);
-        setPredicted(false); 
+        setPredicted(false);
     }
 
     // For now leave this commented out
@@ -96,6 +83,7 @@ export default function Home() {
             <Head>
                 <title>Graph Neural Network Visualization</title>
             </Head>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"></link>
             <div className={inter2.className}>
                 {step === 0 &&
                     <div style={{ paddingTop: '15%' }} className="bg-white min-h-screen flex justify-center items-center">
@@ -133,7 +121,7 @@ export default function Home() {
 
 
                         <Panel className="ml-4">
-                            
+
                             {/* GNN model */}
                             <div className="flex gap-x-2 items-center" style={{ paddingTop: '40px' }}>
                                 <h1 className="text-3xl font-black">
@@ -147,7 +135,7 @@ export default function Home() {
                                     OptionList={Object.keys(modelList)}
                                 />
 
-                                <ButtonChain selectedButtons={selectedButtons} setSelectedButtons={setSelectedButtons} predicted={predicted}/>
+                                <ButtonChain selectedButtons={selectedButtons} setSelectedButtons={setSelectedButtons} predicted={predicted} />
                             </div>
                             {/* <CSSTransition in={show}
                                 timeout={300}
@@ -155,15 +143,15 @@ export default function Home() {
                                 unmountOnExit>
                                 <ModelButtonChain/>
                             </CSSTransition> */}
-                            
+
 
                             <hr className="border-t border-gray-300 my-4"></hr>
 
                             {/* graph data */}
                             <div className="flex gap-x-4 items-center mb-3  ">
-                                
+
                                 <h1 className="text-3xl font-black">Input Graph</h1>
-                                
+
                                 <div className="flex items-center gap-x-4 ">
                                     <Hint text={"Select a graph"} />
                                     <div className={inter3.className}>
@@ -182,13 +170,13 @@ export default function Home() {
 
                             <ClassifyGraph
                                 graphPath={graphList[selectedGraph]}
-                                modelPath = {modelList[model]}
-                                dataComm={handleDataComm}
-                                changedComm={handleChangedComm}
-                                changed={changedG}
-                                onPrediction={handlePrediction}
+                                modelPath={modelList[model]}
+                                setChangedG={setChangedG}
+                                setIntmData={setIntmData}
+                                setPredicted={setPredicted}
                                 predicted={predicted}
-
+                                probabilities={probabilities}
+                                setProbabilities={setProbabilities}
                             />
 
                             <hr className="border-t border-gray-300 my-4"></hr>
@@ -198,9 +186,9 @@ export default function Home() {
                                     <h2 className="text-3xl font-black">
                                         Inner Model Visualization
                                     </h2>
-                                    
+
                                 </div>
-                                <div className="flex gap-x-4"> 
+                                <div className="flex gap-x-4">
                                     <ViewSwitch
                                         handleChange={() => {
                                             setIsGraphView(!isGraphView);
@@ -235,6 +223,26 @@ export default function Home() {
                                         selectedButtons={selectedButtons}
                                     />
                                 </>
+                            )}
+
+                            {/* overlay text on visualizer when not predicted */}
+                            {!predicted && (
+                                <div className="absolute top-1/2 left-1/2 ">
+                                    <h1 className="text-4xl text-gray-300">Model Visualization will show after prediction</h1>
+                                    
+                                    <ClassifyGraph
+                                        graphPath={graphList[selectedGraph]}
+                                        modelPath={modelList[model]}
+                                        setChangedG={setChangedG}
+                                        setIntmData={setIntmData}
+                                        setPredicted={setPredicted}
+                                        predicted={predicted}
+                                        probabilities={probabilities}
+                                        setProbabilities={setProbabilities}
+                                        onlyShownButton={true}
+                                    />
+                                    
+                                </div>
                             )}
                         </Panel>
                     </PanelGroup>
