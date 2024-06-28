@@ -6,6 +6,8 @@ import * as ort from "onnxruntime-web";
 import { env } from "onnxruntime-web";
 import { aggregationCalculator, matrixMultiplication } from "@/utils/graphUtils";
 import { features } from 'process';
+import { IGraphData, IntmData } from "../types/";
+
 import { 
   hideAllLinks, 
   showAllLinks, 
@@ -905,10 +907,10 @@ export async function process() {
     return data;
 }
 
-export async function loadModel() {
+export async function loadModel(modelPath:string) {
   let session: any;
   try {
-    session = await ort.InferenceSession.create("./gnn_model2.onnx", { executionProviders: ['wasm'] });
+    session = await ort.InferenceSession.create(modelPath, { executionProviders: ['wasm'] });
     console.log("Model loaded successfully");
   } catch (error) {
     console.log("Load model failed", error);
@@ -978,6 +980,53 @@ export function analyzeGraph(graphData: any) {
     has_loop: hasLoop.size > 0,
     is_directed: isDirected,
   };
+}
+
+export const graphPrediction = async (modelPath: string, graphPath: string) => {
+ 
+		console.log("start classifying....a");
+		const session = await loadModel(modelPath);
+		const graphData: IGraphData = await load_json(graphPath);
+
+		// Convert `graphData` to tensor-like object expected by your ONNX model
+		const xTensor = new ort.Tensor(
+			"float32",
+			new Float32Array(graphData.x.flat()),
+			[graphData.x.length, graphData.x[0].length]
+		);
+
+		const edgeIndexTensor = new ort.Tensor(
+			"int32",
+			new Int32Array(graphData.edge_index.flat()),
+			[graphData.edge_index.length, graphData.edge_index[0].length]
+		);
+
+		const batchTensor = new ort.Tensor(
+			"int32",
+			new Int32Array(graphData.batch),
+			[graphData.batch.length]
+		);
+
+		const outputMap = await session.run({
+			x: xTensor,
+			edge_index: edgeIndexTensor,
+			batch: batchTensor,
+		});
+		const outputTensor = outputMap.final;
+
+
+		const prob = softmax(outputTensor.cpuData);
+		const intmData: IntmData = {
+			conv1: outputMap.conv1.cpuData,
+			conv2: outputMap.conv2.cpuData,
+			conv3: outputMap.conv3.cpuData,
+			pooling: outputMap.pooling.cpuData,
+			dropout: outputMap.dropout.cpuData,
+			final: outputTensor.cpuData
+		};
+
+		return {prob, intmData};
+	
 }
 
 
