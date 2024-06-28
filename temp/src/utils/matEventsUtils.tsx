@@ -9,6 +9,8 @@ import * as d3 from "d3";
 import { create, all } from "mathjs";
 import { start } from "repl";
 import { roundToTwo } from "@/pages/WebUtils";
+import { drawAniPath } from "./matAnimateUtils";
+import { injectPlayButtonSVG } from "./svgUtils";
 
 //graph feature events interactions - mouseover
 export function oFeatureMouseOver(
@@ -607,22 +609,6 @@ export function featureVisClick(
             .raise();
         });
 
-        // svg.append("circle")
-        //     .attr("cx", cx1)
-        //     .attr("cy", cy1)
-        //     .attr("r", radius)
-        //     .attr("stroke", "black")
-        //     .attr("fill", "white")
-        //     .attr("class", "procVis");
-
-        // svg.append("text")
-        //     .attr("x", cx1)
-        //     .attr("y", cy1 + 3)
-        //     .text("f")
-        //     .style("text-anchor", "middle")
-        //     .style("font-size", "6")
-        //     .attr("class", "procVis");
-
         //find start locations and end locations
         const coordStartPoint: [number, number] = [
             wmCoord[0] - rectW * 64 * 2 - 102,
@@ -634,8 +620,6 @@ export function featureVisClick(
         ];
 
         //draw paths
-
-
         for (let i = 0; i < 64; i++) {
             let s: [number, number] = [
                 coordStartPoint[0] + w * i + w/2,
@@ -698,7 +682,7 @@ export function featureVisClick(
             currentStep++;
             console.log("currentStep", currentStep);
             if (currentStep >= 64 || !lock) {
-                d3.select("text#btn").text("Play");
+                injectPlayButtonSVG(btn, btnX, btnY - 30, "./assets/SVGs/playBtn_play.svg");
                 isPlaying = false;
                 clearInterval(intervalID);
             }
@@ -720,17 +704,7 @@ export function featureVisClick(
     const btnX = playBtnCoord[0];
     const btnY = playBtnCoord[1];
 
-    d3.xml("./assets/SVGs/playBtn_pause.svg").then(function(data) {
-        console.log("xml", data.documentElement)
-        const play = btn!.node()!.appendChild(data.documentElement)
-        d3.select(play).attr("x", btnX).attr("y", btnY - 30).attr("class", "procVis")
-        .on("mouseover", function(event){
-            d3.select(play).select("ellipse").style("fill", "rgb(218, 218, 218)");
-        })
-        .on("mouseout", function(event){
-            d3.select(play).select("ellipse").style("fill", "rgb(255, 255, 255)");
-        });
-    });
+    injectPlayButtonSVG(btn, btnX, btnY - 30, "./assets/SVGs/playBtn_pause.svg");
 
     btn.on("click", function (event: any, d: any) {
         console.log("isPlaying", isPlaying);
@@ -742,65 +716,18 @@ export function featureVisClick(
         if (!isPlaying || currentStep >= 64 || currentStep == 0) {
          //   d3.select("text#btn").text("Pause");
          btn.selectAll("*").remove();
-         d3.xml("./assets/SVGs/playBtn_pause.svg").then(function(data) {
-            console.log("xml", data.documentElement)
-            const play = btn!.node()!.appendChild(data.documentElement)
-            d3.select(play).attr("x", btnX).attr("y", btnY - 30).attr("class", "procVis")
-            .on("mouseover", function(event){
-                d3.select(play).select("ellipse").style("fill", "rgb(218, 218, 218)");
-            })
-            .on("mouseout", function(event){
-                d3.select(play).select("ellipse").style("fill", "rgb(255, 255, 255)");
-            });
-        });
+         injectPlayButtonSVG(btn, btnX, btnY - 30, "./assets/SVGs/playBtn_pause.svg");
             if (currentStep >= 64) {
                 currentStep = 0; // 重置步骤
             }
             const Xt = math.transpose(weights[layerID]);
             let i = 0;
             intervalID = setInterval(() => {
-                d3.selectAll("#tempath").remove();
-
-                const Xv = Xt[currentStep];
-                for (let j = 0; j < 64; j++) {
-                    const s1 = startCoordList[j];
-                    const e1 = endCoordList[currentStep];
-                    let pathDir = e1[0] > s1[0] ? 0 : 1;
-                    if (curveDir == 1) {
-                        pathDir = e1[0] > s1[0] ? 1 : 0;
-                    }
-                    console.log("se", [s1, e1]);
-                    d3.select(".mats")
-                        .append("path")
-                        .attr("d", function () {
-                            return [
-                                "M",
-                                s1[0],
-                                s1[1],
-                                "A",
-                                (e1[0] - s1[0]) / 2,
-                                ",",
-                                (e1[0] - s1[0]) / 4,
-                                0,
-                                0,
-                                ",",
-                                pathDir,
-                                ",",
-                                e1[0],
-                                ",",
-                                e1[1],
-                            ].join(" ");
-                        })
-                        .attr("class", "procVis")
-                        .attr("id", "tempath")
-                        .style("fill", "none")
-                        .attr("stroke", myColor(Xv[j]));
-                }
-                d3.selectAll("#tempath").lower();
+                drawAniPath(Xt, currentStep, startCoordList, endCoordList, curveDir, myColor);
                 currentStep++;
                 console.log("i", currentStep);
                 if (currentStep >= 64 || !lock) {
-                    d3.select("text#btn").text("Play");
+                    injectPlayButtonSVG(btn, btnX, btnY - 30, "./assets/SVGs/playBtn_play.svg");
                     clearInterval(intervalID);
                 }
             }, 250);
@@ -809,17 +736,7 @@ export function featureVisClick(
             isPlaying = true;
         } else if (isPlaying) {
             btn.selectAll("*").remove();
-         d3.xml("./assets/SVGs/playBtn_play.svg").then(function(data) {
-            console.log("xml", data.documentElement)
-            const play = btn!.node()!.appendChild(data.documentElement)
-            d3.select(play).attr("x", btnX).attr("y", btnY - 30).attr("class", "procVis")
-            .on("mouseover", function(event){
-                d3.select(play).select("ellipse").style("fill", "rgb(218, 218, 218)");
-            })
-            .on("mouseout", function(event){
-                d3.select(play).select("ellipse").style("fill", "rgb(255, 255, 255)");
-            });
-        });
+            injectPlayButtonSVG(btn, btnX, btnY - 30, "./assets/SVGs/playBtn_play.svg");
             isPlaying = false;
         }
         d3.selectAll("#tempath").lower();
@@ -1273,46 +1190,12 @@ export function outputVisClick(
             .attr("id", "path1");
 
         intervalID = setInterval(() => {
-            d3.selectAll("#tempath").remove();
             const Xt = modelParams.weights[3];
-            const Xv = Xt[currentStep];
-            for (let j = 0; j < 64; j++) {
-                const s1 = startCoord[j];
-                const e1 = endCoord[currentStep];
-                let pathDir = e1[0] > s1[0] ? 1 : 0;
-                //drawPoints(".mats", "red", [s1, e1]);
-                console.log("se", [s1, e1]);
-                d3.select(".mats")
-                    .append("path")
-                    .attr("d", function () {
-                        return [
-                            "M",
-                            s1[0],
-                            s1[1],
-                            "A",
-                            (e1[0] - s1[0]) / 2,
-                            ",",
-                            (e1[0] - s1[0]) / 4,
-                            0,
-                            0,
-                            ",",
-                            pathDir,
-                            ",",
-                            e1[0],
-                            ",",
-                            e1[1],
-                        ].join(" ");
-                    })
-                    .attr("class", "procVis")
-                    .attr("id", "tempath")
-                    .style("fill", "none")
-                    .attr("stroke", myColor(Xv[j]));
-            }
-            d3.selectAll("path").lower();
+            drawAniPath(Xt, currentStep, startCoord, endCoord, 1, myColor);
             currentStep++;
             console.log("currentStep", currentStep);
             if (currentStep >= 2) {
-                d3.select("text#btn").text("Play");
+                injectPlayButtonSVG(btn, btnX, btnY, "./assets/SVGs/playBtn_play.svg");
                 isPlaying = false;
                 clearInterval(intervalID);
             }
@@ -1330,17 +1213,7 @@ export function outputVisClick(
     const radius = 10;
     const btnX = startCoord[0][0];
     const btnY = startCoord[0][1] + 50;
-    d3.xml("./assets/SVGs/playBtn_pause.svg").then(function(data) {
-        console.log("xml", data.documentElement)
-        const play = btn!.node()!.appendChild(data.documentElement)
-        d3.select(play).attr("x", btnX).attr("y", btnY).attr("class", "procVis")
-        .on("mouseover", function(event){
-            d3.select(play).select("ellipse").style("fill", "rgb(218, 218, 218)");
-        })
-        .on("mouseout", function(event){
-            d3.select(play).select("ellipse").style("fill", "rgb(255, 255, 255)");
-        });
-    });
+    injectPlayButtonSVG(btn, btnX, btnY, "./assets/SVGs/playBtn_pause.svg");
     btn.on("click", function (event: any, d: any) {
         console.log("isPlaying", isPlaying);
         event.stopPropagation();
@@ -1350,17 +1223,7 @@ export function outputVisClick(
 
         if (!isPlaying || currentStep >= 2 || currentStep == 0) {
             btn.selectAll("*").remove();
-            d3.xml("./assets/SVGs/playBtn_pause.svg").then(function(data) {
-                console.log("xml", data.documentElement)
-                const play = btn!.node()!.appendChild(data.documentElement)
-                d3.select(play).attr("x", btnX).attr("y", btnY).attr("class", "procVis")
-                .on("mouseover", function(event){
-                    d3.select(play).select("ellipse").style("fill", "rgb(218, 218, 218)");
-                })
-                .on("mouseout", function(event){
-                    d3.select(play).select("ellipse").style("fill", "rgb(255, 255, 255)");
-                });
-            });
+            injectPlayButtonSVG(btn, btnX, btnY, "./assets/SVGs/playBtn_pause.svg");
             if (currentStep >= 2) {
                 currentStep = 0; // 重置步骤
             }
@@ -1406,17 +1269,7 @@ export function outputVisClick(
                 console.log("i", currentStep);
                 if (currentStep >= 2) {
                     btn.selectAll("*").remove();
-                    d3.xml("./assets/SVGs/playBtn_play.svg").then(function(data) {
-                        console.log("xml", data.documentElement)
-                        const play = btn!.node()!.appendChild(data.documentElement)
-                        d3.select(play).attr("x", btnX).attr("y", btnY).attr("class", "procVis")
-                        .on("mouseover", function(event){
-                            d3.select(play).select("ellipse").style("fill", "rgb(218, 218, 218)");
-                        })
-                        .on("mouseout", function(event){
-                            d3.select(play).select("ellipse").style("fill", "rgb(255, 255, 255)");
-                        });
-                    });
+                    injectPlayButtonSVG(btn, btnX, btnY, "./assets/SVGs/playBtn_play.svg");
                     clearInterval(intervalID);
                 }
             }, 500);
@@ -1425,17 +1278,7 @@ export function outputVisClick(
             isPlaying = true;
         } else if (isPlaying) {
             btn.selectAll("*").remove();
-            d3.xml("./assets/SVGs/playBtn_play.svg").then(function(data) {
-                console.log("xml", data.documentElement)
-                const play = btn!.node()!.appendChild(data.documentElement)
-                d3.select(play).attr("x", btnX).attr("y", btnY).attr("class", "procVis")
-                .on("mouseover", function(event){
-                    d3.select(play).select("ellipse").style("fill", "rgb(218, 218, 218)");
-                })
-                .on("mouseout", function(event){
-                    d3.select(play).select("ellipse").style("fill", "rgb(255, 255, 255)");
-                });
-            });
+            injectPlayButtonSVG(btn, btnX, btnY, "./assets/SVGs/playBtn_play.svg");
             isPlaying = false;
         }
         d3.selectAll("path").lower();
