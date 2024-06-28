@@ -12,7 +12,8 @@ interface GraphData {
 }
 
 interface ClassifyGraphProps {
-  graph_path: string;
+  graphPath: string;
+  modelPath: string;
   dataComm: Function;
   changedComm: Function;
   changed: boolean;
@@ -30,15 +31,15 @@ export interface IntmData {
 }
 
 // parameter will be the user input for json file
-const ClassifyGraph: React.FC<ClassifyGraphProps> = ({ graph_path, dataComm, changedComm, changed, onPrediction, predicted}) => {
+const ClassifyGraph: React.FC<ClassifyGraphProps> = ({ graphPath, modelPath, dataComm, changedComm, changed, onPrediction, predicted}) => {
   const [probabilities, setProbabilities] = useState<number[]>([]);
   const [graphName, setGraphName] = useState("None");
 
   const classifyGraph = async () => {
     onPrediction(true)
     console.log("start classifying....a");
-    const session = await loadModel();
-    const graphData: GraphData = await load_json(graph_path);
+    const session = await loadModel(modelPath);
+    const graphData: GraphData = await load_json(graphPath);
     analyzeGraph(graphData);
 
     // Convert `graphData` to tensor-like object expected by your ONNX model
@@ -105,7 +106,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({ graph_path, dataComm, cha
     dataComm(intmData);
     changedComm(false);
 
-    setGraphName(graph_path);
+    setGraphName(graphPath);
 
     console.log("Probabilities:", prob);
     setProbabilities(prob);
