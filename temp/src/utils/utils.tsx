@@ -582,6 +582,33 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           }
         });
         if (node.graphIndex != 0) {
+          node.text.on("click", function(event:any) {
+            hideAllLinks(allNodes);
+            calculationVisualizer(node, currentWeights, bias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, isClicked);
+            
+            let relatedNodes: any = [];
+            if (node.relatedNodes) {
+              relatedNodes = node.relatedNodes;
+            } 
+            reduceNodeOpacity(allNodes, relatedNodes, node);
+            
+            event.stopPropagation(); 
+            isClicked = true;
+
+            if (movedNode === node) {
+              return; 
+            }
+          
+            if (movedNode) {
+              moveNextLayer(svg, movedNode, moveOffset, -1)
+              isClicked = false; 
+              movedNode = null;
+            }
+
+            
+            moveNextLayer(svg, node, moveOffset, 1);
+            movedNode = node;
+          });
           node.svgElement.addEventListener("click", function(event: any) {
             hideAllLinks(allNodes);
             calculationVisualizer(node, currentWeights, bias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, isClicked);

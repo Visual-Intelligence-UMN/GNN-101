@@ -8,8 +8,7 @@ import {
   featureVisualizer,
   softmax,
 } from "../utils/utils";
-import { IntmData } from "./FileUpload";
-import { visualizeGraph } from "./WebUtils";
+import { visualizeGraph, getInitialCoordinates } from "./WebUtils";
 import { aggregationCalculator } from "@/utils/graphUtils";
 import { sources } from "next/dist/compiled/webpack/webpack";
 
@@ -17,7 +16,7 @@ import { sources } from "next/dist/compiled/webpack/webpack";
 
 interface GraphVisualizerProps {
   graph_path: string;
-  intmData: null | IntmData;
+  intmData: null | any;
   changed: boolean;
   predicted: boolean;
   selectedButtons: boolean[];
@@ -41,7 +40,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
   }
   
   useEffect(() => {
-    const init = async (graphs: any[]) => {
+    const init = async (graphs: any[], initialCoords: {[id: string]: {x: number, y: number}}) => {
       console.log("intmData", intmData);
       if (intmData != null) {
         console.log("From Visualizer:", intmData);
@@ -78,7 +77,8 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           .attr("class", "layerVis") 
           .attr("transform", `translate(${xOffset},${margin.top})`)
           .attr("layerNum", i)
-          
+        
+        
         // Initialize the links
         const link = g1
           .selectAll("line")
@@ -108,95 +108,114 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
         if (i >= 4) {
           labels.attr("opacity", 0);
         }
+        data.nodes.forEach((node: any) => {
+          if (initialCoords[node.id]) {
+            node.x = initialCoords[node.id].x;
+            node.y = initialCoords[node.id].y;
+          } else {
+            node.x = Math.random() * width;
+            node.y = Math.random() * height;
+          }
+        });
+        d3.forceSimulation(data.nodes)
+          .force("link", d3.forceLink(data.links).id((d: any) => d.id).distance(20))
+          .stop()
+        .on("tick", ticked);
 
 
-          // Define the simulation
-          const simulation = d3
-            .forceSimulation(data.nodes)
-            .force(
-              "link",
-              d3
-                .forceLink(data.links)
-                .id((d: any) => d.id)
-                .distance(10)
-            )
-
-            .force("center", d3.forceCenter(width / 2, height / 2.8))
-            .force("collide", d3.forceCollide().radius(20).strength(0.8))
-            .force("aromatic", d3.forceManyBody().strength((d: any) => (d.is_aromatic ? -210: -100)).theta(0.9))
-        
-            .on("tick", function ticked() {
-              link.attr("x1", (d: any) => d.source.x)
-                .attr("y1", (d: any) => d.source.y)
-                .attr("x2", (d: any) => d.target.x)
-                .attr("y2", (d: any) => d.target.y)
-                .attr("transform", function (d: any) {
-                  if (d.type === "double") {
-                    const dx = d.target.x - d.source.x;
-                    const dy = d.target.y - d.source.y;
-                    const dr = Math.sqrt(dx * dx + dy * dy);
-                    const offsetX = 5 * (dy / dr);
-                    const offsetY = 5 * (-dx / dr);
-                    return `translate(${offsetX}, ${offsetY})`;
-                  } 
-                  else {
-                    return null;
-                  }
-                })
-                .style("stroke", function (d: any) {
-                  if (d.type === "aromatic") {
-                    return "purple";
-                  }
-                  else {
-                    return "#aaa";
-                  }
-                }) ;
-
-              node.attr("cx", (d: any) => d.x).attr(
-                "cy",
-                (d: any) => d.y
-              );
-              labels.attr("x", (d: any) => d.x - 6)
-              .attr("y", (d: any) => d.y + 6);
+        function ticked() {
+          link
+            .attr("x1", (d: any) => d.source.x)
+            .attr("y1", (d: any) => d.source.y)
+            .attr("x2", (d: any) => d.target.x)
+            .attr("y2", (d: any) => d.target.y)
+            .attr("transform", function (d: any) {
+              if (d.type === "double") {
+                const dx = d.target.x - d.source.x;
+                const dy = d.target.y - d.source.y;
+                const dr = Math.sqrt(dx * dx + dy * dy);
+                const offsetX = 5 * (dy / dr);
+                const offsetY = 5 * (-dx / dr);
+                return `translate(${offsetX}, ${offsetY})`;
+              } 
+              return null;
             })
-            .on("end", function ended() {
-              let value = null;
-              let index = 0;
-              if (intmData != null) {
-                if (i === 1) {
-                  value = intmData.conv1;
-                }
-                if (i === 2) {
-                  value = intmData.conv2;
-                }
-                if (i === 3) {
-                  value = intmData.conv3;
-                }
-                if (i === 4) {
-                  value = intmData.pooling;
-                }
-                if (i === 5) {
-                  let final: any = intmData.final;
-                  value = softmax(final);
-                }
-              }
-              data.nodes.forEach((node: any) => {
-                node.graphIndex = i;
-                if (value != null && i <= 4 && value instanceof Float32Array) {
-                  node.features = value.subarray(
-                    64 * node.id,
-                    64 * (node.id + 1)
-                  );
-                }
+            .style("stroke", function (d: any) {
+              return d.type === "aromatic" ? "purple" : "#aaa";
+            });
+        
+          node
+            .attr("cx", (d: any) => d.x)
+            .attr("cy", (d: any) => d.y);
+        
+          labels
+            .attr("x", (d: any) => d.x - 6)
+            .attr("y", (d: any) => d.y + 6);
+        }
+        updatePositions();
+          function updatePositions() {
+            link
+    .attr("x1", (d: any) => d.source.x)
+    .attr("y1", (d: any) => d.source.y)
+    .attr("x2", (d: any) => d.target.x)
+    .attr("y2", (d: any) => d.target.y)
+    .attr("transform", function (d: any) {
+      if (d.type === "double") {
+        const dx = d.target.x - d.source.x;
+        const dy = d.target.y - d.source.y;
+        const dr = Math.sqrt(dx * dx + dy * dy);
+        const offsetX = 5 * (dy / dr);
+        const offsetY = 5 * (-dx / dr);
+        return `translate(${offsetX}, ${offsetY})`;
+      } 
+      return null;
+    })
+    .style("stroke", function (d: any) {
+      return d.type === "aromatic" ? "purple" : "#aaa";
+    });
+            node.attr("cx", (d: any) => d.x)
+                .attr("cy", (d: any) => d.y);
   
-                if (value != null && i >= 5) {
-                  node.features.push(value[index]);
-                  index = index + 1;
-                }
-                allNodes.push(node);
-              });
-
-              let maxXDistance = 0;
+            labels.attr("x", (d: any) => d.x - 6)
+                  .attr("y", (d: any) => d.y + 6);
+  
+          
+            let value = null;
+            let index = 0;
+            if (intmData != null) {
+              if (i === 1) {
+                value = intmData.conv1;
+              }
+              if (i === 2) {
+                value = intmData.conv2;
+              }
+              if (i === 3) {
+                value = intmData.conv3;
+              }
+              if (i === 4) {
+                value = intmData.pooling;
+              }
+              if (i === 5) {
+                let final: any = intmData.final;
+                value = softmax(final);
+              }
+            }
+            data.nodes.forEach((node: any) => {
+              node.graphIndex = i;
+              if (value != null && i <= 4 && value instanceof Float32Array) {
+                node.features = value.subarray(
+                  64 * node.id,
+                  64 * (node.id + 1)
+                );
+              }
+  
+              if (value != null && i >= 5) {
+                node.features.push(value[index]);
+                index = index + 1;
+              }
+              allNodes.push(node);
+            });
+            let maxXDistance = 0;
               let maxYDistance = 0;
               const limitedNodes = data.nodes.slice(0, 17); // Why is it 17?
 
@@ -291,10 +310,10 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             
               }
 
-            });
+            }
             setIsLoading(false);
-
-        }
+          }
+          
 
   )};
 
@@ -306,9 +325,9 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
         const processedData = await data_prep(graph_path);
 
         const graphsData = await prep_graphs(num, processedData);
-
+        const initialCoordinates = getInitialCoordinates();
         // Initialize and run D3 visualization with processe  d data
-        await init(graphsData);
+        await init(graphsData, initialCoordinates);
       } catch (error) {
         console.error("Error in visualizeGNN:", error);
       } finally {
