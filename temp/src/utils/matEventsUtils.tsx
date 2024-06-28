@@ -859,6 +859,12 @@ export function outputVisClick(
     result: any,
     myColor: any
 ) {
+
+    const curve = d3.line().curve(d3.curveBasis);
+    let biasCoord:any;
+    let controlPts:any;
+    let feaCoord:any;
+
     //drawPoints(".mats", "red", one)
     let currentStep = 0;
     let isPlaying = true;
@@ -938,7 +944,7 @@ export function outputVisClick(
         resultCoord[1][0] += 300 - rectH * 1.75;
         console.log("comp coord", resultCoord, endCoord);
         //     drawPoints(".mats", "red", resultCoord);
-        let biasCoord = deepClone(aOne);
+        biasCoord = deepClone(aOne);
         biasCoord[0][0] -= 130 + 2 * rectH;
         biasCoord[0][1] += 50;
         const linBias = modelParams.bias[3];
@@ -1228,21 +1234,10 @@ export function outputVisClick(
 
         biasCoord[0][1] += rectH / 2;
         biasCoord[0][0] += rectH * 2;
-        let feaCoord = [one[0][0], one[0][1] + rectH / 2];
+        feaCoord = [one[0][0], one[0][1] + rectH / 2];
 
-        const curve = d3.line().curve(d3.curveBasis);
-        const controlPts = computeMids(biasCoord[0], feaCoord);
-        d3.select(".mats")
-            .append("path")
-            .attr(
-                "d",
-                curve([biasCoord[0], controlPts[0], controlPts[1], feaCoord])
-            )
-            .attr("stroke", "black")
-            .attr("opacity", 0.05)
-            .attr("fill", "none")
-            .attr("class", "procVis")
-            .attr("id", "path1");
+        
+        controlPts = computeMids(biasCoord[0], feaCoord);
         //draw frame
         const f1 = g1
             .append("rect")
@@ -1260,14 +1255,6 @@ export function outputVisClick(
             .attr("id", "fr2");
         //connect!
         one[0][1] += rectH / 2;
-        // d3.select(".mats")
-        //     .append("path")
-        //     .attr("d", d3.line()([one[0], poolingPt[0]]))
-        //     .attr("stroke", "black")
-        //     .attr("opacity", 0.05)
-        //     .attr("fill", "none")
-        //     .attr("class", "procVis")
-        //     .attr("id", "path1");
         const endPt = [one[0][0] + 300, one[0][1]];
         d3.select(".mats")
             .append("path")
@@ -1284,6 +1271,17 @@ export function outputVisClick(
             currentStep++;
             console.log("currentStep", currentStep);
             if (currentStep >= 2) {
+                d3.select(".mats")
+                        .append("path")
+                        .attr(
+                            "d",
+                            curve([biasCoord[0], controlPts[0], controlPts[1], feaCoord])
+                        )
+                        .attr("stroke", "black")
+                        .attr("opacity", 1)
+                        .attr("fill", "none")
+                        .attr("class", "procVis biasPath")
+                        .attr("id", "path1");
                 injectPlayButtonSVG(
                     btn,
                     btnX,
@@ -1309,6 +1307,7 @@ export function outputVisClick(
     const btnY = startCoord[0][1] + 50;
     injectPlayButtonSVG(btn, btnX, btnY, "./assets/SVGs/playBtn_pause.svg");
     btn.on("click", function (event: any, d: any) {
+        d3.select(".biasPath").remove();
         console.log("isPlaying", isPlaying);
         event.stopPropagation();
         if (intervalID) {
@@ -1367,6 +1366,17 @@ export function outputVisClick(
                 currentStep++;
                 console.log("i", currentStep);
                 if (currentStep >= 2) {
+                    d3.select(".mats")
+                        .append("path")
+                        .attr(
+                            "d",
+                            curve([biasCoord[0], controlPts[0], controlPts[1], feaCoord])
+                        )
+                        .attr("stroke", "black")
+                        .attr("opacity", 1)
+                        .attr("fill", "none")
+                        .attr("class", "procVis biasPath")
+                        .attr("id", "path1");
                     btn.selectAll("*").remove();
                     injectPlayButtonSVG(
                         btn,
