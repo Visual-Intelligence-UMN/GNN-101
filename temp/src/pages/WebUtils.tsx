@@ -78,38 +78,38 @@ export const GraphAnalysisViewer: React.FC<GraphAnalysisViewerProps> = ({
         <div>
             {data ? (
                 <div>
-                    <div className="flex flex-row flex-wrap items-center">
+                    <div className="flex flex-row flex-wrap items-center text-lg font-thin">
+                        {/* <div className="mr-4">
+                            <text>Graph Information</text>{" "}
+                        </div> */}
                         <div className="mr-4">
-                            <text className="font-bold">Graph Information</text>{" "}
-                        </div>
-                        <div className="mr-4">
-                            <text className="font-semibold">Node Count</text>:{" "}
+                            <text>Node Count</text>:{" "}
                             {data.node_count}
                         </div>
                         <div className="mr-4">
-                            <text className="font-semibold">Edge Count</text>:{" "}
+                            <text>Edge Count</text>:{" "}
                             {data.is_directed ? data.edge_count : data.edge_count / 2}
                         </div>
                         <div className="mr-4">
-                            <text className="font-semibold">
+                            <text >
                                 Average Node Degree
                             </text>
                             : {roundToTwo(data.avg_node_degree / 2)}
                         </div>
                         <div className="mr-4">
-                            <text className="font-semibold">
+                            <text >
                                 Has Isolated Node
                             </text>
                             : {data.has_isolated_node ? "Yes" : "No"}
                         </div>
                         <div className="mr-4">
-                            <text className="font-semibold">Has Loop</text>:{" "}
+                            <text>Has Loop</text>:{" "}
                             {data.has_loop ? "Yes" : "No"}
                         </div>
-                        <div className="mr-4">
-                            <text className="font-semibold">Is Directed</text>:{" "}
+                        {/* <div className="mr-4">
+                            <text>Is Directed</text>:{" "}
                             {data.is_directed ? "Yes" : "No"}
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             ) : (
@@ -252,42 +252,24 @@ export const Sidebar = () => {
     );
 };
 
-//helper function for graph selector, generate a list of graphs to select
-export function graph_list_generate(num: number) {
-    let res = [];
-    res.push("./input_graph.json");
-    for (let i = 0; i < num; i++) {
-        res.push(`./json_data/input_graph${i}.json`);
-    }
-    console.log("Graphs List", res);
-    return res;
-}
 
 //graph selector
-interface GraphSelectorProps {
-    selectedGraph: string;
+interface SelectorProps {
+    selectedOption: string;
     handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-    graphList: string[];
+    OptionList: string[];
 }
 
-export const GraphSelector: React.FC<GraphSelectorProps> = ({
-    selectedGraph,
+export const Selector: React.FC<SelectorProps> = ({
+    selectedOption,
     handleChange,
-    graphList,
+    OptionList,
 }) => {
     return (
-        <select value={selectedGraph} onChange={handleChange} style={{
-            boxShadow: 'inset 1px 2px 3px rgba(0, 0, 0, 0.25)',
-            height: '30px',
-            width: "120px",
-            textAlign: "left",
-            verticalAlign: "bottom",
-            backgroundColor: "#F9F7F7",
-            color: "#7A7A7A",
-        }}>
-            {graphList.map((item, index) => (
+        <select className='text-2xl rounded-md px-3 shadow-none border-solid border-gray-200 border-2 min-w-80 bg-white text-gray-600' value={selectedOption} onChange={handleChange} >
+            {OptionList.map((item, index) => (
                 <option key={index} value={item}>
-                    Graph {index}
+                    {item}
                 </option>
             ))}
         </select>
@@ -354,6 +336,7 @@ export const PredictionVisualizer: React.FC<PredictionVisualizerProps> = ({
 };
 
 import React from "react";
+import { i } from "mathjs";
 
 interface ViewSwitchProps {
     handleChange: (newView: boolean) => void;
@@ -434,8 +417,8 @@ export const Hint: React.FC<HintProps> = ({ text }) => {
             data-tooltip-id='tooltip'
             className='items-center justify-center'
         >
-            <span className="inline-block bg-gray-300 rounded-full w-6 h-6 flex items-center justify-center text-black cursor-default">
-                ?
+            <span className="inline-block bg-gray-100 border-solid border-gray-500 border-2 rounded-full w-6 h-6 flex items-center justify-center text-black cursor-default text-gray-600">
+                i
             </span>
             <Tooltip id="tooltip" />
         </span>
