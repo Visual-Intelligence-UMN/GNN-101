@@ -687,11 +687,12 @@ export function featureVisClick(
                     .append("path")
                     .attr("d", lineGenerator([biasCoord, res10, res11, nextCoord]))
                     .attr("stroke", "black")
-                    .attr("opacity", 1)
+                    .attr("opacity", 0.05)
                     .attr("fill", "none")
                     .attr("class", "procVis biasPath")
                     .attr("id", "procPath")
                     .lower();
+                d3.selectAll(".biasPath").transition().duration(1000).attr("opacity", 1);
             }
 
             if (currentStep >= 64 || !lock) {
@@ -774,11 +775,12 @@ export function featureVisClick(
                         .append("path")
                         .attr("d", lineGenerator([biasCoord, res10, res11, nextCoord]))
                         .attr("stroke", "black")
-                        .attr("opacity", 1)
+                        .attr("opacity", 0.05)
                         .attr("fill", "none")
                         .attr("class", "procVis biasPath")
                         .attr("id", "procPath")
                         .lower();
+                    d3.selectAll(".biasPath").transition().duration(1000).attr("opacity", 1);
                 }
                 if (currentStep >= 64 || !lock) {
                     injectPlayButtonSVG(
@@ -1278,10 +1280,11 @@ export function outputVisClick(
                             curve([biasCoord[0], controlPts[0], controlPts[1], feaCoord])
                         )
                         .attr("stroke", "black")
-                        .attr("opacity", 1)
+                        .attr("opacity", 0.05)
                         .attr("fill", "none")
                         .attr("class", "procVis biasPath")
                         .attr("id", "path1");
+                d3.selectAll(".biasPath").transition().duration(1000).attr("opacity", 1);
                 injectPlayButtonSVG(
                     btn,
                     btnX,
@@ -1373,10 +1376,11 @@ export function outputVisClick(
                             curve([biasCoord[0], controlPts[0], controlPts[1], feaCoord])
                         )
                         .attr("stroke", "black")
-                        .attr("opacity", 1)
+                        .attr("opacity", 0.05)
                         .attr("fill", "none")
                         .attr("class", "procVis biasPath")
                         .attr("id", "path1");
+                    d3.selectAll(".biasPath").transition().duration(1000).attr("opacity", 1);
                     btn.selectAll("*").remove();
                     injectPlayButtonSVG(
                         btn,
