@@ -74,112 +74,108 @@ export const GraphAnalysisViewer: React.FC<GraphAnalysisViewerProps> = ({
         analysis();
     }, [path]);
 
-    return (
-        <div>
-            {data ? (
-                <div>
-                    <div className="flex flex-row flex-wrap items-center text-lg font-thin">
-                        {/* <div className="mr-4">
-                            <text>Graph Information</text>{" "}
-                        </div> */}
-                        <div className="mr-4">
-                            <text>Node Count</text>:{" "}
-                            {data.node_count}
-                        </div>
-                        <div className="mr-4">
-                            <text>Edge Count</text>:{" "}
-                            {data.is_directed ? data.edge_count : data.edge_count / 2}
-                        </div>
-                        <div className="mr-4">
-                            <text >
-                                Average Node Degree
-                            </text>
-                            : {roundToTwo(data.avg_node_degree / 2)}
-                        </div>
-                        <div className="mr-4">
-                            <text >
-                                Has Isolated Node
-                            </text>
-                            : {data.has_isolated_node ? "Yes" : "No"}
-                        </div>
-                        <div className="mr-4">
-                            <text>Has Loop</text>:{" "}
-                            {data.has_loop ? "Yes" : "No"}
-                        </div>
-                        {/* <div className="mr-4">
-                            <text>Is Directed</text>:{" "}
-                            {data.is_directed ? "Yes" : "No"}
-                        </div> */}
-                    </div>
-                </div>
-            ) : (
-                <div>No data available</div>
-            )}
+    const graphStat = data ?
+        <div className="flex flex-row flex-wrap items-center text-lg font-thin">
+            {/* <div className="mr-4">
+                <text>Graph Information</text>{" "}
+            </div> */}
+            <div className="mr-4">
+                <text>Node Count</text>:{" "}
+                {data.node_count}
+            </div>
+            <div className="mr-4">
+                <text>Edge Count</text>:{" "}
+                {data.is_directed ? data.edge_count : data.edge_count / 2}
+            </div>
+            <div className="mr-4">
+                <text >
+                    Average Node Degree
+                </text>
+                : {roundToTwo(data.avg_node_degree / 2)}
+            </div>
+            <div className="mr-4">
+                <text >
+                    Has Isolated Node
+                </text>
+                : {data.has_isolated_node ? "Yes" : "No"}
+            </div>
+            <div className="mr-4">
+                <text>Has Loop</text>:{" "}
+                {data.has_loop ? "Yes" : "No"}
+            </div>
+            {/* <div className="mr-4">
+                <text>Is Directed</text>:{" "}
+                {data.is_directed ? "Yes" : "No"}
+            </div> */}
         </div>
-    );
+        :
+        <div className="flex flex-row flex-wrap items-center text-lg font-thin">No data available</div>
+
+    return graphStat
 };
 
 //button chain on the general UI    
 export const ButtonChain = ({ selectedButtons, setSelectedButtons, predicted }: { selectedButtons: any[], setSelectedButtons: Function, predicted: boolean }) => {
-    
+
     const handleButtonClick = (index: number) => {
         setSelectedButtons((prevSelectedLayers: any[]) => {
             const updatedLayers = [...prevSelectedLayers];
             updatedLayers[index] = !(updatedLayers[index]);
-            
+
             return updatedLayers;
         });
     };
     return (
-        <div className="flex gap-x-4 items-center" style={{ marginBottom: '20px' }}>
-            <div>
-                <h2 className="text-xl font-semibold">Model Architecture</h2>
+        <div className="flex gap-x-4 items-center" >
+            <div className="flex">
+                <h2 className="text-xl ">Architecture </h2>
+                <div className="my-1 mx-2">
+                    <Hint text={"Click to highlight corresponding layer in Model Visualization"} />
+                </div>
             </div>
             <div>
-                <div className="flex items-center justify-center gap-x-2">
-                    <div style={{ marginRight: '7px' }}>
-                        <Hint text={"Interact with me after you predict!"} />
-                    </div>
-                     {/* Since input is not shown during the predicted phase, it is disabled */}
+                <div className="flex items-center justify-center gap-x-2 opacity-80">
+
+                    {/* Since input is not shown during the predicted phase, it is disabled */}
                     <button
                         disabled={!predicted}
-                        className={`bg-gray-200 border border-gray-300 ${predicted ? 'hover:border-black hover:bg-gray-300' : '' } text-black py-1 px-2 rounded ${selectedButtons[0] ? 'outline outline-2 outline-black bg-gray-300' : ''}`}
+                        className={`bg-gray-200  ${predicted ? 'hover:border-black hover:bg-gray-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[0] ? 'outline outline-2 outline-black bg-gray-300' : ''}`}
                         onClick={() => handleButtonClick(0)}>
                         Input
                     </button>
                     <button
                         disabled={!predicted}
-                        className={`bg-yellow-200 border border-gray-300 ${predicted ? 'hover:border-black hover:bg-yellow-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[1] ? 'outline outline-2 outline-black bg-yellow-300' : ''}`}
+                        className={`bg-yellow-200  ${predicted ? 'hover:border-black hover:bg-yellow-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[1] ? 'outline outline-2 outline-black bg-yellow-300' : ''}`}
                         onClick={() => handleButtonClick(1)}>
                         GNNConv1
                     </button>
                     <button
                         disabled={!predicted}
-                        className={`bg-yellow-200 border border-gray-300 ${predicted ? 'hover:border-black hover:bg-yellow-300': ''} text-black py-1 px-2 rounded ${selectedButtons[2] ? 'outline outline-2 outline-black bg-yellow-300' : ''}`}
+                        className={`bg-yellow-200  ${predicted ? 'hover:border-black hover:bg-yellow-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[2] ? 'outline outline-2 outline-black bg-yellow-300' : ''}`}
                         onClick={() => handleButtonClick(2)}>
                         GNNConv2
                     </button>
                     <button
                         disabled={!predicted}
-                        className={`bg-yellow-200 border border-gray-300 ${predicted ? 'hover:border-black hover:bg-yellow-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[3] ? 'outline outline-2 outline-black bg-yellow-300' : ''}`}
+                        className={`bg-yellow-200  ${predicted ? 'hover:border-black hover:bg-yellow-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[3] ? 'outline outline-2 outline-black bg-yellow-300' : ''}`}
                         onClick={() => handleButtonClick(3)}>
                         GNNConv3
                     </button>
                     <button
                         disabled={!predicted}
-                        className={`bg-blue-200 border border-gray-300 ${predicted ? 'hover:border-black hover:bg-blue-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[4] ? 'outline outline-2 outline-black bg-blue-300' : ''}`}
+                        className={`bg-blue-200  ${predicted ? 'hover:border-black hover:bg-blue-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[4] ? 'outline outline-2 outline-black bg-blue-300' : ''}`}
                         onClick={() => handleButtonClick(4)}>
                         Global Mean Pooling
                     </button>
                     <button
                         disabled={!predicted}
-                        className={`bg-green-200 border border-gray-300 ${predicted ? 'hover:border-black hover:bg-green-300': ''} text-black py-1 px-2 rounded ${selectedButtons[5] ? 'outline outline-2 outline-black bg-green-300' : ''}`}
+                        className={`bg-emerald-200  ${predicted ? 'hover:border-black hover:bg-green-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[5] ? 'outline outline-2 outline-black bg-green-300' : ''}`}
                         onClick={() => handleButtonClick(5)}>
                         FC
                     </button>
                     <button
                         disabled={!predicted}
-                        className={`bg-gray-200 border border-gray-300 ${predicted ? 'hover:border-black hover:bg-gray-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[6] ? 'outline outline-2 outline-black bg-gray-300' : ''}`}
+                        className={`bg-gray-200  ${predicted ? 'hover:border-black hover:bg-gray-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[6] ? 'outline outline-2 outline-black bg-gray-300' : ''}`}
                         onClick={() => handleButtonClick(6)}>
                         Output
                     </button>
@@ -278,7 +274,7 @@ export const Selector: React.FC<SelectorProps> = ({
 
 //prediction result visualizer
 interface PredictionVisualizerProps {
-    result: number[];
+    result: { [label: string]: number };
 }
 
 export const PredictionVisualizer: React.FC<PredictionVisualizerProps> = ({
@@ -298,7 +294,7 @@ export const PredictionVisualizer: React.FC<PredictionVisualizerProps> = ({
             .attr("height", height);
         const bars = svg
             .selectAll("rect")
-            .data(result)
+            .data(Object.values(result))
             .enter()
             .append("rect")
             .attr("x", 0)
@@ -313,7 +309,7 @@ export const PredictionVisualizer: React.FC<PredictionVisualizerProps> = ({
 
         const texts = svg
             .selectAll("text")
-            .data(result)
+            .data(Object.values(result))
             .enter()
             .append("text")
             .text(function (d, i) {
@@ -332,43 +328,58 @@ export const PredictionVisualizer: React.FC<PredictionVisualizerProps> = ({
             .attr("text-anchor", "left");
     }, [result]);
 
-    return <div id="predvis"></div>;
+    return <div className="flex gap-x-4">
+        <div >
+            <p>
+                {Object.keys(result).map((key) => (<span>{key}<br /></span>))}
+            </p>
+        </div>
+        <div>
+            <div id="predvis"></div>
+        </div>
+    </div>
 };
 
 import React from "react";
 import { i } from "mathjs";
 
 interface ViewSwitchProps {
-    handleChange: (newView: boolean) => void;
-    current: boolean;
+    handleChange: () => void;
+    checked: boolean;
+    labels: string[];
 }
 
 export const ViewSwitch: React.FC<ViewSwitchProps> = ({
     handleChange,
-    current,
+    checked,
+    labels,
 }) => {
     return (
 
-        <div className="relative inline-block w-20 h-8 select-none rounded-full overflow-hidden">
+        <div className="relative inline-block w-40 h-8 select-none rounded-full overflow-hidden">
             {/* Input remains hidden but is functional for toggle */}
             <input
                 type="checkbox"
                 id="toggle"
                 className="opacity-0 absolute w-6 h-6 cursor-pointer"
-                checked={current}
-                onChange={() => handleChange(!current)}
+                checked={checked}
+                onChange={() => handleChange()}
             />
             {/* Label serves as the background and slider control, with added text */}
             <label
                 htmlFor="toggle"
                 className="block h-8 rounded-full transition-colors duration-300 ease-in-out cursor-pointer"
-                style={{ backgroundColor: current ? "gray" : "gray" }} // Green when true, Blue when false
+                style={{ backgroundColor: checked ? "gray" : "gray" }} // Green when true, Blue when false
             >
                 {/* Only one span for the slider circle */}
                 <span
-                    className={`cursor-pointer absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow transform transition-all duration-300 ease-in-out ${current ? "translate-x-12" : ""
+                    className={`cursor-pointer absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow transform transition-all duration-300 ease-in-out ${checked ? "translate-x-32" : ""
                         }`}
                 ></span>
+                {/* label */}
+                <span className="text-white text-base font-semibold flex items-center justify-center h-full">
+                    {checked ? labels[0] : labels[1]}
+                </span>
             </label>
         </div>
     );
@@ -415,9 +426,9 @@ export const Hint: React.FC<HintProps> = ({ text }) => {
         <span
             data-tooltip-content={text}
             data-tooltip-id='tooltip'
-            className='items-center justify-center'
+            className='items-center justify-center my-1'
         >
-            <span className="inline-block bg-gray-100 border-solid border-gray-500 border-2 rounded-full w-6 h-6 flex items-center justify-center text-black cursor-default text-gray-600">
+            <span className="inline-block bg-gray-100 border-solid border-gray-500 border-2 rounded-full w-6 h-6 flex items-center justify-center cursor-default text-gray-600 ">
                 i
             </span>
             <Tooltip id="tooltip" />
@@ -528,7 +539,7 @@ export function visualizeGraph(path: string) {
                         .attr("y", (d: any) => d.y + 6);
                 })
                 .on("end", function ended() {
-                    
+
                     let maxXDistance = 0;
                     let maxYDistance = 0;
                     data.nodes.forEach((node1: any) => {
@@ -630,7 +641,7 @@ export function visualizeMatrix(path: string) {
 
         g.append("g")
             .attr("class", "x-axis")
-            .attr("transform", `translate(0,${gridSize+50})`)
+            .attr("transform", `translate(0,${gridSize + 50})`)
             .call(d3.axisBottom(x));
 
         var y = d3
@@ -664,7 +675,7 @@ export function visualizeMatrix(path: string) {
             .enter()
             .append("rect")
             .attr("x", (d: HeatmapData) => x(d.group)!)
-            .attr("y", (d: HeatmapData) => y(d.variable)!+50)
+            .attr("y", (d: HeatmapData) => y(d.variable)! + 50)
             .attr("width", x.bandwidth())
             .attr("height", y.bandwidth())
             .style("fill", (d: HeatmapData) => myColor(d.value))

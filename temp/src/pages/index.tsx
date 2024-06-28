@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Scrollbar } from 'react-scrollbars-custom';
 import GraphVisualizer from "./GraphVisualizer";
 import ClassifyGraph, { IntmData } from "./FileUpload";
-import { CSSTransition } from 'react-transition-group';
+// import { CSSTransition } from 'react-transition-group';
 import MatricesVisualizer from "./MatricesVisualizer";
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels";
 import {graphList, modelList} from "./const";
@@ -134,27 +134,11 @@ export default function Home() {
 
                         <Panel className="ml-4">
                             
+                            {/* GNN model */}
                             <div className="flex gap-x-2 items-center" style={{ paddingTop: '40px' }}>
-                                <h1 className="text-2xl font-extra-black">
-                                    GNN Model: 
+                                <h1 className="text-3xl font-black">
+                                    GNN Model
                                 </h1>
-                                {/* <div className={inter2.className}>
-                                    <p className="transform translate-y-[3px] text-xl ml-10" style={{ fontWeight: 0 }}>
-                                        A binary graph classification model
-                                    </p>
-                                </div>
-                                <div className='flex items-center'>
-                                    <button
-                                        className="transition-transform duration-500 ease-in-out text-2xl ml-6 mt-2"
-                                        style={{ transform: `rotate(${show ? '90deg' : '0deg'})`, transformOrigin: 'center' }}
-                                        onClick={() => setShow(!show)}
-                                        data-tooltip-content={'See more options'}
-                                        data-tooltip-id='tooltip'
-                                    > ⏵
-                                        <Tooltip data-tooltip-id='tooltip' />
-                                    </button>
-                                    
-                                </div> */}
                                 <Selector
                                     selectedOption={model}
                                     handleChange={(e) => {
@@ -162,19 +146,24 @@ export default function Home() {
                                     }}
                                     OptionList={Object.keys(modelList)}
                                 />
+
+                                <ButtonChain selectedButtons={selectedButtons} setSelectedButtons={setSelectedButtons} predicted={predicted}/>
                             </div>
-                            <CSSTransition in={show}
-                                        timeout={300}
-                                        classNames="graph"
-                                        unmountOnExit>
-                                            <ModelButtonChain/>
-                                    </CSSTransition>
+                            {/* <CSSTransition in={show}
+                                timeout={300}
+                                classNames="graph"
+                                unmountOnExit>
+                                <ModelButtonChain/>
+                            </CSSTransition> */}
+                            
+
                             <hr className="border-t border-gray-300 my-4"></hr>
-                            <ButtonChain selectedButtons={selectedButtons} setSelectedButtons={setSelectedButtons} predicted={predicted}/>
+
+                            {/* graph data */}
                             <div className="flex gap-x-4 items-center mb-3  ">
-                                <div>
-                                    <h1 className="text-2xl font-semibold">Input Graph</h1>
-                                </div>
+                                
+                                <h1 className="text-3xl font-black">Input Graph</h1>
+                                
                                 <div className="flex items-center gap-x-4 ">
                                     <Hint text={"Select a graph"} />
                                     <div className={inter3.className}>
@@ -184,11 +173,12 @@ export default function Home() {
                                             OptionList={Object.keys(graphList)}
                                         />
                                     </div>
-
                                 </div>
+
+                                <GraphAnalysisViewer path={graphList[selectedGraph]} />
                             </div>
 
-                            <GraphAnalysisViewer path={graphList[selectedGraph]} />
+                            <hr className="border-t border-gray-300 my-4"></hr>
 
                             <ClassifyGraph
                                 graphPath={graphList[selectedGraph]}
@@ -201,21 +191,25 @@ export default function Home() {
 
                             />
 
+                            <hr className="border-t border-gray-300 my-4"></hr>
+
                             <div className="flex gap-x-4 items-center">
                                 <div className="flex gap-x-4">
-                                    <h2 className="text-2xl font-semibold">
-                                        {isGraphView? 'Graphs View' : 'Matrices View'}
+                                    <h2 className="text-3xl font-black">
+                                        Inner Model Visualization
                                     </h2>
-                                    <Hint
-                                        text={"Change the view of GNN model"}
-                                    />
+                                    
                                 </div>
-                                <div>
+                                <div className="flex gap-x-4"> 
                                     <ViewSwitch
                                         handleChange={() => {
                                             setIsGraphView(!isGraphView);
                                         }}
-                                        current={isGraphView}
+                                        checked={isGraphView}
+                                        labels={['Graph View', 'Matrix View']}
+                                    />
+                                    <Hint
+                                        text={"Change the view of GNN model"}
                                     />
                                 </div>
                             </div>
