@@ -8,7 +8,7 @@ import {
   featureVisualizer,
   softmax,
 } from "../utils/utils";
-import { IntmData } from "./FileUpload";
+import { IntmData } from "../types";
 import { visualizeGraph } from "./WebUtils";
 import { aggregationCalculator } from "@/utils/graphUtils";
 import { sources } from "next/dist/compiled/webpack/webpack";

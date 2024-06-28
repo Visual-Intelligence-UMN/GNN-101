@@ -272,14 +272,16 @@ export function translateLayers(layerID: number, gap: number) {
 export function calculatePrevFeatureVisPos(
     featureVisTable: any,
     layerID: number,
-    node: number
+    node: number,
+    featureChannels: number,
+    oFeatureChannels: number
 ) {
     let coord = get_coordination(featureVisTable[layerID][node]);
     //minor position adjustment
     if (layerID == 0) {
-        coord[0] += 35;
+        coord[0] += oFeatureChannels*5;
     } else {
-        coord[0] += (64*2.5);
+        coord[0] += (featureChannels*2.5);
     }
     coord[1] += 10;
     console.log("coord", coord);

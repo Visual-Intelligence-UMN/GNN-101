@@ -1,41 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>GNN Graph Classification</title>
+        <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+        <script>
+            let session;
 
-<head>
-    <meta charset="UTF-8">
-    <title>GNN Graph Classification</title>
-    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
-    <script type="module" src="app.js"></script>
-    <style>
-        #my_dataviz {
-            display: flex;
-            flex-direction: column;
-            align-items: start;
-            width: 100%;
-<<<<<<< HEAD
-            height: auto; /* change this to auto so the height adjusts to fit the content */
-=======
-            display: flex;
-            flex-direction: column;
-            align-items: start;
-            height:auto;
->>>>>>> web-development
-            overflow: auto; /* this enables scrollbars if content overflows */
-        }
-    </style>
-</head>
+            async function loadModel() {
+                // await session.loadModel("gnn_model.onnx");
+                session = await ort.InferenceSession.create(
+                    "./python_gnn_models/gnn_node_model.onnx"
+                );
+                console.log("Model loaded successfully");
+            }
 
-<body>
-    <h1>GNN Graph Classification with ONNX.js</h1>
-    <input type="file" id="graphInput" accept=".json">
-    <button onclick="classifyGraph()">Classify Graph</button>
-    <a href="./test.html">Testing Page</a>
-    <h2>Result</h2>
-    <div id="result"></div>
-    <script type="module" src="vis.js"></script>
-    <h2>Visualization</h2>
-    <div id="my_dataviz"></div>
-    
-</body>
+            /**
+             * Compute softmax probabilities for an array of logits.
+             * @param {number[]} logits - The input logits for a single example.
+             * @returns {number[]} - The softmax probabilities.
+             */
+            function softmax(logits) {
+                // Find the maximum logit to improve numerical stability.
+                const maxLogit = Math.max(...logits);
 
+                // Compute the exponential of each logit, adjusted by the max logit for numerical stability.
+                const expLogits = logits.map((logit) =>
+                    Math.exp(logit - maxLogit)
+                );
+
+                // Compute the sum of the exponentials.
+                const sumExpLogits = expLogits.reduce(
+                    (acc, val) => acc + val,
+                    0
+                );
+
+                // Divide each exponential by the sum of exponentials to get the probabilities.
+                const probabilities = expLogits.map(
+                    (expLogit) => expLogit / sumExpLogits
+                );
+
+                return probabilities;
+            }
+
+            window.onload = loadModel;
+
+            function classifyGraph() {
+                console.log("start classifying....a");
+                const inputElement = document.getElementById("graphInput");
+                if (inputElement.files.length > 0) {
+                    const file = inputElement.files[0];
+                    // Assuming the user's input is a JSON file representing the graph
+                    // You will need to convert this to the appropriate tensor format
+                    const reader = new FileReader();
+                    reader.onload = async function (e) {
+                        await loadModel();
+                        const graphData = JSON.parse(e.target.result);
+                        // Convert `graphData` to tensor-like object expected by your ONNX model
+                        let xTensor = new ort.Tensor(
+                            "float32",
+                            new Float32Array(graphData["x"].flat()),
+                            [graphData.x.length, graphData.x[0].length]
+                        ); // flat for converting, and then adjust as needed
+                        let int32Array = new Int32Array(
+                            graphData["edge_index"].flat()
+                        );
+                        let bigInt64Array = new BigInt64Array(
+                            int32Array.length
+                        );
+                        for (let i = 0; i < int32Array.length; i++) {
+                            bigInt64Array[i] = BigInt(int32Array[i]);
+                        }
+                        let edgeIndexTensor = new ort.Tensor(
+                            "int64",
+                            bigInt64Array,
+                            [
+                                graphData.edge_index.length,
+                                graphData.edge_index[0].length,
+                            ]
+                        );
+
+                        const outputMap = await session.run({
+                            x: xTensor,
+                            edge_index: edgeIndexTensor,
+                        });
+                        console.log(outputMap);
+                        const outputTensor = outputMap.final;
+
+                        //conv1 data
+                        console.log("Conv1");
+                        console.log(outputMap.conv1.cpuData);
+
+                        //conv2 data
+                        console.log("Conv2");
+                        console.log(outputMap.conv2.cpuData);
+
+                        //conv3 data
+                        console.log("Conv3");
+                        console.log(outputMap.conv3.cpuData);
+
+                        //final data
+                        console.log("Final");
+                        console.log(outputMap.final.cpuData);
+
+                        //the final output of gcn model data
+                        console.log("Final");
+                        console.log(outputTensor);
+                        console.log(outputTensor.cpuData);
+
+                        const probabilities = softmax(outputMap.final.cpuData);
+                        const resultContainer = document.getElementById("result");
+
+                        // 清空结果容器
+                        resultContainer.innerText = "";
+
+                        probabilities.forEach((prob, index) => {
+                            const resultDiv = document.createElement("div");
+                            resultDiv.innerText = `Class ${index + 1}: ${prob.toFixed(4)}`;
+                            resultContainer.appendChild(resultDiv);
+                        });
+                    };
+                    reader.readAsText(file);
+                } else {
+                    console.error("Please upload a file first");
+                }
+            }
+        </script>
+        <style>
+            #my_dataviz {
+                display: flex;
+                flex-direction: column;
+                align-items: start;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: start;
+                height: auto;
+                overflow: auto; /* this enables scrollbars if content overflows */
+            }
+        </style>
+    </head>
+
+    <body>
+        <h1>GNN Graph Classification with ONNX.js</h1>
+        <input type="file" id="graphInput" accept=".json" />
+        <button onclick="classifyGraph()">Classify Graph</button>
+        <a href="./test.html">Testing Page</a>
+        <h2>Result</h2>
+        <div id="result"></div>
+    </body>
 </html>

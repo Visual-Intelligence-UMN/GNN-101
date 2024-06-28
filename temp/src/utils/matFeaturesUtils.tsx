@@ -1,8 +1,6 @@
 import {
     chunkArray,
     deepClone,
-    drawPoints,
-    generateRandomArray,
     preprocessFloat32ArrayToNumber,
     softmax,
     transposeMat,
@@ -10,8 +8,6 @@ import {
 import { addLayerName, buildBinaryLegend, buildLegend } from "./matHelperUtils";
 import * as d3 from "d3";
 import { roundToTwo } from "@/pages/WebUtils";
-import { create, all, matrix } from "mathjs";
-import { start } from "repl";
 
 //draw cross connections between feature visualizers
 export function drawCrossConnection(
@@ -191,7 +187,8 @@ export function drawNodeFeatures(
     features: any,
     frames: any,
     schemeLocations: any,
-    featureVisTable: any
+    featureVisTable: any,
+    featureChannels:number
 ) {
     //initial visualizer
     for (let i = 0; i < locations.length; i++) {
@@ -199,7 +196,7 @@ export function drawNodeFeatures(
         locations[i][1] += 2;
     }
     //draw cross connections for features layer and first GCNConv layer
-    drawCrossConnection(graph, locations, 7 * 10, 102, 0);
+    drawCrossConnection(graph, locations, featureChannels * 10, 102, 0);
 
     //using locations to find the positions for first feature visualizers
     const firstLayer = d3.select(".mats").append("g").attr("id", "layerNum_0");
@@ -212,7 +209,7 @@ export function drawNodeFeatures(
             .attr("node", i)
             .attr("layerID", 0);
 
-        for (let j = 0; j < 7; j++) {
+        for (let j = 0; j < featureChannels; j++) {
             const fVis = g
                 .append("rect")
                 .attr("x", locations[i][0] + rectW * j)
@@ -229,7 +226,7 @@ export function drawNodeFeatures(
             .append("rect")
             .attr("x", locations[i][0])
             .attr("y", locations[i][1])
-            .attr("width", rectW * 7)
+            .attr("width", rectW * featureChannels)
             .attr("height", rectH)
             .attr("fill", "none")
             .attr("opacity", 0)
@@ -277,7 +274,8 @@ export function drawGCNConv(
     outputVis: any,
     final: any,
     firstLayer: any,
-    maxVals: any
+    maxVals: any,
+    featureChannels: number
 ) {
     let path1:any = null;
     let fr1:any = null;
@@ -290,7 +288,6 @@ export function drawGCNConv(
     let resultVis = null;
     const gcnFeatures = [conv1, conv2, conv3];
     //a table to save all rects in the last GCNConv layer
-    const featureChannels = 64;
     let thirdGCN: any = Array.from({ length: featureChannels }, () => []);
     console.log("thirdGCN", thirdGCN);
     console.log("gcnf", gcnFeatures);
@@ -305,7 +302,7 @@ export function drawGCNConv(
             .attr("id", `layerNum_${k + 1}`);
         for (let i = 0; i < locations.length; i++) {
             if (k != 0) {
-                locations[i][0] += rectW * 64 + 100;
+                locations[i][0] += rectW * featureChannels + 100;
             } else {
                 locations[i][0] += 7 * rectW + 100 + 25;
             }
@@ -335,7 +332,8 @@ export function drawGCNConv(
             //loop through each node
             let nodeMat = gcnFeature[i];
             console.log("nodeMat", i, nodeMat);
-            for (let m = 0; m < nodeMat.length; m++) {
+            //where we met encounter issue
+            for (let m = 0; m < featureChannels; m++) {
                 const rect = g
                     .append("rect")
                     .attr("x", locations[i][0] + rectW * m)
@@ -347,7 +345,7 @@ export function drawGCNConv(
                     .attr("stroke", "gray")
                     .attr("stroke-width", 0.1);
                 //if it's the last layer, store rect into thirdGCN
-                if (k == 2) {
+                if (k == 2 && m<featureChannels) {
                     thirdGCN[m].push(rect.node());
                 }
             }
@@ -356,7 +354,7 @@ export function drawGCNConv(
                 .append("rect")
                 .attr("x", locations[i][0])
                 .attr("y", locations[i][1])
-                .attr("width", rectW * 64)
+                .attr("width", rectW * featureChannels)
                 .attr("height", rectH)
                 .attr("fill", "none")
                 .attr("opacity", 0)
@@ -382,7 +380,7 @@ export function drawGCNConv(
             paths = drawCrossConnection(
                 graph,
                 locations,
-                62 * rectW,
+                (featureChannels-2) * rectW,
                 102,
                 k + 1
             );
@@ -396,7 +394,8 @@ export function drawGCNConv(
                 frames,
                 colorSchemesTable,
                 thirdGCN,
-                conv3
+                conv3,
+                featureChannels
             );
             one = poolingPack["one"];
             poolingVis = poolingPack["g"];
@@ -405,7 +404,7 @@ export function drawGCNConv(
             console.log("ONE", one);
             schemeLocations.push([one[0][0], 350]);
             //visualize last layer and softmax output
-            const tlPack = drawTwoLayers(one, final, myColor);
+            const tlPack = drawTwoLayers(one, final, myColor, featureChannels);
             let aOne = tlPack["locations"];
             outputVis = tlPack["g"];
             resultVis = tlPack["g1"];
@@ -524,7 +523,8 @@ export function drawPoolingVis(
     frames: any,
     colorSchemesTable: any,
     thirdGCN: any,
-    conv3: any
+    conv3: any,
+    featureChannels: number
 ) {
     console.log("thirdGCN from pooling vis", thirdGCN);
 
@@ -534,8 +534,8 @@ export function drawPoolingVis(
     const rectW = 5;
     let oLocations = deepClone(locations);
     //find edge points
-    locations[0][0] += 64 * rectW;
-    locations[locations.length - 1][0] += 64 * rectW;
+    locations[0][0] += featureChannels * rectW;
+    locations[locations.length - 1][0] += featureChannels * rectW;
     locations[locations.length - 1][1] += rectH;
     //find mid point
     const midY =
@@ -562,7 +562,7 @@ export function drawPoolingVis(
 
     //drawPoints(".mats", "red", [[displayX, displayY]]);
     let poolingRects = [];
-    for (let i = 0; i < pooling.length; i++) {
+    for (let i = 0; i < featureChannels; i++) {
         const rect = g
             .append("rect")
             .attr("x", locations[0][0] + 102 + rectW * i)
@@ -655,7 +655,7 @@ export function drawPoolingVis(
 
                 //dummy data
                 console.log("fetch pooling conv3", conv3);
-                const matConv3: any = chunkArray(conv3, 64);
+                const matConv3: any = chunkArray(conv3, featureChannels);
                 console.log("fetch 1", matConv3);
                 const aMat = preprocessFloat32ArrayToNumber(matConv3);
                 console.log("fetch 2", aMat);
@@ -820,7 +820,7 @@ export function drawPoolingVis(
 
     //do some transformations on the original locations
     for (let i = 0; i < oLocations.length; i++) {
-        oLocations[i][0] += rectW * 64;
+        oLocations[i][0] += rectW * featureChannels;
         oLocations[i][1] += rectH / 2;
     }
     //drawPoints(".mats", "red", oLocations);
@@ -846,7 +846,7 @@ export function drawPoolingVis(
         .append("rect")
         .attr("x", locations[0][0] + 102)
         .attr("y", midY - 5)
-        .attr("width", rectW * 64)
+        .attr("width", rectW * featureChannels)
         .attr("height", rectH)
         .attr("fill", "none")
         .attr("opacity", 0)
@@ -893,11 +893,11 @@ export function drawPoolingVis(
 }
 
 //the function to draw the last two layers of the model
-export function drawTwoLayers(one: any, final: any, myColor: any) {
+export function drawTwoLayers(one: any, final: any, myColor: any, featureChannels: number) {
     const rectH = 15;
     const rectW = 5;
     //find the next position
-    one[0][0] += 64 * rectW + 102;
+    one[0][0] += featureChannels * rectW + 102;
     let aOne = deepClone(one);
     one[0][1] -= rectH / 2;
     //drawPoints(".mats", "red", one);

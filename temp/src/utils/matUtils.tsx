@@ -13,13 +13,12 @@ import {
     oFeatureMouseOut,
     oFeatureMouseOver,
     outputVisClick,
-    poolingVisClick,
     resultRectMouseover,
     resultRectMouseout
 } from "./matEventsUtils";
 
 //features visualization pipeline: draw all feature visualizers for original features and GCNConv
-export function visualizeFeatures(
+export function visualizeGraphClassifierFeatures(
     locations: any,
     features: any,
     myColor: any,
@@ -30,12 +29,9 @@ export function visualizeFeatures(
     final: any,
     graph: any,
     adjList: any,
-    maxVals: any,
-    detailView: any
+    maxVals: any
 ) {
     //--------------------------------DATA PREP MANAGEMENT--------------------------------
-    const translateGap = 102 * 3 + 5 * 64 * 2;
-    const translateGap1 = 102 * 3 + 5 * 7 + 64 * 5;
     let intervalID: any = null; // to manage animation controls
 
     let poolingVis = null; //to manage pooling visualizer
@@ -69,7 +65,6 @@ export function visualizeFeatures(
         GCNConv3: [],
     };
     var schemeLocations: any = [];
-    console.log("state", detailView);
     console.log("Received", maxVals);
     console.log("adjList", adjList);
 
@@ -86,7 +81,8 @@ export function visualizeFeatures(
         features,
         frames,
         schemeLocations,
-        featureVisTable
+        featureVisTable,
+        7
     );
     //updated variables
     locations = firstLayerPackage.locations;
@@ -96,6 +92,8 @@ export function visualizeFeatures(
     const firstLayer = firstLayerPackage.firstLayer;
 
     //-----------------------------------GCNConv LAYERS-----------------------------------------------
+    const featureChannels = 64;
+
     const GCNConvPackage = drawGCNConv(
         conv1,
         conv2,
@@ -112,7 +110,8 @@ export function visualizeFeatures(
         outputVis,
         final,
         firstLayer,
-        maxVals
+        maxVals,
+        featureChannels
     );
     locations = GCNConvPackage.locations;
     frames = GCNConvPackage.frames;
@@ -174,7 +173,8 @@ export function visualizeFeatures(
                 poolingOutEvent,
                 poolingOverEvent,
                 poolingVis,
-                colorSchemesTable
+                colorSchemesTable,
+                featureChannels
             );
             //update variables
             dview = recoverPackage.dview;
@@ -232,7 +232,8 @@ export function visualizeFeatures(
                 myColor,
                 weights,
                 lock,
-                setIntervalID
+                setIntervalID,
+                featureChannels
             );
             // update variables
             recordLayerID = featureVisPack.recordLayerID;
@@ -257,7 +258,8 @@ export function visualizeFeatures(
                 frames,
                 adjList,
                 matFrames,
-                colFrames
+                colFrames,
+                featureChannels
             );
             paths = featureOverPack.paths;
             frames = featureOverPack.frames;
@@ -284,38 +286,6 @@ export function visualizeFeatures(
             colFrames = featureOverPack.colFrames;
         }
     });
-
-    //pooling visualizer click interaction
-    // if (poolingVis != null) {
-    //     poolingVis.on("click", function (event: any, d: any) {
-    //         transState = "pooling";
-    //         poolingOverEvent = poolingVis.on("mouseover");
-    //         poolingOutEvent = poolingVis.on("mouseout");
-    //         poolingVis.on("mouseover", null);
-    //         poolingVis.on("mouseout", null);
-    //         console.log("f3 1", frames["GCNConv3"][3]);
-    //         frames["GCNConv3"][3].style.opacity = "1";
-    //         console.log("f3 2", frames["GCNConv3"][3]);
-    //         if (lock != true) {
-    //             //d3.select(this).style("pointer-events", "none");
-    //             //state
-    //             lock = true;
-    //             event.stopPropagation();
-    //             dview = true;
-    //             console.log("click! - fVis", dview, lock);
-    //             //click event
-    //             const poolingVisPack = poolingVisClick(
-    //                 colorSchemesTable,
-    //                 adjList,
-    //                 featureVisTable
-    //             );
-    //             //update variables
-    //             colorSchemesTable = poolingVisPack.colorSchemesTable;
-    //             featureVisTable = poolingVisPack.featureVisTable;
-    //         }
-    //     });
-    // }
-
     //model output visualizer click interaction
     if (outputVis != null) {
         d3.selectAll(".resultRect")
@@ -345,7 +315,8 @@ export function visualizeFeatures(
                         colorSchemesTable,
                         one,
                         final,
-                        myColor
+                        myColor,
+                        featureChannels
                     );
                     //update variables
                     resultVis = outputVisPack.resultVis;

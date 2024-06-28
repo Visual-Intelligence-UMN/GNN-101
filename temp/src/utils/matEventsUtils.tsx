@@ -7,7 +7,6 @@ import {
 import { computeMids } from "./matFeaturesUtils";
 import * as d3 from "d3";
 import { create, all } from "mathjs";
-import { start } from "repl";
 import { roundToTwo } from "@/pages/WebUtils";
 import { drawAniPath } from "./matAnimateUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
@@ -87,8 +86,10 @@ export function detailedViewRecovery(
     poolingOutEvent: any,
     poolingOverEvent: any,
     poolingVis: any,
-    colorSchemesTable: any
+    colorSchemesTable: any,
+    featureChannels: number
 ) {
+
     console.log("click!", dview, lock);
 
     //remove calculation process visualizer
@@ -109,7 +110,7 @@ export function detailedViewRecovery(
     //recover layers positions
     if (transState == "GCNConv") {
         if (recordLayerID >= 0) {
-            translateLayers(recordLayerID, -(102 * 3 + 5 * 64 * 2));
+            translateLayers(recordLayerID, -(102 * 3 + 5 * featureChannels * 2));
             recordLayerID = -1;
         }
     } else if (transState == "pooling") {
@@ -184,7 +185,8 @@ export function featureVisMouseOver(
     frames: any,
     adjList: any,
     matFrames: any,
-    colFrames: any
+    colFrames: any,
+    featureChannels: number
 ) {
     console.log("Current layerID and node", layerID, node);
     if (paths != null) {
@@ -316,7 +318,8 @@ export function featureVisClick(
     myColor: any,
     weights: any,
     lock: boolean,
-    setIntervalID: (id: any) => void
+    setIntervalID: (id: any) => void,
+    featureChannels: number
 ) {
 
     let biasCoord: [number, number];
@@ -331,7 +334,7 @@ export function featureVisClick(
     const rectW7 = 10;
     console.log("Current layerID and node", layerID, node);
     setTimeout(() => {
-        translateLayers(layerID, 102 * 3 + 5 * 64 * 2);
+        translateLayers(layerID, 102 * 3 + 5 * featureChannels * 2);
     }, 1750);
     //record the layerID
     recordLayerID = layerID;
@@ -361,14 +364,14 @@ export function featureVisClick(
         featureVisTable[layerID][cur].style.opacity = "1";
 
         //find position and save it
-        let c = calculatePrevFeatureVisPos(featureVisTable, layerID, cur);
+        let c = calculatePrevFeatureVisPos(featureVisTable, layerID, cur, featureChannels, 7);
         posList.push(c);
     }
     let curNode = featureVisTable[layerID + 1][node];
     curNode.style.opacity = "1"; //display current node
 
     //calculation process visualizer
-    let coord = calculatePrevFeatureVisPos(featureVisTable, layerID, node);
+    let coord = calculatePrevFeatureVisPos(featureVisTable, layerID, node, featureChannels, 7);
     console.log("coord", coord);
 
     //find position for intermediate feature vis
@@ -405,7 +408,7 @@ export function featureVisClick(
 
     const g = d3.select(".mats").append("g").attr("class", "procVis");
     let w = 5;
-    if (X.length < 64) {
+    if (X.length < featureChannels) {
         w = 10;
         console.log("compute x 0");
     } else w = 5;
@@ -480,7 +483,7 @@ export function featureVisClick(
                 .attr("opacity", 0);
         }
 
-        coordFeatureVis[0] += 102 + rectW * 64;
+        coordFeatureVis[0] += 102 + rectW * featureChannels;
         btnPos = [coordFeatureVis[0], coordFeatureVis[1] - 50];
 
         // weight matrix * vector visualzier
@@ -520,7 +523,7 @@ export function featureVisClick(
         coordFeatureVis[1] += curveDir * 50;
 
         // bias visualzier
-        for (let m = 0; m < layerBias.length; m++) {
+        for (let m = 0; m < featureChannels; m++) {
             g.append("rect")
                 .attr("x", coordFeatureVis[0] + rectW * m)
                 .attr("y", coordFeatureVis[1] - rectH / 2)
@@ -537,7 +540,7 @@ export function featureVisClick(
         g.append("rect")
             .attr("x", coordFeatureVis[0])
             .attr("y", coordFeatureVis[1] - rectH / 2)
-            .attr("width", rectW * layerBias.length)
+            .attr("width", rectW * featureChannels)
             .attr("height", rectH)
             .attr("fill", "none")
             .attr("opacity", 0)
@@ -547,19 +550,19 @@ export function featureVisClick(
 
         //draw paths from WMVisualizer and Bias Visualizer to final output
         const wmCoord: [number, number] = [
-            coordFeatureVis[0] + rectW * 64,
+            coordFeatureVis[0] + rectW * featureChannels,
             coordFeatureVis[1] - curveDir * 50,
         ];
 
         biasCoord = [
-            coordFeatureVis[0] + rectW * 64,
+            coordFeatureVis[0] + rectW * featureChannels,
             coordFeatureVis[1],
         ];
 
-        let c = calculatePrevFeatureVisPos(featureVisTable, layerID, node);
+        let c = calculatePrevFeatureVisPos(featureVisTable, layerID, node, featureChannels, 7);
 
         nextCoord = [
-            c[0] + 102 * 3 + 5 * 64 * 2 + 102,
+            c[0] + 102 * 3 + 5 * featureChannels * 2 + 102,
             c[1],
         ];
 
@@ -612,16 +615,16 @@ export function featureVisClick(
 
         //find start locations and end locations
         const coordStartPoint: [number, number] = [
-            wmCoord[0] - rectW * 64 * 2 - 102,
+            wmCoord[0] - rectW * featureChannels * 2 - 102,
             wmCoord[1] - (rectH / 2) * curveDir,
         ];
         const coordFinalPoint: [number, number] = [
-            wmCoord[0] - rectW * 64,
+            wmCoord[0] - rectW * featureChannels,
             wmCoord[1] - (rectH / 2) * curveDir,
         ];
 
         //draw paths
-        for (let i = 0; i < 64; i++) {
+        for (let i = 0; i < featureChannels; i++) {
             let s: [number, number] = [
                 coordStartPoint[0] + w * i + w / 2,
                 coordStartPoint[1],
@@ -643,7 +646,7 @@ export function featureVisClick(
         intervalID = setInterval(() => {
             d3.selectAll("#tempath").remove();
             const Xv = Xt[currentStep];
-            for (let j = 0; j < 64; j++) {
+            for (let j = 0; j < featureChannels; j++) {
                 const s1 = startCoordList[j];
                 const e1 = endCoordList[currentStep];
                 let pathDir = e1[0] > s1[0] ? 0 : 1;
@@ -682,7 +685,7 @@ export function featureVisClick(
             currentStep++;
             console.log("currentStep", currentStep);
 
-            if(currentStep >= 64){
+            if(currentStep >= featureChannels){
                 d3.select(".mats")
                     .append("path")
                     .attr("d", lineGenerator([biasCoord, res10, res11, nextCoord]))
@@ -695,7 +698,7 @@ export function featureVisClick(
                 d3.selectAll(".biasPath").transition().duration(1000).attr("opacity", 1);
             }
 
-            if (currentStep >= 64 || !lock) {
+            if (currentStep >= featureChannels || !lock) {
                 injectPlayButtonSVG(
                     btn,
                     btnX,
@@ -740,7 +743,7 @@ export function featureVisClick(
             clearInterval(intervalID);
         }
 
-        if (!isPlaying || currentStep >= 64 || currentStep == 0) {
+        if (!isPlaying || currentStep >= featureChannels || currentStep == 0) {
             //   d3.select("text#btn").text("Pause");
             btn.selectAll("*").remove();
             injectPlayButtonSVG(
@@ -749,7 +752,7 @@ export function featureVisClick(
                 btnY - 30,
                 "./assets/SVGs/playBtn_pause.svg"
             );
-            if (currentStep >= 64) {
+            if (currentStep >= featureChannels) {
                 currentStep = 0; // 重置步骤
             }
             const Xt = math.transpose(weights[layerID]);
@@ -765,7 +768,7 @@ export function featureVisClick(
                 );
                 currentStep++;
                 console.log("i", currentStep);
-                if(currentStep>=64){
+                if(currentStep>=featureChannels){
                     const lineGenerator = d3
                         .line<[number, number]>()
                         .curve(d3.curveBasis)
@@ -782,7 +785,7 @@ export function featureVisClick(
                         .lower();
                     d3.selectAll(".biasPath").transition().duration(1000).attr("opacity", 1);
                 }
-                if (currentStep >= 64 || !lock) {
+                if (currentStep >= featureChannels || !lock) {
                     injectPlayButtonSVG(
                         btn,
                         btnX,
@@ -817,51 +820,14 @@ export function featureVisClick(
     };
 }
 
-export function poolingVisClick(
-    colorSchemesTable: any,
-    adjList: any,
-    featureVisTable: any
-) {
-    //lock all feature visualizers and transparent paths
-    d3.selectAll("[class='frame'][layerID='3']").style("opacity", 1);
-    d3.select(".pooling").style("pointer-events", "none");
-    d3.selectAll(".twoLayer")
-        .style("pointer-events", "none")
-        .style("opacity", 0.2);
-    d3.selectAll("path").style("opacity", 0);
-    //transparent other feature visualizers
-    d3.selectAll(".featureVis").style("opacity", 0.2);
-    d3.selectAll(".oFeature").style("opacity", 0.2);
-    //translate each layer
-    const layerID = 3;
-
-    setTimeout(() => {
-        translateLayers(layerID, 300);
-    }, 1750);
-    d3.select(".poolingFrame").style("opacity", 1);
-    //transparent other color schemes
-    for (let i = 0; i < 3; i++) colorSchemesTable[i].style.opacity = "0.2";
-    //display the features we want to display
-    //display the frame we want to display
-    console.log("FST click", frames);
-    for (let i = 0; i < adjList.length; i++) {
-        featureVisTable[3][i].style.opacity = "1";
-    }
-
-    return {
-        colorSchemesTable: colorSchemesTable,
-        featureVisTable: featureVisTable,
-    };
-}
-
 export function outputVisClick(
     resultVis: any,
     colorSchemesTable: any,
     one: any,
     result: any,
-    myColor: any
+    myColor: any,
+    featureChannels: number
 ) {
-
     const curve = d3.line().curve(d3.curveBasis);
     let biasCoord:any;
     let controlPts:any;
@@ -877,9 +843,9 @@ export function outputVisClick(
 
     let coordForStart = deepClone(poolingPt);
     coordForStart[0][1] += 15;
-    coordForStart[0][0] -= 64 * 2.5;
+    coordForStart[0][0] -= featureChannels * 2.5;
 
-    poolingPt[0][0] += 64;
+    poolingPt[0][0] += featureChannels;
     const modelParams = loadWeights();
 
     poolingPt[0][1] += 10;
@@ -907,7 +873,7 @@ export function outputVisClick(
     let aOne = deepClone(one);
     //locations for paths' starting points
     let startCoord = [];
-    for (let i = 0; i < 64; i++) {
+    for (let i = 0; i < featureChannels; i++) {
         let c = [
             coordForStart[0][0] + i * 5 + rectW / 2,
             coordForStart[0][1] - rectH + 2,
@@ -1334,7 +1300,7 @@ export function outputVisClick(
                 d3.selectAll("#tempath").remove();
                 const Xt = modelParams.weights[3];
                 const Xv = Xt[currentStep];
-                for (let j = 0; j < 64; j++) {
+                for (let j = 0; j < featureChannels; j++) {
                     const s1 = startCoord[j];
                     const e1 = endCoord[currentStep];
                     let pathDir = e1[0] > s1[0] ? 1 : 0;
