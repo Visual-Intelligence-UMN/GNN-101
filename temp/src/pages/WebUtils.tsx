@@ -77,34 +77,34 @@ export const GraphAnalysisViewer: React.FC<GraphAnalysisViewerProps> = ({
     const graphStat = data ?
         <div className="flex flex-row flex-wrap items-center text-lg font-thin">
             {/* <div className="mr-4">
-                <text>Graph Information</text>{" "}
+                <span>Graph Information</span>{" "}
             </div> */}
             <div className="mr-4">
-                <text>Node Count</text>:{" "}
+                <span>Node Count</span>:{" "}
                 {data.node_count}
             </div>
             <div className="mr-4">
-                <text>Edge Count</text>:{" "}
+                <span>Edge Count</span>:{" "}
                 {data.is_directed ? data.edge_count : data.edge_count / 2}
             </div>
             <div className="mr-4">
-                <text >
+                <span>
                     Average Node Degree
-                </text>
+                </span>
                 : {roundToTwo(data.avg_node_degree / 2)}
             </div>
             <div className="mr-4">
-                <text >
+                <span>
                     Has Isolated Node
-                </text>
+                </span>
                 : {data.has_isolated_node ? "Yes" : "No"}
             </div>
             <div className="mr-4">
-                <text>Has Loop</text>:{" "}
+                <span>Has Loop</span>:{" "}
                 {data.has_loop ? "Yes" : "No"}
             </div>
             {/* <div className="mr-4">
-                <text>Is Directed</text>:{" "}
+                <span>Is Directed</span>:{" "}
                 {data.is_directed ? "Yes" : "No"}
             </div> */}
         </div>
