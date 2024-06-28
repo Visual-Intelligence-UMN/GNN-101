@@ -6,10 +6,11 @@ import ClassifyGraph, { IntmData } from "./FileUpload";
 import { CSSTransition } from 'react-transition-group';
 import MatricesVisualizer from "./MatricesVisualizer";
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels";
+import {graphList, modelList} from "./const";
+
 import {
     Sidebar,
-    GraphSelector,
-    graph_list_generate,
+    Selector,
     ViewSelector,
     Hint,
     ButtonChain,
@@ -39,13 +40,14 @@ export const inter3 = Inter({
 })
 
 export default function Home() {
-    const [graphData, setGraphData] = useState<any>(null);
-    const [selectedGraph, setSelectedGraph] =
-        useState<string>("./input_graph.json");
+
+   
+    const [model, setModel] = useState('graph classification');
+    const [selectedGraph, setSelectedGraph] = useState("graph_2");
     const inputRef = useRef<HTMLInputElement>(null);
     const [outputData, setOutputData] = useState(null);
-    const [path, setPath] = useState("./json_data/input_graph0.json");
-    const [isMat, setIsMat] = useState(true);
+
+    const [isGraphView, setIsGraphView] = useState(true);
     const [changedG, setChangedG] = useState(true);
     const [step, setStep] = useState(1);
     const [show, setShow] = useState(false);
@@ -54,7 +56,7 @@ export default function Home() {
     const [intmData, setIntmData] = useState<IntmData | null>(null);
     const [selectedButtons, setSelectedButtons] = useState([false, false, false, false, false, false, false]);
 
-    const graphList = graph_list_generate(3);
+   
 
     function handlePrediction(data: boolean) {
         setPredicted(data);
@@ -72,7 +74,6 @@ export default function Home() {
     }
     function handleGraphSelection(e: React.ChangeEvent<HTMLSelectElement>): void {
         setSelectedGraph(e.target.value);
-        setPath(e.target.value);
         setChangedG(true);
         setPredicted(false); 
     }
@@ -92,6 +93,9 @@ export default function Home() {
     }, []);
     return (
         <main className={inter.className}>
+            <Head>
+                <title>Graph Neural Network Visualization</title>
+            </Head>
             <div className={inter2.className}>
                 {step === 0 &&
                     <div style={{ paddingTop: '15%' }} className="bg-white min-h-screen flex justify-center items-center">
@@ -129,14 +133,12 @@ export default function Home() {
 
 
                         <Panel className="ml-4">
-                            <Head>
-                                <title>Graph Neural Network Visualization</title>
-                            </Head>
+                            
                             <div className="flex gap-x-2 items-center" style={{ paddingTop: '40px' }}>
                                 <h1 className="text-2xl font-extra-black">
-                                    GNN Model
+                                    GNN Model: 
                                 </h1>
-                                <div className={inter2.className}>
+                                {/* <div className={inter2.className}>
                                     <p className="transform translate-y-[3px] text-xl ml-10" style={{ fontWeight: 0 }}>
                                         A binary graph classification model
                                     </p>
@@ -152,7 +154,14 @@ export default function Home() {
                                         <Tooltip data-tooltip-id='tooltip' />
                                     </button>
                                     
-                                </div>
+                                </div> */}
+                                <Selector
+                                    selectedOption={model}
+                                    handleChange={(e) => {
+                                        setModel(e.target.value);
+                                    }}
+                                    OptionList={Object.keys(modelList)}
+                                />
                             </div>
                             <CSSTransition in={show}
                                         timeout={300}
@@ -164,26 +173,26 @@ export default function Home() {
                             <ButtonChain selectedButtons={selectedButtons} setSelectedButtons={setSelectedButtons} predicted={predicted}/>
                             <div className="flex gap-x-4 items-center mb-3  ">
                                 <div>
-                                    <h2 className="text-xl font-semibold">Data</h2>
+                                    <h1 className="text-2xl font-semibold">Input Graph</h1>
                                 </div>
                                 <div className="flex items-center gap-x-4 ">
                                     <Hint text={"Select a graph"} />
                                     <div className={inter3.className}>
-                                        <GraphSelector
-                                            selectedGraph={selectedGraph}
+                                        <Selector
+                                            selectedOption={selectedGraph}
                                             handleChange={handleGraphSelection}
-                                            graphList={graphList}
+                                            OptionList={Object.keys(graphList)}
                                         />
                                     </div>
 
                                 </div>
                             </div>
 
-                            <GraphAnalysisViewer path={path} />
-
+                            <GraphAnalysisViewer path={graphList[selectedGraph]} />
 
                             <ClassifyGraph
-                                graph_path={path}
+                                graphPath={graphList[selectedGraph]}
+                                modelPath = {modelList[model]}
                                 dataComm={handleDataComm}
                                 changedComm={handleChangedComm}
                                 changed={changedG}
@@ -191,38 +200,31 @@ export default function Home() {
                                 predicted={predicted}
 
                             />
-                            {isMat ? (
+
+                            <div className="flex gap-x-4 items-center">
+                                <div className="flex gap-x-4">
+                                    <h2 className="text-2xl font-semibold">
+                                        {isGraphView? 'Graphs View' : 'Matrices View'}
+                                    </h2>
+                                    <Hint
+                                        text={"Change the view of GNN model"}
+                                    />
+                                </div>
+                                <div>
+                                    <ViewSwitch
+                                        handleChange={() => {
+                                            setIsGraphView(!isGraphView);
+                                        }}
+                                        current={isGraphView}
+                                    />
+                                </div>
+                            </div>
+
+                            {isGraphView ? (
                                 <>
-                                    <div className="flex gap-x-4 items-center">
-                                        <div className="flex gap-x-4">
-                                            <h2 className="text-xl font-semibold">
-                                                Graphs Visualization
-                                            </h2>
-                                            <Hint
-                                                text={"Change the view of GNN model"}
-                                            />
-                                        </div>
-                                        <div>
-                                            <ViewSwitch
-                                                handleChange={(e) => {
-                                                    
-                                                    if (e === true) {
-                                                        setIsMat(true);
-                                                        console.log("mat true", isMat);
-                                                        setChangedG(true);
-                                                    } else {
-                                                        setIsMat(false);
-                                                        console.log("mat false", isMat);
-                                                        setChangedG(true);
-                                                    }
-                                                }}
-                                                current={true}
-                                            />
-                                        </div>
-                                    </div>
 
                                     <GraphVisualizer
-                                        graph_path={selectedGraph}
+                                        graph_path={graphList[selectedGraph]}
                                         intmData={intmData}
                                         changed={changedG}
                                         predicted={predicted}
@@ -231,34 +233,8 @@ export default function Home() {
                                 </>
                             ) : (
                                 <>
-                                    <div className="flex gap-x-4">
-                                        <div className="flex gap-x-4">
-                                            <h2 className="text-xl font-semibold">
-                                                Matrices Visualization
-                                            </h2>
-                                            <Hint
-                                                text={"Change the View of GNN model"}
-                                            />
-                                        </div>
-                                        <div>
-                                            <ViewSwitch
-                                                handleChange={(e) => {
-                                                    if (e === true) {
-                                                        setIsMat(true);
-                                                        console.log("mat true", isMat);
-                                                        setChangedG(true);
-                                                    } else {
-                                                        setIsMat(false);
-                                                        console.log("mat false", isMat);
-                                                        setChangedG(true);
-                                                    }
-                                                }}
-                                                current={false}
-                                            />
-                                        </div>
-                                    </div>
                                     <MatricesVisualizer
-                                        graph_path={selectedGraph}
+                                        graph_path={graphList[selectedGraph]}
                                         intmData={intmData}
                                         changed={changedG}
                                         predicted={predicted}
