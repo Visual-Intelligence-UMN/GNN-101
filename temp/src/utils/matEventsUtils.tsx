@@ -1328,23 +1328,17 @@ export function outputVisClick(
     const radius = 10;
     const btnX = startCoord[0][0];
     const btnY = startCoord[0][1] + 50;
-    btn.append("circle")
-        .attr("cx", btnX)
-        .attr("cy", btnY)
-        .attr("r", radius)
-        .attr("id", "btn")
-        .attr("stroke", "black")
-        .attr("fill", "white")
-        .attr("class", "procVis");
-
-    btn.append("text")
-        .attr("x", btnX)
-        .attr("y", btnY + 3)
-        .text("Pause")
-        .attr("id", "btn")
-        .style("text-anchor", "middle")
-        .style("font-size", "6")
-        .attr("class", "procVis");
+    d3.xml("./assets/SVGs/playBtn_pause.svg").then(function(data) {
+        console.log("xml", data.documentElement)
+        const play = btn!.node()!.appendChild(data.documentElement)
+        d3.select(play).attr("x", btnX).attr("y", btnY).attr("class", "procVis")
+        .on("mouseover", function(event){
+            d3.select(play).select("ellipse").style("fill", "rgb(218, 218, 218)");
+        })
+        .on("mouseout", function(event){
+            d3.select(play).select("ellipse").style("fill", "rgb(255, 255, 255)");
+        });
+    });
     btn.on("click", function (event: any, d: any) {
         console.log("isPlaying", isPlaying);
         event.stopPropagation();
@@ -1353,7 +1347,18 @@ export function outputVisClick(
         }
 
         if (!isPlaying || currentStep >= 2 || currentStep == 0) {
-            d3.select("text#btn").text("Pause");
+            btn.selectAll("*").remove();
+            d3.xml("./assets/SVGs/playBtn_pause.svg").then(function(data) {
+                console.log("xml", data.documentElement)
+                const play = btn!.node()!.appendChild(data.documentElement)
+                d3.select(play).attr("x", btnX).attr("y", btnY).attr("class", "procVis")
+                .on("mouseover", function(event){
+                    d3.select(play).select("ellipse").style("fill", "rgb(218, 218, 218)");
+                })
+                .on("mouseout", function(event){
+                    d3.select(play).select("ellipse").style("fill", "rgb(255, 255, 255)");
+                });
+            });
             if (currentStep >= 2) {
                 currentStep = 0; // 重置步骤
             }
@@ -1398,7 +1403,18 @@ export function outputVisClick(
                 currentStep++;
                 console.log("i", currentStep);
                 if (currentStep >= 2) {
-                    d3.select("text#btn").text("Play");
+                    btn.selectAll("*").remove();
+                    d3.xml("./assets/SVGs/playBtn_play.svg").then(function(data) {
+                        console.log("xml", data.documentElement)
+                        const play = btn!.node()!.appendChild(data.documentElement)
+                        d3.select(play).attr("x", btnX).attr("y", btnY).attr("class", "procVis")
+                        .on("mouseover", function(event){
+                            d3.select(play).select("ellipse").style("fill", "rgb(218, 218, 218)");
+                        })
+                        .on("mouseout", function(event){
+                            d3.select(play).select("ellipse").style("fill", "rgb(255, 255, 255)");
+                        });
+                    });
                     clearInterval(intervalID);
                 }
             }, 500);
@@ -1406,7 +1422,18 @@ export function outputVisClick(
             //   setIntervalID(intervalID);
             isPlaying = true;
         } else if (isPlaying) {
-            d3.select("text#btn").text("Play");
+            btn.selectAll("*").remove();
+            d3.xml("./assets/SVGs/playBtn_play.svg").then(function(data) {
+                console.log("xml", data.documentElement)
+                const play = btn!.node()!.appendChild(data.documentElement)
+                d3.select(play).attr("x", btnX).attr("y", btnY).attr("class", "procVis")
+                .on("mouseover", function(event){
+                    d3.select(play).select("ellipse").style("fill", "rgb(218, 218, 218)");
+                })
+                .on("mouseout", function(event){
+                    d3.select(play).select("ellipse").style("fill", "rgb(255, 255, 255)");
+                });
+            });
             isPlaying = false;
         }
         d3.selectAll("path").lower();
