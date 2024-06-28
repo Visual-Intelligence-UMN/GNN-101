@@ -436,7 +436,10 @@ export const Hint: React.FC<HintProps> = ({ text }) => {
 
 //-------------------------------------------------------------
 //single graph visualizer
+let initialCoordinates: {[id: string]: {x: number, y: number}} = {};
+
 export function visualizeGraph(path: string) {
+
     const init = async (data: any) => {
         let allNodes: any[] = [];
         const offset = 600;
@@ -540,7 +543,10 @@ export function visualizeGraph(path: string) {
 
                     let maxXDistance = 0;
                     let maxYDistance = 0;
+                    initialCoordinates = {};
                     data.nodes.forEach((node1: any) => {
+                        initialCoordinates[node1.id] = {x: node1.x, y: node1.y};
+
                         data.nodes.forEach((node2: any) => {
                             if (node1 !== node2) {
                                 const xDistance = Math.abs(node1.x - node2.x);
@@ -591,6 +597,7 @@ export function visualizeGraph(path: string) {
 
         }
     };
+    
 
     const visualizeG = async () => {
         try {
@@ -607,7 +614,10 @@ export function visualizeGraph(path: string) {
 
     visualizeG();
 }
-
+// Helper get function for initial coordinates
+export function getInitialCoordinates() {
+    return initialCoordinates;
+}
 //-------------------------------------------------------------
 //single matrix visualizer
 export function visualizeMatrix(path: string) {
