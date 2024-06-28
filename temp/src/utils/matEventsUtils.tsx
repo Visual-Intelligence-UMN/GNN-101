@@ -101,7 +101,7 @@ export function detailedViewRecovery(
     d3.selectAll(".frame").style("opacity", 0);
     //recover opacity of feature visualizers
     d3.selectAll(".featureVis").style("opacity", 1);
-    d3.selectAll(".oFeature").style("opacity", 1);
+    d3.selectAll(".oFeature").style("opacity", 1).style("pointer-events", "auto");
     //recover layers positions
     if (transState == "GCNConv") {
         if (recordLayerID >= 0) {

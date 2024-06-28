@@ -202,6 +202,9 @@ export function visualizeFeatures(
             dview = true;
             console.log("click! - fVis", dview, lock);
             //lock all feature visualizers and transparent paths
+            d3.selectAll(".oFeature")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
             d3.select(".pooling")
                 .style("pointer-events", "none")
                 .style("opacity", 0.2);
