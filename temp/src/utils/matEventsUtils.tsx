@@ -452,7 +452,8 @@ export function featureVisClick(
                 .attr("stroke", "black")
                 .attr("opacity", 0)
                 .attr("fill", "none")
-                .attr("class", "procVis");
+                .attr("class", "procVis")
+                .attr("id", "procPath");
 
             //draw multipliers
             let x = (coordFeatureVis[0] - posList[i][0]) / 2 + posList[i][0];
@@ -575,7 +576,7 @@ export function featureVisClick(
             .attr("stroke", "black")
             .attr("opacity", 1)
             .attr("fill", "none")
-            .attr("class", "procVis");
+            .attr("class", "procVis").attr("id", "procPath");;
 
         d3.select(".mats")
             .append("path")
@@ -583,31 +584,44 @@ export function featureVisClick(
             .attr("stroke", "black")
             .attr("opacity", 1)
             .attr("fill", "none")
-            .attr("class", "procVis");
+            .attr("class", "procVis").attr("id", "procPath");
+        
+        d3.selectAll("#procPath").lower();
 
         const svg = d3.select(".mats");
+        const relu = svg.append("g");
 
         const cx = midX1;
         const cy = (wmCoord[1] + biasCoord[1]) / 2;
         const radius = 5;
-        const cx1 = nextCoord[0] - 15;
-        const cy1 = nextCoord[1];
+        const cx1 = nextCoord[0] - 45;
+        const cy1 = nextCoord[1]-15;
 
-        svg.append("circle")
-            .attr("cx", cx1)
-            .attr("cy", cy1)
-            .attr("r", radius)
-            .attr("stroke", "black")
-            .attr("fill", "white")
-            .attr("class", "procVis");
-
-        svg.append("text")
+        d3.xml("./assets/SVGs/ReLU.svg").then(function(data) {
+            console.log("xml", data.documentElement)
+            const ReLU = relu!.node()!.appendChild(data.documentElement)
+            d3.select(ReLU)
             .attr("x", cx1)
-            .attr("y", cy1 + 3)
-            .text("f")
-            .style("text-anchor", "middle")
-            .style("font-size", "6")
-            .attr("class", "procVis");
+            .attr("y", cy1)
+            .attr("class", "procVis")
+            .raise();
+        });
+
+        // svg.append("circle")
+        //     .attr("cx", cx1)
+        //     .attr("cy", cy1)
+        //     .attr("r", radius)
+        //     .attr("stroke", "black")
+        //     .attr("fill", "white")
+        //     .attr("class", "procVis");
+
+        // svg.append("text")
+        //     .attr("x", cx1)
+        //     .attr("y", cy1 + 3)
+        //     .text("f")
+        //     .style("text-anchor", "middle")
+        //     .style("font-size", "6")
+        //     .attr("class", "procVis");
 
         //find start locations and end locations
         const coordStartPoint: [number, number] = [
@@ -679,7 +693,7 @@ export function featureVisClick(
                     .style("fill", "none")
                     .attr("stroke", myColor(Xv[j]));
             }
-            d3.selectAll("path").lower();
+            d3.selectAll("#tempath").lower();
             currentStep++;
             console.log("currentStep", currentStep);
             if (currentStep >= 64 || !lock) {
@@ -692,7 +706,7 @@ export function featureVisClick(
         }, 250); // 每2秒执行一次drawPaths
 
         setIntervalID(intervalID);
-        d3.selectAll("path").lower();
+        d3.selectAll("#tempath").lower();
         d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
     }, 2500);
 
@@ -704,23 +718,19 @@ export function featureVisClick(
     const radius = 10;
     const btnX = playBtnCoord[0];
     const btnY = playBtnCoord[1];
-    btn.append("circle")
-        .attr("cx", btnX)
-        .attr("cy", btnY)
-        .attr("r", radius)
-        .attr("id", "btn")
-        .attr("stroke", "black")
-        .attr("fill", "white")
-        .attr("class", "procVis");
 
-    btn.append("text")
-        .attr("x", btnX)
-        .attr("y", btnY + 3)
-        .text("Pause")
-        .attr("id", "btn")
-        .style("text-anchor", "middle")
-        .style("font-size", "6")
-        .attr("class", "procVis");
+    d3.xml("./assets/SVGs/playBtn_pause.svg").then(function(data) {
+        console.log("xml", data.documentElement)
+        const play = btn!.node()!.appendChild(data.documentElement)
+        d3.select(play).attr("x", btnX).attr("y", btnY - 30).attr("class", "procVis")
+        .on("mouseover", function(event){
+            d3.select(play).select("ellipse").style("fill", "rgb(218, 218, 218)");
+        })
+        .on("mouseout", function(event){
+            d3.select(play).select("ellipse").style("fill", "rgb(255, 255, 255)");
+        });
+    });
+
     btn.on("click", function (event: any, d: any) {
         console.log("isPlaying", isPlaying);
         event.stopPropagation();
@@ -729,7 +739,19 @@ export function featureVisClick(
         }
 
         if (!isPlaying || currentStep >= 64 || currentStep == 0) {
-            d3.select("text#btn").text("Pause");
+         //   d3.select("text#btn").text("Pause");
+         btn.selectAll("*").remove();
+         d3.xml("./assets/SVGs/playBtn_pause.svg").then(function(data) {
+            console.log("xml", data.documentElement)
+            const play = btn!.node()!.appendChild(data.documentElement)
+            d3.select(play).attr("x", btnX).attr("y", btnY - 30).attr("class", "procVis")
+            .on("mouseover", function(event){
+                d3.select(play).select("ellipse").style("fill", "rgb(218, 218, 218)");
+            })
+            .on("mouseout", function(event){
+                d3.select(play).select("ellipse").style("fill", "rgb(255, 255, 255)");
+            });
+        });
             if (currentStep >= 64) {
                 currentStep = 0; // 重置步骤
             }
@@ -773,7 +795,7 @@ export function featureVisClick(
                         .style("fill", "none")
                         .attr("stroke", myColor(Xv[j]));
                 }
-                d3.selectAll("path").lower();
+                d3.selectAll("#tempath").lower();
                 currentStep++;
                 console.log("i", currentStep);
                 if (currentStep >= 64 || !lock) {
@@ -785,10 +807,21 @@ export function featureVisClick(
             setIntervalID(intervalID);
             isPlaying = true;
         } else if (isPlaying) {
-            d3.select("text#btn").text("Play");
+            btn.selectAll("*").remove();
+         d3.xml("./assets/SVGs/playBtn_play.svg").then(function(data) {
+            console.log("xml", data.documentElement)
+            const play = btn!.node()!.appendChild(data.documentElement)
+            d3.select(play).attr("x", btnX).attr("y", btnY - 30).attr("class", "procVis")
+            .on("mouseover", function(event){
+                d3.select(play).select("ellipse").style("fill", "rgb(218, 218, 218)");
+            })
+            .on("mouseout", function(event){
+                d3.select(play).select("ellipse").style("fill", "rgb(255, 255, 255)");
+            });
+        });
             isPlaying = false;
         }
-        d3.selectAll("path").lower();
+        d3.selectAll("#tempath").lower();
     });
 
     return {

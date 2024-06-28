@@ -208,7 +208,7 @@ export function visualizeFeatures(
             d3.selectAll(".twoLayer")
                 .style("pointer-events", "none")
                 .style("opacity", 0.2);
-            d3.selectAll("path").style("opacity", 0);
+            d3.selectAll(".crossConnection").style("opacity", 0);
             //transparent other feature visualizers
             d3.selectAll(".featureVis").style("opacity", 0.2);
             d3.selectAll(".oFeature").style("opacity", 0.2);

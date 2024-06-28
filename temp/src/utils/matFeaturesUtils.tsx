@@ -44,7 +44,7 @@ export function drawCrossConnection(
             .attr("opacity", 0.05)
             .attr("fill", "none")
             .attr("endingNode", i)
-            .attr("layerID", layerID);
+            .attr("layerID", layerID).attr("class", "crossConnection");
     }
     //draw one-multiple paths - three
     let pts: number[][] = [];
@@ -66,7 +66,8 @@ export function drawCrossConnection(
                     .attr("opacity", 0.05)
                     .attr("fill", "none")
                     .attr("endingNode", j)
-                    .attr("layerID", layerID);
+                    .attr("layerID", layerID)
+                    .attr("class", "crossConnection");
                 pts.push(hpoint);
                 pts.push(lpoint);
                 console.log(
@@ -836,7 +837,7 @@ export function drawPoolingVis(
             .attr("d", curve([oLocations[i], lpoint, hpoint, one[0]]))
             .attr("stroke", "black")
             .attr("opacity", 0.05)
-            .attr("fill", "none");
+            .attr("fill", "none").attr("class", "crossConnection");
 
         paths.push(path.node());
     }
