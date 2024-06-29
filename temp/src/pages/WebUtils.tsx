@@ -426,7 +426,7 @@ export const Hint: React.FC<HintProps> = ({ text }) => {
         <span
             data-tooltip-content={text}
             data-tooltip-id='tooltip'
-            className='items-center justify-center my-1'
+            className='items-center justify-center flex'
         >
             <i className="fa fa-info-circle m-auto" style={{fontSize: "28px", color: '#333'}}></i>
             <Tooltip id="tooltip" />
@@ -438,7 +438,7 @@ export const Hint: React.FC<HintProps> = ({ text }) => {
 //single graph visualizer
 let initialCoordinates: {[id: string]: {x: number, y: number}} = {};
 
-export function visualizeGraph(path: string) {
+export function visualizeGraph(path: string, setLoading: Function) {
 
     const init = async (data: any) => {
         let allNodes: any[] = [];
@@ -540,7 +540,6 @@ export function visualizeGraph(path: string) {
                         .attr("y", (d: any) => d.y + 6);
                 })
                 .on("end", function ended() {
-
                     let maxXDistance = 0;
                     let maxYDistance = 0;
                     initialCoordinates = {};
@@ -588,13 +587,9 @@ export function visualizeGraph(path: string) {
                         .attr("stroke", "black")
                         .attr("fill", "none")
                         .attr('transform', transform);
-                    //here has an issue
-                    featureVisualizer(svg, allNodes, offset, height, null, []);
+                setLoading(true)
+                console.log('loading', setLoading)
                 });
-
-
-
-
         }
     };
     

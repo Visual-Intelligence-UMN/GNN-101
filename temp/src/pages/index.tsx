@@ -53,6 +53,8 @@ export default function Home() {
     const [step, setStep] = useState(1);
     const [show, setShow] = useState(false);
     const [predicted, setPredicted] = useState(false);
+    const [simulationLoading, setSimulation] = useState(false);
+
     //intermediate output
     const [intmData, setIntmData] = useState<IntmData | null>(null);
     const [selectedButtons, setSelectedButtons] = useState([false, false, false, false, false, false, false]);
@@ -170,7 +172,7 @@ export default function Home() {
                             </div>
 
                             <hr className="border-t border-gray-300 my-4"></hr>
-
+                            
                             <ClassifyGraph
                                 graphPath={graphList[selectedGraph]}
                                 modelPath={modelList[model]}
@@ -180,6 +182,7 @@ export default function Home() {
                                 predicted={predicted}
                                 probabilities={probabilities}
                                 setProbabilities={setProbabilities}
+                                simulationLoading={simulationLoading}
                             />
 
                             <hr className="border-t border-gray-300 my-4"></hr>
@@ -214,6 +217,8 @@ export default function Home() {
                                         changed={changedG}
                                         predicted={predicted}
                                         selectedButtons={selectedButtons}
+                                        simulationLoading={simulationLoading}
+                                        setSimulation={setSimulation}
                                     />
                                 </>
                             ) : (
@@ -243,6 +248,7 @@ export default function Home() {
                                         probabilities={probabilities}
                                         setProbabilities={setProbabilities}
                                         onlyShownButton={true}
+                                        simulationLoading={simulationLoading}
                                     />
 
                                 </div>

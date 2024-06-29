@@ -146,3 +146,17 @@ path {
   transition: all;
   transition-duration: 1s;
 }
+
+@keyframes loading {
+  0% { content: ""; }
+  25% { content: "."; }
+  50% { content: ".."; }
+  75% { content: "..."; }
+  100% { content: ""; }
+}
+.loading::after {
+  content: "";
+  animation-name: loading;
+  animation-duration: 1.2s;
+  animation-iteration-count: infinite;
+}
