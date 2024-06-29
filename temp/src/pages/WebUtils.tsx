@@ -587,7 +587,9 @@ export function visualizeGraph(path: string, setLoading: Function) {
                         .attr("stroke", "black")
                         .attr("fill", "none")
                         .attr('transform', transform);
-                setLoading(true)
+                setTimeout(() => {
+                    setLoading(true)
+                }, 500);
                 console.log('loading', setLoading)
                 });
         }
