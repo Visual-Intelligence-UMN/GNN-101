@@ -13,3 +13,11 @@ export interface IntmData {
 	dropout: Float32Array;
 	final: Float32Array;
 }
+
+export interface IntmDataNode{
+	conv1: Float32Array;
+	conv2: Float32Array;
+	conv3: Float32Array;
+	final: Float32Array;
+	result: number[][];
+}

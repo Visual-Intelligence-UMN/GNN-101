@@ -1,8 +1,9 @@
 import React, { useState, ChangeEvent } from 'react';
-import { graphPrediction } from '@/utils/utils';
+import { graphPrediction, nodePrediction } from '@/utils/utils';
 import { Hint, PredictionVisualizer } from './WebUtils';
 import { on } from 'events';
 import { useEffect } from 'react';
+import { IntmData, IntmDataNode } from '@/types';
 
 interface ClassifyGraphProps {
 	graphPath: string;
@@ -11,8 +12,8 @@ interface ClassifyGraphProps {
 	setIntmData: Function;
 	setPredicted: Function;
 	predicted: boolean;
-	probabilities: number[];
-	setProbabilities: (prob: number[]) => void;
+	probabilities: number[] | number[][];
+	setProbabilities: (prob: number[]|number[][]) => void;
 	onlyShownButton?: boolean;
 	simulationLoading: boolean;
 }
@@ -24,11 +25,22 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({ graphPath, modelPath, set
 	const classifyGraph = async () => {
 		setPredicted(true)
 
-		const { prob, intmData } = await graphPrediction(modelPath, graphPath);
+	//	const { prob, intmData } = await graphPrediction(modelPath, graphPath);
+
+		let prob:number[]|number[][];
+		let intmData:IntmData|IntmDataNode;
+
+		if(modelPath=="./gnn_node_model.onnx") ({ prob, intmData } = await nodePrediction(modelPath, graphPath))
+		else ({ prob, intmData } = await graphPrediction(modelPath, graphPath))
+
 		setChangedG(false);
 		setIntmData(intmData);
 
-		setProbabilities(prob);
+		if (Array.isArray(prob[0])) {
+			setProbabilities(prob as number[][]);
+		} else {
+			setProbabilities(prob as number[]);
+		}
 	};
 
 	const prediction = !predicted ? (
@@ -46,8 +58,10 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({ graphPath, modelPath, set
 			</div>
 				
 		)
-	) : probabilities.length > 0 ? (
-		<PredictionVisualizer result={{ 'Non-Mutagenic': probabilities[0], 'Mutagenic': probabilities[1] }} />
+	): Array.isArray(probabilities[0]) ? (
+		<div>{/* the prediction visualization for the node classifier */}</div>
+	) : probabilities.length > 0 && typeof probabilities[0] === 'number'? (
+		<PredictionVisualizer result={{ 'Non-Mutagenic': probabilities[0] as number, 'Mutagenic': probabilities[1] as number }} />
 	) : (
 		<span>Predicting...</span>
 	);
@@ -56,7 +70,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({ graphPath, modelPath, set
 		<div className="flex gap-x-4 items-center">
 			<h1 className="text-3xl font-black">Predictions</h1>
 			<p className= 'mt-1 	mx-3'>No data available yet!</p>
-			<Hint text='Press the "Classify a Graph" to predict' />
+			<Hint text='Press the "Click to Predict!" to predict' />
 		</div>)}
 		{prediction}
 	</div>

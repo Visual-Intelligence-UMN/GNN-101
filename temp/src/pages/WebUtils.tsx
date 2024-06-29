@@ -1,5 +1,5 @@
 //A web utilities file for general UI building
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef} from "react";
 import { Panel } from "react-resizable-panels";
 import * as d3 from "d3";
 import {
@@ -63,6 +63,7 @@ export const GraphAnalysisViewer: React.FC<GraphAnalysisViewerProps> = ({
 
     useEffect(() => {
         const analysis = async () => {
+            console.log("Ganalysis path", path);
             const graphData: any = await load_json(path);
             console.log("GDATA", graphData);
             const result: any = analyzeGraph(graphData);
@@ -184,6 +185,73 @@ export const ButtonChain = ({ selectedButtons, setSelectedButtons, predicted }: 
         </div>
     );
 };
+
+//we may want to find a smater way to do the button chain
+export const NodeClassifierButtonChain = ({ selectedButtons, setSelectedButtons, predicted }: { selectedButtons: any[], setSelectedButtons: Function, predicted: boolean }) => {
+
+    const handleButtonClick = (index: number) => {
+        setSelectedButtons((prevSelectedLayers: any[]) => {
+            const updatedLayers = [...prevSelectedLayers];
+            updatedLayers[index] = !(updatedLayers[index]);
+
+            return updatedLayers;
+        });
+    };
+    return (
+        <div className="flex gap-x-4 items-center" >
+            <div className="flex">
+                <h2 className="text-xl m-auto">Architecture </h2>
+                <div className="my-1 mx-2">
+                    <Hint text={"Click to highlight corresponding layer in Model Visualization"} />
+                </div>
+            </div>
+            <div>
+                <div className="flex items-center justify-center gap-x-2 opacity-80">
+
+                    {/* Since input is not shown during the predicted phase, it is disabled */}
+                    <button
+                        disabled={!predicted}
+                        className={`bg-gray-200  ${predicted ? 'hover:border-black hover:bg-gray-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[0] ? 'outline outline-2 outline-black bg-gray-300' : ''}`}
+                        onClick={() => handleButtonClick(0)}>
+                        Input
+                    </button>
+                    <button
+                        disabled={!predicted}
+                        className={`bg-yellow-200  ${predicted ? 'hover:border-black hover:bg-yellow-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[1] ? 'outline outline-2 outline-black bg-yellow-300' : ''}`}
+                        onClick={() => handleButtonClick(1)}>
+                        GNNConv1
+                    </button>
+                    <button
+                        disabled={!predicted}
+                        className={`bg-yellow-200  ${predicted ? 'hover:border-black hover:bg-yellow-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[2] ? 'outline outline-2 outline-black bg-yellow-300' : ''}`}
+                        onClick={() => handleButtonClick(2)}>
+                        GNNConv2
+                    </button>
+                    <button
+                        disabled={!predicted}
+                        className={`bg-yellow-200  ${predicted ? 'hover:border-black hover:bg-yellow-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[3] ? 'outline outline-2 outline-black bg-yellow-300' : ''}`}
+                        onClick={() => handleButtonClick(3)}>
+                        GNNConv3
+                    </button>
+                    <button
+                        disabled={!predicted}
+                        className={`bg-emerald-200  ${predicted ? 'hover:border-black hover:bg-green-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[5] ? 'outline outline-2 outline-black bg-green-300' : ''}`}
+                        onClick={() => handleButtonClick(5)}>
+                        FC
+                    </button>
+                    <button
+                        disabled={!predicted}
+                        className={`bg-gray-200  ${predicted ? 'hover:border-black hover:bg-gray-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[6] ? 'outline outline-2 outline-black bg-gray-300' : ''}`}
+                        onClick={() => handleButtonClick(6)}>
+                        Output
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
 export const ModelButtonChain = () => {
     return (
         <div className="flex items-center space-x-4">
@@ -428,7 +496,7 @@ export const Hint: React.FC<HintProps> = ({ text }) => {
             data-tooltip-id='tooltip'
             className='items-center justify-center flex'
         >
-            <i className="fa fa-info-circle m-auto" style={{fontSize: "28px", color: '#333'}}></i>
+            <i className="fa fa-info-circle m-auto" style={{ fontSize: "28px", color: '#333' }}></i>
             <Tooltip id="tooltip" />
         </span>
     );
@@ -436,304 +504,306 @@ export const Hint: React.FC<HintProps> = ({ text }) => {
 
 //-------------------------------------------------------------
 //single graph visualizer
-let initialCoordinates: {[id: string]: {x: number, y: number}} = {};
+let initialCoordinates: { [id: string]: { x: number, y: number } } = {};
 
-export function visualizeGraph(path: string, setLoading: Function) {
+export function visualizeGraph(path: string, onComplete: () => void): Promise<void> {
+    return new Promise<void>((resolve) => {
+        const init = async (data: any) => {
+            let allNodes: any[] = [];
+            const offset = 600;
+            const margin = { top: 10, right: 30, bottom: 30, left: 40 };
+            const width = 6 * offset - margin.left - margin.right;
+            const height = 1000 - margin.top - margin.bottom;
+    
+    
+    
+    
+            // Append the SVG object to the body of the page
+            d3.select("#my_dataviz").selectAll("svg").remove();
+            const svg = d3
+                .select("#my_dataviz")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);
+    
+            if (data.nodes) {
+                const xOffset = -2.5 * offset;
+                const g1 = svg
+                    .append("g")
+                    .attr("transform", `translate(${xOffset},${margin.top})`);
+    
+                // Initialize the links
+                const link = g1
+                    .selectAll("line")
+                    .data(data.links)
+                    .join("line")
+                    .style("stroke", "#aaa");
+    
+                // Initialize the nodes
+                const node = g1
+                    .selectAll("circle")
+                    .data(data.nodes)
+                    .join("circle")
+                    .attr("r", 17)
+                    .style("stroke", "#69b3a2")
+                    .style("fill", "white")
+    
+    
+                const labels = g1
+                    .selectAll("text")
+                    .data(data.nodes)
+                    .join("text")
+                    .text((d: any) => d.name)
+                    .attr("font-size", `20px`);
+    
+    
+    
+                // Define the simulation
+                    console.log('in now')
+                    const simulation = d3
+                        .forceSimulation(data.nodes)
+                        .force(
+                            "link",
+                            d3
+                                .forceLink(data.links)
+                                .id((d: any) => d.id)
+                                .distance(10)
+                        )
+                        .force("center", d3.forceCenter(width / 2, height / 2.8))
+                        .force("collide", d3.forceCollide().radius(20).strength(0.8))
+                        .force("aromatic", d3.forceManyBody().strength((d: any) => (d.is_aromatic ? -210 : -100)).theta(0.9))
+                        .on("tick", function ticked() {
+                            link.attr("x1", (d: any) => d.source.x)
+                                .attr("y1", (d: any) => d.source.y)
+                                .attr("x2", (d: any) => d.target.x)
+                                .attr("y2", (d: any) => d.target.y)
+                                .attr("transform", function (d: any) {
+                                    if (d.type === "double") {
+                                        const dx = d.target.x - d.source.x;
+                                        const dy = d.target.y - d.source.y;
+                                        const dr = Math.sqrt(dx * dx + dy * dy);
+                                        const offsetX = 5 * (dy / dr);
+                                        const offsetY = 5 * (-dx / dr);
+                                        return `translate(${offsetX}, ${offsetY})`;
+                                    }
+                                    else {
+                                        return null;
+                                    }
+                                })
+                                .style("stroke", function (d: any) {
+                                    if (d.type === "aromatic") {
+                                        return "purple";
+                                    }
+                                    else {
+                                        return "#aaa";
+                                    }
+                                });
+    
+    
+                            node.attr("cx", (d: any) => d.x).attr(
+                                "cy",
+                                (d: any) => d.y
+                            );
+    
+                            labels.attr("x", (d: any) => d.x - 6)
+                                .attr("y", (d: any) => d.y + 6);
+                        })
+                        .on("end", function ended() {
+                            let maxXDistance = 0;
+                            let maxYDistance = 0;
+                            initialCoordinates = {};
+                            data.nodes.forEach((node1: any) => {
+                                initialCoordinates[node1.id] = { x: node1.x, y: node1.y };
+    
+                                data.nodes.forEach((node2: any) => {
+                                    if (node1 !== node2) {
+                                        const xDistance = Math.abs(node1.x - node2.x);
+                                        const yDistance = Math.abs(node1.y - node2.y);
+    
+                                        if (xDistance > maxXDistance) {
+                                            maxXDistance = xDistance;
+                                        }
+    
+                                        if (yDistance > maxYDistance) {
+                                            maxYDistance = yDistance;
+                                        }
+                                    }
+                                });
+                            });
+                            const graphWidth = maxXDistance + 20
+                            const graphHeight = maxYDistance + 20;
+                            const point1 = { x: 0.9 * offset - 260, y: height / 8 };
+                            const point2 = { x: 0.8 * offset - 260, y: height / 20 };
+                            const point3 = { x: 0.8 * offset - 260, y: height / 1.7 };
+                            const point4 = { x: 0.9 * offset - 260, y: height / 1.5 };
+                            const tolerance = 120;
+    
+                            const x_dist = Math.abs(point1.x - point2.x);
+                            const y_dist = Math.abs(point1.y - point4.y)
+    
+    
+                            const centerX = (point1.x + point3.x) / 2;
+                            const centerY = (point1.y + point3.y) / 2;
+                            let scaleX = ((graphWidth + tolerance) / x_dist);
+                            let scaleY = ((graphHeight + tolerance) / y_dist);
+                            let transform = `translate(${centerX}, ${centerY}) scale(${scaleX}, ${scaleY}) translate(${-centerX}, ${-centerY})`;
+                            if (graphWidth + tolerance < x_dist && graphHeight + tolerance < y_dist) {
+                                transform = `scale(1, 1)`;
+                            }
+                            const parallelogram = svg
+                                .append("polygon")
+                                .attr("points", `${point1.x},${point1.y} ${point2.x},${point2.y} ${point3.x},${point3.y} ${point4.x},${point4.y}`)
+                                .attr("stroke", "black")
+                                .attr("fill", "none")
+                                .attr('transform', transform);
+                            onComplete();
+                            resolve();
+                        });
+             }
+    
+        };
+    
+    
+            const visualizeG = async () => {
+                try {
+                    console.log("started visualize....");
+                    const pData = await data_prep(path);
+                    console.log("s pdata", pData);
+                    const gData = await prep_graphs(1, pData);
+                    console.log("s gData", gData);
+                    await init(gData[0]);
+                } catch (error) {
+                    console.log("Error in single graph visualizer", error);
+                }
+            };
+    
+            visualizeG();
+        
+    })
+}
+    // Helper get function for initial coordinates
+    export function getInitialCoordinates() {
+        return initialCoordinates;
+    }
+    //-------------------------------------------------------------
+    //single matrix visualizer
+    export function visualizeMatrix(path: string) {
+        const init = async (graph: any, features: any, nodeAttrs: any) => {
+            const gridSize = 400;
+            const margin = { top: 10, right: 80, bottom: 30, left: 80 };
+            const width = gridSize + margin.left + margin.right;
+            const height = (gridSize + margin.top + margin.bottom) * 2;
 
-    const init = async (data: any) => {
-        let allNodes: any[] = [];
-        const offset = 600;
-        const margin = { top: 10, right: 30, bottom: 30, left: 40 };
-        const width = 6 * offset - margin.left - margin.right;
-        const height = 1000 - margin.top - margin.bottom;
-
-
-
-
-        // Append the SVG object to the body of the page
-        d3.select("#my_dataviz").selectAll("svg").remove();
-        const svg = d3
-            .select("#my_dataviz")
-            .append("svg")
-            .attr("width", width)
-            .attr("height", height);
-
-        if (data.nodes) {
-            const xOffset = -2.5 * offset;
-            const g1 = svg
+            d3.select("#matvis").selectAll("svg").remove();
+            const svg = d3
+                .select("#matvis")
+                .append("svg")
+                .attr("class", "mats")
+                .attr("width", width)
+                .attr("height", height);
+            const xOffset = 50;
+            const g = svg
                 .append("g")
                 .attr("transform", `translate(${xOffset},${margin.top})`);
+            var myGroups = get_axis_gdata(graph);
+            var myVars = get_axis_gdata(graph);
 
-            // Initialize the links
-            const link = g1
-                .selectAll("line")
-                .data(data.links)
-                .join("line")
-                .style("stroke", "#aaa");
+            var x = d3
+                .scaleBand()
+                .range([0, gridSize])
+                .domain(myGroups)
+                .padding(0.01);
 
-            // Initialize the nodes
-            const node = g1
-                .selectAll("circle")
-                .data(data.nodes)
-                .join("circle")
-                .attr("r", 17)
-                .style("stroke", "#69b3a2")
-                .style("fill", "white")
+            g.append("g")
+                .attr("class", "x-axis")
+                .attr("transform", `translate(0,${gridSize + 50})`)
+                .call(d3.axisBottom(x));
 
+            var y = d3
+                .scaleBand()
+                .range([0, gridSize])
+                .domain(myVars)
+                .padding(0.01);
 
-            const labels = g1
-                .selectAll("text")
-                .data(data.nodes)
-                .join("text")
-                .text((d: any) => d.name)
-                .attr("font-size", `20px`);
+            g.append("g").attr("class", "y-axis").attr("transform", "translate(0,50)").call(d3.axisLeft(y));
 
+            d3.selectAll<SVGTextElement, any>(".x-axis text").classed(
+                "first",
+                true
+            );
+            d3.selectAll<SVGTextElement, any>(".y-axis text").classed(
+                "first",
+                true
+            );
 
+            var myColor = d3
+                .scaleLinear<string>()
+                .range(["white", "#69b3a2"])
+                .domain([1, 100]);
 
-            // Define the simulation
-            const simulation = d3
-                .forceSimulation(data.nodes)
-                .force(
-                    "link",
-                    d3
-                        .forceLink(data.links)
-                        .id((d: any) => d.id)
-                        .distance(10)
-                )
-                .force("center", d3.forceCenter(width / 2, height / 2.8))
-                .force("collide", d3.forceCollide().radius(20).strength(0.8))
-                .force("aromatic", d3.forceManyBody().strength((d: any) => (d.is_aromatic ? -210 : -100)).theta(0.9))
-                .on("tick", function ticked() {
-                    link.attr("x1", (d: any) => d.source.x)
-                        .attr("y1", (d: any) => d.source.y)
-                        .attr("x2", (d: any) => d.target.x)
-                        .attr("y2", (d: any) => d.target.y)
-                        .attr("transform", function (d: any) {
-                            if (d.type === "double") {
-                                const dx = d.target.x - d.source.x;
-                                const dy = d.target.y - d.source.y;
-                                const dr = Math.sqrt(dx * dx + dy * dy);
-                                const offsetX = 5 * (dy / dr);
-                                const offsetY = 5 * (-dx / dr);
-                                return `translate(${offsetX}, ${offsetY})`;
-                            }
-                            else {
-                                return null;
-                            }
-                        })
-                        .style("stroke", function (d: any) {
-                            if (d.type === "aromatic") {
-                                return "purple";
-                            }
-                            else {
-                                return "#aaa";
-                            }
-                        });
+            const data = matrix_to_hmap(graph);
+            console.log("accepted data:", data);
+            const filteredData = data.filter((d): d is HeatmapData => !!d);
 
+            g.selectAll("rect")
+                .data(data, (d: any) => d.group + ":" + d.variable)
+                .enter()
+                .append("rect")
+                .attr("x", (d: HeatmapData) => x(d.group)!)
+                .attr("y", (d: HeatmapData) => y(d.variable)! + 50)
+                .attr("width", x.bandwidth())
+                .attr("height", y.bandwidth())
+                .style("fill", (d: HeatmapData) => myColor(d.value))
+                .style("stroke-width", 1)
+                .style("stroke", "grey")
+                .style("opacity", 0.8)
+                .on("mouseover", mouseover)
+                .on("mousemove", mousemove)
+                .on("mouseleave", mouseleave);
 
-                    node.attr("cx", (d: any) => d.x).attr(
-                        "cy",
-                        (d: any) => d.y
-                    );
-
-                    labels.attr("x", (d: any) => d.x - 6)
-                        .attr("y", (d: any) => d.y + 6);
+            g.selectAll(".x-axis text")
+                .on("mouseover", function (event) {
+                    console.log("EVENT", event);
+                    const element = event.target as SVGGraphicsElement;
+                    console.log("ELEMENT", element);
                 })
-                .on("end", function ended() {
-                    let maxXDistance = 0;
-                    let maxYDistance = 0;
-                    initialCoordinates = {};
-                    data.nodes.forEach((node1: any) => {
-                        initialCoordinates[node1.id] = {x: node1.x, y: node1.y};
-
-                        data.nodes.forEach((node2: any) => {
-                            if (node1 !== node2) {
-                                const xDistance = Math.abs(node1.x - node2.x);
-                                const yDistance = Math.abs(node1.y - node2.y);
-
-                                if (xDistance > maxXDistance) {
-                                    maxXDistance = xDistance;
-                                }
-
-                                if (yDistance > maxYDistance) {
-                                    maxYDistance = yDistance;
-                                }
-                            }
-                        });
-                    });
-                    const graphWidth = maxXDistance + 20
-                    const graphHeight = maxYDistance + 20;
-                    const point1 = { x: 0.9 * offset - 260, y: height / 8 };
-                    const point2 = { x: 0.8 * offset - 260, y: height / 20 };
-                    const point3 = { x: 0.8 * offset - 260, y: height / 1.7 };
-                    const point4 = { x: 0.9 * offset - 260, y: height / 1.5 };
-                    const tolerance = 120;
-
-                    const x_dist = Math.abs(point1.x - point2.x);
-                    const y_dist = Math.abs(point1.y - point4.y)
-
-
-                    const centerX = (point1.x + point3.x) / 2;
-                    const centerY = (point1.y + point3.y) / 2;
-                    let scaleX = ((graphWidth + tolerance) / x_dist);
-                    let scaleY = ((graphHeight + tolerance) / y_dist);
-                    let transform = `translate(${centerX}, ${centerY}) scale(${scaleX}, ${scaleY}) translate(${-centerX}, ${-centerY})`;
-                    if (graphWidth + tolerance < x_dist && graphHeight + tolerance < y_dist) {
-                        transform = `scale(1, 1)`;
-                    }
-                    const parallelogram = svg
-                        .append("polygon")
-                        .attr("points", `${point1.x},${point1.y} ${point2.x},${point2.y} ${point3.x},${point3.y} ${point4.x},${point4.y}`)
-                        .attr("stroke", "black")
-                        .attr("fill", "none")
-                        .attr('transform', transform);
-                setTimeout(() => {
-                    setLoading(true)
-                }, 500);
-                console.log('loading', setLoading)
+                .on("mouseout", function (event) {
+                    const element = event.target as SVGGraphicsElement;
+                    removeEffect(element);
+                    d3.select("#tmp").remove();
                 });
-        }
-    };
-    
 
-    const visualizeG = async () => {
-        try {
-            console.log("started visualize....");
-            const pData = await data_prep(path);
-            console.log("s pdata", pData);
-            const gData = await prep_graphs(1, pData);
-            console.log("s gData", gData);
-            await init(gData[0]);
-        } catch (error) {
-            console.log("Error in single graph visualizer", error);
-        }
-    };
+            g.selectAll(".y-axis text")
+                .on("mouseover", function (event, d) {
+                    const element = event.target as SVGGraphicsElement;
+                    console.log("ELEMENT", element);
+                })
+                .on("mouseout", function (event, d) {
+                    const element = event.target as SVGGraphicsElement;
+                    removeEffect(element);
+                });
 
-    visualizeG();
-}
-// Helper get function for initial coordinates
-export function getInitialCoordinates() {
-    return initialCoordinates;
-}
-//-------------------------------------------------------------
-//single matrix visualizer
-export function visualizeMatrix(path: string) {
-    const init = async (graph: any, features: any, nodeAttrs: any) => {
-        const gridSize = 400;
-        const margin = { top: 10, right: 80, bottom: 30, left: 80 };
-        const width = gridSize + margin.left + margin.right;
-        const height = (gridSize + margin.top + margin.bottom) * 2;
+            drawNodeAttributes(nodeAttrs, graph, 50);
+        };
 
-        d3.select("#matvis").selectAll("svg").remove();
-        const svg = d3
-            .select("#matvis")
-            .append("svg")
-            .attr("class", "mats")
-            .attr("width", width)
-            .attr("height", height);
-        const xOffset = 50;
-        const g = svg
-            .append("g")
-            .attr("transform", `translate(${xOffset},${margin.top})`);
-        var myGroups = get_axis_gdata(graph);
-        var myVars = get_axis_gdata(graph);
+        const visualizeMat = async (path: string) => {
+            //const features = await get_features_origin(data);
+            //console.log("o features", features);
+            try {
+                const data = await load_json(path);
+                const nodeAttrs = getNodeAttributes(data);
+                const features = await get_features_origin(data);
+                console.log("VIS features", features);
+                const processedData = await graph_to_matrix(data);
+                console.log("VIS pData matvis", processedData);
+                //const graphsData = await prepMatrices(1, processedData);
+                //console.log("VIS gData", graphsData);
+                // Initialize and run D3 visualization with processe  d data
+                await init(processedData, features, nodeAttrs);
+            } catch (error) {
+                console.log("Error in single matrix visualizer", error);
+            }
+        };
 
-        var x = d3
-            .scaleBand()
-            .range([0, gridSize])
-            .domain(myGroups)
-            .padding(0.01);
-
-        g.append("g")
-            .attr("class", "x-axis")
-            .attr("transform", `translate(0,${gridSize + 50})`)
-            .call(d3.axisBottom(x));
-
-        var y = d3
-            .scaleBand()
-            .range([0, gridSize])
-            .domain(myVars)
-            .padding(0.01);
-
-        g.append("g").attr("class", "y-axis").attr("transform", "translate(0,50)").call(d3.axisLeft(y));
-
-        d3.selectAll<SVGTextElement, any>(".x-axis text").classed(
-            "first",
-            true
-        );
-        d3.selectAll<SVGTextElement, any>(".y-axis text").classed(
-            "first",
-            true
-        );
-
-        var myColor = d3
-            .scaleLinear<string>()
-            .range(["white", "#69b3a2"])
-            .domain([1, 100]);
-
-        const data = matrix_to_hmap(graph);
-        console.log("accepted data:", data);
-        const filteredData = data.filter((d): d is HeatmapData => !!d);
-
-        g.selectAll("rect")
-            .data(data, (d: any) => d.group + ":" + d.variable)
-            .enter()
-            .append("rect")
-            .attr("x", (d: HeatmapData) => x(d.group)!)
-            .attr("y", (d: HeatmapData) => y(d.variable)! + 50)
-            .attr("width", x.bandwidth())
-            .attr("height", y.bandwidth())
-            .style("fill", (d: HeatmapData) => myColor(d.value))
-            .style("stroke-width", 1)
-            .style("stroke", "grey")
-            .style("opacity", 0.8)
-            .on("mouseover", mouseover)
-            .on("mousemove", mousemove)
-            .on("mouseleave", mouseleave);
-
-        g.selectAll(".x-axis text")
-            .on("mouseover", function (event) {
-                console.log("EVENT", event);
-                const element = event.target as SVGGraphicsElement;
-                console.log("ELEMENT", element);
-            })
-            .on("mouseout", function (event) {
-                const element = event.target as SVGGraphicsElement;
-                removeEffect(element);
-                d3.select("#tmp").remove();
-            });
-
-        g.selectAll(".y-axis text")
-            .on("mouseover", function (event, d) {
-                const element = event.target as SVGGraphicsElement;
-                console.log("ELEMENT", element);
-            })
-            .on("mouseout", function (event, d) {
-                const element = event.target as SVGGraphicsElement;
-                removeEffect(element);
-            });
-
-        drawNodeAttributes(nodeAttrs, graph, 50);
-    };
-
-    const visualizeMat = async (path: string) => {
-        //const features = await get_features_origin(data);
-        //console.log("o features", features);
-        try {
-            const data = await load_json(path);
-            const nodeAttrs = getNodeAttributes(data);
-            const features = await get_features_origin(data);
-            console.log("VIS features", features);
-            const processedData = await graph_to_matrix(data);
-            console.log("VIS pData matvis", processedData);
-            //const graphsData = await prepMatrices(1, processedData);
-            //console.log("VIS gData", graphsData);
-            // Initialize and run D3 visualization with processe  d data
-            await init(processedData, features, nodeAttrs);
-        } catch (error) {
-            console.log("Error in single matrix visualizer", error);
-        }
-    };
-
-    visualizeMat(path);
-}
+        visualizeMat(path);
+    }
