@@ -669,13 +669,17 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
         node.featureGroup = featureGroup;
 
-
+        const linkStrength = d3.scaleLinear()
+          .domain([-0.25, 0, 0.25])
+          .range([0.1, 0.3, .6]);
+        
         // add interaction. In the 
         node.featureGroup.on("mouseover", function() {
           if (!isClicked) {
             if (node.links) {
               node.links.forEach((link: any) => {
-                link.style("opacity", 1);
+                const avg = calculateAverage(node.features);
+                link.style("opacity", linkStrength(avg))
               });
             }
           }
@@ -685,6 +689,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           if (!isClicked) {
             if (node.links) {
               node.links.forEach((link: any) => {
+                const avg = calculateAverage(node.features);
                 link.style("opacity", 0.07);
               });
             }
@@ -749,9 +754,9 @@ export function calculateAverage(arr: number[]): number {
 export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset: number) {
   const nodesByIndex = d3.group(nodes, (d: any) => d.graphIndex);
 
-  const myColor = d3.scaleLinear<string>()
+  const linkStrength = d3.scaleLinear()
     .domain([-0.25, 0, 0.25])
-    .range(["red", "purple", "blue"]);
+    .range([0.1, 0.3, .6]);
 
 
   nodesByIndex.forEach((nodes, graphIndex) => {
@@ -795,13 +800,12 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
               const controlX2 = node.x + xOffset1 + (neighborNode.x + xOffset2 - node.x - xOffset1) * 0.7;
               const controlY2 = neighborNode.y + 10;
 
-              const color = calculateAverage(node.features);
 
               const path = svg.append("path")
                 .attr("d", `M ${node.x + xOffset1 + 16} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${neighborNode.x + (neighborNode.graphIndex - 2.5) * offset - 16} ${neighborNode.y + 10}`)
-                .style("stroke", myColor(color))
+                .style("stroke", 'black')
+                .style("stroke-width", 2)
                 .style("opacity", 0.07)
-                .style("stroke-width", 1) 
                 .style("fill", "none");
 
 
@@ -824,13 +828,12 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
               const controlY2 = nextNode.y + 10;
 
 
-            const color = calculateAverage(node.features);
 
               const path = svg.append("path")
                 .attr("d", `M ${node.x + xOffset1 + 16} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffsetNext - 16} ${nextNode.y + 10}`)
-                .style("stroke", myColor(color))
+                .style("stroke-width", 2)
                 .style("opacity", 0.07)
-                .style("stroke-width", 1)
+                .style("stroke", 'black')
                 .style("fill", "none");
   
       
@@ -849,7 +852,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
       
         
       } else {  
-          const color = calculateAverage(node.features)
+          const avg = calculateAverage(node.features)
 
           xOffset1 = (graphIndex - 2.5) * offset - 150;
           xOffset2 = (graphIndex - 1.5) * offset - 30 * (graphIndex * 1.5);
@@ -871,9 +874,9 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
   
             const path = svg.append("path")
               .attr("d", `M ${node.x + xOffset1 + 16} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 16} ${nextNode.y + 10}`)
-              .style("stroke", myColor(color))
-              .style("opacity", 0.07)
-              .style("stroke-width", 1)
+              .style("stroke", 'black')
+              .style("opacity", linkStrength(avg))
+              .style('stroke-width', 2)
               .style("fill", "none");
            
   
