@@ -7,6 +7,14 @@
         <script>
             let session;
 
+            function splitArray(arr, chunkSize){
+                const chunks = [];
+                for (let i = 0; i < arr.length; i += chunkSize) {
+                    chunks.push(arr.slice(i, i + chunkSize));
+                }
+                return chunks;
+            }
+
             async function loadModel() {
                 // await session.loadModel("gnn_model.onnx");
                 session = await ort.InferenceSession.create(
@@ -108,17 +116,29 @@
                         console.log(outputTensor);
                         console.log(outputTensor.cpuData);
 
-                        const probabilities = softmax(outputMap.final.cpuData);
+                        let resultArray = [];
+                        let splitedArray = splitArray(outputTensor.cpuData, 4);
+                        for(let i=0; i<splitedArray.length; i++){
+                            const p = softmax(splitedArray[i]);
+                            resultArray.push(p);
+                        }
+
+                        console.log("resultArray", resultArray);
+
+
                         const resultContainer = document.getElementById("result");
 
-                        // 清空结果容器
+                        // clear container
                         resultContainer.innerText = "";
-
-                        probabilities.forEach((prob, index) => {
-                            const resultDiv = document.createElement("div");
-                            resultDiv.innerText = `Class ${index + 1}: ${prob.toFixed(4)}`;
-                            resultContainer.appendChild(resultDiv);
+                        resultArray.forEach(subArray => {
+                            const formattedSubArray = subArray.map(probability => probability.toFixed(2)).join(", ");
+                    
+                            const div = document.createElement("div");
+                            div.innerText = formattedSubArray;
+                            
+                            resultContainer.appendChild(div);
                         });
+                        
                     };
                     reader.readAsText(file);
                 } else {
