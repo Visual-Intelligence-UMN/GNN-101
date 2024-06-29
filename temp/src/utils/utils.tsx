@@ -22,6 +22,11 @@ env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
 };
 
+export interface FeatureGroupLocation {
+  xPos: number;
+  yPos: number;
+}
+
 
 export function preprocessFloat32ArrayToNumber(matrix: any): number[][] {
   // why the matrix here is an array....? 
@@ -421,13 +426,10 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
   }
 
 
-  interface FeatureGroupLocation {
-    xPos: number;
-    yPos: number;
-  }
+
   
   let movedNode: any = null; // to prevent the same node is clicked twice
-  let moveOffset = 300;
+  let moveOffset = 600;
   let isClicked = false; // if isClicked is true, all mouseover/out operation would be banned and some certain functions would be called
 
 
@@ -583,8 +585,11 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
         });
         if (node.graphIndex != 0) {
           node.text.on("click", function(event:any) {
+            if (isClicked) {
+              return;
+            }
             hideAllLinks(allNodes);
-            calculationVisualizer(node, currentWeights, bias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, isClicked);
+            calculationVisualizer(node, currentWeights, bias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, isClicked);
             
             let relatedNodes: any = [];
             if (node.relatedNodes) {
@@ -610,8 +615,11 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             movedNode = node;
           });
           node.svgElement.addEventListener("click", function(event: any) {
+            if (isClicked) {
+              return;
+            }
             hideAllLinks(allNodes);
-            calculationVisualizer(node, currentWeights, bias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, isClicked);
+            calculationVisualizer(node, currentWeights, bias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, isClicked);
             
             let relatedNodes: any = [];
             if (node.relatedNodes) {
@@ -649,7 +657,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           rectHeight = 20;
         }
         let groupCentralHeight = rectHeight * features.length / 2;
-        let offset = groupCentralHeight - (height / 10);
+        let offset = groupCentralHeight - (height / 5);
 
         const featureGroup = g2.append("g")
           .attr("transform", `translate(${node.x - 7.5}, ${node.y - offset})`);
