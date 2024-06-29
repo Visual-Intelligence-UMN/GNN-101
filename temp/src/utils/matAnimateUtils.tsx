@@ -20,19 +20,48 @@ export function drawAniPath(
     endCoordList: any,
     curveDir: number,
     myColor: any,
-    featureChannels: number
+    featureChannels: number,
+    coordFeatureVis:any,
+    rectH:number,
+    rectW:number,
+    dummy:number[],
+    g:any
 ) {
     d3.selectAll("#tempath").remove();
+    if(currentStep==0){
+    g.append("rect")
+        .attr("x", coordFeatureVis[0])
+        .attr("y", coordFeatureVis[1] - rectH / 2)
+        .attr("width", rectW * dummy.length)
+        .attr("height", rectH)
+        .attr("fill", "none")
+        .attr("opacity", 1)
+        .attr("stroke", "black")
+        .attr("stroke-width", 1)
+        .attr("class", "procVis");
+    }
+    g.append("rect")
+        .attr("x", coordFeatureVis[0] + rectW * currentStep)
+        .attr("y", coordFeatureVis[1] - rectH / 2)
+        .attr("width", rectW)
+        .attr("height", rectH)
+        .attr("fill", myColor(dummy[currentStep]))
+        .attr("opacity", 1)
+        .attr("stroke", "gray")
+        .attr("stroke-width", 0.1)
+        .attr("class", "procVis");
 
     const Xv = Xt[currentStep];
     for (let j = 0; j < featureChannels; j++) {
         const s1 = startCoordList[j];
         const e1 = endCoordList[currentStep];
+
         let pathDir = e1[0] > s1[0] ? 0 : 1;
         if (curveDir == 1) {
             pathDir = e1[0] > s1[0] ? 1 : 0;
         }
         console.log("se", [s1, e1]);
+        
         d3.select(".mats")
             .append("path")
             .attr("d", function () {
@@ -148,7 +177,8 @@ export function drawWeightsVector(
             .attr("opacity", 0)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1)
-            .attr("class", "procVis");
+            .attr("class", "procVis")
+            .attr("id", `weightRect${m}`);
     }
 
     //draw frame
@@ -158,11 +188,11 @@ export function drawWeightsVector(
         .attr("width", rectW * dummy.length)
         .attr("height", rectH)
         .attr("fill", "none")
-        .attr("opacity", 0)
+        .attr("opacity", 1)
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("class", "procVis");
-    d3.selectAll(".procVis").transition().duration(100).attr("opacity", 1);
+ //   d3.selectAll(".procVis").transition().duration(100).attr("opacity", 1);
 }
 
 export function drawBiasVector(

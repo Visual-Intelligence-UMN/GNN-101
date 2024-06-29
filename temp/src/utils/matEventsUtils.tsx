@@ -494,7 +494,7 @@ export function featureVisClick(
         const waitSec = 250 * featureChannels;
         const animateSeq:any = [
             {func: ()=>drawSummationFeature(g,X,coordFeatureVis, w, rectH, myColor, posList, mulValues), delay: initSec+aniSec},
-            {func: ()=>drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor), delay: aniSec},
+       //     {func: ()=>drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor), delay: aniSec},
             {func: ()=>drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2, myColor, layerBias), delay: aniSec+waitSec},
             {func: ()=>drawFinalPath(wmCoord, res00, res01, nextCoord), delay: aniSec},
             {func: ()=>drawReLU(midX1, wmCoord, biasCoord, nextCoord), delay: aniSec}
@@ -504,7 +504,7 @@ export function featureVisClick(
 
         setTimeout(()=>{
             intervalID = setInterval(() => {
-                drawAniPath(Xt, currentStep, startCoordList, endCoordList, curveDir, myColor, featureChannels);
+                drawAniPath(Xt, currentStep, startCoordList, endCoordList, curveDir, myColor, featureChannels, coordFeatureVis3, rectH, rectW, dummy, g);
                 currentStep++;
                 console.log("currentStep", currentStep);
 
@@ -574,15 +574,7 @@ export function featureVisClick(
             const Xt = math.transpose(weights[layerID]);
             let i = 0;
             intervalID = setInterval(() => {
-                drawAniPath(
-                    Xt,
-                    currentStep,
-                    startCoordList,
-                    endCoordList,
-                    curveDir,
-                    myColor,
-                    featureChannels
-                );
+                drawAniPath(Xt, currentStep, startCoordList, endCoordList, curveDir, myColor, featureChannels, coordFeatureVis3, rectH, rectW, dummy, g);
                 currentStep++;
                 console.log("i", currentStep);
                 if(currentStep>=featureChannels){
@@ -1040,7 +1032,7 @@ export function outputVisClick(
 
         intervalID = setInterval(() => {
             const Xt = modelParams.weights[3];
-            drawAniPath(Xt, currentStep, startCoord, endCoord, 1, myColor, featureChannels);
+          //  drawAniPath(Xt, currentStep, startCoord, endCoord, 1, myColor, featureChannels);
             currentStep++;
             console.log("currentStep", currentStep);
             if (currentStep >= 2) {
