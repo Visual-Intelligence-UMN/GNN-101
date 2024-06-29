@@ -1,6 +1,18 @@
 import * as d3 from "d3";
 import { computeMids } from "./matFeaturesUtils";
 
+export function runAnimations(index:number, animations:any) {
+    if (index < animations.length) {
+        const { func, delay } = animations[index];
+        setTimeout(() => {
+            func();
+            runAnimations(index + 1, animations);
+        }, delay);
+    } else {
+        console.log("All animations completed");
+    }
+}
+
 export function drawAniPath(
     Xt: any,
     currentStep: number,
@@ -67,7 +79,7 @@ export function drawSummationFeature(
             .attr("width", w)
             .attr("height", rectH)
             .attr("fill", myColor(X[m]))
-            .attr("opacity", 0)
+            .attr("opacity", 1)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1)
             .attr("class", "procVis");
@@ -80,7 +92,7 @@ export function drawSummationFeature(
         .attr("width", w * X.length)
         .attr("height", rectH)
         .attr("fill", "none")
-        .attr("opacity", 0)
+        .attr("opacity", 1)
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("class", "procVis");
@@ -96,7 +108,7 @@ export function drawSummationFeature(
             .append("path")
             .attr("d", curve([posList[i], hpoint, lpoint, coordFeatureVis]))
             .attr("stroke", "black")
-            .attr("opacity", 0)
+            .attr("opacity", 1)
             .attr("fill", "none")
             .attr("class", "procVis")
             .attr("id", "procPath");
@@ -113,7 +125,7 @@ export function drawSummationFeature(
             .attr("text-anchor", "middle")
             .attr("font-size", 7.5)
             .attr("class", "procVis")
-            .attr("opacity", 0);
+            .attr("opacity", 1);
     }
 }
 
@@ -132,7 +144,7 @@ export function drawWeightsVector(
             .attr("width", rectW)
             .attr("height", rectH)
             .attr("fill", myColor(dummy[m]))
-            .attr("opacity", 0)
+            .attr("opacity", 1)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1)
             .attr("class", "procVis");
@@ -145,7 +157,7 @@ export function drawWeightsVector(
         .attr("width", rectW * dummy.length)
         .attr("height", rectH)
         .attr("fill", "none")
-        .attr("opacity", 0)
+        .attr("opacity", 1)
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("class", "procVis");
@@ -167,7 +179,7 @@ export function drawBiasVector(
             .attr("width", rectW)
             .attr("height", rectH)
             .attr("fill", myColor(layerBias[m]))
-            .attr("opacity", 0)
+            .attr("opacity", 1)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1)
             .attr("class", "procVis");
@@ -180,7 +192,7 @@ export function drawBiasVector(
         .attr("width", rectW * featureChannels)
         .attr("height", rectH)
         .attr("fill", "none")
-        .attr("opacity", 0)
+        .attr("opacity", 1)
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("class", "procVis");
@@ -201,7 +213,7 @@ export function drawBiasPath(
         .append("path")
         .attr("d", lineGenerator([biasCoord, res10, res11, nextCoord]))
         .attr("stroke", "black")
-        .attr("opacity", 0.05)
+        .attr("opacity", 1)
         .attr("fill", "none")
         .attr("class", "procVis biasPath")
         .attr("id", "procPath")
