@@ -130,6 +130,7 @@ export function visualizeGraphClassifierFeatures(
     let paths = GCNConvPackage.paths;
     let one = GCNConvPackage.one;
 
+    clearInterval(intervalID);
     //-----------------------------------INTERACTIONS EVENTS MANAGEMENT-----------------------------------------------
     //added interactions
     //add mouse event
@@ -193,6 +194,13 @@ export function visualizeGraphClassifierFeatures(
         intervalID = id;
         console.log("Interval ID set to:", intervalID);
     }
+
+    function getIntervalID(){
+        console.log("get interval ID from vGCF", intervalID);
+        return intervalID;
+    }
+
+
     d3.selectAll(".featureVis").on("click", function (event, d) {
         if (lock != true) {
             //state
@@ -324,4 +332,9 @@ export function visualizeGraphClassifierFeatures(
                 }
             });
     }
+
+    return {
+        getIntervalID: getIntervalID
+    };
+
 }

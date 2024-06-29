@@ -8,7 +8,7 @@ import { computeMids } from "./matFeaturesUtils";
 import * as d3 from "d3";
 import { create, all } from "mathjs";
 import { roundToTwo } from "@/pages/WebUtils";
-import { drawAniPath } from "./matAnimateUtils";
+import { drawAniPath, drawBiasPath, drawBiasVector, drawFinalPath, drawReLU, drawSummationFeature, drawWeightsVector } from "./matAnimateUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
 
 //graph feature events interactions - mouseover
@@ -426,154 +426,31 @@ export function featureVisClick(
     let endCoordList: any[] = [];
     //let curveDir = 1; //true -> -1; false -> 1
     setTimeout(() => {
-        //draw feature visualizer
-        for (let m = 0; m < X.length; m++) {
-            g.append("rect")
-                .attr("x", coordFeatureVis[0] + w * m)
-                .attr("y", coordFeatureVis[1] - rectH / 2)
-                .attr("width", w)
-                .attr("height", rectH)
-                .attr("fill", myColor(X[m]))
-                .attr("opacity", 0)
-                .attr("stroke", "gray")
-                .attr("stroke-width", 0.1)
-                .attr("class", "procVis");
-        }
-
-        //draw frame
-        g.append("rect")
-            .attr("x", coordFeatureVis[0])
-            .attr("y", coordFeatureVis[1] - rectH / 2)
-            .attr("width", w * X.length)
-            .attr("height", rectH)
-            .attr("fill", "none")
-            .attr("opacity", 0)
-            .attr("stroke", "black")
-            .attr("stroke-width", 1)
-            .attr("class", "procVis");
-
-        //path connect - connect prev layer feature vis to intermediate feature vis
-        const curve = d3.line().curve(d3.curveBasis);
-        for (let i = 0; i < posList.length; i++) {
-            const res = computeMids(posList[i], coordFeatureVis);
-            const hpoint = res[0];
-            const lpoint = res[1];
-            console.log("control points", hpoint, lpoint);
-            d3.select(".mats")
-                .append("path")
-                .attr("d", curve([posList[i], hpoint, lpoint, coordFeatureVis]))
-                .attr("stroke", "black")
-                .attr("opacity", 0)
-                .attr("fill", "none")
-                .attr("class", "procVis")
-                .attr("id", "procPath");
-
-            //draw multipliers
-            let x = (coordFeatureVis[0] - posList[i][0]) / 2 + posList[i][0];
-            let y = (coordFeatureVis[1] - posList[i][1]) / 2 + posList[i][1];
-            console.log("text point", x, y, posList[i][0], posList[i][1]);
-            d3.select(".mats")
-                .append("text")
-                .text(mulValues[i].toFixed(2))
-                .attr("x", x - 2)
-                .attr("y", y - 2)
-                .attr("text-anchor", "middle")
-                .attr("font-size", 7.5)
-                .attr("class", "procVis")
-                .attr("opacity", 0);
-        }
-
-        coordFeatureVis[0] += 102 + rectW * featureChannels;
+        let coordFeatureVis2 = [coordFeatureVis[0] + 102 + rectW * featureChannels, coordFeatureVis[1]];
+        let coordFeatureVis3 = [coordFeatureVis[0] + 102 + rectW * featureChannels, coordFeatureVis[1]];
         btnPos = [coordFeatureVis[0], coordFeatureVis[1] - 50];
-
-        // weight matrix * vector visualzier
-        for (let m = 0; m < dummy.length; m++) {
-            g.append("rect")
-                .attr("x", coordFeatureVis[0] + rectW * m)
-                .attr("y", coordFeatureVis[1] - rectH / 2)
-                .attr("width", rectW)
-                .attr("height", rectH)
-                .attr("fill", myColor(dummy[m]))
-                .attr("opacity", 0)
-                .attr("stroke", "gray")
-                .attr("stroke-width", 0.1)
-                .attr("class", "procVis");
-        }
-
-        //draw frame
-        g.append("rect")
-            .attr("x", coordFeatureVis[0])
-            .attr("y", coordFeatureVis[1] - rectH / 2)
-            .attr("width", rectW * dummy.length)
-            .attr("height", rectH)
-            .attr("fill", "none")
-            .attr("opacity", 0)
-            .attr("stroke", "black")
-            .attr("stroke-width", 1)
-            .attr("class", "procVis");
-
         //determine if we need upper-curves or lower-curves
-
         const midNode = adjList.length / 2;
         if (node < midNode) curveDir = -1;
         console.log("curveDir", curveDir);
         //draw paths from intermediate result -> final result
         const layerBias = bias[layerID];
-
-        coordFeatureVis[1] += curveDir * 50;
-
-        // bias visualzier
-        for (let m = 0; m < featureChannels; m++) {
-            g.append("rect")
-                .attr("x", coordFeatureVis[0] + rectW * m)
-                .attr("y", coordFeatureVis[1] - rectH / 2)
-                .attr("width", rectW)
-                .attr("height", rectH)
-                .attr("fill", myColor(layerBias[m]))
-                .attr("opacity", 0)
-                .attr("stroke", "gray")
-                .attr("stroke-width", 0.1)
-                .attr("class", "procVis");
-        }
-
-        //draw frame
-        g.append("rect")
-            .attr("x", coordFeatureVis[0])
-            .attr("y", coordFeatureVis[1] - rectH / 2)
-            .attr("width", rectW * featureChannels)
-            .attr("height", rectH)
-            .attr("fill", "none")
-            .attr("opacity", 0)
-            .attr("stroke", "black")
-            .attr("stroke-width", 1)
-            .attr("class", "procVis");
-
+        coordFeatureVis2[1] += curveDir * 50;
         //draw paths from WMVisualizer and Bias Visualizer to final output
         const wmCoord: [number, number] = [
-            coordFeatureVis[0] + rectW * featureChannels,
-            coordFeatureVis[1] - curveDir * 50,
+            coordFeatureVis2[0] + rectW * featureChannels,
+            coordFeatureVis2[1] - curveDir * 50,
         ];
-
         biasCoord = [
-            coordFeatureVis[0] + rectW * featureChannels,
-            coordFeatureVis[1],
+            coordFeatureVis2[0] + rectW * featureChannels,
+            coordFeatureVis2[1],
         ];
-
         let c = calculatePrevFeatureVisPos(featureVisTable, layerID, node, featureChannels, 7);
-
         nextCoord = [
             c[0] + 102 * 3 + 5 * featureChannels * 2 + 102,
             c[1],
         ];
-
         //drawPoints(".mats", "red", [nextCoord]);
-
-        const lineGenerator = d3
-            .line<[number, number]>()
-            .curve(d3.curveBasis)
-            .x((d) => d[0])
-            .y((d) => d[1]);
-
         const midX0 = (wmCoord[0] + nextCoord[0]) / 2;
         const midX1 = (biasCoord[0] + nextCoord[0]) / 2;
 
@@ -582,38 +459,6 @@ export function featureVisClick(
 
         res10 = [midX1 - 20, biasCoord[1]];
         res11 = [midX1 + 20, nextCoord[1]];
-
-        d3.select(".mats")
-            .append("path")
-            .attr("d", lineGenerator([wmCoord, res00, res01, nextCoord]))
-            .attr("stroke", "black")
-            .attr("opacity", 1)
-            .attr("fill", "none")
-            .attr("class", "procVis")
-            .attr("id", "procPath");
-
-        d3.selectAll("#procPath").lower();
-
-        const svg = d3.select(".mats");
-        const relu = svg.append("g");
-
-        const cx = midX1;
-        const cy = (wmCoord[1] + biasCoord[1]) / 2;
-        const radius = 5;
-        const cx1 = nextCoord[0] - 45;
-        const cy1 = nextCoord[1] - 15;
-
-        d3.xml("./assets/SVGs/ReLU.svg").then(function (data) {
-            console.log("xml", data.documentElement);
-            if(relu.node()!=null){
-            const ReLU = relu!.node()!.appendChild(data.documentElement);
-            d3.select(ReLU)
-                .attr("x", cx1)
-                .attr("y", cy1)
-                .attr("class", "procVis")
-                .raise();
-            }
-        });
 
         //find start locations and end locations
         const coordStartPoint: [number, number] = [
@@ -645,59 +490,28 @@ export function featureVisClick(
         const Xt = math.transpose(weights[layerID]);
         let i = 0;
 
+        //draw feature summation visualizer
+        drawSummationFeature(
+            g,X,coordFeatureVis, w, rectH, myColor, posList, mulValues
+        );
+
+        // weight matrix * vector visualzier
+        drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor);
+
+        // bias visualzier
+        drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2, myColor, layerBias);
+
+        drawFinalPath(wmCoord, res00, res01, nextCoord);
+
+        drawReLU(midX1, wmCoord, biasCoord, nextCoord);
+
         intervalID = setInterval(() => {
-            d3.selectAll("#tempath").remove();
-            const Xv = Xt[currentStep];
-            for (let j = 0; j < featureChannels; j++) {
-                const s1 = startCoordList[j];
-                const e1 = endCoordList[currentStep];
-                let pathDir = e1[0] > s1[0] ? 0 : 1;
-                if (curveDir == 1) {
-                    pathDir = e1[0] > s1[0] ? 1 : 0;
-                }
-                //drawPoints(".mats", "red", [s1, e1]);
-                console.log("se", [s1, e1]);
-                d3.select(".mats")
-                    .append("path")
-                    .attr("d", function () {
-                        return [
-                            "M",
-                            s1[0],
-                            s1[1],
-                            "A",
-                            (e1[0] - s1[0]) / 2,
-                            ",",
-                            (e1[0] - s1[0]) / 4,
-                            0,
-                            0,
-                            ",",
-                            pathDir,
-                            ",",
-                            e1[0],
-                            ",",
-                            e1[1],
-                        ].join(" ");
-                    })
-                    .attr("class", "procVis")
-                    .attr("id", "tempath")
-                    .style("fill", "none")
-                    .attr("stroke", myColor(Xv[j]));
-            }
-            d3.selectAll("#tempath").lower();
+            drawAniPath(Xt, currentStep, startCoordList, endCoordList, curveDir, myColor, featureChannels);
             currentStep++;
             console.log("currentStep", currentStep);
 
             if(currentStep >= featureChannels){
-                d3.select(".mats")
-                    .append("path")
-                    .attr("d", lineGenerator([biasCoord, res10, res11, nextCoord]))
-                    .attr("stroke", "black")
-                    .attr("opacity", 0.05)
-                    .attr("fill", "none")
-                    .attr("class", "procVis biasPath")
-                    .attr("id", "procPath")
-                    .lower();
-                d3.selectAll(".biasPath").transition().duration(1000).attr("opacity", 1);
+                drawBiasPath(biasCoord, res10, res11, nextCoord);
             }
 
             if (currentStep >= featureChannels || !lock) {
@@ -766,26 +580,13 @@ export function featureVisClick(
                     startCoordList,
                     endCoordList,
                     curveDir,
-                    myColor
+                    myColor,
+                    featureChannels
                 );
                 currentStep++;
                 console.log("i", currentStep);
                 if(currentStep>=featureChannels){
-                    const lineGenerator = d3
-                        .line<[number, number]>()
-                        .curve(d3.curveBasis)
-                        .x((d) => d[0])
-                        .y((d) => d[1]);
-                     d3.select(".mats")
-                        .append("path")
-                        .attr("d", lineGenerator([biasCoord, res10, res11, nextCoord]))
-                        .attr("stroke", "black")
-                        .attr("opacity", 0.05)
-                        .attr("fill", "none")
-                        .attr("class", "procVis biasPath")
-                        .attr("id", "procPath")
-                        .lower();
-                    d3.selectAll(".biasPath").transition().duration(1000).attr("opacity", 1);
+                    drawBiasPath(biasCoord, res10, res11, nextCoord);
                 }
                 if (currentStep >= featureChannels || !lock) {
                     injectPlayButtonSVG(
@@ -1237,7 +1038,7 @@ export function outputVisClick(
 
         intervalID = setInterval(() => {
             const Xt = modelParams.weights[3];
-            drawAniPath(Xt, currentStep, startCoord, endCoord, 1, myColor);
+            drawAniPath(Xt, currentStep, startCoord, endCoord, 1, myColor, featureChannels);
             currentStep++;
             console.log("currentStep", currentStep);
             if (currentStep >= 2) {

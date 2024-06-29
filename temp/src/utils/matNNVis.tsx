@@ -102,7 +102,7 @@ async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: str
 
     // Append the SVG object to the body of the page
     console.log("GRAPH", graph);
-    d3.select("#matvis").selectAll("svg").remove();
+    d3.select("#matvis").selectAll("*").remove();
     const svg = d3
         .select("#matvis")
         .append("svg")
@@ -172,7 +172,7 @@ async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: str
 
     locations = get_cood_locations(data, locations);
     //crossConnectionMatrices(graphs, locations, offsetMat, pathMatrix);
-    visualizeGraphClassifierFeatures(
+    const featuresManager = visualizeGraphClassifierFeatures(
         locations,
         features,
         myColor,
@@ -186,6 +186,10 @@ async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: str
         colorSchemeTable
     );
     drawNodeAttributes(nodeAttrs, graph, 50);
+
+    const intervalID = featuresManager.getIntervalID();
+    console.log("get interval ID init G", intervalID);
+    clearInterval(intervalID);
 };
 
 //VIsualization Pipeline
