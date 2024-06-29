@@ -6,8 +6,8 @@ import ClassifyGraph from "./FileUpload";
 // import { CSSTransition } from 'react-transition-group';
 import MatricesVisualizer from "./MatricesVisualizer";
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels";
-import { IntmData } from "../types";
-import { graphList, modelList } from "./const";
+import { IntmData, IntmDataNode } from "../types";
+import { graphList, modelList, nodeList } from "./const";
 
 import {
     Sidebar,
@@ -56,12 +56,13 @@ export default function Home() {
     const [simulationLoading, setSimulation] = useState(false);
 
     //intermediate output
-    const [intmData, setIntmData] = useState<IntmData | null>(null);
+    const [intmData, setIntmData] = useState<IntmData | IntmDataNode | null>(null);
     const [selectedButtons, setSelectedButtons] = useState([false, false, false, false, false, false, false]);
-    const [probabilities, setProbabilities] = useState<number[]>([]);
+    const [probabilities, setProbabilities] = useState<number[] | number[][]>([]);
 
 
     function handleGraphSelection(e: React.ChangeEvent<HTMLSelectElement>): void {
+        console.log("graph handler",e.target.value);
         setSelectedGraph(e.target.value);
         setChangedG(true);
         setProbabilities([]);
@@ -69,15 +70,6 @@ export default function Home() {
         setSimulation(false);
     }
 
-    // For now leave this commented out
-    // useEffect(() => {
-    //     if (step < 1) {
-    //         const timer = setTimeout(() => {
-    //             setStep(step + 1);
-    //         }, 3500); 
-    //         return () => clearTimeout(timer);
-    //     }
-    // }, [step]);
     useEffect(() => {
         (document.body.style as any).zoom = "67%";
 
@@ -135,14 +127,26 @@ export default function Home() {
                                 <Selector
                                     selectedOption={model}
                                     handleChange={(e) => {
-                                        setModel(e.target.value);
+                                        const newModel = e.target.value;
+                                        setModel(newModel);
                                         setPredicted(false);
                                         setProbabilities([]);
+                                        if (newModel === "node classification") {
+                                            setSelectedGraph("karate");
+                                        } else {
+                                            setSelectedGraph("graph_0");
+                                        }
+                                        console.log("selectedGraph from selector", selectedGraph);
                                     }}
                                     OptionList={Object.keys(modelList)}
                                 />
 
-                                <ButtonChain selectedButtons={selectedButtons} setSelectedButtons={setSelectedButtons} predicted={predicted} />
+                                {model=="graph classification"?
+                                <ButtonChain 
+                                    selectedButtons={selectedButtons} 
+                                    setSelectedButtons={setSelectedButtons} 
+                                    predicted={predicted} 
+                                />:<></>}
                             </div>
                             {/* <CSSTransition in={show}
                                 timeout={300}
@@ -162,15 +166,33 @@ export default function Home() {
                                 <div className="flex items-center gap-x-4 ">
                                     <Hint text={"Select a graph"} />
                                     <div className={inter3.className}>
-                                        <Selector
-                                            selectedOption={selectedGraph}
-                                            handleChange={handleGraphSelection}
-                                            OptionList={Object.keys(graphList)}
-                                        />
+                                        {
+                                            model=="graph classification"
+                                            ?
+                                            <Selector
+                                                selectedOption={selectedGraph}
+                                                handleChange={handleGraphSelection}
+                                                OptionList={Object.keys(graphList)}
+                                            />
+                                            :
+                                            <Selector
+                                                selectedOption={selectedGraph}
+                                                handleChange={handleGraphSelection}
+                                                OptionList={Object.keys(nodeList)}
+                                            />
+                                        }
                                     </div>
                                 </div>
 
-                                <GraphAnalysisViewer path={graphList[selectedGraph]} />
+                                {
+                                    selectedGraph && (graphList[selectedGraph] || nodeList[selectedGraph])?(
+                                    model=="graph classification"?
+                                    <GraphAnalysisViewer path={graphList[selectedGraph]} />
+                                    :
+                                    <GraphAnalysisViewer path={nodeList[selectedGraph]} />):null
+                                }
+
+                                
                             </div>
 
                             <hr className="border-t border-gray-300 my-4"></hr>
@@ -210,7 +232,7 @@ export default function Home() {
                                 </div>
                             </div>
 
-                            {isGraphView ? (
+                            {model=="graph classification"?(isGraphView ? (
                                 <>
 
                                     <GraphVisualizer
@@ -233,13 +255,14 @@ export default function Home() {
                                         selectedButtons={selectedButtons}
                                     />
                                 </>
-                            )}
+                            )):<></>}
 
                             {/* overlay text on visualizer when not predicted */}
                             {probabilities.length==0 && (
                                 <div className="absolute top-1/2 left-1/2 ">
                                     <h1 className="text-4xl text-gray-300">Model Visualization will show after prediction</h1>
                                     
+                                    {model=="graph classification"?
                                     <ClassifyGraph
                                         graphPath={graphList[selectedGraph]}
                                         modelPath={modelList[model]}
@@ -251,7 +274,19 @@ export default function Home() {
                                         setProbabilities={setProbabilities}
                                         onlyShownButton={true}
                                         simulationLoading={simulationLoading}
-                                    />
+                                    />:
+                                    <ClassifyGraph
+                                        graphPath={nodeList[selectedGraph]}
+                                        modelPath={modelList[model]}
+                                        setChangedG={setChangedG}
+                                        setIntmData={setIntmData}
+                                        setPredicted={setPredicted}
+                                        predicted={predicted}
+                                        probabilities={probabilities}
+                                        setProbabilities={setProbabilities}
+                                        onlyShownButton={true}
+                                        simulationLoading={simulationLoading}
+                                    />}
 
                                 </div>
                             )}

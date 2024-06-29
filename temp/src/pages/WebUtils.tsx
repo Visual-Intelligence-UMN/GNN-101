@@ -63,6 +63,7 @@ export const GraphAnalysisViewer: React.FC<GraphAnalysisViewerProps> = ({
 
     useEffect(() => {
         const analysis = async () => {
+            console.log("Ganalysis path", path);
             const graphData: any = await load_json(path);
             console.log("GDATA", graphData);
             const result: any = analyzeGraph(graphData);

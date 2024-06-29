@@ -6,7 +6,7 @@ import * as ort from "onnxruntime-web";
 import { env } from "onnxruntime-web";
 import { aggregationCalculator, matrixMultiplication } from "@/utils/graphUtils";
 import { features } from 'process';
-import { IGraphData, IntmData } from "../types/";
+import { IGraphData, IntmData, IntmDataNode } from "../types/";
 
 import { 
   hideAllLinks, 
@@ -248,9 +248,11 @@ export async function prepMatrices(n: number, mat: number[][]) {
 
 export const load_json = async (path: string) => {
   try {
-    console.log('entered load_json');
+    console.log('entered load_json', path);
     const response = await fetch(path);
+    console.log("response", response);
     const data = await response.json();
+    console.log("data", data)
     return data;
   } catch (error) {
     console.error('There has been a problem with your fetch operation:', error);
@@ -905,7 +907,7 @@ export function deepClone(obj: any) {
 }
 
 export async function process() {
-    var data = await data_prep("./input_graph.json");
+    var data = await data_prep("./graphs/input_graph.json");
     console.log(data);
     return data;
 }
@@ -1032,4 +1034,76 @@ export const graphPrediction = async (modelPath: string, graphPath: string) => {
 	
 }
 
+function splitArray(arr: number[], chunkSize: number): number[][] {
+  const chunks: number[][] = [];
+  for (let i = 0; i < arr.length; i += chunkSize) {
+      chunks.push(arr.slice(i, i + chunkSize));
+  }
+  return chunks;
+}
 
+type PredictionResult = {
+  prob: number[] | number[][],
+  intmData: IntmData | IntmDataNode
+};
+
+export const nodePrediction = async (modelPath: string, graphPath: string): Promise<PredictionResult> => {
+ 
+		console.log("start classifying....", modelPath, graphPath);
+		const session = await loadModel(modelPath);
+		const graphData: any = await load_json(graphPath);
+
+    console.log("graphData", graphData);
+
+		// Convert `graphData` to tensor-like object expected by your ONNX model
+		const xTensor = new ort.Tensor(
+			"float32",
+			new Float32Array(graphData.x.flat()),
+			[graphData.x.length, graphData.x[0].length]
+		);
+
+		let int32Array = new Int32Array(
+      graphData["edge_index"].flat()
+    );
+    let bigInt64Array = new BigInt64Array(
+        int32Array.length
+    );
+    for (let i = 0; i < int32Array.length; i++) {
+        bigInt64Array[i] = BigInt(int32Array[i]);
+    }
+    let edgeIndexTensor = new ort.Tensor(
+        "int64",
+        bigInt64Array,
+        [
+            graphData.edge_index.length,
+            graphData.edge_index[0].length,
+        ]
+    );
+
+		const outputMap = await session.run({
+			x: xTensor,
+			edge_index: edgeIndexTensor,
+		});
+		const outputTensor = outputMap.final;
+
+    const resultArray:number[][] = splitArray(outputTensor.cpuData, 4);
+    
+    let prob:number[][] = [];
+
+    for(let i=0; i<resultArray.length; i++){
+        prob.push(softmax(resultArray[i]));
+    }
+
+		const intmData: IntmDataNode = {
+			conv1: outputMap.conv1.cpuData,
+			conv2: outputMap.conv2.cpuData,
+			conv3: outputMap.conv3.cpuData,
+			final: outputTensor.cpuData,
+      result: prob
+		};
+
+    console.log("prediction result from node classifier", intmData, prob);
+
+		return {prob, intmData};
+	
+}
