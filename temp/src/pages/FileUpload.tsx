@@ -59,7 +59,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({ graphPath, modelPath, set
 				
 		)
 	): Array.isArray(probabilities[0]) ? (
-		<div></div>
+		<div>{/* the prediction visualization for the node classifier */}</div>
 	) : probabilities.length > 0 && typeof probabilities[0] === 'number'? (
 		<PredictionVisualizer result={{ 'Non-Mutagenic': probabilities[0] as number, 'Mutagenic': probabilities[1] as number }} />
 	) : (
@@ -70,7 +70,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({ graphPath, modelPath, set
 		<div className="flex gap-x-4 items-center">
 			<h1 className="text-3xl font-black">Predictions</h1>
 			<p className= 'mt-1 	mx-3'>No data available yet!</p>
-			<Hint text='Press the "Classify a Graph" to predict' />
+			<Hint text='Press the "Click to Predict!" to predict' />
 		</div>)}
 		{prediction}
 	</div>

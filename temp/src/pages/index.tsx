@@ -18,6 +18,7 @@ import {
     ModelButtonChain,
     ViewSwitch,
     GraphAnalysisViewer,
+    NodeClassifierButtonChain,
 } from "./WebUtils";
 import { Tooltip } from "react-tooltip";
 import { Inter } from '@next/font/google';
@@ -147,7 +148,14 @@ export default function Home() {
                                     selectedButtons={selectedButtons} 
                                     setSelectedButtons={setSelectedButtons} 
                                     predicted={predicted} 
-                                />:<></>}
+                                />
+                                :
+                                <NodeClassifierButtonChain 
+                                    selectedButtons={selectedButtons} 
+                                    setSelectedButtons={setSelectedButtons} 
+                                    predicted={predicted} 
+                                />
+                                }
                             </div>
                             {/* <CSSTransition in={show}
                                 timeout={300}
@@ -256,7 +264,7 @@ export default function Home() {
                                         selectedButtons={selectedButtons}
                                     />
                                 </>
-                            )):<></>}
+                            )):<>{/**the visualization for the node classifier */}</>}
 
                             {/* overlay text on visualizer when not predicted */}
                             {probabilities.length==0 && (

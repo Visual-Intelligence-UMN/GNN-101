@@ -185,6 +185,73 @@ export const ButtonChain = ({ selectedButtons, setSelectedButtons, predicted }: 
         </div>
     );
 };
+
+//we may want to find a smater way to do the button chain
+export const NodeClassifierButtonChain = ({ selectedButtons, setSelectedButtons, predicted }: { selectedButtons: any[], setSelectedButtons: Function, predicted: boolean }) => {
+
+    const handleButtonClick = (index: number) => {
+        setSelectedButtons((prevSelectedLayers: any[]) => {
+            const updatedLayers = [...prevSelectedLayers];
+            updatedLayers[index] = !(updatedLayers[index]);
+
+            return updatedLayers;
+        });
+    };
+    return (
+        <div className="flex gap-x-4 items-center" >
+            <div className="flex">
+                <h2 className="text-xl m-auto">Architecture </h2>
+                <div className="my-1 mx-2">
+                    <Hint text={"Click to highlight corresponding layer in Model Visualization"} />
+                </div>
+            </div>
+            <div>
+                <div className="flex items-center justify-center gap-x-2 opacity-80">
+
+                    {/* Since input is not shown during the predicted phase, it is disabled */}
+                    <button
+                        disabled={!predicted}
+                        className={`bg-gray-200  ${predicted ? 'hover:border-black hover:bg-gray-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[0] ? 'outline outline-2 outline-black bg-gray-300' : ''}`}
+                        onClick={() => handleButtonClick(0)}>
+                        Input
+                    </button>
+                    <button
+                        disabled={!predicted}
+                        className={`bg-yellow-200  ${predicted ? 'hover:border-black hover:bg-yellow-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[1] ? 'outline outline-2 outline-black bg-yellow-300' : ''}`}
+                        onClick={() => handleButtonClick(1)}>
+                        GNNConv1
+                    </button>
+                    <button
+                        disabled={!predicted}
+                        className={`bg-yellow-200  ${predicted ? 'hover:border-black hover:bg-yellow-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[2] ? 'outline outline-2 outline-black bg-yellow-300' : ''}`}
+                        onClick={() => handleButtonClick(2)}>
+                        GNNConv2
+                    </button>
+                    <button
+                        disabled={!predicted}
+                        className={`bg-yellow-200  ${predicted ? 'hover:border-black hover:bg-yellow-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[3] ? 'outline outline-2 outline-black bg-yellow-300' : ''}`}
+                        onClick={() => handleButtonClick(3)}>
+                        GNNConv3
+                    </button>
+                    <button
+                        disabled={!predicted}
+                        className={`bg-emerald-200  ${predicted ? 'hover:border-black hover:bg-green-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[5] ? 'outline outline-2 outline-black bg-green-300' : ''}`}
+                        onClick={() => handleButtonClick(5)}>
+                        FC
+                    </button>
+                    <button
+                        disabled={!predicted}
+                        className={`bg-gray-200  ${predicted ? 'hover:border-black hover:bg-gray-300' : ''} text-black py-1 px-2 rounded ${selectedButtons[6] ? 'outline outline-2 outline-black bg-gray-300' : ''}`}
+                        onClick={() => handleButtonClick(6)}>
+                        Output
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
 export const ModelButtonChain = () => {
     return (
         <div className="flex items-center space-x-4">
