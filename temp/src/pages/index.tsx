@@ -131,6 +131,7 @@ export default function Home() {
                                         setModel(newModel);
                                         setPredicted(false);
                                         setProbabilities([]);
+                                        setIntmData(null);
                                         if (newModel === "node classification") {
                                             setSelectedGraph("karate");
                                         } else {
