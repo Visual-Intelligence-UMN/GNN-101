@@ -38,17 +38,19 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const lastIntmData = useRef(intmData);
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const currentVisualizationId = useRef(0);
 
-  console.log("updated", intmData);
   if (intmData != null) {
     console.log("From Visualizer:", intmData);
   }
   
   useEffect(() => {
     setSimulation(false)
-    const init = async (graphs: any[], initialCoords: { [id: string]: { x: number, y: number } }) => {
-      setSimulation(false)
+    const visualizationId = ++currentVisualizationId.current;
 
+    const init = async (graphs: any[], initialCoords: { [id: string]: { x: number, y: number } }) => {
+      
+      
       if (intmData != null) {
         console.log("From Visualizer:", intmData);
       }
@@ -331,9 +333,24 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
         setIsLoading(false);
       }
 
-
       )
     };
+
+    const handleSimulationComplete = (completedVisualizationId: number) => {
+      if (completedVisualizationId === currentVisualizationId.current) {
+        setSimulation(true);
+      }
+    };
+
+    const runVisualization = async () => {
+      if ((intmData == null || changed) && !predicted) {
+        await visualizeGraph(graph_path,() => handleSimulationComplete(visualizationId));
+      } else {
+        await visualizeGNN(4);
+        handleSimulationComplete(visualizationId);
+      }
+    };
+
 
     const visualizeGNN = async (num: number) => {
       try {
@@ -352,12 +369,12 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
         setIsLoading(false);
       }
     };
-    if ((intmData == null || changed) && !predicted) {
-      visualizeGraph(graph_path, setSimulation);
-    } else {
-      visualizeGNN(4);
-    }
-    console.log("i fire once");
+    
+    runVisualization();
+
+    
+  
+    
   }, [graph_path, intmData]);
   const updateTextElements = (svg: SVGSVGElement, selectedButtons: boolean[]) => {
     d3.select(svg)

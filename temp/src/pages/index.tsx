@@ -66,6 +66,7 @@ export default function Home() {
         setChangedG(true);
         setProbabilities([]);
         setPredicted(false);
+        setSimulation(false);
     }
 
     // For now leave this commented out
@@ -81,6 +82,7 @@ export default function Home() {
         (document.body.style as any).zoom = "67%";
 
     }, []);
+   
     return (
         <main className={inter.className}>
             <Head>
