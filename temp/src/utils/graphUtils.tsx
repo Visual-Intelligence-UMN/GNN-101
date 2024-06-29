@@ -169,7 +169,7 @@ export function resetNodes(allNodes: any[]) {
       .attr("height", 15)
       .style("fill", (d: number) => myColor(d))
       .style("stroke-width", 1)
-      .attr("class", "aggregatedFeatureGroup")
+      .attr("class", "aggregatedFeatureGroup to-be-removed")
       .style("stroke", "grey")
       .style("opacity", 0);
 
@@ -249,6 +249,7 @@ export function resetNodes(allNodes: any[]) {
     }
   
     setTimeout(() => {
+      weightAnimation(svg, node, startCoordList, endCoordList, currentWeights, offset, height, moveOffset); 
       if (node.relatedNodes) {
         node.relatedNodes.forEach((n: any, i: number) => {
           if (n.featureGroupLocation) {
@@ -375,7 +376,7 @@ export function resetNodes(allNodes: any[]) {
 
 
   
-    weightAnimation(svg, node, startCoordList, endCoordList, currentWeights, offset, height, moveOffset); 
+    
     document.addEventListener('click', () => {
       moveFeaturesBack(node, node.relatedNodes, originalCoordinates);
       d3.selectAll(".to-be-removed").remove();
@@ -489,6 +490,8 @@ export function resetNodes(allNodes: any[]) {
             isPlaying = false;
             d3.selectAll(`#tempath${i - 1}`).remove();
             d3.select(".button-discri").text("play");
+            setTimeout(() => {
+                          
             d3.selectAll(".bias").style("opacity", 1);
             d3.selectAll(".relu").attr("opacity", 1)
             d3.selectAll(".output").transition()
@@ -496,6 +499,11 @@ export function resetNodes(allNodes: any[]) {
             .duration(1000)
             .attr("opacity", 1)
             .attr("transform", `translate(${node.featureGroupLocation.xPos - 2.5 * offset + (moveOffset - node.features.length * 3 - node.relatedNodes[0].features.length * 6) - 100 + 12.5}, ${node.featureGroupLocation.yPos - height / 5 - 150 - node.features.length * 3}) rotate(90)`);
+              
+            }, 2000);
+            
+           
+
           }
         }
       }, 250);
@@ -503,7 +511,7 @@ export function resetNodes(allNodes: any[]) {
   
     setTimeout(() => {
       startAnimation();
-    }, 4000);
+    }, 1000);
   }
   
   function GraphViewDrawPaths(
