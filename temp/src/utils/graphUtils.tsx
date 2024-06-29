@@ -40,6 +40,11 @@ export function reduceNodeOpacity(nodes: any[], relatedNodes: any[], selfNode: a
   }
 
 export function highlightNodes(node: any) {
+  const linkStrength = d3.scaleLinear()
+          .domain([-0.25, 0, 0.25])
+          .range([0.1, 0.3, .6]);
+  const avg = calculateAverage(node.features);
+
   if (node.featureGroup && node.svgElement) {
     node.featureGroup.style('visibility', 'visible');
     node.featureGroup.raise();
@@ -56,7 +61,8 @@ export function highlightNodes(node: any) {
 
   if (node.links) {
     node.links.forEach((link: any) => {
-      link.style("opacity", 0.7);
+      node.features
+      link.style("opacity", linkStrength(avg));
     });
   }
 }
