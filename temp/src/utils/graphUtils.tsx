@@ -46,16 +46,12 @@ export function highlightNodes(node: any) {
   const avg = calculateAverage(node.features);
 
   if (node.featureGroup && node.svgElement) {
-    node.featureGroup.style('visibility', 'visible');
-    node.featureGroup.raise();
     d3.select(node.svgElement).attr("stroke-width", 3);
   } 
 
   if (node.relatedNodes) {
     node.relatedNodes.forEach((n: any) => {
       d3.select(n.svgElement).attr("stroke-width", 3);
-      n.featureGroup.style('visibility', 'visible');
-      n.featureGroup.raise();
     });
   }
 
@@ -80,11 +76,6 @@ export function resetNodes(allNodes: any[]) {
         node.relatedNodes.forEach((relatedNode: any) => {
           d3.select(relatedNode.svgElement).attr("stroke-width", 1);
         });
-      }
-      if (node.intermediatePaths) {
-        node.intermediatePaths.forEach((path: any) => {
-          path.style("opacity", 0);
-        })
       }
       if (node.intermediateFeatureGroups) {
         node.intermediateFeatureGroups.forEach((intermediateFeatureGroup: any) => {
@@ -114,10 +105,17 @@ export function resetNodes(allNodes: any[]) {
   }
 
 
-  export function calculationVisualizer(node: any, currentWeights: any, bias: any, normalizedAdjMatrix: any, aggregatedDataMap: any[], calculatedDataMap: any[], svg: any, offset: number, height: number, isClicked: boolean) {
+  export function calculationVisualizer(node: any, currentWeights: any, bias: any, normalizedAdjMatrix: any, aggregatedDataMap: any[], calculatedDataMap: any[], svg: any, offset: number, height: number, isClicked: boolean, moveOffset: number) {
     if (isClicked || aggregatedDataMap == null || calculatedDataMap == null) { 
       return;
     }
+    node.featureGroup.style("visibility", "visible");
+    node.featureGroup.raise();
+    node.relatedNodes.forEach((n: any) => {
+      n.featureGroup.style("visibility", "visible");
+      n.featureGroup.raise();
+    })
+
     let isPlaying: boolean = true;
   
     let biasData = [];
@@ -176,7 +174,7 @@ export function resetNodes(allNodes: any[]) {
       .style("opacity", 0);
 
     d3.selectAll(".aggregatedFeatureGroup").transition()
-      .delay(1000)
+      .delay(3500)
       .style("opacity", 1);
       
   
@@ -203,7 +201,7 @@ export function resetNodes(allNodes: any[]) {
       .attr("y", 0)
       .attr("width", 3)
       .attr("height", 15)
-      .attr("class", (d: number, i: number) => `calculatedFeatures${i}`)
+      .attr("class", (d: number, i: number) => `calculatedFeatures${i} to-be-removed`)
       .style("fill", (d: number) => myColor(d))
       .style("stroke-width", 1)
       .style("stroke", "grey")
@@ -239,10 +237,10 @@ export function resetNodes(allNodes: any[]) {
     intermediateFeatureGroups.push(BiasGroup);
     node.intermediateFeatureGroups = intermediateFeatureGroups;
   
-    if (node.featureGroupLocation) {
-      end_x = xPos + 400;
-      end_y = yPos;
-    }
+ 
+    end_x = 3.5 * offset + node.relatedNodes[0].features.length * 3
+    end_y = height / 5 + 150 + 7.5;
+    
     let adjMatrixSlice: number[] = []; 
     for (let i = 0; i < normalizedAdjMatrix[node.id].length; i++) {
       if (normalizedAdjMatrix[node.id][i] != 0) {
@@ -254,38 +252,43 @@ export function resetNodes(allNodes: any[]) {
       if (node.relatedNodes) {
         node.relatedNodes.forEach((n: any, i: number) => {
           if (n.featureGroupLocation) {
-            start_x = n.featureGroupLocation.xPos + 15;
-            start_y = n.featureGroupLocation.yPos + 5;
-  
-            const controlX = (start_x + end_x) / 2;
-            const controlY = start_y + 100;
-  
+            start_x = 3.5 * offset - 70 + n.features.length * 3;
+            start_y = height / 5 + 90 + 40 * i;
+
+            const control1_x = start_x + (end_x - start_x) * 0.3;
+            const control1_y = start_y;
+            const control2_x = start_x + (end_x - start_x) * 0.7;
+            const control2_y = end_y;
+
             let color = calculateAverage(n.features);
-  
+
             g3.append("text")
               .attr("x", start_x + 20)
               .attr("y", start_y - 10)
               .text(adjMatrixSlice[i])
               .attr("class", "parameter")
               .attr("opacity", 1);
-  
+
             const originToAggregated = g3.append("path")
-              .attr("d", `M${start_x},${start_y} Q${controlX},${controlY} ${end_x},${end_y}`)
+              .attr("d", `M${start_x},${start_y} C ${control1_x},${control1_y}, ${control2_x},${control2_y}, ${end_x},${end_y}`)
               .style("stroke", pathColor(color))
               .style("opacity", 0.7)
               .style("stroke-width", 1)
               .style("fill", "none")
-              .style("opacity", 1);
-  
+              .attr("class", "to-be-removed origin-to-aggregated")
+              .style("opacity", 0);
+
+            d3.selectAll(".origin-to-aggregated").style("opacity", 1)
+
             paths.push(originToAggregated);
           }
         });
   
         let color;
-        start_x = xPos + 600 + 15;
-        start_y = yPos;
-        end_x = xPos + 600 + 300; // the horizontal distance is offset(600) + moveoffset(300)
-        end_y = yPos;
+        start_x =  3.5 * offset + node.relatedNodes[0].features.length * 6 + node.features.length * 3 + 35
+        start_y = height / 5 + 150 + 7.5
+        end_x =  3.5 * offset + node.relatedNodes[0].features.length * 6 + node.features.length * 3 + 100 // the horizontal distance is offset(600) + moveoffset(300)
+        end_y = height / 5 + 150 + 7.5
   
         color = calculateAverage(node.features); // to be determined
   
@@ -294,13 +297,13 @@ export function resetNodes(allNodes: any[]) {
           .style("stroke", pathColor(color))
           .style("stroke-width", 1)
           .style("fill", "none")
-          .attr("class", "relu")
+          .attr("class", "relu to-be-removed")
           .attr("opacity", 0);
   
         paths.push(aggregatedToFinal);
   
-        start_x = xPos + 600 + 15;
-        start_y = yPos - 220 + 5;
+        start_x =  3.5 * offset + node.relatedNodes[0].features.length * 6 + node.features.length * 3 + 35
+        start_y = height / 5 + 100 + 7.5
   
         let control1_x = start_x + (end_x - start_x) * 0.2;
         let control1_y = start_y;
@@ -309,12 +312,12 @@ export function resetNodes(allNodes: any[]) {
   
         color = calculateAverage(node.features); // to be determined
         const biasToFinal = g3.append("path")
-        .attr("d", `M${start_x},${start_y} C ${control1_x} ${control1_y}, ${control2_x} ${control2_y} ${end_x},${end_y}`)
+        .attr("d", `M${start_x},${start_y} C ${control1_x} ${control1_y}, ${control2_x} ${control2_y} ${end_x - 30},${end_y}`)
           .style("stroke", pathColor(color))
           .style("opacity", 0.7)
           .style("stroke-width", 1)
           .style("fill", "none")
-          .attr("class", "bias")
+          .attr("class", "bias to-be-removed")
           .style("opacity", 0);
   
         paths.push(biasToFinal);
@@ -329,7 +332,7 @@ export function resetNodes(allNodes: any[]) {
         .style("fill", "white")
         .style("stroke", "black")
         .style("stroke-width", 1)
-        .attr("class", "relu")
+        .attr("class", "relu to-be-removed")
         .attr("opacity", 0);
   
       g3.append("text")
@@ -340,14 +343,42 @@ export function resetNodes(allNodes: any[]) {
       .style("font-size", "12px")
       .style("fill", "black")
       .attr("opacity", 0)
-      .attr("class", "relu")
+      .attr("class", "relu to-be-removed")
       .style("text-anchor", "middle");  
       
-    }, 1500);
+    }, 3500);
+
+    const outputGroup = g3.append("g")
+      .attr("transform", `translate(${3.5 * offset + node.relatedNodes[0].features.length * 6 + node.features.length * 3 + 95}, ${height / 5 + 150})`);
   
-    weightAnimation(svg, node, startCoordList, endCoordList, currentWeights); 
+    outputGroup.selectAll("rect")
+      .data(node.features)
+      .enter()
+      .append("rect")
+      .attr("class", "relu output")
+      .attr("x", (d: any, i: number) => i * 3 + 5)
+      .attr("y", 0)
+      .attr("width", 3)
+      .attr("height", 15)
+      .style("fill", (d: number) => myColor(d))
+      .style("stroke-width", 1)
+      .style("stroke", "grey")
+      .attr("opacity", 0);
+  
+    intermediateFeatureGroups.push(outputGroup);
+    node.intermediateFeatureGroups = intermediateFeatureGroups;
+
+
+     
+
+  
+
+
+  
+    weightAnimation(svg, node, startCoordList, endCoordList, currentWeights, offset, height, moveOffset); 
     document.addEventListener('click', () => {
       moveFeaturesBack(node, node.relatedNodes, originalCoordinates);
+      d3.selectAll(".to-be-removed").remove();
     });
   }
   
@@ -374,7 +405,7 @@ export function resetNodes(allNodes: any[]) {
     });
   }
   
-  function weightAnimation(svg: any, node: any, startCoordList: number[][], endCoordList: number[][], weights: any) {
+  function weightAnimation(svg: any, node: any, startCoordList: number[][], endCoordList: number[][], weights: any, offset: number, height: number, moveOffset: number) {
     let i = 0;
     let intervalID: any;
     let isPlaying = true;
@@ -431,6 +462,7 @@ export function resetNodes(allNodes: any[]) {
       d3.selectAll(".relu").remove();
       d3.selectAll(".intermediate-path").remove();
       d3.selectAll(".parameter").remove();
+      d3.selectAll(".to-be-removed").remove();
     });
   
     function startAnimation() {
@@ -459,14 +491,19 @@ export function resetNodes(allNodes: any[]) {
             d3.select(".button-discri").text("play");
             d3.selectAll(".bias").style("opacity", 1);
             d3.selectAll(".relu").attr("opacity", 1)
+            d3.selectAll(".output").transition()
+            .delay(2000)
+            .duration(1000)
+            .attr("opacity", 1)
+            .attr("transform", `translate(${node.featureGroupLocation.xPos - 2.5 * offset + (moveOffset - node.features.length * 3 - node.relatedNodes[0].features.length * 6) - 100 + 12.5}, ${node.featureGroupLocation.yPos - height / 5 - 150 - node.features.length * 3}) rotate(90)`);
           }
         }
-      }, 500);
+      }, 250);
     }
   
     setTimeout(() => {
       startAnimation();
-    }, 2000);
+    }, 4000);
   }
   
   function GraphViewDrawPaths(
@@ -501,14 +538,14 @@ export function resetNodes(allNodes: any[]) {
         .attr("stroke-width", 1)
         .attr("opacity", 1)
         .attr("fill", "none")
-        .attr("class", "intermediate-path")
+        .attr("class", "intermediate-path to-be-removed")
         .attr("id", `tempath${i}`);
     }
   
     if (isAnimating) {
       setTimeout(() => {
         i++;
-      }, 500);
+      }, 250);
     }
   }
   
@@ -598,6 +635,7 @@ export function resetNodes(allNodes: any[]) {
     relatedNodes.forEach((n: any, i: number) => {
       if (n.featureGroup) {
         n.featureGroup.transition() 
+          .delay(2000)
           .duration(1000)
           .attr("transform", `translate(${xPos + 20}, ${yPos + i * 40 + 100}) rotate(-90)`);
       }

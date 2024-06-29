@@ -431,7 +431,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
   
   let movedNode: any = null; // to prevent the same node is clicked twice
-  let moveOffset = 600;
+  
   let isClicked = false; // if isClicked is true, all mouseover/out operation would be banned and some certain functions would be called
 
 
@@ -443,6 +443,10 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
     let aggregatedDataMap: any[] = [];
     let calculatedDataMap: any[] = [];
     let currentWeights: any[] = [];
+    let moveOffset = 900;
+    if (graphIndex === 1) {
+      moveOffset = 600
+    }
 
 
     // do some calculation that sill be used in the animation
@@ -591,7 +595,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
               return;
             }
             hideAllLinks(allNodes);
-            calculationVisualizer(node, currentWeights, bias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, isClicked);
+            calculationVisualizer(node, currentWeights, bias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, isClicked, moveOffset);
             
             let relatedNodes: any = [];
             if (node.relatedNodes) {
@@ -621,7 +625,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
               return;
             }
             hideAllLinks(allNodes);
-            calculationVisualizer(node, currentWeights, bias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, isClicked);
+            calculationVisualizer(node, currentWeights, bias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, isClicked, moveOffset);
             
             let relatedNodes: any = [];
             if (node.relatedNodes) {
@@ -743,6 +747,10 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
     if (movedNode && (!event.target.classList.contains("vis-component"))) {
       svg.selectAll(".vis-component")
         .style("opacity", 0);
+      let moveOffset = 900
+      if (movedNode.graphIndex === 1) {
+        moveOffset = 600
+      }  
       moveNextLayer(svg, movedNode, moveOffset, -1)
       isClicked = false; 
       movedNode = null;
