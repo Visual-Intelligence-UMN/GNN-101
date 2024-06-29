@@ -605,12 +605,14 @@ export function featureVisClick(
 
         d3.xml("./assets/SVGs/ReLU.svg").then(function (data) {
             console.log("xml", data.documentElement);
+            if(relu.node()!=null){
             const ReLU = relu!.node()!.appendChild(data.documentElement);
             d3.select(ReLU)
                 .attr("x", cx1)
                 .attr("y", cy1)
                 .attr("class", "procVis")
                 .raise();
+            }
         });
 
         //find start locations and end locations
