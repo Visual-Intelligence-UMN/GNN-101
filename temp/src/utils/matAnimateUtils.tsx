@@ -1,5 +1,113 @@
 import * as d3 from "d3";
 import { computeMids } from "./matFeaturesUtils";
+import { injectPlayButtonSVG } from "./svgUtils";
+
+export function animatePathDrawing(
+    Xt: any,
+    currentStep: number,
+    startCoordList: any,
+    endCoordList: any,
+    curveDir: number,
+    myColor: any,
+    featureChannels: number,
+    coordFeatureVis3:any,
+    rectH:number,
+    rectW:number,
+    dummy:number[],
+    g:any,
+    biasCoord:any,
+    res10:any,
+    res11:any,
+    nextCoord:any,
+    lock:boolean,
+    aniSec:number,
+    btn:any,
+    btnX:number,
+    btnY:number
+){
+    const intervalID = setInterval(() => {
+        drawAniPath(
+            Xt, 
+            currentStep, 
+            startCoordList, 
+            endCoordList,
+            curveDir,
+            myColor,
+            featureChannels, 
+            coordFeatureVis3, 
+            rectH, 
+            rectW, 
+            dummy, 
+            g
+        );
+        currentStep++;
+        console.log("i", currentStep);
+        if(currentStep>=featureChannels){
+            setTimeout(()=>{
+                drawBiasPath(biasCoord, res10, res11, nextCoord);
+            },aniSec + 100);
+        }
+        if (currentStep >= featureChannels || !lock) {
+            injectPlayButtonSVG(
+                btn,
+                btnX,
+                btnY - 30,
+                "./assets/SVGs/playBtn_play.svg"
+            );
+            clearInterval(intervalID);
+        }
+    }, 250);
+    return intervalID;
+}
+
+interface Animation {
+    func: () => void;
+    delay: number;
+}
+
+export const AnimationController = {
+    isPaused: false,
+    currentAnimationIndex: 0,
+    animationsTimeout: null as any,
+    animationsList: [] as Animation[],
+    intervalID: null as any,
+    currentStep: 0,
+
+    runAnimations(index: number, animations: Animation[]) {
+        this.animationsList = animations; // 保存动画列表
+        if (index < animations.length) {
+            if (!this.isPaused) {
+                const { func, delay } = animations[index];
+                this.animationsTimeout = setTimeout(() => {
+                    func();
+                    this.runAnimations(index + 1, animations);
+                }, delay);
+            }
+            this.currentAnimationIndex = index;
+        } else {
+            console.log("All animations completed");
+        }
+    },
+    pauseAnimations() {
+        this.isPaused = true;
+        clearTimeout(this.animationsTimeout);
+        clearInterval(this.intervalID);
+    },
+    resumeAnimations() {
+        if (this.isPaused) {
+            this.isPaused = false;
+            this.runAnimations(this.currentAnimationIndex, this.animationsList);
+        }
+    },
+    startAnimations(animations: Animation[]) {
+        this.isPaused = false; // 重置暂停状态
+        this.currentAnimationIndex = 0; // 重置当前索引
+        this.runAnimations(0, animations);
+    },
+    getIntervalID() {
+        return this.intervalID;
+    }
+};
 
 export function runAnimations(index:number, animations:any) {
     if (index < animations.length) {

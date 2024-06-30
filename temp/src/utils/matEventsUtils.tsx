@@ -8,7 +8,7 @@ import { computeMids } from "./matFeaturesUtils";
 import * as d3 from "d3";
 import { create, all } from "mathjs";
 import { roundToTwo } from "@/pages/WebUtils";
-import { drawAniPath, drawBiasPath, drawBiasVector, drawFinalPath, drawReLU, drawSummationFeature, drawWeightsVector, runAnimations } from "./matAnimateUtils";
+import { drawAniPath, drawBiasPath, drawBiasVector, drawFinalPath, drawReLU, drawSummationFeature, drawWeightsVector, runAnimations, AnimationController, animatePathDrawing } from "./matAnimateUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
 
 //graph feature events interactions - mouseover
@@ -498,32 +498,14 @@ export function featureVisClick(
         const animateSeq:any = [
             {func: ()=>drawSummationFeature(g,X,coordFeatureVis, w, rectH, myColor, posList, mulValues), delay: initSec+aniSec},
             {func:()=>{
-                setTimeout(()=>{
-                    intervalID = setInterval(() => {
-                        drawAniPath(Xt, currentStep, startCoordList, endCoordList, curveDir, myColor, featureChannels, coordFeatureVis3, rectH, rectW, dummy, g);
-                        currentStep++;
-                        console.log("currentStep", currentStep);
-        
-                        if(currentStep >= featureChannels){
-                            setTimeout(()=>{
-                                drawBiasPath(biasCoord, res10, res11, nextCoord);
-                            }, aniSec*2);
-                        }
-        
-                        if (currentStep >= featureChannels || !lock) {
-                            injectPlayButtonSVG(
-                                btn,
-                                btnX,
-                                btnY - 30,
-                                "./assets/SVGs/playBtn_play.svg"
-                            );
-                            isPlaying = false;
-                            clearInterval(intervalID);
-                        }
-                    }, 250);
-                    setIntervalID(intervalID);
-                    d3.selectAll("#tempath").lower();
-                }, 1);
+                intervalID = intervalID = animatePathDrawing(
+                    Xt, currentStep, startCoordList, endCoordList,
+                    curveDir, myColor, featureChannels, coordFeatureVis3,
+                    rectH, rectW, dummy, g, biasCoord, res10, res11,
+                    nextCoord, lock, aniSec, btn, btnX, btnY
+                );
+                setIntervalID(intervalID);
+                d3.selectAll("#tempath").lower();
             }, delay:aniSec*2},
        //     {func: ()=>drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor), delay: aniSec},
             {func: ()=>drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2, myColor, layerBias), delay: aniSec+waitSec},
@@ -532,12 +514,7 @@ export function featureVisClick(
             {func: ()=>{curNode.style.opacity = "1";}, delay: aniSec}
         ];
 
-        runAnimations(0, animateSeq);
-
-        
-
-        
-        
+        AnimationController.runAnimations(0, animateSeq);
    //     d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
 
     function getIntervalID() {
@@ -579,26 +556,13 @@ export function featureVisClick(
                 currentStep = 0; // 重置步骤
             }
             const Xt = math.transpose(weights[layerID]);
-            let i = 0;
-            intervalID = setInterval(() => {
-                drawAniPath(Xt, currentStep, startCoordList, endCoordList, curveDir, myColor, featureChannels, coordFeatureVis3, rectH, rectW, dummy, g);
-                currentStep++;
-                console.log("i", currentStep);
-                if(currentStep>=featureChannels){
-                    setTimeout(()=>{
-                        drawBiasPath(biasCoord, res10, res11, nextCoord);
-                    },aniSec + 100);
-                }
-                if (currentStep >= featureChannels || !lock) {
-                    injectPlayButtonSVG(
-                        btn,
-                        btnX,
-                        btnY - 30,
-                        "./assets/SVGs/playBtn_play.svg"
-                    );
-                    clearInterval(intervalID);
-                }
-            }, 250);
+
+            intervalID = animatePathDrawing(
+                Xt, currentStep, startCoordList, endCoordList,
+                curveDir, myColor, featureChannels, coordFeatureVis3,
+                rectH, rectW, dummy, g, biasCoord, res10, res11,
+                nextCoord, lock, aniSec, btn, btnX, btnY
+            );
 
             setIntervalID(intervalID);
             isPlaying = true;
