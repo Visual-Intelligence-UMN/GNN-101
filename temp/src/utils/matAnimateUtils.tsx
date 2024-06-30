@@ -322,7 +322,7 @@ export function drawBiasVector(
             .attr("opacity", 0)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1)
-            .attr("class", "procVis biasVector");
+            .attr("class", "procVis biasVector pauseRemove");
     }
 
     //draw frame
@@ -335,7 +335,7 @@ export function drawBiasVector(
         .attr("opacity", 0)
         .attr("stroke", "black")
         .attr("stroke-width", 1)
-        .attr("class", "procVis biasVector");
+        .attr("class", "procVis biasVector pauseRemove");
     d3.selectAll(".biasVector").transition().duration(100).attr("opacity", 1);
 }
 
@@ -356,7 +356,7 @@ export function drawBiasPath(
         .attr("stroke", "black")
         .attr("opacity", 0)
         .attr("fill", "none")
-        .attr("class", "procVis biasPath")
+        .attr("class", "procVis biasPath pauseRemove")
         .attr("id", "procPath")
         .lower();
     d3.selectAll(".biasPath").transition().duration(100).attr("opacity", 1);
@@ -380,7 +380,7 @@ export function drawFinalPath(
             .attr("stroke", "black")
             .attr("opacity", 0)
             .attr("fill", "none")
-            .attr("class", "procVis finalPath")
+            .attr("class", "procVis finalPath pauseRemove")
             .attr("id", "procPath");
 
             d3.selectAll(".finalPath").transition().duration(100).attr("opacity", 1);
@@ -409,7 +409,7 @@ export function drawReLU(
             d3.select(ReLU)
                 .attr("x", cx1)
                 .attr("y", cy1)
-                .attr("class", "procVis")
+                .attr("class", "procVis pauseRemove")
                 .raise();
             }
         });

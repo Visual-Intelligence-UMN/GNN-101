@@ -495,6 +495,13 @@ export function featureVisClick(
         const initSec = 2000;
         const aniSec = 500;
         const waitSec = 250 * featureChannels;
+        const animateSeqAfterPath:any = [ 
+            {func: ()=>drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2, myColor, layerBias), delay: aniSec},
+            {func:()=>drawBiasPath(biasCoord, res10, res11, nextCoord), delay:aniSec},
+            {func: ()=>drawFinalPath(wmCoord, res00, res01, nextCoord), delay: aniSec},
+            {func: ()=>drawReLU(midX1, wmCoord, biasCoord, nextCoord), delay: aniSec},
+            {func: ()=>{curNode.style.opacity = "1";}, delay: aniSec}
+        ];
         const animateSeq:any = [
             {func: ()=>drawSummationFeature(g,X,coordFeatureVis, w, rectH, myColor, posList, mulValues), delay: initSec+aniSec},
             {func:()=>{
@@ -505,9 +512,7 @@ export function featureVisClick(
                         console.log("currentStep", currentStep);
 
                         if(currentStep >= featureChannels){
-                            setTimeout(()=>{
-                                drawBiasPath(biasCoord, res10, res11, nextCoord);
-                            }, aniSec*2);
+                            runAnimations(0, animateSeqAfterPath);
                         }
 
                         if (currentStep >= featureChannels || !lock) {
@@ -526,10 +531,6 @@ export function featureVisClick(
                 }, 1);
             }, delay:aniSec*2},
        //     {func: ()=>drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor), delay: aniSec},
-            {func: ()=>drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2, myColor, layerBias), delay: aniSec+waitSec},
-            {func: ()=>drawFinalPath(wmCoord, res00, res01, nextCoord), delay: aniSec},
-            {func: ()=>drawReLU(midX1, wmCoord, biasCoord, nextCoord), delay: aniSec},
-            {func: ()=>{curNode.style.opacity = "1";}, delay: aniSec}
         ];
 
         AnimationController.runAnimations(0, animateSeq);
@@ -544,12 +545,13 @@ export function featureVisClick(
     const btnX = playBtnCoord[0];
     const btnY = playBtnCoord[1];
     
+    setTimeout(()=>{
     injectPlayButtonSVG(
         btn,
         btnX,
         btnY - 30,
         "./assets/SVGs/playBtn_pause.svg"
-    );
+    );},initSec+aniSec*2);
 
     btn.on("click", function (event: any, d: any) {
         d3.select(".biasPath").remove();
@@ -573,6 +575,7 @@ export function featureVisClick(
             console.log("currentStep", currentStep);
             if (currentStep >= featureChannels) {
                 d3.select(".mats").selectAll(".removeRect").remove();
+                d3.select(".mats").selectAll(".pauseRemove").remove();
                 currentStep = 0; // 重置步骤
             }
             const Xt = math.transpose(weights[layerID]);
@@ -583,9 +586,7 @@ export function featureVisClick(
                 console.log("currentStep", currentStep);
 
                 if(currentStep >= featureChannels){
-                    setTimeout(()=>{
-                        drawBiasPath(biasCoord, res10, res11, nextCoord);
-                    }, aniSec*2);
+                    runAnimations(0, animateSeqAfterPath);
                 }
 
                 if (currentStep >= featureChannels || !lock) {
