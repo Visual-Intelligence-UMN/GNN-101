@@ -157,7 +157,7 @@ export function drawAniPath(
         .attr("opacity", 1)
         .attr("stroke", "gray")
         .attr("stroke-width", 0.1)
-        .attr("class", "procVis removeRect");
+        .attr("class", "procVis removeRect").lower();
 
     const Xv = Xt[currentStep];
     for (let j = 0; j < featureChannels; j++) {

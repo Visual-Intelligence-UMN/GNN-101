@@ -368,7 +368,7 @@ export function featureVisClick(
         posList.push(c);
     }
     let curNode = featureVisTable[layerID + 1][node];
-    curNode.style.opacity = "0"; //display current node
+    curNode.style.opacity = "0.25"; //display current node
     d3.select(curNode).selectAll(".frame").attr("opacity", 1);
 
     //calculation process visualizer
@@ -525,7 +525,7 @@ export function featureVisClick(
     const radius = 10;
     const btnX = playBtnCoord[0];
     const btnY = playBtnCoord[1];
-
+    
     injectPlayButtonSVG(
         btn,
         btnX,
@@ -535,7 +535,7 @@ export function featureVisClick(
 
     btn.on("click", function (event: any, d: any) {
         d3.select(".biasPath").remove();
-        
+        console.log("currentStep 1", currentStep);
         console.log("isPlaying", isPlaying);
         event.stopPropagation();
         if (intervalID) {
@@ -552,6 +552,7 @@ export function featureVisClick(
                 btnY - 30,
                 "./assets/SVGs/playBtn_pause.svg"
             );
+            console.log("currentStep", currentStep);
             if (currentStep >= featureChannels) {
                 currentStep = 0; // 重置步骤
             }
