@@ -497,6 +497,34 @@ export function featureVisClick(
         const waitSec = 250 * featureChannels;
         const animateSeq:any = [
             {func: ()=>drawSummationFeature(g,X,coordFeatureVis, w, rectH, myColor, posList, mulValues), delay: initSec+aniSec},
+            {func:()=>{
+                setTimeout(()=>{
+                    intervalID = setInterval(() => {
+                        drawAniPath(Xt, currentStep, startCoordList, endCoordList, curveDir, myColor, featureChannels, coordFeatureVis3, rectH, rectW, dummy, g);
+                        currentStep++;
+                        console.log("currentStep", currentStep);
+        
+                        if(currentStep >= featureChannels){
+                            setTimeout(()=>{
+                                drawBiasPath(biasCoord, res10, res11, nextCoord);
+                            }, aniSec*2);
+                        }
+        
+                        if (currentStep >= featureChannels || !lock) {
+                            injectPlayButtonSVG(
+                                btn,
+                                btnX,
+                                btnY - 30,
+                                "./assets/SVGs/playBtn_play.svg"
+                            );
+                            isPlaying = false;
+                            clearInterval(intervalID);
+                        }
+                    }, 250);
+                    setIntervalID(intervalID);
+                    d3.selectAll("#tempath").lower();
+                }, 1);
+            }, delay:aniSec*2},
        //     {func: ()=>drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor), delay: aniSec},
             {func: ()=>drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2, myColor, layerBias), delay: aniSec+waitSec},
             {func: ()=>drawFinalPath(wmCoord, res00, res01, nextCoord), delay: aniSec},
@@ -506,34 +534,7 @@ export function featureVisClick(
 
         runAnimations(0, animateSeq);
 
-        setTimeout(()=>{
-            intervalID = setInterval(() => {
-                drawAniPath(Xt, currentStep, startCoordList, endCoordList, curveDir, myColor, featureChannels, coordFeatureVis3, rectH, rectW, dummy, g);
-                currentStep++;
-                console.log("currentStep", currentStep);
-
-                if(currentStep >= featureChannels){
-                    setTimeout(()=>{
-                        drawBiasPath(biasCoord, res10, res11, nextCoord);
-                    }, aniSec*2);
-                }
-
-                if (currentStep >= featureChannels || !lock) {
-                    injectPlayButtonSVG(
-                        btn,
-                        btnX,
-                        btnY - 30,
-                        "./assets/SVGs/playBtn_play.svg"
-                    );
-                    isPlaying = false;
-                    clearInterval(intervalID);
-                }
-                //        drawPoints(".mats", "red", [coordStartPoint, coordFinalPoint]);
-                // d3.selectAll("circle").raise();
-            }, 250); // 每2秒执行一次drawPaths
-            setIntervalID(intervalID);
-            d3.selectAll("#tempath").lower();
-        }, initSec+aniSec*2);
+        
 
         
         
