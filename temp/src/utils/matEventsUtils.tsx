@@ -500,7 +500,8 @@ export function featureVisClick(
             {func:()=>drawBiasPath(biasCoord, res10, res11, nextCoord), delay:aniSec},
             {func: ()=>drawFinalPath(wmCoord, res00, res01, nextCoord), delay: aniSec},
             {func: ()=>drawReLU(midX1, wmCoord, biasCoord, nextCoord), delay: aniSec},
-            {func: ()=>{curNode.style.opacity = "1";}, delay: aniSec}
+            {func: ()=>{curNode.style.opacity = "1";}, delay: aniSec},
+            {func:()=>{d3.select(".ctrlBtn").style("pointer-events", "auto");}, delay:1}
         ];
         const animateSeq:any = [
             {func: ()=>drawSummationFeature(g,X,coordFeatureVis, w, rectH, myColor, posList, mulValues), delay: initSec+aniSec},
@@ -512,6 +513,7 @@ export function featureVisClick(
                         console.log("currentStep", currentStep);
 
                         if(currentStep >= featureChannels){
+                            d3.select(".mats").select(".ctrlBtn").style("pointer-events", "none");
                             runAnimations(0, animateSeqAfterPath);
                         }
 
@@ -586,6 +588,7 @@ export function featureVisClick(
                 console.log("currentStep", currentStep);
 
                 if(currentStep >= featureChannels){
+                    d3.select(".mats").select(".ctrlBtn").style("pointer-events", "none");
                     runAnimations(0, animateSeqAfterPath);
                 }
 
@@ -1077,7 +1080,7 @@ export function outputVisClick(
         d3.selectAll("path").lower();
     }, 2000);
 
-    const btn = d3.select(".mats").append("g");
+    const btn = d3.select(".mats").append("g").attr("class", "ctrlBtn");
     const radius = 10;
     const btnX = startCoord[0][0];
     const btnY = startCoord[0][1] + 50;
