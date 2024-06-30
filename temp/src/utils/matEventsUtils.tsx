@@ -368,7 +368,8 @@ export function featureVisClick(
         posList.push(c);
     }
     let curNode = featureVisTable[layerID + 1][node];
-    curNode.style.opacity = "1"; //display current node
+    curNode.style.opacity = "0"; //display current node
+    d3.select(curNode).selectAll(".frame").attr("opacity", 1);
 
     //calculation process visualizer
     let coord = calculatePrevFeatureVisPos(featureVisTable, layerID, node, featureChannels, 7);
@@ -488,6 +489,8 @@ export function featureVisClick(
         const Xt = math.transpose(weights[layerID]);
         let i = 0;
 
+        console.log("curNode",curNode, d3.select(curNode).selectAll(".frame"));
+
         //aniamtion sequence 
         const initSec = 2000;
         const aniSec = 500;
@@ -497,8 +500,9 @@ export function featureVisClick(
        //     {func: ()=>drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor), delay: aniSec},
             {func: ()=>drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2, myColor, layerBias), delay: aniSec+waitSec},
             {func: ()=>drawFinalPath(wmCoord, res00, res01, nextCoord), delay: aniSec},
-            {func: ()=>drawReLU(midX1, wmCoord, biasCoord, nextCoord), delay: aniSec}
-        ]
+            {func: ()=>drawReLU(midX1, wmCoord, biasCoord, nextCoord), delay: aniSec},
+            {func: ()=>{curNode.style.opacity = "1";}, delay: aniSec}
+        ];
 
         runAnimations(0, animateSeq);
 
@@ -553,6 +557,7 @@ export function featureVisClick(
 
     btn.on("click", function (event: any, d: any) {
         d3.select(".biasPath").remove();
+        
         console.log("isPlaying", isPlaying);
         event.stopPropagation();
         if (intervalID) {
@@ -561,6 +566,7 @@ export function featureVisClick(
 
         if (!isPlaying || currentStep >= featureChannels || currentStep == 0) {
             //   d3.select("text#btn").text("Pause");
+            d3.select(".mats").selectAll(".removeRect").remove();
             btn.selectAll("*").remove();
             injectPlayButtonSVG(
                 btn,

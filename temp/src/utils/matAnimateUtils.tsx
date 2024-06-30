@@ -49,7 +49,7 @@ export function drawAniPath(
         .attr("opacity", 1)
         .attr("stroke", "gray")
         .attr("stroke-width", 0.1)
-        .attr("class", "procVis");
+        .attr("class", "procVis removeRect");
 
     const Xv = Xt[currentStep];
     for (let j = 0; j < featureChannels; j++) {
@@ -111,7 +111,7 @@ export function drawSummationFeature(
             .attr("opacity", 0)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1)
-            .attr("class", "procVis");
+            .attr("class", "procVis summation");
     }
 
     //draw frame
@@ -124,7 +124,7 @@ export function drawSummationFeature(
         .attr("opacity", 0)
         .attr("stroke", "black")
         .attr("stroke-width", 1)
-        .attr("class", "procVis");
+        .attr("class", "procVis summation");
 
     //path connect - connect prev layer feature vis to intermediate feature vis
     const curve = d3.line().curve(d3.curveBasis);
@@ -139,7 +139,7 @@ export function drawSummationFeature(
             .attr("stroke", "black")
             .attr("opacity", 0)
             .attr("fill", "none")
-            .attr("class", "procVis")
+            .attr("class", "procVis summation")
             .attr("id", "procPath");
 
         //draw multipliers
@@ -153,10 +153,10 @@ export function drawSummationFeature(
             .attr("y", y - 2)
             .attr("text-anchor", "middle")
             .attr("font-size", 7.5)
-            .attr("class", "procVis")
+            .attr("class", "procVis summation")
             .attr("opacity", 0);
     }
-    d3.selectAll(".procVis").transition().duration(100).attr("opacity", 1);
+    d3.selectAll(".summation").transition().duration(100).attr("opacity", 1);
 }
 
 export function drawWeightsVector(
@@ -177,7 +177,7 @@ export function drawWeightsVector(
             .attr("opacity", 0)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1)
-            .attr("class", "procVis")
+            .attr("class", "procVis removeRect")
             .attr("id", `weightRect${m}`);
     }
 
@@ -214,7 +214,7 @@ export function drawBiasVector(
             .attr("opacity", 0)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1)
-            .attr("class", "procVis");
+            .attr("class", "procVis biasVector");
     }
 
     //draw frame
@@ -227,8 +227,8 @@ export function drawBiasVector(
         .attr("opacity", 0)
         .attr("stroke", "black")
         .attr("stroke-width", 1)
-        .attr("class", "procVis");
-    d3.selectAll(".procVis").transition().duration(100).attr("opacity", 1);
+        .attr("class", "procVis biasVector");
+    d3.selectAll(".biasVector").transition().duration(100).attr("opacity", 1);
 }
 
 export function drawBiasPath(
@@ -272,10 +272,10 @@ export function drawFinalPath(
             .attr("stroke", "black")
             .attr("opacity", 0)
             .attr("fill", "none")
-            .attr("class", "procVis")
+            .attr("class", "procVis finalPath")
             .attr("id", "procPath");
 
-            d3.selectAll(".procVis").transition().duration(100).attr("opacity", 1);
+            d3.selectAll(".finalPath").transition().duration(100).attr("opacity", 1);
         d3.selectAll("#procPath").lower();
 }
 
