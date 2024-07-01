@@ -344,7 +344,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
     const runVisualization = async () => {
       if ((intmData == null || changed) && !predicted) {
-        await visualizeGraph(graph_path,() => handleSimulationComplete(visualizationId));
+        await visualizeGraph(graph_path,() => handleSimulationComplete(visualizationId), true);
       } else {
         await visualizeGNN(4);
         handleSimulationComplete(visualizationId);

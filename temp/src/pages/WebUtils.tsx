@@ -660,7 +660,8 @@ let initialCoordinates: { [id: string]: { x: number; y: number } } = {};
 
 export function visualizeGraph(
     path: string,
-    onComplete: () => void
+    onComplete: () => void,
+    isAttribute:boolean
 ): Promise<void> {
     return new Promise<void>((resolve) => {
         const init = async (data: any) => {
@@ -669,6 +670,8 @@ export function visualizeGraph(
             const margin = { top: 10, right: 30, bottom: 30, left: 40 };
             const width = 6 * offset - margin.left - margin.right;
             const height = 1000 - margin.top - margin.bottom;
+
+            let labels:any;
 
             // Append the SVG object to the body of the page
             d3.select("#my_dataviz").selectAll("svg").remove();
@@ -700,13 +703,14 @@ export function visualizeGraph(
                     .style("stroke", "#69b3a2")
                     .style("fill", "white");
 
-                const labels = g1
-                    .selectAll("text")
-                    .data(data.nodes)
-                    .join("text")
-                    .text((d: any) => d.name)
-                    .attr("font-size", `20px`);
-
+                if(isAttribute){
+                    labels = g1
+                        .selectAll("text")
+                        .data(data.nodes)
+                        .join("text")
+                        .text((d: any) => d.name)
+                        .attr("font-size", `20px`);
+                }
                 // Define the simulation
                 console.log("in now");
                 const simulation = d3
@@ -760,9 +764,11 @@ export function visualizeGraph(
                             (d: any) => d.y
                         );
 
+                        if(isAttribute){
                         labels
                             .attr("x", (d: any) => d.x - 6)
                             .attr("y", (d: any) => d.y + 6);
+                        }
                     })
                     .on("end", function ended() {
                         let maxXDistance = 0;
@@ -841,6 +847,7 @@ export function visualizeGraph(
 
         const visualizeG = async () => {
             try {
+                console.log("node graph path", path);
                 console.log("started visualize....");
                 const pData = await data_prep(path);
                 console.log("s pdata", pData);

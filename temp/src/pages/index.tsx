@@ -23,6 +23,7 @@ import {
 import { Tooltip } from "react-tooltip";
 import { Inter } from '@next/font/google';
 import NodeMatricesVisualizer from "./node_classifier/NodeMatrixVisualizer";
+import NodeGraphVisualizer from "./node_classifier/NodeGraphVisualizer";
 
 export const inter = Inter({
     variable: '--font-inter',
@@ -266,7 +267,15 @@ export default function Home() {
                                 </>
                             )):
                             (isGraphView?
-                                <>Graph Visualizer{/**thegraph visualizer for the node classifier */}</>
+                                <NodeGraphVisualizer
+                                        graph_path={nodeList[selectedGraph]}
+                                        intmData={intmData}
+                                        changed={changedG}
+                                        predicted={predicted}
+                                        selectedButtons={selectedButtons}
+                                        simulationLoading={simulationLoading}
+                                        setSimulation={setSimulation}
+                                />
                                 :
                                 <NodeMatricesVisualizer graph_path={nodeList[selectedGraph]}
                                     intmData={intmData}
