@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { visualizeMatrix } from "../WebUtils";
-import { visualizeGraphClassifier } from "@/utils/matNNVis";
+import { visualizeGraphClassifier, visualizeNodeClassifier } from "@/utils/matNNVis";
 
 interface NodeMatricesVisualizerProps {
     graph_path: string;
@@ -33,7 +33,7 @@ const NodeMatricesVisualizer: React.FC<NodeMatricesVisualizerProps> = ({
         if ((intmData == null || changed) && !predicted) {
             visualizeMatrix(graph_path, false, 600);
         } else {
-           // visualizeGraphClassifier(setIsLoading, graph_path, intmData);
+           visualizeNodeClassifier(setIsLoading, graph_path, intmData);
         }
         console.log("i fire once");
     }, [graph_path, intmData, changed]);

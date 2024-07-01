@@ -6,7 +6,8 @@ import {
     graph_to_matrix,
     load_json,
     matrix_to_hmap,
-    get_axis_gdata
+    get_axis_gdata,
+    graphToAdjList
 } from "../utils/utils";
 import {
     visualizeGraphClassifierFeatures
@@ -27,23 +28,105 @@ function findAbsMax(arr: number[]) {
     return max;
 }
 
+
+//----------------------function for visualizing node classifier----------------------------
+async function initNodeClassifier(graph: any, features: any[][], intmData:any, graph_path:string)  {
+    console.log("start initNodeC");
+    let colorSchemeTable: any = null;
+    //a data structure to record the link relationship
+    //fill up the linkMap
+    let adjList = graphToAdjList(graph);
+
+    let conv1: number[][] = [],
+        conv2: number[][] = [],
+        conv3: number[][] = [],
+        result: number[][] = [],
+        final = null;
+
+    console.log("intmData", intmData);
+    if (intmData != null) {
+        //max abs find
+        let conv1Max = findAbsMax(intmData.conv1);
+        console.log("conv1Max", conv1Max);
+        let conv2Max = findAbsMax(intmData.conv2);
+        console.log("conv2Max", conv2Max);
+        let conv3Max = findAbsMax(intmData.conv3);
+        console.log("conv3Max", conv3Max);
+        let finalMax = findAbsMax(intmData.final);
+        console.log("finalMax", finalMax);
+        let resultMax = findAbsMax(intmData.result.map((arr:any) => Array.from(arr)).flat());
+        console.log("resultMax", resultMax, intmData.result.flat());
+
+        colorSchemeTable = {
+            conv1: conv1Max,
+            conv2: conv2Max,
+            conv3: conv3Max,
+            final: finalMax,
+            result: resultMax
+        };
+
+        console.log("From Visualizer:", intmData);
+        conv1 = splitIntoMatrices(intmData.conv1, 4);
+        conv2 = splitIntoMatrices(intmData.conv2, 4);
+        conv3 = splitIntoMatrices(intmData.conv3, 2);
+        result = intmData.result;
+        final = splitIntoMatrices(intmData.final, 4);
+    }
+
+    console.log("path ", graph_path);
+
+    const gLen = graph.length;
+    console.log("gLen", gLen);
+    const gridSize = 400;
+    const margin = { top: 10, right: 80, bottom: 30, left: 80 };
+    const width = 20 * gLen + 50 + 6 * 102 + 1200 * 2;
+    const height = (gridSize + margin.top + margin.bottom) * 2;
+
+    let locations: number[][] = [];
+    d3.select("#matvis").selectAll("*").remove();
+    visualizeMatrixBody(gridSize, graph, width, height, margin);
+
+    var myColor = d3
+        .scaleLinear<string>()
+        .domain([-0.25, 0, 0.25])
+        .range(["orange", "white", "#69b3a2"]);
+
+    const data = matrix_to_hmap(graph);
+
+    locations = get_cood_locations(data, locations);
+    //crossConnectionMatrices(graphs, locations, offsetMat, pathMatrix);
+    // const featuresManager = visualizeGraphClassifierFeatures(
+    //     locations,
+    //     features,
+    //     myColor,
+    //     conv1,
+    //     conv2,
+    //     conv3,
+    //     pooling,
+    //     final,
+    //     graph,
+    //     adjList,
+    //     colorSchemeTable
+    // );
+    // drawNodeAttributes(nodeAttrs, graph, 50);
+
+    // const intervalID = featuresManager.getIntervalID();
+    // console.log("get interval ID init G", intervalID);
+    // clearInterval(intervalID);
+
+    console.log("initNode", intmData, data, locations, adjList);
+    console.log("conv", conv1, conv2, conv3, final, result);
+    console.log("initNode CST", colorSchemeTable);
+};
+
+
+
+//----------------------function for visualizing graph classifier----------------------------
 async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: string[], intmData:any, graph_path:string)  {
     let colorSchemeTable: any = null;
     //a data structure to record the link relationship
     //fill up the linkMap
-    let adjList: number[][] = Array.from({ length: graph.length }, () => []);
-    for (let i = 0; i < graph.length; i++) {
-        //push itself to the linkMap
-        adjList[i].push(i);
-        for (let j = 0; j < graph[0].length; j++) {
-            if (graph[i][j] == 1) {
-                //push its neighbors to linkMap
-                adjList[i].push(j);
-            }
-        }
-    }
-
-    const offsetMat = 100;
+    let adjList = graphToAdjList(graph);
 
     let conv1: number[][] = [],
         conv2: number[][] = [],
@@ -128,7 +211,7 @@ async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: str
     clearInterval(intervalID);
 };
 
-//VIsualization Pipeline
+//Visualization Pipeline for Graph Classifier
 export async function visualizeGraphClassifier(setIsLoading:any, graph_path:string, intmData:any) {
     try {
         setIsLoading(true);
@@ -157,3 +240,29 @@ export async function visualizeGraphClassifier(setIsLoading:any, graph_path:stri
         setIsLoading(false);
     }
 };
+
+//Visualization Pipeline for Node Classifier
+export async function visualizeNodeClassifier(setIsLoading:any, graph_path:string, intmData:any) {
+    try {
+        setIsLoading(true);
+        // Process data
+        console.log("path matvis", graph_path);
+        const data = await load_json(graph_path);
+        console.log("data matvis", data);
+
+        //accept the features from original json file
+        const features = await get_features_origin(data);
+        console.log("o features", features);
+
+        const processedData = await graph_to_matrix(data);
+        console.log("pData matvis", processedData);
+        // Initialize and run D3 visualization with processe  d data
+        await initNodeClassifier(processedData, features, intmData, graph_path);
+    } catch (error) {
+        console.error("Error in visualizeGNN:", error);
+    } finally {
+        setIsLoading(false);
+    }
+};
+
+

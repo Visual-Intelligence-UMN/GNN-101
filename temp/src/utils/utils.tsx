@@ -143,13 +143,13 @@ export function printAxisTextCoordinates(): void {
 
 export function splitIntoMatrices(
     array: number[],
-    matrixSize: number = 8
+    matrixSize: number = 64
 ){
     // 创建一个空的二维数组
     let result: number[][] = [];
     // 计算每个子数组的长度
-    let n = array.length / 64;
-    let subArrayLength = 64;
+    let n = array.length / matrixSize;
+    let subArrayLength = matrixSize;
 
     // 遍历 n 次来创建子数组
     for (let i = 0; i < n; i++) {
@@ -1123,3 +1123,20 @@ export const nodePrediction = async (modelPath: string, graphPath: string): Prom
 		return {prob, intmData};
 	
 }
+
+export function graphToAdjList(graph:any){
+  let adjList: number[][] = Array.from({ length: graph.length }, () => []);
+    for (let i = 0; i < graph.length; i++) {
+        //push itself to the linkMap
+        adjList[i].push(i);
+        for (let j = 0; j < graph[0].length; j++) {
+            if (graph[i][j] == 1) {
+                //push its neighbors to linkMap
+                adjList[i].push(j);
+            }
+        }
+    }
+    return adjList;
+}
+
+
