@@ -337,6 +337,38 @@ export function drawSingleGCNConvFeature(
 }
 
 
+export function drawColorSchremeSequence(infoTable:any, myColor:any){
+    const valueTable:number[][] = infoTable.valueTable;
+    const nameTable:string[] = infoTable.nameTable;
+    const xLocationTable:number[] = infoTable.xLocationTable;
+    const yLocationTable:number[] = infoTable.yLocationTable;
+    const layerTable:any = infoTable.layerTable;
+    const schemeTypeTable:string = infoTable.schemeTypeTable;
+
+    let colorSchemesTable:any = [];
+
+    for(let i=0; i<layerTable.length; i++){
+        console.log("cst loop", i, myColor, valueTable[i],
+            nameTable[i], xLocationTable[i], yLocationTable[i],
+            layerTable[i])
+        if(schemeTypeTable[i]=="binary"){
+            const cst = buildBinaryLegend(
+                myColor, valueTable[i][0], valueTable[i][1], 
+                nameTable[i], xLocationTable[i], yLocationTable[i],
+                layerTable[i]
+            );
+            colorSchemesTable.push(cst);
+        }else{
+            const cst = buildLegend(
+                myColor, valueTable[i][0], nameTable[i], 
+                xLocationTable[i], yLocationTable[i], layerTable[i]
+            );
+            colorSchemesTable.push(cst);
+        }
+    }
+
+    return colorSchemesTable;
+}
 
 //draw intermediate features from GCNConv process
 export function drawGCNConv(
@@ -468,65 +500,44 @@ export function drawGCNConv(
 
         const schemeOffset = 150;
 
-        const scheme1 = buildBinaryLegend(
-            myColor,
-            0,
-            1,
-            "Features Color Scheme",
-            schemeLocations[0][0],
-            schemeLocations[0][1] + schemeOffset,
-            firstLayer
-        );
-        const scheme2 = buildLegend(
-            myColor,
-            maxVals.conv1,
-            "GCNConv1 Color Scheme",
-            schemeLocations[1][0],
-            schemeLocations[1][1] + schemeOffset,
-            l1
-        );
-        const scheme3 = buildLegend(
-            myColor,
-            maxVals.conv2,
-            "GCNConv2 Color Scheme",
-            schemeLocations[1][0] + 400,
-            schemeLocations[1][1] + schemeOffset,
-            l2
-        );
-        const scheme4 = buildLegend(
-            myColor,
-            maxVals.conv3,
-            "GCNConv3 Color Scheme",
-            schemeLocations[1][0] + 400 * 2,
-            schemeLocations[1][1] + schemeOffset,
-            l3
-        );
-        const scheme5 = buildLegend(
-            myColor,
-            maxVals.pooling,
-            "Pooling Color Scheme",
-            schemeLocations[1][0] + 400 * 3,
-            schemeLocations[1][1] + schemeOffset,
-            l4
-        );
-        const scheme6 = buildBinaryLegend(
-            myColor,
-            result[0],
-            result[1],
-            "Result Color Scheme",
-            schemeLocations[1][0] + 400 * 4,
-            schemeLocations[1][1] + schemeOffset,
-            l5
-        );
+        const infoTable = {
+            valueTable:[
+                [0,1],
+                [maxVals.conv1],
+                [maxVals.conv2],
+                [maxVals.conv3],
+                [maxVals.pooling],
+                [result[0], result[1]]
+            ],
+            nameTable:[
+                "Features Color Scheme",
+                "GCNConv1 Color Scheme",
+                "GCNConv2 Color Scheme",
+                "GCNConv3 Color Scheme",
+                "Pooling Color Scheme",
+                "Result Color Scheme",
+            ],
+            xLocationTable:[
+                schemeLocations[0][0],
+                schemeLocations[1][0],
+                schemeLocations[1][0] + 400,
+                schemeLocations[1][0] + 400*2,
+                schemeLocations[1][0] + 400*3,
+                schemeLocations[1][0] + 400*4
+            ],
+            yLocationTable:[
+                schemeLocations[0][1] + schemeOffset,
+                schemeLocations[1][1] + schemeOffset,
+                schemeLocations[1][1] + schemeOffset,
+                schemeLocations[1][1] + schemeOffset,
+                schemeLocations[1][1] + schemeOffset,
+                schemeLocations[1][1] + schemeOffset
+            ],
+            layerTable:[firstLayer, l1, l2, l3, l4, l5],
+            schemeTypeTable:["binary", "", "", "", "", "binary"]
+        };
 
-        colorSchemesTable = [
-            scheme1,
-            scheme2,
-            scheme3,
-            scheme4,
-            scheme5,
-            scheme6,
-        ];
+        colorSchemesTable = drawColorSchremeSequence(infoTable, myColor);
     }
 
     console.log("thirdGCN after filled", thirdGCN);
