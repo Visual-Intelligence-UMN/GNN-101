@@ -17,6 +17,7 @@ import {
     drawNodeAttributes,
     getNodeAttributes
 } from "../utils/matHelperUtils";
+import { visualizeMatrixBody } from "@/pages/WebUtils";
 
 //find absolute max value in an 1d array
 function findAbsMax(arr: number[]) {
@@ -95,60 +96,8 @@ async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: str
     const height = (gridSize + margin.top + margin.bottom) * 2;
 
     let locations: number[][] = [];
-
-    //prepare for path matrix
-    let pathMatrix = Array.from({ length: graph.length }, () => []);
-    console.log("pathMat", pathMatrix);
-
-    // Append the SVG object to the body of the page
-    console.log("GRAPH", graph);
     d3.select("#matvis").selectAll("*").remove();
-    const svg = d3
-        .select("#matvis")
-        .append("svg")
-        .attr("class", "mats")
-        .attr("width", width)
-        .attr("height", height);
-
-    const xOffset = 0 * gridSize + 50;
-    const g = svg
-        .append("g")
-        .attr(
-            "transform",
-            `translate(${xOffset + 0 * offsetMat},${margin.top})`
-        );
-    //do the real thing: visualize the matrices
-    // set the dimensions and margins of the graph
-    // Labels of row and columns
-    var myGroups = get_axis_gdata(graph);
-    var myVars = get_axis_gdata(graph);
-
-    // Build X scales and axis:
-    var x = d3.scaleBand().range([0, gridSize]).domain(myGroups).padding(0.01);
-    g.append("g")
-        .attr("class", "x-axis")
-        .attr("transform", `translate(0,${gridSize + 50})`)
-        .call(d3.axisBottom(x));
-
-    // Build Y scales and axis:
-    var y = d3.scaleBand().range([0, gridSize]).domain(myVars).padding(0.01);
-    g.append("g")
-        .attr("class", "y-axis")
-        .call(d3.axisLeft(y))
-        .attr("transform", `translate(0,50)`);
-
-    if (0 == 0) {
-        d3.selectAll<SVGTextElement, any>(".x-axis text").classed(
-            "first",
-            true
-        );
-        d3.selectAll<SVGTextElement, any>(".y-axis text").classed(
-            "first",
-            true
-        );
-    }
-
-    printAxisTextCoordinates();
+    visualizeMatrixBody(gridSize, graph, width, height, margin);
 
     var myColor = d3
         .scaleLinear<string>()
@@ -156,19 +105,6 @@ async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: str
         .range(["orange", "white", "#69b3a2"]);
 
     const data = matrix_to_hmap(graph);
-    console.log("accepted data:", data);
-    g.selectAll("rect")
-        .data(data, (d: any) => d.group + ":" + d.variable)
-        .enter()
-        .append("rect")
-        .attr("x", (d: HeatmapData) => x(d.group)!)
-        .attr("y", (d: HeatmapData) => y(d.variable)! + 50)
-        .attr("width", x.bandwidth())
-        .attr("height", y.bandwidth())
-        .style("fill", (d: HeatmapData) => myColor(d.value / 250))
-        .style("stroke-width", 1)
-        .style("stroke", "grey")
-        .style("opacity", 0.8);
 
     locations = get_cood_locations(data, locations);
     //crossConnectionMatrices(graphs, locations, offsetMat, pathMatrix);

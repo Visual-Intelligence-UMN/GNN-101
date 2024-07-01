@@ -868,10 +868,8 @@ export function getInitialCoordinates() {
 }
 
 //helper to get the matrix body visualize
-export function visualizeMatrixBody(gridSize:number, graph:any){
-    const margin = { top: 10, right: 80, bottom: 30, left: 80 };
-    const width = gridSize + margin.left + margin.right;
-    const height = (gridSize + margin.top + margin.bottom) * 2;
+export function visualizeMatrixBody(gridSize: number, graph: any, width:number, height:number, margin:any) {
+    
 
     d3.select("#matvis").selectAll("svg").remove();
     const svg = d3
@@ -887,36 +885,33 @@ export function visualizeMatrixBody(gridSize:number, graph:any){
     var myGroups = get_axis_gdata(graph);
     var myVars = get_axis_gdata(graph);
 
-    var x = d3
-        .scaleBand()
-        .range([0, gridSize])
-        .domain(myGroups)
-        .padding(0.01);
+    var x = d3.scaleBand().range([0, gridSize]).domain(myGroups).padding(0.01);
 
     g.append("g")
         .attr("class", "x-axis")
         .attr("transform", `translate(0,${gridSize + 50})`)
         .call(d3.axisBottom(x));
 
-    var y = d3
-        .scaleBand()
-        .range([0, gridSize])
-        .domain(myVars)
-        .padding(0.01);
+    var y = d3.scaleBand().range([0, gridSize]).domain(myVars).padding(0.01);
 
     g.append("g")
         .attr("class", "y-axis")
         .attr("transform", "translate(0,50)")
         .call(d3.axisLeft(y));
 
-    d3.selectAll<SVGTextElement, any>(".x-axis text").classed(
-        "first",
-        true
-    );
-    d3.selectAll<SVGTextElement, any>(".y-axis text").classed(
-        "first",
-        true
-    );
+    if (0 == 0) {
+        d3.selectAll<SVGTextElement, any>(".x-axis text").classed(
+            "first",
+            true
+        );
+        d3.selectAll<SVGTextElement, any>(".y-axis text").classed(
+            "first",
+            true
+        );
+    }
+
+    d3.selectAll<SVGTextElement, any>(".x-axis text").classed("first", true);
+    d3.selectAll<SVGTextElement, any>(".y-axis text").classed("first", true);
 
     var myColor = d3
         .scaleLinear<string>()
@@ -939,9 +934,9 @@ export function visualizeMatrixBody(gridSize:number, graph:any){
         .style("stroke-width", 1)
         .style("stroke", "grey")
         .style("opacity", 0.8);
+
+    return data;
 }
-
-
 
 //-------------------------------------------------------------
 //single matrix visualizer
@@ -951,8 +946,11 @@ export function visualizeMatrix(
     gridSize: number
 ) {
     const init = async (graph: any, features: any, nodeAttrs: any) => {
+        const margin = { top: 10, right: 80, bottom: 30, left: 80 };
+    const width = gridSize + margin.left + margin.right;
+    const height = (gridSize + margin.top + margin.bottom) * 2;
         //visualize matrix body part
-        visualizeMatrixBody(gridSize, graph);
+        visualizeMatrixBody(gridSize, graph, width, height, margin);
 
         if (isAttribute) drawNodeAttributes(nodeAttrs, graph, 50);
     };
