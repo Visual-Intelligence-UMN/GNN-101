@@ -661,7 +661,7 @@ let initialCoordinates: { [id: string]: { x: number; y: number } } = {};
 export function visualizeGraph(
     path: string,
     onComplete: () => void,
-    isAttribute:boolean
+    isAttribute: boolean
 ): Promise<void> {
     return new Promise<void>((resolve) => {
         const init = async (data: any) => {
@@ -671,7 +671,7 @@ export function visualizeGraph(
             const width = 6 * offset - margin.left - margin.right;
             const height = 1000 - margin.top - margin.bottom;
 
-            let labels:any;
+            let labels: any;
 
             // Append the SVG object to the body of the page
             d3.select("#my_dataviz").selectAll("svg").remove();
@@ -703,7 +703,7 @@ export function visualizeGraph(
                     .style("stroke", "#69b3a2")
                     .style("fill", "white");
 
-                if(isAttribute){
+                if (isAttribute) {
                     labels = g1
                         .selectAll("text")
                         .data(data.nodes)
@@ -764,10 +764,10 @@ export function visualizeGraph(
                             (d: any) => d.y
                         );
 
-                        if(isAttribute){
-                        labels
-                            .attr("x", (d: any) => d.x - 6)
-                            .attr("y", (d: any) => d.y + 6);
+                        if (isAttribute) {
+                            labels
+                                .attr("x", (d: any) => d.x - 6)
+                                .attr("y", (d: any) => d.y + 6);
                         }
                     })
                     .on("end", function ended() {
@@ -866,107 +866,95 @@ export function visualizeGraph(
 export function getInitialCoordinates() {
     return initialCoordinates;
 }
+
+//helper to get the matrix body visualize
+export function visualizeMatrixBody(gridSize:number, graph:any){
+    const margin = { top: 10, right: 80, bottom: 30, left: 80 };
+    const width = gridSize + margin.left + margin.right;
+    const height = (gridSize + margin.top + margin.bottom) * 2;
+
+    d3.select("#matvis").selectAll("svg").remove();
+    const svg = d3
+        .select("#matvis")
+        .append("svg")
+        .attr("class", "mats")
+        .attr("width", width)
+        .attr("height", height);
+    const xOffset = 50;
+    const g = svg
+        .append("g")
+        .attr("transform", `translate(${xOffset},${margin.top})`);
+    var myGroups = get_axis_gdata(graph);
+    var myVars = get_axis_gdata(graph);
+
+    var x = d3
+        .scaleBand()
+        .range([0, gridSize])
+        .domain(myGroups)
+        .padding(0.01);
+
+    g.append("g")
+        .attr("class", "x-axis")
+        .attr("transform", `translate(0,${gridSize + 50})`)
+        .call(d3.axisBottom(x));
+
+    var y = d3
+        .scaleBand()
+        .range([0, gridSize])
+        .domain(myVars)
+        .padding(0.01);
+
+    g.append("g")
+        .attr("class", "y-axis")
+        .attr("transform", "translate(0,50)")
+        .call(d3.axisLeft(y));
+
+    d3.selectAll<SVGTextElement, any>(".x-axis text").classed(
+        "first",
+        true
+    );
+    d3.selectAll<SVGTextElement, any>(".y-axis text").classed(
+        "first",
+        true
+    );
+
+    var myColor = d3
+        .scaleLinear<string>()
+        .range(["white", "#69b3a2"])
+        .domain([1, 100]);
+
+    const data = matrix_to_hmap(graph);
+    console.log("accepted data:", data);
+    const filteredData = data.filter((d): d is HeatmapData => !!d);
+
+    g.selectAll("rect")
+        .data(data, (d: any) => d.group + ":" + d.variable)
+        .enter()
+        .append("rect")
+        .attr("x", (d: HeatmapData) => x(d.group)!)
+        .attr("y", (d: HeatmapData) => y(d.variable)! + 50)
+        .attr("width", x.bandwidth())
+        .attr("height", y.bandwidth())
+        .style("fill", (d: HeatmapData) => myColor(d.value))
+        .style("stroke-width", 1)
+        .style("stroke", "grey")
+        .style("opacity", 0.8);
+}
+
+
+
 //-------------------------------------------------------------
 //single matrix visualizer
-export function visualizeMatrix(path: string, isAttribute:boolean, gridSize:number) {
+export function visualizeMatrix(
+    path: string,
+    isAttribute: boolean,
+    gridSize: number
+) {
     const init = async (graph: any, features: any, nodeAttrs: any) => {
-        const margin = { top: 10, right: 80, bottom: 30, left: 80 };
-        const width = gridSize + margin.left + margin.right;
-        const height = (gridSize + margin.top + margin.bottom) * 2;
+        //visualize matrix body part
+        visualizeMatrixBody(gridSize, graph);
 
-        d3.select("#matvis").selectAll("svg").remove();
-        const svg = d3
-            .select("#matvis")
-            .append("svg")
-            .attr("class", "mats")
-            .attr("width", width)
-            .attr("height", height);
-        const xOffset = 50;
-        const g = svg
-            .append("g")
-            .attr("transform", `translate(${xOffset},${margin.top})`);
-        var myGroups = get_axis_gdata(graph);
-        var myVars = get_axis_gdata(graph);
-
-        var x = d3
-            .scaleBand()
-            .range([0, gridSize])
-            .domain(myGroups)
-            .padding(0.01);
-
-        g.append("g")
-            .attr("class", "x-axis")
-            .attr("transform", `translate(0,${gridSize + 50})`)
-            .call(d3.axisBottom(x));
-
-        var y = d3
-            .scaleBand()
-            .range([0, gridSize])
-            .domain(myVars)
-            .padding(0.01);
-
-        g.append("g")
-            .attr("class", "y-axis")
-            .attr("transform", "translate(0,50)")
-            .call(d3.axisLeft(y));
-
-        d3.selectAll<SVGTextElement, any>(".x-axis text").classed(
-            "first",
-            true
-        );
-        d3.selectAll<SVGTextElement, any>(".y-axis text").classed(
-            "first",
-            true
-        );
-
-        var myColor = d3
-            .scaleLinear<string>()
-            .range(["white", "#69b3a2"])
-            .domain([1, 100]);
-
-        const data = matrix_to_hmap(graph);
-        console.log("accepted data:", data);
-        const filteredData = data.filter((d): d is HeatmapData => !!d);
-
-        g.selectAll("rect")
-            .data(data, (d: any) => d.group + ":" + d.variable)
-            .enter()
-            .append("rect")
-            .attr("x", (d: HeatmapData) => x(d.group)!)
-            .attr("y", (d: HeatmapData) => y(d.variable)! + 50)
-            .attr("width", x.bandwidth())
-            .attr("height", y.bandwidth())
-            .style("fill", (d: HeatmapData) => myColor(d.value))
-            .style("stroke-width", 1)
-            .style("stroke", "grey")
-            .style("opacity", 0.8)
-            .on("mouseover", mouseover)
-            .on("mousemove", mousemove)
-            .on("mouseleave", mouseleave);
-
-        g.selectAll(".x-axis text")
-            .on("mouseover", function (event) {
-                console.log("EVENT", event);
-                const element = event.target as SVGGraphicsElement;
-                console.log("ELEMENT", element);
-            })
-            .on("mouseout", function (event) {
-                const element = event.target as SVGGraphicsElement;
-                removeEffect(element);
-                d3.select("#tmp").remove();
-            });
-
-        g.selectAll(".y-axis text")
-            .on("mouseover", function (event, d) {
-                const element = event.target as SVGGraphicsElement;
-                console.log("ELEMENT", element);
-            })
-            .on("mouseout", function (event, d) {
-                const element = event.target as SVGGraphicsElement;
-                removeEffect(element);
-            });
-
-        if(isAttribute)drawNodeAttributes(nodeAttrs, graph, 50);
+        if (isAttribute) drawNodeAttributes(nodeAttrs, graph, 50);
     };
 
     const visualizeMat = async (path: string) => {
