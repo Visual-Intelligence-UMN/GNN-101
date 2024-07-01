@@ -417,6 +417,47 @@ export function visualizeNodeClassifierFeatures(
     featureVisTable = firstLayerPackage.featureVisTable;
     const firstLayer = firstLayerPackage.firstLayer;
 
+    //-----------------------------------GCNConv LAYERS-----------------------------------------------
+    // const featureChannels = 4;
+
+    // const GCNConvPackage = drawGCNConv(
+    //     conv1,
+    //     conv2,
+    //     conv3,
+    //     locations,
+    //     myColor,
+    //     frames,
+    //     schemeLocations,
+    //     featureVisTable,
+    //     pooling,
+    //     graph,
+    //     colorSchemesTable,
+    //     poolingVis,
+    //     outputVis,
+    //     final,
+    //     firstLayer,
+    //     maxVals,
+    //     featureChannels
+    // );
+    // locations = GCNConvPackage.locations;
+    // frames = GCNConvPackage.frames;
+    // schemeLocations = GCNConvPackage.schemeLocations;
+    // featureVisTable = GCNConvPackage.featureVisTable;
+    // colorSchemesTable = GCNConvPackage.colorSchemesTable;
+    // poolingVis = GCNConvPackage.poolingVis;
+    // outputVis = GCNConvPackage.outputVis;
+    // resultVis = GCNConvPackage.resultVis;
+    // maxVals = GCNConvPackage.maxVals;
+
+    // let path1 = GCNConvPackage.path1;
+    // let fr1 = GCNConvPackage.fr1;
+    // let poolingFrame = GCNConvPackage.poolingFrame;
+
+    // let paths = GCNConvPackage.paths;
+    // let one = GCNConvPackage.one;
+
+    // clearInterval(intervalID);
+
     return null;
 }
 

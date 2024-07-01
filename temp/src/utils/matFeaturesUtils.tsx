@@ -259,6 +259,85 @@ export function drawNodeFeatures(
     };
 }
 
+
+export function drawSingleGCNConvFeature(
+    layer:any,
+    i:number,
+    k:number,
+    gcnFeature:any,
+    featureChannels:number,
+    locations:any,
+    rectW:number,
+    rectH:number,
+    myColor:any,
+    thirdGCN:any,
+    frames:any,
+    schemeLocations:any,
+    featureVisTable:any
+){
+    //const cate = get_category_node(features[i]) * 100;
+    const g = layer
+        .append("g")
+        .attr("class", "featureVis")
+        .attr("node", i)
+        .attr("layerID", k + 1);
+
+    console.log("new", gcnFeature);
+
+    //loop through each node
+    let nodeMat = gcnFeature[i];
+    console.log("nodeMat", i, nodeMat);
+    //where we met encounter issue
+    for (let m = 0; m < featureChannels; m++) {
+        const rect = g
+            .append("rect")
+            .attr("x", locations[i][0] + rectW * m)
+            .attr("y", locations[i][1])
+            .attr("width", rectW)
+            .attr("height", rectH)
+            .attr("fill", myColor(nodeMat[m]))
+            .attr("opacity", 1)
+            .attr("stroke", "gray")
+            .attr("stroke-width", 0.1);
+        //if it's the last layer, store rect into thirdGCN
+        if (k == 2 && m<featureChannels) {
+            thirdGCN[m].push(rect.node());
+        }
+    }
+    //draw frame
+    const f = g
+        .append("rect")
+        .attr("x", locations[i][0])
+        .attr("y", locations[i][1])
+        .attr("width", rectW * featureChannels)
+        .attr("height", rectH)
+        .attr("fill", "none")
+        .attr("opacity", 0)
+        .attr("stroke", "black")
+        .attr("stroke-width", 1)
+        .attr("node", i)
+        .attr("layerID", k + 1)
+        .attr("class", "frame");
+    //havent figure out how to optimize this code..
+    if (k == 0) frames["GCNConv1"].push(f.node());
+    if (k == 1) frames["GCNConv2"].push(f.node());
+    if (k == 2) frames["GCNConv3"].push(f.node());
+    //drawPoints(".mats", "red", locations);
+    if (i == locations.length - 1) {
+        schemeLocations.push([locations[i][0], 350]);
+    }
+
+    featureVisTable[k + 1].push(g.node() as SVGElement);
+
+    return {
+        thirdGCN: thirdGCN,
+        schemeLocations: schemeLocations,
+        featureVisTable: featureVisTable
+    }
+}
+
+
+
 //draw intermediate features from GCNConv process
 export function drawGCNConv(
     conv1: any,
@@ -322,59 +401,14 @@ export function drawGCNConv(
         const gcnFeature = gcnFeatures[k];
 
         for (let i = 0; i < locations.length; i++) {
-            //const cate = get_category_node(features[i]) * 100;
-            const g = layer
-                .append("g")
-                .attr("class", "featureVis")
-                .attr("node", i)
-                .attr("layerID", k + 1);
-
-            console.log("new", gcnFeature);
-
-            //loop through each node
-            let nodeMat = gcnFeature[i];
-            console.log("nodeMat", i, nodeMat);
-            //where we met encounter issue
-            for (let m = 0; m < featureChannels; m++) {
-                const rect = g
-                    .append("rect")
-                    .attr("x", locations[i][0] + rectW * m)
-                    .attr("y", locations[i][1])
-                    .attr("width", rectW)
-                    .attr("height", rectH)
-                    .attr("fill", myColor(nodeMat[m]))
-                    .attr("opacity", 1)
-                    .attr("stroke", "gray")
-                    .attr("stroke-width", 0.1);
-                //if it's the last layer, store rect into thirdGCN
-                if (k == 2 && m<featureChannels) {
-                    thirdGCN[m].push(rect.node());
-                }
-            }
-            //draw frame
-            const f = g
-                .append("rect")
-                .attr("x", locations[i][0])
-                .attr("y", locations[i][1])
-                .attr("width", rectW * featureChannels)
-                .attr("height", rectH)
-                .attr("fill", "none")
-                .attr("opacity", 0)
-                .attr("stroke", "black")
-                .attr("stroke-width", 1)
-                .attr("node", i)
-                .attr("layerID", k + 1)
-                .attr("class", "frame");
-            //havent figure out how to optimize this code..
-            if (k == 0) frames["GCNConv1"].push(f.node());
-            if (k == 1) frames["GCNConv2"].push(f.node());
-            if (k == 2) frames["GCNConv3"].push(f.node());
-            //drawPoints(".mats", "red", locations);
-            if (i == locations.length - 1) {
-                schemeLocations.push([locations[i][0], 350]);
-            }
-
-            featureVisTable[k + 1].push(g.node() as SVGElement);
+            const sgfPack = drawSingleGCNConvFeature(
+                layer, i, k, gcnFeature, featureChannels, locations, 
+                rectW, rectH, myColor, thirdGCN, frames,
+                schemeLocations, featureVisTable
+            );
+            thirdGCN = sgfPack.thirdGCN;
+            schemeLocations = sgfPack.schemeLocations;
+            featureVisTable = sgfPack.featureVisTable;
         }
         console.log("FVT", featureVisTable);
         if (k != 2) {
