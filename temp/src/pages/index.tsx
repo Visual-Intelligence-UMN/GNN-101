@@ -22,6 +22,7 @@ import {
 } from "./WebUtils";
 import { Tooltip } from "react-tooltip";
 import { Inter } from '@next/font/google';
+import NodeMatricesVisualizer from "./node_classifier/NodeMatrixVisualizer";
 
 export const inter = Inter({
     variable: '--font-inter',
@@ -243,7 +244,6 @@ export default function Home() {
 
                             {model=="graph classification"?(isGraphView ? (
                                 <>
-
                                     <GraphVisualizer
                                         graph_path={graphList[selectedGraph]}
                                         intmData={intmData}
@@ -264,7 +264,17 @@ export default function Home() {
                                         selectedButtons={selectedButtons}
                                     />
                                 </>
-                            )):<>{/**the visualization for the node classifier */}</>}
+                            )):
+                            (isGraphView?
+                                <>Graph Visualizer{/**thegraph visualizer for the node classifier */}</>
+                                :
+                                <NodeMatricesVisualizer graph_path={nodeList[selectedGraph]}
+                                    intmData={intmData}
+                                    changed={changedG}
+                                    predicted={predicted}
+                                    selectedButtons={selectedButtons}
+                                />)
+                            }
 
                             {/* overlay text on visualizer when not predicted */}
                             {probabilities.length==0 && (

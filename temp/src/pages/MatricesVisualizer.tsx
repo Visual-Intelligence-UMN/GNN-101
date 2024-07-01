@@ -31,7 +31,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
 
     useEffect(() => {
         if ((intmData == null || changed) && !predicted) {
-            visualizeMatrix(graph_path);
+            visualizeMatrix(graph_path, true, 400);
         } else {
             visualizeGraphClassifier(setIsLoading, graph_path, intmData);
         }
