@@ -2,7 +2,8 @@ import { loadWeights } from "./matHelperUtils";
 import {
     drawMatrixPreparation,
     drawNodeFeatures,
-    drawGCNConv,
+    drawGCNConvGraphModel,
+    drawGCNConvNodeModel,
 } from "./matFeaturesUtils";
 import * as d3 from "d3";
 import {
@@ -96,7 +97,7 @@ export function visualizeGraphClassifierFeatures(
     //-----------------------------------GCNConv LAYERS-----------------------------------------------
     const featureChannels = 64;
 
-    const GCNConvPackage = drawGCNConv(
+    const GCNConvPackage = drawGCNConvGraphModel(
         conv1,
         conv2,
         conv3,
@@ -418,43 +419,32 @@ export function visualizeNodeClassifierFeatures(
     const firstLayer = firstLayerPackage.firstLayer;
 
     //-----------------------------------GCNConv LAYERS-----------------------------------------------
-    // const featureChannels = 4;
+    const featureChannels = 4;
 
-    // const GCNConvPackage = drawGCNConv(
-    //     conv1,
-    //     conv2,
-    //     conv3,
-    //     locations,
-    //     myColor,
-    //     frames,
-    //     schemeLocations,
-    //     featureVisTable,
-    //     pooling,
-    //     graph,
-    //     colorSchemesTable,
-    //     poolingVis,
-    //     outputVis,
-    //     final,
-    //     firstLayer,
-    //     maxVals,
-    //     featureChannels
-    // );
-    // locations = GCNConvPackage.locations;
-    // frames = GCNConvPackage.frames;
-    // schemeLocations = GCNConvPackage.schemeLocations;
-    // featureVisTable = GCNConvPackage.featureVisTable;
-    // colorSchemesTable = GCNConvPackage.colorSchemesTable;
-    // poolingVis = GCNConvPackage.poolingVis;
-    // outputVis = GCNConvPackage.outputVis;
-    // resultVis = GCNConvPackage.resultVis;
-    // maxVals = GCNConvPackage.maxVals;
-
-    // let path1 = GCNConvPackage.path1;
-    // let fr1 = GCNConvPackage.fr1;
-    // let poolingFrame = GCNConvPackage.poolingFrame;
-
-    // let paths = GCNConvPackage.paths;
-    // let one = GCNConvPackage.one;
+    const GCNConvPackage = drawGCNConvNodeModel(
+        conv1,
+        conv2,
+        conv3,
+        locations,
+        myColor,
+        frames,
+        schemeLocations,
+        featureVisTable,
+        result,
+        graph,
+        colorSchemesTable,
+        final,
+        firstLayer,
+        maxVals,
+        featureChannels
+    );
+    locations = GCNConvPackage.locations;
+    frames = GCNConvPackage.frames;
+    schemeLocations = GCNConvPackage.schemeLocations;
+    featureVisTable = GCNConvPackage.featureVisTable;
+    colorSchemesTable = GCNConvPackage.colorSchemesTable;
+    maxVals = GCNConvPackage.maxVals;
+    let paths = GCNConvPackage.paths;
 
     // clearInterval(intervalID);
 

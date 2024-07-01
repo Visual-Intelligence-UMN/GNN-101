@@ -371,7 +371,7 @@ export function drawColorSchremeSequence(infoTable:any, myColor:any){
 }
 
 //draw intermediate features from GCNConv process
-export function drawGCNConv(
+export function drawGCNConvGraphModel(
     conv1: any,
     conv2: any,
     conv3: any,
@@ -559,6 +559,100 @@ export function drawGCNConv(
         path1:path1,
         fr1:fr1,
         poolingFrame:poolingFrame
+    };
+}
+
+//draw intermediate features from GCNConv process
+export function drawGCNConvNodeModel(
+    conv1: any,
+    conv2: any,
+    conv3: any,
+    locations: any,
+    myColor: any,
+    frames: any,
+    schemeLocations: any,
+    featureVisTable: any,
+    result: any,
+    graph: any,
+    colorSchemesTable: any,
+    final: any,
+    firstLayer: any,
+    maxVals: any,
+    featureChannels: number
+) {
+    //GCNCov Visualizer
+    let paths: any;
+    const gcnFeatures = [conv1, conv2, conv3];
+    //a table to save all rects in the last GCNConv layer
+    let thirdGCN: any = Array.from({ length: featureChannels }, () => []);
+    console.log("thirdGCN", thirdGCN);
+    console.log("gcnf", gcnFeatures);
+    console.log("CONV1", conv1);
+    for (let k = 0; k < 3; k++) {
+        const rectH = 15;
+        const rectW = 10;
+        const layer = d3
+            .select(".mats")
+            .append("g")
+            .attr("class", "layerVis")
+            .attr("id", `layerNum_${k + 1}`);
+        for (let i = 0; i < locations.length; i++) {
+            if (k != 0) {
+                locations[i][0] += rectW * featureChannels + 100-rectW;
+            } else {
+                locations[i][0] += 34 * 5 + 100;
+            }
+        }
+
+        addLayerName(
+            locations,
+            "GCNConv" + (k + 1),
+            0,
+            30,
+            d3.select(`g#layerNum_${k + 1}`)
+        );
+
+        //drawPoints(".mats","red",locations);
+        const gcnFeature = gcnFeatures[k];
+
+        for (let i = 0; i < locations.length; i++) {
+            const sgfPack = drawSingleGCNConvFeature(
+                layer, i, k, gcnFeature, featureChannels, locations, 
+                rectW, rectH, myColor, thirdGCN, frames,
+                schemeLocations, featureVisTable
+            );
+            thirdGCN = sgfPack.thirdGCN;
+            schemeLocations = sgfPack.schemeLocations;
+            featureVisTable = sgfPack.featureVisTable;
+        }
+        console.log("FVT", featureVisTable);
+        if (k != 2) {
+            // visualize cross connections btw 1st, 2nd, 3rd GCNConv
+            paths = drawCrossConnection(
+                graph,
+                locations,
+                (featureChannels-2) * rectW,
+                102,
+                k + 1
+            );
+            console.log("grouped grouped", paths);
+        } else {
+        }
+        console.log("schemeLocations", schemeLocations);
+    }
+
+    console.log("thirdGCN after filled", thirdGCN);
+
+    return {
+        locations: locations,
+        frames: frames,
+        schemeLocations: schemeLocations,
+        featureVisTable: featureVisTable,
+        colorSchemesTable: colorSchemesTable,
+        firstLayer: firstLayer,
+        maxVals: maxVals,
+        paths: paths,
+        thirdGCN: thirdGCN
     };
 }
 
