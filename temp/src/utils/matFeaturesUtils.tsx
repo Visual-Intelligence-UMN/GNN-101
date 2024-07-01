@@ -125,17 +125,17 @@ export function computeMids(point1: any, point2: any) {
 }
 
 //draw aid utils for matrix visualization(column and row frames)
-export function drawMatrixPreparation(graph: any, locations: any) {
+export function drawMatrixPreparation(graph: any, locations: any, gridSize:number) {
     let colLocations = [];
     for (let i = 0; i < graph.length; i++) {
         const x =
-            locations[0][0] - (400 / graph.length) * i - 400 / graph.length / 2;
+            locations[0][0] - (gridSize / graph.length) * i - gridSize / graph.length / 2;
         const y = locations[0][1];
         colLocations.push([x, y]);
     }
     const ratio = locations[0][1] / 61.875365257263184;
     const startY = locations[0][1] / ratio;
-    const rowHeight = 400 / graph.length;
+    const rowHeight = gridSize / graph.length;
     //drawPoints(".mats", "red", colLocations);
     let colFrames: SVGElement[] = []; //a
     for (let i = 0; i < colLocations.length; i++) {
@@ -144,8 +144,8 @@ export function drawMatrixPreparation(graph: any, locations: any) {
             .append("rect")
             .attr("x", colLocations[i][0])
             .attr("y", colLocations[i][1] / ratio)
-            .attr("height", 400)
-            .attr("width", 400 / graph.length)
+            .attr("height", gridSize)
+            .attr("width", gridSize / graph.length)
             .attr("fill", "none")
             .attr("opacity", 0)
             .attr("stroke", "black")
@@ -163,10 +163,10 @@ export function drawMatrixPreparation(graph: any, locations: any) {
         const r = d3
             .select(".mats")
             .append("rect")
-            .attr("x", locations[i][0] - 400 + rowHeight / 2)
+            .attr("x", locations[i][0] - gridSize + rowHeight / 2)
             .attr("y", startY + i * rowHeight)
             .attr("height", rowHeight)
-            .attr("width", 400)
+            .attr("width", gridSize)
             .attr("fill", "none")
             .attr("opacity", 0)
             .attr("stroke", "black")
@@ -188,7 +188,9 @@ export function drawNodeFeatures(
     frames: any,
     schemeLocations: any,
     featureVisTable: any,
-    featureChannels:number
+    featureChannels:number,
+    rectW:number,
+    rectH:number
 ) {
     //initial visualizer
     for (let i = 0; i < locations.length; i++) {
@@ -196,12 +198,12 @@ export function drawNodeFeatures(
         locations[i][1] += 2;
     }
     //draw cross connections for features layer and first GCNConv layer
-    drawCrossConnection(graph, locations, featureChannels * 10, 102, 0);
+    drawCrossConnection(graph, locations, featureChannels * rectW, 102, 0);
 
     //using locations to find the positions for first feature visualizers
     const firstLayer = d3.select(".mats").append("g").attr("id", "layerNum_0");
-    const rectW = 10;
-    const rectH = 15;
+    // const rectW = 10;
+    // const rectH = 15;
     for (let i = 0; i < locations.length; i++) {
         const g = firstLayer
             .append("g")

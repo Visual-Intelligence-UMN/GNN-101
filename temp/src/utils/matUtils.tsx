@@ -17,7 +17,7 @@ import {
     resultRectMouseout
 } from "./matEventsUtils";
 
-//features visualization pipeline: draw all feature visualizers for original features and GCNConv
+//Graph Classifier： features visualization pipeline: draw all feature visualizers for original features and GCNConv
 export function visualizeGraphClassifierFeatures(
     locations: any,
     features: any,
@@ -69,7 +69,7 @@ export function visualizeGraphClassifierFeatures(
     console.log("adjList", adjList);
 
     //--------------------------------DRAW FRAMES--------------------------------
-    const framePackage = drawMatrixPreparation(graph, locations);
+    const framePackage = drawMatrixPreparation(graph, locations, 400);
     let colFrames: SVGElement[] = framePackage.colFrames; //a
     let matFrames: SVGElement[] = framePackage.matFrames; //a
 
@@ -82,7 +82,9 @@ export function visualizeGraphClassifierFeatures(
         frames,
         schemeLocations,
         featureVisTable,
-        7
+        7,
+        10,
+        15
     );
     //updated variables
     locations = firstLayerPackage.locations;
@@ -338,3 +340,86 @@ export function visualizeGraphClassifierFeatures(
     };
 
 }
+
+//Node Classifier: features visualization pipeline: draw all feature visualizers for original features and GCNConv
+export function visualizeNodeClassifierFeatures(
+    locations: any,
+    features: any,
+    myColor: any,
+    conv1: any,
+    conv2: any,
+    conv3: any,
+    result: any,
+    final: any,
+    graph: any,
+    adjList: any,
+    maxVals: any
+) {
+    //--------------------------------DATA PREP MANAGEMENT--------------------------------
+    let intervalID: any = null; // to manage animation controls
+
+    let poolingVis = null; //to manage pooling visualizer
+    let outputVis = null; //to manage model output
+    let resultVis: any = null; //tp manage result visualizer
+    //load weights and bias
+    const dataPackage = loadWeights();
+    console.log("weights, data", dataPackage);
+    const weights = dataPackage["weights"];
+    const bias = dataPackage["bias"];
+    console.log("weights, data", weights, bias);
+    //table that manage all feature visualizers for GCNConv
+    let featureVisTable: SVGElement[][] = [[], [], [], []];
+    //table that manage color schemes
+    let colorSchemesTable: SVGElement[] = [];
+    //control detail view
+    let dview = false;
+    //control lock and unlock
+    let lock = false;
+    //a data structure to store all feature vis frames information
+    interface FrameDS {
+        features: any[];
+        GCNConv1: any[];
+        GCNConv2: any[];
+        GCNConv3: any[];
+    }
+    var frames: FrameDS = {
+        features: [],
+        GCNConv1: [],
+        GCNConv2: [],
+        GCNConv3: [],
+    };
+    var schemeLocations: any = [];
+    console.log("Received", maxVals);
+    console.log("adjList", adjList);
+
+    //--------------------------------DRAW FRAMES--------------------------------
+    const framePackage = drawMatrixPreparation(graph, locations, 800);
+    let colFrames: SVGElement[] = framePackage.colFrames; //a
+    let matFrames: SVGElement[] = framePackage.matFrames; //a
+
+    //-----------------------------------FIRST LAYER-----------------------------------------------
+    const firstLayerPackage = drawNodeFeatures(
+        locations,
+        graph,
+        myColor,
+        features,
+        frames,
+        schemeLocations,
+        featureVisTable,
+        34,
+        5,
+        15
+    );
+    //updated variables
+    locations = firstLayerPackage.locations;
+    frames = firstLayerPackage.frames;
+    schemeLocations = firstLayerPackage.schemeLocations;
+    featureVisTable = firstLayerPackage.featureVisTable;
+    const firstLayer = firstLayerPackage.firstLayer;
+
+    return null;
+}
+
+
+
+

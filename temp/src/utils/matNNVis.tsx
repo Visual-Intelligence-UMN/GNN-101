@@ -7,10 +7,12 @@ import {
     load_json,
     matrix_to_hmap,
     get_axis_gdata,
-    graphToAdjList
+    graphToAdjList,
+    drawPoints
 } from "../utils/utils";
 import {
-    visualizeGraphClassifierFeatures
+    visualizeGraphClassifierFeatures,
+    visualizeNodeClassifierFeatures
 } from "@/utils/matUtils";
 import {
     get_cood_locations,
@@ -77,7 +79,7 @@ async function initNodeClassifier(graph: any, features: any[][], intmData:any, g
 
     const gLen = graph.length;
     console.log("gLen", gLen);
-    const gridSize = 400;
+    const gridSize = 800;
     const margin = { top: 10, right: 80, bottom: 30, left: 80 };
     const width = 20 * gLen + 50 + 6 * 102 + 1200 * 2;
     const height = (gridSize + margin.top + margin.bottom) * 2;
@@ -95,19 +97,19 @@ async function initNodeClassifier(graph: any, features: any[][], intmData:any, g
 
     locations = get_cood_locations(data, locations);
     //crossConnectionMatrices(graphs, locations, offsetMat, pathMatrix);
-    // const featuresManager = visualizeGraphClassifierFeatures(
-    //     locations,
-    //     features,
-    //     myColor,
-    //     conv1,
-    //     conv2,
-    //     conv3,
-    //     pooling,
-    //     final,
-    //     graph,
-    //     adjList,
-    //     colorSchemeTable
-    // );
+    const featuresManager = visualizeNodeClassifierFeatures(
+        locations,
+        features,
+        myColor,
+        conv1,
+        conv2,
+        conv3,
+        result,
+        final,
+        graph,
+        adjList,
+        colorSchemeTable
+    );
     // drawNodeAttributes(nodeAttrs, graph, 50);
 
     // const intervalID = featuresManager.getIntervalID();
@@ -117,6 +119,9 @@ async function initNodeClassifier(graph: any, features: any[][], intmData:any, g
     console.log("initNode", intmData, data, locations, adjList);
     console.log("conv", conv1, conv2, conv3, final, result);
     console.log("initNode CST", colorSchemeTable);
+    console.log("initNode features", features);
+
+    //drawPoints(".mats", "red", locations);
 };
 
 
