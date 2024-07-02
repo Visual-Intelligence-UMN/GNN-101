@@ -511,16 +511,27 @@ export function featureVisClick(
     res10 = [midX1 - 20, biasCoord[1]];
     res11 = [midX1 + 20, nextCoord[1]];
 
-    //find start locations and end locations
-    const coordStartPoint: [number, number] = [
+    //find start locations and end locations - issue here
+    let coordStartPoint: [number, number] = [
         wmCoord[0] - rectW * featureChannels * 2 - (gap+2),
         wmCoord[1] - (rectH / 2) * curveDir,
     ];
-    const coordFinalPoint: [number, number] = [
+    let coordFinalPoint: [number, number] = [
         wmCoord[0] - rectW * featureChannels,
         wmCoord[1] - (rectH / 2) * curveDir,
     ];
 
+
+    if(featureChannels==4&&layerID==0){
+         coordFinalPoint = [
+            wmCoord[0]+10,
+            wmCoord[1] - (rectH / 2) * curveDir,
+        ];
+        coordFeatureVis3 = [
+            wmCoord[0]+10,
+            coordFeatureVis[1],
+        ];
+    }
     
 
     //draw paths
@@ -559,16 +570,17 @@ export function featureVisClick(
                     rectW,
                     coordFeatureVis2,
                     myColor,
-                    layerBias
+                    layerBias,
+                    layerID
                 ),
             delay: aniSec,
         },
         {
-            func: () => drawBiasPath(biasCoord, res10, res11, nextCoord),
+            func: () => drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels),
             delay: aniSec,
         },
         {
-            func: () => drawFinalPath(wmCoord, res00, res01, nextCoord),
+            func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels),
             delay: aniSec,
         },
         {
@@ -631,6 +643,18 @@ export function featureVisClick(
                             runAnimations(0, animateSeqAfterPath);
                         }
 
+                        if(featureChannels==4&&layerID==2&&currentStep >= 2){
+                            injectPlayButtonSVG(
+                                btn,
+                                btnX,
+                                btnY - 30,
+                                "./assets/SVGs/playBtn_play.svg"
+                            );
+                            isPlaying = false;
+                            clearInterval(intervalID);
+                            runAnimations(0, animateSeqAfterPath);
+                        }
+
                         if (currentStep >= featureChannels || !lock) {
                             injectPlayButtonSVG(
                                 btn,
@@ -644,7 +668,7 @@ export function featureVisClick(
                     }, 250);
                     setIntervalID(intervalID);
                     d3.selectAll("#tempath").lower();
-                }, 1);
+                }, 2);
             },
             delay: aniSec * 2,
         },
@@ -692,6 +716,11 @@ export function featureVisClick(
                 "./assets/SVGs/playBtn_pause.svg"
             );
             console.log("currentStep", currentStep);
+            if(featureChannels==4&&layerID==2&&currentStep >= 2){
+                d3.select(".mats").selectAll(".removeRect").remove();
+                d3.select(".mats").selectAll(".pauseRemove").remove();
+                currentStep = 0; // 重置步骤
+            }
             if (currentStep >= featureChannels) {
                 d3.select(".mats").selectAll(".removeRect").remove();
                 d3.select(".mats").selectAll(".pauseRemove").remove();
@@ -716,6 +745,19 @@ export function featureVisClick(
                 );
                 currentStep++;
                 console.log("currentStep", currentStep);
+
+                if(featureChannels==4&&layerID==2&&currentStep >= 2){
+                    injectPlayButtonSVG(
+                        btn,
+                        btnX,
+                        btnY - 30,
+                        "./assets/SVGs/playBtn_play.svg"
+                    );
+                    isPlaying = false;
+                    clearInterval(intervalID);
+                    runAnimations(0, animateSeqAfterPath);
+                }
+                
 
                 if (currentStep >= featureChannels) {
                     d3.select(".mats")

@@ -44,7 +44,7 @@ export function animatePathDrawing(
         console.log("i", currentStep);
         if(currentStep>=featureChannels){
             setTimeout(()=>{
-                drawBiasPath(biasCoord, res10, res11, nextCoord);
+              //  drawBiasPath(biasCoord, res10, res11, nextCoord);
             },aniSec + 100);
         }
         if (currentStep >= featureChannels || !lock) {
@@ -160,6 +160,7 @@ export function drawAniPath(
         .attr("class", "procVis removeRect").lower();
 
     const Xv = Xt[currentStep];
+    console.log("debug Xv", Xv)
     for (let j = 0; j < Xv.length; j++) {
         const s1 = startCoordList[j];
         const e1 = endCoordList[currentStep];
@@ -310,9 +311,12 @@ export function drawBiasVector(
     rectW: number,
     coordFeatureVis: any,
     myColor: any,
-    layerBias: number[]
+    layerBias: number[],
+    layerID:number
 ) {
-    for (let m = 0; m < featureChannels; m++) {
+    let channels = featureChannels;
+    if(layerID==2&&featureChannels==4)channels=2;
+    for (let m = 0; m < channels; m++) {
         g.append("rect")
             .attr("x", coordFeatureVis[0] + rectW * m)
             .attr("y", coordFeatureVis[1] - rectH / 2)
@@ -329,7 +333,7 @@ export function drawBiasVector(
     g.append("rect")
         .attr("x", coordFeatureVis[0])
         .attr("y", coordFeatureVis[1] - rectH / 2)
-        .attr("width", rectW * featureChannels)
+        .attr("width", rectW * channels)
         .attr("height", rectH)
         .attr("fill", "none")
         .attr("opacity", 0)
@@ -343,8 +347,11 @@ export function drawBiasPath(
     biasCoord:[number, number], 
     res10:[number, number], 
     res11:[number, number], 
-    nextCoord:[number, number]
+    nextCoord:[number, number],
+    layerID:number,
+    featureChannels:number
 ) {
+    if(layerID==2&&featureChannels==4)biasCoord[0]-=15;
     const lineGenerator = d3
         .line<[number, number]>()
         .curve(d3.curveBasis)
@@ -366,8 +373,12 @@ export function drawFinalPath(
     wmCoord:[number, number], 
     res00:[number, number], 
     res01:[number, number], 
-    nextCoord:[number, number]
+    nextCoord:[number, number],
+    layerID:number,
+    featureChannels:number
 ){
+    if((layerID==2)&&featureChannels==4)wmCoord[0]-=15;
+    if((layerID==0)&&featureChannels==4)wmCoord[0]+=15;
     const lineGenerator = d3
             .line<[number, number]>()
             .curve(d3.curveBasis)

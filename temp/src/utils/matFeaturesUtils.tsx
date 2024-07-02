@@ -616,15 +616,29 @@ export function drawGCNConvNodeModel(
         //drawPoints(".mats","red",locations);
         const gcnFeature = gcnFeatures[k];
 
-        for (let i = 0; i < locations.length; i++) {
-            const sgfPack = drawSingleGCNConvFeature(
-                layer, i, k, gcnFeature, featureChannels, locations, 
-                rectW, rectH, myColor, thirdGCN, frames,
-                schemeLocations, featureVisTable
-            );
-            thirdGCN = sgfPack.thirdGCN;
-            schemeLocations = sgfPack.schemeLocations;
-            featureVisTable = sgfPack.featureVisTable;
+
+        if(k==2){
+            for (let i = 0; i < locations.length; i++) {
+                const sgfPack = drawSingleGCNConvFeature(
+                    layer, i, k, gcnFeature, 2, locations, 
+                    rectW, rectH, myColor, thirdGCN, frames,
+                    schemeLocations, featureVisTable
+                );
+                thirdGCN = sgfPack.thirdGCN;
+                schemeLocations = sgfPack.schemeLocations;
+                featureVisTable = sgfPack.featureVisTable;
+            }
+        }else{
+            for (let i = 0; i < locations.length; i++) {
+                const sgfPack = drawSingleGCNConvFeature(
+                    layer, i, k, gcnFeature, featureChannels, locations, 
+                    rectW, rectH, myColor, thirdGCN, frames,
+                    schemeLocations, featureVisTable
+                );
+                thirdGCN = sgfPack.thirdGCN;
+                schemeLocations = sgfPack.schemeLocations;
+                featureVisTable = sgfPack.featureVisTable;
+            }
         }
         console.log("FVT", featureVisTable);
         if (k != 2) {
