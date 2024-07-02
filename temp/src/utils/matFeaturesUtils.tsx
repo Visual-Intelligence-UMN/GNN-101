@@ -190,7 +190,8 @@ export function drawNodeFeatures(
     featureVisTable: any,
     featureChannels:number,
     rectW:number,
-    rectH:number
+    rectH:number,
+    gap:number
 ) {
     //initial visualizer
     for (let i = 0; i < locations.length; i++) {
@@ -198,7 +199,7 @@ export function drawNodeFeatures(
         locations[i][1] += 2;
     }
     //draw cross connections for features layer and first GCNConv layer
-    drawCrossConnection(graph, locations, featureChannels * rectW, 102, 0);
+    drawCrossConnection(graph, locations, featureChannels * rectW, gap+2, 0);
 
     //using locations to find the positions for first feature visualizers
     const firstLayer = d3.select(".mats").append("g").attr("id", "layerNum_0");
@@ -598,9 +599,9 @@ export function drawGCNConvNodeModel(
             .attr("id", `layerNum_${k + 1}`);
         for (let i = 0; i < locations.length; i++) {
             if (k != 0) {
-                locations[i][0] += rectW * featureChannels + 100-rectW;
+                locations[i][0] += rectW * featureChannels + 150;
             } else {
-                locations[i][0] += 34 * 5 + 100;
+                locations[i][0] += 34 * 5 + 150;
             }
         }
 
@@ -631,8 +632,8 @@ export function drawGCNConvNodeModel(
             paths = drawCrossConnection(
                 graph,
                 locations,
-                (featureChannels-2) * rectW,
-                102,
+                (featureChannels) * rectW,
+                152,
                 k + 1
             );
             console.log("grouped grouped", paths);

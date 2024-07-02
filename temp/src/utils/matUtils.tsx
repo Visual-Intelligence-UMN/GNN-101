@@ -85,7 +85,8 @@ export function visualizeGraphClassifierFeatures(
         featureVisTable,
         7,
         10,
-        15
+        15,
+        100
     );
     //updated variables
     locations = firstLayerPackage.locations;
@@ -409,7 +410,8 @@ export function visualizeNodeClassifierFeatures(
         featureVisTable,
         34,
         5,
-        15
+        15,
+        150
     );
     //updated variables
     locations = firstLayerPackage.locations;
@@ -447,6 +449,78 @@ export function visualizeNodeClassifierFeatures(
     let paths = GCNConvPackage.paths;
 
     // clearInterval(intervalID);
+
+    //-----------------------------------INTERACTIONS EVENTS MANAGEMENT-----------------------------------------------
+    //added interactions
+    //add mouse event
+    d3.selectAll(".oFeature").on("mouseover", function (event, d) {
+        //if not in the state of lock
+        if (!lock) {
+            const layerID = d3.select(this).attr("layerID");
+            const node = d3.select(this).attr("node");
+            const pack = oFeatureMouseOver(layerID, node, frames, matFrames);
+            //update variables
+            frames = pack.frames;
+            matFrames = pack.matFrames;
+        }
+    });
+    d3.selectAll(".oFeature").on("mouseout", function (event, d) {
+        const layerID = d3.select(this).attr("layerID");
+        const node = d3.select(this).attr("node");
+        const pack = oFeatureMouseOut(layerID, node, frames, matFrames);
+        //update variables
+        frames = pack.frames;
+        matFrames = pack.matFrames;
+    });
+
+    let recordLayerID: number = -1;
+    // a state to controls the recover event
+    let transState = "GCNConv";
+    //save events for poolingVis
+    let poolingOverEvent: any = null;
+    let poolingOutEvent: any = null;
+
+    d3.selectAll(".featureVis").on("mouseover", function (event, d) {
+        //if not in the state of lock
+        if (!lock) {
+            //paths interactions
+            const layerID = Number(d3.select(this).attr("layerID")) - 1;
+            const node = Number(d3.select(this).attr("node"));
+            const featureOverPack = featureVisMouseOver(
+                layerID,
+                node,
+                paths,
+                frames,
+                adjList,
+                matFrames,
+                colFrames,
+                featureChannels
+            );
+            paths = featureOverPack.paths;
+            frames = featureOverPack.frames;
+            matFrames = featureOverPack.matFrames;
+            colFrames = featureOverPack.colFrames;
+        }
+    });
+    d3.selectAll(".featureVis").on("mouseout", function (event, d) {
+        if (!lock) {
+            const layerID = Number(d3.select(this).attr("layerID")) - 1;
+            const node = Number(d3.select(this).attr("node"));
+            const featureOverPack = featureVisMouseOut(
+                layerID,
+                node,
+                paths,
+                frames,
+                adjList,
+                matFrames,
+                colFrames
+            );
+            paths = featureOverPack.paths;
+            frames = featureOverPack.frames;
+            matFrames = featureOverPack.matFrames;
+            colFrames = featureOverPack.colFrames;
+        }
+    });
 
     return null;
 }
