@@ -496,7 +496,11 @@ export function featureVisClick(
         rectW,
         oRectW
     );
-    nextCoord = [c[0] + (gap+2) * 3 + 5 * featureChannels * 2 + (gap+2), c[1]];
+    nextCoord = [c[0] + (gap+2) * 3 + rectW * featureChannels * 2 + (gap+2), c[1]];
+
+    //adjustment based on cases
+    if(featureChannels==4)nextCoord[0]+=15;
+
     //drawPoints(".mats", "red", [nextCoord]);
     const midX0 = (wmCoord[0] + nextCoord[0]) / 2;
     const midX1 = (biasCoord[0] + nextCoord[0]) / 2;
