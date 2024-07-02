@@ -274,18 +274,45 @@ export function calculatePrevFeatureVisPos(
     layerID: number,
     node: number,
     featureChannels: number,
-    oFeatureChannels: number
+    oFeatureChannels: number,
+    rectW: number, 
+    oRectW: number
 ) {
     let coord = get_coordination(featureVisTable[layerID][node]);
     //minor position adjustment
     if (layerID == 0) {
-        coord[0] += oFeatureChannels*5;
+        coord[0] += oFeatureChannels*(oRectW/2);
     } else {
-        coord[0] += (featureChannels*2.5);
+        coord[0] += (featureChannels*rectW/2);
     }
     coord[1] += 10;
     console.log("coord", coord);
     return coord;
+}
+
+export function loadNodeWeights(){
+    // weights data preparation
+    let weights: any = []; // DS to manage weights for each layer
+    let bias: any = []; // DS to manage bias for each layer
+
+    const weightsJSON: any = require("../../public/node_weights.json");
+    console.log("weightsJSON", weightsJSON);
+    console.log("weights", weightsJSON["onnx::MatMul_311"]);
+
+    weights = [
+        weightsJSON["onnx::MatMul_271"],
+        weightsJSON["onnx::MatMul_274"],
+        weightsJSON["onnx::MatMul_277"],
+        weightsJSON["classifier.weight"],
+    ];
+    bias = [
+        weightsJSON["conv1.bias"],
+        weightsJSON["conv2.bias"],
+        weightsJSON["conv3.bias"],
+        weightsJSON["classifier.bias"],
+    ];
+    console.log("weights array", weights, bias);
+    return { weights: weights, bias: bias };
 }
 
 export function loadWeights() {

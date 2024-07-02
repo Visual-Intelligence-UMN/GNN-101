@@ -642,6 +642,44 @@ export function drawGCNConvNodeModel(
         console.log("schemeLocations", schemeLocations);
     }
 
+    //select layers
+    const l1 = d3.select(`g#layerNum_1`);
+    const l2 = d3.select(`g#layerNum_2`);
+    const l3 = d3.select(`g#layerNum_3`);
+
+    const schemeOffset =550;
+
+    const infoTable = {
+        valueTable:[
+            [0,1],
+            [maxVals.conv1],
+            [maxVals.conv2],
+            [maxVals.conv3]
+        ],
+        nameTable:[
+            "Features Color Scheme",
+            "GCNConv1 Color Scheme",
+            "GCNConv2 Color Scheme",
+            "GCNConv3 Color Scheme"
+        ],
+        xLocationTable:[
+            schemeLocations[0][0],
+            schemeLocations[1][0],
+            schemeLocations[1][0] + 200,
+            schemeLocations[1][0] + 200*2
+        ],
+        yLocationTable:[
+            schemeLocations[0][1] + schemeOffset,
+            schemeLocations[1][1] + schemeOffset,
+            schemeLocations[1][1] + schemeOffset,
+            schemeLocations[1][1] + schemeOffset
+        ],
+        layerTable:[firstLayer, l1, l2, l3],
+        schemeTypeTable:["binary", "", "", ""]
+    };
+
+    colorSchemesTable = drawColorSchremeSequence(infoTable, myColor);
+
     console.log("thirdGCN after filled", thirdGCN);
 
     return {

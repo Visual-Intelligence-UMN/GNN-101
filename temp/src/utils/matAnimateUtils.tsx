@@ -160,7 +160,7 @@ export function drawAniPath(
         .attr("class", "procVis removeRect").lower();
 
     const Xv = Xt[currentStep];
-    for (let j = 0; j < featureChannels; j++) {
+    for (let j = 0; j < Xv.length; j++) {
         const s1 = startCoordList[j];
         const e1 = endCoordList[currentStep];
 

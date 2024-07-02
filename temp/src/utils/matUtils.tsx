@@ -1,4 +1,4 @@
-import { loadWeights } from "./matHelperUtils";
+import { loadNodeWeights, loadWeights } from "./matHelperUtils";
 import {
     drawMatrixPreparation,
     drawNodeFeatures,
@@ -179,7 +179,8 @@ export function visualizeGraphClassifierFeatures(
                 poolingOverEvent,
                 poolingVis,
                 colorSchemesTable,
-                featureChannels
+                featureChannels,
+                100
             );
             //update variables
             dview = recoverPackage.dview;
@@ -245,7 +246,12 @@ export function visualizeGraphClassifierFeatures(
                 weights,
                 lock,
                 setIntervalID,
-                featureChannels
+                featureChannels,
+                15,
+                5,
+                100,
+                7,
+                10
             );
             // update variables
             recordLayerID = featureVisPack.recordLayerID;
@@ -364,7 +370,7 @@ export function visualizeNodeClassifierFeatures(
     let outputVis = null; //to manage model output
     let resultVis: any = null; //tp manage result visualizer
     //load weights and bias
-    const dataPackage = loadWeights();
+    const dataPackage = loadNodeWeights();
     console.log("weights, data", dataPackage);
     const weights = dataPackage["weights"];
     const bias = dataPackage["bias"];
@@ -521,6 +527,107 @@ export function visualizeNodeClassifierFeatures(
             colFrames = featureOverPack.colFrames;
         }
     });
+
+    d3.select(".mats").on("click", function (event, d) {
+        if (event.target && event.target.id === "btn") {
+            return;
+        }
+        if (lock) {
+            const recoverPackage = detailedViewRecovery(
+                event,
+                dview,
+                lock,
+                transState,
+                recordLayerID,
+                poolingOutEvent,
+                poolingOverEvent,
+                poolingVis,
+                colorSchemesTable,
+                featureChannels,
+                90
+            );
+            //update variables
+            dview = recoverPackage.dview;
+            lock = recoverPackage.lock;
+            transState = recoverPackage.transState;
+            recordLayerID = recoverPackage.recordLayerID;
+            poolingOutEvent = recoverPackage.poolingOutEvent;
+            poolingOverEvent = recoverPackage.poolingOverEvent;
+            colorSchemesTable = recoverPackage.colorSchemesTable;
+            console.log("interval .mats", intervalID);
+            clearInterval(intervalID);
+        }
+    });
+
+    function setIntervalID(id: any) {
+        intervalID = id;
+        console.log("Interval ID set to:", intervalID);
+    }
+
+    function getIntervalID(){
+        console.log("get interval ID from vGCF", intervalID);
+        return intervalID;
+    }
+
+
+    d3.selectAll(".featureVis").on("click", function (event, d) {
+        if (lock != true) {
+            //state
+            transState = "GCNConv";
+            lock = true;
+            event.stopPropagation();
+            dview = true;
+            console.log("click! - fVis", dview, lock);
+            //lock all feature visualizers and transparent paths
+            d3.selectAll(".oFeature")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.select(".pooling")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".twoLayer")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".crossConnection").style("opacity", 0);
+            //transparent other feature visualizers
+            d3.selectAll(".featureVis").style("opacity", 0.2);
+            d3.selectAll(".oFeature").style("opacity", 0.2);
+            //translate each layer
+            const layerID = Number(d3.select(this).attr("layerID")) - 1;
+            const node = Number(d3.select(this).attr("node"));
+            const featureVisPack = featureVisClick(
+                layerID,
+                node,
+                recordLayerID,
+                colorSchemesTable,
+                adjList,
+                featureVisTable,
+                features,
+                conv1,
+                conv2,
+                bias,
+                myColor,
+                weights,
+                lock,
+                setIntervalID,
+                featureChannels,
+                15,
+                10,
+                90,
+                34,
+                5
+            );
+            // update variables
+            recordLayerID = featureVisPack.recordLayerID;
+            colorSchemesTable = featureVisPack.colorSchemesTable;
+            featureVisTable = featureVisPack.featureVisTable;
+            features = featureVisPack.features;
+            intervalID = featureVisPack.getIntervalID();
+            console.log("interval", intervalID);
+            //path connect - connect intermediate feature vis to current feature vis
+        }
+    });
+
 
     return null;
 }
