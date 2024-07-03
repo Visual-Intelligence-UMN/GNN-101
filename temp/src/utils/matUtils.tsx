@@ -708,24 +708,8 @@ export function visualizeNodeClassifierFeatures(
             colorSchemesTable[layerID + 1].style.opacity = "1";
 
             let posList = []; //a list to manage all position from the previous layer feature vis
-            let neighbors = adjList[node];
-            for (let i = 0; i < neighbors.length; i++) {
-                //display pre layer
-                let cur = neighbors[i];
-                featureVisTable[layerID][cur].style.opacity = "1";
-
-                //find position and save it
-                // let c = calculatePrevFeatureVisPos(
-                //     featureVisTable,
-                //     layerID,
-                //     cur,
-                //     featureChannels,
-                //     oFeatureChannels,
-                //     rectW,
-                //     oRectW
-                // );
-                // posList.push(c);
-            }
+            
+            featureVisTable[layerID][node].style.opacity = "1";
             let curNode = featureVisTable[layerID + 1][node];
             curNode.style.opacity = "0.25"; //display current node
             d3.select(curNode).selectAll(".frame").attr("opacity", 1);

@@ -336,35 +336,16 @@ export function resultVisMouseEvent(
     pathOpacity:string
 ){
     //paths interactions
-    if (resultPaths != null) {
-        console.log("grouped", resultPaths.paths[4][node]);
-        const changePaths = resultPaths.paths[4][node];
-        changePaths.forEach((div: HTMLElement) => {
-            div.style.opacity = pathOpacity;
-        });
-    }
+    d3.select(".mats").select("path#endingNode"+node).attr("opacity", pathOpacity)
 
     let fr = frames["results"][node];
     if (fr != null) {
         fr.style.opacity = opacity;
     }
-
-    let prevVis = adjList[node];
     let prevLayer: any = frames["GCNConv3"];
 
     if (prevLayer != null) {
-        prevVis.forEach((vis: number) => {
-            prevLayer[vis].style.opacity = opacity;
-        });
-    }
-
-    //matrix frame interaction
-    if (matFrames != null) {
-        prevVis.forEach((vis: number) => {
-            if (matFrames[vis] && vis!=node) {
-                matFrames[vis].style.opacity = opacity;
-            }
-        });
+            prevLayer[node].style.opacity = opacity;
     }
 
     if (colFrames != null) {

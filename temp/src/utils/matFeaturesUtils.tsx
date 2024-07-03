@@ -1251,7 +1251,33 @@ export function drawResultLayer(
     }
 
     //visualize paths
-    const paths = drawCrossConnection(graph, locations, 2*10, 202, 4)
+    let paths:any = [];
+    console.log("layerID", 4);
+    let alocations = deepClone(locations);
+    for (let i = 0; i < alocations.length; i++) {
+        alocations[i][0] += 20;
+        alocations[i][1] += rectH / 2;
+    }
+
+    let blocations = deepClone(alocations);
+    for (let i = 0; i < blocations.length; i++) {
+        blocations[i][0] += 202;
+    }
+    // drawPoints(".mats", "red", blocations);
+    console.log("location length", alocations.length);
+    //draw one-one paths
+    for (let i = 0; i < alocations.length; i++) {
+        const path = d3.select(".mats")
+            .append("path")
+            .attr("d", d3.line()([alocations[i], blocations[i]]))
+            .attr("stroke", "black")
+            .attr("opacity", 0.1)
+            .attr("fill", "none")
+            .attr("endingNode", i)
+            .attr("id", `endingNode${i}`)
+            .attr("layerID", 4).attr("class", "crossConnection").lower();
+        paths.push(path.node() as SVGPathElement);
+    }
 
     console.log("result paths", paths);
 
