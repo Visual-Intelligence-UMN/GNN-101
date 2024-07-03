@@ -323,6 +323,53 @@ export function featureVisMouseOut(
     };
 }
 
+export function resultVisMouseEvent(
+    node:number, 
+    resultPaths:any, 
+    frames:any, 
+    adjList:number[][], 
+    matFrames:any, 
+    colFrames:any, 
+    opacity:string,
+    pathOpacity:string
+){
+    //paths interactions
+    if (resultPaths != null) {
+        console.log("grouped", resultPaths.paths[4][node]);
+        const changePaths = resultPaths.paths[4][node];
+        changePaths.forEach((div: HTMLElement) => {
+            div.style.opacity = pathOpacity;
+        });
+    }
+
+    let fr = frames["results"][node];
+    if (fr != null) {
+        fr.style.opacity = opacity;
+    }
+
+    let prevVis = adjList[node];
+    let prevLayer: any = frames["GCNConv3"];
+
+    if (prevLayer != null) {
+        prevVis.forEach((vis: number) => {
+            prevLayer[vis].style.opacity = opacity;
+        });
+    }
+
+    //matrix frame interaction
+    if (matFrames != null) {
+        prevVis.forEach((vis: number) => {
+            if (matFrames[vis] && vis!=node) {
+                matFrames[vis].style.opacity = opacity;
+            }
+        });
+    }
+
+    if (colFrames != null) {
+        colFrames[node].style.opacity = opacity;
+    }
+}
+
 export function featureVisClick(
     layerID: number,
     node: number,

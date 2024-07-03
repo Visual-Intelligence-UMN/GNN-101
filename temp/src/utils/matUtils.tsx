@@ -15,7 +15,8 @@ import {
     oFeatureMouseOver,
     outputVisClick,
     resultRectMouseover,
-    resultRectMouseout
+    resultRectMouseout,
+    resultVisMouseEvent
 } from "./matEventsUtils";
 
 //Graph Classifier： features visualization pipeline: draw all feature visualizers for original features and GCNConv
@@ -538,40 +539,7 @@ export function visualizeNodeClassifierFeatures(
         if (!lock) {
             //paths interactions
             const node = Number(d3.select(this).attr("node"));
-            if (resultPaths != null) {
-                console.log("grouped", resultPaths.paths[4][node]);
-                const changePaths = resultPaths.paths[4][node];
-                changePaths.forEach((div: HTMLElement) => {
-                    div.style.opacity = "1";
-                });
-            }
-
-            let fr = frames["results"][node];
-            if (fr != null) {
-                fr.style.opacity = "1";
-            }
-
-            let prevVis = adjList[node];
-            let prevLayer: any = frames["GCNConv3"];
-
-            if (prevLayer != null) {
-                prevVis.forEach((vis: number) => {
-                    prevLayer[vis].style.opacity = "1";
-                });
-            }
-        
-            //matrix frame interaction
-            if (matFrames != null) {
-                prevVis.forEach((vis: number) => {
-                    if (matFrames[vis] && vis!=node) {
-                        matFrames[vis].style.opacity = "1";
-                    }
-                });
-            }
-        
-            if (colFrames != null) {
-                colFrames[node].style.opacity = "1";
-            }
+            resultVisMouseEvent(node, resultPaths, frames, adjList, matFrames, colFrames, "1", "1")
             
         }
     });
@@ -579,39 +547,7 @@ export function visualizeNodeClassifierFeatures(
         if (!lock) {
             //paths interactions
             const node = Number(d3.select(this).attr("node"));
-            if (resultPaths != null) {
-                console.log("grouped", resultPaths.paths[4][node]);
-                const changePaths = resultPaths.paths[4][node];
-                changePaths.forEach((div: HTMLElement) => {
-                    div.style.opacity = "0.05";
-                });
-            }
-            let prevVis = adjList[node];
-            let prevLayer: any = frames["GCNConv3"];
-
-            let fr = frames["results"][node];
-            if (fr != null) {
-                fr.style.opacity = "0";
-            }
-
-            if (prevLayer != null) {
-                prevVis.forEach((vis: number) => {
-                    prevLayer[vis].style.opacity = "0";
-                });
-            }
-        
-            //matrix frame interaction
-            if (matFrames != null) {
-                prevVis.forEach((vis: number) => {
-                    if (matFrames[vis]) {
-                        matFrames[vis].style.opacity = "0";
-                    }
-                });
-            }
-        
-            if (colFrames != null) {
-                colFrames[node].style.opacity = "0";
-            }
+            resultVisMouseEvent(node, resultPaths, frames, adjList, matFrames, colFrames, "0", "0.05")
             
         }
     });
