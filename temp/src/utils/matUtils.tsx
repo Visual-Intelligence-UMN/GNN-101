@@ -455,6 +455,9 @@ export function visualizeNodeClassifierFeatures(
     colorSchemesTable = GCNConvPackage.colorSchemesTable;
     maxVals = GCNConvPackage.maxVals;
     let paths = GCNConvPackage.paths;
+    let resultPaths = GCNConvPackage.resultPaths;
+
+    console.log("resultPaths in nc", resultPaths)
 
     // clearInterval(intervalID);
 
@@ -527,6 +530,89 @@ export function visualizeNodeClassifierFeatures(
             frames = featureOverPack.frames;
             matFrames = featureOverPack.matFrames;
             colFrames = featureOverPack.colFrames;
+        }
+    });
+
+    d3.selectAll(".resultVis").on("mouseover", function (event, d) {
+        //if not in the state of lock
+        if (!lock) {
+            //paths interactions
+            const node = Number(d3.select(this).attr("node"));
+            if (resultPaths != null) {
+                console.log("grouped", resultPaths.paths[4][node]);
+                const changePaths = resultPaths.paths[4][node];
+                changePaths.forEach((div: HTMLElement) => {
+                    div.style.opacity = "1";
+                });
+            }
+
+            let fr = frames["results"][node];
+            if (fr != null) {
+                fr.style.opacity = "1";
+            }
+
+            let prevVis = adjList[node];
+            let prevLayer: any = frames["GCNConv3"];
+
+            if (prevLayer != null) {
+                prevVis.forEach((vis: number) => {
+                    prevLayer[vis].style.opacity = "1";
+                });
+            }
+        
+            //matrix frame interaction
+            if (matFrames != null) {
+                prevVis.forEach((vis: number) => {
+                    if (matFrames[vis] && vis!=node) {
+                        matFrames[vis].style.opacity = "1";
+                    }
+                });
+            }
+        
+            if (colFrames != null) {
+                colFrames[node].style.opacity = "1";
+            }
+            
+        }
+    });
+    d3.selectAll(".resultVis").on("mouseout", function (event, d) {
+        if (!lock) {
+            //paths interactions
+            const node = Number(d3.select(this).attr("node"));
+            if (resultPaths != null) {
+                console.log("grouped", resultPaths.paths[4][node]);
+                const changePaths = resultPaths.paths[4][node];
+                changePaths.forEach((div: HTMLElement) => {
+                    div.style.opacity = "0.05";
+                });
+            }
+            let prevVis = adjList[node];
+            let prevLayer: any = frames["GCNConv3"];
+
+            let fr = frames["results"][node];
+            if (fr != null) {
+                fr.style.opacity = "0";
+            }
+
+            if (prevLayer != null) {
+                prevVis.forEach((vis: number) => {
+                    prevLayer[vis].style.opacity = "0";
+                });
+            }
+        
+            //matrix frame interaction
+            if (matFrames != null) {
+                prevVis.forEach((vis: number) => {
+                    if (matFrames[vis]) {
+                        matFrames[vis].style.opacity = "0";
+                    }
+                });
+            }
+        
+            if (colFrames != null) {
+                colFrames[node].style.opacity = "0";
+            }
+            
         }
     });
 

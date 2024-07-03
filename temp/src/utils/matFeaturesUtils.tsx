@@ -585,6 +585,7 @@ export function drawGCNConvNodeModel(
 ) {
     //GCNCov Visualizer
     let paths: any;
+    let resultPaths: any;
     const gcnFeatures = [conv1, conv2, conv3];
     //a table to save all rects in the last GCNConv layer
     let thirdGCN: any = Array.from({ length: featureChannels }, () => []);
@@ -660,7 +661,7 @@ export function drawGCNConvNodeModel(
             for(let i=0; i<layerLocations.length; i++){
                 layerLocations[i][0] += rectW*2+200;
             }
-            drawResultLayer(locations, layerLocations, result, rectW, rectH, myColor, featureVisTable, frames, graph);
+            resultPaths = drawResultLayer(locations, layerLocations, result, rectW, rectH, myColor, featureVisTable, frames, graph);
             //drawPoints(".mats", "red", layerLocations);
         }
         console.log("schemeLocations", schemeLocations);
@@ -720,7 +721,8 @@ export function drawGCNConvNodeModel(
         firstLayer: firstLayer,
         maxVals: maxVals,
         paths: paths,
-        thirdGCN: thirdGCN
+        thirdGCN: thirdGCN,
+        resultPaths: resultPaths
     };
 }
 
@@ -1251,6 +1253,8 @@ export function drawResultLayer(
     //visualize paths
     const paths = drawCrossConnection(graph, locations, 2*10, 202, 4)
 
+    console.log("result paths", paths);
+
     addLayerName(
         layerLocations,
         "Prediction Results",
@@ -1259,7 +1263,8 @@ export function drawResultLayer(
         d3.select(`g#layerNum_4`)
     );
     return {
-        featureVisTable:featureVisTable
+        featureVisTable:featureVisTable,
+        paths:paths
     };
 }
 
