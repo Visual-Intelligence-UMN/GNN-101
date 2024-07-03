@@ -22,6 +22,7 @@ import {
     drawOutputVisualizer,
     drawPathInteractiveComponents,
     drawPathBtwOuputResult,
+    drawBiasPathOutputVis,
 } from "./matAnimateUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
 import { drawSoftmaxDisplayer } from "./matInteractionUtils";
@@ -565,63 +566,16 @@ export function featureVisClick(
     const aniSec = 500;
     const waitSec = 250 * featureChannels;
     const animateSeqAfterPath: any = [
-        {
-            func: () =>
-                drawBiasVector(
-                    g,
-                    featureChannels,
-                    rectH,
-                    rectW,
-                    coordFeatureVis2,
-                    myColor,
-                    layerBias,
-                    layerID
-                ),
-            delay: aniSec,
-        },
-        {
-            func: () => drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels),
-            delay: aniSec,
-        },
-        {
-            func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels),
-            delay: aniSec,
-        },
-        {
-            func: () => drawReLU(midX1, wmCoord, biasCoord, nextCoord),
-            delay: aniSec,
-        },
-        {
-            func: () => {
-                curNode.style.opacity = "1";
-            },
-            delay: aniSec,
-        },
-        {
-            func: () => {
-                d3.select(".ctrlBtn").style("pointer-events", "auto");
-            },
-            delay: 1,
-        },
+        {func: () => drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2, myColor, layerBias, layerID), delay: aniSec,},
+        {func: () => drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels), delay: aniSec,},
+        {func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels), delay: aniSec,},
+        {func: () => drawReLU(midX1, wmCoord, biasCoord, nextCoord), delay: aniSec,},
+        {func: () => {curNode.style.opacity = "1";},delay: aniSec,},
+        {func: () => {d3.select(".ctrlBtn").style("pointer-events", "auto");},delay: 1,},
     ];
     const animateSeq: any = [
-        {
-            func: () =>
-                drawSummationFeature(
-                    g,
-                    X,
-                    coordFeatureVis,
-                    w,
-                    rectH,
-                    myColor,
-                    posList,
-                    mulValues
-                ),
-            delay: initSec + aniSec,
-        },
-        {
-            func: () => {
-                setTimeout(() => {
+        {func: () => drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues), delay: initSec + aniSec,},
+        {func: () => {setTimeout(() => {
                     intervalID = setInterval(() => {
                         drawAniPath(
                             Xt,
@@ -673,9 +627,7 @@ export function featureVisClick(
                     setIntervalID(intervalID);
                     d3.selectAll("#tempath").lower();
                 }, 2);
-            },
-            delay: aniSec * 2,
-        },
+            }, delay: aniSec * 2},
         //     {func: ()=>drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor), delay: aniSec},
     ];
 
@@ -816,6 +768,9 @@ export function outputVisClick(
     myColor: any,
     featureChannels: number
 ) {
+    const initSec = 2000;
+    const aniSec = 500;
+
     const curve = d3.line().curve(d3.curveBasis);
     let biasCoord: any;
     let controlPts: any;
@@ -908,64 +863,54 @@ export function outputVisClick(
     const btnY = startCoord[0][1] + 50;
 
     //where we put out animation sequence
+    let pathMap: any = null;
 
-    //path interactive components with softmax
-    let pathMap: any = drawPathInteractiveComponents(endCoord, resultCoord, result, myColor);
+    const animateSeqAfterPath = [
+        {func:()=>{drawBiasVector(g1, linBias.length, rectH, rectH, biasCoordCopy[0], myColor, linBias, layerID);}, delay: 200}, 
+        {func:()=>{drawBiasPathOutputVis(biasCoord, controlPts, feaCoord);}, delay:200}, 
+        {func:()=>{drawPathBtwOuputResult(one, endPt);}, delay:200}, 
+    ]
 
-    //bias visualizer
-    drawBiasVector(g1, linBias.length, rectH, rectH, biasCoordCopy[0], myColor, linBias, layerID);
+    const animateSeq = [
+        {func:()=>{
+            intervalID = setInterval(() => {
+                const Xt = modelParams.weights[3];
+                const Xv = Xt[currentStep];
+                drawAniPath(Xt, currentStep, startCoord, endCoord, 1, myColor, 0, outputCoord, rectH, rectH, result, g1);
+                currentStep++;
+                console.log("i", currentStep);
+                if (currentStep >= 2) {
+                    //bias add-on
+                    AnimationController.runAnimations(0, animateSeqAfterPath);
+                    setTimeout(()=>{
+                        pathMap = drawPathInteractiveComponents(endCoord, resultCoord, result, myColor);
+                    }, 1500);
+                    btn.selectAll("*").remove();
+                    injectPlayButtonSVG(
+                        btn,
+                        btnX,
+                        btnY,
+                        "./assets/SVGs/playBtn_play.svg"
+                    );
+                    clearInterval(intervalID);
+                }
+            }, 250); 
+            d3.selectAll("path").lower();
+            d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
+            d3.selectAll("path").lower();
+        }, delay:initSec+aniSec},
+     //   {func:()=>{injectPlayButtonSVG(btn, btnX, btnY, "./assets/SVGs/playBtn_pause.svg");}, delay:200}, 
+    ];
+    AnimationController.runAnimations(0, animateSeq);
 
-    //path between the output vis and result vis
-    drawPathBtwOuputResult(one, endPt);
-
-    injectPlayButtonSVG(btn, btnX, btnY, "./assets/SVGs/playBtn_pause.svg");
-
-    // animation for the matmul - what the fuck is this piece of code?????
-    intervalID = setInterval(() => {
-        const Xt = modelParams.weights[3];
-        const Xv = Xt[currentStep];
-        drawAniPath(Xt, currentStep, startCoord, endCoord, 1, myColor, 0, outputCoord, rectH, rectH, result, g1);
-        currentStep++;
-        console.log("i", currentStep);
-        if (currentStep >= 2) {
-            //bias add-on
-            d3.select(".mats")
-                .append("path")
-                .attr(
-                    "d",
-                    curve([
-                        biasCoord[0],
-                        controlPts[0],
-                        controlPts[1],
-                        feaCoord,
-                    ])
-                )
-                .attr("stroke", "black")
-                .attr("opacity", 0.05)
-                .attr("fill", "none")
-                .attr("class", "procVis biasPath")
-                .attr("id", "path1");
-            d3.selectAll(".biasPath")
-                .transition()
-                .duration(1000)
-                .attr("opacity", 1);
-            btn.selectAll("*").remove();
-            injectPlayButtonSVG(
-                btn,
-                btnX,
-                btnY,
-                "./assets/SVGs/playBtn_play.svg"
-            );
-            clearInterval(intervalID);
-        }
-        //        drawPoints(".mats", "red", [coordStartPoint, coordFinalPoint]);
-        // d3.selectAll("circle").raise();
-    }, 250); // 每2秒执行一次drawPaths
-
-    //setIntervalID(intervalID);
-    d3.selectAll("path").lower();
-    d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
-    d3.selectAll("path").lower();
+    // setTimeout(() => {
+    //     injectPlayButtonSVG(
+    //         btn,
+    //         btnX,
+    //         btnY,
+    //         "./assets/SVGs/playBtn_pause.svg"
+    //     );
+    // }, initSec + aniSec * 2);
 
 
     //all the interaction add-ons
@@ -976,14 +921,16 @@ export function outputVisClick(
         console.log("IN!");
         const id: number = Number(d3.select(this).attr("id"));
         //here's the place to place the softmax displayer
-        drawSoftmaxDisplayer(pathMap, endCoord, result, id, myColor);
+        if(pathMap!=null)drawSoftmaxDisplayer(pathMap, endCoord, result, id, myColor);
     })
     .on("mouseout", function (event) {
         d3.selectAll(".math-displayer").remove();
         const id: number = Number(d3.select(this).attr("id"));
 
-        pathMap[0][id]!.style.opacity = "0.1";
-        pathMap[1][id]!.style.opacity = "0.1";
+        if(pathMap!=null){
+            pathMap[0][id]!.style.opacity = "0.1";
+            pathMap[1][id]!.style.opacity = "0.1";
+        }
     });
 
     // play button interaction add-ons
@@ -996,89 +943,97 @@ export function outputVisClick(
         }
         //replay controls
         if (!isPlaying || currentStep >= 2 || currentStep == 0) {
-            btn.selectAll("*").remove();
             injectPlayButtonSVG(
                 btn,
                 btnX,
                 btnY,
-                "./assets/SVGs/playBtn_pause.svg"
+                "./assets/SVGs/playBtn_play.svg"
             );
             if (currentStep >= 2) {
+                d3.select(".mats").selectAll(".removeRect").remove();
+                d3.select(".mats").selectAll(".pauseRemove").remove();
                 currentStep = 0; // 重置步骤
             }
-
-            let i = 0;
-            //matmul animation
-            intervalID = setInterval(() => {
-                d3.selectAll("#tempath").remove();
-                const Xt = modelParams.weights[3];
-                const Xv = Xt[currentStep];
-                for (let j = 0; j < featureChannels; j++) {
-                    const s1 = startCoord[j];
-                    const e1 = endCoord[currentStep];
-                    let pathDir = e1[0] > s1[0] ? 1 : 0;
-                    console.log("se", [s1, e1]);
-                    d3.select(".mats")
-                        .append("path")
-                        .attr("d", function () {
-                            return [
-                                "M",
-                                s1[0],
-                                s1[1],
-                                "A",
-                                (e1[0] - s1[0]) / 2,
-                                ",",
-                                (e1[0] - s1[0]) / 4,
-                                0,
-                                0,
-                                ",",
-                                pathDir,
-                                ",",
-                                e1[0],
-                                ",",
-                                e1[1],
-                            ].join(" ");
-                        })
-                        .attr("class", "procVis")
-                        .attr("id", "tempath")
-                        .style("fill", "none")
-                        .attr("stroke", myColor(Xv[j]));
-                }
-                d3.selectAll("path").lower();
-                currentStep++;
-                console.log("i", currentStep);
-                if (currentStep >= 2) {
-                    //bias add-on
-                    d3.select(".mats")
-                        .append("path")
-                        .attr(
-                            "d",
-                            curve([
-                                biasCoord[0],
-                                controlPts[0],
-                                controlPts[1],
-                                feaCoord,
-                            ])
-                        )
-                        .attr("stroke", "black")
-                        .attr("opacity", 0.05)
-                        .attr("fill", "none")
-                        .attr("class", "procVis biasPath")
-                        .attr("id", "path1");
-                    d3.selectAll(".biasPath")
-                        .transition()
-                        .duration(1000)
-                        .attr("opacity", 1);
-                    btn.selectAll("*").remove();
-                    injectPlayButtonSVG(
-                        btn,
-                        btnX,
-                        btnY,
-                        "./assets/SVGs/playBtn_play.svg"
-                    );
-                    clearInterval(intervalID);
-                }
-            }, 500);
+            animateSeq[0].delay = 1;
+            AnimationController.runAnimations(0, animateSeq);
+            setTimeout(()=>{
+                AnimationController.runAnimations(0, animateSeqAfterPath);
+            }, 1500);
+            setTimeout(()=>{
+                pathMap = drawPathInteractiveComponents(endCoord, resultCoord, result, myColor);
+            }, 3000);
+            // let i = 0;
+            // //matmul animation
+            // intervalID = setInterval(() => {
+            //     d3.selectAll("#tempath").remove();
+            //     const Xt = modelParams.weights[3];
+            //     const Xv = Xt[currentStep];
+            //     for (let j = 0; j < featureChannels; j++) {
+            //         const s1 = startCoord[j];
+            //         const e1 = endCoord[currentStep];
+            //         let pathDir = e1[0] > s1[0] ? 1 : 0;
+            //         console.log("se", [s1, e1]);
+            //         d3.select(".mats")
+            //             .append("path")
+            //             .attr("d", function () {
+            //                 return [
+            //                     "M",
+            //                     s1[0],
+            //                     s1[1],
+            //                     "A",
+            //                     (e1[0] - s1[0]) / 2,
+            //                     ",",
+            //                     (e1[0] - s1[0]) / 4,
+            //                     0,
+            //                     0,
+            //                     ",",
+            //                     pathDir,
+            //                     ",",
+            //                     e1[0],
+            //                     ",",
+            //                     e1[1],
+            //                 ].join(" ");
+            //             })
+            //             .attr("class", "procVis")
+            //             .attr("id", "tempath")
+            //             .style("fill", "none")
+            //             .attr("stroke", myColor(Xv[j]));
+            //     }
+            //     d3.selectAll("path").lower();
+            //     currentStep++;
+            //     console.log("i", currentStep);
+            //     if (currentStep >= 2) {
+            //         //bias add-on
+            //         d3.select(".mats")
+            //             .append("path")
+            //             .attr(
+            //                 "d",
+            //                 curve([
+            //                     biasCoord[0],
+            //                     controlPts[0],
+            //                     controlPts[1],
+            //                     feaCoord,
+            //                 ])
+            //             )
+            //             .attr("stroke", "black")
+            //             .attr("opacity", 0.05)
+            //             .attr("fill", "none")
+            //             .attr("class", "procVis biasPath")
+            //             .attr("id", "path1");
+            //         d3.selectAll(".biasPath")
+            //             .transition()
+            //             .duration(1000)
+            //             .attr("opacity", 1);
+            //         btn.selectAll("*").remove();
+            //         injectPlayButtonSVG(
+            //             btn,
+            //             btnX,
+            //             btnY,
+            //             "./assets/SVGs/playBtn_play.svg"
+            //         );
+            //         clearInterval(intervalID);
+            //     }
+            // }, 500);
 
             //   setIntervalID(intervalID);
             isPlaying = true;
@@ -1088,7 +1043,7 @@ export function outputVisClick(
                 btn,
                 btnX,
                 btnY,
-                "./assets/SVGs/playBtn_play.svg"
+                "./assets/SVGs/playBtn_pause.svg"
             );
             isPlaying = false;
         }

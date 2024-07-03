@@ -444,7 +444,7 @@ export function drawOutputVisualizer(
             .attr("opacity", 1)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1)
-            .attr("class", "procVis");
+            .attr("class", "procVis pauseRemove");
     }
 }
 
@@ -481,7 +481,7 @@ export function drawPathInteractiveComponents(
                         resultCoord[i][1],
                     ].join(" ");
                 })
-                .attr("class", "procVis")
+                .attr("class", "procVis pauseRemove")
                 .style("fill", "none")
                 .style("opacity", "0.1")
                 .attr("stroke", myColor(result[j]));
@@ -498,12 +498,38 @@ export function drawPathBtwOuputResult(one:any, endPt:any){
             .append("path")
             .attr("d", d3.line()([one[0], endPt]))
             .attr("stroke", "black")
-            .attr("opacity", 0.05)
+            .attr("opacity", 1)
             .attr("fill", "none")
-            .attr("class", "procVis")
-            .attr("id", "path1");
+            .attr("class", "procVis pauseRemove")
+            .attr("id", "path1").lower();
 }
 
-
+export function drawBiasPathOutputVis(
+    biasCoord:any,
+    controlPts:any,
+    feaCoord:any
+){
+    const curve = d3.line().curve(d3.curveBasis);
+    d3.select(".mats")
+                        .append("path")
+                        .attr(
+                            "d",
+                            curve([
+                                biasCoord[0],
+                                controlPts[0],
+                                controlPts[1],
+                                feaCoord,
+                            ])
+                        )
+                        .attr("stroke", "black")
+                        .attr("opacity", 0.05)
+                        .attr("fill", "none")
+                        .attr("class", "procVis biasPath pauseRemove")
+                        .attr("id", "path1");
+                    d3.selectAll(".biasPath")
+                        .transition()
+                        .duration(1000)
+                        .attr("opacity", 1);
+}
 
 
