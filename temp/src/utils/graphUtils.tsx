@@ -39,6 +39,20 @@ export function reduceNodeOpacity(nodes: any[], relatedNodes: any[], selfNode: a
     })
   }
 
+export function showFeature(node: any) {
+  if (node.featureGroup) {
+    node.featureGroup.style("visibility", "visible");
+    node.featureGroup.raise();
+  }
+  if (node.relatedNodes) {
+    node.relatedNodes.forEach((n: any) => {
+      n.featureGroup.style("visibility", "visible");
+      n.featureGroup.raise();
+  })
+}
+}
+
+
 export function highlightNodes(node: any) {
   const linkStrength = d3.scaleLinear()
           .domain([-0.25, 0, 0.25])
@@ -109,12 +123,7 @@ export function resetNodes(allNodes: any[]) {
     if (isClicked || aggregatedDataMap == null || calculatedDataMap == null) { 
       return;
     }
-    node.featureGroup.style("visibility", "visible");
-    node.featureGroup.raise();
-    node.relatedNodes.forEach((n: any) => {
-      n.featureGroup.style("visibility", "visible");
-      n.featureGroup.raise();
-    })
+    showFeature(node);
 
     let isPlaying: boolean = true;
   
@@ -140,7 +149,7 @@ export function resetNodes(allNodes: any[]) {
   
     let moveToX =  3.5 * offset - 100;
     let moverToY = height / 5;
-    let originalCoordinates = moveFeatures(node, node.relatedNodes, moveToX, moverToY);
+    let originalCoordinates = moveFeatures(node.relatedNodes, moveToX, moverToY); //record the original cooridinates for restoring
   
     if (node.featureGroupLocation) {  
       xPos = node.featureGroupLocation.xPos;
@@ -247,7 +256,7 @@ export function resetNodes(allNodes: any[]) {
        adjMatrixSlice.push(normalizedAdjMatrix[node.id][i].toFixed(2));
       }
     }
-  
+   
     setTimeout(() => {
       weightAnimation(svg, node, startCoordList, endCoordList, currentWeights, offset, height, moveOffset); 
       if (node.relatedNodes) {
@@ -378,7 +387,7 @@ export function resetNodes(allNodes: any[]) {
   
     
     document.addEventListener('click', () => {
-      moveFeaturesBack(node, node.relatedNodes, originalCoordinates);
+      moveFeaturesBack(node.relatedNodes, originalCoordinates);
       d3.selectAll(".to-be-removed").remove();
     });
   }
@@ -635,7 +644,7 @@ export function resetNodes(allNodes: any[]) {
     return result;
   }
   
-  function moveFeatures(node: any, relatedNodes: any, xPos: number, yPos: number) {
+  function moveFeatures(relatedNodes: any, xPos: number, yPos: number) {
     let originalCoordinates: any[] = [];
     let coordinate: FeatureGroupLocation;
     let x;
@@ -659,7 +668,7 @@ export function resetNodes(allNodes: any[]) {
     return originalCoordinates;
   }
   
-  function moveFeaturesBack(node: any, relatedNodes: any, originalCoordinates: FeatureGroupLocation[]) {
+  function moveFeaturesBack(relatedNodes: any, originalCoordinates: FeatureGroupLocation[]) {
     relatedNodes.forEach((n: any, i: number) => {
       let xPos = originalCoordinates[i].xPos;
       let yPos = originalCoordinates[i].yPos;
@@ -673,4 +682,26 @@ export function resetNodes(allNodes: any[]) {
         n.featureGroupLocation.yPos = yPos;
       }
     });
+  }
+
+  export function fcLayerCalculationVisualizer(node: any, relatedNodes:any, offset: number, height: number, moveOffset: number, graphIndex: number) {
+    let moveToX =  (graphIndex) * offset - 300;
+    let moveToY = height / 8;
+    let originalCoordinates = moveFeatures(relatedNodes, moveToX, moveToY );
+
+      let xPos = node.featureGroupLocation.xPos +  (graphIndex - 3.5) * offset ;
+      let yPos = node.featureGroupLocation.yPos;
+      node.featureGroup.transition()
+        .delay(1000)
+        .duration(1000)
+        .attr("transform", `translate(${moveToX - 100}, ${moveToY + 150}) rotate(90)`);
+    
+
+    document.addEventListener('click', () => {
+    moveFeaturesBack(relatedNodes, originalCoordinates);
+    node.featureGroup.transition()
+    .duration(1000)
+    .attr("transform", `translate(${xPos - 100 - moveOffset}, ${yPos}) rotate(0)`);
+    });
+    
   }
