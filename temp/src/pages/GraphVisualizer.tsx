@@ -58,7 +58,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
       let allNodes: any[] = [];
       const offset = 600;
       const margin = { top: 10, right: 30, bottom: 30, left: 40 };
-      const width = 6 * offset - margin.left - margin.right;
+      const width = 8 * offset - margin.left - margin.right;
       const height = 1000 - margin.top - margin.bottom;
 
       // Append the SVG object to the body of the page
@@ -154,7 +154,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                 const dr = Math.sqrt(dx * dx + dy * dy);
                 const offsetX = 5 * (dy / dr);
                 const offsetY = 5 * (-dx / dr);
-                return `translate(${offsetX}, ${offsetY})`;
+                return `translate(${offsetX}, ${offsetY})`; 
               }
               return null;
             })
@@ -226,6 +226,9 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                 64 * (node.id + 1)
               );
             }
+
+
+
 
             if (value != null && i >= 5) {
               node.features.push(value[index]);
@@ -323,8 +326,8 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             svg.selectAll("circle")
               .attr("opacity", 0);
 
-            if (intmData && intmData.final) {
-              featureVisualizer(svg, allNodes, offset, height, intmData.final, graphs); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
+            if (intmData) {
+              featureVisualizer(svg, allNodes, offset, height, graphs); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
             }
 
           }

@@ -4,7 +4,7 @@ import * as d3 from "d3";
 import { loadWeights } from "./matHelperUtils";
 import * as ort from "onnxruntime-web";
 import { env } from "onnxruntime-web";
-import { aggregationCalculator, matrixMultiplication } from "@/utils/graphUtils";
+import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature } from "@/utils/graphUtils";
 import { features } from 'process';
 import { IGraphData, IntmData, IntmDataNode } from "../types/";
 
@@ -417,7 +417,10 @@ export const myColor = d3.scaleLinear<string>()
 
 
 
-export function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, final: any, graphs: any[]) {
+export function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, graphs: any[]) {
+  // 1. visualize feature
+  // 2. handle interaction event
+  // 3. do the calculation for animation
   const {weights, bias} = loadWeights();
   const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex); //somehow doesn't include the node in the last layer
 
@@ -433,7 +436,6 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
   let movedNode: any = null; // to prevent the same node is clicked twice
   
   let isClicked = false; // if isClicked is true, all mouseover/out operation would be banned and some certain functions would be called
-
 
 
 
@@ -466,7 +468,6 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
        aggregatedDataMap = matrixMultiplication(normalizedAdjMatrix, featureMap)
        calculatedDataMap = matrixMultiplication(aggregatedDataMap, currentWeights)
 
-
       }
 
       
@@ -475,6 +476,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
 
     const occupiedPositions: { x: number; y: number }[] = []; 
+
     let xOffset = (graphIndex - 2.5) * offset;
     if (graphIndex >= 4) {
       xOffset = (graphIndex - 2.5) * offset - 25 * (graphIndex * 1.5);
@@ -589,6 +591,9 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             resetNodes(allNodes);
           }
         });
+
+
+        //click logic
         if (node.graphIndex != 0) {
           node.text.on("click", function(event:any) {
             if (isClicked) {
@@ -606,6 +611,8 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             event.stopPropagation(); 
             isClicked = true;
 
+
+            // prevent clicking on other nodes and move the layers to the right again
             if (movedNode === node) {
               return; 
             }
@@ -620,10 +627,13 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             moveNextLayer(svg, node, moveOffset, 1);
             movedNode = node;
           });
+
+
           node.svgElement.addEventListener("click", function(event: any) {
             if (isClicked) {
               return;
             }
+
             hideAllLinks(allNodes);
             calculationVisualizer(node, currentWeights, bias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, isClicked, moveOffset);
             
@@ -648,7 +658,6 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
               movedNode = null;
             }
 
-            
             moveNextLayer(svg, node, moveOffset, 1);
             movedNode = node; // Update the moved node
         });
@@ -656,6 +665,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
   
       } else {
+        moveOffset = 200;
 
         // for the pooling layer(graphIndex = 3), the rectHeight = 2, for the other 2 layers, rectHeight = 20;
         let rectHeight = 2;
@@ -663,10 +673,10 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           rectHeight = 20;
         }
         let groupCentralHeight = rectHeight * features.length / 2;
-        let offset = groupCentralHeight - (height / 5);
+        let yOffset = groupCentralHeight - (height / 5);
 
         const featureGroup = g2.append("g")
-          .attr("transform", `translate(${node.x - 7.5}, ${node.y - offset})`);
+          .attr("transform", `translate(${node.x - 7.5}, ${node.y - yOffset})`);
 
         featureGroup.selectAll("rect")
           .data(features)
@@ -682,12 +692,16 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .style("opacity", 1);
 
         node.featureGroup = featureGroup;
+        xPos = node.x;
+        yPos = node.y + rectHeight * node.features.length + 25; 
+        let featureGroupLocation: FeatureGroupLocation = {xPos, yPos}; 
+        node.featureGroupLocation = featureGroupLocation; // this will be used in calculationvisualizer
 
         const linkStrength = d3.scaleLinear()
           .domain([-0.25, 0, 0.25])
           .range([0.1, 0.3, .6]);
         
-        // add interaction. In the 
+        
         node.featureGroup.on("mouseover", function() {
           if (!isClicked) {
             if (node.links) {
@@ -711,11 +725,15 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
         });
         node.featureGroup.on("click", function(event: any) {
           hideAllLinks(allNodes);
+          highlightNodes(node);
           // calculationVisualizer(node, currentWeights, bias, aggregatedDataMap, calculatedDataMap, svg, offset, isClicked);
           let relatedNodes: any = [];
             if (node.relatedNodes) {
               relatedNodes = node.relatedNodes;
             } // to make sure relatedNodes is not null
+            showFeature(node);
+            fcLayerCalculationVisualizer(node, relatedNodes, offset, height, moveOffset, node.graphIndex);
+            
             reduceNodeOpacity(allNodes, relatedNodes, node);
             event.stopPropagation(); // Prevent the click event from bubbling up
             isClicked = true;
@@ -751,6 +769,9 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
       if (movedNode.graphIndex === 1) {
         moveOffset = 600
       }  
+      if (movedNode.graphIndex >= 4) {
+        moveOffset = 200;
+      }
       moveNextLayer(svg, movedNode, moveOffset, -1)
       isClicked = false; 
       movedNode = null;
@@ -905,7 +926,12 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
           if (!nextNode.links) {
             nextNode.links = [];
           }
+          if (!nextNode.relatedNodes) {
+            nextNode.relatedNodes = [];
+          }
           nextNode.links.push(path);
+          nextNode.relatedNodes.push(node);
+          
         }
       }
       
