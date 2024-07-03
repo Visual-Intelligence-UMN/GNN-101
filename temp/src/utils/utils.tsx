@@ -679,7 +679,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .style("fill", (d: number) => myColor(d))
           .style("stroke-width", 1)
           .style("stroke", "grey")
-          .style("opacity", 0.8);
+          .style("opacity", 1);
 
         node.featureGroup = featureGroup;
 
@@ -886,12 +886,16 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
             let nextNode = nextLayer.nodes[0];
 
             const controlX1 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.3;
-            const controlY1 = node.y + 10;
+            const controlY1 = node.y;
             const controlX2 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.7;
-            const controlY2 = nextNode.y + 10;
-  
+            const controlY2 = nextNode.y;
+            let offset = 100;
+            let offset1 = 0;
+            if (graphIndex == 4) {
+              offset1 = 100
+            }
             const path = svg.append("path")
-              .attr("d", `M ${node.x + xOffset1 + 16} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 16} ${nextNode.y + 10}`)
+              .attr("d", `M ${node.x + xOffset1 + 16} ${node.y + offset1} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 16} ${nextNode.y + offset}`)
               .style("stroke", 'black')
               .style("opacity", linkStrength(avg))
               .style('stroke-width', 2)
