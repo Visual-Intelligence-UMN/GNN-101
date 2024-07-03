@@ -1,4 +1,4 @@
-import { loadNodeWeights, loadWeights } from "./matHelperUtils";
+import { loadNodeWeights, loadWeights, translateLayers } from "./matHelperUtils";
 import {
     drawMatrixPreparation,
     drawNodeFeatures,
@@ -657,6 +657,85 @@ export function visualizeNodeClassifierFeatures(
             //path connect - connect intermediate feature vis to current feature vis
         }
     });
+
+    d3.selectAll(".resultVis").on("click", function (event, d) {
+        if (lock != true) {
+            //state
+            transState = "resultLayer";
+            lock = true;
+            event.stopPropagation();
+            dview = true;
+            console.log("click! - fVis", dview, lock);
+            //lock all feature visualizers and transparent paths
+            d3.selectAll(".resultVis")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".oFeature")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.select(".pooling")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".twoLayer")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".crossConnection").style("opacity", 0);
+            //transparent other feature visualizers
+            d3.selectAll(".featureVis").style("opacity", 0.2);
+            d3.selectAll(".oFeature").style("opacity", 0.2);
+
+            //------------------the actual interaction codes part --------------------------------
+            const layerID = 3;
+            const node = Number(d3.select(this).attr("node"));
+            setTimeout(() => {
+                translateLayers(3, 300);
+            }, 1750);
+
+            console.log("CST before modification", colorSchemesTable);
+            colorSchemesTable.forEach((d: any, i: any) => {
+                console.log(
+                    `Before modification: Element ${i} opacity`,
+                    d.style.opacity
+                );
+                d.style.opacity = "0.2";
+                console.log(
+                    `After modification: Element ${i} opacity`,
+                    d.style.opacity
+                );
+            });
+            //choose the right color schemes to display
+            colorSchemesTable[layerID].style.opacity = "1";
+            colorSchemesTable[layerID + 1].style.opacity = "1";
+
+            let posList = []; //a list to manage all position from the previous layer feature vis
+            let neighbors = adjList[node];
+            for (let i = 0; i < neighbors.length; i++) {
+                //display pre layer
+                let cur = neighbors[i];
+                featureVisTable[layerID][cur].style.opacity = "1";
+
+                //find position and save it
+                // let c = calculatePrevFeatureVisPos(
+                //     featureVisTable,
+                //     layerID,
+                //     cur,
+                //     featureChannels,
+                //     oFeatureChannels,
+                //     rectW,
+                //     oRectW
+                // );
+                // posList.push(c);
+            }
+            let curNode = featureVisTable[layerID + 1][node];
+            curNode.style.opacity = "0.25"; //display current node
+            d3.select(curNode).selectAll(".frame").attr("opacity", 1);
+                
+        }
+    });
+
+
+
+    
 
 
     return null;

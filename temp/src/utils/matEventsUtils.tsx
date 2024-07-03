@@ -141,7 +141,9 @@ export function detailedViewRecovery(
         d3.select(".poolingFrame").style("opacity", 0);
     } else if (transState == "result") {
         translateLayers(5, -300);
-    } else {
+    } else if(transState=="resultLayer"){
+        translateLayers(3, -300);
+    }else{
         translateLayers(4, -300);
     }
 
