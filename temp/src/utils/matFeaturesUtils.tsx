@@ -1,6 +1,7 @@
 import {
     chunkArray,
     deepClone,
+    drawPoints,
     preprocessFloat32ArrayToNumber,
     softmax,
     transposeMat,
@@ -8,6 +9,7 @@ import {
 import { addLayerName, buildBinaryLegend, buildLegend } from "./matHelperUtils";
 import * as d3 from "d3";
 import { roundToTwo } from "@/pages/WebUtils";
+import { deprecate } from "util";
 
 //draw cross connections between feature visualizers
 export function drawCrossConnection(
@@ -652,6 +654,14 @@ export function drawGCNConvNodeModel(
             );
             console.log("grouped grouped", paths);
         } else {
+            //here's the place we draw the result layer
+            //do locations tranformation
+            let layerLocations = deepClone(locations);
+            for(let i=0; i<layerLocations.length; i++){
+                layerLocations[i][0] += rectW*2+200;
+            }
+            drawResultLayer(locations, layerLocations, result, rectW, rectH, myColor, featureVisTable, frames, graph);
+            //drawPoints(".mats", "red", layerLocations);
         }
         console.log("schemeLocations", schemeLocations);
     }
@@ -660,6 +670,7 @@ export function drawGCNConvNodeModel(
     const l1 = d3.select(`g#layerNum_1`);
     const l2 = d3.select(`g#layerNum_2`);
     const l3 = d3.select(`g#layerNum_3`);
+    const l4 = d3.select(`g#layerNum_4`);
 
     const schemeOffset =550;
 
@@ -668,28 +679,32 @@ export function drawGCNConvNodeModel(
             [0,1],
             [maxVals.conv1],
             [maxVals.conv2],
-            [maxVals.conv3]
+            [maxVals.conv3],
+            [maxVals.result]
         ],
         nameTable:[
             "Features Color Scheme",
             "GCNConv1 Color Scheme",
             "GCNConv2 Color Scheme",
-            "GCNConv3 Color Scheme"
+            "GCNConv3 Color Scheme",
+            "Prediction Result Color Scheme"
         ],
         xLocationTable:[
             schemeLocations[0][0],
             schemeLocations[1][0],
             schemeLocations[1][0] + 200,
-            schemeLocations[1][0] + 200*2
+            schemeLocations[1][0] + 200*2,
+            schemeLocations[1][0] + 200*3
         ],
         yLocationTable:[
             schemeLocations[0][1] + schemeOffset,
             schemeLocations[1][1] + schemeOffset,
             schemeLocations[1][1] + schemeOffset,
+            schemeLocations[1][1] + schemeOffset,
             schemeLocations[1][1] + schemeOffset
         ],
-        layerTable:[firstLayer, l1, l2, l3],
-        schemeTypeTable:["binary", "", "", ""]
+        layerTable:[firstLayer, l1, l2, l3, l4],
+        schemeTypeTable:["binary", "", "", "", ""]
     };
 
     colorSchemesTable = drawColorSchremeSequence(infoTable, myColor);
@@ -1173,3 +1188,79 @@ export function drawTwoLayers(one: any, final: any, myColor: any, featureChannel
 
     return { locations: [aOne[0], cOne[0]], g: g, g1: null, fr1:fr1.node(), path1:path1.node() };
 }
+
+
+export function drawResultLayer(
+    locations:any, 
+    layerLocations: any, 
+    results: any, 
+    rectW:number, 
+    rectH:number, 
+    myColor:any, 
+    featureVisTable:any,
+    frames: any,
+    graph:any
+){
+    const layer = d3
+            .select(".mats")
+            .append("g")
+            .attr("class", "layerVis")
+            .attr("id", "layerNum_4");
+    //visualize results
+    for(let i=0; i<layerLocations.length; i++){
+        const x = layerLocations[i][0];
+        const y = layerLocations[i][1];
+
+        const resultArray = results[i];
+
+        const g = layer
+            .append("g")
+            .attr("class", "resultVis")
+            .attr("node", i)
+            .attr("layerID", 4);
+
+        for(let j=0; j<resultArray.length; j++){
+            g.append("rect")
+                .attr("x", x+j*rectW)
+                .attr("y", y)
+                .attr("width", rectW)
+                .attr("height", rectH)
+                .attr("fill", myColor(resultArray[j]))
+                .attr("stroke", "gray")
+                .attr("stroke-width", 0.1)
+        }
+
+        const f = g
+            .append("rect")
+            .attr("x", x)
+            .attr("y", y)
+            .attr("width", rectW * 4)
+            .attr("height", rectH)
+            .attr("fill", "none")
+            .attr("opacity", 0)
+            .attr("stroke", "black")
+            .attr("stroke-width", 1)
+            .attr("node", i)
+            .attr("layerID", 4)
+            .attr("class", "frame");
+
+        featureVisTable[4].push(g.node() as SVGElement);
+        frames["results"].push(f.node() as SVGElement);
+    }
+
+    //visualize paths
+    const paths = drawCrossConnection(graph, locations, 2*10, 202, 4)
+
+    addLayerName(
+        layerLocations,
+        "Prediction Results",
+        0,
+        30,
+        d3.select(`g#layerNum_4`)
+    );
+    return {
+        featureVisTable:featureVisTable
+    };
+}
+
+

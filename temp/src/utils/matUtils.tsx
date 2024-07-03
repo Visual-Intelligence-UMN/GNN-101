@@ -376,7 +376,7 @@ export function visualizeNodeClassifierFeatures(
     const bias = dataPackage["bias"];
     console.log("weights, data", weights, bias);
     //table that manage all feature visualizers for GCNConv
-    let featureVisTable: SVGElement[][] = [[], [], [], []];
+    let featureVisTable: SVGElement[][] = [[], [], [], [], []];
     //table that manage color schemes
     let colorSchemesTable: SVGElement[] = [];
     //control detail view
@@ -389,12 +389,14 @@ export function visualizeNodeClassifierFeatures(
         GCNConv1: any[];
         GCNConv2: any[];
         GCNConv3: any[];
+        results: any[];
     }
     var frames: FrameDS = {
         features: [],
         GCNConv1: [],
         GCNConv2: [],
         GCNConv3: [],
+        results: []
     };
     var schemeLocations: any = [];
     console.log("Received", maxVals);
@@ -533,6 +535,9 @@ export function visualizeNodeClassifierFeatures(
             return;
         }
         if (lock) {
+            d3.selectAll(".resultVis")
+                .style("pointer-events", "auto")
+                .style("opacity", 1);
             const recoverPackage = detailedViewRecovery(
                 event,
                 dview,
@@ -579,6 +584,9 @@ export function visualizeNodeClassifierFeatures(
             dview = true;
             console.log("click! - fVis", dview, lock);
             //lock all feature visualizers and transparent paths
+            d3.selectAll(".resultVis")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
             d3.selectAll(".oFeature")
                 .style("pointer-events", "none")
                 .style("opacity", 0.2);

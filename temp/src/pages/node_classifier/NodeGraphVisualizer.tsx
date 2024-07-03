@@ -324,7 +324,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
               .attr("opacity", 0);
 
             if (intmData && intmData.final) {
-              featureVisualizer(svg, allNodes, offset, height, intmData.final, graphs); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
+              featureVisualizer(svg, allNodes, offset, height, graphs); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
             }
 
           }
