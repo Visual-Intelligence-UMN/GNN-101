@@ -167,7 +167,7 @@ export function drawAniPath(
 
         let pathDir = e1[0] > s1[0] ? 0 : 1;
         if (curveDir == 1) {
-            pathDir = e1[0] > s1[0] ? 1 : 0;
+            pathDir = e1[0] > s1[0] ? 1 : 0; //curDir =
         }
         console.log("se", [s1, e1]);
         
@@ -425,3 +425,85 @@ export function drawReLU(
             }
         });
 }
+
+//-----------------------------animation functions for poolingVisClick----------------------------------
+export function drawOutputVisualizer(
+    result:number[],
+    g1:any,
+    one:any,
+    rectH:number,
+    myColor:any
+){
+    for (let m = 0; m < result.length; m++) {
+        g1.append("rect")
+            .attr("x", one[0][0] + rectH * m)
+            .attr("y", one[0][1])
+            .attr("width", rectH)
+            .attr("height", rectH)
+            .attr("fill", myColor(result[m]))
+            .attr("opacity", 1)
+            .attr("stroke", "gray")
+            .attr("stroke-width", 0.1)
+            .attr("class", "procVis");
+    }
+}
+
+
+export function drawPathInteractiveComponents(
+    endCoord:any,
+    resultCoord:any,
+    result:number[],
+    myColor:any
+){
+    let pathMap: any = [];
+    for (let j = 0; j < endCoord.length; j++) {
+        let temPathMap = [];
+        for (let i = 0; i < resultCoord.length; i++) {
+            const path = d3
+                .select(".mats")
+                .append("path")
+                .attr("d", function () {
+                    return [
+                        "M",
+                        endCoord[j][0],
+                        endCoord[j][1],
+                        "A",
+                        (resultCoord[i][0] - endCoord[j][0]) / 2,
+                        ",",
+                        (resultCoord[i][0] - endCoord[j][0]) / 4,
+                        0,
+                        0,
+                        ",",
+                        0,
+                        ",",
+                        resultCoord[i][0],
+                        ",",
+                        resultCoord[i][1],
+                    ].join(" ");
+                })
+                .attr("class", "procVis")
+                .style("fill", "none")
+                .style("opacity", "0.1")
+                .attr("stroke", myColor(result[j]));
+
+            temPathMap.push(path.node());
+        }
+        pathMap.push(temPathMap);
+    }
+    return pathMap;
+}
+
+export function drawPathBtwOuputResult(one:any, endPt:any){
+    d3.select(".mats")
+            .append("path")
+            .attr("d", d3.line()([one[0], endPt]))
+            .attr("stroke", "black")
+            .attr("opacity", 0.05)
+            .attr("fill", "none")
+            .attr("class", "procVis")
+            .attr("id", "path1");
+}
+
+
+
+

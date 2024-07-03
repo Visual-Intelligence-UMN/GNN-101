@@ -3,6 +3,7 @@ import {
     translateLayers,
     calculatePrevFeatureVisPos,
     loadWeights,
+    loadNodeWeights,
 } from "./matHelperUtils";
 import { computeMids } from "./matFeaturesUtils";
 import * as d3 from "d3";
@@ -18,6 +19,9 @@ import {
     runAnimations,
     AnimationController,
     animatePathDrawing,
+    drawOutputVisualizer,
+    drawPathInteractiveComponents,
+    drawPathBtwOuputResult,
 } from "./matAnimateUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
 import { drawSoftmaxDisplayer } from "./matInteractionUtils";
@@ -872,188 +876,117 @@ export function outputVisClick(
     }
 
     //one[0][1] -= 5;
-    setTimeout(() => {
-        const g1 = d3.select(".mats").append("g").attr("class", "procVis");
-        for (let m = 0; m < result.length; m++) {
-            g1.append("rect")
-                .attr("x", one[0][0] + rectH * m)
-                .attr("y", one[0][1])
-                .attr("width", rectH)
-                .attr("height", rectH)
-                .attr("fill", myColor(result[m]))
-                .attr("opacity", 1)
-                .attr("stroke", "gray")
-                .attr("stroke-width", 0.1)
-                .attr("class", "procVis");
-            // endCoord.push([
-            //     one[0][0] + rectH * m + rectH / 2,
-            //     one[0][1],
-            // ]);
-        }
-        //drawPoints(".mats", "red", endCoord);
-        let resultCoord = deepClone(endCoord);
-        resultCoord[0][0] += 300 - rectH * 1.75;
-        resultCoord[1][0] += 300 - rectH * 1.75;
-        console.log("comp coord", resultCoord, endCoord);
-        //     drawPoints(".mats", "red", resultCoord);
-        biasCoord = deepClone(aOne);
-        biasCoord[0][0] -= 130 + 2 * rectH;
-        biasCoord[0][1] += 50;
-        const linBias = modelParams.bias[3];
+    const g1 = d3.select(".mats").append("g").attr("class", "procVis");
+    const outputCoord = [one[0][0], one[0][1]+rectH/2];
+    //drawPoints(".mats", "red", endCoord);
+    let resultCoord = deepClone(endCoord);
+    resultCoord[0][0] += 300 - rectH * 1.75;
+    resultCoord[1][0] += 300 - rectH * 1.75;
+    console.log("comp coord", resultCoord, endCoord);
+    //     drawPoints(".mats", "red", resultCoord);
+    biasCoord = deepClone(aOne);
+    biasCoord[0][0] -= 130 + 2 * rectH;
+    biasCoord[0][1] += 50;
+    const linBias = modelParams.bias[3];
 
-        let pathMap: any = [];
+    d3.select(".twoLayer").style("pointer-events", "none");
 
-        for (let j = 0; j < endCoord.length; j++) {
-            let temPathMap = [];
-            for (let i = 0; i < resultCoord.length; i++) {
-                const path = d3
-                    .select(".mats")
-                    .append("path")
-                    .attr("d", function () {
-                        return [
-                            "M",
-                            endCoord[j][0],
-                            endCoord[j][1],
-                            "A",
-                            (resultCoord[i][0] - endCoord[j][0]) / 2,
-                            ",",
-                            (resultCoord[i][0] - endCoord[j][0]) / 4,
-                            0,
-                            0,
-                            ",",
-                            0,
-                            ",",
-                            resultCoord[i][0],
-                            ",",
-                            resultCoord[i][1],
-                        ].join(" ");
-                    })
-                    .attr("class", "procVis")
-                    .style("fill", "none")
-                    .style("opacity", "0.1")
-                    .attr("stroke", myColor(result[j]));
+    const biasCoordCopy = deepClone(biasCoord);
 
-                temPathMap.push(path.node());
-            }
-            pathMap.push(temPathMap);
-        }
+    biasCoord[0][0] += rectH * 2;
+    feaCoord = [one[0][0], one[0][1] + rectH / 2];
 
-        console.log("pathMap", pathMap, d3.selectAll(".resultRect"));
+    controlPts = computeMids(biasCoord[0], feaCoord);
+    //connect!
+    one[0][1] += rectH / 2;
+    const endPt = [one[0][0] + 300, one[0][1]];
 
-        d3.select(".twoLayer").style("pointer-events", "none");
-
-        d3.selectAll(".resultRect")
-            .style("pointer-events", "auto")
-            .on("mouseover", function (event) {
-                event.stopPropagation();
-                console.log("IN!");
-                const id: number = Number(d3.select(this).attr("id"));
-                //here's the place to place the softmax displayer
-                drawSoftmaxDisplayer(pathMap, endCoord, result, id, myColor);
-            })
-            .on("mouseout", function (event) {
-                d3.selectAll(".math-displayer").remove();
-                const id: number = Number(d3.select(this).attr("id"));
-
-                pathMap[0][id]!.style.opacity = "0.1";
-                pathMap[1][id]!.style.opacity = "0.1";
-            });
-
-        for (let m = 0; m < linBias.length; m++) {
-            g1.append("rect")
-                .attr("x", biasCoord[0][0] + rectH * m)
-                .attr("y", biasCoord[0][1])
-                .attr("width", rectH)
-                .attr("height", rectH)
-                .attr("fill", myColor(linBias[m]))
-                .attr("opacity", 1)
-                .attr("stroke", "gray")
-                .attr("stroke-width", 0.1)
-                .attr("class", "procVis");
-        }
-
-        biasCoord[0][1] += rectH / 2;
-        biasCoord[0][0] += rectH * 2;
-        feaCoord = [one[0][0], one[0][1] + rectH / 2];
-
-        controlPts = computeMids(biasCoord[0], feaCoord);
-        //draw frame
-        const f1 = g1
-            .append("rect")
-            .attr("x", one[0][0])
-            .attr("y", one[0][1])
-            .attr("width", 2 * rectH)
-            .attr("height", rectH)
-            .attr("fill", "none")
-            .attr("opacity", 0)
-            .attr("stroke", "black")
-            .attr("stroke-width", 1)
-            .attr("layerID", 4)
-            .attr("class", "procVis")
-            .attr("fr", 2)
-            .attr("id", "fr2");
-        //connect!
-        one[0][1] += rectH / 2;
-        const endPt = [one[0][0] + 300, one[0][1]];
-        d3.select(".mats")
-            .append("path")
-            .attr("d", d3.line()([one[0], endPt]))
-            .attr("stroke", "black")
-            .attr("opacity", 0.05)
-            .attr("fill", "none")
-            .attr("class", "procVis")
-            .attr("id", "path1");
-
-        intervalID = setInterval(() => {
-            const Xt = modelParams.weights[3];
-            //  drawAniPath(Xt, currentStep, startCoord, endCoord, 1, myColor, featureChannels);
-            currentStep++;
-            console.log("currentStep", currentStep);
-            if (currentStep >= 2) {
-                d3.select(".mats")
-                    .append("path")
-                    .attr(
-                        "d",
-                        curve([
-                            biasCoord[0],
-                            controlPts[0],
-                            controlPts[1],
-                            feaCoord,
-                        ])
-                    )
-                    .attr("stroke", "black")
-                    .attr("opacity", 0.05)
-                    .attr("fill", "none")
-                    .attr("class", "procVis biasPath")
-                    .attr("id", "path1");
-                d3.selectAll(".biasPath")
-                    .transition()
-                    .duration(1000)
-                    .attr("opacity", 1);
-                injectPlayButtonSVG(
-                    btn,
-                    btnX,
-                    btnY,
-                    "./assets/SVGs/playBtn_play.svg"
-                );
-                isPlaying = false;
-                clearInterval(intervalID);
-            }
-            //        drawPoints(".mats", "red", [coordStartPoint, coordFinalPoint]);
-            // d3.selectAll("circle").raise();
-        }, 250); // 每2秒执行一次drawPaths
-
-        //setIntervalID(intervalID);
-        d3.selectAll("path").lower();
-        d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
-        d3.selectAll("path").lower();
-    }, 2000);
-
+    //play button injection
     const btn = d3.select(".mats").append("g").attr("class", "ctrlBtn");
     const radius = 10;
     const btnX = startCoord[0][0];
     const btnY = startCoord[0][1] + 50;
+
+    //where we put out animation sequence
+
+    //path interactive components with softmax
+    let pathMap: any = drawPathInteractiveComponents(endCoord, resultCoord, result, myColor);
+
+    //bias visualizer
+    drawBiasVector(g1, linBias.length, rectH, rectH, biasCoordCopy[0], myColor, linBias, layerID);
+
+    //path between the output vis and result vis
+    drawPathBtwOuputResult(one, endPt);
+
     injectPlayButtonSVG(btn, btnX, btnY, "./assets/SVGs/playBtn_pause.svg");
+
+    // animation for the matmul - what the fuck is this piece of code?????
+    intervalID = setInterval(() => {
+        const Xt = modelParams.weights[3];
+        const Xv = Xt[currentStep];
+        drawAniPath(Xt, currentStep, startCoord, endCoord, 1, myColor, 0, outputCoord, rectH, rectH, result, g1);
+        currentStep++;
+        console.log("i", currentStep);
+        if (currentStep >= 2) {
+            //bias add-on
+            d3.select(".mats")
+                .append("path")
+                .attr(
+                    "d",
+                    curve([
+                        biasCoord[0],
+                        controlPts[0],
+                        controlPts[1],
+                        feaCoord,
+                    ])
+                )
+                .attr("stroke", "black")
+                .attr("opacity", 0.05)
+                .attr("fill", "none")
+                .attr("class", "procVis biasPath")
+                .attr("id", "path1");
+            d3.selectAll(".biasPath")
+                .transition()
+                .duration(1000)
+                .attr("opacity", 1);
+            btn.selectAll("*").remove();
+            injectPlayButtonSVG(
+                btn,
+                btnX,
+                btnY,
+                "./assets/SVGs/playBtn_play.svg"
+            );
+            clearInterval(intervalID);
+        }
+        //        drawPoints(".mats", "red", [coordStartPoint, coordFinalPoint]);
+        // d3.selectAll("circle").raise();
+    }, 250); // 每2秒执行一次drawPaths
+
+    //setIntervalID(intervalID);
+    d3.selectAll("path").lower();
+    d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
+    d3.selectAll("path").lower();
+
+
+    //all the interaction add-ons
+    d3.selectAll(".resultRect")
+    .style("pointer-events", "auto")
+    .on("mouseover", function (event) {
+        event.stopPropagation();
+        console.log("IN!");
+        const id: number = Number(d3.select(this).attr("id"));
+        //here's the place to place the softmax displayer
+        drawSoftmaxDisplayer(pathMap, endCoord, result, id, myColor);
+    })
+    .on("mouseout", function (event) {
+        d3.selectAll(".math-displayer").remove();
+        const id: number = Number(d3.select(this).attr("id"));
+
+        pathMap[0][id]!.style.opacity = "0.1";
+        pathMap[1][id]!.style.opacity = "0.1";
+    });
+
+    // play button interaction add-ons
     btn.on("click", function (event: any, d: any) {
         d3.select(".biasPath").remove();
         console.log("isPlaying", isPlaying);
@@ -1061,7 +994,7 @@ export function outputVisClick(
         if (intervalID) {
             clearInterval(intervalID);
         }
-
+        //replay controls
         if (!isPlaying || currentStep >= 2 || currentStep == 0) {
             btn.selectAll("*").remove();
             injectPlayButtonSVG(
@@ -1075,6 +1008,7 @@ export function outputVisClick(
             }
 
             let i = 0;
+            //matmul animation
             intervalID = setInterval(() => {
                 d3.selectAll("#tempath").remove();
                 const Xt = modelParams.weights[3];
@@ -1114,6 +1048,7 @@ export function outputVisClick(
                 currentStep++;
                 console.log("i", currentStep);
                 if (currentStep >= 2) {
+                    //bias add-on
                     d3.select(".mats")
                         .append("path")
                         .attr(
