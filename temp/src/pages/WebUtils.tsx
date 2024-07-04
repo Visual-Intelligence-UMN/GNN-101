@@ -15,12 +15,6 @@ import {
     get_features_origin,
 } from "@/utils/utils";
 import {
-    removeEffect,
-    mouseover,
-    mousemove,
-    mouseleave,
-} from "@/utils/matInteractionUtils";
-import {
     HeatmapData,
     drawNodeAttributes,
     getNodeAttributes,

@@ -215,86 +215,253 @@ export function drawSoftmaxDisplayer(
         .attr("fill", textColor);
 }
 
-//-----------------------------------------------------warn: below are some functions that need to be updated
-export function featureTooltip(adjustedX: number, adjustedY: number) {
-    const tooltipG = d3
-        .select(".mats")
-        .append("g")
-        .attr("x", adjustedX)
-        .attr("y", adjustedY)
-        .raise();
-
-    return tooltipG;
-}
-
-// Three function that change the tooltip when user hover / move / leave a cell
-export const mouseover = (event: MouseEvent, d: { value: number }) => {
-    d3.select(event.currentTarget as HTMLElement)
-        .style("stroke", "black")
-        .style("opacity", 1);
-};
-
-export const mousemove = (event: MouseEvent, d: { value: number }) => {
-    const rect = (event.target as HTMLElement).getBoundingClientRect();
-};
-
-export const mouseleave = (event: MouseEvent, d: { value: number }) => {
-    d3.select(event.currentTarget as HTMLElement)
-        .style("stroke", "grey")
-        .style("opacity", 0.8);
-};
-
-export function removeEffect(element: any) {
-    d3.select(".matrix-tooltip").remove(); // remove tooltip
-
-    d3.select(element).style("fill", "black").style("font-weight", "normal");
-}
-
-export function mouseoverEvent(
-    element: any,
-    target: any,
-    i: number,
-    conv1: any,
-    conv2: any,
-    conv3: any,
-    final: any,
-    features: any,
-    myColor: any,
-    offset: number,
-    gridNum: number,
-    sqSize: number,
-    xAxis: boolean
+export function drawSoftmaxDisplayerNodeClassifier(
+    displayerPos: number[],
+    titles: string[],
+    rectID: number,
+    nthOutputVals: number[],
+    nthResult: number[],
+    myColor: any
 ) {
-    console.log("ELEMENT", element);
-    const bbox = element.getBBox();
-    const cx = bbox.x + bbox.width / 2;
-    const cy = bbox.y + bbox.height / 2;
+    //set-up the paramtere for the math displayer
+    const displayW = 350;
+    const displayH = 75;
+    const displayX = displayerPos[0];
+    const displayY = displayerPos[1];
 
-    const transformAttr = d3
-        .select(element.parentNode as SVGElement)
-        .attr("transform");
-    let translate = [0, 0]; // no translation for default
-    if (transformAttr) {
-        const matches = transformAttr.match(/translate\(([^,]+),([^)]+)\)/);
-        if (matches) {
-            translate = matches.slice(1).map(Number);
-        }
+    //add displayer
+    d3.select(".mats")
+        .append("rect")
+        .attr("x", displayX)
+        .attr("y", displayY)
+        .attr("width", displayW)
+        .attr("height", displayH)
+        .attr("rx", 10)
+        .attr("ry", 10)
+        .style("fill", "white")
+        .style("stroke", "black")
+        .style("stroke-width", 2)
+        .attr("class", "math-displayer")
+        .raise();
+    //add contents into the math displayer
+    //add title
+    const titleYOffset = 10;
+    const titleXOffset = 50;
+    d3.select(".mats")
+        .append("text")
+        .attr("x", displayX + titleXOffset)
+        .attr("y", displayY + titleYOffset)
+        .text(titles[Number(rectID)])
+        .attr("class", "math-displayer")
+        .attr("font-size", titleYOffset)
+        .attr("fill", "black");
+    const eqXOffset = titleXOffset / 2;
+    const eqYOffset = titleYOffset * 2.5;
+    const unitSize = eqXOffset / 3 + 3;
+    const upperOffset = unitSize * 2;
+    d3.select(".mats")
+        .append("text")
+        .attr("x", displayX + eqXOffset + unitSize * 4 + upperOffset)
+        .attr("y", displayY + eqYOffset)
+        .text("exp(")
+        .attr("class", "math-displayer")
+        .attr("font-size", unitSize)
+        .attr("fill", "black");
+    d3.select(".mats")
+        .append("rect")
+        .attr("x", displayX + eqXOffset + unitSize * 6.5 + upperOffset)
+        .attr("y", displayY + eqYOffset - unitSize + 2)
+        .attr("width", unitSize)
+        .attr("height", unitSize)
+        .style("stroke", "black")
+        .attr("fill", myColor(nthOutputVals[Number(rectID)]))
+        .attr("class", "math-displayer")
+        .raise();
+    d3.select(".mats")
+        .append("text")
+        .attr("x", displayX + eqXOffset + unitSize * 6.5 + upperOffset)
+        .attr("y", displayY + eqYOffset - unitSize / 3)
+        .text(roundToTwo(nthOutputVals[Number(rectID)]))
+        .attr("class", "math-displayer")
+        .attr("font-size", unitSize / 2)
+        .attr("fill", "white");
+    d3.select(".mats")
+        .append("text")
+        .attr("x", displayX + eqXOffset + unitSize * 8 + upperOffset)
+        .attr("y", displayY + eqYOffset)
+        .text(")")
+        .attr("class", "math-displayer")
+        .attr("font-size", unitSize)
+        .attr("fill", "black");
+    //draw fraction line
+    const startFLPt: [number, number] = [
+        displayX + eqXOffset / 2,
+        displayY + eqYOffset + unitSize,
+    ];
+    const endFLPt: [number, number] = [
+        displayX + eqXOffset + unitSize * 10,
+        displayY + eqYOffset + unitSize,
+    ];
+    const endPathPt: [number, number] = [
+        displayX + eqXOffset + unitSize * 19,
+        displayY + eqYOffset + unitSize,
+    ];
+    const path1 = d3
+        .select(".mats")
+        .append("path")
+        .attr("d", d3.line()([startFLPt, endPathPt]))
+        .attr("stroke", "black")
+        .attr("opacity", 1)
+        .attr("fill", "none")
+        .attr("class", "math-displayer");
+
+    //draw lower part
+    const offsetMul = 2;
+    d3.select(".mats")
+        .append("text")
+        .attr("x", displayX + eqXOffset)
+        .attr("y", displayY + eqYOffset * offsetMul)
+        .text("exp(")
+        .attr("class", "math-displayer")
+        .attr("font-size", unitSize)
+        .attr("fill", "black");
+    d3.select(".mats")
+        .append("rect")
+        .attr("x", displayX + eqXOffset + unitSize * 2.5)
+        .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
+        .attr("width", unitSize)
+        .attr("height", unitSize)
+        .style("stroke", "black")
+        .attr("fill", myColor(nthOutputVals[0]))
+        .attr("class", "math-displayer")
+        .raise();
+    d3.select(".mats")
+        .append("text")
+        .attr("x", displayX + eqXOffset + unitSize * 2.5)
+        .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
+        .text(roundToTwo(nthOutputVals[0]))
+        .attr("class", "math-displayer")
+        .attr("font-size", unitSize / 2)
+        .attr("fill", "white");
+    d3.select(".mats")
+        .append("text")
+        .attr("x", displayX + eqXOffset + unitSize * 4)
+        .attr("y", displayY + eqYOffset * offsetMul)
+        .text(")+exp(")
+        .attr("class", "math-displayer")
+        .attr("font-size", unitSize)
+        .attr("fill", "black");
+    d3.select(".mats")
+        .append("rect")
+        .attr("x", displayX + eqXOffset + unitSize * 7.5)
+        .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
+        .attr("width", unitSize)
+        .attr("height", unitSize)
+        .style("stroke", "black")
+        .attr("fill", myColor(nthOutputVals[1]))
+        .attr("class", "math-displayer")
+        .raise();
+    d3.select(".mats")
+        .append("text")
+        .attr("x", displayX + eqXOffset + unitSize * 7.5)
+        .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
+        .text(roundToTwo(nthOutputVals[1]))
+        .attr("class", "math-displayer")
+        .attr("font-size", unitSize / 2)
+        .attr("fill", "white");
+
+    d3.select(".mats")
+        .append("text")
+        .attr("x", displayX + eqXOffset + unitSize * 9)
+        .attr("y", displayY + eqYOffset * offsetMul)
+        .text(")+exp(")
+        .attr("class", "math-displayer")
+        .attr("font-size", unitSize)
+        .attr("fill", "black");
+    d3.select(".mats")
+        .append("rect")
+        .attr("x", displayX + eqXOffset + unitSize * 12.5)
+        .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
+        .attr("width", unitSize)
+        .attr("height", unitSize)
+        .style("stroke", "black")
+        .attr("fill", myColor(nthOutputVals[2]))
+        .attr("class", "math-displayer")
+        .raise();
+    d3.select(".mats")
+        .append("text")
+        .attr("x", displayX + eqXOffset + unitSize * 12.5)
+        .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
+        .text(roundToTwo(nthOutputVals[2]))
+        .attr("class", "math-displayer")
+        .attr("font-size", unitSize / 2)
+        .attr("fill", "white");
+
+    d3.select(".mats")
+        .append("text")
+        .attr("x", displayX + eqXOffset + unitSize * 14)
+        .attr("y", displayY + eqYOffset * offsetMul)
+        .text(")+exp(")
+        .attr("class", "math-displayer")
+        .attr("font-size", unitSize)
+        .attr("fill", "black");
+    d3.select(".mats")
+        .append("rect")
+        .attr("x", displayX + eqXOffset + unitSize * 17.5)
+        .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
+        .attr("width", unitSize)
+        .attr("height", unitSize)
+        .style("stroke", "black")
+        .attr("fill", myColor(nthOutputVals[3]))
+        .attr("class", "math-displayer")
+        .raise();
+    d3.select(".mats")
+        .append("text")
+        .attr("x", displayX + eqXOffset + unitSize * 17.5)
+        .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
+        .text(roundToTwo(nthOutputVals[3]))
+        .attr("class", "math-displayer")
+        .attr("font-size", unitSize / 2)
+        .attr("fill", "white");
+    d3.select(".mats")
+        .append("text")
+        .attr("x", displayX + eqXOffset + unitSize * 19)
+        .attr("y", displayY + eqYOffset * offsetMul)
+        .text(")")
+        .attr("class", "math-displayer")
+        .attr("font-size", unitSize)
+        .attr("fill", "black");
+
+    //lower part finished
+    //eq sign and result
+    d3.select(".mats")
+        .append("text")
+        .attr("x", endFLPt[0] + unitSize * 11)
+        .attr("y", endFLPt[1])
+        .text("=")
+        .attr("class", "math-displayer")
+        .attr("font-size", unitSize)
+        .attr("fill", "black");
+    d3.select(".mats")
+        .append("rect")
+        .attr("x", endFLPt[0] + unitSize * 12)
+        .attr("y", endFLPt[1] - unitSize)
+        .attr("width", unitSize)
+        .attr("height", unitSize)
+        .style("stroke", "black")
+        .attr("fill", myColor(nthResult[Number(rectID)]))
+        .attr("class", "math-displayer")
+        .raise();
+    let textColor = "white";
+    if (Math.abs(nthResult[Number(rectID)]) < 0.5) {
+        textColor = "black";
     }
-
-    const adjustedX = cx + translate[0];
-    const adjustedY = cy + translate[1] - 10;
-    const cellSize = 5; // size for each grid
-
-    //-----------------interaction with text label and heatmap----------------------
-
-    if (d3.select(target).attr("class") != "first") {
-        // 8*8 matrix
-        const matrixSize = 8;
-
-        const tooltipG = featureTooltip(adjustedX, adjustedY);
-    } else {
-        const tooltipG = featureTooltip(adjustedX, adjustedY);
-    }
-
-    d3.select(element).style("fill", "red").style("font-weight", "bold");
+    d3.select(".mats")
+        .append("text")
+        .attr("x", endFLPt[0] + unitSize * 12)
+        .attr("y", endFLPt[1] - unitSize / 2)
+        .text(roundToTwo(nthResult[Number(rectID)]))
+        .attr("class", "math-displayer")
+        .attr("font-size", unitSize / 2)
+        .attr("fill", textColor);
 }
