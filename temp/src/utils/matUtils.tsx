@@ -824,6 +824,34 @@ export function visualizeNodeClassifierFeatures(
             //draw softmax
             let clockwise = 0;
             if(node < 17)clockwise = 1;
+
+            //smart ui detections & transparent
+            console.log("smart ui", featureVisTable);
+            //transparent prevLayer(featureVisTable[3]) && curLayer(featureVisTable[4])
+            if(node<17){
+                //process prevLayer
+                featureVisTable[3][node+1].style.opacity = "0";
+                featureVisTable[3][node+2].style.opacity = "0";
+                //process curLayer
+                if(node-1>=0){
+                    featureVisTable[4][node-1].style.opacity = "0";
+                }
+                if(node-2>=0){
+                    featureVisTable[4][node-2].style.opacity = "0";
+                }
+            }else{
+                //process prevLayer
+                featureVisTable[3][node-1].style.opacity = "0";
+                featureVisTable[3][node-2].style.opacity = "0";
+                //process curLayer
+                if(node+1<34){
+                    featureVisTable[4][node+1].style.opacity = "0";
+                }
+                if(node+2<34){
+                    featureVisTable[4][node+2].style.opacity = "0";
+                }
+            }
+
             
             //animation
             //play button injection
