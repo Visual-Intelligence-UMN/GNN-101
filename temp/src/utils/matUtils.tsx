@@ -851,7 +851,10 @@ export function visualizeNodeClassifierFeatures(
                 {func:()=>{drawBiasVector(g, 4, 15, 10, biasCoord, myColor, linBias, 4);}, delay:aniSec},
                 {func:()=>{drawBiasPath(endBiasCoord, res10, res11, endBiasPathCoord, 4, 4);}, delay:aniSec},
                 {func:()=>{drawPathBtwOuputResult([endOutputCoord], startResultCoord);}, delay:aniSec},
-                {func:()=>{}, delay:aniSec}
+                {func:()=>{
+                    //display the result feature visualizer
+                    featureVisTable[4][node].style.opacity = "1";
+                }, delay:aniSec}
             ]
 
             const animateSeq = [
@@ -863,6 +866,7 @@ export function visualizeNodeClassifierFeatures(
                         currentStep++;
                         console.log("i", currentStep);
                         if (currentStep >= 4) {
+                            
                             AnimationController.runAnimations(0, animateSeqAfterPath);
                             setTimeout(()=>{
                                 pathMap = drawPathInteractiveComponents(softmaxStartCoords, softmaxEndCoords, nthOutputVals, myColor, clockwise);
@@ -886,6 +890,16 @@ export function visualizeNodeClassifierFeatures(
 
             // play button interaction add-ons
             let isPlaying = true;
+
+            setTimeout(() => {
+                injectPlayButtonSVG(
+                    btn,
+                    btnX,
+                    btnY,
+                    "./assets/SVGs/playBtn_pause.svg"
+                );
+            }, initSec + aniSec * 2);
+
             btn.on("click", function (event: any, d: any) {
                 d3.select(".biasPath").remove();
                 console.log("isPlaying", isPlaying);
@@ -895,16 +909,18 @@ export function visualizeNodeClassifierFeatures(
                 }
                 //replay controls
                 if (!isPlaying || currentStep >= 4 || currentStep == 0) {
+                    btn.selectAll("*").remove();
                     injectPlayButtonSVG(
                         btn,
                         btnX,
                         btnY,
-                        "./assets/SVGs/playBtn_play.svg"
+                        "./assets/SVGs/playBtn_pause.svg"
                     );
                     if (currentStep >= 4) {
                         d3.select(".mats").selectAll(".removeRect").remove();
                         d3.select(".mats").selectAll(".pauseRemove").remove();
                         currentStep = 0; // 重置步骤
+                        featureVisTable[4][node].style.opacity = "0.25";
                     }
                     animateSeq[0].delay = 1;
                     AnimationController.runAnimations(0, animateSeq);
