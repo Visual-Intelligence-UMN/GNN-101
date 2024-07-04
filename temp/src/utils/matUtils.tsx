@@ -943,7 +943,23 @@ export function visualizeNodeClassifierFeatures(
                         const nthResult = result[node];
                         //data needed - pathMap(path inetraction), result and final for displayer
                         console.log("data fetching result rect", pathMap, nthResult, nthOutputVals);
-
+                        //path interaction
+                        for(let i=0; i<pathMap.length; i++){
+                            pathMap[i][rectID].style.opacity = "1";
+                        }
+                    }
+                });
+            
+            d3.select(".mats")
+                .selectAll(`rect#resultRect${node}`)
+                .style("pointer-events", "auto")
+                .on("mouseout", function(event, d){
+                    if(pathMap!=null){
+                        const rectID = d3.select(this).attr("rectID");
+                        //path interaction
+                        for(let i=0; i<pathMap.length; i++){
+                            pathMap[i][rectID].style.opacity = "0.1";
+                        }
                     }
                 });
 
