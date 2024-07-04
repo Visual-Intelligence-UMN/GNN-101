@@ -105,7 +105,8 @@ export function detailedViewRecovery(
     poolingVis: any,
     colorSchemesTable: any,
     featureChannels: number,
-    gap:number
+    gap:number,
+    resultLabelsList:any
 ) {
     console.log("click!", dview, lock);
 
@@ -146,6 +147,9 @@ export function detailedViewRecovery(
         d3.select(".mats")
                 .selectAll(".resultRect")
                 .style("pointer-events", "none");
+        resultLabelsList.forEach((element:any) => {
+            element.style.fill = "gray";
+        });
         translateLayers(3, -150);
 
     }else{

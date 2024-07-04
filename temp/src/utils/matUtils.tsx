@@ -186,7 +186,8 @@ export function visualizeGraphClassifierFeatures(
                 poolingVis,
                 colorSchemesTable,
                 featureChannels,
-                100
+                100,
+                []
             );
             //update variables
             dview = recoverPackage.dview;
@@ -577,7 +578,8 @@ export function visualizeNodeClassifierFeatures(
                 poolingVis,
                 colorSchemesTable,
                 featureChannels,
-                90
+                90,
+                resultLabelsList
             );
             //update variables
             dview = recoverPackage.dview;
@@ -845,6 +847,7 @@ export function visualizeNodeClassifierFeatures(
                 {func:()=>{
                     //display the result feature visualizer
                     featureVisTable[4][node].style.opacity = "1";
+                    resultLabelsList[node].style.fill = "black";
                 }, delay:aniSec}
             ]
 
@@ -911,6 +914,7 @@ export function visualizeNodeClassifierFeatures(
                         d3.select(".mats").selectAll(".pauseRemove").remove();
                         currentStep = 0; // 重置步骤
                         featureVisTable[4][node].style.opacity = "0.25";
+                        resultLabelsList[node].style.fill = "gray";
                     }
                     animateSeq[0].delay = 1;
                     AnimationController.runAnimations(0, animateSeq);
