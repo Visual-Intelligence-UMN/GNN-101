@@ -799,17 +799,6 @@ export function visualizeNodeClassifierFeatures(
                 [startResultCoord[0]+35, yForSoftmax]
             ];
 
-            // drawPoints(".mats", "red", [
-            //     outputCoord, endOutputCoord, startResultCoord, 
-            //     biasCoord, endBiasCoord, endBiasPathCoord,
-            //     startPathCoords[0], startPathCoords[1],
-            //     endPathCoords[0], endPathCoords[1], endPathCoords[2], endPathCoords[3],
-            //     softmaxStartCoords[0], softmaxStartCoords[1], 
-            //     softmaxStartCoords[2], softmaxStartCoords[3],
-            //     softmaxEndCoords[0], softmaxEndCoords[1], 
-            //     softmaxEndCoords[2], softmaxEndCoords[3]
-            // ]);
-
             //data preparation<- weights, final outputs, softmax values in paths
             const modelParams = loadNodeWeights();
             const linBias = modelParams["bias"][3]; //bias vector
@@ -866,7 +855,6 @@ export function visualizeNodeClassifierFeatures(
                         currentStep++;
                         console.log("i", currentStep);
                         if (currentStep >= 4) {
-                            
                             AnimationController.runAnimations(0, animateSeqAfterPath);
                             setTimeout(()=>{
                                 pathMap = drawPathInteractiveComponents(softmaxStartCoords, softmaxEndCoords, nthOutputVals, myColor, clockwise);
@@ -944,11 +932,26 @@ export function visualizeNodeClassifierFeatures(
                 d3.selectAll("path").lower();
             });
 
+            
+            d3.select(".mats")
+                .selectAll(`rect#resultRect${node}`)
+                .style("pointer-events", "auto")
+                .on("mouseover", function(event, d){
+                    if(pathMap!=null){
+                        const rectID = d3.select(this).attr("rectID");
+                        console.log("resultRect event", node, rectID);
+                        const nthResult = result[node];
+                        //data needed - pathMap(path inetraction), result and final for displayer
+                        console.log("data fetching result rect", pathMap, nthResult, nthOutputVals);
+
+                    }
+                });
 
         }
+
     });
 
-
+    
 
     
 

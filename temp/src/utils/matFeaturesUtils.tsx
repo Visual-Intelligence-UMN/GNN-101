@@ -1230,6 +1230,9 @@ export function drawResultLayer(
                 .attr("fill", myColor(resultArray[j]))
                 .attr("stroke", "gray")
                 .attr("stroke-width", 0.1)
+                .attr("id", `resultRect${i}`)
+                .attr("class", "resultRect")
+                .attr("rectID",j);
         }
 
         const f = g

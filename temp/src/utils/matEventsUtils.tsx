@@ -143,7 +143,11 @@ export function detailedViewRecovery(
     } else if (transState == "result") {
         translateLayers(5, -300);
     } else if(transState=="resultLayer"){
+        d3.select(".mats")
+                .selectAll(".resultRect")
+                .style("pointer-events", "none");
         translateLayers(3, -150);
+
     }else{
         translateLayers(4, -300);
     }
