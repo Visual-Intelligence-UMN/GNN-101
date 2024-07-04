@@ -1,4 +1,4 @@
-import { loadNodeWeights, loadWeights, translateLayers } from "./matHelperUtils";
+import { calculatePrevFeatureVisPos, loadNodeWeights, loadWeights, translateLayers } from "./matHelperUtils";
 import {
     drawMatrixPreparation,
     drawNodeFeatures,
@@ -18,6 +18,7 @@ import {
     resultRectMouseout,
     resultVisMouseEvent
 } from "./matEventsUtils";
+import { drawPoints } from "./utils";
 
 //Graph Classifier： features visualization pipeline: draw all feature visualizers for original features and GCNConv
 export function visualizeGraphClassifierFeatures(
@@ -688,7 +689,7 @@ export function visualizeNodeClassifierFeatures(
             const layerID = 3;
             const node = Number(d3.select(this).attr("node"));
             setTimeout(() => {
-                translateLayers(3, 300);
+                translateLayers(3, 150);
             }, 1750);
 
             console.log("CST before modification", colorSchemesTable);
@@ -706,13 +707,119 @@ export function visualizeNodeClassifierFeatures(
             //choose the right color schemes to display
             colorSchemesTable[layerID].style.opacity = "1";
             colorSchemesTable[layerID + 1].style.opacity = "1";
-
-            let posList = []; //a list to manage all position from the previous layer feature vis
             
             featureVisTable[layerID][node].style.opacity = "1";
             let curNode = featureVisTable[layerID + 1][node];
             curNode.style.opacity = "0.25"; //display current node
             d3.select(curNode).selectAll(".frame").attr("opacity", 1);
+
+            let prevFeatureCoord:any = calculatePrevFeatureVisPos(
+                featureVisTable,
+                layerID,
+                node, 
+                2, 
+                34,
+                10,
+                5
+            );
+            //-------------------------position computing
+
+            //coordinate for model output <- the position for model output feature visualizer
+            let outputCoord = [
+                prevFeatureCoord[0] + 150,
+                prevFeatureCoord[1] - 7.5 //may need adjust to top-left pos
+            ];
+
+            //end coordinate for model output <- the starting point for final path
+            let endOutputCoord = [
+                prevFeatureCoord[0] + 150 + 10*4,
+                prevFeatureCoord[1] //may need adjust to top-left pos
+            ];
+
+            //start coordinate for result <- the ending point for final path
+            let startResultCoord = [
+                prevFeatureCoord[0] + 350,
+                prevFeatureCoord[1] //may need adjust to top-left pos
+            ];
+
+            //do a curveDir test for the direction of arcs and bias vector
+            let curveDir = 1;
+            if(node < 17)curveDir = -1;
+
+            //find the position for the bias vector <- we use this positio to compute the position for bias vector
+            //coordinate for model output <- the position for model output feature visualizer
+            let biasCoord = [
+                prevFeatureCoord[0] + 50,
+                prevFeatureCoord[1] - 7.5 + curveDir * 50 //may need adjust to top-left pos
+            ];
+
+            //find the ending position of bias vector <- we use this for bias path computing - ending point
+            let endBiasPathCoord = [
+                prevFeatureCoord[0] + 150,
+                prevFeatureCoord[1] //may need adjust to top-left pos
+            ];
+
+            //find the ending position of bias vector <- we use this for bias path computing
+            let endBiasCoord = [
+                biasCoord[0] + 4*10,
+                biasCoord[1] + 7.5
+            ];
+
+            const yForPathAni = prevFeatureCoord[1]-curveDir*7.5;
+            //following position computations will be based on the value of curveDir for dynamic adjustment
+            //find the coordinates for arcs animation
+            let startPathCoords = [
+                [prevFeatureCoord[0]-5, prevFeatureCoord[1]-curveDir*7.5],
+                [prevFeatureCoord[0]-15, prevFeatureCoord[1]-curveDir*7.5]
+            ]; //compute the starting positions of the paths animation
+            let endPathCoords = [
+                [outputCoord[0]+5, yForPathAni],
+                [outputCoord[0]+15, yForPathAni],
+                [outputCoord[0]+25, yForPathAni],
+                [outputCoord[0]+35, yForPathAni]
+            ]; //compute the ending positions of the paths animation
+
+            //find the coordination for softmax visualization
+            const yForSoftmax = prevFeatureCoord[1]+curveDir*7.5;
+            let softmaxStartCoords = [
+                [outputCoord[0]+5, yForSoftmax],
+                [outputCoord[0]+15, yForSoftmax],
+                [outputCoord[0]+25, yForSoftmax],
+                [outputCoord[0]+35, yForSoftmax]
+            ]; //compute the starting positions of the softmax vis
+
+            //find the positions for softmax ending position
+            let softmaxEndCoords = [
+                [startResultCoord[0]+5, yForSoftmax],
+                [startResultCoord[0]+15, yForSoftmax],
+                [startResultCoord[0]+25, yForSoftmax],
+                [startResultCoord[0]+35, yForSoftmax]
+            ];
+
+            drawPoints(".mats", "red", [
+                outputCoord, endOutputCoord, startResultCoord, 
+                biasCoord, endBiasCoord, endBiasPathCoord,
+                startPathCoords[0], startPathCoords[1],
+                endPathCoords[0], endPathCoords[1], endPathCoords[2], endPathCoords[3],
+                softmaxStartCoords[0], softmaxStartCoords[1], 
+                softmaxStartCoords[2], softmaxStartCoords[3],
+                softmaxEndCoords[0], softmaxEndCoords[1], 
+                softmaxEndCoords[2], softmaxEndCoords[3]
+            ]);
+
+            //data preparation<- weights, final outputs, softmax values in paths
+            const modelParams = loadNodeWeights();
+            const linBias = modelParams["bias"][3]; //bias vector
+            const matMulWeights = modelParams["weights"][3]; // weights for matrix multiplication
+            //we need split the final matrix for intermediate output
+
+            console.log("data fetching in the NC result layer",
+                linBias,
+                matMulWeights
+            );
+
+
+            //visualization <- replace this by animation sequence
                 
         }
     });
