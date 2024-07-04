@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import { FeatureGroupLocation, calculateAverage, myColor } from "./utils";
+import { roundToTwo } from "@/pages/WebUtils";
 import { loadWeights } from "./matHelperUtils";
 import { create, all, matrix } from "mathjs";
 import { inter } from "@/pages";
@@ -684,24 +685,198 @@ export function resetNodes(allNodes: any[]) {
     });
   }
 
-  export function fcLayerCalculationVisualizer(node: any, relatedNodes:any, offset: number, height: number, moveOffset: number, graphIndex: number) {
+  export function fcLayerCalculationVisualizer(node: any, relatedNodes:any, offset: number, height: number, moveOffset: number, graphIndex: number, svg: any, isClicked: boolean) {
+
     let moveToX =  (graphIndex) * offset - 300;
     let moveToY = height / 8;
     let originalCoordinates = moveFeatures(relatedNodes, moveToX, moveToY );
+
+    if (!svg.selectAll) {
+      svg = d3.select(svg);
+    }
+
+    const g4 = svg.append("g")
+    .attr("transform", `translate(${moveToX - 250}, ${ moveToY})`)
+
+  const displayer = g4.append("rect")
+  .attr("x", 0)
+  .attr("y", 0)
+  .attr("width", 300)
+  .attr("height", 75)
+  .attr("rx", 10)
+  .attr("ry", 10)
+  .style("fill", "transparent")
+  .style("stroke", "black")
+  .style("stroke-width", 2)
+  .attr("class", "graph-displayer")
+  .attr("opacity", 0)
+  .lower();
+
 
       let xPos = node.featureGroupLocation.xPos +  (graphIndex - 3.5) * offset ;
       let yPos = node.featureGroupLocation.yPos;
       node.featureGroup.transition()
         .delay(1000)
         .duration(1000)
-        .attr("transform", `translate(${moveToX - 100}, ${moveToY + 150}) rotate(90)`);
-    
+        .attr("transform", `translate(${moveToX - 100}, ${moveToY + 150}) rotate(-90)`);
+        
+       
+let rectL = 175 / node.relatedNodes.length; // Assuming square shape and 75 is the height of graph-displayer
+let spacing = 30; // Adjust spacing as needed
+let displayerWidth = 300; // Width of the graph-displayer
+let numRect = [];
+let ySpacing = 5; // Additional spacing for y direction
 
-    document.addEventListener('click', () => {
+for (let i = 0; i < node.relatedNodes.length; i++) {
+  let x = (i % Math.floor((displayerWidth - spacing) / (rectL + spacing))) * (rectL + spacing) + spacing + 20;
+  let y = Math.floor(i / Math.floor((displayerWidth - spacing - 20) / (rectL + spacing))) * (rectL + ySpacing) + ySpacing;
+  numRect.push([x, y]);
+}
+
+let posNeed = [];
+
+  posNeed.push([40, 30]); // Adjust the x offset to space the textNeed elements
+  posNeed.push([265, 30]);
+  posNeed.push([270, 30]);
+
+
+
+let posPlus = [];
+for (let i = 0; i < numRect.length; i++) {
+    let c = [
+        numRect[i][0] + rectL,
+        numRect[i][1] + rectL / 2 + 2,
+    ];
+    posPlus.push(c);
+}
+
+// 
+
+      poolingLayerInteraction(node, g4, numRect, rectL, posNeed, posPlus, isClicked);
+    
+    document.addEventListener('click', function() {
+      if (!isClicked) {
+        return;
+      }
+    
     moveFeaturesBack(relatedNodes, originalCoordinates);
     node.featureGroup.transition()
     .duration(1000)
     .attr("transform", `translate(${xPos - 100 - moveOffset}, ${yPos}) rotate(0)`);
+    d3.selectAll("rect").style("opacity", 1);
+    d3.select(".graph-displayer").attr("opacity", 0);
+    isClicked = false;
     });
     
   }
+
+
+function poolingLayerInteraction(node: any, svg: any, numRect: number[][], rectL: number, posNeed: number[][], posPlus: number[][], isClicked: boolean) {
+  if (!svg.selectAll) {
+    svg = d3.select(svg);
+  }
+
+
+
+  for (let i = 0; i < node.features.length; i++) {
+    d3.select(`#pooling-layer-rect-${i}`).on("mouseover", function() {
+      if (!isClicked) {
+        return;
+      }
+      d3.selectAll(".node-features").style("opacity", 0.3);
+      d3.select(`#pooling-layer-rect-${i}`).style("opacity", 1);
+      d3.selectAll(`#conv3-layer-rect-${i}`).style("opacity", 1);
+      d3.select(".graph-displayer").attr("opacity", 1);
+      svg
+      .append("text")
+      .attr("x", 0)
+      .attr("y", 30)
+      .text("Avg")
+      .attr("class", "math-displayer")
+      .attr("font-size", "12.5")
+      .attr("fill", "black");
+
+
+      for (let j = 0; j < node.relatedNodes.length; j++) {
+
+        
+                          svg.append("rect")
+                          .attr("x", numRect[j][0])
+                          .attr("y", numRect[j][1])
+                          .attr("width", rectL)
+                          .attr("height", rectL)
+                          .style("stroke", "black")
+                          .attr("fill", myColor(node.relatedNodes[j].features[i]))
+                          .attr("class", "math-displayer")
+                          .lower();
+                          svg
+                          .append("text")
+                          .attr("x", numRect[j][0])
+                          .attr("y", numRect[j][1] + rectL / 2)
+                          .text(roundToTwo(node.relatedNodes[j].features[i]))
+                          .attr("class", "math-displayer")
+                          .attr("font-size", "5")
+
+                     
+      }
+                      // append text
+  
+                //add plus sign to svg
+                for (let i = 0; i < posPlus.length - 1; i++) {
+                    svg
+                        .append("text")
+                        .attr("x", posPlus[i][0])
+                        .attr("y", posPlus[i][1])
+                        .text("+")
+                        .attr("class", "math-displayer")
+                        .attr("font-size", "10")
+                        .attr("fill", "black");
+                }
+                     
+                          const textNeed = ["(", ")", "="];
+                          for (let i = 0; i < textNeed.length; i++) {
+                              svg
+                                  .append("text")
+                                  .attr("x", posNeed[i][0])
+                                  .attr("y", posNeed[i][1])
+                                  .text(textNeed[i])
+                                  .attr("class", "math-displayer")
+                                  .attr("font-size", "10")
+                                  .attr("fill", "black");
+                          }
+
+                          svg
+                          .append("rect")
+                          .attr("x", 280)
+                          .attr("y", 30 - rectL)
+                          .attr("width", rectL)
+                          .attr("height", rectL)
+                          .style("stroke", "black")
+                          .attr("fill", myColor(node.features[i]))
+                          .text(roundToTwo(node.features[i]))
+                          .attr("class", "math-displayer")
+                          .lower();
+                          svg
+                          .append("text")
+                          .attr("x", 280)
+                          .attr("y", 30 - rectL / 2)
+                          .text(roundToTwo(node.features[i]))
+                          .attr("class", "math-displayer")
+                          .attr("font-size", "5")
+        
+                
+    }).on("mouseout", function() {
+      if (!isClicked) {
+        return;
+      }
+      d3.selectAll(".math-displayer").remove();
+      d3.select(".graph-displayer").attr("opacity", 0);
+      
+    })
+  }
+
+  
+
+
+}
+  
