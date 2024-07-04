@@ -1297,11 +1297,11 @@ export function drawResultLayer(
             .append("path")
             .attr("d", d3.line()([alocations[i], blocations[i]]))
             .attr("stroke", "black")
-            .attr("opacity", 0.1)
+            .attr("opacity", 0.25)
             .attr("fill", "none")
             .attr("endingNode", i)
             .attr("id", `endingNode${i}`)
-            .attr("layerID", 4).attr("class", "crossConnection").lower();
+            .attr("layerID", 4).attr("class", "crossConnection lastLayerConnections").lower();
         paths.push(path.node() as SVGPathElement);
     }
 

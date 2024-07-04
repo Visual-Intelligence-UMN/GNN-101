@@ -147,6 +147,7 @@ export function detailedViewRecovery(
         d3.select(".mats")
                 .selectAll(".resultRect")
                 .style("pointer-events", "none");
+        
         resultLabelsList.forEach((element:any) => {
             element.style.fill = "gray";
         });
@@ -179,6 +180,7 @@ export function detailedViewRecovery(
             .style("opacity", 1);
 
         d3.selectAll("path").style("opacity", 0.05);
+        d3.select(".mats").selectAll(".lastLayerConnections").style("opacity", 0.25);
     }, 1750);
 
     //recover color schemes opacity

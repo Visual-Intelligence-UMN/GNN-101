@@ -555,7 +555,7 @@ export function visualizeNodeClassifierFeatures(
         if (!lock) {
             //paths interactions
             const node = Number(d3.select(this).attr("node"));
-            resultVisMouseEvent(node, resultPaths, frames, adjList, matFrames, colFrames, "0", "0.05")
+            resultVisMouseEvent(node, resultPaths, frames, adjList, matFrames, colFrames, "0", "0.25")
             resultLabelsList[node].style.fill = "gray";
         }
     });
