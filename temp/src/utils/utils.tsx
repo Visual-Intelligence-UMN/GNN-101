@@ -138,6 +138,16 @@ export function printAxisTextCoordinates(): void {
 }
 
 
+export function findMaxIndex(arr: number[]): number {
+  if (arr.length === 0) {
+      throw new Error("Array is empty");
+  }
+
+  const maxValue = Math.max(...arr);
+  return arr.indexOf(maxValue);
+}
+
+
 //Split a large 1d array into a 1d array with multiple 8*8 matrices
 
 
