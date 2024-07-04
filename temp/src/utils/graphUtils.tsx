@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { FeatureGroupLocation, calculateAverage, myColor } from "./utils";
+import { FeatureGroupLocation, State, calculateAverage, myColor, state } from "./utils";
 import { roundToTwo } from "@/pages/WebUtils";
 import { loadWeights } from "./matHelperUtils";
 import { create, all, matrix } from "mathjs";
@@ -128,10 +128,7 @@ export function resetNodes(allNodes: any[]) {
 
     let isPlaying: boolean = true;
   
-    let biasData = [];
-    if (node.graphIndex) {
-      biasData = bias[node.graphIndex - 1]; //might cause an issue when the first layer is added 
-    }
+    let biasData = bias;
     
     const g3 = svg.append("g")
       .attr("class", "layerVis")
@@ -685,7 +682,7 @@ export function resetNodes(allNodes: any[]) {
     });
   }
 
-  export function fcLayerCalculationVisualizer(node: any, relatedNodes:any, offset: number, height: number, moveOffset: number, graphIndex: number, svg: any, isClicked: boolean) {
+  export function fcLayerCalculationVisualizer(node: any, relatedNodes:any, offset: number, height: number, moveOffset: number, graphIndex: number, svg: any, state: State) {
 
     let moveToX =  (graphIndex) * offset - 300;
     let moveToY = height / 8;
@@ -752,26 +749,24 @@ for (let i = 0; i < numRect.length; i++) {
 
 // 
 
-      poolingLayerInteraction(node, g4, numRect, rectL, posNeed, posPlus, isClicked);
+      poolingLayerInteraction(node, g4, numRect, rectL, posNeed, posPlus, state);
     
     document.addEventListener('click', function() {
-      if (!isClicked) {
-        return;
-      }
+      console.log("document clicked")
     
     moveFeaturesBack(relatedNodes, originalCoordinates);
     node.featureGroup.transition()
     .duration(1000)
     .attr("transform", `translate(${xPos - 100 - moveOffset}, ${yPos}) rotate(0)`);
     d3.selectAll("rect").style("opacity", 1);
-    d3.select(".graph-displayer").attr("opacity", 0);
-    isClicked = false;
+    d3.select(".graph-displayer").remove();
+    state.isClicked = false;
     });
     
   }
 
 
-function poolingLayerInteraction(node: any, svg: any, numRect: number[][], rectL: number, posNeed: number[][], posPlus: number[][], isClicked: boolean) {
+function poolingLayerInteraction(node: any, svg: any, numRect: number[][], rectL: number, posNeed: number[][], posPlus: number[][], state: State) {
   if (!svg.selectAll) {
     svg = d3.select(svg);
   }
@@ -780,7 +775,7 @@ function poolingLayerInteraction(node: any, svg: any, numRect: number[][], rectL
 
   for (let i = 0; i < node.features.length; i++) {
     d3.select(`#pooling-layer-rect-${i}`).on("mouseover", function() {
-      if (!isClicked) {
+      if (!state.isClicked) {
         return;
       }
       d3.selectAll(".node-features").style("opacity", 0.3);
@@ -866,7 +861,7 @@ function poolingLayerInteraction(node: any, svg: any, numRect: number[][], rectL
         
                 
     }).on("mouseout", function() {
-      if (!isClicked) {
+      if (!state.isClicked) {
         return;
       }
       d3.selectAll(".math-displayer").remove();
@@ -876,7 +871,11 @@ function poolingLayerInteraction(node: any, svg: any, numRect: number[][], rectL
   }
 
   
+}
 
 
+export function outputVisualizer(node: any, weight: any[], bias: any[], svg: any, offset: number, isClicked: boolean, moveOffset: number) {
+  
+  
 }
   
