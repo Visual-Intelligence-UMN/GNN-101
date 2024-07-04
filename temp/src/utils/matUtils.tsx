@@ -4,6 +4,7 @@ import {
     drawNodeFeatures,
     drawGCNConvGraphModel,
     drawGCNConvNodeModel,
+    computeMids,
 } from "./matFeaturesUtils";
 import * as d3 from "d3";
 import {
@@ -19,6 +20,8 @@ import {
     resultVisMouseEvent
 } from "./matEventsUtils";
 import { drawPoints } from "./utils";
+import { AnimationController, drawAniPath, drawBiasPath, drawBiasVector, drawPathBtwOuputResult, drawPathInteractiveComponents } from "./matAnimateUtils";
+import { injectPlayButtonSVG } from "./svgUtils";
 
 //Graph Classifier： features visualization pipeline: draw all feature visualizers for original features and GCNConv
 export function visualizeGraphClassifierFeatures(
@@ -725,19 +728,19 @@ export function visualizeNodeClassifierFeatures(
             //-------------------------position computing
 
             //coordinate for model output <- the position for model output feature visualizer
-            let outputCoord = [
+            let outputCoord:[number, number] = [
                 prevFeatureCoord[0] + 150,
-                prevFeatureCoord[1] - 7.5 //may need adjust to top-left pos
+                prevFeatureCoord[1] //may need adjust to top-left pos
             ];
 
             //end coordinate for model output <- the starting point for final path
-            let endOutputCoord = [
+            let endOutputCoord:[number, number] = [
                 prevFeatureCoord[0] + 150 + 10*4,
                 prevFeatureCoord[1] //may need adjust to top-left pos
             ];
 
             //start coordinate for result <- the ending point for final path
-            let startResultCoord = [
+            let startResultCoord:[number, number] = [
                 prevFeatureCoord[0] + 350,
                 prevFeatureCoord[1] //may need adjust to top-left pos
             ];
@@ -748,31 +751,31 @@ export function visualizeNodeClassifierFeatures(
 
             //find the position for the bias vector <- we use this positio to compute the position for bias vector
             //coordinate for model output <- the position for model output feature visualizer
-            let biasCoord = [
+            let biasCoord:[number, number] = [
                 prevFeatureCoord[0] + 50,
-                prevFeatureCoord[1] - 7.5 + curveDir * 50 //may need adjust to top-left pos
+                prevFeatureCoord[1] + curveDir * 50 //may need adjust to top-left pos
             ];
 
             //find the ending position of bias vector <- we use this for bias path computing - ending point
-            let endBiasPathCoord = [
+            let endBiasPathCoord:[number, number] = [
                 prevFeatureCoord[0] + 150,
                 prevFeatureCoord[1] //may need adjust to top-left pos
             ];
 
             //find the ending position of bias vector <- we use this for bias path computing
-            let endBiasCoord = [
+            let endBiasCoord:[number, number] = [
                 biasCoord[0] + 4*10,
-                biasCoord[1] + 7.5
+                biasCoord[1]
             ];
 
             const yForPathAni = prevFeatureCoord[1]-curveDir*7.5;
             //following position computations will be based on the value of curveDir for dynamic adjustment
             //find the coordinates for arcs animation
-            let startPathCoords = [
+            let startPathCoords:number[][] = [
                 [prevFeatureCoord[0]-5, prevFeatureCoord[1]-curveDir*7.5],
                 [prevFeatureCoord[0]-15, prevFeatureCoord[1]-curveDir*7.5]
             ]; //compute the starting positions of the paths animation
-            let endPathCoords = [
+            let endPathCoords:number[][] = [
                 [outputCoord[0]+5, yForPathAni],
                 [outputCoord[0]+15, yForPathAni],
                 [outputCoord[0]+25, yForPathAni],
@@ -789,7 +792,7 @@ export function visualizeNodeClassifierFeatures(
             ]; //compute the starting positions of the softmax vis
 
             //find the positions for softmax ending position
-            let softmaxEndCoords = [
+            let softmaxEndCoords:number[][] = [
                 [startResultCoord[0]+5, yForSoftmax],
                 [startResultCoord[0]+15, yForSoftmax],
                 [startResultCoord[0]+25, yForSoftmax],
@@ -819,7 +822,113 @@ export function visualizeNodeClassifierFeatures(
                 nthOutputVals
             );
             //visualization <- replace this by animation sequence
-                
+            const g = d3.select(".mats");
+            const rArray = computeMids(endBiasCoord, endBiasPathCoord);
+            const res10:any = rArray[0];
+            const res11:any = rArray[1];
+
+            //draw softmax
+            let clockwise = 0;
+            if(node < 17)clockwise = 1;
+            
+            //animation
+            //play button injection
+            const btn = d3.select(".mats").append("g").attr("class", "ctrlBtn");
+            const radius = 10;
+            const btnX = biasCoord[0];
+            const btnY = biasCoord[1] - 100*curveDir;
+
+            let currentStep = 0;
+
+            const initSec = 2000;
+            const aniSec = 500;
+
+            const g1 = d3.select(".mats").append("g").attr("class", "procVis");
+
+            let pathMap: any = null;
+
+            const animateSeqAfterPath = [
+                {func:()=>{drawBiasVector(g, 4, 15, 10, biasCoord, myColor, linBias, 4);}, delay:aniSec},
+                {func:()=>{drawBiasPath(endBiasCoord, res10, res11, endBiasPathCoord, 4, 4);}, delay:aniSec},
+                {func:()=>{drawPathBtwOuputResult([endOutputCoord], startResultCoord);}, delay:aniSec},
+                {func:()=>{}, delay:aniSec}
+            ]
+
+            const animateSeq = [
+                {func:()=>{
+                    intervalID = setInterval(() => {
+                        const Xt = modelParams.weights[3];
+                        const Xv = Xt[currentStep];
+                        drawAniPath(Xt, currentStep, startPathCoords, endPathCoords, -clockwise, myColor, 0, outputCoord, 15, 10, nthOutputVals, g1);
+                        currentStep++;
+                        console.log("i", currentStep);
+                        if (currentStep >= 4) {
+                            AnimationController.runAnimations(0, animateSeqAfterPath);
+                            setTimeout(()=>{
+                                pathMap = drawPathInteractiveComponents(softmaxStartCoords, softmaxEndCoords, nthOutputVals, myColor, clockwise);
+                            }, 1500);
+                            btn.selectAll("*").remove();
+                            injectPlayButtonSVG(
+                                btn,
+                                btnX,
+                                btnY,
+                                "./assets/SVGs/playBtn_play.svg"
+                            );
+                            clearInterval(intervalID);
+                        }
+                    }, 250); 
+                    d3.selectAll("path").lower();
+                    d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
+                    d3.selectAll("path").lower();
+                }, delay:initSec+aniSec},
+            ];
+            AnimationController.runAnimations(0, animateSeq);
+
+            // play button interaction add-ons
+            let isPlaying = true;
+            btn.on("click", function (event: any, d: any) {
+                d3.select(".biasPath").remove();
+                console.log("isPlaying", isPlaying);
+                event.stopPropagation();
+                if (intervalID) {
+                    clearInterval(intervalID);
+                }
+                //replay controls
+                if (!isPlaying || currentStep >= 4 || currentStep == 0) {
+                    injectPlayButtonSVG(
+                        btn,
+                        btnX,
+                        btnY,
+                        "./assets/SVGs/playBtn_play.svg"
+                    );
+                    if (currentStep >= 4) {
+                        d3.select(".mats").selectAll(".removeRect").remove();
+                        d3.select(".mats").selectAll(".pauseRemove").remove();
+                        currentStep = 0; // 重置步骤
+                    }
+                    animateSeq[0].delay = 1;
+                    AnimationController.runAnimations(0, animateSeq);
+                    setTimeout(()=>{
+                        AnimationController.runAnimations(0, animateSeqAfterPath);
+                    }, 1500);
+                    setTimeout(()=>{
+                        pathMap = drawPathInteractiveComponents(softmaxStartCoords, softmaxEndCoords, nthOutputVals, myColor, clockwise);
+                    }, 3000);
+                    isPlaying = true;
+                } else if (isPlaying) {
+                    btn.selectAll("*").remove();
+                    injectPlayButtonSVG(
+                        btn,
+                        btnX,
+                        btnY,
+                        "./assets/SVGs/playBtn_pause.svg"
+                    );
+                    isPlaying = false;
+                }
+                d3.selectAll("path").lower();
+            });
+
+
         }
     });
 

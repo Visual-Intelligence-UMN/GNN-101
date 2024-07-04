@@ -453,7 +453,8 @@ export function drawPathInteractiveComponents(
     endCoord:any,
     resultCoord:any,
     result:number[],
-    myColor:any
+    myColor:any,
+    clockwise:number=0
 ){
     let pathMap: any = [];
     for (let j = 0; j < endCoord.length; j++) {
@@ -474,7 +475,7 @@ export function drawPathInteractiveComponents(
                         0,
                         0,
                         ",",
-                        0,
+                        clockwise,
                         ",",
                         resultCoord[i][0],
                         ",",
