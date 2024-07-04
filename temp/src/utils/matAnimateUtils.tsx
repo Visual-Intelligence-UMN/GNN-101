@@ -137,16 +137,16 @@ export function drawAniPath(
 ) {
     d3.selectAll("#tempath").remove();
     if(currentStep==0){
-    g.append("rect")
-        .attr("x", coordFeatureVis[0])
-        .attr("y", coordFeatureVis[1] - rectH / 2)
-        .attr("width", rectW * dummy.length)
-        .attr("height", rectH)
-        .attr("fill", "none")
-        .attr("opacity", 1)
-        .attr("stroke", "black")
-        .attr("stroke-width", 1)
-        .attr("class", "procVis");
+        g.append("rect")
+            .attr("x", coordFeatureVis[0])
+            .attr("y", coordFeatureVis[1] - rectH / 2)
+            .attr("width", rectW * dummy.length)
+            .attr("height", rectH)
+            .attr("fill", "none")
+            .attr("opacity", 1)
+            .attr("stroke", "black")
+            .attr("stroke-width", 1)
+            .attr("class", "procVis");
     }
     g.append("rect")
         .attr("x", coordFeatureVis[0] + rectW * currentStep)

@@ -799,16 +799,16 @@ export function visualizeNodeClassifierFeatures(
                 [startResultCoord[0]+35, yForSoftmax]
             ];
 
-            drawPoints(".mats", "red", [
-                outputCoord, endOutputCoord, startResultCoord, 
-                biasCoord, endBiasCoord, endBiasPathCoord,
-                startPathCoords[0], startPathCoords[1],
-                endPathCoords[0], endPathCoords[1], endPathCoords[2], endPathCoords[3],
-                softmaxStartCoords[0], softmaxStartCoords[1], 
-                softmaxStartCoords[2], softmaxStartCoords[3],
-                softmaxEndCoords[0], softmaxEndCoords[1], 
-                softmaxEndCoords[2], softmaxEndCoords[3]
-            ]);
+            // drawPoints(".mats", "red", [
+            //     outputCoord, endOutputCoord, startResultCoord, 
+            //     biasCoord, endBiasCoord, endBiasPathCoord,
+            //     startPathCoords[0], startPathCoords[1],
+            //     endPathCoords[0], endPathCoords[1], endPathCoords[2], endPathCoords[3],
+            //     softmaxStartCoords[0], softmaxStartCoords[1], 
+            //     softmaxStartCoords[2], softmaxStartCoords[3],
+            //     softmaxEndCoords[0], softmaxEndCoords[1], 
+            //     softmaxEndCoords[2], softmaxEndCoords[3]
+            // ]);
 
             //data preparation<- weights, final outputs, softmax values in paths
             const modelParams = loadNodeWeights();
@@ -836,7 +836,7 @@ export function visualizeNodeClassifierFeatures(
             const btn = d3.select(".mats").append("g").attr("class", "ctrlBtn");
             const radius = 10;
             const btnX = biasCoord[0];
-            const btnY = biasCoord[1] - 100*curveDir;
+            const btnY = outputCoord[1] - 200*curveDir;
 
             let currentStep = 0;
 
@@ -862,7 +862,7 @@ export function visualizeNodeClassifierFeatures(
                     intervalID = setInterval(() => {
                         const Xt = modelParams.weights[3];
                         const Xv = Xt[currentStep];
-                        drawAniPath(Xt, currentStep, startPathCoords, endPathCoords, -clockwise, myColor, 0, outputCoord, 15, 10, nthOutputVals, g1);
+                        drawAniPath(Xt, currentStep, startPathCoords, endPathCoords, curveDir, myColor, 0, outputCoord, 15, 10, nthOutputVals, g1);
                         currentStep++;
                         console.log("i", currentStep);
                         if (currentStep >= 4) {
