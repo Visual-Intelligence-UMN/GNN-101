@@ -593,6 +593,7 @@ export function drawGCNConvNodeModel(
     console.log("thirdGCN", thirdGCN);
     console.log("gcnf", gcnFeatures);
     console.log("CONV1", conv1);
+    let resultLabelsList: any;
     for (let k = 0; k < 3; k++) {
         const rectH = 15;
         const rectW = 10;
@@ -664,6 +665,7 @@ export function drawGCNConvNodeModel(
             }
             resultPaths = drawResultLayer(locations, layerLocations, result, rectW, rectH, myColor, featureVisTable, frames, graph);
             //drawPoints(".mats", "red", layerLocations);
+            resultLabelsList = resultPaths.resultLabelsList;
         }
         console.log("schemeLocations", schemeLocations);
     }
@@ -723,7 +725,8 @@ export function drawGCNConvNodeModel(
         maxVals: maxVals,
         paths: paths,
         thirdGCN: thirdGCN,
-        resultPaths: resultPaths
+        resultPaths: resultPaths,
+        resultLabelsList:resultLabelsList
     };
 }
 
@@ -1204,6 +1207,7 @@ export function drawResultLayer(
     frames: any,
     graph:any
 ){
+    let resultLabelsList = [];
     const layer = d3
             .select(".mats")
             .append("g")
@@ -1266,6 +1270,7 @@ export function drawResultLayer(
                         .style("font-size", "8px"); 
 
 
+        resultLabelsList.push(label.node() as SVGElement);
         featureVisTable[4].push(g.node() as SVGElement);
         frames["results"].push(f.node() as SVGElement);
     }
@@ -1310,7 +1315,8 @@ export function drawResultLayer(
     );
     return {
         featureVisTable:featureVisTable,
-        paths:paths
+        paths:paths,
+        resultLabelsList:resultLabelsList
     };
 }
 

@@ -460,6 +460,7 @@ export function visualizeNodeClassifierFeatures(
     featureVisTable = GCNConvPackage.featureVisTable;
     colorSchemesTable = GCNConvPackage.colorSchemesTable;
     maxVals = GCNConvPackage.maxVals;
+    let resultLabelsList = GCNConvPackage.resultLabelsList;
     let paths = GCNConvPackage.paths;
     let resultPaths = GCNConvPackage.resultPaths;
 
@@ -545,7 +546,7 @@ export function visualizeNodeClassifierFeatures(
             //paths interactions
             const node = Number(d3.select(this).attr("node"));
             resultVisMouseEvent(node, resultPaths, frames, adjList, matFrames, colFrames, "1", "1")
-            
+            resultLabelsList[node].style.fill = "black";
         }
     });
     d3.selectAll(".resultVis").on("mouseout", function (event, d) {
@@ -553,7 +554,7 @@ export function visualizeNodeClassifierFeatures(
             //paths interactions
             const node = Number(d3.select(this).attr("node"));
             resultVisMouseEvent(node, resultPaths, frames, adjList, matFrames, colFrames, "0", "0.05")
-            
+            resultLabelsList[node].style.fill = "gray";
         }
     });
 
