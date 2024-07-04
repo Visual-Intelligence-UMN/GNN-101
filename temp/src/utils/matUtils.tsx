@@ -811,14 +811,13 @@ export function visualizeNodeClassifierFeatures(
             const modelParams = loadNodeWeights();
             const linBias = modelParams["bias"][3]; //bias vector
             const matMulWeights = modelParams["weights"][3]; // weights for matrix multiplication
-            //we need split the final matrix for intermediate output
+            const nthOutputVals = final[node];
 
             console.log("data fetching in the NC result layer",
                 linBias,
-                matMulWeights
+                matMulWeights,
+                nthOutputVals
             );
-
-
             //visualization <- replace this by animation sequence
                 
         }
