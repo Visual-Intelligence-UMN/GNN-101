@@ -253,7 +253,8 @@ export function drawNodeFeatures(
     //drawPoints(".mats", "red", schemeLocations);
     //add layer label for the first one
 
-    addLayerName(locations, "Graph Features", 0, 30, firstLayer);
+    if(featureChannels!=34)addLayerName(locations, "Graph Features", 0, 30, firstLayer);
+    else addLayerName(locations, "Graph Features", 0, 70, firstLayer);
     return {
         locations: locations,
         frames: frames,
@@ -614,7 +615,7 @@ export function drawGCNConvNodeModel(
             locations,
             "GCNConv" + (k + 1),
             0,
-            30,
+            70,
             d3.select(`g#layerNum_${k + 1}`)
         );
 
@@ -676,7 +677,7 @@ export function drawGCNConvNodeModel(
     const l3 = d3.select(`g#layerNum_3`);
     const l4 = d3.select(`g#layerNum_4`);
 
-    const schemeOffset =550;
+    const schemeOffset =600;
 
     const infoTable = {
         valueTable:[
@@ -1310,7 +1311,7 @@ export function drawResultLayer(
         layerLocations,
         "Prediction Results",
         0,
-        30,
+        70,
         d3.select(`g#layerNum_4`)
     );
     return {
