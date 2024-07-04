@@ -540,6 +540,8 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .attr("y", (d: any, i: number) => i * 3 + 5)
           .attr("width", 15)
           .attr("height", 3)
+          .attr("class", "node-features")
+          .attr("id", (d: any, i: number) => "conv" + graphIndex + "-layer-rect-" + i) 
           .style("fill", (d: number) => myColor(d))
           .style("stroke-width", 1)
           .style("stroke", "grey")
@@ -555,6 +557,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .style("text-anchor", "middle");
 
         featureGroup.style('visibility', 'hidden');  
+
 
         
         yPos = yPos + 3 * node.features.length; //the bottom of the featureGroup 
@@ -668,7 +671,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
         moveOffset = 200;
 
         // for the pooling layer(graphIndex = 3), the rectHeight = 2, for the other 2 layers, rectHeight = 20;
-        let rectHeight = 2;
+        let rectHeight = 3;
         if (node.graphIndex >= 5) {
           rectHeight = 20;
         }
@@ -684,8 +687,10 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .append("rect")
           .attr("x", -10) //adjust x and y coordination so it locates in the middle of the graph
           .attr("y", (d: any, i: number) => i * rectHeight - 100)
-          .attr("width", 35)
+          .attr("width", 15)
+          .attr("id", (d: any, i: number) => "pooling-layer-rect-" + i) 
           .attr("height", rectHeight)
+          .attr("class", "node-features")
           .style("fill", (d: number) => myColor(d))
           .style("stroke-width", 1)
           .style("stroke", "grey")
@@ -724,6 +729,13 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           }
         });
         node.featureGroup.on("click", function(event: any) {
+          event.stopPropagation()
+          if (isClicked) {
+            return;
+          }
+          isClicked = true;
+
+
           hideAllLinks(allNodes);
           highlightNodes(node);
           // calculationVisualizer(node, currentWeights, bias, aggregatedDataMap, calculatedDataMap, svg, offset, isClicked);
@@ -732,7 +744,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
               relatedNodes = node.relatedNodes;
             } // to make sure relatedNodes is not null
             showFeature(node);
-            fcLayerCalculationVisualizer(node, relatedNodes, offset, height, moveOffset, node.graphIndex);
+            fcLayerCalculationVisualizer(node, relatedNodes, offset, height, moveOffset, node.graphIndex, g2, isClicked);
             
             reduceNodeOpacity(allNodes, relatedNodes, node);
             event.stopPropagation(); // Prevent the click event from bubbling up
