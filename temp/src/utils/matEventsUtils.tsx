@@ -909,7 +909,7 @@ export function outputVisClick(
     const animateSeqAfterPath = [
         {func:()=>{drawBiasVector(g1, linBias.length, rectH, rectH, biasCoordCopy[0], myColor, linBias, layerID);}, delay: 200}, 
         {func:()=>{drawBiasPathOutputVis(biasCoord, controlPts, feaCoord);}, delay:200}, 
-        {func:()=>{drawPathBtwOuputResult(one, endPt);}, delay:200}, 
+      //  {func:()=>{drawPathBtwOuputResult(one, endPt);}, delay:200}, 
     ]
 
     const animateSeq = [

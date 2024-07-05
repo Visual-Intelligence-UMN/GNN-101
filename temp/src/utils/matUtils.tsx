@@ -872,7 +872,7 @@ export function visualizeNodeClassifierFeatures(
             const animateSeqAfterPath = [
                 {func:()=>{drawBiasVector(g, 4, 15, 10, biasCoord, myColor, linBias, 4);}, delay:aniSec},
                 {func:()=>{drawBiasPath(endBiasCoord, res10, res11, endBiasPathCoord, 4, 4);}, delay:aniSec},
-                {func:()=>{drawPathBtwOuputResult([endOutputCoord], startResultCoord);}, delay:aniSec},
+           //     {func:()=>{drawPathBtwOuputResult([endOutputCoord], startResultCoord);}, delay:aniSec},
                 {func:()=>{
                     //display the result feature visualizer
                     featureVisTable[4][node].style.opacity = "1";
