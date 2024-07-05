@@ -433,7 +433,7 @@ for (let i = 0; i < node.features.length; i++) {
         return;
       }
       d3.selectAll(".math-displayer").remove();
-      d3.select(".graph-displayer").attr("opacity", 0);
+      d3.selectAll(".graph-displayer").attr("opacity", 0);
       d3.selectAll(".softmax").attr("opacity", 0)
       d3.selectAll(`.softmax${i}`).attr("opacity", 0.07)
       
@@ -445,6 +445,7 @@ for (let i = 0; i < node.features.length; i++) {
   }
 
   document.addEventListener("click", function() {
+    d3.selectAll(".graph-displayer").remove();
     moveFeaturesBack(node.relatedNodes, originalCoordinates);
     node.featureGroup.transition()
     .duration(1000)
