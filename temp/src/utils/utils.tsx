@@ -687,8 +687,10 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
         // for the pooling layer(graphIndex = 3), the rectHeight = 2, for the other 2 layers, rectHeight = 20;
         let rectHeight = 3;
+        let rectName = "pooling"
         if (node.graphIndex >= 5) {
           rectHeight = 20;
+          rectName = "output";
         }
         let groupCentralHeight = rectHeight * features.length / 2;
         let yOffset = groupCentralHeight - (height / 5);
@@ -703,7 +705,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .attr("x", -10) //adjust x and y coordination so it locates in the middle of the graph
           .attr("y", (d: any, i: number) => i * rectHeight - 190)
           .attr("width", 15)
-          .attr("id", (d: any, i: number) => "pooling-layer-rect-" + i) 
+          .attr("id", (d: any, i: number) => rectName +"-layer-rect-" + i) 
           .attr("height", rectHeight)
           .attr("class", "node-features")
           .style("fill", (d: number) => myColor(d))
@@ -762,7 +764,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             }
             if (node.graphIndex === 5) {
               console.log("CAWCAW", node.relatedNodes, weights, bias)
-              outputVisualizer(node, weights[3], bias[3], svg, offset, state.isClicked, moveOffset)
+              outputVisualizer(node, weights[3], bias[3], g2, offset, state.isClicked, moveOffset, height)
             }
             
             reduceNodeOpacity(allNodes, relatedNodes, node);
