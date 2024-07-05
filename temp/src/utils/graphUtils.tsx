@@ -2,11 +2,12 @@ import * as d3 from "d3";
 import { FeatureGroupLocation, State, calculateAverage, myColor, state } from "./utils";
 import { roundToTwo } from "@/pages/WebUtils";
 import { loadWeights } from "./matHelperUtils";
+import * as math from 'mathjs';
 import { create, all, matrix } from "mathjs";
 import { inter } from "@/pages";
 import { off } from "process";
 
-const pathColor = d3.scaleLinear<string>()
+export const pathColor = d3.scaleLinear<string>()
 .domain([-0.25, 0, 0.25])
 .range(["white", "gray", "black"]);
 
@@ -24,7 +25,7 @@ export function showAllLinks(nodes: any) {
     nodes.forEach((node: any) => {
       if (node.links) {
         node.links.forEach((link: any) => {
-          link.style("opacity", 0.07);
+          link.style("opacity", 0.1);
         })
   
       }
@@ -58,9 +59,6 @@ export function showFeature(node: any) {
 
 
 export function highlightNodes(node: any) {
-  const linkStrength = d3.scaleLinear()
-          .domain([-0.25, 0, 0.25])
-          .range([0.1, 0.3, .6]);
   const avg = calculateAverage(node.features);
 
   if (node.featureGroup && node.svgElement) {
@@ -76,7 +74,7 @@ export function highlightNodes(node: any) {
   if (node.links) {
     node.links.forEach((link: any) => {
       node.features
-      link.style("opacity", linkStrength(avg));
+      link.style("opacity", 1);
     });
   }
 }
@@ -103,7 +101,7 @@ export function resetNodes(allNodes: any[]) {
 
       if (node.links) {
         node.links.forEach((link: any) => {
-          link.style("opacity", 0.07);
+          link.style("opacity", 0.1);
         });
       }
 
@@ -123,35 +121,38 @@ export function resetNodes(allNodes: any[]) {
   }
 
   export function outputVisualizer(node: any, weights: any[], bias: any[], svg: any, offset: number, isClicked: boolean, moveOffset: number, height: number) {
-    let originalCoordinates = moveFeatures(node.relatedNodes, 3.5 * offset - 100, height / 5 );
+    let originalCoordinates = moveFeatures(node.relatedNodes, (node.graphIndex - 1) * offset - 550, height / 5 );
     node.featureGroup.transition()
       .delay(2000)
       .duration(1000)
-      .attr("transform", `translate(${node.x}, ${node.y - 20}) rotate(90)`);
+      .attr("transform", `translate(${node.x + 150}, ${node.y - 25}) rotate(-90)`);
+
+      let temp = 250;
 
       let calculatedData: number[] = []
       for (let i = 0; i < 2; i++) {
         let temp = 0;
         for (let j = 0; j < node.relatedNodes[0].features.length; j++) {
-          temp += (weights[i][j] * node.relatedNodes[0].features[j])
+          temp += (weights[i][j] * (node.relatedNodes[0].features[j]))
         }
         calculatedData.push(temp);
     }
+    console.log("mDAWa", node.relatedNodes[0].features, weights)
 
 
     let startCoordList = []
     for (let i = 0; i < 64; i++) {
      
       let s: [number, number] = [
-       node.x + 3 * i - offset + moveOffset - 100 - node.relatedNodes[0].features.length * 3,
-        node.y - 35
+       node.x + 3 * i - offset + moveOffset - 100 - node.relatedNodes[0].features.length * 3 - 100,
+        node.y - 15
       ];  
       startCoordList.push(s);
     }  
 
     console.log(calculatedData)
     const calculatedFeatureGroup = svg.append("g")
-      .attr("transform", `translate(${node.x}, ${node.y})`);
+      .attr("transform", `translate(${node.x - temp}, ${node.y})`);
   
     calculatedFeatureGroup.selectAll("rect")
       .data(calculatedData)
@@ -171,8 +172,8 @@ export function resetNodes(allNodes: any[]) {
 
       for (let i = 0; i < node.features.length; i++) {
         let s: [number, number] = [
-            node.x + 20 + i * 100,
-            node.y - 35
+            node.x + 20 + i * 100 - temp,
+            node.y - 15
         ];  
         endCoordList.push(s);
       }    
@@ -183,7 +184,7 @@ const Xt = math.transpose(weights);
 
 
 const BiasGroup = svg.append("g")
-      .attr("transform", `translate(${node.x}, ${node.y + 30})`);
+      .attr("transform", `translate(${node.x - temp}, ${node.y + 30})`);
   
     BiasGroup.selectAll("rect")
       .data(bias)
@@ -203,10 +204,10 @@ const BiasGroup = svg.append("g")
   setTimeout(() => {
     weightAnimation(svg, node, startCoordList, endCoordList, Xt, offset, height, moveOffset)
     
-    let start_x = node.x + 40 + 5
+    let start_x = node.x + 40 + 5 - temp
     let start_y = node.y - 22.5
-    let end_x = node.x + 200 - 40 - 5
-    let end_y = node.y - 22.5
+    let end_x = node.x + 200 - 40 - 5 - temp + 50
+    let end_y = node.y - 22.5 
 
     let control_x = (start_x + end_x) / 2; 
     let control_y = start_y + 50; 
@@ -234,9 +235,9 @@ const BiasGroup = svg.append("g")
       .attr("class", "relu to-be-removed")
       .attr("opacity", 0);
 
-      start_y = node.y + 40
+      start_y = node.y + 40 
       start_x = start_x - moveOffset
-      end_x = end_x - 150
+      end_x = end_x - 150 
 
       let control1_x = start_x + (end_x - start_x) * 0.2;
       let control1_y = start_y;
@@ -253,11 +254,11 @@ const BiasGroup = svg.append("g")
         .attr("class", "bias to-be-removed")
         .style("opacity", 0);
 
-  }, 1000) 
+  }, 2000) 
 
 
   const g4 = svg.append("g")
-  .attr("transform", `translate(${node.x}, ${node.y - 150})`)
+  .attr("transform", `translate(${node.x - temp + 50}, ${node.y - 150})`)
 
   let rectL = 15;
 let displayerWidth = 300; // Width of the graph-displayer
@@ -456,7 +457,7 @@ for (let i = 0; i < node.features.length; i++) {
     
 
 
-  export function calculationVisualizer(node: any, currentWeights: any, bias: any, normalizedAdjMatrix: any, aggregatedDataMap: any[], calculatedDataMap: any[], svg: any, offset: number, height: number, isClicked: boolean, moveOffset: number) {
+  export function calculationVisualizer(node: any, currentWeights: any, bias: any, normalizedAdjMatrix: any, aggregatedDataMap: any[], calculatedDataMap: any[], svg: any, offset: number, height: number, isClicked: boolean, moveOffset: number, rectHeight: number) {
     if (isClicked || aggregatedDataMap == null || calculatedDataMap == null) { 
       return;
     }
@@ -493,19 +494,19 @@ for (let i = 0; i < node.features.length; i++) {
     let paths: any = [];
     let intermediateFeatureGroups: any = [];
   
-  
+    
     const aggregatedData = aggregatedDataMap[node.id];
   
     const aggregatedFeatureGroup = g3.append("g")
-      .attr("transform", `translate(${3.5 * offset + node.relatedNodes[0].features.length * 3}, ${height / 5 + 150})`);
+      .attr("transform", `translate(${3.5 * offset + node.relatedNodes[0].features.length * rectHeight}, ${height / 5 + 150})`);
   
     aggregatedFeatureGroup.selectAll("rect")
       .data(aggregatedData)
       .enter()
       .append("rect")
-      .attr("x", (d: any, i: number) => i * 3)
+      .attr("x", (d: any, i: number) => i * rectHeight)
       .attr("y", 0)
-      .attr("width", 3)
+      .attr("width", rectHeight)
       .attr("height", 15)
       .style("fill", (d: number) => myColor(d))
       .style("stroke-width", 1)
@@ -520,8 +521,8 @@ for (let i = 0; i < node.features.length; i++) {
   
     for (let i = 0; i < 64; i++) {
       let s: [number, number] = [
-          (node.graphIndex) * offset + i * 3 + node.relatedNodes[0].features.length * 3,
-          height / 5 + 150 + 10
+          (node.graphIndex) * offset + i * rectHeight + node.relatedNodes[0].features.length * rectHeight,
+          height / 5 + 150 + 25
       ];  
       startCoordList.push(s);
     }  
@@ -531,7 +532,7 @@ for (let i = 0; i < node.features.length; i++) {
     const calculatedData = calculatedDataMap[node.id];
   
     const calculatedFeatureGroup = g3.append("g")
-      .attr("transform", `translate(${3.5 * offset + node.relatedNodes[0].features.length * 6 + 30}, ${height / 5 + 150})`);
+      .attr("transform", `translate(${3.5 * offset + node.relatedNodes[0].features.length * 2 * rectHeight + 30}, ${height / 5 + 150})`);
   
     calculatedFeatureGroup.selectAll("rect")
       .data(calculatedData)
@@ -549,8 +550,8 @@ for (let i = 0; i < node.features.length; i++) {
   
     for (let i = 0; i < 64; i++) {
       let s: [number, number] = [
-          (node.graphIndex) * offset + i * 3 + node.relatedNodes[0].features.length * 6 + 30,
-          height / 5 + 150 + 10
+          (node.graphIndex) * offset + i * 3 + node.relatedNodes[0].features.length * 2 * rectHeight + 30,
+          height / 5 + 150 + 25
       ];  
       endCoordList.push(s);
     }
@@ -558,7 +559,7 @@ for (let i = 0; i < node.features.length; i++) {
     intermediateFeatureGroups.push(calculatedFeatureGroup);
   
     const BiasGroup = g3.append("g")
-      .attr("transform", `translate(${3.5 * offset + node.relatedNodes[0].features.length * 6 + 30}, ${height / 5 + 100})`);
+      .attr("transform", `translate(${3.5 * offset + node.relatedNodes[0].features.length * 2 * rectHeight + 30}, ${height / 5 + 100})`);
   
     BiasGroup.selectAll("rect")
       .data(biasData)
@@ -578,7 +579,7 @@ for (let i = 0; i < node.features.length; i++) {
     node.intermediateFeatureGroups = intermediateFeatureGroups;
   
  
-    end_x = 3.5 * offset + node.relatedNodes[0].features.length * 3
+    end_x = 3.5 * offset + node.relatedNodes[0].features.length * rectHeight
     end_y = height / 5 + 150 + 7.5;
     
     let adjMatrixSlice: number[] = []; 
@@ -593,9 +594,11 @@ for (let i = 0; i < node.features.length; i++) {
       if (node.relatedNodes) {
         node.relatedNodes.forEach((n: any, i: number) => {
           if (n.featureGroupLocation) {
-            start_x = 3.5 * offset - 70 + n.features.length * 3;
-            start_y = height / 5 + 90 + 40 * i;
-
+            start_x = 3.5 * offset - 70 + n.features.length * rectHeight;
+            start_y = height / 5 + 90 + 50 * i;
+            if (node.graphIndex === 1) {
+              start_x -= 60;
+            }
             const control1_x = start_x + (end_x - start_x) * 0.3;
             const control1_y = start_y;
             const control2_x = start_x + (end_x - start_x) * 0.7;
@@ -626,9 +629,9 @@ for (let i = 0; i < node.features.length; i++) {
         });
   
         let color;
-        start_x =  3.5 * offset + node.relatedNodes[0].features.length * 6 + node.features.length * 3 + 35
+        start_x =  3.5 * offset + node.relatedNodes[0].features.length * rectHeight * 2 + node.features.length * 3 + 35
         start_y = height / 5 + 150 + 7.5
-        end_x =  3.5 * offset + node.relatedNodes[0].features.length * 6 + node.features.length * 3 + 100 // the horizontal distance is offset(600) + moveoffset(300)
+        end_x =  3.5 * offset + node.relatedNodes[0].features.length * rectHeight * 2 + node.features.length * 3 + 100 // the horizontal distance is offset(600) + moveoffset(300)
         end_y = height / 5 + 150 + 7.5
   
         color = calculateAverage(node.features); // to be determined
@@ -643,7 +646,7 @@ for (let i = 0; i < node.features.length; i++) {
   
         paths.push(aggregatedToFinal);
   
-        start_x =  3.5 * offset + node.relatedNodes[0].features.length * 6 + node.features.length * 3 + 35
+        start_x =  3.5 * offset + node.relatedNodes[0].features.length * 2 * rectHeight + node.features.length * 3 + 35
         start_y = height / 5 + 100 + 7.5
   
         let control1_x = start_x + (end_x - start_x) * 0.2;
@@ -690,7 +693,7 @@ for (let i = 0; i < node.features.length; i++) {
     }, 3500);
 
     const outputGroup = g3.append("g")
-      .attr("transform", `translate(${3.5 * offset + node.relatedNodes[0].features.length * 6 + node.features.length * 3 + 95}, ${height / 5 + 150})`);
+      .attr("transform", `translate(${3.5 * offset + node.relatedNodes[0].features.length * 2 * rectHeight + node.features.length * 3 + 95}, ${height / 5 + 150})`);
   
     outputGroup.selectAll("rect")
       .data(node.features)
@@ -755,6 +758,15 @@ for (let i = 0; i < node.features.length; i++) {
     if (node.graphIndex === 5) {
       endNumber = 2;
     }
+    let rectHeight = 3;
+    if (node.graphIndex === 1){
+      rectHeight = 10;
+    }
+    let translateOffset = 0;
+    if (node.graphIndex === 1){
+      translateOffset = 140;
+    }
+
   
     if (!svg.selectAll) {
       svg = d3.select(svg);
@@ -843,7 +855,7 @@ for (let i = 0; i < node.features.length; i++) {
             .delay(2000)
             .duration(1000)
             .attr("opacity", 1)
-            .attr("transform", `translate(${node.featureGroupLocation.xPos - 2.5 * offset + (moveOffset - node.features.length * 3 - node.relatedNodes[0].features.length * 6) - 100 + 12.5}, ${node.featureGroupLocation.yPos - height / 5 - 150 - node.features.length * 3}) rotate(90)`);
+            .attr("transform", `translate(${node.featureGroupLocation.xPos - 2.5 * offset + (moveOffset - node.features.length * 3 - node.relatedNodes[0].features.length * 2 * rectHeight) - 100 + 12.5 - translateOffset}, ${node.featureGroupLocation.yPos - height / 5 - 150 - node.features.length * 3}) rotate(90)`);
               
             }, 2000);
             
@@ -884,7 +896,7 @@ for (let i = 0; i < node.features.length; i++) {
       let end_y = e[1];
   
       let control_x = (start_x + end_x) * 0.5
-      let control_y = start_y - 100;
+      let control_y = start_y + 100;
  
   
       svg.append("path")
@@ -994,15 +1006,14 @@ for (let i = 0; i < node.features.length; i++) {
         n.featureGroup.transition() 
           .delay(2000)
           .duration(1000)
-          .attr("transform", `translate(${xPos + 20}, ${yPos + i * 40 + 100}) rotate(-90)`);
+          .attr("transform", `translate(${xPos + 27.5}, ${yPos + i * 47.5 + 100}) rotate(-90)`);
       }
       if (n.featureGroupLocation) {
         x = n.featureGroupLocation.xPos; 
         y = n.featureGroupLocation.yPos; 
         coordinate = {xPos: x, yPos: y};
         originalCoordinates.push(coordinate);
-        n.featureGroupLocation.xPos = xPos;
-        n.featureGroupLocation.yPos = yPos + i * 40 + 100;
+
 
       }
     });
@@ -1017,24 +1028,21 @@ for (let i = 0; i < node.features.length; i++) {
       if (n.graphIndex <= 3) {
         n.featureGroup.transition()
           .duration(1000)
-          .attr("transform", `translate(${xPos}, ${yPos + 5 - n.features.length * 3}) rotate(0)`);
+          .attr("transform", `translate(${xPos - 7.5}, ${yPos + 5 - n.features.length * 3 - 4.5}) rotate(0)`);
       }
       else {
         n.featureGroup.transition()
         .duration(1000)
-        .attr("transform", `translate(${xPos}, ${yPos + 200 - n.features.length * 3}) rotate(0)`);
+        .attr("transform", `translate(${xPos - 7.5}, ${yPos + 200 - n.features.length * 3 - 4.5}) rotate(0)`);
       }
-      if (n.featureGroupLocation) {
-        n.featureGroupLocation.xPos = xPos;
-        n.featureGroupLocation.yPos = yPos;
-      }
+
     });
   }
 
   export function fcLayerCalculationVisualizer(node: any, relatedNodes:any, offset: number, height: number, moveOffset: number, graphIndex: number, svg: any, state: State) {
 
-    let moveToX =  (graphIndex) * offset - 300;
-    let moveToY = height / 8;
+    let moveToX =  (graphIndex) * offset - 450;
+    let moveToY = height / 7;
     let originalCoordinates = moveFeatures(relatedNodes, moveToX, moveToY );
 
     if (!svg.selectAll) {
@@ -1097,8 +1105,10 @@ for (let i = 0; i < numRect.length; i++) {
 }
 
 
-
-      poolingLayerInteraction(node, g4, numRect, rectL, posNeed, posPlus, state);
+  setTimeout(() => {
+    poolingLayerInteraction(node, g4, numRect, rectL, posNeed, posPlus, state);
+  }, 1500)
+      
     
     document.addEventListener('click', function() {
       console.log("document clicked")

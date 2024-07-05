@@ -27,9 +27,9 @@ export interface FeatureGroupLocation {
   xPos: number;
   yPos: number;
 }
-export const linkStrength = d3.scaleLinear()
+export const linkStrength = d3.scaleLinear<string>()
   .domain([-0.25, 0, 0.25])
-  .range([0.1, 0.3, .6]);
+  .range(["gray", "darkgray", "black"]);
 
 
 
@@ -458,9 +458,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
     let currentWeights: any[] = [];
     let currentBias: any[] = []
     let moveOffset = 900;
-    if (graphIndex === 1) {
-      moveOffset = 600
-    }
+
 
 
     // do some calculation that sill be used in the animation
@@ -544,15 +542,20 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
         const featureGroup = g2.append("g")
           .attr("transform", `translate(${xPos - 7.5}, ${yPos})`);
 
+
+          let rectHeight = 3;
+          if (graphIndex === 0) {
+            rectHeight = 10
+          }
   
         featureGroup.selectAll("rect")
           .data(features)
           .enter()
           .append("rect")
           .attr("x", 0)
-          .attr("y", (d: any, i: number) => i * 3 + 5)
+          .attr("y", (d: any, i: number) => i * rectHeight + 5)
           .attr("width", 15)
-          .attr("height", 3)
+          .attr("height", rectHeight)
           .attr("class", "node-features")
           .attr("id", (d: any, i: number) => "conv" + graphIndex + "-layer-rect-" + i) 
           .style("fill", (d: number) => myColor(d))
@@ -562,7 +565,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
         featureGroup.append("text")
           .attr("x", 10)
-          .attr("y", node.features.length * 3 + 10)
+          .attr("y", node.features.length * rectHeight + 10)
           .attr("dy", ".35em")
           .text(node.id)
           .style("font-size", "12px")
@@ -573,7 +576,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
 
         
-        yPos = yPos + 3 * node.features.length; //the bottom of the featureGroup 
+        yPos = yPos + rectHeight * node.features.length; //the bottom of the featureGroup 
         let featureGroupLocation: FeatureGroupLocation = {xPos, yPos}; 
 
         node.featureGroup = featureGroup;
@@ -618,7 +621,10 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
               return;
             }
             hideAllLinks(allNodes);
-            calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, moveOffset);
+            if (graphIndex === 1) {
+              rectHeight = 20;
+            }
+            calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, moveOffset, rectHeight);
             
             let relatedNodes: any = [];
             if (node.relatedNodes) {
@@ -654,7 +660,10 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             }
 
             hideAllLinks(allNodes);
-            calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, moveOffset);
+            if (graphIndex === 1) {
+              rectHeight = 20;
+            }
+            calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, moveOffset, rectHeight);
             
             let relatedNodes: any = [];
             if (node.relatedNodes) {
@@ -725,7 +734,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             if (node.links) {
               node.links.forEach((link: any) => {
                 const avg = calculateAverage(node.features);
-                link.style("opacity", linkStrength(avg))
+                link.style("opacity", 1)
               });
             }
           }
@@ -736,7 +745,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             if (node.links) {
               node.links.forEach((link: any) => {
               
-                link.style("opacity", 0.07);
+                link.style("opacity", 0.1);
               });
             }
           }
@@ -802,9 +811,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
       svg.selectAll(".vis-component")
         .style("opacity", 0);
       let moveOffset = 900
-      if (movedNode.graphIndex === 1) {
-        moveOffset = 600
-      }  
+
       if (movedNode.graphIndex >= 4) {
         moveOffset = 200;
       }
@@ -872,13 +879,13 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
               const controlY1 = node.y + 10;
               const controlX2 = node.x + xOffset1 + (neighborNode.x + xOffset2 - node.x - xOffset1) * 0.7;
               const controlY2 = neighborNode.y + 10;
-
+              const avg = calculateAverage(node.features)
 
               const path = svg.append("path")
                 .attr("d", `M ${node.x + xOffset1 + 16} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${neighborNode.x + (neighborNode.graphIndex - 2.5) * offset - 16} ${neighborNode.y + 10}`)
-                .style("stroke", 'black')
-                .style("stroke-width", 2)
-                .style("opacity", 0.07)
+                .style("stroke", linkStrength(avg))
+                .style("stroke-width", 1)
+                .style("opacity", 0.1)
                 .style("fill", "none");
 
 
@@ -900,13 +907,13 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
               const controlX2 = node.x + xOffset1 + (nextNode.x + xOffsetNext - node.x - xOffset1) * 0.7;
               const controlY2 = nextNode.y + 10;
 
-
+              const avg = calculateAverage(node.features)
 
               const path = svg.append("path")
                 .attr("d", `M ${node.x + xOffset1 + 16} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffsetNext - 16} ${nextNode.y + 10}`)
-                .style("stroke-width", 2)
-                .style("opacity", 0.07)
-                .style("stroke", 'black')
+                .style("stroke-width", 1)
+                .style("opacity", 0.1)
+                .style("stroke", linkStrength(avg))
                 .style("fill", "none");
   
       
@@ -947,9 +954,9 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
 
             
             const path = svg.append("path")
-              .attr("d", `M ${node.x + xOffset1 + 16} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 16} ${nextNode.y + 10}`)
-              .style("stroke", 'black')
-              .style("opacity", linkStrength(avg))
+              .attr("d", `M ${node.x + xOffset1} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 20} ${nextNode.y + 10}`)
+              .style("stroke", linkStrength(avg))
+              .style("opacity", 0.1)
               .style('stroke-width', 1)
               .style("fill", "none");
            
