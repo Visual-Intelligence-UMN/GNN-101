@@ -12,6 +12,7 @@ import * as math from "mathjs";
 import { create, all, matrix } from "mathjs";
 import { inter } from "@/pages";
 import { off } from "process";
+import { injectPlayButtonSVGForGraphView } from "./svgUtils";
 
 export const pathColor = d3
     .scaleLinear<string>()
@@ -895,32 +896,14 @@ function weightAnimation(
     // Pause and replay button
     const btn = svg.append("g").attr("class", "button-group");
 
-    btn.append("circle")
-        .attr("cx", endCoordList[0][0] - 100)
-        .attr("cy", node.y - 100)
-        .attr("r", 25)
-        .style("fill", "white")
-        .style("stroke", "black")
-        .style("stroke-width", 1)
-        .attr("opacity", 1)
-        .attr("class", "vis-component");
-
-    btn.append("text")
-        .attr("x", endCoordList[0][0] - 100)
-        .attr("y", node.y - 100)
-        .attr("dy", ".50em")
-        .text("pause")
-        .style("font-size", "16px")
-        .style("fill", "black")
-        .attr("class", "vis-component button-discri")
-        .attr("opacity", 1)
-        .style("text-anchor", "middle");
+    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - 100, "./assets/SVGs/playBtn_pause.svg")
 
     btn.on("click", function (event: any) {
         event.stopPropagation();
         isPlaying = !isPlaying;
         console.log(isPlaying);
-        d3.select(".button-discri").text(isPlaying ? "pause" : "play");
+        if(isPlaying)injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - 100, "./assets/SVGs/playBtn_pause.svg");
+        else injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - 100, "./assets/SVGs/playBtn_play.svg")
         if (isPlaying) {
             startAnimation(endNumber);
         } else {
@@ -957,14 +940,16 @@ function weightAnimation(
                     startCoordList,
                     endCoordList,
                     svg,
-                    isAnimating
+                    isAnimating,
+                    btn,
+                    node
                 );
                 i++;
                 if (i >= endNumber) {
                     clearInterval(intervalID);
                     isPlaying = false;
                     d3.selectAll(`#tempath${i - 1}`).remove();
-                    d3.select(".button-discri").text("play");
+                    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - 100, "./assets/SVGs/playBtn_play.svg")
                     setTimeout(() => {
                         d3.selectAll(".bias").style("opacity", 1);
                         d3.selectAll(".softmax").attr("opacity", 0.07);
@@ -1012,7 +997,9 @@ function GraphViewDrawPaths(
     startCoordList: number[][],
     endCoordList: number[][],
     svg: any,
-    isAnimating: boolean
+    isAnimating: boolean,
+    btn:any,
+    node:any
 ) {
     if (!svg.selectAll) {
         svg = d3.select(svg);
