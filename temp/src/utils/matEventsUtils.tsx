@@ -616,10 +616,17 @@ export function featureVisClick(
         {func: () => {curNode.style.opacity = "1";},delay: aniSec,},
         {func: () => {d3.select(".ctrlBtn").style("pointer-events", "auto");},delay: 1,},
     ];
+
+    let aniPathSec = 50;
+
     const animateSeq: any = [
         {func: () => drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir), delay: initSec + aniSec,},
         {func: () => {setTimeout(() => {
+                    aniPathSec = 50;
+                    aniPathSec += 4 * Math.abs(featureChannels/2 - currentStep);
+                    clearInterval(intervalID);
                     intervalID = setInterval(() => {
+                        
                         drawAniPath(
                             Xt,
                             currentStep,
@@ -666,7 +673,7 @@ export function featureVisClick(
                             isPlaying = false;
                             clearInterval(intervalID);
                         }
-                    }, 250);
+                    }, aniPathSec);
                     setIntervalID(intervalID);
                     d3.selectAll("#tempath").lower();
                 }, 2);
