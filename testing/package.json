@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "http-server": "^14.1.1",
+    "lite-server": "^2.6.1"
+  },
+  "scripts": {
+    "start": "npx http-server -p 8080"
+  }
+}
