@@ -1,11 +1,9 @@
 import Head from "next/head";
 import React, { useEffect, useRef, useState } from "react";
-import { Scrollbar } from "react-scrollbars-custom";
 import GraphVisualizer from "./GraphVisualizer";
 import ClassifyGraph from "./FileUpload";
 // import { CSSTransition } from 'react-transition-group';
 import MatricesVisualizer from "./MatricesVisualizer";
-import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels";
 import { IntmData, IntmDataNode } from "../types";
 import { graphList, modelList, nodeList } from "./const";
 import Sidebar from "./Sidebar";
@@ -13,15 +11,12 @@ import styles from "./index.module.css";
 
 import {
   Selector,
-  ViewSelector,
   Hint,
   ButtonChain,
-  ModelButtonChain,
   ViewSwitch,
   GraphAnalysisViewer,
   NodeClassifierButtonChain,
 } from "./WebUtils";
-import { Tooltip } from "react-tooltip";
 import { Inter } from "@next/font/google";
 import NodeMatricesVisualizer from "./node_classifier/NodeMatrixVisualizer";
 import NodeGraphVisualizer from "./node_classifier/NodeGraphVisualizer";
@@ -117,7 +112,10 @@ export default function Home() {
           {/* <PanelGroup direction="horizontal"> */}
 
           <div className={` ${styles.body}  grid grid-cols-4 `}>
-            <Sidebar />
+            <Sidebar
+              isGraphView={isGraphView}
+              setIsGraphView={setIsGraphView}
+            />
 
             {/* <Panel className="ml-4"> */}
             {/* GNN model */}
