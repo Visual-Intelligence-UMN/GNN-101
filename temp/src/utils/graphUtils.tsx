@@ -900,13 +900,34 @@ for (let i = 0; i < node.features.length; i++) {
  
   
       svg.append("path")
-        .attr("d", `M${start_x},${start_y} Q ${control_x} ${control_y}, ${end_x},${end_y}`)
+        .attr(
+          "d", 
+          function () {
+            return [
+                "M",
+                start_x,
+                start_y,
+                "A",
+                (end_x - start_x) / 2,
+                ",",
+                (end_x - start_x) / 4,
+                0,
+                0,
+                ",",
+                0,
+                ",",
+                end_x,
+                ",",
+                end_y,
+            ].join(" ");
+          }
+        )
         .attr("stroke", myColor(Wi[63 - j]))
         .attr("stroke-width", 1)
         .attr("opacity", 1)
         .attr("fill", "none")
         .attr("class", "intermediate-path to-be-removed")
-        .attr("id", `tempath${i}`);
+        .attr("id", `tempath${i}`).lower();
     }
   
     if (isAnimating) {
