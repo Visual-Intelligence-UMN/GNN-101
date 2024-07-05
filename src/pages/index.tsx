@@ -9,6 +9,7 @@ import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels";
 import { IntmData, IntmDataNode } from "../types";
 import { graphList, modelList, nodeList } from "./const";
 import Sidebar from "./Sidebar";
+import styles from "./index.module.css";
 
 import {
   Selector,
@@ -81,7 +82,7 @@ export default function Home() {
   }
 
   useEffect(() => {
-    (document.body.style as any).zoom = "67%";
+    (document.body.style as any).zoom = "70%";
   }, []);
 
   return (
@@ -107,12 +108,20 @@ export default function Home() {
         )}
       </div>
       {step === 1 && (
-        <div className="bg-white min-h-screen text-black">
-          <PanelGroup direction="horizontal">
+        <div className="bg-white text-black">
+          <div className={styles.header}>
+            <h1 className="text-3xl text-left">
+              Looks like We need a name and a logo here
+            </h1>
+          </div>
+          {/* <PanelGroup direction="horizontal"> */}
+
+          <div className={` ${styles.body}  grid grid-cols-4 `}>
             <Sidebar />
 
-            <Panel className="ml-4">
-              {/* GNN model */}
+            {/* <Panel className="ml-4"> */}
+            {/* GNN model */}
+            <div className="col-span-3 ml-4">
               <div
                 className="flex gap-x-2 items-center"
                 style={{ paddingTop: "40px" }}
@@ -306,8 +315,10 @@ export default function Home() {
                   )}
                 </div>
               )}
-            </Panel>
-          </PanelGroup>
+              {/* </Panel> */}
+              {/* </PanelGroup> */}
+            </div>
+          </div>
         </div>
       )}
     </main>

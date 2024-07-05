@@ -1,9 +1,10 @@
 .sidebar {
-  top: 0;
+  /* top: 0;
   position: relative;
   left: 0;
-  width: 35vw;
-  min-height: 100vh;
+  width: 35vw; */
+  /* min-height: calc(100vh - var(--header-height)); */
+  height: calc((100vh - var(--header-height)) / var(--zoom-ratio));
   background-color: white;
   padding: 10px;
   overflow-y: visible;
