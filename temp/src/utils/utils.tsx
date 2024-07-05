@@ -4,8 +4,8 @@ import * as d3 from "d3";
 import { loadWeights } from "./matHelperUtils";
 import * as ort from "onnxruntime-web";
 import { env } from "onnxruntime-web";
-import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature } from "@/utils/graphUtils";
-import { features } from 'process';
+import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature, outputVisualizer } from "@/utils/graphUtils";
+import { features, off } from 'process';
 import { IGraphData, IntmData, IntmDataNode } from "../types/";
 
 import { 
@@ -17,6 +17,7 @@ import {
   highlightNodes,
   moveNextLayer
 } from "@/utils/graphUtils"
+import { stat } from "fs";
 
 env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
@@ -26,6 +27,10 @@ export interface FeatureGroupLocation {
   xPos: number;
   yPos: number;
 }
+export const linkStrength = d3.scaleLinear()
+  .domain([-0.25, 0, 0.25])
+  .range([0.1, 0.3, .6]);
+
 
 
 export function preprocessFloat32ArrayToNumber(matrix: any): number[][] {
@@ -424,7 +429,13 @@ export const myColor = d3.scaleLinear<string>()
 .range(["orange", "white", "#69b3a2"]);
 
 
+export interface State {
+  isClicked: boolean;
+}
 
+export const state: State = {
+  isClicked: false // if isClicked is true, all mouseover/out operation would be banned and some certain functions would be called
+};
 
 
 export function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, graphs: any[]) {
@@ -445,7 +456,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
   
   let movedNode: any = null; // to prevent the same node is clicked twice
   
-  let isClicked = false; // if isClicked is true, all mouseover/out operation would be banned and some certain functions would be called
+
 
 
 
@@ -455,6 +466,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
     let aggregatedDataMap: any[] = [];
     let calculatedDataMap: any[] = [];
     let currentWeights: any[] = [];
+    let currentBias: any[] = []
     let moveOffset = 900;
     if (graphIndex === 1) {
       moveOffset = 600
@@ -464,6 +476,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
     // do some calculation that sill be used in the animation
     if (graphs.length != 0 && graphIndex > 0 && graphIndex < 4) {
     currentWeights = weights[graphIndex - 1];
+    currentBias = bias[graphIndex - 1]
       
 
      let featureMap: number[][] = [];
@@ -578,7 +591,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
         // add interaction 
         node.svgElement.addEventListener("mouseover", function(this: any) {
-          if (!isClicked) {
+          if (!state.isClicked) {
             highlightNodes(node);
             if (node.relatedNodes) {
               reduceNodeOpacity(allNodes, node.relatedNodes, node);
@@ -586,7 +599,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           }
         });
         node.text.on("mouseover", function() {
-          if (!isClicked) {
+          if (!state.isClicked) {
             highlightNodes(node);
             if (node.relatedNodes) {
               reduceNodeOpacity(allNodes, node.relatedNodes, node);
@@ -595,12 +608,12 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
         });
 
         node.text.on("mouseout", function() {
-          if (!isClicked) {
+          if (!state.isClicked) {
             resetNodes(allNodes);
           }
         });
         node.svgElement.addEventListener("mouseout", function(this: any) {
-          if (!isClicked) {
+          if (!state.isClicked) {
             resetNodes(allNodes);
           }
         });
@@ -609,11 +622,13 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
         //click logic
         if (node.graphIndex != 0) {
           node.text.on("click", function(event:any) {
-            if (isClicked) {
+            event.stopPropagation();
+            event.preventDefault();
+            if (state.isClicked) {
               return;
             }
             hideAllLinks(allNodes);
-            calculationVisualizer(node, currentWeights, bias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, isClicked, moveOffset);
+            calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, moveOffset);
             
             let relatedNodes: any = [];
             if (node.relatedNodes) {
@@ -621,8 +636,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             } 
             reduceNodeOpacity(allNodes, relatedNodes, node);
             
-            event.stopPropagation(); 
-            isClicked = true;
+            state.isClicked = true;
 
 
             // prevent clicking on other nodes and move the layers to the right again
@@ -632,7 +646,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           
             if (movedNode) {
               moveNextLayer(svg, movedNode, moveOffset, -1)
-              isClicked = false; 
+              state.isClicked = false; 
               movedNode = null;
             }
 
@@ -643,12 +657,14 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
 
           node.svgElement.addEventListener("click", function(event: any) {
-            if (isClicked) {
+            event.stopPropagation();
+            event.preventDefault();
+            if (state.isClicked) {
               return;
             }
 
             hideAllLinks(allNodes);
-            calculationVisualizer(node, currentWeights, bias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, isClicked, moveOffset);
+            calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, moveOffset);
             
             let relatedNodes: any = [];
             if (node.relatedNodes) {
@@ -656,18 +672,17 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             } // to make sure relatedNodes is not null
             reduceNodeOpacity(allNodes, relatedNodes, node);
             
-            event.stopPropagation(); // Prevent the click event from bubbling up
-            isClicked = true;
+            state.isClicked = true;
 
             if (movedNode === node) {
               return; // Do nothing if the node is already moved
             }
           
 
-            if (movedNode) {
+            if (movedNode && movedNode != node) {
               // Move back the previously moved node and its layer
               moveNextLayer(svg, movedNode, moveOffset, -1)
-              isClicked = false; 
+              state.isClicked = false; 
               movedNode = null;
             }
 
@@ -682,8 +697,10 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
         // for the pooling layer(graphIndex = 3), the rectHeight = 2, for the other 2 layers, rectHeight = 20;
         let rectHeight = 3;
+        let rectName = "pooling"
         if (node.graphIndex >= 5) {
           rectHeight = 20;
+          rectName = "output";
         }
         let groupCentralHeight = rectHeight * features.length / 2;
         let yOffset = groupCentralHeight - (height / 5);
@@ -696,29 +713,25 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .enter()
           .append("rect")
           .attr("x", -10) //adjust x and y coordination so it locates in the middle of the graph
-          .attr("y", (d: any, i: number) => i * rectHeight - 100)
+          .attr("y", (d: any, i: number) => i * rectHeight - 190)
           .attr("width", 15)
-          .attr("id", (d: any, i: number) => "pooling-layer-rect-" + i) 
+          .attr("id", (d: any, i: number) => rectName +"-layer-rect-" + i) 
           .attr("height", rectHeight)
           .attr("class", "node-features")
           .style("fill", (d: number) => myColor(d))
           .style("stroke-width", 1)
           .style("stroke", "grey")
           .style("opacity", 1);
-
+        
         node.featureGroup = featureGroup;
         xPos = node.x;
-        yPos = node.y + rectHeight * node.features.length + 25; 
+        yPos = node.y + rectHeight * node.features.length + yOffset; 
         let featureGroupLocation: FeatureGroupLocation = {xPos, yPos}; 
         node.featureGroupLocation = featureGroupLocation; // this will be used in calculationvisualizer
 
-        const linkStrength = d3.scaleLinear()
-          .domain([-0.25, 0, 0.25])
-          .range([0.1, 0.3, .6]);
-        
         
         node.featureGroup.on("mouseover", function() {
-          if (!isClicked) {
+          if (!state.isClicked) {
             if (node.links) {
               node.links.forEach((link: any) => {
                 const avg = calculateAverage(node.features);
@@ -729,36 +742,44 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
         });
 
         node.featureGroup.on("mouseout", function() {
-          if (!isClicked) {
+          if (!state.isClicked) {
             if (node.links) {
               node.links.forEach((link: any) => {
-                const avg = calculateAverage(node.features);
+              
                 link.style("opacity", 0.07);
               });
             }
           }
         });
         node.featureGroup.on("click", function(event: any) {
-          event.stopPropagation()
-          if (isClicked) {
+          event.stopPropagation();
+          event.preventDefault();
+          if (state.isClicked) {
             return;
           }
-          isClicked = true;
+          state.isClicked = true;
 
 
-          hideAllLinks(allNodes);
+
           highlightNodes(node);
+          hideAllLinks(allNodes);
           // calculationVisualizer(node, currentWeights, bias, aggregatedDataMap, calculatedDataMap, svg, offset, isClicked);
           let relatedNodes: any = [];
             if (node.relatedNodes) {
               relatedNodes = node.relatedNodes;
             } // to make sure relatedNodes is not null
             showFeature(node);
-            fcLayerCalculationVisualizer(node, relatedNodes, offset, height, moveOffset, node.graphIndex, g2, isClicked);
+            if (node.graphIndex === 4) {
+              fcLayerCalculationVisualizer(node, relatedNodes, offset, height, moveOffset, node.graphIndex, g2, state);
+            }
+            if (node.graphIndex === 5) {
+              console.log("CAWCAW", node.relatedNodes, weights, bias)
+              outputVisualizer(node, weights[3], bias[3], g2, offset, state.isClicked, moveOffset, height)
+            }
             
             reduceNodeOpacity(allNodes, relatedNodes, node);
             event.stopPropagation(); // Prevent the click event from bubbling up
-            isClicked = true;
+            state.isClicked = true;
 
             if (movedNode === node) {
               return; // Do nothing if the node is already moved
@@ -768,7 +789,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             if (movedNode) {
               // Move back the previously moved node and its layer
               moveNextLayer(svg, movedNode, moveOffset, -1)
-              isClicked = false; 
+              state.isClicked = false; 
               movedNode = null;
             }
 
@@ -784,6 +805,9 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
   // Add a global click event to the document to reset the moved node and isClicked flag
   document.addEventListener("click", function(event: any) {
+    if (!movedNode || !state.isClicked) {
+      return;
+    }
     if (movedNode && (!event.target.classList.contains("vis-component"))) {
       svg.selectAll(".vis-component")
         .style("opacity", 0);
@@ -795,13 +819,13 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
         moveOffset = 200;
       }
       moveNextLayer(svg, movedNode, moveOffset, -1)
-      isClicked = false; 
+      state.isClicked = false; 
       movedNode = null;
       showAllLinks(allNodes);
       resetNodes(allNodes);
       resetNodes(allNodes);
     }
-  }, { capture: true });
+  });
 }
 
 
@@ -815,9 +839,7 @@ export function calculateAverage(arr: number[]): number {
 export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset: number) {
   const nodesByIndex = d3.group(nodes, (d: any) => d.graphIndex);
 
-  const linkStrength = d3.scaleLinear()
-    .domain([-0.25, 0, 0.25])
-    .range([0.1, 0.3, .6]);
+
 
 
   nodesByIndex.forEach((nodes, graphIndex) => {
@@ -929,19 +951,16 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
             let nextNode = nextLayer.nodes[0];
 
             const controlX1 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.3;
-            const controlY1 = node.y;
+            const controlY1 = node.y + 10;
             const controlX2 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.7;
-            const controlY2 = nextNode.y;
-            let offset = 100;
-            let offset1 = 0;
-            if (graphIndex == 4) {
-              offset1 = 100
-            }
+            const controlY2 = nextNode.y + 10;
+
+            
             const path = svg.append("path")
-              .attr("d", `M ${node.x + xOffset1 + 16} ${node.y + offset1} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 16} ${nextNode.y + offset}`)
+              .attr("d", `M ${node.x + xOffset1 + 16} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 16} ${nextNode.y + 10}`)
               .style("stroke", 'black')
               .style("opacity", linkStrength(avg))
-              .style('stroke-width', 2)
+              .style('stroke-width', 1)
               .style("fill", "none");
            
   

@@ -6,7 +6,7 @@ import {
   prep_graphs,
   connectCrossGraphNodes,
   featureVisualizer,
-  softmax,
+  softmax
 } from "../utils/utils";
 
 import { visualizeGraph, getInitialCoordinates } from "./WebUtils";
@@ -118,12 +118,16 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           labels.attr("opacity", 0);
         }
         data.nodes.forEach((node: any) => {
+  
           if (initialCoords[node.id]) {
             node.x = initialCoords[node.id].x;
             node.y = initialCoords[node.id].y;
           } else {
             node.x = Math.random() * width;
             node.y = Math.random() * height;
+          }
+          if (i >= 4) {
+            node.y = height / 3;
           }
         });
         // This is needed to connect links to the nodes within its own graph.
@@ -166,6 +170,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             .attr("cx", (d: any) => d.x)
             .attr("cy", (d: any) => d.y);
 
+
           labels
             .attr("x", (d: any) => d.x - 6)
             .attr("y", (d: any) => d.y + 6);
@@ -196,6 +201,8 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
           labels.attr("x", (d: any) => d.x - 6)
             .attr("y", (d: any) => d.y + 6);
+
+
 
 
           let value = null;
