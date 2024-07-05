@@ -151,7 +151,7 @@ export function detailedViewRecovery(
         resultLabelsList.forEach((element:any) => {
             element.style.fill = "gray";
         });
-        translateLayers(3, -150);
+        translateLayers(3, -250);
 
     }else{
         translateLayers(4, -300);

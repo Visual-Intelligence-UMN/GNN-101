@@ -310,7 +310,7 @@ export function drawWeightsVector(
             .attr("opacity", 0)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1)
-            .attr("class", "procVis removeRect")
+            .attr("class", "procVis wRect")
             .attr("id", `weightRect${m}`);
     }
 
@@ -324,8 +324,8 @@ export function drawWeightsVector(
         .attr("opacity", 1)
         .attr("stroke", "black")
         .attr("stroke-width", 1)
-        .attr("class", "procVis");
- //   d3.selectAll(".procVis").transition().duration(100).attr("opacity", 1);
+        .attr("class", "procVis wRect");
+    d3.selectAll(".wRect").transition().duration(100).attr("opacity", 1);
 }
 
 export function drawBiasVector(

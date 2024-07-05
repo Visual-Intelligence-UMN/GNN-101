@@ -20,10 +20,11 @@ import {
     resultVisMouseEvent
 } from "./matEventsUtils";
 import { drawPoints } from "./utils";
-import { AnimationController, drawAniPath, drawBiasPath, drawBiasVector, drawPathBtwOuputResult, drawPathInteractiveComponents } from "./matAnimateUtils";
+import { AnimationController, drawAniPath, drawBiasPath, drawBiasVector, drawPathBtwOuputResult, drawPathInteractiveComponents, drawWeightsVector } from "./matAnimateUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
 import { roundToTwo } from "@/pages/WebUtils";
 import { drawSoftmaxDisplayerNodeClassifier } from "./matInteractionUtils";
+import { create, all } from "mathjs";
 
 //Graph Classifier： features visualization pipeline: draw all feature visualizers for original features and GCNConv
 export function visualizeGraphClassifierFeatures(
@@ -697,7 +698,7 @@ export function visualizeNodeClassifierFeatures(
             const layerID = 3;
             const node = Number(d3.select(this).attr("node"));
             setTimeout(() => {
-                translateLayers(3, 150);
+                translateLayers(3, 250);
             }, 1750);
 
             console.log("CST before modification", colorSchemesTable);
@@ -746,7 +747,7 @@ export function visualizeNodeClassifierFeatures(
 
             //start coordinate for result <- the ending point for final path
             let startResultCoord:[number, number] = [
-                prevFeatureCoord[0] + 350,
+                prevFeatureCoord[0] + 450,
                 prevFeatureCoord[1] //may need adjust to top-left pos
             ];
 
@@ -757,15 +758,27 @@ export function visualizeNodeClassifierFeatures(
             //find the position for the bias vector <- we use this positio to compute the position for bias vector
             //coordinate for model output <- the position for model output feature visualizer
             let biasCoord:[number, number] = [
-                prevFeatureCoord[0] + 50,
+                prevFeatureCoord[0] + 150,
                 prevFeatureCoord[1] + curveDir * 50 //may need adjust to top-left pos
             ];
 
             //find the ending position of bias vector <- we use this for bias path computing - ending point
             let endBiasPathCoord:[number, number] = [
-                prevFeatureCoord[0] + 150,
+                prevFeatureCoord[0] + 250,
                 prevFeatureCoord[1] //may need adjust to top-left pos
             ];
+
+            //starting point for final values visualizer
+            let finalOutputCoord: [number, number] = [
+                endBiasPathCoord[0],
+                endBiasPathCoord[1]
+            ];
+
+            let vectorAfterMatMulPath:[number, number] = [
+                finalOutputCoord[0] - 6 * 10,
+                finalOutputCoord[1]
+            ];
+
 
             //find the ending position of bias vector <- we use this for bias path computing
             let endBiasCoord:[number, number] = [
@@ -788,12 +801,12 @@ export function visualizeNodeClassifierFeatures(
             ]; //compute the ending positions of the paths animation
 
             //find the coordination for softmax visualization
-            const yForSoftmax = prevFeatureCoord[1]+curveDir*7.5;
+            const yForSoftmax = prevFeatureCoord[1]-curveDir*7.5;
             let softmaxStartCoords = [
-                [outputCoord[0]+5, yForSoftmax],
-                [outputCoord[0]+15, yForSoftmax],
-                [outputCoord[0]+25, yForSoftmax],
-                [outputCoord[0]+35, yForSoftmax]
+                [finalOutputCoord[0]+5, yForSoftmax],
+                [finalOutputCoord[0]+15, yForSoftmax],
+                [finalOutputCoord[0]+25, yForSoftmax],
+                [finalOutputCoord[0]+35, yForSoftmax]
             ]; //compute the starting positions of the softmax vis
 
             //find the positions for softmax ending position
@@ -810,10 +823,17 @@ export function visualizeNodeClassifierFeatures(
             const matMulWeights = modelParams["weights"][3]; // weights for matrix multiplication
             const nthOutputVals = final[node];
 
+            //the vector after matrix multiplication - before adding the bias
+            const math = create(all, {});
+            const prevCon3Val = [conv3[node][0], conv3[node][1]];
+            const vectorAfterMul = math.multiply(prevCon3Val, math.transpose(matMulWeights));
+
             console.log("data fetching in the NC result layer",
                 linBias,
                 matMulWeights,
-                nthOutputVals
+                nthOutputVals,
+                conv3,
+                vectorAfterMul
             );
             //visualization <- replace this by animation sequence
             const g = d3.select(".mats");
@@ -833,26 +853,17 @@ export function visualizeNodeClassifierFeatures(
                 featureVisTable[3][node+1].style.opacity = "0";
                 featureVisTable[3][node+2].style.opacity = "0";
                 //process curLayer
-                if(node-1>=0){
-                    featureVisTable[4][node-1].style.opacity = "0";
-                }
-                if(node-2>=0){
-                    featureVisTable[4][node-2].style.opacity = "0";
-                }
+                featureVisTable[4][node+1].style.opacity = "0";
+                featureVisTable[4][node+2].style.opacity = "0";
             }else{
                 //process prevLayer
                 featureVisTable[3][node-1].style.opacity = "0";
                 featureVisTable[3][node-2].style.opacity = "0";
                 //process curLayer
-                if(node+1<34){
-                    featureVisTable[4][node+1].style.opacity = "0";
-                }
-                if(node+2<34){
-                    featureVisTable[4][node+2].style.opacity = "0";
-                }
+                featureVisTable[4][node-1].style.opacity = "0";
+                featureVisTable[4][node-2].style.opacity = "0";
             }
 
-            
             //animation
             //play button injection
             const btn = d3.select(".mats").append("g").attr("class", "ctrlBtn");
@@ -870,6 +881,11 @@ export function visualizeNodeClassifierFeatures(
             let pathMap: any = null;
 
             const animateSeqAfterPath = [
+                {func:()=>{
+                    //draw a final value output visualizer for testing
+                    drawWeightsVector(g, nthOutputVals, finalOutputCoord, 15, 10, myColor);
+                    drawPathBtwOuputResult([vectorAfterMatMulPath], finalOutputCoord);
+                }, delay:aniSec}, 
                 {func:()=>{drawBiasVector(g, 4, 15, 10, biasCoord, myColor, linBias, 4);}, delay:aniSec},
                 {func:()=>{drawBiasPath(endBiasCoord, res10, res11, endBiasPathCoord, 4, 4);}, delay:aniSec},
            //     {func:()=>{drawPathBtwOuputResult([endOutputCoord], startResultCoord);}, delay:aniSec},
@@ -885,13 +901,15 @@ export function visualizeNodeClassifierFeatures(
                     intervalID = setInterval(() => {
                         const Xt = modelParams.weights[3];
                         const Xv = Xt[currentStep];
-                        drawAniPath(Xt, currentStep, startPathCoords, endPathCoords, curveDir, myColor, 0, outputCoord, 15, 10, nthOutputVals, g1);
+                        drawAniPath(Xt, currentStep, startPathCoords, endPathCoords, curveDir, myColor, 0, outputCoord, 15, 10, vectorAfterMul, g1);
                         currentStep++;
                         console.log("i", currentStep);
                         if (currentStep >= 4) {
                             AnimationController.runAnimations(0, animateSeqAfterPath);
                             setTimeout(()=>{
-                                pathMap = drawPathInteractiveComponents(softmaxStartCoords, softmaxEndCoords, nthOutputVals, myColor, clockwise);
+                                let dir = 1;
+                                if(clockwise==1)dir = 0;
+                                pathMap = drawPathInteractiveComponents(softmaxStartCoords, softmaxEndCoords, nthOutputVals, myColor, dir);
                             }, 1500);
                             btn.selectAll("*").remove();
                             injectPlayButtonSVG(
