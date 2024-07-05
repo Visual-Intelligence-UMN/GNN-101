@@ -4,7 +4,13 @@ An visualization project about the Graph Convolutional Neural Network.
 
 ## Getting Started
 
-First, run the development server:
+First, install all dependencies by using: 
+
+```bash
+npm install
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev
