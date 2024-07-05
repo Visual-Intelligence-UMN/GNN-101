@@ -206,7 +206,6 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
 
           let value = null;
-          let index = 0;
           if (intmData != null) {
             if (i === 1) {
               value = intmData.conv1;
@@ -223,6 +222,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             if (i === 5) {
               let final: any = intmData.final;
               value = softmax(final);
+
             }
           }
           data.nodes.forEach((node: any) => {
@@ -238,8 +238,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
 
             if (value != null && i >= 5) {
-              node.features.push(value[index]);
-              index = index + 1;
+              node.features = value;
             }
             allNodes.push(node);
           });
@@ -285,14 +284,24 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           if (graphWidth + tolerance < x_dist && graphHeight + tolerance < y_dist) {
             transform = `scale(1, 1)`;
           } 
-          if (i <4) {
+          if (i >= 4) {
+            point1.y -= 130;
+            point2.y -= 130;
+            point3.y += 70;
+            point4.y += 70;
+            point1.x += 15;
+            point4.x += 15;
+            point2.x -= 15;
+            point3.x -= 15;
+
+          }
           const parallelogram = g1
             .append("polygon")
             .attr("points", `${point1.x},${point1.y} ${point2.x},${point2.y} ${point3.x},${point3.y} ${point4.x},${point4.y}`)
             .attr("stroke", "black")
             .attr("fill", "none")
             .attr('transform', transform);
-          }
+          
 
 
           let text = " ";
