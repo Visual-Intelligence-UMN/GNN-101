@@ -8,4 +8,16 @@
 
 .body {
   height: calc((100vh - var(--header-height)) / var(--zoom-ratio));
+  overflow-y: auto;
+}
+
+.rightContainer {
+  display: flex;
+  flex-direction: column;
+  height: calc((100vh - var(--header-height)) / var(--zoom-ratio));
+}
+
+.vizContainer {
+  flex: 1; /* Allow div3 to fill remaining space */
+  overflow: auto;
 }

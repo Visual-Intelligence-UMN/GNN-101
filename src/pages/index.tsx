@@ -121,7 +121,7 @@ export default function Home() {
 
             {/* <Panel className="ml-4"> */}
             {/* GNN model */}
-            <div className="col-span-3 ml-4">
+            <div className={`${styles.rightContainer} col-span-3 ml-4`}>
               <div
                 className="flex gap-x-2 items-center"
                 style={{ paddingTop: "40px" }}
@@ -217,6 +217,8 @@ export default function Home() {
 
               <hr className="border-t border-gray-300 my-4"></hr>
 
+              {/* model visualization */}
+
               <div className="flex gap-x-4 items-center">
                 <div className="flex gap-x-4">
                   <h2 className="text-3xl font-black">
@@ -235,88 +237,90 @@ export default function Home() {
                 </div>
               </div>
 
-              {model == "graph classification" ? (
-                isGraphView ? (
-                  <>
-                    <GraphVisualizer
-                      graph_path={graphList[selectedGraph]}
-                      intmData={intmData}
-                      changed={changedG}
-                      predicted={predicted}
-                      selectedButtons={selectedButtons}
-                      simulationLoading={simulationLoading}
-                      setSimulation={setSimulation}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <MatricesVisualizer
-                      graph_path={graphList[selectedGraph]}
-                      intmData={intmData}
-                      changed={changedG}
-                      predicted={predicted}
-                      selectedButtons={selectedButtons}
-                    />
-                  </>
-                )
-              ) : isGraphView ? (
-                <NodeGraphVisualizer
-                  graph_path={nodeList[selectedGraph]}
-                  intmData={intmData}
-                  changed={changedG}
-                  predicted={predicted}
-                  selectedButtons={selectedButtons}
-                  simulationLoading={simulationLoading}
-                  setSimulation={setSimulation}
-                />
-              ) : (
-                <NodeMatricesVisualizer
-                  graph_path={nodeList[selectedGraph]}
-                  intmData={intmData}
-                  changed={changedG}
-                  predicted={predicted}
-                  selectedButtons={selectedButtons}
-                />
-              )}
-
-              {/* overlay text on visualizer when not predicted */}
-              {probabilities.length == 0 && (
-                <div className="absolute top-1/2 left-1/2 ">
-                  <h1 className="text-4xl text-gray-300">
-                    Model Visualization will show after prediction
-                  </h1>
-
-                  {model == "graph classification" ? (
-                    <ClassifyGraph
-                      graphPath={graphList[selectedGraph]}
-                      modelPath={modelList[model]}
-                      setChangedG={setChangedG}
-                      setIntmData={setIntmData}
-                      setPredicted={setPredicted}
-                      predicted={predicted}
-                      probabilities={probabilities}
-                      setProbabilities={setProbabilities}
-                      onlyShownButton={true}
-                      simulationLoading={simulationLoading}
-                    />
+              <div className={styles.vizContainer}>
+                {model == "graph classification" ? (
+                  isGraphView ? (
+                    <>
+                      <GraphVisualizer
+                        graph_path={graphList[selectedGraph]}
+                        intmData={intmData}
+                        changed={changedG}
+                        predicted={predicted}
+                        selectedButtons={selectedButtons}
+                        simulationLoading={simulationLoading}
+                        setSimulation={setSimulation}
+                      />
+                    </>
                   ) : (
-                    <ClassifyGraph
-                      graphPath={nodeList[selectedGraph]}
-                      modelPath={modelList[model]}
-                      setChangedG={setChangedG}
-                      setIntmData={setIntmData}
-                      setPredicted={setPredicted}
-                      predicted={predicted}
-                      probabilities={probabilities}
-                      setProbabilities={setProbabilities}
-                      onlyShownButton={true}
-                      simulationLoading={simulationLoading}
-                    />
-                  )}
-                </div>
-              )}
-              {/* </Panel> */}
-              {/* </PanelGroup> */}
+                    <>
+                      <MatricesVisualizer
+                        graph_path={graphList[selectedGraph]}
+                        intmData={intmData}
+                        changed={changedG}
+                        predicted={predicted}
+                        selectedButtons={selectedButtons}
+                      />
+                    </>
+                  )
+                ) : isGraphView ? (
+                  <NodeGraphVisualizer
+                    graph_path={nodeList[selectedGraph]}
+                    intmData={intmData}
+                    changed={changedG}
+                    predicted={predicted}
+                    selectedButtons={selectedButtons}
+                    simulationLoading={simulationLoading}
+                    setSimulation={setSimulation}
+                  />
+                ) : (
+                  <NodeMatricesVisualizer
+                    graph_path={nodeList[selectedGraph]}
+                    intmData={intmData}
+                    changed={changedG}
+                    predicted={predicted}
+                    selectedButtons={selectedButtons}
+                  />
+                )}
+
+                {/* overlay text on visualizer when not predicted */}
+                {probabilities.length == 0 && (
+                  <div className="absolute top-1/2 left-1/2 ">
+                    <h1 className="text-4xl text-gray-300">
+                      Model Visualization will show after prediction
+                    </h1>
+
+                    {model == "graph classification" ? (
+                      <ClassifyGraph
+                        graphPath={graphList[selectedGraph]}
+                        modelPath={modelList[model]}
+                        setChangedG={setChangedG}
+                        setIntmData={setIntmData}
+                        setPredicted={setPredicted}
+                        predicted={predicted}
+                        probabilities={probabilities}
+                        setProbabilities={setProbabilities}
+                        onlyShownButton={true}
+                        simulationLoading={simulationLoading}
+                      />
+                    ) : (
+                      <ClassifyGraph
+                        graphPath={nodeList[selectedGraph]}
+                        modelPath={modelList[model]}
+                        setChangedG={setChangedG}
+                        setIntmData={setIntmData}
+                        setPredicted={setPredicted}
+                        predicted={predicted}
+                        probabilities={probabilities}
+                        setProbabilities={setProbabilities}
+                        onlyShownButton={true}
+                        simulationLoading={simulationLoading}
+                      />
+                    )}
+                  </div>
+                )}
+                {/* </Panel> */}
+                {/* </PanelGroup> */}
+              </div>
             </div>
           </div>
         </div>
