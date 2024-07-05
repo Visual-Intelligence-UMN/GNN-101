@@ -697,9 +697,7 @@ export function visualizeNodeClassifierFeatures(
             //------------------the actual interaction codes part --------------------------------
             const layerID = 3;
             const node = Number(d3.select(this).attr("node"));
-            setTimeout(() => {
-                translateLayers(3, 250);
-            }, 1750);
+            translateLayers(3, 250);
 
             console.log("CST before modification", colorSchemesTable);
             colorSchemesTable.forEach((d: any, i: any) => {
@@ -873,7 +871,7 @@ export function visualizeNodeClassifierFeatures(
 
             let currentStep = 0;
 
-            const initSec = 2000;
+            const initSec = 300;
             const aniSec = 500;
 
             const g1 = d3.select(".mats").append("g").attr("class", "procVis");

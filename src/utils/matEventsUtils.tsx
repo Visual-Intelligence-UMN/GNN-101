@@ -399,9 +399,7 @@ export function featureVisClick(
     // const rectW = 5;
     const rectW7 = 10;
     console.log("Current layerID and node", layerID, node);
-    setTimeout(() => {
-        translateLayers(layerID, (gap+2) * 3 + 5 * featureChannels * 2);
-    }, 1750);
+    translateLayers(layerID, (gap+2) * 3 + 5 * featureChannels * 2);
     //record the layerID
     recordLayerID = layerID;
 
@@ -605,7 +603,7 @@ export function featureVisClick(
     console.log("curNode", curNode, d3.select(curNode).selectAll(".frame"));
 
     //aniamtion sequence
-    const initSec = 2000;
+    const initSec = 1000;
     const aniSec = 500;
     const waitSec = 250 * featureChannels;
     const animateSeqAfterPath: any = [
@@ -816,8 +814,7 @@ export function outputVisClick(
     myColor: any,
     featureChannels: number
 ) {
-    const initSec = 2000;
-    const aniSec = 500;
+    const aniSec = 300;
 
     const curve = d3.line().curve(d3.curveBasis);
     let biasCoord: any;
@@ -854,9 +851,7 @@ export function outputVisClick(
     resultVis?.style("opacity", 0.2);
     //translate each layer
     const layerID = 4;
-    setTimeout(() => {
-        translateLayers(layerID, 300);
-    }, 1750);
+    translateLayers(layerID, 300);
 
     //locations calculation
     //find the next position
@@ -946,7 +941,7 @@ export function outputVisClick(
             d3.selectAll("path").lower();
             d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
             d3.selectAll("path").lower();
-        }, delay:initSec+aniSec},
+        }, delay:aniSec},
     ];
     AnimationController.runAnimations(0, animateSeq);
 
