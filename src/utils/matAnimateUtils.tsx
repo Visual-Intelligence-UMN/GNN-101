@@ -269,7 +269,7 @@ export function drawSummationFeature(
         d3.select(".mats")
             .append("path")
             .attr("d", curve([posList[i], hpoint, lpoint, coordFeatureVis]))
-            .attr("stroke", "black")
+            .attr("stroke", myColor(mulValues[i]))
             .attr("opacity", 0)
             .attr("fill", "none")
             .attr("class", "procVis summation")

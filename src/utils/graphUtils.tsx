@@ -615,7 +615,7 @@ for (let i = 0; i < node.features.length; i++) {
 
             const originToAggregated = g3.append("path")
               .attr("d", `M${start_x},${start_y} C ${control1_x},${control1_y}, ${control2_x},${control2_y}, ${end_x},${end_y}`)
-              .style("stroke", pathColor(color))
+              .style("stroke", myColor(adjMatrixSlice[i]))
               .style("opacity", 0.7)
               .style("stroke-width", 1)
               .style("fill", "none")
