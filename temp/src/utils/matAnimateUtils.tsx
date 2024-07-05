@@ -147,6 +147,20 @@ export function drawAniPath(
             .attr("stroke", "black")
             .attr("stroke-width", 1)
             .attr("class", "procVis");
+        g.append("text")
+            .attr("x", coordFeatureVis[0] - (endCoordList[currentStep][0] - startCoordList[0][0])/2 - 20)
+            .attr("y", coordFeatureVis[1] + rectH - curveDir*Xt[currentStep].length*(2) - curveDir * 45)
+            .text("Matrix Multiplication")
+            .style("fill", "gray")
+            .style("font-size", "8px")
+            .attr("class", "procVis"); 
+        g.append("text")
+            .attr("x", coordFeatureVis[0])
+            .attr("y", coordFeatureVis[1] + rectH * curveDir)
+            .text("Vector After Multiplication")
+            .style("fill", "gray")
+            .style("font-size", "8px")
+            .attr("class", "procVis"); 
     }
     g.append("rect")
         .attr("x", coordFeatureVis[0] + rectW * currentStep)
@@ -208,7 +222,8 @@ export function drawSummationFeature(
     rectH: number,
     myColor: any,
     posList: any,
-    mulValues: any
+    mulValues: any,
+    curveDir: number
 ) {
     for (let m = 0; m < X.length; m++) {
         g.append("rect")
@@ -234,6 +249,15 @@ export function drawSummationFeature(
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("class", "procVis summation");
+
+    //draw label
+    g.append("text")
+            .attr("x", coordFeatureVis[0])
+            .attr("y", coordFeatureVis[1] + rectH * curveDir)
+            .text("Vectors Summation")
+            .style("fill", "gray")
+            .style("font-size", "8px")
+            .attr("class", "procVis"); 
 
     //path connect - connect prev layer feature vis to intermediate feature vis
     const curve = d3.line().curve(d3.curveBasis);
@@ -340,6 +364,13 @@ export function drawBiasVector(
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("class", "procVis biasVector pauseRemove");
+    const label = g.append("text")
+        .attr("x", coordFeatureVis[0])
+        .attr("y", coordFeatureVis[1] + rectH)
+        .text("Bias Vector")
+        .style("fill", "gray")
+        .style("font-size", "8px")
+        .attr("class", "procVis biasVector pauseRemove"); 
     d3.selectAll(".biasVector").transition().duration(100).attr("opacity", 1);
 }
 
@@ -424,6 +455,14 @@ export function drawReLU(
                 .raise();
             }
         });
+
+        relu.append("text")
+            .attr("x", cx1 - 20)
+            .attr("y", cy1 + radius * 4 + 12)
+            .text("ReLU Non-linear Function")
+            .style("fill", "gray")
+            .style("font-size", "8px")
+            .attr("class", "procVis pauseRemove"); 
 }
 
 //-----------------------------animation functions for poolingVisClick----------------------------------
@@ -491,6 +530,15 @@ export function drawPathInteractiveComponents(
         }
         pathMap.push(temPathMap);
     }
+    let yOffset = - clockwise*70;
+    if(clockwise==0)yOffset = 80;
+    const label = d3.select(".mats").append("text")
+        .attr("x", (resultCoord[0][0]+endCoord[endCoord.length-1][0])/2-20)
+        .attr("y", (resultCoord[0][1]+endCoord[endCoord.length-1][1])/2 +yOffset)
+        .text("Softmax")
+        .style("fill", "gray")
+        .style("font-size", "8px")
+        .attr("class", "procVis pauseRemove"); 
     return pathMap;
 }
 

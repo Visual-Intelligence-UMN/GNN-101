@@ -617,7 +617,7 @@ export function featureVisClick(
         {func: () => {d3.select(".ctrlBtn").style("pointer-events", "auto");},delay: 1,},
     ];
     const animateSeq: any = [
-        {func: () => drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues), delay: initSec + aniSec,},
+        {func: () => drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir), delay: initSec + aniSec,},
         {func: () => {setTimeout(() => {
                     intervalID = setInterval(() => {
                         drawAniPath(
