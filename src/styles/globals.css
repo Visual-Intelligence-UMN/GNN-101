@@ -3,10 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --tw-gradient-stops: #4158D0 0%, #C850C0 50%, #DF849F 71%, #FFCC70 100%;
+  --tw-gradient-stops: #4158d0 0%, #c850c0 50%, #df849f 71%, #ffcc70 100%;
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+  --header-height: 80px;
+  --zoom-ratio: 0.7;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,12 +21,8 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to top,
-      rgb(236, 236, 236),
-      white
-    );
-     background-color: white;
+  background: linear-gradient(to top, rgb(236, 236, 236), white);
+  background-color: white;
 }
 
 g.layerVis {
@@ -32,11 +30,13 @@ g.layerVis {
   transition-duration: 2s;
 }
 
-path, text, svgElement, rect {
+path,
+text,
+svgElement,
+rect {
   transition: all;
   transition-duration: 1s;
 }
-
 
 .frame {
   transition: all;
@@ -64,10 +64,8 @@ path {
   }
 }
 
-
 .text-gradient-stroke {
   position: relative;
-
 }
 
 .text-gradient-stroke::before {
@@ -94,15 +92,14 @@ path {
 
 .sidebar {
   top: 0;
-  position:relative;
+  position: relative;
   left: 0;
-  width: 400px; 
-  height: 1200px; 
-  background-color: white; 
-  padding: 10px; 
-  overflow-y: auto; 
-  overflow-x:hidden
-
+  width: 400px;
+  height: 1200px;
+  background-color: white;
+  padding: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .graph-enter {
@@ -148,11 +145,21 @@ path {
 }
 
 @keyframes loading {
-  0% { content: ""; }
-  25% { content: "."; }
-  50% { content: ".."; }
-  75% { content: "..."; }
-  100% { content: ""; }
+  0% {
+    content: "";
+  }
+  25% {
+    content: ".";
+  }
+  50% {
+    content: "..";
+  }
+  75% {
+    content: "...";
+  }
+  100% {
+    content: "";
+  }
 }
 .loading::after {
   content: "";
