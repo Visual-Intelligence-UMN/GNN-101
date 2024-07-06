@@ -22,6 +22,9 @@ import {
 
 import { Tooltip } from "react-tooltip";
 
+
+
+
 //Math function:::
 export function roundToTwo(num: number): number {
     return Math.round(num * 100) / 100;
@@ -141,105 +144,91 @@ export const ButtonChain = ({
                     {/* Since input is not shown during the predicted phase, it is disabled */}
                     <button
                         disabled={!predicted}
-                        className={`bg-gray-200  ${
-                            predicted
-                                ? "hover:border-black hover:bg-gray-300"
-                                : ""
-                        } text-black py-1 px-2 rounded ${
-                            selectedButtons[0]
+                        className={`bg-gray-200  ${predicted
+                            ? "hover:border-black hover:bg-gray-300"
+                            : ""
+                            } text-black py-1 px-2 rounded ${selectedButtons[0]
                                 ? "outline outline-2 outline-black bg-gray-300"
                                 : ""
-                        }`}
+                            }`}
                         onClick={() => handleButtonClick(0)}
                     >
                         Input
                     </button>
                     <button
                         disabled={!predicted}
-                        className={`bg-yellow-200  ${
-                            predicted
-                                ? "hover:border-black hover:bg-yellow-300"
-                                : ""
-                        } text-black py-1 px-2 rounded ${
-                            selectedButtons[1]
+                        className={`bg-yellow-200  ${predicted
+                            ? "hover:border-black hover:bg-yellow-300"
+                            : ""
+                            } text-black py-1 px-2 rounded ${selectedButtons[1]
                                 ? "outline outline-2 outline-black bg-yellow-300"
                                 : ""
-                        }`}
+                            }`}
                         onClick={() => handleButtonClick(1)}
                     >
                         GNNConv1
                     </button>
                     <button
                         disabled={!predicted}
-                        className={`bg-yellow-200  ${
-                            predicted
-                                ? "hover:border-black hover:bg-yellow-300"
-                                : ""
-                        } text-black py-1 px-2 rounded ${
-                            selectedButtons[2]
+                        className={`bg-yellow-200  ${predicted
+                            ? "hover:border-black hover:bg-yellow-300"
+                            : ""
+                            } text-black py-1 px-2 rounded ${selectedButtons[2]
                                 ? "outline outline-2 outline-black bg-yellow-300"
                                 : ""
-                        }`}
+                            }`}
                         onClick={() => handleButtonClick(2)}
                     >
                         GNNConv2
                     </button>
                     <button
                         disabled={!predicted}
-                        className={`bg-yellow-200  ${
-                            predicted
-                                ? "hover:border-black hover:bg-yellow-300"
-                                : ""
-                        } text-black py-1 px-2 rounded ${
-                            selectedButtons[3]
+                        className={`bg-yellow-200  ${predicted
+                            ? "hover:border-black hover:bg-yellow-300"
+                            : ""
+                            } text-black py-1 px-2 rounded ${selectedButtons[3]
                                 ? "outline outline-2 outline-black bg-yellow-300"
                                 : ""
-                        }`}
+                            }`}
                         onClick={() => handleButtonClick(3)}
                     >
                         GNNConv3
                     </button>
                     <button
                         disabled={!predicted}
-                        className={`bg-blue-200  ${
-                            predicted
-                                ? "hover:border-black hover:bg-blue-300"
-                                : ""
-                        } text-black py-1 px-2 rounded ${
-                            selectedButtons[4]
+                        className={`bg-blue-200  ${predicted
+                            ? "hover:border-black hover:bg-blue-300"
+                            : ""
+                            } text-black py-1 px-2 rounded ${selectedButtons[4]
                                 ? "outline outline-2 outline-black bg-blue-300"
                                 : ""
-                        }`}
+                            }`}
                         onClick={() => handleButtonClick(4)}
                     >
                         Global Mean Pooling
                     </button>
                     <button
                         disabled={!predicted}
-                        className={`bg-emerald-200  ${
-                            predicted
-                                ? "hover:border-black hover:bg-green-300"
-                                : ""
-                        } text-black py-1 px-2 rounded ${
-                            selectedButtons[5]
+                        className={`bg-emerald-200  ${predicted
+                            ? "hover:border-black hover:bg-green-300"
+                            : ""
+                            } text-black py-1 px-2 rounded ${selectedButtons[5]
                                 ? "outline outline-2 outline-black bg-green-300"
                                 : ""
-                        }`}
+                            }`}
                         onClick={() => handleButtonClick(5)}
                     >
                         FC
                     </button>
                     <button
                         disabled={!predicted}
-                        className={`bg-gray-200  ${
-                            predicted
-                                ? "hover:border-black hover:bg-gray-300"
-                                : ""
-                        } text-black py-1 px-2 rounded ${
-                            selectedButtons[6]
+                        className={`bg-gray-200  ${predicted
+                            ? "hover:border-black hover:bg-gray-300"
+                            : ""
+                            } text-black py-1 px-2 rounded ${selectedButtons[6]
                                 ? "outline outline-2 outline-black bg-gray-300"
                                 : ""
-                        }`}
+                            }`}
                         onClick={() => handleButtonClick(6)}
                     >
                         Output
@@ -285,90 +274,78 @@ export const NodeClassifierButtonChain = ({
                     {/* Since input is not shown during the predicted phase, it is disabled */}
                     <button
                         disabled={!predicted}
-                        className={`bg-gray-200  ${
-                            predicted
-                                ? "hover:border-black hover:bg-gray-300"
-                                : ""
-                        } text-black py-1 px-2 rounded ${
-                            selectedButtons[0]
+                        className={`bg-gray-200  ${predicted
+                            ? "hover:border-black hover:bg-gray-300"
+                            : ""
+                            } text-black py-1 px-2 rounded ${selectedButtons[0]
                                 ? "outline outline-2 outline-black bg-gray-300"
                                 : ""
-                        }`}
+                            }`}
                         onClick={() => handleButtonClick(0)}
                     >
                         Input
                     </button>
                     <button
                         disabled={!predicted}
-                        className={`bg-yellow-200  ${
-                            predicted
-                                ? "hover:border-black hover:bg-yellow-300"
-                                : ""
-                        } text-black py-1 px-2 rounded ${
-                            selectedButtons[1]
+                        className={`bg-yellow-200  ${predicted
+                            ? "hover:border-black hover:bg-yellow-300"
+                            : ""
+                            } text-black py-1 px-2 rounded ${selectedButtons[1]
                                 ? "outline outline-2 outline-black bg-yellow-300"
                                 : ""
-                        }`}
+                            }`}
                         onClick={() => handleButtonClick(1)}
                     >
                         GNNConv1
                     </button>
                     <button
                         disabled={!predicted}
-                        className={`bg-yellow-200  ${
-                            predicted
-                                ? "hover:border-black hover:bg-yellow-300"
-                                : ""
-                        } text-black py-1 px-2 rounded ${
-                            selectedButtons[2]
+                        className={`bg-yellow-200  ${predicted
+                            ? "hover:border-black hover:bg-yellow-300"
+                            : ""
+                            } text-black py-1 px-2 rounded ${selectedButtons[2]
                                 ? "outline outline-2 outline-black bg-yellow-300"
                                 : ""
-                        }`}
+                            }`}
                         onClick={() => handleButtonClick(2)}
                     >
                         GNNConv2
                     </button>
                     <button
                         disabled={!predicted}
-                        className={`bg-yellow-200  ${
-                            predicted
-                                ? "hover:border-black hover:bg-yellow-300"
-                                : ""
-                        } text-black py-1 px-2 rounded ${
-                            selectedButtons[3]
+                        className={`bg-yellow-200  ${predicted
+                            ? "hover:border-black hover:bg-yellow-300"
+                            : ""
+                            } text-black py-1 px-2 rounded ${selectedButtons[3]
                                 ? "outline outline-2 outline-black bg-yellow-300"
                                 : ""
-                        }`}
+                            }`}
                         onClick={() => handleButtonClick(3)}
                     >
                         GNNConv3
                     </button>
                     <button
                         disabled={!predicted}
-                        className={`bg-emerald-200  ${
-                            predicted
-                                ? "hover:border-black hover:bg-green-300"
-                                : ""
-                        } text-black py-1 px-2 rounded ${
-                            selectedButtons[5]
+                        className={`bg-emerald-200  ${predicted
+                            ? "hover:border-black hover:bg-green-300"
+                            : ""
+                            } text-black py-1 px-2 rounded ${selectedButtons[5]
                                 ? "outline outline-2 outline-black bg-green-300"
                                 : ""
-                        }`}
+                            }`}
                         onClick={() => handleButtonClick(5)}
                     >
                         FC
                     </button>
                     <button
                         disabled={!predicted}
-                        className={`bg-gray-200  ${
-                            predicted
-                                ? "hover:border-black hover:bg-gray-300"
-                                : ""
-                        } text-black py-1 px-2 rounded ${
-                            selectedButtons[6]
+                        className={`bg-gray-200  ${predicted
+                            ? "hover:border-black hover:bg-gray-300"
+                            : ""
+                            } text-black py-1 px-2 rounded ${selectedButtons[6]
                                 ? "outline outline-2 outline-black bg-gray-300"
                                 : ""
-                        }`}
+                            }`}
                         onClick={() => handleButtonClick(6)}
                     >
                         Output
@@ -583,9 +560,8 @@ export const ViewSwitch: React.FC<ViewSwitchProps> = ({
             >
                 {/* Only one span for the slider circle */}
                 <span
-                    className={`cursor-pointer absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow transform transition-all duration-300 ease-in-out ${
-                        checked ? "translate-x-32" : ""
-                    }`}
+                    className={`cursor-pointer absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow transform transition-all duration-300 ease-in-out ${checked ? "translate-x-32" : ""
+                        }`}
                 ></span>
                 {/* label */}
                 <span className="text-white text-base font-semibold flex items-center justify-center h-full">
@@ -862,8 +838,8 @@ export function getInitialCoordinates() {
 }
 
 //helper to get the matrix body visualize
-export function visualizeMatrixBody(gridSize: number, graph: any, width:number, height:number, margin:any) {
-    
+export function visualizeMatrixBody(gridSize: number, graph: any, width: number, height: number, margin: any) {
+
 
     d3.select("#matvis").selectAll("svg").remove();
     const svg = d3
@@ -941,8 +917,8 @@ export function visualizeMatrix(
 ) {
     const init = async (graph: any, features: any, nodeAttrs: any) => {
         const margin = { top: 10, right: 80, bottom: 30, left: 80 };
-    const width = gridSize + margin.left + margin.right;
-    const height = (gridSize + margin.top + margin.bottom) * 2;
+        const width = gridSize + margin.left + margin.right;
+        const height = (gridSize + margin.top + margin.bottom) * 2;
         //visualize matrix body part
         visualizeMatrixBody(gridSize, graph, width, height, margin);
 
