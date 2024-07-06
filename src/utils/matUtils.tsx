@@ -891,7 +891,7 @@ export function visualizeNodeClassifierFeatures(
                     //display the result feature visualizer
                     featureVisTable[4][node].style.opacity = "1";
                     resultLabelsList[node].style.fill = "black";
-                }, delay:aniSec}
+                }, delay:aniSec+400}
             ]
 
             const animateSeq = [
@@ -908,7 +908,7 @@ export function visualizeNodeClassifierFeatures(
                                 let dir = 1;
                                 if(clockwise==1)dir = 0;
                                 pathMap = drawPathInteractiveComponents(softmaxStartCoords, softmaxEndCoords, nthOutputVals, myColor, dir);
-                            }, 1500);
+                            }, 1900);
                             btn.selectAll("*").remove();
                             injectPlayButtonSVG(
                                 btn,
