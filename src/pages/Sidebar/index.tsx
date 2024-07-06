@@ -11,6 +11,7 @@ const inter = Inter({
 type Props = {
     isGraphView: boolean;
     setIsGraphView: (isGraphView: boolean) => void;
+    predicted: boolean;
 };
 export default function Sidebar(props: Props) {
     return (
@@ -64,43 +65,58 @@ export default function Sidebar(props: Props) {
                         atoms.
                     </p>
 
+                    <span className={styles.tag}>Data Representation</span>
                     <p>
+                        <span style={{ color: props.isGraphView ? 'black' : 'gray' }}> Node Link Graph</span> or <span style={{ color: props.isGraphView ? 'gray' : 'black' }}> Adjacency Matrix</span>
+                        <br />
                         <button
                             className={styles.button}
                             onClick={() => props.setIsGraphView(!props.isGraphView)}
                         >
-                            Click to show {props.isGraphView ? "Adjacency Matrix" : "Node Link Graph"}
+                            Click to Switch
                         </button>
                         <br />
+
                         A graph can be represented as either a node-link diagram or an adjacency matrix.
-                        An adjacency matrix is a square matrix where the rows and columns of
+                        A node-link diagram is an intuitive visual representation of the graph where nodes are depcited as circles and edges are lines connecting the circles.
+                        It is easy to understand and informative, especially for small graphs.
+                        <br />
+                        An adjacency matrix is a square matrix where the rows and columns represent the nodes,
+                        and the value at each intersection (cell) indicates the presence or absence of an edge between the corresponding nodes.
+                        It is a compact way to represent the graph, especially for large and dense graphs.
                         <br />
                     </p>
 
+                    <span className={styles.tag}>Node Features</span>
                     <p>
-                        <span className={styles.tag}>Node Features </span> The information of each graph node can be stored as embeddings.
+                        The information of each graph node can be stored as embeddings.
                         For example, in the chemical compound graph, an one-hot
                         encoding is used to represent the atom type, whether it is a carbon,
                         oxygen, nitrogen, etc.
                         {/* TODO: maybe also show node features before clicking prediction */}
                     </p>
                     <h1 className="text-2xl font-black text-3xl">Layers inside a GNN:</h1>
+
+                    {!props.predicted && 'Click to predict and show inner layers'}
+
                     <p>
                         A layer is a function that ... Depending on how we sort the nodes,
                         the same graph can be represented by adjacent matrixes that look
                         very different from each other. Layers in a GNN needs to be
                         permutation invariant
                     </p>
+                    <span className={styles.tag}>GCNConv </span>
                     <p>
-                        <span className={styles.tag}>GCNConv </span>
+
                         This is a paragraph explaining how to interact with the demo. The
                         quick brown fox jumps over the lazy dog. The quick brown fox jumps
                         over the lazy dog. The quick brown fox jumps over the lazy dog. The
                         quick brown fox jumps over the lazy dog. The quick brown fox jumps
                         over the lazy dog.
                     </p>
+
+                    <span className={styles.tag}>Global Pooling </span>
                     <p>
-                        <span className={styles.tag}>Global Pooling </span>
                         This is a paragraph explaining how to interact with the demo. The
                         quick brown fox jumps over the lazy dog. The quick brown fox jumps
                         over the lazy dog. The quick brown fox jumps over the lazy dog. The
@@ -111,6 +127,7 @@ export default function Sidebar(props: Props) {
                     <h1 className="text-2xl font-black text-3xl">
                         Tasks that GNNs can solve:
                     </h1>
+                    <span className={styles.tag}>Graph-Level Tasks </span>
                     <p>
                         This is a paragraph explaining how to interact with the demo. The
                         quick brown fox jumps over the lazy dog. The quick brown fox jumps
@@ -118,6 +135,16 @@ export default function Sidebar(props: Props) {
                         quick brown fox jumps over the lazy dog. The quick brown fox jumps
                         over the lazy dog.
                     </p>
+                    <span className={styles.tag}>Node-Level Tasks </span>
+                    <p>
+                        This is a paragraph explaining the GNN model. The quick brown fox
+                        jumps over the lazy dog. The quick brown fox jumps over the lazy
+                        dog. The quick brown fox jumps over the lazy dog. The quick brown
+                        fox jumps over the lazy dog. The quick brown fox jumps over the lazy
+                        dog. The quick brown fox jumps over the lazy dog. The quick brown
+                        fox jumps over the lazy dog.
+                    </p>
+                    <span className={styles.tag}>Edge-Level Tasks </span>
                     <p>
                         This is a paragraph explaining the GNN model. The quick brown fox
                         jumps over the lazy dog. The quick brown fox jumps over the lazy
@@ -133,14 +160,14 @@ export default function Sidebar(props: Props) {
                         real-time on the your web browser, supported by the ONNX web
                         runtime.
                         <br />
-                        Team Members:
+                        🤸 Team Members:
                         <br />
-                        Contact:
+                        📧 Contact:
                         <br />
-                        Source Code:
+                        💻 Source Code:
                     </p>
                 </div>
-            </Scrollbar>
-        </div>
+            </Scrollbar >
+        </div >
     );
 }

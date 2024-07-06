@@ -112,6 +112,7 @@ export default function Home() {
                         <Sidebar
                             isGraphView={isGraphView}
                             setIsGraphView={setIsGraphView}
+                            predicted={predicted}
                         />
 
                         {/* <Panel className="ml-4"> */}

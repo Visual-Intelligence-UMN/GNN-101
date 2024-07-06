@@ -14,11 +14,13 @@
 }
 
 .tag {
-  background-color: #f0f0f0;
-  padding: 5px;
+  background-color: #d4f7e6;
+  padding: 5px 10px;
   border-radius: 5px;
   color: #000;
   font-weight: 1200;
+  /* border-color: #333;
+    border-width: 1px; */
 }
 
 .sidebar a {
@@ -33,7 +35,7 @@
 }
 
 .button {
-  padding: 5px;
+  padding: 0px 10px;
   border-radius: 5px;
   color: #000;
   font-weight: 1200;
