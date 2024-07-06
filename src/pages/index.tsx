@@ -16,8 +16,8 @@ import {
     ViewSwitch,
     GraphAnalysisViewer,
     NodeClassifierButtonChain,
-    Footer
 } from "./WebUtils";
+import { Footer, NavBar } from "./Surfaces";
 import { Inter } from "@next/font/google";
 import NodeMatricesVisualizer from "./node_classifier/NodeMatrixVisualizer";
 import NodeGraphVisualizer from "./node_classifier/NodeGraphVisualizer";
@@ -105,11 +105,7 @@ export default function Home() {
             </div>
             {step === 1 && (
                 <div className="bg-white text-black">
-                    <div className={styles.header}>
-                        <h1 className="text-3xl text-left">
-                            Looks like We need a name and a logo here
-                        </h1>
-                    </div>
+                    <NavBar />
                     {/* <PanelGroup direction="horizontal"> */}
 
                     <div className={` ${styles.body}  grid grid-cols-4 `}>
