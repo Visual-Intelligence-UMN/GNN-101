@@ -370,7 +370,8 @@ export function visualizeNodeClassifierFeatures(
     final: any,
     graph: any,
     adjList: any,
-    maxVals: any
+    maxVals: any,
+    trainingNodes: number[]
 ) {
     //--------------------------------DATA PREP MANAGEMENT--------------------------------
     let intervalID: any = null; // to manage animation controls
@@ -455,7 +456,8 @@ export function visualizeNodeClassifierFeatures(
         final,
         firstLayer,
         maxVals,
-        featureChannels
+        featureChannels,
+        trainingNodes
     );
     locations = GCNConvPackage.locations;
     frames = GCNConvPackage.frames;

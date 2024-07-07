@@ -583,7 +583,8 @@ export function drawGCNConvNodeModel(
     final: any,
     firstLayer: any,
     maxVals: any,
-    featureChannels: number
+    featureChannels: number,
+    trainingNodes: number[]
 ) {
     //GCNCov Visualizer
     let paths: any;
@@ -664,7 +665,7 @@ export function drawGCNConvNodeModel(
             for(let i=0; i<layerLocations.length; i++){
                 layerLocations[i][0] += rectW*2+200;
             }
-            resultPaths = drawResultLayer(locations, layerLocations, result, rectW, rectH, myColor, featureVisTable, frames, graph);
+            resultPaths = drawResultLayer(locations, layerLocations, result, rectW, rectH, myColor, featureVisTable, frames, graph, trainingNodes);
             //drawPoints(".mats", "red", layerLocations);
             resultLabelsList = resultPaths.resultLabelsList;
         }
@@ -1206,7 +1207,8 @@ export function drawResultLayer(
     myColor:any, 
     featureVisTable:any,
     frames: any,
-    graph:any
+    graph:any,
+    trainingNodes: number[]
 ){
     let resultLabelsList = [];
     const layer = d3
@@ -1262,6 +1264,11 @@ export function drawResultLayer(
         if(maxIdx==1)resultLabel = "Class B";
         else if(maxIdx==2)resultLabel = "Class C";
         else if(maxIdx==3)resultLabel = "Class D";
+
+        //determine a node is train node or test node
+        if(trainingNodes.includes(i))resultLabel += " / train node"
+        else resultLabel += " / test node";
+
         //draw label
         const label = g.append("text")
                         .attr("x", x + 45)

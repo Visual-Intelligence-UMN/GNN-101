@@ -32,7 +32,7 @@ function findAbsMax(arr: number[]) {
 
 
 //----------------------function for visualizing node classifier----------------------------
-async function initNodeClassifier(graph: any, features: any[][], intmData:any, graph_path:string)  {
+async function initNodeClassifier(graph: any, features: any[][], intmData:any, graph_path:string, trainingNodes: number[])  {
     console.log("start initNodeC");
     let colorSchemeTable: any = null;
     //a data structure to record the link relationship
@@ -108,7 +108,8 @@ async function initNodeClassifier(graph: any, features: any[][], intmData:any, g
         final,
         graph,
         adjList,
-        colorSchemeTable
+        colorSchemeTable,
+        trainingNodes
     );
     // drawNodeAttributes(nodeAttrs, graph, 50);
 
@@ -255,6 +256,10 @@ export async function visualizeNodeClassifier(setIsLoading:any, graph_path:strin
         const data = await load_json(graph_path);
         console.log("data matvis", data);
 
+        //training nodes
+        const trainingNodes = data.train_nodes;
+        console.log("train nodes", trainingNodes)
+
         //accept the features from original json file
         const features = await get_features_origin(data);
         console.log("o features", features);
@@ -262,7 +267,7 @@ export async function visualizeNodeClassifier(setIsLoading:any, graph_path:strin
         const processedData = await graph_to_matrix(data);
         console.log("pData matvis", processedData);
         // Initialize and run D3 visualization with processe  d data
-        await initNodeClassifier(processedData, features, intmData, graph_path);
+        await initNodeClassifier(processedData, features, intmData, graph_path, trainingNodes);
     } catch (error) {
         console.error("Error in visualizeGNN:", error);
     } finally {
