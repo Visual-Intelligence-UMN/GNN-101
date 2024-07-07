@@ -23,6 +23,7 @@ import {
     drawPathInteractiveComponents,
     drawPathBtwOuputResult,
     drawBiasPathOutputVis,
+    drawTanh,
 } from "./matAnimateUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
 import { drawSoftmaxDisplayer } from "./matInteractionUtils";
@@ -386,7 +387,8 @@ export function featureVisClick(
     rectW:number,
     gap:number,
     oFeatureChannels:number,
-    oRectW:number
+    oRectW:number,
+    activation: string = "relu"
 ) {
     let biasCoord: [number, number];
     let res10: [number, number];
@@ -606,7 +608,7 @@ export function featureVisClick(
     const initSec = 1000;
     const aniSec = 500;
     const waitSec = 250 * featureChannels;
-    const animateSeqAfterPath: any = [
+    let animateSeqAfterPath: any = [
         {func: () => drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2, myColor, layerBias, layerID), delay: aniSec,},
         {func: () => drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels), delay: aniSec,},
         {func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels), delay: aniSec,},
@@ -614,6 +616,10 @@ export function featureVisClick(
         {func: () => {curNode.style.opacity = "1";},delay: aniSec,},
         {func: () => {d3.select(".ctrlBtn").style("pointer-events", "auto");},delay: 1,},
     ];
+
+    if(activation=="tanh"){
+        animateSeqAfterPath[3].func = ()=>drawTanh(midX1, wmCoord, biasCoord, nextCoord);
+    }
 
     let aniPathSec = 50;
 

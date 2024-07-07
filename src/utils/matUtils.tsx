@@ -655,7 +655,8 @@ export function visualizeNodeClassifierFeatures(
                 10,
                 90,
                 34,
-                5
+                5,
+                "tanh"
             );
             // update variables
             recordLayerID = featureVisPack.recordLayerID;

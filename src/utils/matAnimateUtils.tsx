@@ -465,6 +465,42 @@ export function drawReLU(
             .attr("class", "procVis pauseRemove"); 
 }
 
+export function drawTanh(
+    midX1:number, 
+    wmCoord:number[], 
+    biasCoord:number[], 
+    nextCoord:number[]
+){
+    const svg = d3.select(".mats");
+        const relu = svg.append("g");
+
+        const cx = midX1;
+        const cy = (wmCoord[1] + biasCoord[1]) / 2;
+        const radius = 5;
+        const cx1 = nextCoord[0] - 45;
+        const cy1 = nextCoord[1] - 15;
+
+        d3.xml("./assets/SVGs/tanh.svg").then(function (data) {
+            console.log("xml", data.documentElement);
+            if(relu.node()!=null){
+            const ReLU = relu!.node()!.appendChild(data.documentElement);
+            d3.select(ReLU)
+                .attr("x", cx1)
+                .attr("y", cy1)
+                .attr("class", "procVis pauseRemove")
+                .raise();
+            }
+        });
+
+        relu.append("text")
+            .attr("x", cx1 - 20)
+            .attr("y", cy1 + radius * 4 + 12)
+            .text("Tanh Non-linear Function")
+            .style("fill", "gray")
+            .style("font-size", "8px")
+            .attr("class", "procVis pauseRemove"); 
+}
+
 //-----------------------------animation functions for poolingVisClick----------------------------------
 export function drawOutputVisualizer(
     result:number[],
