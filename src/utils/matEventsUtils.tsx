@@ -526,14 +526,20 @@ export function featureVisClick(
     //draw paths from intermediate result -> final result
     const layerBias = bias[layerID];
     coordFeatureVis2[1] += curveDir * 50;
+
+    let coordFeatureVis2Copy = deepClone(coordFeatureVis2);
+
+    //adjust the position of the bias vector for special case
+    if(layerID==0 && oFeatureChannels==34)coordFeatureVis2Copy[0] += 50;
+
     //draw paths from WMVisualizer and Bias Visualizer to final output
     const wmCoord: [number, number] = [
         coordFeatureVis2[0] + rectW * featureChannels,
         coordFeatureVis2[1] - curveDir * 50,
     ];
     biasCoord = [
-        coordFeatureVis2[0] + rectW * featureChannels,
-        coordFeatureVis2[1],
+        coordFeatureVis2Copy[0] + rectW * featureChannels,
+        coordFeatureVis2Copy[1],
     ];
     let c = calculatePrevFeatureVisPos(
         featureVisTable,
@@ -609,7 +615,7 @@ export function featureVisClick(
     const aniSec = 500;
     const waitSec = 250 * featureChannels;
     let animateSeqAfterPath: any = [
-        {func: () => drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2, myColor, layerBias, layerID), delay: aniSec,},
+        {func: () => drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2Copy, myColor, layerBias, layerID), delay: aniSec,},
         {func: () => drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels), delay: aniSec,},
         {func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels), delay: aniSec,},
         {func: () => drawReLU(midX1, wmCoord, biasCoord, nextCoord), delay: aniSec,},
