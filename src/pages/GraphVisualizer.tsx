@@ -284,6 +284,8 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           if (graphWidth + tolerance < x_dist && graphHeight + tolerance < y_dist) {
             transform = `scale(1, 1)`;
           } 
+          const text_x = point1.x
+          const text_y = point4.y + 100;
           if (i >= 4) {
             point1.y -= 130;
             point2.y -= 130;
@@ -319,8 +321,8 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           }
           const textElement = g1.append("text")
             .attr("class", "layer-label")
-            .attr("x", point1.x)
-            .attr("y", point4.y + 100)
+            .attr("x", text_x)
+            .attr("y", text_y)
             .attr("text-anchor", "middle")
             .attr("fill", "black")
             .attr("font-size", "15px")

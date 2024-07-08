@@ -1248,7 +1248,7 @@ export function fcLayerCalculationVisualizer(
 
     const g4 = svg
         .append("g")
-        .attr("transform", `translate(${moveToX - 400}, ${moveToY})`);
+        .attr("transform", `translate(${moveToX - 600}, ${moveToY})`);
 
     const displayer = g4
         .append("rect")
