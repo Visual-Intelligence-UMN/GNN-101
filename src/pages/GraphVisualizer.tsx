@@ -311,7 +311,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             text = "Input"
           }
           if (i <= 3 && i != 0) {
-            text = `GCNGconv${i}`
+            text = `GCNConv${i}`
           }
           if (i === 4) {
             text = "Pooling"
