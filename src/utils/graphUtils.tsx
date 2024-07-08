@@ -34,7 +34,7 @@ export function showAllLinks(nodes: any) {
     nodes.forEach((node: any) => {
         if (node.links) {
             node.links.forEach((link: any) => {
-                link.style("opacity", 0.1);
+                link.style("opacity", 0.1).lower();
             });
         }
     });
@@ -97,7 +97,7 @@ export function highlightNodes(node: any) {
 
     if (node.links) {
         node.links.forEach((link: any) => {
-            link.style("opacity", 1);
+            link.style("opacity", 1).raise();
         });
     }
 }
@@ -127,7 +127,7 @@ export function resetNodes(allNodes: any[]) {
 
             if (node.links) {
                 node.links.forEach((link: any) => {
-                    link.style("opacity", 0.1);
+                    link.style("opacity", 0.1).lower();
                 });
             }
 
