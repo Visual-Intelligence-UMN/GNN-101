@@ -6,12 +6,15 @@ import {
   prep_graphs,
   connectCrossGraphNodes,
   featureVisualizer,
-  softmax
+  softmax,
+  myColor
 } from "../utils/utils";
 
 import { visualizeGraph, getInitialCoordinates } from "./WebUtils";
 import { aggregationCalculator } from "@/utils/graphUtils";
 import { sources } from "next/dist/compiled/webpack/webpack";
+import { buildBinaryLegend, buildLegend } from "@/utils/matHelperUtils";
+import { findAbsMax } from "@/utils/matNNVis";
 
 
 
@@ -205,7 +208,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
 
 
-          let value = null;
+          let value:number[] = [];
           if (intmData != null) {
             if (i === 1) {
               value = intmData.conv1;
@@ -329,6 +332,13 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             .text(text)
             .attr("font-weight", "normal")
             .attr('opacity', 0.5);
+
+            const absMax = findAbsMax(value);
+           console.log("array value", value)
+          
+          if(i==0){buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x - 50, text_y + 50, g1)}
+          else if(i==5){buildBinaryLegend(myColor, value[0], value[1], text+" Color Scheme", text_x - 50, text_y + 50, g1)}
+          else buildLegend(myColor, absMax, text+" Color Scheme", text_x - 50, text_y + 50, g1);
 
 
           // doesn't show the text, need to be fixed 

@@ -23,7 +23,7 @@ import {
 import { visualizeMatrixBody } from "@/pages/WebUtils";
 
 //find absolute max value in an 1d array
-function findAbsMax(arr: number[]) {
+export function findAbsMax(arr: number[]) {
     let max: number = Math.abs(Math.max(...arr));
     let min: number = Math.abs(Math.min(...arr));
     if (min > max) return min;
