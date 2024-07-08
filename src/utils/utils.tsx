@@ -948,14 +948,25 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
               neighborNode.relatedNodes = [];
              }
             
-              const controlX1 = node.x + xOffset1 + (neighborNode.x + xOffset2 - node.x - xOffset1) * 0.3;
+              const controlX1 = node.x + xOffset1 + (neighborNode.x + xOffset2 - node.x - xOffset1) * 0.8;
               const controlY1 = node.y + 10;
-              const controlX2 = node.x + xOffset1 + (neighborNode.x + xOffset2 - node.x - xOffset1) * 0.7;
+              const controlX2 = node.x + xOffset1 + (neighborNode.x + xOffset2 - node.x - xOffset1) * 0.2;
               const controlY2 = neighborNode.y + 10;
               const avg = calculateAverage(node.features)
 
               const path = svg.append("path")
-                .attr("d", `M ${node.x + xOffset1 + 16} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${neighborNode.x + (neighborNode.graphIndex - 2.5) * offset - 16} ${neighborNode.y + 10}`)
+                .attr("d", 
+                  `M 
+                  ${node.x + xOffset1 + 16}
+                  ${node.y + 10}
+                  C 
+                  ${controlX1} 
+                  ${controlY1}, 
+                  ${controlX2} 
+                  ${controlY2}, 
+                  ${neighborNode.x + (neighborNode.graphIndex - 2.5) * offset - 16} 
+                  ${neighborNode.y + 10}
+                `)
                 .style("stroke", linkStrength(avg))
                 .style("stroke-width", 1)
                 .style("opacity", 0.1)
