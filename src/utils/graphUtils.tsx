@@ -1238,7 +1238,7 @@ export function fcLayerCalculationVisualizer(
 ) {
 
     d3.selectAll(".node-features-Copy").style("visibility", "visible");
-    let moveToX = graphIndex * offset - 450;
+    let moveToX = graphIndex * offset - 350;
     let moveToY = height / 7;
     let originalCoordinates = moveFeatures(relatedNodes, moveToX, moveToY);
 
@@ -1248,7 +1248,7 @@ export function fcLayerCalculationVisualizer(
 
     const g4 = svg
         .append("g")
-        .attr("transform", `translate(${moveToX - 600}, ${moveToY})`);
+        .attr("transform", `translate(${moveToX - 700}, ${moveToY})`);
 
     const displayer = g4
         .append("rect")
@@ -1273,7 +1273,7 @@ export function fcLayerCalculationVisualizer(
         .duration(1000)
         .attr(
             "transform",
-            `translate(${moveToX - 400}, ${moveToY + 150}) rotate(-90)`
+            `translate(${moveToX - 500}, ${moveToY + 150}) rotate(-90)`
         );
 
     let rectL = 175 / node.relatedNodes.length; // Assuming square shape and 75 is the height of graph-displayer
@@ -1325,10 +1325,10 @@ export function fcLayerCalculationVisualizer(
         node.relatedNodes.forEach((n: any, i: number) => {
             let start_x = 0;
             let start_y = 0;
-            let end_x = moveToX - 800 + 15 + node.relatedNodes[0].features.length * 3;
+            let end_x = moveToX - 900 + 15 + node.relatedNodes[0].features.length * 3;
             let end_y = moveToY + 150;
                 start_x =
-                    3.5 * offset + n.features.length * 3 - offset - moveOffset + 35;
+                    3.5 * offset + n.features.length * 3 - offset - moveOffset + 135;
                 start_y = height / 7 + 100 + 45 * i - 7.5;
                 const control1_x = start_x + (end_x - start_x) * 0.3;
                 const control1_y = start_y;
