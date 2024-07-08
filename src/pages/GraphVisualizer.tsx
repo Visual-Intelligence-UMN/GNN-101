@@ -345,7 +345,8 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
               .attr("opacity", 0);
 
             if (intmData) {
-              featureVisualizer(svg, allNodes, offset, height, graphs); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
+              featureVisualizer(svg, allNodes, offset, height, graphs, 900, 600, 15, 10, 3, 20); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
+              //function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, graphs: any[], moveOffset: number, fcLayerMoveOffset: number, rectWidth: number, firstLayerRectHeight: number, rectHeight: number, outputLayerRectHeight: number)
             }
 
           }

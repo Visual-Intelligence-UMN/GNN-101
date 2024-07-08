@@ -438,7 +438,7 @@ export const state: State = {
 };
 
 
-export function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, graphs: any[]) {
+export function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, graphs: any[], moveOffset: number, fcLayerMoveOffset: number, rectWidth: number, firstLayerRectHeight: number, rectHeight: number, outputLayerRectHeight: number) {
   // 1. visualize feature
   // 2. handle interaction event
   // 3. do the calculation for animation
@@ -467,7 +467,6 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
     let calculatedDataMap: any[] = [];
     let currentWeights: any[] = [];
     let currentBias: any[] = []
-    let moveOffset = 900;
 
 
 
@@ -511,7 +510,10 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
 
     nodes.forEach((node: any, i: number) => { // iterate through each node in the current graph
-
+      let currRectHeight = rectHeight;
+      if (graphIndex === 0) {
+        currRectHeight = firstLayerRectHeight;
+      }
       const features = node.features;
       let xPos = node.x;
       let yPos = node.y + 25;
@@ -552,20 +554,15 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
         const featureGroup = g2.append("g")
           .attr("transform", `translate(${xPos - 7.5}, ${yPos})`);
 
-
-          let rectHeight = 3;
-          if (graphIndex === 0) {
-            rectHeight = 10
-          }
   
         featureGroup.selectAll("rect")
           .data(features)
           .enter()
           .append("rect")
           .attr("x", 0)
-          .attr("y", (d: any, i: number) => i * rectHeight)
-          .attr("width", 15)
-          .attr("height", rectHeight)
+          .attr("y", (d: any, i: number) => i * currRectHeight)
+          .attr("width", rectWidth)
+          .attr("height", currRectHeight)
           .attr("class", `node-features node-features-${node.graphIndex}-${node.id}`)
           .attr("id", (d: any, i: number) => "conv" + graphIndex + "-layer-rect-" + i) 
           .style("fill", (d: number) => myColor(d))
@@ -577,16 +574,16 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
         .attr("class", `node-features-${node.graphIndex}-${node.id}`)
         .attr("x", 0)  
         .attr("y", 0)
-        .attr("width", 15)
-        .attr("height", rectHeight * (node.features.length) )
+        .attr("width", rectWidth)
+        .attr("height", currRectHeight * (node.features.length) )
         .attr("class", `node-features-${node.graphIndex}-${node.id}`)
         .style("fill", "none")
         .style("stroke", "black")
         .style("stroke-width", 1);
 
         featureGroup.append("text")
-          .attr("x", 10)
-          .attr("y", node.features.length * rectHeight + 12)
+          .attr("x", rectWidth / 2)
+          .attr("y", node.features.length * currRectHeight + 12)
           .attr("class", `node-features-${node.graphIndex}-${node.id}`)
           .attr("dy", ".35em")
           .text(node.id)
@@ -597,6 +594,17 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
 
         featureGroup.style('visibility', 'hidden');  
+
+        let prevRectHeight;
+
+        if (graphIndex === 1) {
+          prevRectHeight = firstLayerRectHeight;
+        } else {
+          prevRectHeight = rectHeight;
+        }
+ 
+
+        let currMoveOffset = moveOffset;
 
 
         
@@ -645,11 +653,12 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             if (state.isClicked) {
               return;
             }
+
             hideAllLinks(allNodes);
-            if (graphIndex === 1) {
-              rectHeight = 20;
-            }
-            calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, moveOffset, rectHeight);
+            console.log("pre",prevRectHeight)
+           
+            calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth);
+
             
             let relatedNodes: any = [];
             if (node.relatedNodes) {
@@ -666,18 +675,19 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             }
           
             if (movedNode) {
-              moveNextLayer(svg, movedNode, moveOffset, -1)
+              moveNextLayer(svg, movedNode, currMoveOffset, -1)
               state.isClicked = false; 
               movedNode = null;
             }
 
             
-            moveNextLayer(svg, node, moveOffset, 1);
+            moveNextLayer(svg, node, currMoveOffset, 1);
             movedNode = node;
           });
 
 
           node.svgElement.addEventListener("click", function(event: any) {
+            console.log("pre",prevRectHeight)
             event.stopPropagation();
             event.preventDefault();
             if (state.isClicked) {
@@ -685,10 +695,8 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             }
 
             hideAllLinks(allNodes);
-            if (graphIndex === 1) {
-              rectHeight = 20;
-            }
-            calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, moveOffset, rectHeight);
+
+            calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth);
             
             let relatedNodes: any = [];
             if (node.relatedNodes) {
@@ -701,32 +709,33 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             if (movedNode === node) {
               return; // Do nothing if the node is already moved
             }
-          
 
             if (movedNode && movedNode != node) {
               // Move back the previously moved node and its layer
-              moveNextLayer(svg, movedNode, moveOffset, -1)
+              moveNextLayer(svg, movedNode, currMoveOffset, -1)
               state.isClicked = false; 
               movedNode = null;
             }
 
-            moveNextLayer(svg, node, moveOffset, 1);
+            moveNextLayer(svg, node, currMoveOffset, 1);
             movedNode = node; // Update the moved node
         });
       }
 
   
       } else {
-        moveOffset = 600;
+        let currMoveOffset = fcLayerMoveOffset;
 
-        // for the pooling layer(graphIndex = 3), the rectHeight = 2, for the other 2 layers, rectHeight = 20;
-        let rectHeight = 3;
+
+
+        let currRectHeight = rectHeight;
         let rectName = "pooling"
         if (node.graphIndex >= 5) {
-          rectHeight = 20;
+          currRectHeight = outputLayerRectHeight;
           rectName = "output";
         }
-        let groupCentralHeight = rectHeight * features.length / 2;
+        let prevRectHeight = 3;
+        let groupCentralHeight = currRectHeight * features.length / 2;
         let yOffset = groupCentralHeight - (height / 5);
 
         const featureGroup = g2.append("g")
@@ -737,10 +746,10 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .enter()
           .append("rect")
           .attr("x", -10) //adjust x and y coordination so it locates in the middle of the graph
-          .attr("y", (d: any, i: number) => i * rectHeight - 190)
-          .attr("width", 15)
+          .attr("y", (d: any, i: number) => i * currRectHeight - 190)
+          .attr("width", rectWidth)
           .attr("id", (d: any, i: number) => rectName +"-layer-rect-" + i) 
-          .attr("height", rectHeight)
+          .attr("height", currRectHeight)
           .attr("class", "node-features")
           .style("fill", (d: number) => myColor(d))
           .style("stroke-width", 0.1)
@@ -752,7 +761,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .attr("x", -10)  
           .attr("y", -190)
           .attr("width", 15)
-          .attr("height", rectHeight * (node.features.length))
+          .attr("height", currRectHeight * (node.features.length))
           .attr("class", `node-features`)
           .attr("id", (d: any, i: number) => rectName +"-layer-rect-" + i) 
           .style("fill", "none")
@@ -768,9 +777,9 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .enter()
           .append("rect")
           .attr("x", -10) //adjust x and y coordination so it locates in the middle of the graph
-          .attr("y", (d: any, i: number) => i * rectHeight - 190)
-          .attr("width", 15)
-          .attr("height", rectHeight)
+          .attr("y", (d: any, i: number) => i * currRectHeight - 190)
+          .attr("width", rectWidth)
+          .attr("height", currRectHeight)
           .attr("class", "node-features-Copy")
           .style("fill", (d: number) => myColor(d))
           .style("stroke-width", 0.1)
@@ -783,7 +792,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .attr("x", -10)  
           .attr("y", -190)
           .attr("width", 15)
-          .attr("height", rectHeight * (node.features.length))
+          .attr("height", currRectHeight * (node.features.length))
           .attr("class", "node-features-Copy")
           .style("fill", "none")
           .style("stroke", "black")
@@ -842,11 +851,11 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             } // to make sure relatedNodes is not null
             showFeature(node);
             if (node.graphIndex === 4) {
-              fcLayerCalculationVisualizer(node, relatedNodes, offset, height, moveOffset, node.graphIndex, g2, state);
+              fcLayerCalculationVisualizer(node, relatedNodes, offset, height, currMoveOffset, node.graphIndex, g2, state, currRectHeight);
             }
             if (node.graphIndex === 5) {
               console.log("CAWCAW", node.relatedNodes, weights, bias)
-              outputVisualizer(node, weights[3], bias[3], g2, offset, state.isClicked, moveOffset, height)
+              outputVisualizer(node, weights[3], bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth)
             }
             
             reduceNodeOpacity(allNodes, relatedNodes, node);
@@ -860,13 +869,13 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
             if (movedNode) {
               // Move back the previously moved node and its layer
-              moveNextLayer(svg, movedNode, moveOffset, -1)
+              moveNextLayer(svg, movedNode, currMoveOffset, -1)
               state.isClicked = false; 
               movedNode = null;
             }
 
             
-            moveNextLayer(svg, node, moveOffset, 1);
+            moveNextLayer(svg, node, currMoveOffset, 1);
             movedNode = node; // Update the moved node
            
 
@@ -883,12 +892,12 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
     if (movedNode && (!event.target.classList.contains("vis-component"))) {
       svg.selectAll(".vis-component")
         .style("opacity", 0);
-      let moveOffset = 900
+      let currMoveOffset = moveOffset;
 
       if (movedNode.graphIndex >= 4) {
-        moveOffset = 600;
+        currMoveOffset = fcLayerMoveOffset;
       }
-      moveNextLayer(svg, movedNode, moveOffset, -1)
+      moveNextLayer(svg, movedNode, currMoveOffset, -1)
       state.isClicked = false; 
       movedNode = null;
       showAllLinks(allNodes);
