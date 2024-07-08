@@ -586,7 +586,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
         featureGroup.append("text")
           .attr("x", 10)
-          .attr("y", node.features.length * rectHeight)
+          .attr("y", node.features.length * rectHeight + 12)
           .attr("class", `node-features-${node.graphIndex}-${node.id}`)
           .attr("dy", ".35em")
           .text(node.id)
