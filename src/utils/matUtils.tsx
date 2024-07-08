@@ -172,7 +172,7 @@ export function visualizeGraphClassifierFeatures(
     //save events for poolingVis
     let poolingOverEvent: any = null;
     let poolingOutEvent: any = null;
-    d3.select(".mats").on("click", function (event, d) {
+    d3.select("html").on("click", function (event, d) {
         if (event.target && event.target.id === "btn") {
             return;
         }
@@ -563,7 +563,7 @@ export function visualizeNodeClassifierFeatures(
         }
     });
 
-    d3.select(".mats").on("click", function (event, d) {
+    d3.select("html").on("click", function (event, d) {
         if (event.target && event.target.id === "btn") {
             return;
         }
