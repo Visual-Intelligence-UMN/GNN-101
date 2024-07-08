@@ -820,6 +820,33 @@ export function calculationVisualizer(
         .style("stroke", "grey")
         .attr("opacity", 0);
 
+    const outputGroupCopy = g3
+        .append("g")
+        .attr(
+            "transform",
+            `translate(${
+                3.5 * offset +
+                node.relatedNodes[0].features.length * 2 * rectHeight +
+                node.features.length * 3 +
+                95
+            }, ${height / 5 + 150})`
+        );
+
+    outputGroupCopy
+        .selectAll("rect")
+        .data(node.features)
+        .enter()
+        .append("rect")
+        .attr("class", "relu")
+        .attr("x", (d: any, i: number) => i * 3 + 5)
+        .attr("y", 0)
+        .attr("width", 3)
+        .attr("height", 15)
+        .style("fill", (d: number) => myColor(d))
+        .style("stroke-width", 1)
+        .style("stroke", "grey")
+        .attr("opacity", 0);    
+
     intermediateFeatureGroups.push(outputGroup);
     node.intermediateFeatureGroups = intermediateFeatureGroups;
 
