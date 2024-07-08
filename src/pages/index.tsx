@@ -211,7 +211,7 @@ export default function Home() {
                                 simulationLoading={simulationLoading}
                             />
 
-                            <hr className="border-t border-gray-300 my-4"></hr>
+                            {modelList[model]=="./gnn_node_model.onnx"? <></> :<hr className="border-t border-gray-300 my-4"></hr>}
 
                             {/* model visualization */}
 

@@ -58,14 +58,14 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({ graphPath, modelPath, set
 			</div>
 				
 		)
-	): Array.isArray(probabilities[0]) ? (
+	): (modelPath=="./gnn_node_model.onnx"? <></> :(Array.isArray(probabilities[0]) ? (
 		<div>{/* the prediction visualization for the node classifier */}</div>
 	) : probabilities.length > 0 && typeof probabilities[0] === 'number'? (
 		<PredictionVisualizer result={{ 'Non-Mutagenic': probabilities[0] as number, 'Mutagenic': probabilities[1] as number }} />
 	) : (
 		<span>Predicting...</span>
-	);
-	const content = onlyShownButton ? prediction : <div className="flex gap-x-4 items-center mb-2">
+	)));
+	const content = (modelPath=="./gnn_node_model.onnx"? <>{prediction}</> :(onlyShownButton ? prediction : <div className="flex gap-x-4 items-center mb-2">
 		{!predicted && (
 		<div className="flex gap-x-4 items-center">
 			<h1 className="text-3xl font-black">Predictions</h1>
@@ -73,7 +73,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({ graphPath, modelPath, set
 			<Hint text='Press the "Click to Predict!" to predict' />
 		</div>)}
 		{prediction}
-	</div>
+	</div>))
 
 	return content
 }
