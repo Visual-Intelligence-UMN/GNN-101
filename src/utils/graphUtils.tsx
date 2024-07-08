@@ -572,7 +572,7 @@ export function calculationVisualizer(
         let s: [number, number] = [
             node.graphIndex * offset +
                 i * rectHeight +
-                node.relatedNodes[0].features.length * rectHeight,
+                node.relatedNodes[0].features.length * rectHeight + rectHeight / 2,
             height / 5 + 150 + 25,
         ];
         startCoordList.push(s);
@@ -891,8 +891,7 @@ export function moveNextLayer(
 
 function weightAnimation(
     svg: any,
-    node: any,
-    startCoordList: number[][],
+    node: any,startCoordList: number[][],
     endCoordList: number[][],
     weights: any,
     offset: number,
