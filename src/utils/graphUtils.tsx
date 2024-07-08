@@ -58,35 +58,41 @@ export function reduceNodeOpacity(
     });
 }
 
+export function scaleFeatureGroup(node: any, scale: number) {
+    d3.selectAll(`.node-features-${node.graphIndex}-${node.id}`).attr('transform', `scale(${scale})`);  
+}
+
 export function showFeature(node: any) {
+    const scale = 1;
     if (node.featureGroup) {
-        node.featureGroup.style("visibility", "visible");
-        node.featureGroup.raise();
+        scaleFeatureGroup(node, scale);
     }
     if (node.relatedNodes) {
         node.relatedNodes.forEach((n: any) => {
-            n.featureGroup.style("visibility", "visible");
-            n.featureGroup.raise();
+            if (n.featureGroup) {
+                scaleFeatureGroup(n, scale);
+            }
         });
     }
 }
 
 export function highlightNodes(node: any) {
-    const avg = calculateAverage(node.features);
 
     if (node.featureGroup && node.svgElement) {
         d3.select(node.svgElement).attr("stroke-width", 3);
+        node.featureGroup.style("visibility", "visible");
     }
 
     if (node.relatedNodes) {
         node.relatedNodes.forEach((n: any) => {
             d3.select(n.svgElement).attr("stroke-width", 3);
+            n.featureGroup.style("visibility", "visible");
         });
     }
+    
 
     if (node.links) {
         node.links.forEach((link: any) => {
-            node.features;
             link.style("opacity", 1);
         });
     }
@@ -94,6 +100,7 @@ export function highlightNodes(node: any) {
 
 export function resetNodes(allNodes: any[]) {
     allNodes.forEach((node) => {
+        scaleFeatureGroup(node, 0.5);
         if (node.graphIndex <= 3) {
             if (node.featureGroup) {
                 node.featureGroup.style("visibility", "hidden");

@@ -4,7 +4,7 @@ import * as d3 from "d3";
 import { loadWeights } from "./matHelperUtils";
 import * as ort from "onnxruntime-web";
 import { env } from "onnxruntime-web";
-import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature, outputVisualizer } from "@/utils/graphUtils";
+import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature, outputVisualizer, scaleFeatureGroup } from "@/utils/graphUtils";
 import { features, off } from 'process';
 import { IGraphData, IntmData, IntmDataNode } from "../types/";
 
@@ -566,7 +566,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .attr("y", (d: any, i: number) => i * rectHeight + 5)
           .attr("width", 15)
           .attr("height", rectHeight)
-          .attr("class", "node-features")
+          .attr("class", `node-features node-features-${node.graphIndex}-${node.id}`)
           .attr("id", (d: any, i: number) => "conv" + graphIndex + "-layer-rect-" + i) 
           .style("fill", (d: number) => myColor(d))
           .style("stroke-width", 1)
@@ -576,11 +576,14 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
         featureGroup.append("text")
           .attr("x", 10)
           .attr("y", node.features.length * rectHeight + 10)
+          .attr("class", `node-features-${node.graphIndex}-${node.id}`)
           .attr("dy", ".35em")
           .text(node.id)
           .style("font-size", "12px")
           .style("fill", "black")
           .style("text-anchor", "middle");
+
+
 
         featureGroup.style('visibility', 'hidden');  
 
@@ -591,6 +594,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
         node.featureGroup = featureGroup;
         node.featureGroupLocation = featureGroupLocation; // this will be used in calculationvisualizer
+        scaleFeatureGroup(node, 0.5);
 
         // add interaction 
         node.svgElement.addEventListener("mouseover", function(this: any) {
