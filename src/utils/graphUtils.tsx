@@ -3,6 +3,7 @@ import {
     FeatureGroupLocation,
     State,
     calculateAverage,
+    deepClone,
     myColor,
     state,
 } from "./utils";
@@ -703,7 +704,6 @@ export function calculationVisualizer(
                             `M${start_x},${start_y} C ${control1_x},${control1_y}, ${control2_x},${control2_y}, ${end_x},${end_y}`
                         )
                         .style("stroke", myColor(adjMatrixSlice[i]))
-                        .style("opacity", 0.7)
                         .style("stroke-width", 1)
                         .style("fill", "none")
                         .attr("class", "to-be-removed origin-to-aggregated")
@@ -1180,7 +1180,7 @@ function moveFeatures(relatedNodes: any, xPos: number, yPos: number) {
                 .attr(
                     "transform",
                     `translate(${xPos + 27.5}, ${
-                        yPos + i * 47.5 + 100
+                        yPos + i * 45 + 100
                     }) rotate(-90)`
                 );
         }
@@ -1236,6 +1236,8 @@ export function fcLayerCalculationVisualizer(
     svg: any,
     state: State
 ) {
+
+    d3.selectAll(".node-features-Copy").style("visibility", "visible");
     let moveToX = graphIndex * offset - 450;
     let moveToY = height / 7;
     let originalCoordinates = moveFeatures(relatedNodes, moveToX, moveToY);
@@ -1246,7 +1248,7 @@ export function fcLayerCalculationVisualizer(
 
     const g4 = svg
         .append("g")
-        .attr("transform", `translate(${moveToX - 250}, ${moveToY})`);
+        .attr("transform", `translate(${moveToX - 400}, ${moveToY})`);
 
     const displayer = g4
         .append("rect")
@@ -1271,7 +1273,7 @@ export function fcLayerCalculationVisualizer(
         .duration(1000)
         .attr(
             "transform",
-            `translate(${moveToX - 100}, ${moveToY + 150}) rotate(-90)`
+            `translate(${moveToX - 400}, ${moveToY + 150}) rotate(-90)`
         );
 
     let rectL = 175 / node.relatedNodes.length; // Assuming square shape and 75 is the height of graph-displayer
@@ -1320,10 +1322,50 @@ export function fcLayerCalculationVisualizer(
             posPlus,
             state
         );
-    }, 1500);
+        node.relatedNodes.forEach((n: any, i: number) => {
+            let start_x = 0;
+            let start_y = 0;
+            let end_x = moveToX - 800 + 15 + node.relatedNodes[0].features.length * 3;
+            let end_y = moveToY + 150;
+                start_x =
+                    3.5 * offset + n.features.length * 3 - offset - moveOffset + 35;
+                start_y = height / 7 + 100 + 45 * i - 7.5;
+                const control1_x = start_x + (end_x - start_x) * 0.3;
+                const control1_y = start_y;
+                const control2_x = start_x + (end_x - start_x) * 0.7;
+                const control2_y = end_y;
+
+
+
+                const originToAggregated = svg
+                    .append("path")
+                    .attr(
+                        "d",
+                        `M${start_x},${start_y} C ${control1_x},${control1_y}, ${control2_x},${control2_y}, ${end_x},${end_y}`
+                    )
+                    .style("stroke", "black")
+                    .style("stroke-width", 1)
+                    .style("fill", "none")
+                    .attr("class", "to-be-removed origin-to-aggregated")
+                    .style("opacity", 0);
+
+                    d3.selectAll(".origin-to-aggregated").transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .style("opacity", 0.3);
+
+         
+
+            
+        })
+    }, 1000);
+
 
     document.addEventListener("click", function () {
         console.log("document clicked");
+        d3.selectAll(".origin-to-aggregated").remove();
+
+        d3.selectAll(".node-features-Copy").style("visibility", "hidden");
 
         moveFeaturesBack(relatedNodes, originalCoordinates);
         node.featureGroup
@@ -1331,7 +1373,7 @@ export function fcLayerCalculationVisualizer(
             .duration(1000)
             .attr(
                 "transform",
-                `translate(${xPos - 100 - moveOffset}, ${yPos}) rotate(0)`
+                `translate(${xPos - 300 - 15 / 2}, ${yPos}) rotate(0)`
             );
         d3.selectAll("rect").style("opacity", 1);
         d3.select(".graph-displayer").remove();

@@ -702,7 +702,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
   
       } else {
-        moveOffset = 200;
+        moveOffset = 600;
 
         // for the pooling layer(graphIndex = 3), the rectHeight = 2, for the other 2 layers, rectHeight = 20;
         let rectHeight = 3;
@@ -731,6 +731,26 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .style("stroke-width", 1)
           .style("stroke", "grey")
           .style("opacity", 1);
+
+
+        const featureGroupCopy = g2.append("g")
+          .attr("transform", `translate(${node.x - 7.5}, ${node.y - yOffset})`);
+
+        featureGroupCopy.selectAll("rect")
+          .data(features)
+          .enter()
+          .append("rect")
+          .attr("x", -10) //adjust x and y coordination so it locates in the middle of the graph
+          .attr("y", (d: any, i: number) => i * rectHeight - 190)
+          .attr("width", 15)
+          .attr("height", rectHeight)
+          .attr("class", "node-features-Copy")
+          .style("fill", (d: number) => myColor(d))
+          .style("stroke-width", 1)
+          .style("stroke", "grey")
+          .style("visibility", "hidden")
+          .lower();
+        
         
         node.featureGroup = featureGroup;
         xPos = node.x;
@@ -823,7 +843,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
       let moveOffset = 900
 
       if (movedNode.graphIndex >= 4) {
-        moveOffset = 200;
+        moveOffset = 600;
       }
       moveNextLayer(svg, movedNode, moveOffset, -1)
       state.isClicked = false; 
