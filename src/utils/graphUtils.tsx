@@ -637,7 +637,7 @@ export function calculationVisualizer(
         .data(calculatedData)
         .enter()
         .append("rect")
-        .attr("x", (d: number, i: number) => i * 3 + 5)
+        .attr("x", (d: number, i: number) => i * 3)
         .attr("y", 0)
         .attr("width", 3)
         .attr("height", 15)
@@ -655,7 +655,7 @@ export function calculationVisualizer(
     .attr("class", "calFrame to-be-removed")
     .attr("x", 0)  
     .attr("y", 0)
-    .attr("width", (3 * calculatedData.length + 5))
+    .attr("width", (3 * calculatedData.length))
     .attr("height", 15)
     .style("fill", "none")
     .style("stroke", "black")
@@ -691,7 +691,7 @@ export function calculationVisualizer(
         .enter()
         .append("rect")
         .attr("class", "bias")
-        .attr("x", (d: any, i: number) => i * 3 + 5)
+        .attr("x", (d: any, i: number) => i * 3)
         .attr("y", 0)
         .attr("width", 3)
         .attr("height", 15)
@@ -704,7 +704,7 @@ export function calculationVisualizer(
     .attr("class", "bias to-be-removed")
     .attr("x", 0)  
     .attr("y", 0)
-    .attr("width", 3 * biasData.length + 5)
+    .attr("width", 3 * biasData.length)
     .attr("height", 15)
     .style("fill", "none")
     .style("stroke", "black")
@@ -757,19 +757,19 @@ export function calculationVisualizer(
                         .attr("y", start_y - 10)
                         .text(adjMatrixSlice[i])
                         .attr("class", "parameter")
-                        .attr("opacity", 1);
+                        .attr("opacity", 1).raise();
 
                     const originToAggregated = g3
                         .append("path")
                         .attr(
                             "d",
-                            `M${start_x},${start_y} C ${control1_x},${control1_y}, ${control2_x},${control2_y}, ${end_x},${end_y}`
+                            `M${start_x-10},${start_y} C ${control1_x},${control1_y}, ${control2_x},${control2_y}, ${end_x},${end_y}`
                         )
                         .style("stroke", myColor(adjMatrixSlice[i]))
                         .style("stroke-width", 1)
                         .style("fill", "none")
                         .attr("class", "to-be-removed origin-to-aggregated")
-                        .style("opacity", 0);
+                        .style("opacity", 0).lower();
 
                     d3.selectAll(".origin-to-aggregated").style("opacity", 1);
 
@@ -782,7 +782,7 @@ export function calculationVisualizer(
                 3.5 * offset +
                 node.relatedNodes[0].features.length * rectHeight * 2 +
                 node.features.length * 3 +
-                35;
+                30;
             start_y = height / 5 + 150 + 7.5;
             end_x =
                 3.5 * offset +
@@ -800,7 +800,7 @@ export function calculationVisualizer(
                 .style("stroke-width", 1)
                 .style("fill", "none")
                 .attr("class", "relu to-be-removed")
-                .attr("opacity", 0);
+                .attr("opacity", 0).lower();
 
             paths.push(aggregatedToFinal);
 
@@ -808,7 +808,7 @@ export function calculationVisualizer(
                 3.5 * offset +
                 node.relatedNodes[0].features.length * 2 * rectHeight +
                 node.features.length * 3 +
-                35;
+                30;
             start_y = height / 5 + 100 + 7.5;
 
             let control1_x = start_x + (end_x - start_x) * 0.2;
@@ -830,7 +830,7 @@ export function calculationVisualizer(
                 .style("stroke-width", 1)
                 .style("fill", "none")
                 .attr("class", "bias to-be-removed")
-                .style("opacity", 0);
+                .style("opacity", 0).lower();
 
             paths.push(biasToFinal);
             node.intermediatePaths = paths;
@@ -873,7 +873,7 @@ export function calculationVisualizer(
         .enter()
         .append("rect")
         .attr("class", "relu output")
-        .attr("x", (d: any, i: number) => i * 3+ 5)
+        .attr("x", (d: any, i: number) => i * 3)
         .attr("y", 0)
         .attr("width", 3)
         .attr("height", 15)
@@ -887,7 +887,7 @@ export function calculationVisualizer(
         .attr("x", 0)  
         .attr("y", 0)
         .attr("class", "relu output")
-        .attr("width", 3 * node.features.length + 5)
+        .attr("width", 3 * node.features.length )
         .attr("height", 15)
         .style("fill", "none")
         .style("stroke", "black")
