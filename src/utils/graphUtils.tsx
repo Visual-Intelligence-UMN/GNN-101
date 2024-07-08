@@ -154,7 +154,10 @@ export function outputVisualizer(
     offset: number,
     isClicked: boolean,
     moveOffset: number,
-    height: number
+    height: number,
+    prevRectHeight: number,
+    rectHeight: number,
+    rectWidth: number
 ) {
     d3.selectAll(".node-features-Copy").style("visibility", "visible");
     let originalCoordinates = moveFeatures(
@@ -187,7 +190,7 @@ export function outputVisualizer(
     for (let i = 0; i < 64; i++) {
         let s: [number, number] = [
             node.x +
-                3 * i -
+                prevRectHeight * i -
                 offset -
                 moveOffset + temp - 215,
             node.y - 15,
@@ -205,10 +208,10 @@ export function outputVisualizer(
         .data(calculatedData)
         .enter()
         .append("rect")
-        .attr("x", (d: number, i: number) => i * 20 + 5)
+        .attr("x", (d: number, i: number) => i * rectHeight + 5)
         .attr("y", -30)
-        .attr("width", 20)
-        .attr("height", 15)
+        .attr("width", rectHeight)
+        .attr("height", rectWidth)
         .attr(
             "class",
             (d: number, i: number) => `calculatedFeatures${i} to-be-removed`
@@ -221,7 +224,7 @@ export function outputVisualizer(
     let endCoordList = [];
 
     for (let i = 0; i < node.features.length; i++) {
-        let s: [number, number] = [node.x + 20 + i * 100 - temp, node.y - 15];
+        let s: [number, number] = [node.x + 20 + i * rectHeight - temp, node.y - 15];
         endCoordList.push(s);
     }
     console.log("start", startCoordList);
@@ -238,10 +241,10 @@ export function outputVisualizer(
         .enter()
         .append("rect")
         .attr("class", "bias")
-        .attr("x", (d: any, i: number) => i * 20 + 5 - moveOffset)
+        .attr("x", (d: any, i: number) => i * rectHeight + 5 - moveOffset)
         .attr("y", 0)
-        .attr("width", 20)
-        .attr("height", 15)
+        .attr("width", rectHeight)
+        .attr("height", rectWidth)
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 1)
         .style("stroke", "grey")
@@ -256,7 +259,8 @@ export function outputVisualizer(
             Xt,
             offset,
             height,
-            moveOffset
+            moveOffset,
+            prevRectHeight
         );
 
         let start_x = node.x + 40 + 5 - temp;
@@ -515,7 +519,9 @@ export function calculationVisualizer(
     height: number,
     isClicked: boolean,
     moveOffset: number,
-    rectHeight: number
+    prevRectHeight: number,
+    rectHeight: number,
+    rectWidth: number
 ) {
     if (isClicked || aggregatedDataMap == null || calculatedDataMap == null) {
         return;
@@ -571,7 +577,7 @@ export function calculationVisualizer(
         .attr(
             "transform",
             `translate(${
-                3.5 * offset + node.relatedNodes[0].features.length * rectHeight
+                3.5 * offset + node.relatedNodes[0].features.length * prevRectHeight
             }, ${height / 5 + 150})`
         );
 
@@ -580,10 +586,10 @@ export function calculationVisualizer(
         .data(aggregatedData)
         .enter()
         .append("rect")
-        .attr("x", (d: any, i: number) => i * rectHeight)
+        .attr("x", (d: any, i: number) => i * prevRectHeight)
         .attr("y", 0)
-        .attr("width", rectHeight)
-        .attr("height", 15)
+        .attr("width", prevRectHeight)
+        .attr("height", rectWidth)
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 0.1)
         .attr("class", "aggregatedFeatureGroup to-be-removed")
@@ -595,8 +601,8 @@ export function calculationVisualizer(
         .attr("class", "aggregatedFeatureGroup to-be-removed")
         .attr("x", 0)  
         .attr("y", 0)
-        .attr("width", rectHeight * aggregatedData.length)
-        .attr("height", 15)
+        .attr("width", prevRectHeight * aggregatedData.length)
+        .attr("height", rectWidth)
         .style("fill", "none")
         .style("stroke", "black")
         .style("stroke-width", 1)
@@ -610,8 +616,8 @@ export function calculationVisualizer(
     for (let i = 0; i < 64; i++) {
         let s: [number, number] = [
             node.graphIndex * offset +
-                i * rectHeight +
-                node.relatedNodes[0].features.length * rectHeight + rectHeight / 2,
+                i * prevRectHeight +
+                node.relatedNodes[0].features.length * prevRectHeight + prevRectHeight / 2,
             height / 5 + 150 + 25,
         ];
         startCoordList.push(s);
@@ -627,7 +633,7 @@ export function calculationVisualizer(
             "transform",
             `translate(${
                 3.5 * offset +
-                node.relatedNodes[0].features.length * 2 * rectHeight +
+                node.relatedNodes[0].features.length * 2 * prevRectHeight +
                 30
             }, ${height / 5 + 150})`
         );
@@ -637,10 +643,10 @@ export function calculationVisualizer(
         .data(calculatedData)
         .enter()
         .append("rect")
-        .attr("x", (d: number, i: number) => i * 3)
+        .attr("x", (d: number, i: number) => i * rectHeight)
         .attr("y", 0)
-        .attr("width", 3)
-        .attr("height", 15)
+        .attr("width", rectHeight)
+        .attr("height", rectWidth)
         .attr(
             "class",
             (d: number, i: number) => `calculatedFeatures${i} to-be-removed`
@@ -655,8 +661,8 @@ export function calculationVisualizer(
     .attr("class", "calFrame to-be-removed")
     .attr("x", 0)  
     .attr("y", 0)
-    .attr("width", (3 * calculatedData.length))
-    .attr("height", 15)
+    .attr("width", (rectHeight * calculatedData.length))
+    .attr("height", rectWidth)
     .style("fill", "none")
     .style("stroke", "black")
     .style("stroke-width", 1)
@@ -665,8 +671,8 @@ export function calculationVisualizer(
     for (let i = 0; i < 64; i++) {
         let s: [number, number] = [
             node.graphIndex * offset +
-                i * 3 +
-                node.relatedNodes[0].features.length * 2 * rectHeight +
+                i * rectHeight +
+                node.relatedNodes[0].features.length * 2 * prevRectHeight +
                 30,
             height / 5 + 150 + 25,
         ];
@@ -681,7 +687,7 @@ export function calculationVisualizer(
             "transform",
             `translate(${
                 3.5 * offset +
-                node.relatedNodes[0].features.length * 2 * rectHeight +
+                node.relatedNodes[0].features.length * 2 * prevRectHeight +
                 30
             }, ${height / 5 + 100})`
         );
@@ -691,10 +697,10 @@ export function calculationVisualizer(
         .enter()
         .append("rect")
         .attr("class", "bias")
-        .attr("x", (d: any, i: number) => i * 3)
+        .attr("x", (d: any, i: number) => i * rectHeight)
         .attr("y", 0)
-        .attr("width", 3)
-        .attr("height", 15)
+        .attr("width", rectHeight)
+        .attr("height", rectWidth)
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 0.1)
         .style("stroke", "grey")
@@ -704,8 +710,8 @@ export function calculationVisualizer(
     .attr("class", "bias to-be-removed")
     .attr("x", 0)  
     .attr("y", 0)
-    .attr("width", 3 * biasData.length)
-    .attr("height", 15)
+    .attr("width", rectHeight * biasData.length)
+    .attr("height", rectWidth)
     .style("fill", "none")
     .style("stroke", "black")
     .style("stroke-width", 1)
@@ -714,7 +720,7 @@ export function calculationVisualizer(
     intermediateFeatureGroups.push(BiasGroup);
     node.intermediateFeatureGroups = intermediateFeatureGroups;
 
-    end_x = 3.5 * offset + node.relatedNodes[0].features.length * rectHeight;
+    end_x = 3.5 * offset + node.relatedNodes[0].features.length * prevRectHeight;
     end_y = height / 5 + 150 + 7.5;
 
     let adjMatrixSlice: number[] = [];
@@ -734,17 +740,16 @@ export function calculationVisualizer(
             currentWeights,
             offset,
             height,
-            moveOffset
+            moveOffset,
+            prevRectHeight
         );
         if (node.relatedNodes) {
             node.relatedNodes.forEach((n: any, i: number) => {
                 if (n.featureGroupLocation) {
                     start_x =
-                        3.5 * offset - 70 + n.features.length * rectHeight;
+                        3.5 * offset - 70 + n.features.length * prevRectHeight;
                     start_y = height / 5 + 90 + 50 * i;
-                    if (node.graphIndex === 1) {
-                        start_x -= 60;
-                    }
+          
                     const control1_x = start_x + (end_x - start_x) * 0.3;
                     const control1_y = start_y;
                     const control2_x = start_x + (end_x - start_x) * 0.7;
@@ -763,7 +768,7 @@ export function calculationVisualizer(
                         .append("path")
                         .attr(
                             "d",
-                            `M${start_x-10},${start_y} C ${control1_x},${control1_y}, ${control2_x},${control2_y}, ${end_x},${end_y}`
+                            `M${start_x},${start_y} C ${control1_x},${control1_y}, ${control2_x},${control2_y}, ${end_x},${end_y}`
                         )
                         .style("stroke", myColor(adjMatrixSlice[i]))
                         .style("stroke-width", 1)
@@ -780,14 +785,14 @@ export function calculationVisualizer(
             let color;
             start_x =
                 3.5 * offset +
-                node.relatedNodes[0].features.length * rectHeight * 2 +
+                node.relatedNodes[0].features.length * prevRectHeight * 2 +
                 node.features.length * 3 +
                 30;
             start_y = height / 5 + 150 + 7.5;
             end_x =
                 3.5 * offset +
-                node.relatedNodes[0].features.length * rectHeight * 2 +
-                node.features.length * 3 +
+                node.relatedNodes[0].features.length * prevRectHeight * 2 +
+                node.features.length * rectHeight +
                 100; // the horizontal distance is offset(600) + moveoffset(300)
             end_y = height / 5 + 150 + 7.5;
 
@@ -806,7 +811,7 @@ export function calculationVisualizer(
 
             start_x =
                 3.5 * offset +
-                node.relatedNodes[0].features.length * 2 * rectHeight +
+                node.relatedNodes[0].features.length * 2 * prevRectHeight +
                 node.features.length * 3 +
                 30;
             start_y = height / 5 + 100 + 7.5;
@@ -861,8 +866,8 @@ export function calculationVisualizer(
             "transform",
             `translate(${
                 3.5 * offset +
-                node.relatedNodes[0].features.length * 2 * rectHeight +
-                node.features.length * 3 +
+                node.relatedNodes[0].features.length * 2 * prevRectHeight +
+                node.features.length * rectHeight +
                 95
             }, ${height / 5 + 150})`
         );
@@ -873,10 +878,10 @@ export function calculationVisualizer(
         .enter()
         .append("rect")
         .attr("class", "relu output")
-        .attr("x", (d: any, i: number) => i * 3)
+        .attr("x", (d: any, i: number) => i * rectHeight)
         .attr("y", 0)
-        .attr("width", 3)
-        .attr("height", 15)
+        .attr("width", rectHeight)
+        .attr("height", rectWidth)
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 0.1)
         .style("stroke", "grey")
@@ -887,8 +892,8 @@ export function calculationVisualizer(
         .attr("x", 0)  
         .attr("y", 0)
         .attr("class", "relu output")
-        .attr("width", 3 * node.features.length )
-        .attr("height", 15)
+        .attr("width", rectHeight * node.features.length )
+        .attr("height", rectWidth)
         .style("fill", "none")
         .style("stroke", "black")
         .style("stroke-width", 1)
@@ -900,8 +905,8 @@ export function calculationVisualizer(
             "transform",
             `translate(${
                 3.5 * offset +
-                node.relatedNodes[0].features.length * 2 * rectHeight +
-                node.features.length * 3 +
+                node.relatedNodes[0].features.length * 2 * prevRectHeight +
+                node.features.length * rectHeight +
                 95
             }, ${height / 5 + 150})`
         );
@@ -912,10 +917,10 @@ export function calculationVisualizer(
         .enter()
         .append("rect")
         .attr("class", "relu")
-        .attr("x", (d: any, i: number) => i * 3 + 5)
+        .attr("x", (d: any, i: number) => i * rectHeight + 5)
         .attr("y", 0)
-        .attr("width", 3)
-        .attr("height", 15)
+        .attr("width", rectHeight)
+        .attr("height", rectWidth)
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 0.1)
         .style("stroke", "grey")
@@ -927,8 +932,8 @@ export function calculationVisualizer(
     .attr("x", 5)  
     .attr("y", 0)
     .attr("class", "relu")
-    .attr("width", 3 * node.features.length + 5)
-    .attr("height", 15)
+    .attr("width", rectHeight * node.features.length + 5)
+    .attr("height", rectWidth)
     .style("fill", "none")
     .style("stroke", "black")
     .style("stroke-width", 1)
@@ -984,7 +989,8 @@ function weightAnimation(
     weights: any,
     offset: number,
     height: number,
-    moveOffset: number
+    moveOffset: number,
+    rectHeight: number
 ) {
     
     let i = 0;
@@ -995,10 +1001,8 @@ function weightAnimation(
     if (node.graphIndex === 5) {
         endNumber = 2;
     }
-    let rectHeight = 3;
-    if (node.graphIndex === 1) {
-        rectHeight = 10;
-    }
+
+
     let translateOffset = 0;
     if (node.graphIndex === 1) {
         translateOffset = 140;
@@ -1326,7 +1330,8 @@ export function fcLayerCalculationVisualizer(
     moveOffset: number,
     graphIndex: number,
     svg: any,
-    state: State
+    state: State,
+    rectHeight: number
 ) {
 
     d3.selectAll(".node-features-Copy").style("visibility", "visible");
@@ -1418,10 +1423,10 @@ export function fcLayerCalculationVisualizer(
         node.relatedNodes.forEach((n: any, i: number) => {
             let start_x = 0;
             let start_y = 0;
-            let end_x = moveToX - 900 + 15 + node.relatedNodes[0].features.length * 3;
+            let end_x = moveToX - 900 + 15 + node.relatedNodes[0].features.length * rectHeight;
             let end_y = moveToY + 150;
                 start_x =
-                    3.5 * offset + n.features.length * 3 - offset - moveOffset + 135;
+                    3.5 * offset + n.features.length * rectHeight - offset - moveOffset + 135;
                 start_y = height / 7 + 100 + 45 * i - 7.5;
                 const control1_x = start_x + (end_x - start_x) * 0.3;
                 const control1_y = start_y;
