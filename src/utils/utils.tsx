@@ -4,7 +4,7 @@ import * as d3 from "d3";
 import { loadWeights } from "./matHelperUtils";
 import * as ort from "onnxruntime-web";
 import { env } from "onnxruntime-web";
-import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature, outputVisualizer } from "@/utils/graphUtils";
+import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature, outputVisualizer, scaleFeatureGroup } from "@/utils/graphUtils";
 import { features, off } from 'process';
 import { IGraphData, IntmData, IntmDataNode } from "../types/";
 
@@ -566,21 +566,35 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .attr("y", (d: any, i: number) => i * rectHeight + 5)
           .attr("width", 15)
           .attr("height", rectHeight)
-          .attr("class", "node-features")
+          .attr("class", `node-features node-features-${node.graphIndex}-${node.id}`)
           .attr("id", (d: any, i: number) => "conv" + graphIndex + "-layer-rect-" + i) 
           .style("fill", (d: number) => myColor(d))
-          .style("stroke-width", 1)
+          .style("stroke-width", 0.1)
           .style("stroke", "grey")
           .style("opacity", 1);
+
+        const frame = featureGroup.append("rect")
+        .attr("class", `node-features-${node.graphIndex}-${node.id}`)
+        .attr("x", 0)  
+        .attr("y", 0)
+        .attr("width", 15)
+        .attr("height", rectHeight * (node.features.length) + 5)
+        .attr("class", `node-features-${node.graphIndex}-${node.id}`)
+        .style("fill", "none")
+        .style("stroke", "black")
+        .style("stroke-width", 1);
 
         featureGroup.append("text")
           .attr("x", 10)
           .attr("y", node.features.length * rectHeight + 10)
+          .attr("class", `node-features-${node.graphIndex}-${node.id}`)
           .attr("dy", ".35em")
           .text(node.id)
           .style("font-size", "12px")
           .style("fill", "black")
           .style("text-anchor", "middle");
+
+
 
         featureGroup.style('visibility', 'hidden');  
 
@@ -591,6 +605,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
         node.featureGroup = featureGroup;
         node.featureGroupLocation = featureGroupLocation; // this will be used in calculationvisualizer
+        scaleFeatureGroup(node, 0.5);
 
         // add interaction 
         node.svgElement.addEventListener("mouseover", function(this: any) {
@@ -702,7 +717,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
   
       } else {
-        moveOffset = 200;
+        moveOffset = 600;
 
         // for the pooling layer(graphIndex = 3), the rectHeight = 2, for the other 2 layers, rectHeight = 20;
         let rectHeight = 3;
@@ -728,9 +743,57 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .attr("height", rectHeight)
           .attr("class", "node-features")
           .style("fill", (d: number) => myColor(d))
-          .style("stroke-width", 1)
+          .style("stroke-width", 0.1)
           .style("stroke", "grey")
           .style("opacity", 1);
+
+
+          const frame = featureGroup.append("rect")
+          .attr("x", -10)  
+          .attr("y", -190)
+          .attr("width", 15)
+          .attr("height", rectHeight * (node.features.length))
+          .attr("class", `node-features`)
+          .attr("id", (d: any, i: number) => rectName +"-layer-rect-" + i) 
+          .style("fill", "none")
+          .style("stroke", "black")
+          .style("stroke-width", 1);
+
+
+        const featureGroupCopy = g2.append("g")
+          .attr("transform", `translate(${node.x - 7.5}, ${node.y - yOffset})`);
+
+        featureGroupCopy.selectAll("rect")
+          .data(features)
+          .enter()
+          .append("rect")
+          .attr("x", -10) //adjust x and y coordination so it locates in the middle of the graph
+          .attr("y", (d: any, i: number) => i * rectHeight - 190)
+          .attr("width", 15)
+          .attr("height", rectHeight)
+          .attr("class", "node-features-Copy")
+          .style("fill", (d: number) => myColor(d))
+          .style("stroke-width", 0.1)
+          .style("stroke", "grey")
+          .style("visibility", "hidden")
+          .lower();
+
+
+          const frameCopy = featureGroup.append("rect")
+          .attr("x", -10)  
+          .attr("y", -190)
+          .attr("width", 15)
+          .attr("height", rectHeight * (node.features.length))
+          .attr("class", "node-features-Copy")
+          .style("fill", "none")
+          .style("stroke", "black")
+          .style("stroke-width", 1)
+          .style("visibility", "hidden")
+
+          
+
+          
+        
         
         node.featureGroup = featureGroup;
         xPos = node.x;
@@ -823,7 +886,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
       let moveOffset = 900
 
       if (movedNode.graphIndex >= 4) {
-        moveOffset = 200;
+        moveOffset = 600;
       }
       moveNextLayer(svg, movedNode, moveOffset, -1)
       state.isClicked = false; 

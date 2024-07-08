@@ -3,6 +3,7 @@ import {
     FeatureGroupLocation,
     State,
     calculateAverage,
+    deepClone,
     myColor,
     state,
 } from "./utils";
@@ -57,35 +58,45 @@ export function reduceNodeOpacity(
     });
 }
 
+export function scaleFeatureGroup(node: any, scale: number) {
+    d3.selectAll(`.node-features-${node.graphIndex}-${node.id}`).attr('transform', `scale(${scale})`);  
+
+
+}
+
 export function showFeature(node: any) {
+    const scale = 1;
     if (node.featureGroup) {
-        node.featureGroup.style("visibility", "visible");
-        node.featureGroup.raise();
+        scaleFeatureGroup(node, scale);
     }
     if (node.relatedNodes) {
         node.relatedNodes.forEach((n: any) => {
-            n.featureGroup.style("visibility", "visible");
-            n.featureGroup.raise();
+            if (n.featureGroup) {
+                scaleFeatureGroup(n, scale);
+            }
         });
     }
 }
 
 export function highlightNodes(node: any) {
-    const avg = calculateAverage(node.features);
 
     if (node.featureGroup && node.svgElement) {
         d3.select(node.svgElement).attr("stroke-width", 3);
+        node.featureGroup.style("visibility", "visible");
+        node.featureGroup.raise();
     }
 
     if (node.relatedNodes) {
         node.relatedNodes.forEach((n: any) => {
             d3.select(n.svgElement).attr("stroke-width", 3);
+            n.featureGroup.style("visibility", "visible");
+            n.featureGroup.raise();
         });
     }
+    
 
     if (node.links) {
         node.links.forEach((link: any) => {
-            node.features;
             link.style("opacity", 1);
         });
     }
@@ -93,6 +104,7 @@ export function highlightNodes(node: any) {
 
 export function resetNodes(allNodes: any[]) {
     allNodes.forEach((node) => {
+        scaleFeatureGroup(node, 0.5)
         if (node.graphIndex <= 3) {
             if (node.featureGroup) {
                 node.featureGroup.style("visibility", "hidden");
@@ -144,9 +156,10 @@ export function outputVisualizer(
     moveOffset: number,
     height: number
 ) {
+    d3.selectAll(".node-features-Copy").style("visibility", "visible");
     let originalCoordinates = moveFeatures(
         node.relatedNodes,
-        (node.graphIndex - 1) * offset - 550,
+        (node.graphIndex - 1) * offset - 250,
         height / 5
     );
     node.featureGroup
@@ -155,18 +168,18 @@ export function outputVisualizer(
         .duration(1000)
         .attr(
             "transform",
-            `translate(${node.x + 150}, ${node.y - 25}) rotate(-90)`
+            `translate(${node.x - 100}, ${node.y - 25}) rotate(-90)`
         );
 
-    let temp = 250;
+    let temp = 475;
 
     let calculatedData: number[] = [];
     for (let i = 0; i < 2; i++) {
-        let temp = 0;
+        let data = 0;
         for (let j = 0; j < node.relatedNodes[0].features.length; j++) {
-            temp += weights[i][j] * node.relatedNodes[0].features[j];
+            data += weights[i][j] * node.relatedNodes[0].features[j];
         }
-        calculatedData.push(temp);
+        calculatedData.push(data);
     }
     console.log("mDAWa", node.relatedNodes[0].features, weights);
 
@@ -175,11 +188,8 @@ export function outputVisualizer(
         let s: [number, number] = [
             node.x +
                 3 * i -
-                offset +
-                moveOffset -
-                100 -
-                node.relatedNodes[0].features.length * 3 -
-                100,
+                offset -
+                moveOffset + temp - 215,
             node.y - 15,
         ];
         startCoordList.push(s);
@@ -221,7 +231,7 @@ export function outputVisualizer(
 
     const BiasGroup = svg
         .append("g")
-        .attr("transform", `translate(${node.x - temp}, ${node.y + 30})`);
+        .attr("transform", `translate(${node.x - 200}, ${node.y + 30})`);
 
     BiasGroup.selectAll("rect")
         .data(bias)
@@ -265,7 +275,7 @@ export function outputVisualizer(
                         "d",
                         `M${start_x + 20 * i - 30},${
                             start_y + 7.5
-                        } Q${control_x},${control_y} ${end_x + 20 * j},${
+                        } Q${control_x},${control_y} ${end_x - 20 * j},${
                             end_y + 7.5
                         }`
                     )
@@ -280,7 +290,7 @@ export function outputVisualizer(
 
         const aggregatedToFinal = svg
             .append("path")
-            .attr("d", `M${start_x},${start_y} ${end_x},${end_y}`)
+            .attr("d", `M${start_x},${start_y} ${end_x - 20},${end_y}`)
             .style("stroke", pathColor(color))
             .style("stroke-width", 1)
             .style("fill", "none")
@@ -288,8 +298,8 @@ export function outputVisualizer(
             .attr("opacity", 0);
 
         start_y = node.y + 40;
-        start_x = start_x - moveOffset;
-        end_x = end_x - 150;
+        start_x = start_x - moveOffset + temp - 200;
+        end_x = end_x - 200;
 
         let control1_x = start_x + (end_x - start_x) * 0.2;
         let control1_y = start_y;
@@ -309,11 +319,25 @@ export function outputVisualizer(
             .style("fill", "none")
             .attr("class", "bias to-be-removed")
             .style("opacity", 0);
+
+
+
+        const originToAggregated = svg
+            .append("path")
+            .attr(
+                "d",
+                `M${start_x + 6},${start_y - 65} L${end_x},${end_y}`
+            )
+            .style("stroke", pathColor(color))
+            .style("stroke-width", 1)
+            .style("fill", "none")
+            .attr("class", "output-path to-be-removed")
+            .attr("opacity", 0);
     }, 2000);
 
     const g4 = svg
         .append("g")
-        .attr("transform", `translate(${node.x - temp + 50}, ${node.y - 150})`);
+        .attr("transform", `translate(${node.x - temp}, ${node.y - 150})`);
 
     let rectL = 15;
     let displayerWidth = 300; // Width of the graph-displayer
@@ -474,7 +498,7 @@ export function outputVisualizer(
             .duration(1000)
             .attr(
                 "transform",
-                `translate(${node.x}, ${node.y + 170}) rotate(0)`
+                `translate(${node.x - 7.5}, ${node.y + 170 + 5}) rotate(0)`
             );
     });
 }
@@ -509,6 +533,9 @@ export function calculationVisualizer(
             "transform",
             `translate(${(node.graphIndex - 3.5) * offset}, 10)`
         );
+
+    d3.selectAll(".to-be-removed").remove();   
+
 
     let startCoordList: any[] = [];
     let endCoordList: any[] = [];
@@ -558,9 +585,21 @@ export function calculationVisualizer(
         .attr("width", rectHeight)
         .attr("height", 15)
         .style("fill", (d: number) => myColor(d))
-        .style("stroke-width", 1)
+        .style("stroke-width", 0.1)
         .attr("class", "aggregatedFeatureGroup to-be-removed")
         .style("stroke", "grey")
+        .style("opacity", 0);
+
+    
+    const aggFrame = aggregatedFeatureGroup.append("rect")
+        .attr("class", "aggregatedFeatureGroup to-be-removed")
+        .attr("x", 0)  
+        .attr("y", 0)
+        .attr("width", rectHeight * aggregatedData.length)
+        .attr("height", 15)
+        .style("fill", "none")
+        .style("stroke", "black")
+        .style("stroke-width", 1)
         .style("opacity", 0);
 
     d3.selectAll(".aggregatedFeatureGroup")
@@ -572,7 +611,7 @@ export function calculationVisualizer(
         let s: [number, number] = [
             node.graphIndex * offset +
                 i * rectHeight +
-                node.relatedNodes[0].features.length * rectHeight,
+                node.relatedNodes[0].features.length * rectHeight + rectHeight / 2,
             height / 5 + 150 + 25,
         ];
         startCoordList.push(s);
@@ -600,16 +639,28 @@ export function calculationVisualizer(
         .append("rect")
         .attr("x", (d: number, i: number) => i * 3 + 5)
         .attr("y", 0)
-        .attr("width", 3)
+        .attr("width", rectHeight)
         .attr("height", 15)
         .attr(
             "class",
             (d: number, i: number) => `calculatedFeatures${i} to-be-removed`
         )
         .style("fill", (d: number) => myColor(d))
-        .style("stroke-width", 1)
+        .style("stroke-width", 0.1)
         .style("stroke", "grey")
         .style("opacity", 0);
+
+            
+    const calFrame = calculatedFeatureGroup.append("rect")
+    .attr("class", "calFrame to-be-removed")
+    .attr("x", 0)  
+    .attr("y", 0)
+    .attr("width", (rectHeight * calculatedData.length + 5))
+    .attr("height", 15)
+    .style("fill", "none")
+    .style("stroke", "black")
+    .style("stroke-width", 1)
+    .style("opacity", 0);
 
     for (let i = 0; i < 64; i++) {
         let s: [number, number] = [
@@ -642,12 +693,23 @@ export function calculationVisualizer(
         .attr("class", "bias")
         .attr("x", (d: any, i: number) => i * 3 + 5)
         .attr("y", 0)
-        .attr("width", 3)
+        .attr("width", rectHeight)
         .attr("height", 15)
         .style("fill", (d: number) => myColor(d))
-        .style("stroke-width", 1)
+        .style("stroke-width", 0.1)
         .style("stroke", "grey")
         .style("opacity", 0);
+
+        const BiasFrame = BiasGroup.append("rect")
+    .attr("class", "bias to-be-removed")
+    .attr("x", 0)  
+    .attr("y", 0)
+    .attr("width", rectHeight * biasData.length + 5)
+    .attr("height", 15)
+    .style("fill", "none")
+    .style("stroke", "black")
+    .style("stroke-width", 1)
+    .style("opacity", 0);    
 
     intermediateFeatureGroups.push(BiasGroup);
     node.intermediateFeatureGroups = intermediateFeatureGroups;
@@ -663,6 +725,7 @@ export function calculationVisualizer(
     }
 
     setTimeout(() => {
+        d3.selectAll(".calFrame").style("opacity", 1);
         weightAnimation(
             svg,
             node,
@@ -703,7 +766,6 @@ export function calculationVisualizer(
                             `M${start_x},${start_y} C ${control1_x},${control1_y}, ${control2_x},${control2_y}, ${end_x},${end_y}`
                         )
                         .style("stroke", myColor(adjMatrixSlice[i]))
-                        .style("opacity", 0.7)
                         .style("stroke-width", 1)
                         .style("fill", "none")
                         .attr("class", "to-be-removed origin-to-aggregated")
@@ -811,14 +873,66 @@ export function calculationVisualizer(
         .enter()
         .append("rect")
         .attr("class", "relu output")
-        .attr("x", (d: any, i: number) => i * 3 + 5)
+        .attr("x", (d: any, i: number) => i * rectHeight + 5)
         .attr("y", 0)
-        .attr("width", 3)
+        .attr("width", rectHeight)
         .attr("height", 15)
         .style("fill", (d: number) => myColor(d))
-        .style("stroke-width", 1)
+        .style("stroke-width", 0.1)
         .style("stroke", "grey")
         .attr("opacity", 0);
+
+
+    const outputFrame = outputGroup.append("rect")
+        .attr("x", 0)  
+        .attr("y", 0)
+        .attr("class", "relu output")
+        .attr("width", rectHeight * node.features.length + 5)
+        .attr("height", 15)
+        .style("fill", "none")
+        .style("stroke", "black")
+        .style("stroke-width", 1)
+        .style("opacity", 0);
+
+    const outputGroupCopy = g3
+        .append("g")
+        .attr(
+            "transform",
+            `translate(${
+                3.5 * offset +
+                node.relatedNodes[0].features.length * 2 * rectHeight +
+                node.features.length * 3 +
+                95
+            }, ${height / 5 + 150})`
+        );
+
+    outputGroupCopy
+        .selectAll("rect")
+        .data(node.features)
+        .enter()
+        .append("rect")
+        .attr("class", "relu")
+        .attr("x", (d: any, i: number) => i * rectHeight + 5)
+        .attr("y", 0)
+        .attr("width", rectHeight)
+        .attr("height", 15)
+        .style("fill", (d: number) => myColor(d))
+        .style("stroke-width", 0.1)
+        .style("stroke", "grey")
+        .attr("opacity", 0);    
+
+
+
+    const outputFrameCopy = outputGroupCopy.append("rect")
+    .attr("x", 0)  
+    .attr("y", 0)
+    .attr("class", "relu")
+    .attr("width", rectHeight * node.features.length + 5)
+    .attr("height", 15)
+    .style("fill", "none")
+    .style("stroke", "black")
+    .style("stroke-width", 1)
+    .style("opacity", 0);
 
     intermediateFeatureGroups.push(outputGroup);
     node.intermediateFeatureGroups = intermediateFeatureGroups;
@@ -826,6 +940,7 @@ export function calculationVisualizer(
     document.addEventListener("click", () => {
         moveFeaturesBack(node.relatedNodes, originalCoordinates);
         d3.selectAll(".to-be-removed").remove();
+        
     });
 }
 
@@ -864,14 +979,14 @@ export function moveNextLayer(
 
 function weightAnimation(
     svg: any,
-    node: any,
-    startCoordList: number[][],
+    node: any,startCoordList: number[][],
     endCoordList: number[][],
     weights: any,
     offset: number,
     height: number,
     moveOffset: number
 ) {
+    
     let i = 0;
     let intervalID: any;
     let isPlaying = true;
@@ -916,6 +1031,7 @@ function weightAnimation(
 
     document.addEventListener("click", () => {
         isAnimating = false;
+        state.isClicked = false;
         d3.selectAll(".bias").remove();
         d3.selectAll(".vis-component").remove();
         d3.selectAll(".relu").remove();
@@ -944,6 +1060,7 @@ function weightAnimation(
                     btn,
                     node
                 );
+ 
                 i++;
                 if (i >= endNumber) {
                     clearInterval(intervalID);
@@ -954,6 +1071,7 @@ function weightAnimation(
                         d3.selectAll(".bias").style("opacity", 1);
                         d3.selectAll(".softmax").attr("opacity", 0.07);
                         d3.selectAll(".relu").attr("opacity", 1);
+                        d3.selectAll(".output-path").attr("opacity", 1);
                         d3.selectAll(".output")
                             .transition()
                             .delay(2000)
@@ -1154,7 +1272,7 @@ function moveFeatures(relatedNodes: any, xPos: number, yPos: number) {
                 .attr(
                     "transform",
                     `translate(${xPos + 27.5}, ${
-                        yPos + i * 47.5 + 100
+                        yPos + i * 45 + 100
                     }) rotate(-90)`
                 );
         }
@@ -1210,7 +1328,10 @@ export function fcLayerCalculationVisualizer(
     svg: any,
     state: State
 ) {
-    let moveToX = graphIndex * offset - 450;
+
+    d3.selectAll(".node-features-Copy").style("visibility", "visible");
+    d3.selectAll(".node-features-Copy").raise();
+    let moveToX = graphIndex * offset - 350;
     let moveToY = height / 7;
     let originalCoordinates = moveFeatures(relatedNodes, moveToX, moveToY);
 
@@ -1220,7 +1341,7 @@ export function fcLayerCalculationVisualizer(
 
     const g4 = svg
         .append("g")
-        .attr("transform", `translate(${moveToX - 250}, ${moveToY})`);
+        .attr("transform", `translate(${moveToX - 700}, ${moveToY})`);
 
     const displayer = g4
         .append("rect")
@@ -1245,7 +1366,7 @@ export function fcLayerCalculationVisualizer(
         .duration(1000)
         .attr(
             "transform",
-            `translate(${moveToX - 100}, ${moveToY + 150}) rotate(-90)`
+            `translate(${moveToX - 500}, ${moveToY + 150}) rotate(-90)`
         );
 
     let rectL = 175 / node.relatedNodes.length; // Assuming square shape and 75 is the height of graph-displayer
@@ -1294,10 +1415,50 @@ export function fcLayerCalculationVisualizer(
             posPlus,
             state
         );
-    }, 1500);
+        node.relatedNodes.forEach((n: any, i: number) => {
+            let start_x = 0;
+            let start_y = 0;
+            let end_x = moveToX - 900 + 15 + node.relatedNodes[0].features.length * 3;
+            let end_y = moveToY + 150;
+                start_x =
+                    3.5 * offset + n.features.length * 3 - offset - moveOffset + 135;
+                start_y = height / 7 + 100 + 45 * i - 7.5;
+                const control1_x = start_x + (end_x - start_x) * 0.3;
+                const control1_y = start_y;
+                const control2_x = start_x + (end_x - start_x) * 0.7;
+                const control2_y = end_y;
+
+
+
+                const originToAggregated = svg
+                    .append("path")
+                    .attr(
+                        "d",
+                        `M${start_x},${start_y} C ${control1_x},${control1_y}, ${control2_x},${control2_y}, ${end_x},${end_y}`
+                    )
+                    .style("stroke", "black")
+                    .style("stroke-width", 1)
+                    .style("fill", "none")
+                    .attr("class", "to-be-removed origin-to-aggregated")
+                    .style("opacity", 0);
+
+                    d3.selectAll(".origin-to-aggregated").transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .style("opacity", 0.3);
+
+         
+
+            
+        })
+    }, 1000);
+
 
     document.addEventListener("click", function () {
         console.log("document clicked");
+        d3.selectAll(".origin-to-aggregated").remove();
+
+        d3.selectAll(".node-features-Copy").style("visibility", "hidden");
 
         moveFeaturesBack(relatedNodes, originalCoordinates);
         node.featureGroup
@@ -1305,7 +1466,7 @@ export function fcLayerCalculationVisualizer(
             .duration(1000)
             .attr(
                 "transform",
-                `translate(${xPos - 100 - moveOffset}, ${yPos}) rotate(0)`
+                `translate(${xPos - 300 - 15 / 2}, ${yPos}) rotate(0)`
             );
         d3.selectAll("rect").style("opacity", 1);
         d3.select(".graph-displayer").remove();
