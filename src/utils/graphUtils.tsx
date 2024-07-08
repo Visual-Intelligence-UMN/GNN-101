@@ -60,6 +60,8 @@ export function reduceNodeOpacity(
 
 export function scaleFeatureGroup(node: any, scale: number) {
     d3.selectAll(`.node-features-${node.graphIndex}-${node.id}`).attr('transform', `scale(${scale})`);  
+
+
 }
 
 export function showFeature(node: any) {
@@ -81,12 +83,14 @@ export function highlightNodes(node: any) {
     if (node.featureGroup && node.svgElement) {
         d3.select(node.svgElement).attr("stroke-width", 3);
         node.featureGroup.style("visibility", "visible");
+        node.featureGroup.raise();
     }
 
     if (node.relatedNodes) {
         node.relatedNodes.forEach((n: any) => {
             d3.select(n.svgElement).attr("stroke-width", 3);
             n.featureGroup.style("visibility", "visible");
+            n.featureGroup.raise();
         });
     }
     
@@ -100,7 +104,7 @@ export function highlightNodes(node: any) {
 
 export function resetNodes(allNodes: any[]) {
     allNodes.forEach((node) => {
-        scaleFeatureGroup(node, 0.5);
+        scaleFeatureGroup(node, 0.5)
         if (node.graphIndex <= 3) {
             if (node.featureGroup) {
                 node.featureGroup.style("visibility", "hidden");
@@ -530,6 +534,9 @@ export function calculationVisualizer(
             `translate(${(node.graphIndex - 3.5) * offset}, 10)`
         );
 
+    d3.selectAll(".to-be-removed").remove();   
+
+
     let startCoordList: any[] = [];
     let endCoordList: any[] = [];
 
@@ -872,6 +879,7 @@ export function calculationVisualizer(
     document.addEventListener("click", () => {
         moveFeaturesBack(node.relatedNodes, originalCoordinates);
         d3.selectAll(".to-be-removed").remove();
+        
     });
 }
 
@@ -917,6 +925,7 @@ function weightAnimation(
     height: number,
     moveOffset: number
 ) {
+    
     let i = 0;
     let intervalID: any;
     let isPlaying = true;
@@ -961,6 +970,7 @@ function weightAnimation(
 
     document.addEventListener("click", () => {
         isAnimating = false;
+        state.isClicked = false;
         d3.selectAll(".bias").remove();
         d3.selectAll(".vis-component").remove();
         d3.selectAll(".relu").remove();
@@ -989,6 +999,7 @@ function weightAnimation(
                     btn,
                     node
                 );
+ 
                 i++;
                 if (i >= endNumber) {
                     clearInterval(intervalID);

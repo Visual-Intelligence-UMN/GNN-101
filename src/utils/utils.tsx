@@ -842,6 +842,7 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
       return;
     }
     if (movedNode && (!event.target.classList.contains("vis-component"))) {
+
       svg.selectAll(".vis-component")
         .style("opacity", 0);
       let moveOffset = 900
