@@ -924,7 +924,7 @@ export function calculationVisualizer(
 
 
     const outputFrameCopy = outputGroupCopy.append("rect")
-    .attr("x", 0)  
+    .attr("x", 5)  
     .attr("y", 0)
     .attr("class", "relu")
     .attr("width", 3 * node.features.length + 5)
@@ -932,7 +932,7 @@ export function calculationVisualizer(
     .style("fill", "none")
     .style("stroke", "black")
     .style("stroke-width", 1)
-    .style("opacity", 0);
+    .style("opacity", 0).raise();
 
     intermediateFeatureGroups.push(outputGroup);
     node.intermediateFeatureGroups = intermediateFeatureGroups;
@@ -1070,7 +1070,7 @@ function weightAnimation(
                     setTimeout(() => {
                         d3.selectAll(".bias").style("opacity", 1);
                         d3.selectAll(".softmax").attr("opacity", 0.07);
-                        d3.selectAll(".relu").attr("opacity", 1);
+                        d3.selectAll(".relu").style("opacity", 1);
                         d3.selectAll(".output-path").attr("opacity", 1);
                         d3.selectAll(".output")
                             .transition()
