@@ -145,9 +145,10 @@ export function outputVisualizer(
     moveOffset: number,
     height: number
 ) {
+    d3.selectAll(".node-features-Copy").style("visibility", "visible");
     let originalCoordinates = moveFeatures(
         node.relatedNodes,
-        (node.graphIndex - 1) * offset - 550,
+        (node.graphIndex - 1) * offset - 250,
         height / 5
     );
     node.featureGroup
@@ -156,18 +157,18 @@ export function outputVisualizer(
         .duration(1000)
         .attr(
             "transform",
-            `translate(${node.x + 150}, ${node.y - 25}) rotate(-90)`
+            `translate(${node.x - 100}, ${node.y - 25}) rotate(-90)`
         );
 
-    let temp = 250;
+    let temp = 475;
 
     let calculatedData: number[] = [];
     for (let i = 0; i < 2; i++) {
-        let temp = 0;
+        let data = 0;
         for (let j = 0; j < node.relatedNodes[0].features.length; j++) {
-            temp += weights[i][j] * node.relatedNodes[0].features[j];
+            data += weights[i][j] * node.relatedNodes[0].features[j];
         }
-        calculatedData.push(temp);
+        calculatedData.push(data);
     }
     console.log("mDAWa", node.relatedNodes[0].features, weights);
 
@@ -176,11 +177,8 @@ export function outputVisualizer(
         let s: [number, number] = [
             node.x +
                 3 * i -
-                offset +
-                moveOffset -
-                100 -
-                node.relatedNodes[0].features.length * 3 -
-                100,
+                offset -
+                moveOffset + temp - 215,
             node.y - 15,
         ];
         startCoordList.push(s);
@@ -222,7 +220,7 @@ export function outputVisualizer(
 
     const BiasGroup = svg
         .append("g")
-        .attr("transform", `translate(${node.x - temp}, ${node.y + 30})`);
+        .attr("transform", `translate(${node.x - 200}, ${node.y + 30})`);
 
     BiasGroup.selectAll("rect")
         .data(bias)
@@ -266,7 +264,7 @@ export function outputVisualizer(
                         "d",
                         `M${start_x + 20 * i - 30},${
                             start_y + 7.5
-                        } Q${control_x},${control_y} ${end_x + 20 * j},${
+                        } Q${control_x},${control_y} ${end_x - 20 * j},${
                             end_y + 7.5
                         }`
                     )
@@ -281,7 +279,7 @@ export function outputVisualizer(
 
         const aggregatedToFinal = svg
             .append("path")
-            .attr("d", `M${start_x},${start_y} ${end_x},${end_y}`)
+            .attr("d", `M${start_x},${start_y} ${end_x - 20},${end_y}`)
             .style("stroke", pathColor(color))
             .style("stroke-width", 1)
             .style("fill", "none")
@@ -289,8 +287,8 @@ export function outputVisualizer(
             .attr("opacity", 0);
 
         start_y = node.y + 40;
-        start_x = start_x - moveOffset;
-        end_x = end_x - 150;
+        start_x = start_x - moveOffset + temp - 200;
+        end_x = end_x - 200;
 
         let control1_x = start_x + (end_x - start_x) * 0.2;
         let control1_y = start_y;
@@ -310,11 +308,25 @@ export function outputVisualizer(
             .style("fill", "none")
             .attr("class", "bias to-be-removed")
             .style("opacity", 0);
+
+
+
+        const originToAggregated = svg
+            .append("path")
+            .attr(
+                "d",
+                `M${start_x + 6},${start_y - 65} L${end_x},${end_y}`
+            )
+            .style("stroke", pathColor(color))
+            .style("stroke-width", 1)
+            .style("fill", "none")
+            .attr("class", "output-path to-be-removed")
+            .attr("opacity", 0);
     }, 2000);
 
     const g4 = svg
         .append("g")
-        .attr("transform", `translate(${node.x - temp + 50}, ${node.y - 150})`);
+        .attr("transform", `translate(${node.x - temp}, ${node.y - 150})`);
 
     let rectL = 15;
     let displayerWidth = 300; // Width of the graph-displayer
@@ -475,7 +487,7 @@ export function outputVisualizer(
             .duration(1000)
             .attr(
                 "transform",
-                `translate(${node.x}, ${node.y + 170}) rotate(0)`
+                `translate(${node.x - 7.5}, ${node.y + 170 + 5}) rotate(0)`
             );
     });
 }
@@ -980,6 +992,7 @@ function weightAnimation(
                         d3.selectAll(".bias").style("opacity", 1);
                         d3.selectAll(".softmax").attr("opacity", 0.07);
                         d3.selectAll(".relu").attr("opacity", 1);
+                        d3.selectAll(".output-path").attr("opacity", 1);
                         d3.selectAll(".output")
                             .transition()
                             .delay(2000)
