@@ -585,9 +585,21 @@ export function calculationVisualizer(
         .attr("width", rectHeight)
         .attr("height", 15)
         .style("fill", (d: number) => myColor(d))
-        .style("stroke-width", 1)
+        .style("stroke-width", 0.1)
         .attr("class", "aggregatedFeatureGroup to-be-removed")
         .style("stroke", "grey")
+        .style("opacity", 0);
+
+    
+    const aggFrame = aggregatedFeatureGroup.append("rect")
+        .attr("class", "aggregatedFeatureGroup to-be-removed")
+        .attr("x", 0)  
+        .attr("y", 0)
+        .attr("width", rectHeight * aggregatedData.length)
+        .attr("height", 15)
+        .style("fill", "none")
+        .style("stroke", "black")
+        .style("stroke-width", 1)
         .style("opacity", 0);
 
     d3.selectAll(".aggregatedFeatureGroup")
@@ -627,16 +639,28 @@ export function calculationVisualizer(
         .append("rect")
         .attr("x", (d: number, i: number) => i * 3 + 5)
         .attr("y", 0)
-        .attr("width", 3)
+        .attr("width", rectHeight)
         .attr("height", 15)
         .attr(
             "class",
             (d: number, i: number) => `calculatedFeatures${i} to-be-removed`
         )
         .style("fill", (d: number) => myColor(d))
-        .style("stroke-width", 1)
+        .style("stroke-width", 0.1)
         .style("stroke", "grey")
         .style("opacity", 0);
+
+            
+    const calFrame = calculatedFeatureGroup.append("rect")
+    .attr("class", "calFrame to-be-removed")
+    .attr("x", 0)  
+    .attr("y", 0)
+    .attr("width", (rectHeight * calculatedData.length + 5))
+    .attr("height", 15)
+    .style("fill", "none")
+    .style("stroke", "black")
+    .style("stroke-width", 1)
+    .style("opacity", 0);
 
     for (let i = 0; i < 64; i++) {
         let s: [number, number] = [
@@ -669,12 +693,23 @@ export function calculationVisualizer(
         .attr("class", "bias")
         .attr("x", (d: any, i: number) => i * 3 + 5)
         .attr("y", 0)
-        .attr("width", 3)
+        .attr("width", rectHeight)
         .attr("height", 15)
         .style("fill", (d: number) => myColor(d))
-        .style("stroke-width", 1)
+        .style("stroke-width", 0.1)
         .style("stroke", "grey")
         .style("opacity", 0);
+
+        const BiasFrame = BiasGroup.append("rect")
+    .attr("class", "bias to-be-removed")
+    .attr("x", 0)  
+    .attr("y", 0)
+    .attr("width", rectHeight * biasData.length + 5)
+    .attr("height", 15)
+    .style("fill", "none")
+    .style("stroke", "black")
+    .style("stroke-width", 1)
+    .style("opacity", 0);    
 
     intermediateFeatureGroups.push(BiasGroup);
     node.intermediateFeatureGroups = intermediateFeatureGroups;
@@ -690,6 +725,7 @@ export function calculationVisualizer(
     }
 
     setTimeout(() => {
+        d3.selectAll(".calFrame").style("opacity", 1);
         weightAnimation(
             svg,
             node,
@@ -837,14 +873,26 @@ export function calculationVisualizer(
         .enter()
         .append("rect")
         .attr("class", "relu output")
-        .attr("x", (d: any, i: number) => i * 3 + 5)
+        .attr("x", (d: any, i: number) => i * rectHeight + 5)
         .attr("y", 0)
-        .attr("width", 3)
+        .attr("width", rectHeight)
         .attr("height", 15)
         .style("fill", (d: number) => myColor(d))
-        .style("stroke-width", 1)
+        .style("stroke-width", 0.1)
         .style("stroke", "grey")
         .attr("opacity", 0);
+
+
+    const outputFrame = outputGroup.append("rect")
+        .attr("x", 0)  
+        .attr("y", 0)
+        .attr("class", "relu output")
+        .attr("width", rectHeight * node.features.length + 5)
+        .attr("height", 15)
+        .style("fill", "none")
+        .style("stroke", "black")
+        .style("stroke-width", 1)
+        .style("opacity", 0);
 
     const outputGroupCopy = g3
         .append("g")
@@ -864,14 +912,27 @@ export function calculationVisualizer(
         .enter()
         .append("rect")
         .attr("class", "relu")
-        .attr("x", (d: any, i: number) => i * 3 + 5)
+        .attr("x", (d: any, i: number) => i * rectHeight + 5)
         .attr("y", 0)
-        .attr("width", 3)
+        .attr("width", rectHeight)
         .attr("height", 15)
         .style("fill", (d: number) => myColor(d))
-        .style("stroke-width", 1)
+        .style("stroke-width", 0.1)
         .style("stroke", "grey")
         .attr("opacity", 0);    
+
+
+
+    const outputFrameCopy = outputGroupCopy.append("rect")
+    .attr("x", 0)  
+    .attr("y", 0)
+    .attr("class", "relu")
+    .attr("width", rectHeight * node.features.length + 5)
+    .attr("height", 15)
+    .style("fill", "none")
+    .style("stroke", "black")
+    .style("stroke-width", 1)
+    .style("opacity", 0);
 
     intermediateFeatureGroups.push(outputGroup);
     node.intermediateFeatureGroups = intermediateFeatureGroups;
@@ -1269,6 +1330,7 @@ export function fcLayerCalculationVisualizer(
 ) {
 
     d3.selectAll(".node-features-Copy").style("visibility", "visible");
+    d3.selectAll(".node-features-Copy").raise();
     let moveToX = graphIndex * offset - 350;
     let moveToY = height / 7;
     let originalCoordinates = moveFeatures(relatedNodes, moveToX, moveToY);

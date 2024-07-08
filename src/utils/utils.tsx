@@ -569,9 +569,20 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .attr("class", `node-features node-features-${node.graphIndex}-${node.id}`)
           .attr("id", (d: any, i: number) => "conv" + graphIndex + "-layer-rect-" + i) 
           .style("fill", (d: number) => myColor(d))
-          .style("stroke-width", 1)
+          .style("stroke-width", 0.1)
           .style("stroke", "grey")
           .style("opacity", 1);
+
+        const frame = featureGroup.append("rect")
+        .attr("class", `node-features-${node.graphIndex}-${node.id}`)
+        .attr("x", 0)  
+        .attr("y", 0)
+        .attr("width", 15)
+        .attr("height", rectHeight * (node.features.length) + 5)
+        .attr("class", `node-features-${node.graphIndex}-${node.id}`)
+        .style("fill", "none")
+        .style("stroke", "black")
+        .style("stroke-width", 1);
 
         featureGroup.append("text")
           .attr("x", 10)
@@ -732,9 +743,21 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .attr("height", rectHeight)
           .attr("class", "node-features")
           .style("fill", (d: number) => myColor(d))
-          .style("stroke-width", 1)
+          .style("stroke-width", 0.1)
           .style("stroke", "grey")
           .style("opacity", 1);
+
+
+          const frame = featureGroup.append("rect")
+          .attr("x", -10)  
+          .attr("y", -190)
+          .attr("width", 15)
+          .attr("height", rectHeight * (node.features.length))
+          .attr("class", `node-features`)
+          .attr("id", (d: any, i: number) => rectName +"-layer-rect-" + i) 
+          .style("fill", "none")
+          .style("stroke", "black")
+          .style("stroke-width", 1);
 
 
         const featureGroupCopy = g2.append("g")
@@ -750,10 +773,26 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
           .attr("height", rectHeight)
           .attr("class", "node-features-Copy")
           .style("fill", (d: number) => myColor(d))
-          .style("stroke-width", 1)
+          .style("stroke-width", 0.1)
           .style("stroke", "grey")
           .style("visibility", "hidden")
           .lower();
+
+
+          const frameCopy = featureGroup.append("rect")
+          .attr("x", -10)  
+          .attr("y", -190)
+          .attr("width", 15)
+          .attr("height", rectHeight * (node.features.length))
+          .attr("class", "node-features-Copy")
+          .style("fill", "none")
+          .style("stroke", "black")
+          .style("stroke-width", 1)
+          .style("visibility", "hidden")
+
+          
+
+          
         
         
         node.featureGroup = featureGroup;
@@ -842,7 +881,6 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
       return;
     }
     if (movedNode && (!event.target.classList.contains("vis-component"))) {
-
       svg.selectAll(".vis-component")
         .style("opacity", 0);
       let moveOffset = 900
