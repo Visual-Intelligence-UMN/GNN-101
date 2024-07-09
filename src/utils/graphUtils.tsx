@@ -14,6 +14,7 @@ import { create, all, matrix } from "mathjs";
 import { inter } from "@/pages";
 import { off } from "process";
 import { injectPlayButtonSVGForGraphView } from "./svgUtils";
+import { stat } from "fs";
 
 export const pathColor = d3
     .scaleLinear<string>()
@@ -190,7 +191,7 @@ export function outputVisualizer(
         }
         calculatedData.push(data);
     }
-    console.log("mDAWa", node.relatedNodes[0].features, weights);
+
 
     let startCoordList = [];
     for (let i = 0; i < 64; i++) {
@@ -267,7 +268,8 @@ export function outputVisualizer(
             height,
             moveOffset,
             rectHeight,
-            prevRectHeight
+            prevRectHeight,
+            state
         );
 
         let start_x = node.x + 40 + 5 - temp;
@@ -529,14 +531,16 @@ export function calculationVisualizer(
     moveOffset: number,
     prevRectHeight: number,
     rectHeight: number,
-    rectWidth: number
+    rectWidth: number,
+    state: State
 ) {
-    if (isClicked || aggregatedDataMap == null || calculatedDataMap == null) {
+    if (state.isClicked || aggregatedDataMap == null || calculatedDataMap == null) {
+        d3.selectAll(".to-be-removed").remove();   
+
         return;
     }
     showFeature(node);
 
-    let isPlaying: boolean = true;
 
     let biasData = bias;
 
@@ -744,6 +748,9 @@ export function calculationVisualizer(
     
 
     setTimeout(() => {
+        if (!state.isClicked) {
+            return;
+        }
         d3.selectAll(".calFrame").style("opacity", 1);
         weightAnimation(
             svg,
@@ -755,9 +762,10 @@ export function calculationVisualizer(
             height,
             moveOffset,
             rectHeight,
-            prevRectHeight
+            prevRectHeight,
+            state
         );
-        console.log("hi", prevRectHeight)
+      
         if (node.relatedNodes) {
             node.relatedNodes.forEach((n: any, i: number) => {
                 if (n.featureGroupLocation) {
@@ -861,7 +869,7 @@ export function calculationVisualizer(
         const relu = g3.append("g");
 
         d3.xml("./assets/SVGs/ReLU.svg").then(function (data) {
-          console.log("xml", data.documentElement);
+    
           if(relu.node()!=null){
           const ReLU = relu!.node()!.appendChild(data.documentElement);
           d3.select(ReLU)
@@ -1006,8 +1014,14 @@ function weightAnimation(
     height: number,
     moveOffset: number,
     rectHeight: number,
-    prevRectHeight: number
+    prevRectHeight: number,
+    state: State
 ) {
+
+    if (!state.isClicked) {
+        d3.selectAll(".to-be-removed").remove();
+        return
+    }
     
     let i = 0;
     let intervalID: any;
@@ -1028,7 +1042,7 @@ function weightAnimation(
     // Pause and replay button
     const btn = svg.append("g").attr("class", "button-group");
 
-    console.log("node weight ani", node);
+
 
     let btnYOffset = 100;
     if(node.relatedNodes.length==2)btnYOffset = 150;
@@ -1041,7 +1055,7 @@ function weightAnimation(
         console.log(isPlaying);
         if(isPlaying)injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - btnYOffset, "./assets/SVGs/playBtn_pause.svg");
         else injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - btnYOffset, "./assets/SVGs/playBtn_play.svg")
-        if (isPlaying) {
+        if (isPlaying && state.isClicked) {
             startAnimation(endNumber);
         } else {
             clearInterval(intervalID);
@@ -1056,6 +1070,7 @@ function weightAnimation(
     document.addEventListener("click", () => {
         isAnimating = false;
         state.isClicked = false;
+        clearInterval(intervalID); 
         d3.selectAll(".bias").remove();
         d3.selectAll(".vis-component").remove();
         d3.selectAll(".relu").remove();
@@ -1065,10 +1080,12 @@ function weightAnimation(
     });
 
     function startAnimation(endNumber: number) {
+
         if (i >= endNumber) {
             i = 0; // Reset the index to replay the animation
         }
         intervalID = setInterval(() => {
+
             d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1);
             d3.selectAll(`#tempath${i - 1}`).attr("opacity", 0);
 
@@ -1142,8 +1159,7 @@ function GraphViewDrawPaths(
     for (let j = 0; j < 64; j++) {
         let s = startCoordList[63 - j];
         let e = endCoordList[i];
-        console.log("S", s);
-        console.log("E", e);
+
 
         let start_x = s[0];
         let start_y = s[1];
