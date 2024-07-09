@@ -228,6 +228,15 @@ export function outputVisualizer(
         .style("stroke", "grey")
         .style("opacity", 0);
 
+    calculatedFeatureGroup.append("text")
+        .attr("x", 5)
+        .attr("y", -38)
+        .text("Matrix Multiplication")
+        .style("fill", "gray")
+        .style("font-size", "8px")
+        .attr("class", "bias")
+        .style("opacity", 1); 
+
     let endCoordList = [];
 
     for (let i = 0; i < node.features.length; i++) {
