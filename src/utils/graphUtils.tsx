@@ -599,6 +599,16 @@ export function calculationVisualizer(
         .style("stroke", "grey")
         .style("opacity", 0);
 
+    //draw label
+    aggregatedFeatureGroup.append("text")
+            .attr("x", 0)
+            .attr("y", -3)
+            .text("Vectors Summation")
+            .style("fill", "gray")
+            .style("font-size", "8px")
+            .attr("class", "aggregatedFeatureGroup to-be-removed")
+            .style("opacity", 0); 
+
     
     const aggFrame = aggregatedFeatureGroup.append("rect")
         .attr("class", "aggregatedFeatureGroup to-be-removed")
@@ -660,6 +670,16 @@ export function calculationVisualizer(
         .style("stroke", "grey")
         .style("opacity", 0);
 
+    //draw label
+    calculatedFeatureGroup.append("text")
+            .attr("x", 0)
+            .attr("y", -3)
+            .text("Matrix Multiplication")
+            .style("fill", "gray")
+            .style("font-size", "8px")
+            .attr("class", "calFrame to-be-removed")
+            .style("opacity", 0); 
+
         d3.selectAll(".aniRect").style("opacity", 0);
 
             
@@ -711,6 +731,15 @@ export function calculationVisualizer(
         .style("stroke-width", 0.1)
         .style("stroke", "grey")
         .style("opacity", 0);
+
+    //draw label
+    BiasGroup.append("text")
+            .attr("x", 0)
+            .attr("y", 23)
+            .text("Bias Vector")
+            .style("fill", "gray")
+            .style("font-size", "8px")
+            .attr("class", "bias to-be-removed").style("opacity", 0); 
 
         const BiasFrame = BiasGroup.append("rect")
     .attr("class", "bias to-be-removed")
@@ -861,18 +890,29 @@ export function calculationVisualizer(
 
         d3.xml("./assets/SVGs/ReLU.svg").then(function (data) {
     
-          if(relu.node()!=null){
-          const ReLU = relu!.node()!.appendChild(data.documentElement);
-          d3.select(ReLU)
-              .attr("x", end_x - 45)
-              .attr("y", end_y - 15)
-              .attr("class", "relu to-be-removed")
-              .attr("opacity", 0)
-              .raise();
-          }
-      });
+            if(relu.node()!=null){
+            const ReLU = relu!.node()!.appendChild(data.documentElement);
+            d3.select(ReLU)
+                .attr("x", end_x - 45)
+                .attr("y", end_y - 15)
+                .attr("class", "relu to-be-removed")
+                .attr("opacity", 0)
+                .raise();
+            }
+        });
+
+        //draw label
+        relu.append("text")
+        .attr("x", end_x - 45)
+        .attr("y", end_y - 25)
+        .text("ReLU Non-linear Function")
+        .style("fill", "gray")
+        .style("font-size", "8px")
+        .attr("class", "relu to-be-removed").attr("opacity", 0); 
 
     }, 3500);
+
+   
 
     const outputGroup = g3
         .append("g")
@@ -886,6 +926,16 @@ export function calculationVisualizer(
             }, ${height / 5 + 150})`
         );
 
+
+    //draw label
+    outputGroup.append("text")
+            .attr("x", 0)
+            .attr("y", 23)
+            .text("Final Output Vector")
+            .style("fill", "gray")
+            .style("font-size", "8px")
+            .attr("class", "relu output").style("opacity", 0); 
+    
     outputGroup
         .selectAll("rect")
         .data(node.features)
@@ -952,6 +1002,15 @@ export function calculationVisualizer(
     .style("stroke", "black")
     .style("stroke-width", 1)
     .style("opacity", 0).raise();
+
+    //draw label
+    outputGroupCopy.append("text")
+            .attr("x", 0)
+            .attr("y", 23)
+            .text("Final Output Vector")
+            .style("fill", "gray")
+            .style("font-size", "8px")
+            .attr("class", "relu").style("opacity", 0); 
 
     intermediateFeatureGroups.push(outputGroup);
     node.intermediateFeatureGroups = intermediateFeatureGroups;
