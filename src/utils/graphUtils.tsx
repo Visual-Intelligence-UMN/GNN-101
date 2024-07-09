@@ -157,10 +157,15 @@ export function outputVisualizer(
     height: number,
     prevRectHeight: number,
     rectHeight: number,
-    rectWidth: number
+    rectWidth: number,
+    colorSchemes:any
 ) {
     d3.selectAll(".to-be-removed").remove();
     d3.selectAll(".node-features-Copy").style("visibility", "visible");
+
+    //color schemes interaction
+    for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "0.5";
+
     let originalCoordinates = moveFeatures(
         node.relatedNodes,
         (node.graphIndex - 1) * offset - 250,
@@ -498,6 +503,7 @@ export function outputVisualizer(
 
     document.addEventListener("click", function () {
         d3.selectAll(".graph-displayer").remove();
+        for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "1";
         moveFeaturesBack(node.relatedNodes, originalCoordinates);
         node.featureGroup
             .transition()
@@ -1337,7 +1343,8 @@ export function fcLayerCalculationVisualizer(
     graphIndex: number,
     svg: any,
     state: State,
-    rectHeight: number
+    rectHeight: number,
+    colorSchemes:any
 ) {
 
     d3.selectAll(".node-features-Copy").style("visibility", "visible");
@@ -1424,7 +1431,8 @@ export function fcLayerCalculationVisualizer(
             rectL,
             posNeed,
             posPlus,
-            state
+            state,
+            colorSchemes
         );
         node.relatedNodes.forEach((n: any, i: number) => {
             let start_x = 0;
@@ -1471,6 +1479,8 @@ export function fcLayerCalculationVisualizer(
 
         d3.selectAll(".node-features-Copy").style("visibility", "hidden");
 
+        for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "1";
+
         moveFeaturesBack(relatedNodes, originalCoordinates);
         node.featureGroup
             .transition()
@@ -1492,11 +1502,17 @@ function poolingLayerInteraction(
     rectL: number,
     posNeed: number[][],
     posPlus: number[][],
-    state: State
+    state: State,
+    colorSchemes:any
 ) {
     if (!svg.selectAll) {
         svg = d3.select(svg);
     }
+
+    for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
+
+    colorSchemes[3].style.opacity = "1";
+    colorSchemes[4].style.opacity = "1";
 
     for (let i = 0; i < node.features.length; i++) {
         d3.select(`#pooling-layer-rect-${i}`)

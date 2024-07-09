@@ -75,6 +75,8 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
       svgRef.current = svg.node();
 
+      let colorSchemes:any = [];
+
 
       graphs.forEach((data, i) => {
         console.log("i", i);
@@ -335,11 +337,22 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
             const absMax = findAbsMax(value);
            console.log("array value", value)
-          
-          if(i==0){buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x, text_y + 50, g1)}
-          else if(i==5){buildBinaryLegend(myColor, value[0], value[1], text+" Color Scheme", text_x, text_y + 50, g1)}
-          else buildLegend(myColor, absMax, text+" Color Scheme", text_x - 50, text_y + 50, g1);
 
+           let cst:any = null;
+          
+          if(i==0){
+            cst = buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x, text_y + 50, g1)
+          }
+          else if(i==5){
+            cst = buildBinaryLegend(myColor, value[0], value[1], text+" Color Scheme", text_x, text_y + 50, g1)
+          }
+          else {
+            cst = buildLegend(myColor, absMax, text+" Color Scheme", text_x - 50, text_y + 50, g1);
+          }
+
+          colorSchemes.push(cst);
+
+          console.log("colorSchemes", colorSchemes);
 
           // doesn't show the text, need to be fixed 
           if (i === graphs.length - 1) { // 6 layers in total, call the connect when reaching the last layer of convolutional layer.
@@ -355,7 +368,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
               .attr("opacity", 0);
 
             if (intmData) {
-              featureVisualizer(svg, allNodes, offset, height, graphs, 900, 600, 15, 10, 3, 20); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
+              featureVisualizer(svg, allNodes, offset, height, graphs, 900, 600, 15, 10, 3, 20, colorSchemes); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
               //function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, graphs: any[], moveOffset: number, fcLayerMoveOffset: number, rectWidth: number, firstLayerRectHeight: number, rectHeight: number, outputLayerRectHeight: number)
             }
 

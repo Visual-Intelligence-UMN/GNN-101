@@ -438,7 +438,20 @@ export const state: State = {
 };
 
 
-export function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, graphs: any[], moveOffset: number, fcLayerMoveOffset: number, rectWidth: number, firstLayerRectHeight: number, rectHeight: number, outputLayerRectHeight: number) {
+export function featureVisualizer(
+  svg: any, 
+  allNodes: any[], 
+  offset: number, 
+  height: number, 
+  graphs: any[], 
+  moveOffset: number, 
+  fcLayerMoveOffset: number, 
+  rectWidth: number, 
+  firstLayerRectHeight: number, 
+  rectHeight: number, 
+  outputLayerRectHeight: number,
+  colorSchemes:any
+) {
   // 1. visualize feature
   // 2. handle interaction event
   // 3. do the calculation for animation
@@ -656,7 +669,11 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
 
 
             //color schemes interaction logic
-            console.log("node", node);
+            console.log("node", node.graphIndex);
+            for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
+
+            colorSchemes[node.graphIndex].style.opacity = "1";
+            colorSchemes[node.graphIndex - 1].style.opacity = "1";
 
             hideAllLinks(allNodes);
             console.log("pre",prevRectHeight)
@@ -697,6 +714,11 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             if (state.isClicked) {
               return;
             }
+
+            for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
+
+            colorSchemes[node.graphIndex].style.opacity = "1";
+            colorSchemes[node.graphIndex - 1].style.opacity = "1";
 
             hideAllLinks(allNodes);
 
@@ -855,11 +877,11 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
             } // to make sure relatedNodes is not null
             showFeature(node);
             if (node.graphIndex === 4) {
-              fcLayerCalculationVisualizer(node, relatedNodes, offset, height, currMoveOffset, node.graphIndex, g2, state, currRectHeight);
+              fcLayerCalculationVisualizer(node, relatedNodes, offset, height, currMoveOffset, node.graphIndex, g2, state, currRectHeight, colorSchemes);
             }
             if (node.graphIndex === 5) {
               console.log("CAWCAW", node.relatedNodes, weights, bias)
-              outputVisualizer(node, weights[3], bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth)
+              outputVisualizer(node, weights[3], bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes)
             }
             
             reduceNodeOpacity(allNodes, relatedNodes, node);
@@ -897,6 +919,8 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
       svg.selectAll(".vis-component")
         .style("opacity", 0);
       let currMoveOffset = moveOffset;
+
+      for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "1";
 
       if (movedNode.graphIndex >= 4) {
         currMoveOffset = fcLayerMoveOffset;
