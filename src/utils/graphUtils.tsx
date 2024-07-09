@@ -257,6 +257,15 @@ export function outputVisualizer(
         .style("stroke", "grey")
         .style("opacity", 0);
 
+    BiasGroup.append("text")
+        .attr("x", 5 - moveOffset)
+        .attr("y", 23)
+        .text("Bias Vector")
+        .style("fill", "gray")
+        .style("font-size", "8px")
+        .attr("class", "bias")
+        .style("opacity", 0); 
+
     setTimeout(() => {
         weightAnimation(
             svg,
@@ -280,7 +289,7 @@ export function outputVisualizer(
         let control_x = (start_x + end_x) / 2;
         let control_y = start_y + 50;
 
-        for (let i = 0; i < node.features.length; i++)
+        for (let i = 0; i < node.features.length; i++){
             for (let j = 0; j < node.features.length; j++) {
                 const softmaxPath1 = svg
                     .append("path")
@@ -298,7 +307,18 @@ export function outputVisualizer(
                     .attr("opacity", 0)
                     .style("fill", "none");
             }
-
+        }
+        
+        svg.append("text")
+        .attr("x", (start_x - 30 + end_x)/2)
+        .attr("y", end_y + 50)
+        .text("Softmax")
+        .style("fill", "gray")
+        .style("font-size", "8px")
+        .attr("class", "to-be-removed softmaxLabel")
+        .style("opacity", 1); 
+        
+        
         let color = calculateAverage(node.features); // to be determined
 
         start_y = node.y + 40;
@@ -1106,6 +1126,7 @@ function weightAnimation(
         if(isPlaying)injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - btnYOffset, "./assets/SVGs/playBtn_pause.svg");
         else injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - btnYOffset, "./assets/SVGs/playBtn_play.svg")
         if (isPlaying && state.isClicked) {
+            d3.selectAll(".aniRect").style("opacity", 0);
             startAnimation(endNumber);
         } else {
             clearInterval(intervalID);
@@ -1163,6 +1184,7 @@ function weightAnimation(
                         d3.selectAll(".softmax").attr("opacity", 0.07);
                         d3.selectAll(".relu").style("opacity", 1);
                         d3.selectAll(".output-path").attr("opacity", 1);
+                        d3.selectAll(".softmaxLabel").attr("opacity", 1);
                         d3.selectAll(".output")
                             .transition()
                             .delay(2000)
