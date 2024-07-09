@@ -299,15 +299,6 @@ export function outputVisualizer(
 
         let color = calculateAverage(node.features); // to be determined
 
-        const aggregatedToFinal = svg
-            .append("path")
-            .attr("d", `M${start_x},${start_y} ${end_x - 20},${end_y}`)
-            .style("stroke", pathColor(color))
-            .style("stroke-width", 1)
-            .style("fill", "none")
-            .attr("class", "relu to-be-removed")
-            .attr("opacity", 0);
-
         start_y = node.y + 40;
         start_x = start_x - moveOffset + temp - 200;
         end_x = end_x - 200;
