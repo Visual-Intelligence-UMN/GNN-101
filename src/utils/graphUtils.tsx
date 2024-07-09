@@ -260,6 +260,7 @@ export function outputVisualizer(
             offset,
             height,
             moveOffset,
+            rectHeight,
             prevRectHeight
         );
 
@@ -741,8 +742,10 @@ export function calculationVisualizer(
             offset,
             height,
             moveOffset,
+            rectHeight,
             prevRectHeight
         );
+        console.log("hi", prevRectHeight)
         if (node.relatedNodes) {
             node.relatedNodes.forEach((n: any, i: number) => {
                 if (n.featureGroupLocation) {
@@ -892,7 +895,7 @@ export function calculationVisualizer(
         .attr("x", 0)  
         .attr("y", 0)
         .attr("class", "relu output")
-        .attr("width", rectHeight * node.features.length )
+        .attr("width", rectHeight * node.features.length)
         .attr("height", rectWidth)
         .style("fill", "none")
         .style("stroke", "black")
@@ -917,7 +920,7 @@ export function calculationVisualizer(
         .enter()
         .append("rect")
         .attr("class", "relu")
-        .attr("x", (d: any, i: number) => i * rectHeight + 5)
+        .attr("x", (d: any, i: number) => i * rectHeight)
         .attr("y", 0)
         .attr("width", rectHeight)
         .attr("height", rectWidth)
@@ -929,10 +932,10 @@ export function calculationVisualizer(
 
 
     const outputFrameCopy = outputGroupCopy.append("rect")
-    .attr("x", 5)  
+    .attr("x", 0)  
     .attr("y", 0)
     .attr("class", "relu")
-    .attr("width", rectHeight * node.features.length + 5)
+    .attr("width", rectHeight * node.features.length)
     .attr("height", rectWidth)
     .style("fill", "none")
     .style("stroke", "black")
@@ -990,7 +993,8 @@ function weightAnimation(
     offset: number,
     height: number,
     moveOffset: number,
-    rectHeight: number
+    rectHeight: number,
+    prevRectHeight: number
 ) {
     
     let i = 0;
@@ -1003,10 +1007,7 @@ function weightAnimation(
     }
 
 
-    let translateOffset = 0;
-    if (node.graphIndex === 1) {
-        translateOffset = 140;
-    }
+ 
 
     if (!svg.selectAll) {
         svg = d3.select(svg);
@@ -1084,21 +1085,13 @@ function weightAnimation(
                             .attr(
                                 "transform",
                                 `translate(${
-                                    node.featureGroupLocation.xPos -
-                                    2.5 * offset +
-                                    (moveOffset -
-                                        node.features.length * 3 -
-                                        node.relatedNodes[0].features.length *
-                                            2 *
-                                            rectHeight) -
-                                    100 +
-                                    12.5 -
-                                    translateOffset
+                                    node.featureGroupLocation.xPos - 2.5 * offset + (moveOffset - node.features.length * rectHeight - node.relatedNodes[0].features.length *
+                                            2 * prevRectHeight) - 100 + 12.5
                                 }, ${
                                     node.featureGroupLocation.yPos -
                                     height / 5 -
                                     150 -
-                                    node.features.length * 3
+                                    node.features.length * rectHeight
                                 }) rotate(90)`
                             );
                     }, 2000);
