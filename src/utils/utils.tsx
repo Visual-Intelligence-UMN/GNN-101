@@ -654,6 +654,10 @@ export function featureVisualizer(svg: any, allNodes: any[], offset: number, hei
               return;
             }
 
+
+            //color schemes interaction logic
+            console.log("node", node);
+
             hideAllLinks(allNodes);
             console.log("pre",prevRectHeight)
            

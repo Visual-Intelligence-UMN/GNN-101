@@ -159,6 +159,7 @@ export function outputVisualizer(
     rectHeight: number,
     rectWidth: number
 ) {
+    d3.selectAll(".to-be-removed").remove();
     d3.selectAll(".node-features-Copy").style("visibility", "visible");
     let originalCoordinates = moveFeatures(
         node.relatedNodes,
@@ -639,6 +640,7 @@ export function calculationVisualizer(
             }, ${height / 5 + 150})`
         );
 
+        d3.selectAll(".aniRect").style("opacity", 0);
     calculatedFeatureGroup
         .selectAll("rect")
         .data(calculatedData)
@@ -650,12 +652,14 @@ export function calculationVisualizer(
         .attr("height", rectWidth)
         .attr(
             "class",
-            (d: number, i: number) => `calculatedFeatures${i} to-be-removed`
+            (d: number, i: number) => `calculatedFeatures${i} to-be-removed aniRect`
         )
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 0.1)
         .style("stroke", "grey")
         .style("opacity", 0);
+
+        d3.selectAll(".aniRect").style("opacity", 0);
 
             
     const calFrame = calculatedFeatureGroup.append("rect")
@@ -730,6 +734,8 @@ export function calculationVisualizer(
             adjMatrixSlice.push(normalizedAdjMatrix[node.id][i].toFixed(2));
         }
     }
+
+    
 
     setTimeout(() => {
         d3.selectAll(".calFrame").style("opacity", 1);
@@ -1016,14 +1022,19 @@ function weightAnimation(
     // Pause and replay button
     const btn = svg.append("g").attr("class", "button-group");
 
-    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - 100, "./assets/SVGs/playBtn_pause.svg")
+    console.log("node weight ani", node);
+
+    let btnYOffset = 100;
+    if(node.relatedNodes.length==2)btnYOffset = 150;
+
+    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - btnYOffset, "./assets/SVGs/playBtn_pause.svg")
 
     btn.on("click", function (event: any) {
         event.stopPropagation();
         isPlaying = !isPlaying;
         console.log(isPlaying);
-        if(isPlaying)injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - 100, "./assets/SVGs/playBtn_pause.svg");
-        else injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - 100, "./assets/SVGs/playBtn_play.svg")
+        if(isPlaying)injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - btnYOffset, "./assets/SVGs/playBtn_pause.svg");
+        else injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - btnYOffset, "./assets/SVGs/playBtn_play.svg")
         if (isPlaying) {
             startAnimation(endNumber);
         } else {
@@ -1033,6 +1044,8 @@ function weightAnimation(
 
     const math = create(all, {});
     const Xt = math.transpose(weights);
+
+    d3.selectAll(".aniRect").style("opacity", 0);
 
     document.addEventListener("click", () => {
         isAnimating = false;
@@ -1071,7 +1084,7 @@ function weightAnimation(
                     clearInterval(intervalID);
                     isPlaying = false;
                     d3.selectAll(`#tempath${i - 1}`).remove();
-                    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - 100, "./assets/SVGs/playBtn_play.svg")
+                    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - btnYOffset, "./assets/SVGs/playBtn_play.svg")
                     setTimeout(() => {
                         d3.selectAll(".bias").style("opacity", 1);
                         d3.selectAll(".softmax").attr("opacity", 0.07);
