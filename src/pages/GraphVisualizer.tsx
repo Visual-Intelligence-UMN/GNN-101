@@ -336,8 +336,8 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             const absMax = findAbsMax(value);
            console.log("array value", value)
           
-          if(i==0){buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x - 50, text_y + 50, g1)}
-          else if(i==5){buildBinaryLegend(myColor, value[0], value[1], text+" Color Scheme", text_x - 50, text_y + 50, g1)}
+          if(i==0){buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x, text_y + 50, g1)}
+          else if(i==5){buildBinaryLegend(myColor, value[0], value[1], text+" Color Scheme", text_x, text_y + 50, g1)}
           else buildLegend(myColor, absMax, text+" Color Scheme", text_x - 50, text_y + 50, g1);
 
 
