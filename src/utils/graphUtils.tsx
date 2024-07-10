@@ -1761,11 +1761,12 @@ showFeature(node)
 
     //color schemes interaction
     //for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "0.5";
-
+    let xPos = (node.graphIndex) * offset - 250;
+    let yPos = node.y - 15
     let originalCoordinates = moveFeatures(
         node.relatedNodes,
-        (node.graphIndex - 1) * offset,
-        height / 5
+        xPos,
+        yPos - 100
     );
     node.featureGroup
         .transition()
@@ -1773,10 +1774,10 @@ showFeature(node)
         .duration(1000)
         .attr(
             "transform",
-            `translate(${node.x - 300}, ${node.y - 25}) rotate(-90)`
+            `translate(${xPos - moveOffset}, ${yPos}) rotate(-90)`
         );
 
-    let temp = 475;
+    let temp = 350;
 
     let calculatedData: number[] = [];
     for (let i = 0; i < 4; i++) {
@@ -1791,10 +1792,8 @@ showFeature(node)
     let startCoordList = [];
     for (let i = 0; i < 2; i++) {
         let s: [number, number] = [
-            node.x +
-                prevRectHeight * i -
-                offset -
-                moveOffset + temp - 215,
+            xPos - temp - moveOffset
+                + prevRectHeight * i - 215, 
             node.y - 15,
         ];
         startCoordList.push(s);
@@ -1803,7 +1802,7 @@ showFeature(node)
     console.log(calculatedData);
     const calculatedFeatureGroup = svg
         .append("g")
-        .attr("transform", `translate(${node.x - temp}, ${node.y})`);
+        .attr("transform", `translate(${xPos - temp - moveOffset}, ${node.y})`);
 
     calculatedFeatureGroup
         .selectAll("rect")
@@ -1834,25 +1833,24 @@ showFeature(node)
 
     let endCoordList = [];
 
-    for (let i = 0; i < node.features.length; i++) {
-        let s: [number, number] = [node.x + 20 + i * rectHeight - temp, node.y - 15];
+    for (let i = 0; i < 4; i++) {
+        let s: [number, number] = [xPos - moveOffset + 20 + i * rectHeight - temp, node.y - 15];
         endCoordList.push(s);
     }
-    console.log("start", startCoordList);
-    console.log("end", endCoordList);
+
     const math = create(all, {});
     const Xt = math.transpose(weights);
 
     const BiasGroup = svg
         .append("g")
-        .attr("transform", `translate(${node.x - 200}, ${node.y + 30})`);
+        .attr("transform", `translate(${xPos - temp - moveOffset - 225}, ${node.y + 30})`);
 
     BiasGroup.selectAll("rect")
         .data(bias)
         .enter()
         .append("rect")
         .attr("class", "bias")
-        .attr("x", (d: any, i: number) => i * rectHeight + 5 - moveOffset)
+        .attr("x", (d: any, i: number) => i * rectHeight + 5)
         .attr("y", 0)
         .attr("width", rectHeight)
         .attr("height", rectWidth)
@@ -1862,7 +1860,7 @@ showFeature(node)
         .style("opacity", 0);
 
     BiasGroup.append("text")
-        .attr("x", 5 - moveOffset)
+        .attr("x", 5)
         .attr("y", 23)
         .text("Bias Vector")
         .style("fill", "gray")
@@ -1887,31 +1885,34 @@ showFeature(node)
             mode
         );
 
-        let start_x = node.x + 40 + 5 - temp;
+        let start_x =  xPos - temp - moveOffset
+        + prevRectHeight * 4 - 40;
         let start_y = node.y - 22.5;
-        let end_x = node.x + 200 - 40 - 5 - temp + 50;
+        let end_x =  xPos - temp - moveOffset
+        + prevRectHeight * 4 + 200; 
         let end_y = node.y - 22.5;
 
         let control_x = (start_x + end_x) / 2;
         let control_y = start_y + 50;
 
-        for (let i = 0; i < node.features.length; i++){
-            for (let j = 0; j < node.features.length; j++) {
+        for (let i = 0; i < 4; i++){
+            for (let j = 0; j < 4; j++) {
                 const softmaxPath1 = svg
                     .append("path")
                     .attr(
                         "d",
                         `M${start_x + 20 * i - 30},${
                             start_y + 7.5
-                        } Q${control_x},${control_y} ${end_x - 20 * j},${
+                        } Q${control_x},${control_y} ${end_x + 70 + 20 * j},${
                             end_y + 7.5
                         }`
                     )
                     .attr("stroke", myColor(calculatedData[i]))
                     .attr("stroke-width", 1)
-                    .attr("class", `softmax${1 - j} softmax to-be-removed`)
+                    .attr("class", `softmax${3 - j} softmax to-be-removed`)
                     .attr("opacity", 0)
-                    .style("fill", "none");
+                    .style("fill", "none")
+                    
             }
         }
         
@@ -1928,7 +1929,7 @@ showFeature(node)
         let color = calculateAverage(node.features); // to be determined
 
         start_y = node.y + 40;
-        start_x = start_x - moveOffset + temp - 200;
+        start_x = start_x - 200;
         end_x = end_x - 200;
 
         let control1_x = start_x + (end_x - start_x) * 0.2;
@@ -1943,12 +1944,13 @@ showFeature(node)
                 "d",
                 `M${start_x},${start_y} C ${control1_x} ${control1_y}, ${control2_x} ${control2_y} ${end_x},${end_y}`
             )
-            .style("stroke", pathColor(color))
+            .style("stroke", "black") //pathColor(color))
             .style("opacity", 0.7)
             .style("stroke-width", 1)
             .style("fill", "none")
             .attr("class", "bias to-be-removed")
-            .style("opacity", 0);
+            .style("opacity", 0)
+            .lower()
 
 
 
@@ -1956,13 +1958,14 @@ showFeature(node)
             .append("path")
             .attr(
                 "d",
-                `M${start_x + 6},${start_y - 65} L${end_x},${end_y}`
+                `M${start_x - 20},${start_y - 65} L${end_x},${end_y}`
             )
-            .style("stroke", pathColor(color))
+            .style("stroke", "black") //pathColor(color))
             .style("stroke-width", 1)
             .style("fill", "none")
             .attr("class", "output-path to-be-removed")
-            .attr("opacity", 0);
+            .attr("opacity", 0)
+            .lower();
     }, 2000);
 
     const g4 = svg
@@ -1991,8 +1994,9 @@ showFeature(node)
     state.isClicked = true;
 
     for (let i = 0; i < node.features.length; i++) {
-        d3.select(`#output-layer-rect-${i}`)
+        d3.selectAll(`#output-layer-rect-${i}`)
             .on("mouseover", function () {
+
                 if (!state.isClicked) {
                     return;
                 }
@@ -2131,7 +2135,7 @@ showFeature(node)
             .duration(1000)
             .attr(
                 "transform",
-                `translate(${node.x - 7.5}, ${node.y + 170 + 5}) rotate(0)`
+                `translate(${node.x - 7.5}, ${node.y + 25}) rotate(0)`
             );
     });
 }
