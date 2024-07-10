@@ -159,10 +159,12 @@ export function outputVisualizer(
     prevRectHeight: number,
     rectHeight: number,
     rectWidth: number,
-    colorSchemes:any
+    colorSchemes:any,
+    mode: number
+
 ) {
     d3.selectAll(".to-be-removed").remove();
-    d3.selectAll(".node-features-Copy").style("visibility", "visible");
+    d3.selectAll(".node-features-Copy").style("visibility", "visible").lower();
 
     //color schemes interaction
     for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "0.5";
@@ -276,6 +278,7 @@ export function outputVisualizer(
         .style("opacity", 0); 
 
     setTimeout(() => {
+
         weightAnimation(
             svg,
             node,
@@ -287,7 +290,8 @@ export function outputVisualizer(
             moveOffset,
             rectHeight,
             prevRectHeight,
-            state
+            state,
+            mode
         );
 
         let start_x = node.x + 40 + 5 - temp;
@@ -524,6 +528,8 @@ export function outputVisualizer(
     }
 
     document.addEventListener("click", function () {
+        d3.selectAll(".node-features-Copy").style("visibility", "hidden")
+        state.isClicked = false;
         d3.selectAll(".graph-displayer").remove();
         for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "1";
         moveFeaturesBack(node.relatedNodes, originalCoordinates);
@@ -552,7 +558,8 @@ export function calculationVisualizer(
     prevRectHeight: number,
     rectHeight: number,
     rectWidth: number,
-    state: State
+    state: State,
+    mode: number
 ) {
     if (state.isClicked || aggregatedDataMap == null || calculatedDataMap == null) {
         d3.selectAll(".to-be-removed").remove();   
@@ -812,7 +819,8 @@ export function calculationVisualizer(
             moveOffset,
             rectHeight,
             prevRectHeight,
-            state
+            state,
+            mode
         );
       
         if (node.relatedNodes) {
@@ -1094,7 +1102,8 @@ function weightAnimation(
     moveOffset: number,
     rectHeight: number,
     prevRectHeight: number,
-    state: State
+    state: State,
+    mode: number
 ) {
 
     if (!state.isClicked) {
@@ -1110,8 +1119,19 @@ function weightAnimation(
     if (node.graphIndex === 5) {
         endNumber = 2;
     }
+    if (mode === 1) {
+        endNumber = 4
+        if (node.graphIndex === 3) {  //need to alter
+            endNumber = 2
 
+        }
+    }
 
+    svg.append("circle")
+    .attr("cx", 1331)
+    .attr("cy", 305)
+    .attr("fill", "red")
+    .attr("r", 1)
  
 
     if (!svg.selectAll) {
@@ -1148,6 +1168,7 @@ function weightAnimation(
     d3.selectAll(".aniRect").style("opacity", 0);
 
     document.addEventListener("click", () => {
+        state.isClicked = false
         isAnimating = false;
         state.isClicked = false;
         clearInterval(intervalID); 
@@ -1158,17 +1179,27 @@ function weightAnimation(
         d3.selectAll(".parameter").remove();
         d3.selectAll(".to-be-removed").remove();
     });
-
+    let featureLength = node.features.length;
+    if (node.graphIndex === 5) {
+        featureLength = node.relatedNodes[0].features.length;
+    }
     function startAnimation(endNumber: number) {
+        if (!state.isClicked) {
+            return;
+        }
 
         if (i >= endNumber) {
             i = 0; // Reset the index to replay the animation
         }
         intervalID = setInterval(() => {
+            if (!state.isClicked) {
+                return;
+            }
+
 
             d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1);
             d3.selectAll(`#tempath${i - 1}`).attr("opacity", 0);
-
+            console.log("AWD", endCoordList)
             if (isAnimating) {
                 GraphViewDrawPaths(
                     Xt,
@@ -1179,14 +1210,16 @@ function weightAnimation(
                     svg,
                     isAnimating,
                     btn,
-                    node
+                    node,
+                    featureLength,
+                    state
                 );
  
                 i++;
                 if (i >= endNumber) {
                     clearInterval(intervalID);
                     isPlaying = false;
-                    d3.selectAll(`#tempath${i - 1}`).remove();
+                    d3.selectAll(".intermediate-path").remove();
                     injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - btnYOffset, "./assets/SVGs/playBtn_play.svg")
                     setTimeout(() => {
                         d3.selectAll(".bias").style("opacity", 1);
@@ -1230,16 +1263,24 @@ function GraphViewDrawPaths(
     endCoordList: number[][],
     svg: any,
     isAnimating: boolean,
-    btn:any,
-    node:any
+    btn: any,
+    node: any,
+    featureLength: number,
+    state: State
 ) {
     if (!svg.selectAll) {
         svg = d3.select(svg);
     }
     const Wi = Xt[i];
-    for (let j = 0; j < 64; j++) {
-        let s = startCoordList[63 - j];
+
+    for (let j = 0; j < featureLength; j++) {
+        if (!state.isClicked) {
+            return;
+
+        }
+        let s = startCoordList[featureLength - 1 - j];
         let e = endCoordList[i];
+        console.log("AWD", e)
 
 
         let start_x = s[0];
@@ -1270,7 +1311,7 @@ function GraphViewDrawPaths(
                     end_y,
                 ].join(" ");
             })
-            .attr("stroke", myColor(Wi[63 - j]))
+            .attr("stroke", myColor(Wi[featureLength - 1 - j]))
             .attr("stroke-width", 1)
             .attr("opacity", 1)
             .attr("fill", "none")
@@ -1407,27 +1448,17 @@ function moveFeaturesBack(
         let xPos = originalCoordinates[i].xPos;
         let yPos = originalCoordinates[i].yPos;
 
-        if (n.graphIndex <= 3) {
+
             n.featureGroup
                 .transition()
                 .duration(1000)
                 .attr(
                     "transform",
                     `translate(${xPos - 7.5}, ${
-                        yPos + 5 - n.features.length * 3 - 4.5
+                        yPos 
                     }) rotate(0)`
                 );
-        } else {
-            n.featureGroup
-                .transition()
-                .duration(1000)
-                .attr(
-                    "transform",
-                    `translate(${xPos - 7.5}, ${
-                        yPos + 200 - n.features.length * 3 - 4.5
-                    }) rotate(0)`
-                );
-        }
+       
     });
 }
 
@@ -1441,7 +1472,8 @@ export function fcLayerCalculationVisualizer(
     svg: any,
     state: State,
     rectHeight: number,
-    colorSchemes:any
+    colorSchemes:any,
+    mode: number
 ) {
 
     d3.selectAll(".node-features-Copy").style("visibility", "visible");
