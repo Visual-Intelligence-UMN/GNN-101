@@ -653,7 +653,7 @@ export function featureVisClick(
                         );
                         currentStep++;
                         console.log("currentStep", currentStep);
-
+                        
                         if (currentStep >= featureChannels) {
                             d3.select(".mats")
                                 .select(".ctrlBtn")
