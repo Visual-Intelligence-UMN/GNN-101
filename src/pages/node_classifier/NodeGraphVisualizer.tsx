@@ -61,7 +61,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
       let allNodes: any[] = [];
       const offset = 600;
       const margin = { top: 10, right: 30, bottom: 30, left: 40 };
-      const width = 6 * offset - margin.left - margin.right;
+      const width = 8 * offset - margin.left - margin.right;
       const height = 1000 - margin.top - margin.bottom;
 
       // Append the SVG object to the body of the page
@@ -81,9 +81,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
         console.log(data);
 
         let xOffset = (i - 2.5) * offset;
-        if (i >= 4) {
-          xOffset = (i - 2.5) * offset - 25 * (i * 1.5);
-        }
+
         const g1 = svg
           .append("g")
           .attr("class", "layerVis")
@@ -117,7 +115,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
           .text((d: any) => d.id)
           .attr("font-size", `17px`);
 
-        if (i >= 4) {
+        if (i >= 5) {
           labels.attr("opacity", 0);
         }
         data.nodes.forEach((node: any) => {
@@ -214,11 +212,10 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
               value = intmData.conv3;
             }
             if (i === 4) {
-              value = intmData.pooling;
+              value = intmData.conv3;
             }
             if (i === 5) {
-              let final: any = intmData.final;
-              value = softmax(final);
+              value = intmData.conv3;
             }
           }
           data.nodes.forEach((node: any) => {
@@ -229,10 +226,17 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
                 4 * (node.id + 1)
               );
             }
-            if (value != null && i > 2 && value instanceof Float32Array) {
+            if (value != null && i > 2 && i < 4 && value instanceof Float32Array) {
               node.features = value.subarray(
                 2 * node.id,
                 2 * (node.id + 1)
+              );
+            }
+
+            if (value != null && i > 2 && i === 4 && value instanceof Float32Array) {
+              node.features = value.subarray(
+                4 * node.id,
+                4 * (node.id + 1)
               );
             }
 
@@ -283,7 +287,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
 
           const text_x = point1.x
           const text_y = point4.y + 100;
-          if (i <4) {
+          if (i < 5) {
           const parallelogram = g1
             .append("polygon")
             .attr("points", `${point1.x},${point1.y} ${point2.x},${point2.y} ${point3.x},${point3.y} ${point4.x},${point4.y}`)
@@ -300,10 +304,8 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
           if (i <= 3 && i != 0) {
             text = `GCNGconv${i}`
           }
+
           if (i === 4) {
-            text = "Pooling"
-          }
-          if (i === 5) {
             text = "Prediction Result"
           }
           const textElement = g1.append("text")
@@ -319,7 +321,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
 
 
           // doesn't show the text, need to be fixed 
-          if (i === graphs.length - 1) { // 6 layers in total, call the connect when reaching the last layer of convolutional layer.
+          if (i === graphs.length - 2) { // 6 layers in total, call the connect when reaching the last layer of convolutional layer.
             connectCrossGraphNodes( // in this function the connection of last two layers will be drwan
               allNodes,
               svg,
@@ -372,7 +374,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
       if ((intmData == null || changed) && !predicted) {
         await visualizeGraph(graph_path,() => handleSimulationComplete(visualizationId), false);
       } else {
-       await visualizeGNN(4);
+       await visualizeGNN(5);
        handleSimulationComplete(visualizationId);
       }
     };
