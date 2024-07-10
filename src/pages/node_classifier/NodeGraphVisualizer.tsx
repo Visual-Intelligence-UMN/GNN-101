@@ -7,11 +7,14 @@ import {
   connectCrossGraphNodes,
   featureVisualizer,
   softmax,
+  myColor,
 } from "../../utils/utils";
 
 import { visualizeGraph, getInitialCoordinates } from "../WebUtils";
 import { aggregationCalculator } from "@/utils/graphUtils";
 import { sources } from "next/dist/compiled/webpack/webpack";
+import { buildBinaryLegend, buildLegend } from "@/utils/matHelperUtils";
+import { findAbsMax } from "@/utils/matNNVis";
 
 
 
@@ -220,22 +223,24 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
           }
           data.nodes.forEach((node: any) => {
             node.graphIndex = i;
-            if (value != null && i <= 4 && value instanceof Float32Array) {
+            if (value != null && i <= 2 && value instanceof Float32Array) {
               node.features = value.subarray(
-                64 * node.id,
-                64 * (node.id + 1)
+                4 * node.id,
+                4 * (node.id + 1)
+              );
+            }
+            if (value != null && i > 2 && value instanceof Float32Array) {
+              node.features = value.subarray(
+                2 * node.id,
+                2 * (node.id + 1)
               );
             }
 
-            if (value != null && i >= 5) {
-              node.features.push(value[index]);
-              index = index + 1;
-            }
             allNodes.push(node);
           });
           let maxXDistance = 0;
           let maxYDistance = 0;
-          const limitedNodes = data.nodes.slice(0, 17); // Why is it 17?
+          const limitedNodes = data.nodes.slice(0, 35); // Why is it 17?
 
           limitedNodes.forEach((node1: any) => {
             limitedNodes.forEach((node2: any) => {
@@ -275,6 +280,9 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
           if (graphWidth + tolerance < x_dist && graphHeight + tolerance < y_dist) {
             transform = `scale(1, 1)`;
           } 
+
+          const text_x = point1.x
+          const text_y = point4.y + 100;
           if (i <4) {
           const parallelogram = g1
             .append("polygon")
@@ -317,14 +325,32 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
               svg,
               graphs,
               offset,
+              1
             );
+
+          const absMax = findAbsMax(value);
+          let colorSchemes:any = [];
+          let cst:any = null;
+          
+           if(i==0){
+             cst = buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x, text_y + 50, g1)
+           }
+           else if(i==5){
+             cst = buildBinaryLegend(myColor, value[0], value[1], text+" Color Scheme", text_x, text_y + 50, g1)
+           }
+           else {
+             cst = buildLegend(myColor, absMax, text+" Color Scheme", text_x - 50, text_y + 50, g1);
+           }
+ 
+           colorSchemes.push(cst);
 
             // since in the featureVisualizer each node has its own svgElement, circles here are made transparent
             svg.selectAll("circle")
               .attr("opacity", 0);
 
+
             if (intmData && intmData.final) {
-              featureVisualizer(svg, allNodes, offset, height, graphs); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
+              featureVisualizer(svg, allNodes, offset, height, graphs, 900, 600, 15, 10, 20, 20, colorSchemes, 1); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
             }
 
           }
@@ -346,8 +372,8 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
       if ((intmData == null || changed) && !predicted) {
         await visualizeGraph(graph_path,() => handleSimulationComplete(visualizationId), false);
       } else {
-       // await visualizeGNN(4);
-       // handleSimulationComplete(visualizationId);
+       await visualizeGNN(4);
+       handleSimulationComplete(visualizationId);
       }
     };
 
@@ -360,6 +386,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
         const processedData = await data_prep(graph_path);
 
         const graphsData = await prep_graphs(num, processedData);
+   
         const initialCoordinates = getInitialCoordinates();
         // Initialize and run D3 visualization with processe  d data
         await init(graphsData, initialCoordinates);

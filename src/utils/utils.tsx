@@ -1,11 +1,12 @@
 // UTILS FILE BECAUSE WE HAVE SO MANY HELPER FUNCTIONS
 import * as d3 from "d3";
 
-import { loadWeights } from "./matHelperUtils";
+import { loadNodeWeights, loadWeights } from "./matHelperUtils";
 import * as ort from "onnxruntime-web";
 import { env } from "onnxruntime-web";
 import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature, outputVisualizer, scaleFeatureGroup } from "@/utils/graphUtils";
 import { features, off } from 'process';
+
 import { IGraphData, IntmData, IntmDataNode } from "../types/";
 
 import { 
@@ -18,6 +19,7 @@ import {
   moveNextLayer
 } from "@/utils/graphUtils"
 import { stat } from "fs";
+import { Yomogi } from "@next/font/google";
 
 env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
@@ -450,12 +452,20 @@ export function featureVisualizer(
   firstLayerRectHeight: number, 
   rectHeight: number, 
   outputLayerRectHeight: number,
-  colorSchemes:any
+  colorSchemes:any,
+  mode: number
 ) {
+
+  
   // 1. visualize feature
   // 2. handle interaction event
   // 3. do the calculation for animation
-  const {weights, bias} = loadWeights();
+  let {weights, bias} = loadWeights();
+  if (mode === 1) {
+    ({weights, bias} = loadNodeWeights());
+  }
+
+
   const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex); //somehow doesn't include the node in the last layer
 
 
@@ -463,12 +473,7 @@ export function featureVisualizer(
   if (graphs.length != 0) {
     normalizedAdjMatrix = aggregationCalculator(graphs);
   }
-
-
-
-  
   let movedNode: any = null; // to prevent the same node is clicked twice
-  
 
 
 
@@ -527,6 +532,8 @@ export function featureVisualizer(
       if (graphIndex === 0) {
         currRectHeight = firstLayerRectHeight;
       }
+
+
       const features = node.features;
       let xPos = node.x;
       let yPos = node.y + 25;
@@ -540,8 +547,11 @@ export function featureVisualizer(
       });
       occupiedPositions.push({ x: xPos, y: yPos });
 
-
-      if (graphIndex <= 3) {
+      let convNum = 3;
+      if (mode === 1) {
+        convNum = 4; 
+      } 
+      if (graphIndex <= convNum) {
         // featureGroup in the convolutional layers and the last three layers are different.
 
         // add svgElement to each node simplify the interaction process (maybe)
@@ -609,6 +619,7 @@ export function featureVisualizer(
         featureGroup.style('visibility', 'hidden');  
 
         let prevRectHeight;
+ 
 
         if (graphIndex === 1) {
           prevRectHeight = firstLayerRectHeight;
@@ -619,9 +630,7 @@ export function featureVisualizer(
 
         let currMoveOffset = moveOffset;
 
-
-        
-        yPos = yPos + rectHeight * node.features.length; //the bottom of the featureGroup 
+      //the bottom of the featureGroup 
         let featureGroupLocation: FeatureGroupLocation = {xPos, yPos}; 
 
         node.featureGroup = featureGroup;
@@ -669,16 +678,16 @@ export function featureVisualizer(
 
 
             //color schemes interaction logic
-            console.log("node", node.graphIndex);
-            for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
+            // console.log("node", node.graphIndex);
+            // for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
 
-            colorSchemes[node.graphIndex].style.opacity = "1";
-            colorSchemes[node.graphIndex - 1].style.opacity = "1";
+            // colorSchemes[node.graphIndex].style.opacity = "1";
+            // colorSchemes[node.graphIndex - 1].style.opacity = "1";
 
             hideAllLinks(allNodes);
             console.log("pre",prevRectHeight)
            
-            calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state);
+            calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
 
             
             let relatedNodes: any = [];
@@ -715,14 +724,14 @@ export function featureVisualizer(
               return;
             }
 
-            for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
+            // for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
 
-            colorSchemes[node.graphIndex].style.opacity = "1";
-            colorSchemes[node.graphIndex - 1].style.opacity = "1";
+            // colorSchemes[node.graphIndex].style.opacity = "1";
+            // colorSchemes[node.graphIndex - 1].style.opacity = "1";
 
             hideAllLinks(allNodes);
 
-            calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state);
+            calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
             
             let relatedNodes: any = [];
             if (node.relatedNodes) {
@@ -750,6 +759,9 @@ export function featureVisualizer(
 
   
       } else {
+        if (mode === 1) {
+          return;
+        }
         let currMoveOffset = fcLayerMoveOffset;
 
 
@@ -877,11 +889,11 @@ export function featureVisualizer(
             } // to make sure relatedNodes is not null
             showFeature(node);
             if (node.graphIndex === 4) {
-              fcLayerCalculationVisualizer(node, relatedNodes, offset, height, currMoveOffset, node.graphIndex, g2, state, currRectHeight, colorSchemes);
+              fcLayerCalculationVisualizer(node, relatedNodes, offset, height, currMoveOffset, node.graphIndex, g2, state, currRectHeight, colorSchemes, mode);
             }
             if (node.graphIndex === 5) {
               console.log("CAWCAW", node.relatedNodes, weights, bias)
-              outputVisualizer(node, weights[3], bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes)
+              outputVisualizer(node, weights[3], bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
             }
             
             reduceNodeOpacity(allNodes, relatedNodes, node);
@@ -943,7 +955,7 @@ export function calculateAverage(arr: number[]): number {
   return average * 10;
 }
 
-export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset: number) {
+export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset: number, mode: number) {
   const nodesByIndex = d3.group(nodes, (d: any) => d.graphIndex);
 
 
@@ -963,9 +975,12 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
         let xOffset1 = (graphIndex - 2.5) * offset;
         let xOffset2 = (graphIndex - 1.5) * offset;
 
-  
-
-      if (graphIndex < 3) { 
+      let conv = 3;
+      // if (mode === 1) {
+      //   conv = 4;
+        
+      // }
+      if (graphIndex < conv) { 
         
         let drawnLinks = new Set();
 
@@ -1053,6 +1068,9 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
       
         
       } else {  
+        if (mode === 1) {
+          return;
+        }
           const avg = calculateAverage(node.features)
 
           xOffset1 = (graphIndex - 2.5) * offset - 150;
