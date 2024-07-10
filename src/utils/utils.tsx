@@ -4,7 +4,7 @@ import * as d3 from "d3";
 import { loadNodeWeights, loadWeights } from "./matHelperUtils";
 import * as ort from "onnxruntime-web";
 import { env } from "onnxruntime-web";
-import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature, outputVisualizer, scaleFeatureGroup } from "@/utils/graphUtils";
+import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature, outputVisualizer, scaleFeatureGroup, nodeOutputVisualizer } from "@/utils/graphUtils";
 import { features, off } from 'process';
 
 import { IGraphData, IntmData, IntmDataNode } from "../types/";
@@ -576,7 +576,27 @@ export function featureVisualizer(
         const featureGroup = g2.append("g")
           .attr("transform", `translate(${xPos - 7.5}, ${yPos})`);
 
-  
+        if (mode === 1 && graphIndex === 4) {
+
+          featureGroup.selectAll("rect")
+          .data(features)
+          .enter()
+          .append("rect")
+          .attr("x", 0)
+          .attr("y", (d: any, i: number) => i * currRectHeight)
+          .attr("width", rectWidth)
+          .attr("height", currRectHeight)
+          .attr("class", `node-features node-features-${node.graphIndex}-${node.id}`)
+          .attr("id", (d: any, i: number) => "output-layer-rect-" + i) 
+          .style("fill", (d: number) => myColor(d))
+          .style("stroke-width", 0.1)
+          .style("stroke", "grey")
+          .style("opacity", 1);
+
+
+
+
+        } else {
         featureGroup.selectAll("rect")
           .data(features)
           .enter()
@@ -591,6 +611,7 @@ export function featureVisualizer(
           .style("stroke-width", 0.1)
           .style("stroke", "grey")
           .style("opacity", 1);
+        }
 
         const frame = featureGroup.append("rect")
         .attr("class", `node-features-${node.graphIndex}-${node.id}`)
@@ -612,6 +633,8 @@ export function featureVisualizer(
           .style("font-size", "12px")
           .style("fill", "black")
           .style("text-anchor", "middle");
+        
+
 
 
 
@@ -686,7 +709,7 @@ export function featureVisualizer(
             hideAllLinks(allNodes);
 
            if (mode === 1 && graphIndex === 4) {
-            outputVisualizer(node, weights[3], bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
+            nodeOutputVisualizer(node, weights[3], bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
            } else {
             calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
            };
@@ -734,7 +757,7 @@ export function featureVisualizer(
             hideAllLinks(allNodes);
 
             if (mode === 1 && graphIndex === 4) {
-              outputVisualizer(node, weights[3], bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
+              nodeOutputVisualizer(node, weights[3], bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
              } else {
               calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
              };

@@ -171,7 +171,7 @@ export function outputVisualizer(
     d3.selectAll(".node-features-Copy").style("visibility", "visible").lower();
 
     //color schemes interaction
-    //for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "0.5";
+    for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "0.5";
 
     let originalCoordinates = moveFeatures(
         node.relatedNodes,
@@ -535,7 +535,7 @@ export function outputVisualizer(
         d3.selectAll(".node-features-Copy").style("visibility", "hidden")
         state.isClicked = false;
         d3.selectAll(".graph-displayer").remove();
-        //for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "1";
+        for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "1";
         moveFeaturesBack(node.relatedNodes, originalCoordinates);
         node.featureGroup
             .transition()
@@ -1735,3 +1735,404 @@ function poolingLayerInteraction(
             });
     }
 }
+
+export function nodeOutputVisualizer(
+    node: any,
+    weights: any[],
+    bias: any[],
+    svg: any,
+    offset: number,
+    isClicked: boolean,
+    moveOffset: number,
+    height: number,
+    prevRectHeight: number,
+    rectHeight: number,
+    rectWidth: number,
+    colorSchemes:any,
+    mode: number
+
+) {
+showFeature(node)
+
+
+    
+    d3.selectAll(".to-be-removed").remove();
+    d3.selectAll(".node-features-Copy").style("visibility", "visible").lower();
+
+    //color schemes interaction
+    //for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "0.5";
+
+    let originalCoordinates = moveFeatures(
+        node.relatedNodes,
+        (node.graphIndex - 1) * offset,
+        height / 5
+    );
+    node.featureGroup
+        .transition()
+        .delay(2000)
+        .duration(1000)
+        .attr(
+            "transform",
+            `translate(${node.x - 300}, ${node.y - 25}) rotate(-90)`
+        );
+
+    let temp = 475;
+
+    let calculatedData: number[] = [];
+    for (let i = 0; i < 4; i++) {
+        let data = 0;
+        for (let j = 0; j < node.relatedNodes[0].features.length; j++) {
+            data += weights[i][j] * node.relatedNodes[0].features[j];
+        }
+        calculatedData.push(data);
+    }
+
+
+    let startCoordList = [];
+    for (let i = 0; i < 2; i++) {
+        let s: [number, number] = [
+            node.x +
+                prevRectHeight * i -
+                offset -
+                moveOffset + temp - 215,
+            node.y - 15,
+        ];
+        startCoordList.push(s);
+    }
+
+    console.log(calculatedData);
+    const calculatedFeatureGroup = svg
+        .append("g")
+        .attr("transform", `translate(${node.x - temp}, ${node.y})`);
+
+    calculatedFeatureGroup
+        .selectAll("rect")
+        .data(calculatedData)
+        .enter()
+        .append("rect")
+        .attr("x", (d: number, i: number) => i * rectHeight + 5)
+        .attr("y", -30)
+        .attr("width", rectHeight)
+        .attr("height", rectWidth)
+        .attr(
+            "class",
+            (d: number, i: number) => `calculatedFeatures${i} to-be-removed`
+        )
+        .style("fill", (d: number) => myColor(d))
+        .style("stroke-width", 1)
+        .style("stroke", "grey")
+        .style("opacity", 0);
+
+    calculatedFeatureGroup.append("text")
+        .attr("x", 5)
+        .attr("y", -38)
+        .text("Matrix Multiplication")
+        .style("fill", "gray")
+        .style("font-size", "8px")
+        .attr("class", "bias")
+        .style("opacity", 1); 
+
+    let endCoordList = [];
+
+    for (let i = 0; i < node.features.length; i++) {
+        let s: [number, number] = [node.x + 20 + i * rectHeight - temp, node.y - 15];
+        endCoordList.push(s);
+    }
+    console.log("start", startCoordList);
+    console.log("end", endCoordList);
+    const math = create(all, {});
+    const Xt = math.transpose(weights);
+
+    const BiasGroup = svg
+        .append("g")
+        .attr("transform", `translate(${node.x - 200}, ${node.y + 30})`);
+
+    BiasGroup.selectAll("rect")
+        .data(bias)
+        .enter()
+        .append("rect")
+        .attr("class", "bias")
+        .attr("x", (d: any, i: number) => i * rectHeight + 5 - moveOffset)
+        .attr("y", 0)
+        .attr("width", rectHeight)
+        .attr("height", rectWidth)
+        .style("fill", (d: number) => myColor(d))
+        .style("stroke-width", 1)
+        .style("stroke", "grey")
+        .style("opacity", 0);
+
+    BiasGroup.append("text")
+        .attr("x", 5 - moveOffset)
+        .attr("y", 23)
+        .text("Bias Vector")
+        .style("fill", "gray")
+        .style("font-size", "8px")
+        .attr("class", "bias")
+        .style("opacity", 0); 
+
+    setTimeout(() => {
+
+        weightAnimation(
+            svg,
+            node,
+            startCoordList,
+            endCoordList,
+            Xt,
+            offset,
+            height,
+            moveOffset,
+            rectHeight,
+            prevRectHeight,
+            state,
+            mode
+        );
+
+        let start_x = node.x + 40 + 5 - temp;
+        let start_y = node.y - 22.5;
+        let end_x = node.x + 200 - 40 - 5 - temp + 50;
+        let end_y = node.y - 22.5;
+
+        let control_x = (start_x + end_x) / 2;
+        let control_y = start_y + 50;
+
+        for (let i = 0; i < node.features.length; i++){
+            for (let j = 0; j < node.features.length; j++) {
+                const softmaxPath1 = svg
+                    .append("path")
+                    .attr(
+                        "d",
+                        `M${start_x + 20 * i - 30},${
+                            start_y + 7.5
+                        } Q${control_x},${control_y} ${end_x - 20 * j},${
+                            end_y + 7.5
+                        }`
+                    )
+                    .attr("stroke", myColor(calculatedData[i]))
+                    .attr("stroke-width", 1)
+                    .attr("class", `softmax${1 - j} softmax to-be-removed`)
+                    .attr("opacity", 0)
+                    .style("fill", "none");
+            }
+        }
+        
+        svg.append("text")
+        .attr("x", (start_x - 30 + end_x)/2)
+        .attr("y", end_y + 50)
+        .text("Softmax")
+        .style("fill", "gray")
+        .style("font-size", "8px")
+        .attr("class", "to-be-removed softmaxLabel")
+        .style("opacity", 1); 
+        
+        
+        let color = calculateAverage(node.features); // to be determined
+
+        start_y = node.y + 40;
+        start_x = start_x - moveOffset + temp - 200;
+        end_x = end_x - 200;
+
+        let control1_x = start_x + (end_x - start_x) * 0.2;
+        let control1_y = start_y;
+        let control2_x = start_x + (end_x - start_x) * 0.4;
+        let control2_y = end_y;
+
+        color = calculateAverage(node.features); // to be determined
+        const biasToFinal = svg
+            .append("path")
+            .attr(
+                "d",
+                `M${start_x},${start_y} C ${control1_x} ${control1_y}, ${control2_x} ${control2_y} ${end_x},${end_y}`
+            )
+            .style("stroke", pathColor(color))
+            .style("opacity", 0.7)
+            .style("stroke-width", 1)
+            .style("fill", "none")
+            .attr("class", "bias to-be-removed")
+            .style("opacity", 0);
+
+
+
+        const originToAggregated = svg
+            .append("path")
+            .attr(
+                "d",
+                `M${start_x + 6},${start_y - 65} L${end_x},${end_y}`
+            )
+            .style("stroke", pathColor(color))
+            .style("stroke-width", 1)
+            .style("fill", "none")
+            .attr("class", "output-path to-be-removed")
+            .attr("opacity", 0);
+    }, 2000);
+
+    const g4 = svg
+        .append("g")
+        .attr("transform", `translate(${node.x - temp}, ${node.y - 150})`);
+
+    let rectL = 15;
+    let displayerWidth = 300; // Width of the graph-displayer
+    let displayHeight = 75;
+
+    const displayer = g4
+        .append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", displayerWidth)
+        .attr("height", displayHeight)
+        .attr("rx", 10)
+        .attr("ry", 10)
+        .style("fill", "transparent")
+        .style("stroke", "black")
+        .style("stroke-width", 2)
+        .attr("class", "graph-displayer")
+        .attr("opacity", 0)
+        .lower();
+
+    state.isClicked = true;
+
+    for (let i = 0; i < node.features.length; i++) {
+        d3.select(`#output-layer-rect-${i}`)
+            .on("mouseover", function () {
+                if (!state.isClicked) {
+                    return;
+                }
+                d3.select(".graph-displayer").attr("opacity", 1);
+                d3.selectAll(`.softmax${i}`).attr("opacity", 1);
+                g4.append("rect")
+                    .attr("x", 70)
+                    .attr("y", displayHeight - 40)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(calculatedData[0]))
+                    .attr("class", "math-displayer")
+                    .lower();
+                g4.append("text")
+                    .attr("x", 70)
+                    .attr("y", displayHeight - 40 + rectL / 2)
+                    .text(roundToTwo(calculatedData[0]))
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "5");
+
+                g4.append("rect")
+                    .attr("x", displayerWidth - 130)
+                    .attr("y", displayHeight - 40)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(calculatedData[1]))
+                    .attr("class", "math-displayer")
+                    .lower();
+                g4.append("text")
+                    .attr("x", displayerWidth - 130)
+                    .attr("y", displayHeight - 40 + rectL / 2)
+                    .text(roundToTwo(calculatedData[1]))
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "5");
+
+                g4.append("rect")
+                    .attr("x", 100)
+                    .attr("y", 10)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(calculatedData[i]))
+                    .attr("class", "math-displayer")
+                    .lower();
+                g4.append("text")
+                    .attr("x", 100)
+                    .attr("y", 10 + rectL / 2)
+                    .text(roundToTwo(calculatedData[i]))
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "5");
+
+                g4.append("text")
+                    .attr("x", displayerWidth / 2 - 50)
+                    .attr("y", displayHeight - 30)
+                    .text("+")
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "12");
+
+                g4.append("text")
+                    .attr("x", 100 - 25)
+                    .attr("y", 20)
+                    .attr("xml:space", "preserve")
+                    .text("exp(        )")
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "10");
+
+                g4.append("text")
+                    .attr("x", 70 - 25)
+                    .attr("y", displayHeight - 30)
+                    .attr("xml:space", "preserve")
+                    .text("exp(        )")
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "10");
+
+                g4.append("text")
+                    .attr("x", displayerWidth - 130 - 25)
+                    .attr("y", displayHeight - 30)
+                    .attr("xml:space", "preserve")
+                    .text("exp(        )")
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "10");
+
+                g4.append("line")
+                    .attr("x1", 20)
+                    .attr("y1", 30)
+                    .attr("x2", displayerWidth - 80)
+                    .attr("y2", 30)
+                    .attr("stroke", "black")
+                    .attr("class", "math-displayer")
+                    .attr("stroke-width", 1);
+
+                g4.append("text")
+                    .attr("x", displayerWidth - 60)
+                    .attr("y", 35)
+                    .text("=")
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "15");
+
+                g4.append("rect")
+                    .attr("x", displayerWidth - 50)
+                    .attr("y", 25)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(node.features[i]))
+                    .attr("class", "math-displayer")
+                    .lower();
+                g4.append("text")
+                    .attr("x", displayerWidth - 50)
+                    .attr("y", 25 + rectL / 2)
+                    .text(roundToTwo(node.features[i]))
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "5");
+            })
+            .on("mouseout", function () {
+                if (!state.isClicked) {
+                    return;
+                }
+                d3.selectAll(".math-displayer").remove();
+                d3.selectAll(".graph-displayer").attr("opacity", 0);
+                d3.selectAll(".softmax").attr("opacity", 0);
+                d3.selectAll(`.softmax${i}`).attr("opacity", 0.07);
+            });
+    }
+
+    document.addEventListener("click", function () {
+        d3.selectAll(".node-features-Copy").style("visibility", "hidden")
+        state.isClicked = false;
+        d3.selectAll(".graph-displayer").remove();
+        //for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "1";
+        moveFeaturesBack(node.relatedNodes, originalCoordinates);
+        node.featureGroup
+            .transition()
+            .duration(1000)
+            .attr(
+                "transform",
+                `translate(${node.x - 7.5}, ${node.y + 170 + 5}) rotate(0)`
+            );
+    });
+}
+
