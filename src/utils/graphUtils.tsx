@@ -1764,7 +1764,7 @@ showFeature(node)
     d3.selectAll(".node-features-Copy").style("visibility", "visible").lower();
 
     //color schemes interaction
-    //for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "0.5";
+    for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "0.5";
     let xPos = (node.graphIndex) * offset - 250;
     let yPos = node.y - 15
     let originalCoordinates = moveFeatures(
@@ -1941,14 +1941,14 @@ showFeature(node)
         let control2_x = start_x + (end_x - start_x) * 0.4;
         let control2_y = end_y;
 
-        color = calculateAverage(node.features); // to be determined
+        color = calculateAverage(node.features);
         const biasToFinal = svg
             .append("path")
             .attr(
                 "d",
                 `M${start_x},${start_y} C ${control1_x} ${control1_y}, ${control2_x} ${control2_y} ${end_x},${end_y}`
             )
-            .style("stroke", "black") //pathColor(color))
+            .style("stroke", pathColor(color))
             .style("opacity", 0.7)
             .style("stroke-width", 1)
             .style("fill", "none")
@@ -1964,7 +1964,7 @@ showFeature(node)
                 "d",
                 `M${start_x - 20},${start_y - 65} L${end_x},${end_y}`
             )
-            .style("stroke", "black") //pathColor(color))
+            .style("stroke", pathColor(color))
             .style("stroke-width", 1)
             .style("fill", "none")
             .attr("class", "output-path to-be-removed")
@@ -2132,7 +2132,7 @@ showFeature(node)
         d3.selectAll(".node-features-Copy").style("visibility", "hidden")
         state.isClicked = false;
         d3.selectAll(".graph-displayer").remove();
-        //for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "1";
+        for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "1";
         moveFeaturesBack(node.relatedNodes, originalCoordinates);
         node.featureGroup
             .transition()
