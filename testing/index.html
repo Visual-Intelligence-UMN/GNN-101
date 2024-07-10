@@ -18,7 +18,7 @@
             async function loadModel() {
                 // await session.loadModel("gnn_model.onnx");
                 session = await ort.InferenceSession.create(
-                    "./python_gnn_models/gnn_node_model.onnx"
+                    "gnn_link_model.onnx"
                 );
                 console.log("Model loaded successfully");
             }
@@ -91,30 +91,31 @@
                         const outputMap = await session.run({
                             x: xTensor,
                             edge_index: edgeIndexTensor,
+                            edge_label_index: edgeIndexTensor
                         });
-                        console.log(outputMap);
-                        const outputTensor = outputMap.final;
+                        console.log("outputMap",outputMap);
+                        // const outputTensor = outputMap.final;
 
-                        //conv1 data
-                        console.log("Conv1");
-                        console.log(outputMap.conv1.cpuData);
+                        // //conv1 data
+                        // console.log("Conv1");
+                        // console.log(outputMap.conv1.cpuData);
 
-                        //conv2 data
-                        console.log("Conv2");
-                        console.log(outputMap.conv2.cpuData);
+                        // //conv2 data
+                        // console.log("Conv2");
+                        // console.log(outputMap.conv2.cpuData);
 
-                        //conv3 data
-                        console.log("Conv3");
-                        console.log(outputMap.conv3.cpuData);
+                        // //conv3 data
+                        // console.log("Conv3");
+                        // console.log(outputMap.conv3.cpuData);
 
-                        //final data
-                        console.log("Final");
-                        console.log(outputMap.final.cpuData);
+                        // //final data
+                        // console.log("Final");
+                        // console.log(outputMap.final.cpuData);
 
-                        //the final output of gcn model data
-                        console.log("Final");
-                        console.log(outputTensor);
-                        console.log(outputTensor.cpuData);
+                        // //the final output of gcn model data
+                        // console.log("Final");
+                        // console.log(outputTensor);
+                        // console.log(outputTensor.cpuData);
 
                         let resultArray = [];
                         let splitedArray = splitArray(outputTensor.cpuData, 4);
@@ -126,18 +127,18 @@
                         console.log("resultArray", resultArray);
 
 
-                        const resultContainer = document.getElementById("result");
+                        // const resultContainer = document.getElementById("result");
 
-                        // clear container
-                        resultContainer.innerText = "";
-                        resultArray.forEach(subArray => {
-                            const formattedSubArray = subArray.map(probability => probability.toFixed(2)).join(", ");
+                        // // clear container
+                        // resultContainer.innerText = "";
+                        // resultArray.forEach(subArray => {
+                        //     const formattedSubArray = subArray.map(probability => probability.toFixed(2)).join(", ");
                     
-                            const div = document.createElement("div");
-                            div.innerText = formattedSubArray;
+                        //     const div = document.createElement("div");
+                        //     div.innerText = formattedSubArray;
                             
-                            resultContainer.appendChild(div);
-                        });
+                        //     resultContainer.appendChild(div);
+                        // });
                         
                     };
                     reader.readAsText(file);
