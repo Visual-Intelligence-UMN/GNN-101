@@ -702,10 +702,11 @@ export function featureVisualizer(
 
             //color schemes interaction logic
             // console.log("node", node.graphIndex);
-            // for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
-
-            // colorSchemes[node.graphIndex].style.opacity = "1";
-            // colorSchemes[node.graphIndex - 1].style.opacity = "1";
+            for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
+            console.log(node.graphIndex)
+            console.log(colorSchemes)
+            colorSchemes[node.graphIndex].style.opacity = "1";
+            colorSchemes[node.graphIndex - 1].style.opacity = "1";
 
             hideAllLinks(allNodes);
 
@@ -750,10 +751,10 @@ export function featureVisualizer(
               return;
             }
 
-            // for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
+            for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
 
-            // colorSchemes[node.graphIndex].style.opacity = "1";
-            // colorSchemes[node.graphIndex - 1].style.opacity = "1";
+            colorSchemes[node.graphIndex].style.opacity = "1";
+            colorSchemes[node.graphIndex - 1].style.opacity = "1";
 
             hideAllLinks(allNodes);
 
@@ -965,7 +966,7 @@ export function featureVisualizer(
       let currMoveOffset = moveOffset;
 
 
-      //for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "1";
+      for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "1";
 
       if (mode === 0 && movedNode.graphIndex >= 4) {
         currMoveOffset = fcLayerMoveOffset;
