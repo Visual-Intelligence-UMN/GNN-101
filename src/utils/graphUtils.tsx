@@ -1135,9 +1135,10 @@ function weightAnimation(
         if(isPlaying)injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - btnYOffset, "./assets/SVGs/playBtn_pause.svg");
         else injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - btnYOffset, "./assets/SVGs/playBtn_play.svg")
         if (isPlaying && state.isClicked) {
-            d3.selectAll(".aniRect").style("opacity", 0);
+            
             startAnimation(endNumber);
         } else {
+            //d3.selectAll(".aniRect").style("opacity", 0);
             clearInterval(intervalID);
         }
     });

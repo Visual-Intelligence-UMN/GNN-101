@@ -194,7 +194,8 @@ export function drawNodeFeatures(
     featureChannels:number,
     rectW:number,
     rectH:number,
-    gap:number
+    gap:number,
+    drawPaths: boolean = true
 ) {
     //initial visualizer
     for (let i = 0; i < locations.length; i++) {
@@ -202,7 +203,8 @@ export function drawNodeFeatures(
         locations[i][1] += 2;
     }
     //draw cross connections for features layer and first GCNConv layer
-    drawCrossConnection(graph, locations, featureChannels * rectW, gap+2, 0);
+    //drawPaths controls the cross connection func
+    if(drawPaths)drawCrossConnection(graph, locations, featureChannels * rectW, gap+2, 0);
 
     //using locations to find the positions for first feature visualizers
     const firstLayer = d3.select(".mats").append("g").attr("id", "layerNum_0");
