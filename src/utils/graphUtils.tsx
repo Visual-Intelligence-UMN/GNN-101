@@ -103,10 +103,10 @@ export function highlightNodes(node: any) {
     }
 }
 
-export function resetNodes(allNodes: any[]) {
+export function resetNodes(allNodes: any[], convNum: number) {
     allNodes.forEach((node) => {
         scaleFeatureGroup(node, 0.5)
-        if (node.graphIndex <= 3) {
+        if (node.graphIndex < convNum) {
             if (node.featureGroup) {
                 node.featureGroup.style("visibility", "hidden");
             }
@@ -163,11 +163,15 @@ export function outputVisualizer(
     mode: number
 
 ) {
+
+
+
+    
     d3.selectAll(".to-be-removed").remove();
     d3.selectAll(".node-features-Copy").style("visibility", "visible").lower();
 
     //color schemes interaction
-    for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "0.5";
+    //for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "0.5";
 
     let originalCoordinates = moveFeatures(
         node.relatedNodes,
@@ -531,7 +535,7 @@ export function outputVisualizer(
         d3.selectAll(".node-features-Copy").style("visibility", "hidden")
         state.isClicked = false;
         d3.selectAll(".graph-displayer").remove();
-        for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "1";
+        //for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "1";
         moveFeaturesBack(node.relatedNodes, originalCoordinates);
         node.featureGroup
             .transition()
@@ -1178,11 +1182,10 @@ function weightAnimation(
         d3.selectAll(".intermediate-path").remove();
         d3.selectAll(".parameter").remove();
         d3.selectAll(".to-be-removed").remove();
+        d3.selectAll(".intermediate-path").remove();
     });
     let featureLength = node.features.length;
-    if (node.graphIndex === 5) {
-        featureLength = node.relatedNodes[0].features.length;
-    }
+    let prevLayerFeatureLength = node.relatedNodes[0].features.length;
     function startAnimation(endNumber: number) {
         if (!state.isClicked) {
             return;
@@ -1199,7 +1202,7 @@ function weightAnimation(
 
             d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1);
             d3.selectAll(`#tempath${i - 1}`).attr("opacity", 0);
-            console.log("AWD", endCoordList)
+    
             if (isAnimating) {
                 GraphViewDrawPaths(
                     Xt,
@@ -1212,6 +1215,7 @@ function weightAnimation(
                     btn,
                     node,
                     featureLength,
+                    prevLayerFeatureLength,
                     state
                 );
  
@@ -1219,7 +1223,7 @@ function weightAnimation(
                 if (i >= endNumber) {
                     clearInterval(intervalID);
                     isPlaying = false;
-                    d3.selectAll(".intermediate-path").remove();
+                
                     injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - btnYOffset, "./assets/SVGs/playBtn_play.svg")
                     setTimeout(() => {
                         d3.selectAll(".bias").style("opacity", 1);
@@ -1227,6 +1231,7 @@ function weightAnimation(
                         d3.selectAll(".relu").style("opacity", 1);
                         d3.selectAll(".output-path").attr("opacity", 1);
                         d3.selectAll(".softmaxLabel").attr("opacity", 1);
+                        d3.selectAll(".intermediate-path").attr("opacity", 0)
                         d3.selectAll(".output")
                             .transition()
                             .delay(2000)
@@ -1240,8 +1245,7 @@ function weightAnimation(
                                 }, ${
                                     node.featureGroupLocation.yPos -
                                     height / 5 -
-                                    150 -
-                                    node.features.length * rectHeight
+                                    150 
                                 }) rotate(90)`
                             );
                     }, 2000);
@@ -1266,6 +1270,7 @@ function GraphViewDrawPaths(
     btn: any,
     node: any,
     featureLength: number,
+    prevLayerFeatureLength: number,
     state: State
 ) {
     if (!svg.selectAll) {
@@ -1273,12 +1278,12 @@ function GraphViewDrawPaths(
     }
     const Wi = Xt[i];
 
-    for (let j = 0; j < featureLength; j++) {
+    for (let j = 0; j < prevLayerFeatureLength; j++) {
         if (!state.isClicked) {
             return;
 
         }
-        let s = startCoordList[featureLength - 1 - j];
+        let s = startCoordList[prevLayerFeatureLength - 1 - j];
         let e = endCoordList[i];
         console.log("AWD", e)
 
@@ -1311,7 +1316,7 @@ function GraphViewDrawPaths(
                     end_y,
                 ].join(" ");
             })
-            .attr("stroke", myColor(Wi[featureLength - 1 - j]))
+            .attr("stroke", myColor(Wi[prevLayerFeatureLength - 1 - j]))
             .attr("stroke-width", 1)
             .attr("opacity", 1)
             .attr("fill", "none")

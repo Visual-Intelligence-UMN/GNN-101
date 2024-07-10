@@ -460,9 +460,11 @@ export function featureVisualizer(
   // 1. visualize feature
   // 2. handle interaction event
   // 3. do the calculation for animation
+  let convNum = 4;
   let {weights, bias} = loadWeights();
   if (mode === 1) {
     ({weights, bias} = loadNodeWeights());
+    convNum = 5
   }
 
 
@@ -489,7 +491,7 @@ export function featureVisualizer(
 
 
     // do some calculation that sill be used in the animation
-    if (graphs.length != 0 && graphIndex > 0 && graphIndex < 4) {
+    if (graphs.length != 0 && graphIndex > 0 && graphIndex < (convNum)) {
     currentWeights = weights[graphIndex - 1];
     currentBias = bias[graphIndex - 1]
       
@@ -516,7 +518,7 @@ export function featureVisualizer(
     const occupiedPositions: { x: number; y: number }[] = []; 
 
     let xOffset = (graphIndex - 2.5) * offset;
-    if (graphIndex >= 4) {
+    if (graphIndex >= 4 && mode === 0) {
       xOffset = (graphIndex - 2.5) * offset - 25 * (graphIndex * 1.5);
     }
 
@@ -547,11 +549,8 @@ export function featureVisualizer(
       });
       occupiedPositions.push({ x: xPos, y: yPos });
 
-      let convNum = 3;
-      if (mode === 1) {
-        convNum = 4; 
-      } 
-      if (graphIndex <= convNum) {
+
+      if (graphIndex < convNum) {
         // featureGroup in the convolutional layers and the last three layers are different.
 
         // add svgElement to each node simplify the interaction process (maybe)
@@ -657,12 +656,12 @@ export function featureVisualizer(
 
         node.text.on("mouseout", function() {
           if (!state.isClicked) {
-            resetNodes(allNodes);
+            resetNodes(allNodes, convNum);
           }
         });
         node.svgElement.addEventListener("mouseout", function(this: any) {
           if (!state.isClicked) {
-            resetNodes(allNodes);
+            resetNodes(allNodes, convNum);
           }
         });
 
@@ -685,9 +684,12 @@ export function featureVisualizer(
             // colorSchemes[node.graphIndex - 1].style.opacity = "1";
 
             hideAllLinks(allNodes);
-            console.log("pre",prevRectHeight)
-           
+
+           if (mode === 1 && graphIndex === 4) {
+            outputVisualizer(node, weights[3], bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
+           } else {
             calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
+           };
 
             
             let relatedNodes: any = [];
@@ -731,7 +733,11 @@ export function featureVisualizer(
 
             hideAllLinks(allNodes);
 
-            calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
+            if (mode === 1 && graphIndex === 4) {
+              outputVisualizer(node, weights[3], bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
+             } else {
+              calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
+             };
             
             let relatedNodes: any = [];
             if (node.relatedNodes) {
@@ -759,9 +765,9 @@ export function featureVisualizer(
 
   
       } else {
-        if (mode === 1) {
-          return;
-        }
+        if (mode === 0) {
+          
+        
         let currMoveOffset = fcLayerMoveOffset;
 
 
@@ -919,6 +925,7 @@ export function featureVisualizer(
 
         });
       }
+    }
     });
   });
 
@@ -932,7 +939,7 @@ export function featureVisualizer(
         .style("opacity", 0);
       let currMoveOffset = moveOffset;
 
-      for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "1";
+      //for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "1";
 
       if (movedNode.graphIndex >= 4) {
         currMoveOffset = fcLayerMoveOffset;
@@ -941,8 +948,8 @@ export function featureVisualizer(
       state.isClicked = false; 
       movedNode = null;
       showAllLinks(allNodes);
-      resetNodes(allNodes);
-      resetNodes(allNodes);
+      resetNodes(allNodes, convNum);
+      resetNodes(allNodes, convNum);
     }
   });
 }
@@ -1069,6 +1076,37 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
         
       } else {  
         if (mode === 1) {
+          if (graphIndex === 3) {
+            const nextLayerNodes = nodesByIndex.get(graphIndex + 1);
+          if (nextLayerNodes) {
+            nextLayerNodes.forEach((nextNode: any) => {
+              if (node.id === nextNode.id) {
+                const avg = calculateAverage(node.features);
+
+                const path = svg.append("line")
+                  .attr("x1", node.x + xOffset1)
+                  .attr("y1", node.y + 10)
+                  .attr("x2", nextNode.x + (graphIndex - 1.5) * offset)
+                  .attr("y2", nextNode.y + 10)
+                  .style("stroke", linkStrength(avg))
+                  .style("stroke-width", 1)
+                  .style("opacity", 0.1)
+                  .style("fill", "none");
+
+                if (!nextNode.links) {
+                  nextNode.links = [];
+                }
+                if (!nextNode.relatedNodes) {
+                  nextNode.relatedNodes = [];
+                }
+                nextNode.links.push(path);
+                nextNode.relatedNodes.push(node);
+              }
+            });
+          }
+        
+
+          }
           return;
         }
           const avg = calculateAverage(node.features)
