@@ -926,11 +926,15 @@ export function calculationVisualizer(
         }
 
         // relu
-
         const relu = g3.append("g");
-
-        d3.xml("./assets/SVGs/ReLU.svg").then(function (data) {
-    
+        let svgPath = "./assets/SVGs/ReLU.svg";
+        let labelText = "ReLU Non-linear Function";
+        if(mode==1){
+            svgPath = "./assets/SVGs/tanh.svg";
+            labelText = "Tanh Non-linear Function";
+        }
+        d3.xml(svgPath).then(function (data) {
+        
             if(relu.node()!=null){
             const ReLU = relu!.node()!.appendChild(data.documentElement);
             d3.select(ReLU)
@@ -946,11 +950,10 @@ export function calculationVisualizer(
         relu.append("text")
         .attr("x", end_x - 45)
         .attr("y", end_y - 25)
-        .text("ReLU Non-linear Function")
+        .text(labelText)
         .style("fill", "gray")
         .style("font-size", "8px")
         .attr("class", "relu to-be-removed").attr("opacity", 0); 
-
     }, 3500);
 
    
