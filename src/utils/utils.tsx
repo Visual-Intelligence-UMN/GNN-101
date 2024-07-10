@@ -652,6 +652,7 @@ export function featureVisualizer(
 
         let currMoveOffset = moveOffset;
 
+
       //the bottom of the featureGroup 
         let featureGroupLocation: FeatureGroupLocation = {xPos, yPos}; 
 
@@ -957,14 +958,16 @@ export function featureVisualizer(
     if (!movedNode || !state.isClicked) {
       return;
     }
+
     if (movedNode && (!event.target.classList.contains("vis-component"))) {
       svg.selectAll(".vis-component")
         .style("opacity", 0);
       let currMoveOffset = moveOffset;
 
+
       //for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "1";
 
-      if (movedNode.graphIndex >= 4) {
+      if (mode === 0 && movedNode.graphIndex >= 4) {
         currMoveOffset = fcLayerMoveOffset;
       }
       moveNextLayer(svg, movedNode, currMoveOffset, -1)
