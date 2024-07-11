@@ -564,7 +564,32 @@ export function featureVisualizer(
           .attr("stroke-opacity", 1)
           .attr("opacity", 1)
           .node(); // make the svgElement a DOM element (the original on method somehow doesn't work)
+        if (mode === 1 && graphIndex === 4) {
+          let name = "unknown";
+          if (node.features[0] > 0.5) {
+            name = "A"
+          }
+          if (node.features[1] > 0.5) {
+            name = "B"
+          }
+          if (node.features[2] > 0.5) {
+            name = "C"
+          }
+          if (node.features[3] > 0.5) {
+            name = "D"
+          }
 
+
+          node.text = g2.append("text")
+          .attr("x", node.x - 6)
+          .attr("y", node.y + 6)
+          .join("text")
+          .text(name)
+          .attr("font-size", `17px`)
+          .attr("opacity", 1);
+
+        }
+        else {
         node.text = g2.append("text")
           .attr("x", node.x - 6)
           .attr("y", node.y + 6)
@@ -572,6 +597,7 @@ export function featureVisualizer(
           .text(node.id)
           .attr("font-size", `17px`)
           .attr("opacity", 1);
+        }
 
         const featureGroup = g2.append("g")
           .attr("transform", `translate(${xPos - 7.5}, ${yPos})`);
