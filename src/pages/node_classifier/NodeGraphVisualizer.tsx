@@ -77,6 +77,9 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
       let colorSchemes:any = [];
 
       graphs.forEach((data, i) => {
+        if (i >= 5) {
+          return;
+        }
 
         console.log("i", i);
         console.log(data);
@@ -118,6 +121,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
 
         if (i >= 5) {
           labels.attr("opacity", 0);
+          node.attr("opacity", 0)
         }
         data.nodes.forEach((node: any) => {
           if (initialCoords[node.id]) {
@@ -200,7 +204,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
             .attr("y", (d: any) => d.y + 6);
 
 
-          let value = null;
+          let value: number[] | null = null;
 
           if (intmData != null) {
             if (i === 1) {
@@ -236,6 +240,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
 
             if (value != null && i > 2 && i === 4) {
               node.features = value[node.id];
+
               
             }
 
@@ -325,7 +330,13 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
             .attr("font-weight", "normal")
             .attr('opacity', 0.5);
 
-            
+            if (i === 4 && value) {
+              let mergedArray: number[] = [];
+              value.forEach((arr: any) => {
+                mergedArray = mergedArray.concat(Array.from(arr));
+              });
+              value = mergedArray;
+            }
             let absMax = 1;
             if (value != null) {
               absMax = findAbsMax(value);
@@ -337,10 +348,9 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
              if(i==0){
                cst = buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x, text_y + 50, g1)
              }
-             else if(i==4){
-               cst = buildBinaryLegend(myColor, value[0], value[1], text+" Color Scheme", text_x, text_y + 50, g1)
-             }
+     
              else {
+              console.log("AWD", value,absMax,text,i)
                cst = buildLegend(myColor, absMax, text+" Color Scheme", text_x - 50, text_y + 50, g1);
              }
    
@@ -349,7 +359,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
 
 
           // doesn't show the text, need to be fixed 
-          if (i === graphs.length - 2) { // 6 layers in total, call the connect when reaching the last layer of convolutional layer.
+          if (i === graphs.length - 3) { // 6 layers in total, call the connect when reaching the last layer of convolutional layer.
             connectCrossGraphNodes( // in this function the connection of last two layers will be drwan
               allNodes,
               svg,
@@ -358,11 +368,8 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
               1
             );
 
-         
-            console.log("AWDAWD", colorSchemes)
-            // since in the featureVisualizer each node has its own svgElement, circles here are made transparent
-            svg.selectAll("circle")
-              .attr("opacity", 0);
+
+
 
 
             if (intmData && intmData.final) {

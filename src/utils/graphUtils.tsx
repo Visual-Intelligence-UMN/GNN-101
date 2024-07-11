@@ -320,7 +320,7 @@ export function outputVisualizer(
                     )
                     .attr("stroke", myColor(calculatedData[i]))
                     .attr("stroke-width", 1)
-                    .attr("class", `softmax${1 - j} softmax to-be-removed`)
+                    .attr("class", `softmax${j} softmax to-be-removed`)
                     .attr("opacity", 0)
                     .style("fill", "none");
             }
@@ -1909,7 +1909,7 @@ showFeature(node)
                     )
                     .attr("stroke", myColor(calculatedData[i]))
                     .attr("stroke-width", 1)
-                    .attr("class", `softmax${3 - j} softmax to-be-removed`)
+                    .attr("class", `softmax${j} softmax to-be-removed`)
                     .attr("opacity", 0)
                     .style("fill", "none")
                     
