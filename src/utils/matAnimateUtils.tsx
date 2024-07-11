@@ -169,18 +169,20 @@ export function drawAniPath(
         .attr("stroke-width", 0.1)
         .attr("class", "procVis removeRect interactRect").attr("rectID", currentStep).lower();
 
-    const Xv = Xt[currentStep];
-    console.log("debug Xv", Xv)
-    drawMatrixWeight(Xv, startCoordList, endCoordList, curveDir, currentStep, myColor);
+    
+
+    drawMatrixWeight(Xt, startCoordList, endCoordList, curveDir, currentStep, myColor);
     d3.selectAll("#tempath").lower();
 
     d3.selectAll(".interactRect").on("mouseover", function(){
         const rectID = d3.select(this).attr("rectID")
         console.log("rectID",rectID)
+        drawMatrixWeight(Xt, startCoordList, endCoordList, curveDir, Number(rectID), myColor, "weightPath");
     });
     d3.selectAll(".interactRect").on("mouseout", function(){
         const rectID = d3.select(this).attr("rectID")
         console.log("rectID quit",rectID)
+        d3.selectAll("#weightPath").remove();
     });
 
     
@@ -188,7 +190,7 @@ export function drawAniPath(
 
 
 export function drawMatrixWeight(
-    Xv: number[][],
+    Xt: any,
     startCoordList:any,
     endCoordList:any,
     curveDir:number,
@@ -196,6 +198,7 @@ export function drawMatrixWeight(
     myColor:any,
     id:string = "tempath"
 ){
+    const Xv = Xt[currentStep];
     for (let j = 0; j < Xv.length; j++) {
         const s1 = startCoordList[j];
         const e1 = endCoordList[currentStep];
@@ -319,7 +322,11 @@ export function drawWeightsVector(
     coordFeatureVis: any,
     rectH: number,
     rectW: number,
-    myColor: any
+    myColor: any,
+    Xv:number[][],
+    startCoordList: any,
+    endCoordList:any,
+    curveDir:number
 ) {
     for (let m = 0; m < dummy.length; m++) {
         g.append("rect")
@@ -360,10 +367,12 @@ export function drawWeightsVector(
     d3.selectAll(".interactRect").on("mouseover", function(){
         const rectID = d3.select(this).attr("rectID")
         console.log("rectID",rectID)
+        drawMatrixWeight(Xv, startCoordList, endCoordList, curveDir, Number(rectID), myColor, "weightPath");
     });
     d3.selectAll(".interactRect").on("mouseout", function(){
         const rectID = d3.select(this).attr("rectID")
         console.log("rectID quit",rectID)
+        d3.selectAll("#weightPath").remove();
     });
 }
 

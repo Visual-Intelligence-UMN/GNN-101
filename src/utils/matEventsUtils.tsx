@@ -617,7 +617,7 @@ export function featureVisClick(
     const waitSec = 250 * featureChannels;
     let animateSeqAfterPath: any = [
         {func: () => drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir), delay: initSec + aniSec,},
-        {func: () => drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor), delay: aniSec},
+        {func: () => drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor, math.transpose(weights[layerID]), startCoordList, endCoordList, curveDir), delay: aniSec},
         {func: ()=>{
             injectPlayButtonSVG(
                 btn,
@@ -760,6 +760,8 @@ export function featureVisClick(
         }
         d3.selectAll("#tempath").lower();
     });
+
+    
 
     return {
         getIntervalID: getIntervalID,
