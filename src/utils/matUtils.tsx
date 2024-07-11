@@ -884,7 +884,7 @@ export function visualizeNodeClassifierFeatures(
             const animateSeqAfterPath = [
                 {func:()=>{
                     //draw a final value output visualizer for testing
-                    drawWeightsVector(g, nthOutputVals, finalOutputCoord, 15, 10, myColor);
+                    drawWeightsVector(g, nthOutputVals, finalOutputCoord, 15, 10, myColor, modelParams.weights[3], startPathCoords, endPathCoords, curveDir);
                     drawPathBtwOuputResult([vectorAfterMatMulPath], finalOutputCoord);
                 }, delay:aniSec}, 
                 {func:()=>{drawBiasVector(g, 4, 15, 10, biasCoord, myColor, linBias, 4);}, delay:aniSec},

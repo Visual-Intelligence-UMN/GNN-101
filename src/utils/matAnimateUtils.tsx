@@ -177,11 +177,14 @@ export function drawAniPath(
     d3.selectAll(".interactRect").on("mouseover", function(){
         const rectID = d3.select(this).attr("rectID")
         console.log("rectID",rectID)
+        d3.selectAll(".interactRect").style("opacity", 0.5);
+        d3.select(`.interactRect[rectID="${rectID}"]`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
         drawMatrixWeight(Xt, startCoordList, endCoordList, curveDir, Number(rectID), myColor, "weightPath");
     });
     d3.selectAll(".interactRect").on("mouseout", function(){
         const rectID = d3.select(this).attr("rectID")
         console.log("rectID quit",rectID)
+        d3.selectAll(".interactRect").style("opacity", 1).style("stroke", "gray").style("stroke-width", 0.1);
         d3.selectAll("#weightPath").remove();
     });
 
@@ -374,11 +377,14 @@ export function drawWeightsVector(
     d3.selectAll(".interactRect").on("mouseover", function(){
         const rectID = d3.select(this).attr("rectID")
         console.log("rectID",rectID)
+        d3.selectAll(".interactRect").style("opacity", 0.5);
+        d3.select(`.interactRect[rectID="${rectID}"]`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
         drawMatrixWeight(Xv, startCoordList, endCoordList, curveDir, Number(rectID), myColor, "weightPath");
     });
     d3.selectAll(".interactRect").on("mouseout", function(){
         const rectID = d3.select(this).attr("rectID")
         console.log("rectID quit",rectID)
+        d3.selectAll(".interactRect").style("opacity", 1).style("stroke", "gray").style("stroke-width", 0.1);
         d3.selectAll("#weightPath").remove();
     });
 }
