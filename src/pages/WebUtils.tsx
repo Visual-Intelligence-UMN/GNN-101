@@ -647,7 +647,7 @@ export const ViewSwitch: React.FC<ViewSwitchProps> = ({
     labels,
 }) => {
     return (
-        <div className="relative inline-block w-40 h-8 select-none rounded-full overflow-hidden m-auto">
+        <div className="relative inline-block w-40 h-8 select-none rounded-full overflow-hidden m-auto switchBtn">
             {/* Input remains hidden but is functional for toggle */}
             <input
                 type="checkbox"

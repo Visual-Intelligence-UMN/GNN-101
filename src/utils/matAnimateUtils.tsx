@@ -137,16 +137,18 @@ export function drawAniPath(
 ) {
     d3.selectAll("#tempath").remove();
     if(currentStep==0){
-        g.append("rect")
-            .attr("x", coordFeatureVis[0])
-            .attr("y", coordFeatureVis[1] - rectH / 2)
-            .attr("width", rectW * dummy.length)
-            .attr("height", rectH)
-            .attr("fill", "none")
-            .attr("opacity", 1)
-            .attr("stroke", "black")
-            .attr("stroke-width", 1)
-            .attr("class", "procVis");
+        //d3.selectAll(".removeRect").remove();
+        // g.append("rect")
+        //     .attr("x", coordFeatureVis[0])
+        //     .attr("y", coordFeatureVis[1] - rectH / 2)
+        //     .attr("width", rectW * dummy.length)
+        //     .attr("height", rectH)
+        //     .attr("fill", "none")
+        //     .attr("opacity", 1)
+        //     .attr("stroke", "black")
+        //     .attr("stroke-width", 1)
+        //     .attr("class", "procVis");
+        
         g.append("text")
             .attr("x", coordFeatureVis[0] - (endCoordList[currentStep][0] - startCoordList[0][0])/2 - 20)
             .attr("y", coordFeatureVis[1] + rectH - curveDir*Xt[currentStep].length*(2) - curveDir * 45)
@@ -154,13 +156,7 @@ export function drawAniPath(
             .style("fill", "gray")
             .style("font-size", "8px")
             .attr("class", "procVis"); 
-        g.append("text")
-            .attr("x", coordFeatureVis[0])
-            .attr("y", coordFeatureVis[1] + rectH * curveDir)
-            .text("Vector After Multiplication")
-            .style("fill", "gray")
-            .style("font-size", "8px")
-            .attr("class", "procVis"); 
+        
     }
     g.append("rect")
         .attr("x", coordFeatureVis[0] + rectW * currentStep)
@@ -171,10 +167,35 @@ export function drawAniPath(
         .attr("opacity", 1)
         .attr("stroke", "gray")
         .attr("stroke-width", 0.1)
-        .attr("class", "procVis removeRect").lower();
+        .attr("class", "procVis removeRect interactRect").attr("rectID", currentStep).lower();
 
     const Xv = Xt[currentStep];
     console.log("debug Xv", Xv)
+    drawMatrixWeight(Xv, startCoordList, endCoordList, curveDir, currentStep, myColor);
+    d3.selectAll("#tempath").lower();
+
+    d3.selectAll(".interactRect").on("mouseover", function(){
+        const rectID = d3.select(this).attr("rectID")
+        console.log("rectID",rectID)
+    });
+    d3.selectAll(".interactRect").on("mouseout", function(){
+        const rectID = d3.select(this).attr("rectID")
+        console.log("rectID quit",rectID)
+    });
+
+    
+}
+
+
+export function drawMatrixWeight(
+    Xv: number[][],
+    startCoordList:any,
+    endCoordList:any,
+    curveDir:number,
+    currentStep:number,
+    myColor:any,
+    id:string = "tempath"
+){
     for (let j = 0; j < Xv.length; j++) {
         const s1 = startCoordList[j];
         const e1 = endCoordList[currentStep];
@@ -207,12 +228,12 @@ export function drawAniPath(
                 ].join(" ");
             })
             .attr("class", "procVis")
-            .attr("id", "tempath")
+            .attr("id", id)
             .style("fill", "none")
             .attr("stroke", myColor(Xv[j]));
     }
-    d3.selectAll("#tempath").lower();
 }
+
 
 export function drawSummationFeature(
     g: any,
@@ -310,9 +331,18 @@ export function drawWeightsVector(
             .attr("opacity", 0)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1)
-            .attr("class", "procVis wRect")
+            .attr("class", "procVis removeRect wRect interactRect")
+            .attr("rectID", m)
             .attr("id", `weightRect${m}`);
     }
+
+        g.append("text")
+            .attr("x", coordFeatureVis[0])
+            .attr("y", coordFeatureVis[1] + rectH)
+            .text("Vector After Multiplication")
+            .style("fill", "gray")
+            .style("font-size", "8px")
+            .attr("class", "procVis"); 
 
     //draw frame
     g.append("rect")
@@ -326,6 +356,15 @@ export function drawWeightsVector(
         .attr("stroke-width", 1)
         .attr("class", "procVis wRect");
     d3.selectAll(".wRect").transition().duration(100).attr("opacity", 1);
+
+    d3.selectAll(".interactRect").on("mouseover", function(){
+        const rectID = d3.select(this).attr("rectID")
+        console.log("rectID",rectID)
+    });
+    d3.selectAll(".interactRect").on("mouseout", function(){
+        const rectID = d3.select(this).attr("rectID")
+        console.log("rectID quit",rectID)
+    });
 }
 
 export function drawBiasVector(
@@ -350,7 +389,7 @@ export function drawBiasVector(
             .attr("opacity", 0)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1)
-            .attr("class", "procVis biasVector pauseRemove");
+            .attr("class", "procVis biasVector");
     }
 
     //draw frame
@@ -363,14 +402,14 @@ export function drawBiasVector(
         .attr("opacity", 0)
         .attr("stroke", "black")
         .attr("stroke-width", 1)
-        .attr("class", "procVis biasVector pauseRemove");
+        .attr("class", "procVis biasVector");
     const label = g.append("text")
         .attr("x", coordFeatureVis[0])
         .attr("y", coordFeatureVis[1] + rectH)
         .text("Bias Vector")
         .style("fill", "gray")
         .style("font-size", "8px")
-        .attr("class", "procVis biasVector pauseRemove"); 
+        .attr("class", "procVis biasVector"); 
     d3.selectAll(".biasVector").transition().duration(100).attr("opacity", 1);
 }
 
@@ -394,7 +433,7 @@ export function drawBiasPath(
         .attr("stroke", "black")
         .attr("opacity", 0)
         .attr("fill", "none")
-        .attr("class", "procVis biasPath pauseRemove")
+        .attr("class", "procVis biasPath")
         .attr("id", "procPath")
         .lower();
     d3.selectAll(".biasPath").transition().duration(100).attr("opacity", 1);
@@ -422,7 +461,7 @@ export function drawFinalPath(
             .attr("stroke", "black")
             .attr("opacity", 0)
             .attr("fill", "none")
-            .attr("class", "procVis finalPath pauseRemove")
+            .attr("class", "procVis finalPath")
             .attr("id", "procPath");
 
             d3.selectAll(".finalPath").transition().duration(100).attr("opacity", 1);
@@ -451,7 +490,7 @@ export function drawReLU(
             d3.select(ReLU)
                 .attr("x", cx1)
                 .attr("y", cy1)
-                .attr("class", "procVis pauseRemove")
+                .attr("class", "procVis")
                 .raise();
             }
         });
@@ -462,7 +501,7 @@ export function drawReLU(
             .text("ReLU Non-linear Function")
             .style("fill", "gray")
             .style("font-size", "8px")
-            .attr("class", "procVis pauseRemove"); 
+            .attr("class", "procVis"); 
 }
 
 export function drawTanh(
@@ -487,7 +526,7 @@ export function drawTanh(
             d3.select(ReLU)
                 .attr("x", cx1)
                 .attr("y", cy1)
-                .attr("class", "procVis pauseRemove")
+                .attr("class", "procVis")
                 .raise();
             }
         });
@@ -498,7 +537,7 @@ export function drawTanh(
             .text("Tanh Non-linear Function")
             .style("fill", "gray")
             .style("font-size", "8px")
-            .attr("class", "procVis pauseRemove"); 
+            .attr("class", "procVis"); 
 }
 
 //-----------------------------animation functions for poolingVisClick----------------------------------
@@ -519,7 +558,7 @@ export function drawOutputVisualizer(
             .attr("opacity", 1)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1)
-            .attr("class", "procVis pauseRemove");
+            .attr("class", "procVis");
     }
 }
 
@@ -557,7 +596,7 @@ export function drawPathInteractiveComponents(
                         resultCoord[i][1],
                     ].join(" ");
                 })
-                .attr("class", "procVis pauseRemove")
+                .attr("class", "procVis")
                 .style("fill", "none")
                 .style("opacity", "0.1")
                 .attr("stroke", myColor(result[j]));
@@ -574,7 +613,7 @@ export function drawPathInteractiveComponents(
         .text("Softmax")
         .style("fill", "gray")
         .style("font-size", "8px")
-        .attr("class", "procVis pauseRemove"); 
+        .attr("class", "procVis"); 
     return pathMap;
 }
 
@@ -585,7 +624,7 @@ export function drawPathBtwOuputResult(one:any, endPt:any){
             .attr("stroke", "black")
             .attr("opacity", 1)
             .attr("fill", "none")
-            .attr("class", "procVis pauseRemove")
+            .attr("class", "procVis")
             .attr("id", "path1").lower();
 }
 
@@ -609,7 +648,7 @@ export function drawBiasPathOutputVis(
                         .attr("stroke", "black")
                         .attr("opacity", 0.05)
                         .attr("fill", "none")
-                        .attr("class", "procVis biasPath pauseRemove")
+                        .attr("class", "procVis biasPath")
                         .attr("id", "path1");
                     d3.selectAll(".biasPath")
                         .transition()

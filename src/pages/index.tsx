@@ -233,7 +233,7 @@ export default function Home() {
                                         Inner Model Visualization
                                     </h2>
                                 </div>
-                                <div className="flex gap-x-4">
+                                <div className="flex gap-x-4 switchBtn">
                                     <ViewSwitch
                                         handleChange={() => {
                                             setIsGraphView(!isGraphView);

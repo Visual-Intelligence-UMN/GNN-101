@@ -20,6 +20,7 @@ import {
 } from "@/utils/graphUtils"
 import { stat } from "fs";
 import { Yomogi } from "@next/font/google";
+import { dataPreparationLinkPred, indexingFeatures } from "./linkPredictionUtils";
 
 env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
@@ -42,10 +43,10 @@ export function preprocessFloat32ArrayToNumber(matrix: any): number[][] {
     let row = [];
     for(let j=0; j<matrix[0][i].length; j++){
       row.push(matrix[0][i][j]);
-      console.log("fetch loop row", matrix[0][i][j])
+     // console.log("fetch loop row", matrix[0][i][j])
     }
     mat.push(row)
-    console.log("fetch loop mat", mat)
+   // console.log("fetch loop mat", mat)
   }
 return mat;
 }
@@ -241,6 +242,24 @@ export async function graph_to_matrix(data: any) {
     }
     console.log("matrix representation", matrix);
     return matrix;
+}
+
+
+//input a JSON file and transform it into a matrix representation of graph
+export function graphToMatrix(data: any) {
+  //get the number of nodes
+  const nodeCount = data.x.length;
+  //tranformation process
+  let matrix: number[][];
+  matrix = Array.from({ length: nodeCount }, () => Array(nodeCount).fill(0));
+  for (let i = 0; i < data.edge_index[0].length; i++) {
+      let source = data.edge_index[0][i];
+      let target = data.edge_index[1][i];
+    //  console.log("target:", target, "source:", source, "iter:", i);
+      matrix[source][target] = 1;
+  }
+ // console.log("matrix representation", matrix);
+  return matrix;
 }
 
 export function chunkArray<T>(inputArray: T[], chunkSize: number): T[][] {
@@ -1399,6 +1418,18 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
   const prob = outputMap.prob_adj.cpuData;
 
   console.log("link prediction result", prob, intmData);
+
+  const data = dataPreparationLinkPred(intmData);
+
+  const features = graphData.x;
+
+  console.log("debug link pred",data, features)
+
+
+    const indexedFeaturesI = indexingFeatures(
+      graphData, features, data.conv1Data, data.conv2Data, 241
+    );
+    console.log(`indexed `, indexedFeaturesI)
 
   return {prob, intmData};
 
