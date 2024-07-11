@@ -584,7 +584,7 @@ export function featureVisClick(
     }
 
     const playBtnCoord = [
-        (coordFeatureVis[0]+coordFeatureVis3[0])/2,
+        (coordFeatureVis[0]+featureChannels*rectW)+15,
         res00[1]
     ];
     

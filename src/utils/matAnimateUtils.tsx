@@ -239,7 +239,7 @@ export function drawMatrixWeight(
 
 
 export function drawSummationFeature(
-    g: any,
+    g1: any,
     X: any,
     coordFeatureVis: any,
     w: number,
@@ -249,6 +249,7 @@ export function drawSummationFeature(
     mulValues: any,
     curveDir: number
 ) {
+    const g = g1.append("g").attr("class", "procVis aggregate")
     for (let m = 0; m < X.length; m++) {
         g.append("rect")
             .attr("x", coordFeatureVis[0] + w * m)
@@ -263,7 +264,7 @@ export function drawSummationFeature(
     }
 
     //draw frame
-    g.append("rect")
+    g1.append("rect")
         .attr("x", coordFeatureVis[0])
         .attr("y", coordFeatureVis[1] - rectH / 2)
         .attr("width", w * X.length)
@@ -275,7 +276,7 @@ export function drawSummationFeature(
         .attr("class", "procVis summation");
 
     //draw label
-    g.append("text")
+    g1.append("text")
             .attr("x", coordFeatureVis[0])
             .attr("y", coordFeatureVis[1] + rectH * curveDir)
             .text("Vectors Summation")
@@ -310,10 +311,16 @@ export function drawSummationFeature(
             .attr("y", y - 2)
             .attr("text-anchor", "middle")
             .attr("font-size", 7.5)
-            .attr("class", "procVis summation")
+            .attr("class", "procVis multiplier")
             .attr("opacity", 0);
     }
     d3.selectAll(".summation").transition().duration(100).attr("opacity", 1);
+    d3.select(".aggregate").on("mouseover", function(){
+        d3.selectAll(".multiplier").style("opacity", 1);
+    })
+    d3.select(".aggregate").on("mouseout", function(){
+        d3.selectAll(".multiplier").style("opacity", 0);
+    })
 }
 
 export function drawWeightsVector(
