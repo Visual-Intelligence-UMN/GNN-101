@@ -5,7 +5,7 @@ import ClassifyGraph from "./FileUpload";
 // import { CSSTransition } from 'react-transition-group';
 import MatricesVisualizer from "./MatricesVisualizer";
 import { IntmData, IntmDataNode } from "../types";
-import { graphList, modelList, nodeList } from "./const";
+import { graphList, linkList, modelList, nodeList } from "./const";
 import Sidebar from "./Sidebar";
 import styles from "./index.module.css";
 
@@ -133,8 +133,10 @@ export default function Home() {
                                         setIntmData(null);
                                         if (newModel === "node classification") {
                                             setSelectedGraph("karate");
-                                        } else {
+                                        } else if(newModel === "graph classification"){
                                             setSelectedGraph("graph_0");
+                                        } else {
+                                            setSelectedGraph("twitch_EN");
                                         }
                                         console.log("selectedGraph from selector", selectedGraph);
                                     }}
@@ -177,12 +179,16 @@ export default function Home() {
                                                 handleChange={handleGraphSelection}
                                                 OptionList={Object.keys(graphList)}
                                             />
-                                        ) : (
+                                        ) : (model == "node classification"?
                                             <Selector
                                                 selectedOption={selectedGraph}
                                                 handleChange={handleGraphSelection}
                                                 OptionList={Object.keys(nodeList)}
-                                            />
+                                            />:<Selector
+                                            selectedOption={selectedGraph}
+                                            handleChange={handleGraphSelection}
+                                            OptionList={Object.keys(linkList)}
+                                        />
                                         )}
                                     </div>
                                 </div>
@@ -258,7 +264,8 @@ export default function Home() {
                                             />
                                         </>
                                     )
-                                ) : isGraphView ? (
+                                ) : (model=="node classification"?
+                                    (isGraphView ? (
                                     <NodeGraphVisualizer
                                         graph_path={nodeList[selectedGraph]}
                                         intmData={intmData}
@@ -276,7 +283,13 @@ export default function Home() {
                                         predicted={predicted}
                                         selectedButtons={selectedButtons}
                                     />
-                                )}
+                                )):(
+                                    isGraphView ? (
+                                        <>Graph View</>
+                                    ) : (
+                                        <>Matrix View</>
+                                )))
+                                }
 
                                 {/* overlay text on visualizer when not predicted */}
                                 {probabilities.length == 0 && (

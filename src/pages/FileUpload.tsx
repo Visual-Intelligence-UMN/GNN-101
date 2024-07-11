@@ -1,9 +1,9 @@
 import React, { useState, ChangeEvent } from 'react';
-import { graphPrediction, nodePrediction } from '@/utils/utils';
+import { graphPrediction, linkPrediction, nodePrediction } from '@/utils/utils';
 import { Hint, PredictionVisualizer } from './WebUtils';
 import { on } from 'events';
 import { useEffect } from 'react';
-import { IntmData, IntmDataNode } from '@/types';
+import { IntmData, IntmDataLink, IntmDataNode } from '@/types';
 
 interface ClassifyGraphProps {
 	graphPath: string;
@@ -28,10 +28,11 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({ graphPath, modelPath, set
 	//	const { prob, intmData } = await graphPrediction(modelPath, graphPath);
 
 		let prob:number[]|number[][];
-		let intmData:IntmData|IntmDataNode;
+		let intmData:IntmData|IntmDataNode|IntmDataLink;
 
 		if(modelPath=="./gnn_node_model.onnx") ({ prob, intmData } = await nodePrediction(modelPath, graphPath))
-		else ({ prob, intmData } = await graphPrediction(modelPath, graphPath))
+		else if(modelPath=="./gnn_model2.onnx") ({ prob, intmData } = await graphPrediction(modelPath, graphPath))
+		else ({prob, intmData} = await linkPrediction(modelPath, "./json_data/links/twitch.json"));
 
 		setChangedG(false);
 		setIntmData(intmData);

@@ -7,7 +7,7 @@ import { env } from "onnxruntime-web";
 import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature, outputVisualizer, scaleFeatureGroup, nodeOutputVisualizer } from "@/utils/graphUtils";
 import { features, off } from 'process';
 
-import { IGraphData, IntmData, IntmDataNode } from "../types/";
+import { IGraphData, IntmData, IntmDataLink, IntmDataNode } from "../types/";
 
 import { 
   hideAllLinks, 
@@ -1319,8 +1319,65 @@ export const graphPrediction = async (modelPath: string, graphPath: string) => {
 		};
 
 		return {prob, intmData};
-	
 }
+
+
+export const linkPrediction = async (modelPath: string, graphPath: string) => {
+ 
+  console.log("start classifying....a");
+  const session = await loadModel(modelPath);
+  const graphData: IGraphData = await load_json(graphPath);
+
+  console.log("graphData link pred", graphData);
+
+  // Convert `graphData` to tensor-like object expected by your ONNX model
+  const xTensor = new ort.Tensor(
+    "float32",
+    new Float32Array(graphData.x.flat()),
+    [graphData.x.length, graphData.x[0].length]
+  );
+
+  let int32Array = new Int32Array(
+    graphData["edge_index"].flat()
+  );
+  let bigInt64Array = new BigInt64Array(
+      int32Array.length
+  );
+  for (let i = 0; i < int32Array.length; i++) {
+      bigInt64Array[i] = BigInt(int32Array[i]);
+  }
+  let edgeIndexTensor = new ort.Tensor(
+      "int64",
+      bigInt64Array,
+      [
+          graphData.edge_index.length,
+          graphData.edge_index[0].length,
+      ]
+  );
+
+  const outputMap = await session.run({
+    x: xTensor,
+    edge_index: edgeIndexTensor,
+    edge_label_index: edgeIndexTensor,
+  });
+
+  const intmData: IntmDataLink = {
+    conv1: outputMap.conv1.cpuData,
+    conv2: outputMap.conv2.cpuData,
+    decode_mul: outputMap.decode_mul.cpuData,
+    decode_sum: outputMap.decode_sum.cpuData,
+    prob_adj: outputMap.prob_adj.cpuData,
+    decode_all_final: outputMap.decode_all_final.cpuData,
+  };
+
+  const prob = outputMap.prob_adj.cpuData;
+
+  console.log("link prediction result", prob, intmData);
+
+  return {prob, intmData};
+
+}
+
 
 function splitArray(arr: number[], chunkSize: number): number[][] {
   const chunks: number[][] = [];
