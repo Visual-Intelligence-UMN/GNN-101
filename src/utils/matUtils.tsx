@@ -927,7 +927,7 @@ export function visualizeNodeClassifierFeatures(
                     d3.selectAll("path").lower();
                 }, delay:initSec+aniSec},
             ];
-            AnimationController.runAnimations(0, animateSeq);
+            AnimationController.runAnimations(0, animateSeqAfterPath);
 
             // play button interaction add-ons
             let isPlaying = true;
