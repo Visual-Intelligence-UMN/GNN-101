@@ -247,7 +247,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             }
             allNodes.push(node);
           });
-          console.log("AWDAWD", allNodes)
+
           let maxXDistance = 0;
           let maxYDistance = 0;
           const limitedNodes = data.nodes.slice(0, 17); // Why is it 17?
