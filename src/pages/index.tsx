@@ -16,6 +16,7 @@ import {
     ViewSwitch,
     GraphAnalysisViewer,
     NodeClassifierButtonChain,
+    LinkClassifierButtonChain,
 } from "./WebUtils";
 import { Footer, NavBar } from "./Surfaces";
 import { Inter } from "@next/font/google";
@@ -149,8 +150,13 @@ export default function Home() {
                                         setSelectedButtons={setSelectedButtons}
                                         predicted={predicted}
                                     />
-                                ) : (
+                                ) : (model == "node classification"?
                                     <NodeClassifierButtonChain
+                                        selectedButtons={selectedButtons}
+                                        setSelectedButtons={setSelectedButtons}
+                                        predicted={predicted}
+                                    />:
+                                    <LinkClassifierButtonChain
                                         selectedButtons={selectedButtons}
                                         setSelectedButtons={setSelectedButtons}
                                         predicted={predicted}
