@@ -320,7 +320,7 @@ export function outputVisualizer(
                     )
                     .attr("stroke", myColor(calculatedData[i]))
                     .attr("stroke-width", 1)
-                    .attr("class", `softmax${1 - j} softmax to-be-removed`)
+                    .attr("class", `softmax${j} softmax to-be-removed`)
                     .attr("opacity", 0)
                     .style("fill", "none");
             }
@@ -1772,6 +1772,49 @@ showFeature(node)
         xPos,
         yPos - 100
     );
+    const featureGroupCopy = svg.append("g")
+        .attr("transform", `translate(${node.featureGroupLocation.xPos - 7.5}, ${node.featureGroupLocation.yPos})`);
+    featureGroupCopy.selectAll("rect")
+        .data(node.features)
+        .enter()
+        .append("rect")
+        .attr("x", 0)
+        .attr("y", (d: any, i: number) => i * rectHeight)
+        .attr("width", rectWidth)
+        .attr("height",rectHeight)
+        .attr("class", `node-features-copy`)
+        .style("fill", (d: number) => myColor(d))
+        .style("stroke-width", 0.1)
+        .style("stroke", "grey")
+   
+
+        const frame = featureGroupCopy.append("rect")
+        .attr("x", 0)  
+        .attr("y", 0)
+        .attr("width", rectWidth)
+        .attr("height", rectHeight * (node.features.length) )
+        .attr("class", `node-features-copy`)
+        .style("fill", "none")
+        .style("stroke", "black")
+        .style("stroke-width", 1);
+
+        featureGroupCopy.append("text")
+          .attr("x", rectWidth / 2)
+          .attr("y", node.features.length * rectHeight + 12)
+          .attr("class", `node-features-copy`)
+          .attr("dy", ".35em")
+          .text(node.id)
+          .style("font-size", "12px")
+          .style("fill", "black")
+          .style("text-anchor", "middle");
+
+          featureGroupCopy.style('visibility', 'hidden');      
+
+          setTimeout(() => {
+            featureGroupCopy.style('visibility', 'visible');      
+
+          }, 500)
+
     node.featureGroup
         .transition()
         .delay(2000)
@@ -1913,7 +1956,7 @@ showFeature(node)
                     )
                     .attr("stroke", myColor(calculatedData[i]))
                     .attr("stroke-width", 1)
-                    .attr("class", `softmax${3 - j} softmax to-be-removed`)
+                    .attr("class", `softmax${j} softmax to-be-removed`)
                     .attr("opacity", 0)
                     .style("fill", "none")
                     
@@ -2129,7 +2172,11 @@ showFeature(node)
     }
 
     document.addEventListener("click", function () {
-        d3.selectAll(".node-features-Copy").style("visibility", "hidden")
+        setTimeout(() => {
+            d3.selectAll(".node-features-Copy").remove()
+            
+        }, 500);
+
         state.isClicked = false;
         d3.selectAll(".graph-displayer").remove();
         for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "1";
