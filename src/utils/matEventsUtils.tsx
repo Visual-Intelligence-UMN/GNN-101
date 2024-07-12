@@ -24,6 +24,7 @@ import {
     drawPathBtwOuputResult,
     drawBiasPathOutputVis,
     drawTanh,
+    drawWeightMatrix,
 } from "./matAnimateUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
 import { drawSoftmaxDisplayer } from "./matInteractionUtils";
@@ -631,46 +632,7 @@ export function featureVisClick(
             drawPathBtwOuputResult([coordFeatureVis], coordFeatureVis3)
         }, delay:aniSec*2},
         {func:()=>{
-            //draw weight matrix
-            //positioning
-            const matX = btnX;
-            const matY = btnY - curveDir * 50;
-            drawPoints(".mats", "red", [[matX, matY]]);
-            //draw matrix
-            const weightMat = math.transpose(weights[layerID]);
-            for(let i=0; i<weightMat.length; i++){
-                let tempArr = [];
-                for(let j=0; j<weightMat[i].length; j++){
-                    if(i==0){
-                        g.append("rect")
-                            .attr("x", matX+j*rectW/2)
-                            .attr("y", matY+i*rectW/2)
-                            .attr("width", rectW/2)
-                            .attr("height", rectW/2*weightMat.length)
-                            .attr("fill", "none")
-                            .attr("stroke", "black")
-                            .attr("stroke-width", 0.5)
-                            .attr("opacity", 0)
-                            .attr("class", "columnUnit")
-                            .attr("id", `columnUnit-${j}`);
-                    }
-                    g.append("rect")
-                        .attr("x", matX+j*rectW/2)
-                        .attr("y", matY+i*rectW/2)
-                        .attr("width", rectW/2)
-                        .attr("height", rectW/2)
-                        .attr("fill", myColor(weightMat[i][j]))
-                        .attr("class", "weightUnit")
-                        .attr("id", `weightUnit-${j}`);
-
-                    tempArr.push([matX+j*rectW/2+rectW/4, matY+i*rectW/2+rectW/4]);
-                }
-            //    drawPoints(".mats", "red", tempArr)
-                weightMatrixPostions.push(tempArr);
-            }
-            d3.selectAll(".columnUnit").raise();
-            //draw connection
-
+            weightMatrixPostions = drawWeightMatrix(btnX, btnY, curveDir, rectW, rectH, featureChannels, weights, layerID, myColor, g);
         }, delay:aniSec},
         {func: () => drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor, math.transpose(weights[layerID]), startCoordList, endCoordList, curveDir, weightMatrixPostions), delay: aniSec},
         {func: () => drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2Copy, myColor, layerBias, layerID), delay: aniSec},
@@ -750,7 +712,8 @@ export function featureVisClick(
                     rectH,
                     rectW,
                     dummy,
-                    g
+                    g,
+                    weightMatrixPostions
                 );
                 currentStep++;
                 console.log("currentStep", currentStep);

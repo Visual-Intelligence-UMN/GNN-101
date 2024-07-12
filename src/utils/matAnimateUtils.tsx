@@ -2,6 +2,7 @@ import * as d3 from "d3";
 import { computeMids } from "./matFeaturesUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
 import { drawActivationExplanation } from "./matInteractionUtils";
+import { create, all } from "mathjs";
 
 export function animatePathDrawing(
     Xt: any,
@@ -24,7 +25,8 @@ export function animatePathDrawing(
     aniSec:number,
     btn:any,
     btnX:number,
-    btnY:number
+    btnY:number,
+    weightMatrixPostions:any
 ){
     const intervalID = setInterval(() => {
         drawAniPath(
@@ -39,7 +41,8 @@ export function animatePathDrawing(
             rectH, 
             rectW, 
             dummy, 
-            g
+            g,
+            weightMatrixPostions
         );
         currentStep++;
         console.log("i", currentStep);
@@ -134,7 +137,8 @@ export function drawAniPath(
     rectH:number,
     rectW:number,
     dummy:number[],
-    g:any
+    g:any,
+    weightMatrixPostions:any
 ) {
     d3.selectAll("#tempath").remove();
     if(currentStep==0){
@@ -172,7 +176,7 @@ export function drawAniPath(
 
     
 
-    drawMatrixWeight(Xt, startCoordList, endCoordList, curveDir, currentStep, myColor);
+    drawMatrixWeight(Xt, startCoordList, endCoordList, curveDir, currentStep, myColor, weightMatrixPostions);
     d3.selectAll("#tempath").lower();
 
     d3.selectAll(".interactRect").on("mouseover", function(){
@@ -180,7 +184,7 @@ export function drawAniPath(
         console.log("rectID",rectID)
         d3.selectAll(".interactRect").style("opacity", 0.5);
         d3.select(`.interactRect[rectID="${rectID}"]`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
-        drawMatrixWeight(Xt, startCoordList, endCoordList, curveDir, Number(rectID), myColor, "weightPath");
+        drawMatrixWeight(Xt, startCoordList, endCoordList, curveDir, Number(rectID), myColor, weightMatrixPostions, "weightPath");
     });
     d3.selectAll(".interactRect").on("mouseout", function(){
         const rectID = d3.select(this).attr("rectID")
@@ -211,8 +215,8 @@ export function drawMatrixWeight(
     curveDir:number,
     currentStep:number,
     myColor:any,
-    id:string = "tempath",
-    weightMatrixPostions:any
+    weightMatrixPostions:any,
+    id:string = "tempath"
 ){
     const Xv = Xt[currentStep];
     for (let j = 0; j < Xv.length; j++) {
@@ -231,22 +235,52 @@ export function drawMatrixWeight(
 
         const points = [s1, m1, e1];
 
-        // Create a line generator with Catmull-Rom interpolation
-        const lineGenerator = d3.line()
-            .curve(d3.curveCatmullRom)
-            .x(d => d[0])
-            .y(d => d[1]);
+        const controlPoint1 = [s1[0], m1[1]];
+        const controlPoint2 = [e1[0], m1[1]];
 
-        // Generate the path data
-        const pathData = lineGenerator(points);
-        
+        const pathData1 = `
+            M${s1[0]},${s1[1]}
+            Q${controlPoint1[0]},${controlPoint1[1]} ${m1[0]},${m1[1]}
+        `;
+
+        const pathData2 = `
+            M${m1[0]},${m1[1]}
+            Q${controlPoint2[0]},${controlPoint2[1]} ${e1[0]},${e1[1]}
+        `;
+
+        // Append the paths to the SVG
         d3.select(".mats")
             .append("path")
-            .attr("d", pathData)
+            .attr("d", pathData1)
             .attr("class", "procVis")
-            .attr("id", id)
             .style("fill", "none")
-            .attr("stroke", myColor(Xv[j])).lower();
+            .attr("stroke", "black").attr("id", id)
+            .attr("stroke-width", 2).attr("stroke", myColor(Xv[j])).lower();
+
+        d3.select(".mats")
+            .append("path")
+            .attr("d", pathData2)
+            .attr("class", "procVis")
+            .style("fill", "none")
+            .attr("stroke", "black").attr("id", id)
+            .attr("stroke-width", 2).attr("stroke", myColor(Xv[j])).lower();
+
+        // // Create a line generator with Catmull-Rom interpolation
+        // const lineGenerator = d3.line()
+        //     .curve(d3.curveCatmullRom)
+        //     .x(d => d[0])
+        //     .y(d => d[1]);
+
+        // // Generate the path data
+        // const pathData = lineGenerator(points);
+        
+        // d3.select(".mats")
+        //     .append("path")
+        //     .attr("d", pathData)
+        //     .attr("class", "procVis")
+        //     .attr("id", id)
+        //     .style("fill", "none")
+        //     .attr("stroke", myColor(Xv[j])).lower();
     }
 }
 
@@ -391,8 +425,8 @@ export function drawWeightsVector(
         console.log("rectID",rectID);
         d3.selectAll(".interactRect").style("opacity", 0.5);
         d3.select(`.interactRect[rectID="${rectID}"]`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
-        drawMatrixWeight(Xv, startCoordList, endCoordList, curveDir, Number(rectID), myColor, "weightPath", weightMatrixPostions);
-        d3.selectAll(".weightUnit").style("opacity", 0.3).lower();
+        drawMatrixWeight(Xv, startCoordList, endCoordList, curveDir, Number(rectID), myColor, weightMatrixPostions, "weightPath");
+        d3.selectAll(".weightUnit").style("opacity", 0).lower();
         d3.selectAll(`#weightUnit-${rectID}`).style("opacity", 1).raise();
         d3.select(`#columnUnit-${rectID}`).style("opacity", 1).raise();
     });
@@ -408,9 +442,59 @@ export function drawWeightsVector(
 
 
 export function drawWeightMatrix(
-
+btnX:number,
+btnY:number,
+curveDir:number,
+rectW:number,
+rectH:number,
+featureChannels:number,
+weights:number[][][],
+layerID:number,
+myColor:any,
+g:any
 ){
+//draw weight matrix
+            //positioning
+            const math = create(all, {});
+            const matX = btnX;
+            const matY = btnY - curveDir * 50;
+            const coefficient = 1;
+            let weightMatrixPositions = [];
+            //draw matrix
+            const weightMat = math.transpose(weights[layerID]);
+            for(let i=0; i<weightMat.length; i++){
+                let tempArr = [];
+                for(let j=0; j<weightMat[i].length; j++){
+                    if(i==0){
+                        g.append("rect")
+                            .attr("x", matX+j*rectW/coefficient)
+                            .attr("y", matY+i*rectW/coefficient)
+                            .attr("width", rectW/coefficient)
+                            .attr("height", rectW/coefficient*weightMat.length)
+                            .attr("fill", "none")
+                            .attr("stroke", "black")
+                            .attr("stroke-width", 0.5)
+                            .attr("opacity", 0)
+                            .attr("class", "columnUnit")
+                            .attr("id", `columnUnit-${j}`);
+                    }
+                    g.append("rect")
+                        .attr("x", matX+j*rectW/coefficient)
+                        .attr("y", matY+i*rectW/coefficient)
+                        .attr("width", rectW/coefficient)
+                        .attr("height", rectW/coefficient)
+                        .attr("fill", myColor(weightMat[featureChannels-i-1][j]))
+                        .attr("class", "weightUnit")
+                        .attr("id", `weightUnit-${j}`);
 
+                    tempArr.push([matX+j*rectW/coefficient+rectW/(coefficient*2), matY+i*rectW/coefficient+rectW/(coefficient*2)]);
+                }
+            //    drawPoints(".mats", "red", tempArr)
+                weightMatrixPositions.push(tempArr);
+            }
+            d3.selectAll(".columnUnit").raise();
+            //draw connection
+            return weightMatrixPositions;
 }
 
 export function drawBiasVector(
