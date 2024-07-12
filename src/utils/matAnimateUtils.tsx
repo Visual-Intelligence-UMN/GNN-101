@@ -337,7 +337,8 @@ export function drawWeightsVector(
     Xv:number[][],
     startCoordList: any,
     endCoordList:any,
-    curveDir:number
+    curveDir:number,
+    rectClass: string = "procVis removeRect wRect interactRect"
 ) {
     for (let m = 0; m < dummy.length; m++) {
         g.append("rect")
@@ -349,7 +350,7 @@ export function drawWeightsVector(
             .attr("opacity", 0)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1)
-            .attr("class", "procVis removeRect wRect interactRect")
+            .attr("class", rectClass)
             .attr("rectID", m)
             .attr("id", `weightRect${m}`);
     }

@@ -869,8 +869,8 @@ export function visualizeNodeClassifierFeatures(
             //play button injection
             const btn = d3.select(".mats").append("g").attr("class", "ctrlBtn");
             const radius = 10;
-            const btnX = biasCoord[0];
-            const btnY = outputCoord[1] - 200*curveDir;
+            const btnX = (prevFeatureCoord[0] + outputCoord[0])/2;
+            const btnY = prevFeatureCoord[1];
 
             let currentStep = 0;
 
@@ -883,18 +883,28 @@ export function visualizeNodeClassifierFeatures(
 
             const animateSeqAfterPath = [
                 {func:()=>{
+                    const Xt = modelParams.weights[3];
+                    drawWeightsVector(g, vectorAfterMul, outputCoord, 15, 10, myColor, Xt, startPathCoords, endPathCoords, curveDir)
+                    drawPathBtwOuputResult([prevFeatureCoord], outputCoord);
+                }, delay:aniSec},
+                {func:()=>{
                     //draw a final value output visualizer for testing
-                    drawWeightsVector(g, nthOutputVals, finalOutputCoord, 15, 10, myColor, modelParams.weights[3], startPathCoords, endPathCoords, curveDir);
-                    drawPathBtwOuputResult([vectorAfterMatMulPath], finalOutputCoord);
+                    drawWeightsVector(g, nthOutputVals, finalOutputCoord, 15, 10, myColor, modelParams.weights[3], startPathCoords, endPathCoords, curveDir, "procVis wRect");
+                    drawPathBtwOuputResult([vectorAfterMatMulPath], finalOutputCoord);  
                 }, delay:aniSec}, 
                 {func:()=>{drawBiasVector(g, 4, 15, 10, biasCoord, myColor, linBias, 4);}, delay:aniSec},
                 {func:()=>{drawBiasPath(endBiasCoord, res10, res11, endBiasPathCoord, 4, 4);}, delay:aniSec},
-           //     {func:()=>{drawPathBtwOuputResult([endOutputCoord], startResultCoord);}, delay:aniSec},
-                {func:()=>{
+                {func:()=>{drawPathBtwOuputResult([endOutputCoord], startResultCoord);}, delay:aniSec},
+           {func:()=>{
+            let dir = 1;
+            if(clockwise==1)dir = 0;
+            pathMap = drawPathInteractiveComponents(softmaxStartCoords, softmaxEndCoords, nthOutputVals, myColor, dir);
+           }, delay:aniSec},     
+           {func:()=>{
                     //display the result feature visualizer
                     featureVisTable[4][node].style.opacity = "1";
                     resultLabelsList[node].style.fill = "black";
-                }, delay:aniSec+400}
+                }, delay:aniSec}
             ]
 
             const animateSeq = [
@@ -906,12 +916,12 @@ export function visualizeNodeClassifierFeatures(
                         currentStep++;
                         console.log("i", currentStep);
                         if (currentStep >= 4) {
-                            AnimationController.runAnimations(0, animateSeqAfterPath);
-                            setTimeout(()=>{
-                                let dir = 1;
-                                if(clockwise==1)dir = 0;
-                                pathMap = drawPathInteractiveComponents(softmaxStartCoords, softmaxEndCoords, nthOutputVals, myColor, dir);
-                            }, 1900);
+                            // AnimationController.runAnimations(0, animateSeqAfterPath);
+                            // setTimeout(()=>{
+                            //     let dir = 1;
+                            //     if(clockwise==1)dir = 0;
+                            //     pathMap = drawPathInteractiveComponents(softmaxStartCoords, softmaxEndCoords, nthOutputVals, myColor, dir);
+                            // }, 1900);
                             btn.selectAll("*").remove();
                             injectPlayButtonSVG(
                                 btn,
@@ -919,6 +929,7 @@ export function visualizeNodeClassifierFeatures(
                                 btnY,
                                 "./assets/SVGs/playBtn_play.svg"
                             );
+                            d3.selectAll("#tempath").remove();
                             clearInterval(intervalID);
                         }
                     }, 250); 
@@ -930,19 +941,25 @@ export function visualizeNodeClassifierFeatures(
             AnimationController.runAnimations(0, animateSeqAfterPath);
 
             // play button interaction add-ons
-            let isPlaying = true;
+            let isPlaying = false;
 
             setTimeout(() => {
                 injectPlayButtonSVG(
                     btn,
                     btnX,
                     btnY,
-                    "./assets/SVGs/playBtn_pause.svg"
+                    "./assets/SVGs/playBtn_play.svg"
                 );
             }, initSec + aniSec * 2);
 
+            let firstPlay = true;
+
             btn.on("click", function (event: any, d: any) {
-                d3.select(".biasPath").remove();
+              //  d3.select(".biasPath").remove();
+              if(firstPlay){
+                d3.selectAll(".removeRect").remove();
+                firstPlay = false;
+              }
                 console.log("isPlaying", isPlaying);
                 event.stopPropagation();
                 if (intervalID) {
@@ -966,12 +983,12 @@ export function visualizeNodeClassifierFeatures(
                     }
                     animateSeq[0].delay = 1;
                     AnimationController.runAnimations(0, animateSeq);
-                    setTimeout(()=>{
-                        AnimationController.runAnimations(0, animateSeqAfterPath);
-                    }, 1500);
-                    setTimeout(()=>{
-                        pathMap = drawPathInteractiveComponents(softmaxStartCoords, softmaxEndCoords, nthOutputVals, myColor, clockwise);
-                    }, 3000);
+                    // setTimeout(()=>{
+                    //     AnimationController.runAnimations(0, animateSeqAfterPath);
+                    // }, 1500);
+                    // setTimeout(()=>{
+                    //     pathMap = drawPathInteractiveComponents(softmaxStartCoords, softmaxEndCoords, nthOutputVals, myColor, clockwise);
+                    // }, 3000);
                     isPlaying = true;
                 } else if (isPlaying) {
                     btn.selectAll("*").remove();
