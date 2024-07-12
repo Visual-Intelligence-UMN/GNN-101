@@ -616,9 +616,11 @@ export function featureVisClick(
     const initSec = 1000;
     const aniSec = 500;
     const waitSec = 250 * featureChannels;
+
+    let weightMatrixPostions:any = [];
+
     let animateSeqAfterPath: any = [
         {func: () => drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir), delay: initSec + aniSec,},
-        {func: () => drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor, math.transpose(weights[layerID]), startCoordList, endCoordList, curveDir), delay: aniSec},
         {func: ()=>{
             injectPlayButtonSVG(
                 btn,
@@ -628,6 +630,49 @@ export function featureVisClick(
             );
             drawPathBtwOuputResult([coordFeatureVis], coordFeatureVis3)
         }, delay:aniSec*2},
+        {func:()=>{
+            //draw weight matrix
+            //positioning
+            const matX = btnX;
+            const matY = btnY - curveDir * 50;
+            drawPoints(".mats", "red", [[matX, matY]]);
+            //draw matrix
+            const weightMat = math.transpose(weights[layerID]);
+            for(let i=0; i<weightMat.length; i++){
+                let tempArr = [];
+                for(let j=0; j<weightMat[i].length; j++){
+                    if(i==0){
+                        g.append("rect")
+                            .attr("x", matX+j*rectW/2)
+                            .attr("y", matY+i*rectW/2)
+                            .attr("width", rectW/2)
+                            .attr("height", rectW/2*weightMat.length)
+                            .attr("fill", "none")
+                            .attr("stroke", "black")
+                            .attr("stroke-width", 0.5)
+                            .attr("opacity", 0)
+                            .attr("class", "columnUnit")
+                            .attr("id", `columnUnit-${j}`);
+                    }
+                    g.append("rect")
+                        .attr("x", matX+j*rectW/2)
+                        .attr("y", matY+i*rectW/2)
+                        .attr("width", rectW/2)
+                        .attr("height", rectW/2)
+                        .attr("fill", myColor(weightMat[i][j]))
+                        .attr("class", "weightUnit")
+                        .attr("id", `weightUnit-${j}`);
+
+                    tempArr.push([matX+j*rectW/2+rectW/4, matY+i*rectW/2+rectW/4]);
+                }
+            //    drawPoints(".mats", "red", tempArr)
+                weightMatrixPostions.push(tempArr);
+            }
+            d3.selectAll(".columnUnit").raise();
+            //draw connection
+
+        }, delay:aniSec},
+        {func: () => drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor, math.transpose(weights[layerID]), startCoordList, endCoordList, curveDir, weightMatrixPostions), delay: aniSec},
         {func: () => drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2Copy, myColor, layerBias, layerID), delay: aniSec},
         {func: () => drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels), delay: aniSec,},
         {func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels), delay: 1,},

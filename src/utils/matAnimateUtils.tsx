@@ -192,6 +192,17 @@ export function drawAniPath(
     
 }
 
+function calculateControlPoints(p0:any, p1:any, p2:any) {
+    const dx1 = p1[0] - p0[0];
+    const dy1 = p1[1] - p0[1];
+    const dx2 = p2[0] - p1[0];
+    const dy2 = p2[1] - p1[1];
+
+    const m1 = [p1[0] - dx1 / 2, p1[1] - dy1 / 2];
+    const m2 = [p1[0] + dx2 / 2, p1[1] + dy2 / 2];
+
+    return [m1, m2];
+}
 
 export function drawMatrixWeight(
     Xt: any,
@@ -200,44 +211,42 @@ export function drawMatrixWeight(
     curveDir:number,
     currentStep:number,
     myColor:any,
-    id:string = "tempath"
+    id:string = "tempath",
+    weightMatrixPostions:any
 ){
     const Xv = Xt[currentStep];
     for (let j = 0; j < Xv.length; j++) {
         const s1 = startCoordList[j];
         const e1 = endCoordList[currentStep];
 
+        const m1 = weightMatrixPostions[63-j][currentStep];
+
         let pathDir = e1[0] > s1[0] ? 0 : 1;
         if (curveDir == 1) {
             pathDir = e1[0] > s1[0] ? 1 : 0; //curDir =
         }
         console.log("se", [s1, e1]);
+
+        
+
+        const points = [s1, m1, e1];
+
+        // Create a line generator with Catmull-Rom interpolation
+        const lineGenerator = d3.line()
+            .curve(d3.curveCatmullRom)
+            .x(d => d[0])
+            .y(d => d[1]);
+
+        // Generate the path data
+        const pathData = lineGenerator(points);
         
         d3.select(".mats")
             .append("path")
-            .attr("d", function () {
-                return [
-                    "M",
-                    s1[0],
-                    s1[1],
-                    "A",
-                    (e1[0] - s1[0]) / 2,
-                    ",",
-                    (e1[0] - s1[0]) / 4,
-                    0,
-                    0,
-                    ",",
-                    pathDir,
-                    ",",
-                    e1[0],
-                    ",",
-                    e1[1],
-                ].join(" ");
-            })
+            .attr("d", pathData)
             .attr("class", "procVis")
             .attr("id", id)
             .style("fill", "none")
-            .attr("stroke", myColor(Xv[j]));
+            .attr("stroke", myColor(Xv[j])).lower();
     }
 }
 
@@ -338,6 +347,7 @@ export function drawWeightsVector(
     startCoordList: any,
     endCoordList:any,
     curveDir:number,
+    weightMatrixPostions: any,
     rectClass: string = "procVis removeRect wRect interactRect"
 ) {
     for (let m = 0; m < dummy.length; m++) {
@@ -378,17 +388,29 @@ export function drawWeightsVector(
 
     d3.selectAll(".interactRect").on("mouseover", function(){
         const rectID = d3.select(this).attr("rectID")
-        console.log("rectID",rectID)
+        console.log("rectID",rectID);
         d3.selectAll(".interactRect").style("opacity", 0.5);
         d3.select(`.interactRect[rectID="${rectID}"]`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
-        drawMatrixWeight(Xv, startCoordList, endCoordList, curveDir, Number(rectID), myColor, "weightPath");
+        drawMatrixWeight(Xv, startCoordList, endCoordList, curveDir, Number(rectID), myColor, "weightPath", weightMatrixPostions);
+        d3.selectAll(".weightUnit").style("opacity", 0.3).lower();
+        d3.selectAll(`#weightUnit-${rectID}`).style("opacity", 1).raise();
+        d3.select(`#columnUnit-${rectID}`).style("opacity", 1).raise();
     });
     d3.selectAll(".interactRect").on("mouseout", function(){
         const rectID = d3.select(this).attr("rectID")
+        d3.selectAll(".weightUnit").style("opacity", 1);
         console.log("rectID quit",rectID)
+        d3.selectAll(".columnUnit").style("opacity", 0);
         d3.selectAll(".interactRect").style("opacity", 1).style("stroke", "gray").style("stroke-width", 0.1);
         d3.selectAll("#weightPath").remove();
     });
+}
+
+
+export function drawWeightMatrix(
+
+){
+
 }
 
 export function drawBiasVector(
