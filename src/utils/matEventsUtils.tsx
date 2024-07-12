@@ -118,6 +118,7 @@ export function detailedViewRecovery(
     }, 2000);
 
     //recover all frames
+    d3.select(".poolingFrame").style("opacity", 0);
     d3.selectAll(".colFrame").style("opacity", 0);
     d3.selectAll(".rowFrame").style("opacity", 0);
     d3.selectAll(".frame").style("opacity", 0);
@@ -910,13 +911,13 @@ export function outputVisClick(
         one[0][1] + rectH/2
     ];
 
-    drawPoints(".mats", "red", endPt1);
+  //  drawPoints(".mats", "red", endPt1);
 
     //play button injection
     const btn = d3.select(".mats").append("g").attr("class", "ctrlBtn");
     const radius = 10;
-    const btnX = startCoord[0][0];
-    const btnY = startCoord[0][1] + 50;
+    const btnX = (endPt1[0][0]+endPt2[0])/2;
+    const btnY = endPt2[1];
 
     //where we put out animation sequence
     let pathMap: any = null;
