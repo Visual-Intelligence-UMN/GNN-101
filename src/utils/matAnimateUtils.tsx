@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 import { computeMids } from "./matFeaturesUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
+import { drawActivationExplanation } from "./matInteractionUtils";
 
 export function animatePathDrawing(
     Xt: any,
@@ -524,6 +525,21 @@ export function drawReLU(
             .style("fill", "gray")
             .style("font-size", "8px")
             .attr("class", "procVis"); 
+
+        relu.on("mouseover", function(event, d){
+            const [x, y] = d3.pointer(event);
+
+            //set-up the paramtere for the math displayer
+           drawActivationExplanation(
+            x, y, "ReLU Non-Linear Function",
+            "f(x) = max(0, x)", "some description about relu"
+            );
+            
+        });
+
+        relu.on("mouseout", function(){
+            d3.selectAll(".math-displayer").remove();
+        });
 }
 
 export function drawTanh(
@@ -560,6 +576,21 @@ export function drawTanh(
             .style("fill", "gray")
             .style("font-size", "8px")
             .attr("class", "procVis"); 
+
+        relu.on("mouseover", function(event, d){
+            const [x, y] = d3.pointer(event);
+
+            //set-up the paramtere for the math displayer
+           drawActivationExplanation(
+            x, y, "Tanh Non-Linear Function",
+            "f(x) = (e^x - e^(-x)) / (e^x + e^(-x))", "some description about tanh"
+            );
+            
+        });
+
+        relu.on("mouseout", function(){
+            d3.selectAll(".math-displayer").remove();
+        });
 }
 
 //-----------------------------animation functions for poolingVisClick----------------------------------

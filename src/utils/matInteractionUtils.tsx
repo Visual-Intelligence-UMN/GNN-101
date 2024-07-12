@@ -465,3 +465,59 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .attr("font-size", unitSize / 2)
         .attr("fill", textColor);
 }
+
+
+export function drawActivationExplanation(x:number, y:number, title:string, formula:string, description:string){
+    const displayW = 250;
+    const displayH = 75;
+
+    //find coordination for the math displayer first
+    const displayX = x + 10;
+    const displayY = y - 10;
+
+    //add displayer
+    d3.select(".mats")
+        .append("rect")
+        .attr("x", displayX)
+        .attr("y", displayY)
+        .attr("width", displayW)
+        .attr("height", displayH)
+        .attr("rx", 10)
+        .attr("ry", 10)
+        .style("fill", "white")
+        .style("stroke", "black")
+        .style("stroke-width", 2)
+        .attr("class", "math-displayer")
+        .raise();
+
+    const titleYOffset = 10;
+    const titleXOffset = 50;
+    d3.select(".mats")
+        .append("text")
+        .attr("x", displayX + titleXOffset)
+        .attr("y", displayY + titleYOffset)
+        .text(title)
+        .attr("class", "math-displayer")
+        .attr("font-size", titleYOffset)
+        .attr("fill", "black");
+    const eqXOffset = titleXOffset / 2;
+    const eqYOffset = titleYOffset * 2.5;
+    const unitSize = eqXOffset / 3 + 3;
+    const upperOffset = unitSize * 2;
+    d3.select(".mats")
+        .append("text")
+        .attr("x", displayX + eqXOffset)
+        .attr("y", displayY + eqYOffset)
+        .text(formula)
+        .attr("class", "math-displayer")
+        .attr("font-size", unitSize)
+        .attr("fill", "black");
+    d3.select(".mats")
+        .append("text")
+        .attr("x", displayX + eqXOffset)
+        .attr("y", displayY + eqYOffset + unitSize * 1.5)
+        .text(description)
+        .attr("class", "math-displayer")
+        .attr("font-size", unitSize)
+        .attr("fill", "black");
+}

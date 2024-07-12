@@ -446,8 +446,8 @@ export async function prep_graphs(g_num: number, data: any) {
 }
 
 export const myColor = d3.scaleLinear<string>()
-.domain([-0.25, 0, 0.25])
-.range(["orange", "white", "#69b3a2"]);
+.domain([-1, 0, 1])
+.range(["#1AFF1A", "white", "#4B0092"]);
 
 
 export interface State {

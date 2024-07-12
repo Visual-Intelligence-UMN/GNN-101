@@ -15,6 +15,7 @@ import { inter } from "@/pages";
 import { off } from "process";
 import { injectPlayButtonSVGForGraphView } from "./svgUtils";
 import { stat } from "fs";
+import { drawActivationExplanation } from "./matInteractionUtils";
 
 export const pathColor = d3
     .scaleLinear<string>()
