@@ -142,26 +142,13 @@ export function drawAniPath(
 ) {
     d3.selectAll("#tempath").remove();
     if(currentStep==0){
-        //d3.selectAll(".removeRect").remove();
-        // g.append("rect")
-        //     .attr("x", coordFeatureVis[0])
-        //     .attr("y", coordFeatureVis[1] - rectH / 2)
-        //     .attr("width", rectW * dummy.length)
-        //     .attr("height", rectH)
-        //     .attr("fill", "none")
-        //     .attr("opacity", 1)
-        //     .attr("stroke", "black")
-        //     .attr("stroke-width", 1)
-        //     .attr("class", "procVis");
-        
         g.append("text")
             .attr("x", coordFeatureVis[0] - (endCoordList[currentStep][0] - startCoordList[0][0])/2 - 20)
-            .attr("y", coordFeatureVis[1] + rectH - curveDir*Xt[currentStep].length*(2) - curveDir * 45)
+            .attr("y", coordFeatureVis[1] + rectH - curveDir*Xt[currentStep].length*(2))
             .text("Matrix Multiplication")
             .style("fill", "gray")
             .style("font-size", "8px")
             .attr("class", "procVis"); 
-        
     }
     g.append("rect")
         .attr("x", coordFeatureVis[0] + rectW * currentStep)
@@ -181,14 +168,19 @@ export function drawAniPath(
 
     d3.selectAll(".interactRect").on("mouseover", function(){
         const rectID = d3.select(this).attr("rectID")
-        console.log("rectID",rectID)
+        console.log("rectID",rectID);
         d3.selectAll(".interactRect").style("opacity", 0.5);
         d3.select(`.interactRect[rectID="${rectID}"]`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
         drawMatrixWeight(Xt, startCoordList, endCoordList, curveDir, Number(rectID), myColor, weightMatrixPostions, "weightPath");
+        d3.selectAll(".weightUnit").style("opacity", 0).lower();
+        d3.selectAll(`#weightUnit-${rectID}`).style("opacity", 1).raise();
+        d3.select(`#columnUnit-${rectID}`).style("opacity", 1).raise();
     });
     d3.selectAll(".interactRect").on("mouseout", function(){
         const rectID = d3.select(this).attr("rectID")
+        d3.selectAll(".weightUnit").style("opacity", 1);
         console.log("rectID quit",rectID)
+        d3.selectAll(".columnUnit").style("opacity", 0);
         d3.selectAll(".interactRect").style("opacity", 1).style("stroke", "gray").style("stroke-width", 0.1);
         d3.selectAll("#weightPath").remove();
     });
@@ -216,27 +208,23 @@ export function drawMatrixWeight(
     currentStep:number,
     myColor:any,
     weightMatrixPostions:any,
-    id:string = "tempath"
+    id:string = "tempath",
+    mode:string = "normal"
 ){
     const Xv = Xt[currentStep];
     for (let j = 0; j < Xv.length; j++) {
-        const s1 = startCoordList[j];
-        const e1 = endCoordList[currentStep];
+        let s1 = startCoordList[j];
+        let e1 = endCoordList[currentStep];
+
+        if(curveDir==1){
+            s1 = startCoordList[startCoordList.length - j - 1];
+         e1 = endCoordList[currentStep];
+        }
 
         const m1 = weightMatrixPostions[63-j][currentStep];
 
-        let pathDir = e1[0] > s1[0] ? 0 : 1;
-        if (curveDir == 1) {
-            pathDir = e1[0] > s1[0] ? 1 : 0; //curDir =
-        }
-        console.log("se", [s1, e1]);
-
-        
-
-        const points = [s1, m1, e1];
-
-        const controlPoint1 = [s1[0], m1[1]];
-        const controlPoint2 = [e1[0], m1[1]];
+        let controlPoint1 = [s1[0], m1[1]];
+        let controlPoint2 = [e1[0], m1[1]];
 
         const pathData1 = `
             M${s1[0]},${s1[1]}
@@ -264,23 +252,6 @@ export function drawMatrixWeight(
             .style("fill", "none")
             .attr("stroke", "black").attr("id", id)
             .attr("stroke-width", 2).attr("stroke", myColor(Xv[j])).lower();
-
-        // // Create a line generator with Catmull-Rom interpolation
-        // const lineGenerator = d3.line()
-        //     .curve(d3.curveCatmullRom)
-        //     .x(d => d[0])
-        //     .y(d => d[1]);
-
-        // // Generate the path data
-        // const pathData = lineGenerator(points);
-        
-        // d3.select(".mats")
-        //     .append("path")
-        //     .attr("d", pathData)
-        //     .attr("class", "procVis")
-        //     .attr("id", id)
-        //     .style("fill", "none")
-        //     .attr("stroke", myColor(Xv[j])).lower();
     }
 }
 
@@ -421,11 +392,14 @@ export function drawWeightsVector(
     d3.selectAll(".wRect").transition().duration(100).attr("opacity", 1);
 
     d3.selectAll(".interactRect").on("mouseover", function(){
+        let paintMode = "reverse";
+        if(curveDir==-1)paintMode = "normal";
+        
         const rectID = d3.select(this).attr("rectID")
         console.log("rectID",rectID);
         d3.selectAll(".interactRect").style("opacity", 0.5);
         d3.select(`.interactRect[rectID="${rectID}"]`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
-        drawMatrixWeight(Xv, startCoordList, endCoordList, curveDir, Number(rectID), myColor, weightMatrixPostions, "weightPath");
+        drawMatrixWeight(Xv, startCoordList, endCoordList, curveDir, Number(rectID), myColor, weightMatrixPostions, "weightPath", paintMode);
         d3.selectAll(".weightUnit").style("opacity", 0).lower();
         d3.selectAll(`#weightUnit-${rectID}`).style("opacity", 1).raise();
         d3.select(`#columnUnit-${rectID}`).style("opacity", 1).raise();
@@ -455,10 +429,12 @@ g:any
 ){
 //draw weight matrix
             //positioning
+            let offsetH = curveDir * 50;
+            if(curveDir==1)offsetH = (-curveDir * 50 + featureChannels * rectW);
             const math = create(all, {});
             const matX = btnX;
-            const matY = btnY - curveDir * 50;
-            const coefficient = 1;
+            const matY = btnY - offsetH;
+            const coefficient = 1.25;
             let weightMatrixPositions = [];
             //draw matrix
             const weightMat = math.transpose(weights[layerID]);
