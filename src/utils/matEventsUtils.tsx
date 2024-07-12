@@ -799,11 +799,14 @@ export function outputVisClick(
     coordForStart[0][1] += 15;
     coordForStart[0][0] -= featureChannels * 2.5;
 
-    poolingPt[0][0] += featureChannels;
+    poolingPt[0][0] += featureChannels*1.5;
+
     const modelParams = loadWeights();
 
     poolingPt[0][1] += 10;
     one = deepClone(poolingPt);
+    let endPt1 = deepClone(poolingPt);
+    endPt1[0][0] += featureChannels;
 
     one[0][1] -= rectH / 2;
     let end = deepClone(poolingPt);
@@ -821,7 +824,7 @@ export function outputVisClick(
 
     //locations calculation
     //find the next position
-    one[0][0] += 225;
+    one[0][0] += 350;
     let aOne = deepClone(one);
     //locations for paths' starting points
     let startCoord = [];
@@ -836,22 +839,49 @@ export function outputVisClick(
     //locations for paths' ending points
     let endCoord: any = [];
     for (let m = 0; m < 2; m++) {
-        endCoord.push([one[0][0] + rectH * m + rectH / 2, one[0][1] + rectH]);
+        endCoord.push([one[0][0] + rectH * m + rectH / 2, one[0][1]]);
     }
+
+    const resultWithoutBiasCoord = [
+        [one[0][0] - 150 - rectH/2,
+        one[0][1]],
+        [one[0][0] - 150 + rectH/2,
+        one[0][1]]
+    ];
+
+    const endPathAniCoord = [
+        [one[0][0] - 150,
+        one[0][1]],
+        [one[0][0] - 150 + rectH,
+        one[0][1]]
+    ];
+
+    let resultStartCoord = deepClone(endCoord);
+    resultStartCoord[0][1] += rectH;
+    resultStartCoord[1][1] += rectH;
 
     //one[0][1] -= 5;
     const g1 = d3.select(".mats").append("g").attr("class", "procVis");
     const outputCoord = [one[0][0], one[0][1]+rectH/2];
     //drawPoints(".mats", "red", endCoord);
     let resultCoord = deepClone(endCoord);
-    resultCoord[0][0] += 300 - rectH * 1.75;
-    resultCoord[1][0] += 300 - rectH * 1.75;
+    resultCoord[0][0] += 175 - rectH * 3.75;
+    resultCoord[1][0] += 175 - rectH * 3.75;
+    resultCoord[0][1] += rectH;
+    resultCoord[1][1] += rectH;
     console.log("comp coord", resultCoord, endCoord);
     //     drawPoints(".mats", "red", resultCoord);
     biasCoord = deepClone(aOne);
     biasCoord[0][0] -= 130 + 2 * rectH;
     biasCoord[0][1] += 50;
     const linBias = modelParams.bias[3];
+
+    const resultWithoutBias = [
+        result[0]-linBias[0],
+        result[1]-linBias[1]
+    ];
+
+    
 
     d3.select(".twoLayer").style("pointer-events", "none");
 
@@ -862,8 +892,25 @@ export function outputVisClick(
 
     controlPts = computeMids(biasCoord[0], feaCoord);
     //connect!
-    one[0][1] += rectH / 2;
-    const endPt = [one[0][0] + 300, one[0][1]];
+    // one[0][1] += rectH / 2;
+    // const endPt = [one[0][0] + 300, one[0][1]];
+
+    const endPt2 = [
+        resultWithoutBiasCoord[0][0], 
+        resultWithoutBiasCoord[0][1]+rectH/2
+    ];
+
+    const endPt3 = [
+        resultWithoutBiasCoord[0][0] + 2 * rectH, 
+        resultWithoutBiasCoord[0][1]+rectH/2
+    ];
+
+    const endPt4 = [
+        one[0][0],
+        one[0][1] + rectH/2
+    ];
+
+    drawPoints(".mats", "red", endPt1);
 
     //play button injection
     const btn = d3.select(".mats").append("g").attr("class", "ctrlBtn");
@@ -877,7 +924,24 @@ export function outputVisClick(
     const animateSeqAfterPath = [
         {func:()=>{drawBiasVector(g1, linBias.length, rectH, rectH, biasCoordCopy[0], myColor, linBias, layerID);}, delay: 200}, 
         {func:()=>{drawBiasPathOutputVis(biasCoord, controlPts, feaCoord);}, delay:200}, 
-      //  {func:()=>{drawPathBtwOuputResult(one, endPt);}, delay:200}, 
+        {func:()=>{drawWeightsVector(g1, resultWithoutBias, endPt2, rectH, rectH, myColor, modelParams.weights[3], startCoord,endPathAniCoord , 1)}, delay:200},
+        {func:()=>{
+            drawWeightsVector(g1, result, outputCoord, rectH, rectH, myColor, modelParams.weights[3], startCoord, endPathAniCoord, 1, "procVis wRect");
+            //draw the path connect to 
+            drawPathBtwOuputResult([endPt1[0]], endPt2);
+            drawPathBtwOuputResult([endPt3], endPt4);
+        }, delay:200},
+        {func:()=>{pathMap = drawPathInteractiveComponents(resultStartCoord, resultCoord, result, myColor);}, delay:200},
+        {func:()=>{
+            btn.selectAll("*").remove();
+            injectPlayButtonSVG(
+                btn,
+                btnX,
+                btnY,
+                "./assets/SVGs/playBtn_play.svg"
+            );
+        }, delay:200}
+        //  {func:()=>{drawPathBtwOuputResult(one, endPt);}, delay:200}, 
     ]
 
     const animateSeq = [
@@ -885,15 +949,11 @@ export function outputVisClick(
             intervalID = setInterval(() => {
                 const Xt = modelParams.weights[3];
                 const Xv = Xt[currentStep];
-                drawAniPath(Xt, currentStep, startCoord, endCoord, 1, myColor, 0, outputCoord, rectH, rectH, result, g1);
+                drawAniPath(Xt, currentStep, startCoord, endPathAniCoord, 1, myColor, 0, [resultWithoutBiasCoord[0][0], resultWithoutBiasCoord[0][1]+rectH/2], rectH, rectH, result, g1);
                 currentStep++;
                 console.log("i", currentStep);
                 if (currentStep >= 2) {
-                    //bias add-on
-                    AnimationController.runAnimations(0, animateSeqAfterPath);
-                    setTimeout(()=>{
-                        pathMap = drawPathInteractiveComponents(endCoord, resultCoord, result, myColor);
-                    }, 1500);
+                    
                     btn.selectAll("*").remove();
                     injectPlayButtonSVG(
                         btn,
@@ -902,6 +962,7 @@ export function outputVisClick(
                         "./assets/SVGs/playBtn_play.svg"
                     );
                     clearInterval(intervalID);
+                    d3.selectAll("#tempath").transition().delay(200).duration(200).remove();
                 }
             }, 250); 
             d3.selectAll("path").lower();
@@ -909,7 +970,7 @@ export function outputVisClick(
             d3.selectAll("path").lower();
         }, delay:aniSec},
     ];
-    AnimationController.runAnimations(0, animateSeq);
+    AnimationController.runAnimations(0, animateSeqAfterPath);
 
 
     //all the interaction add-ons
@@ -941,6 +1002,7 @@ export function outputVisClick(
         }
         //replay controls
         if (!isPlaying || currentStep >= 2 || currentStep == 0) {
+            d3.selectAll("#tempath").remove();
             injectPlayButtonSVG(
                 btn,
                 btnX,
@@ -948,6 +1010,7 @@ export function outputVisClick(
                 "./assets/SVGs/playBtn_play.svg"
             );
             if (currentStep >= 2) {
+                d3.selectAll("#tempath").remove();
                 d3.select(".mats").selectAll(".removeRect").remove();
           //      d3.select(".mats").selectAll(".pauseRemove").remove();
                 currentStep = 0; // 重置步骤
