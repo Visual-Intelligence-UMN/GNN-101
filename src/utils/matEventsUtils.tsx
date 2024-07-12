@@ -790,7 +790,7 @@ export function outputVisClick(
 
     //drawPoints(".mats", "red", one)
     let currentStep = 0;
-    let isPlaying = true;
+    let isPlaying = false;
     let intervalID: any = null;
     const rectH = 15;
     const rectW = 5;
@@ -954,7 +954,6 @@ export function outputVisClick(
                 currentStep++;
                 console.log("i", currentStep);
                 if (currentStep >= 2) {
-                    
                     btn.selectAll("*").remove();
                     injectPlayButtonSVG(
                         btn,
@@ -967,7 +966,7 @@ export function outputVisClick(
                 }
             }, 250); 
             d3.selectAll("path").lower();
-            d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
+            //d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
             d3.selectAll("path").lower();
         }, delay:aniSec},
     ];
@@ -994,10 +993,16 @@ export function outputVisClick(
         }
     });
 
+    let firstPlay = true;
+
     // play button interaction add-ons
     btn.on("click", function (event: any, d: any) {
         console.log("isPlaying", isPlaying);
         event.stopPropagation();
+        if(firstPlay){
+            d3.select(".mats").selectAll(".removeRect").remove();
+            firstPlay = false;
+        }
         if (intervalID) {
             clearInterval(intervalID);
         }
