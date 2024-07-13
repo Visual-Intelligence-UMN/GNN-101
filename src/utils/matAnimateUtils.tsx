@@ -163,7 +163,7 @@ export function drawAniPath(
 
     
 
-    drawMatrixWeight(Xt, startCoordList, endCoordList, curveDir, currentStep, myColor, weightMatrixPostions);
+    drawMatrixWeight(Xt, startCoordList, endCoordList, curveDir, currentStep, myColor, weightMatrixPostions, featureChannels);
     d3.selectAll("#tempath").lower();
 
     d3.selectAll(".interactRect").on("mouseover", function(){
@@ -171,7 +171,7 @@ export function drawAniPath(
         console.log("rectID",rectID);
         d3.selectAll(".interactRect").style("opacity", 0.5);
         d3.select(`.interactRect[rectID="${rectID}"]`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
-        drawMatrixWeight(Xt, startCoordList, endCoordList, curveDir, Number(rectID), myColor, weightMatrixPostions, "weightPath");
+        drawMatrixWeight(Xt, startCoordList, endCoordList, curveDir, Number(rectID), myColor, weightMatrixPostions, featureChannels, "weightPath");
         d3.selectAll(".weightUnit").style("opacity", 0).lower();
         d3.selectAll(`#weightUnit-${rectID}`).style("opacity", 1).raise();
         d3.select(`#columnUnit-${rectID}`).style("opacity", 1).raise();
@@ -208,6 +208,7 @@ export function drawMatrixWeight(
     currentStep:number,
     myColor:any,
     weightMatrixPostions:any,
+    featureChannels: number,
     id:string = "tempath",
     mode:string = "normal"
 ){
@@ -221,7 +222,7 @@ export function drawMatrixWeight(
          e1 = endCoordList[currentStep];
         }
 
-        const m1 = weightMatrixPostions[63-j][currentStep];
+        const m1 = weightMatrixPostions[featureChannels-1-j][currentStep];
 
         let controlPoint1 = [s1[0], m1[1]];
         let controlPoint2 = [e1[0], m1[1]];
@@ -353,6 +354,7 @@ export function drawWeightsVector(
     endCoordList:any,
     curveDir:number,
     weightMatrixPostions: any,
+    featureChannels: number,
     rectClass: string = "procVis removeRect wRect interactRect"
 ) {
     for (let m = 0; m < dummy.length; m++) {
@@ -362,7 +364,7 @@ export function drawWeightsVector(
             .attr("width", rectW)
             .attr("height", rectH)
             .attr("fill", myColor(dummy[m]))
-            .attr("opacity", 0)
+            .attr("opacity", 1)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1)
             .attr("class", rectClass)
@@ -389,7 +391,7 @@ export function drawWeightsVector(
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("class", "procVis wRect");
-    d3.selectAll(".wRect").transition().duration(100).attr("opacity", 1);
+   // d3.selectAll(".wRect").transition().duration(100).attr("opacity", 1);
 
     d3.selectAll(".interactRect").on("mouseover", function(){
         let paintMode = "reverse";
@@ -399,7 +401,7 @@ export function drawWeightsVector(
         console.log("rectID",rectID);
         d3.selectAll(".interactRect").style("opacity", 0.5);
         d3.select(`.interactRect[rectID="${rectID}"]`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
-        drawMatrixWeight(Xv, startCoordList, endCoordList, curveDir, Number(rectID), myColor, weightMatrixPostions, "weightPath", paintMode);
+        drawMatrixWeight(Xv, startCoordList, endCoordList, curveDir, Number(rectID), myColor, weightMatrixPostions, featureChannels, "weightPath", paintMode);
         d3.selectAll(".weightUnit").style("opacity", 0).lower();
         d3.selectAll(`#weightUnit-${rectID}`).style("opacity", 1).raise();
         d3.select(`#columnUnit-${rectID}`).style("opacity", 1).raise();

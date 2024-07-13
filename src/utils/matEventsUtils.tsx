@@ -634,7 +634,7 @@ export function featureVisClick(
         {func:()=>{
             weightMatrixPostions = drawWeightMatrix(btnX, btnY, curveDir, rectW, rectH, featureChannels, weights, layerID, myColor, g);
         }, delay:aniSec},
-        {func: () => drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor, math.transpose(weights[layerID]), startCoordList, endCoordList, curveDir, weightMatrixPostions), delay: aniSec},
+        {func: () => drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor, math.transpose(weights[layerID]), startCoordList, endCoordList, curveDir, weightMatrixPostions, featureChannels), delay: aniSec},
         {func: () => drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2Copy, myColor, layerBias, layerID), delay: aniSec},
         {func: () => drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels), delay: aniSec,},
         {func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels), delay: 1,},
@@ -966,7 +966,7 @@ export function outputVisClick(
             intervalID = setInterval(() => {
                 const Xt = modelParams.weights[3];
                 const Xv = Xt[currentStep];
-                drawAniPath(Xt, currentStep, startCoord, endPathAniCoord, 1, myColor, 0, [resultWithoutBiasCoord[0][0], resultWithoutBiasCoord[0][1]+rectH/2], rectH, rectH, result, g1);
+                drawAniPath(Xt, currentStep, startCoord, endPathAniCoord, 1, myColor, 0, [resultWithoutBiasCoord[0][0], resultWithoutBiasCoord[0][1]+rectH/2], rectH, rectH, result, g1, featureChannels);
                 currentStep++;
                 console.log("i", currentStep);
                 if (currentStep >= 2) {
