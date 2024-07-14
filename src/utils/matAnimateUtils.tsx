@@ -203,11 +203,17 @@ export function drawMatrixWeight(
 ){
     
     let flag = true;
+
+    console.log("Xv check 1", Xt, weightMatrixPostions);
     
     if(Xt[0].length!=Xt.length){
         //weightMatrixPostions = transposeAnyMatrix(weightMatrixPostions);
         flag = false;
         console.log("w mat flag")
+        const math = create(all, {});
+        Xt = math.transpose(Xt);
+    }
+    if(Xt[0].length==2 && Xt.length==64){
         const math = create(all, {});
         Xt = math.transpose(Xt);
     }
@@ -230,11 +236,17 @@ export function drawMatrixWeight(
         //     m1 = weightMatrixPostions[currentStep][weightMatrixPostions[0].length-1-j];
         // }
 
+        // if(Xt[0].length==64 && Xt.length==2){
+        //     m1 = weightMatrixPostions[currentStep][j];
+        // }else{
+        //     m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+        // }
         m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+        
 
         console.log("wanfeng", Xt);
 
-        if(Xt[0].length<Xt.length && Xt.length!=64){
+        if((Xt[0].length<Xt.length && Xt.length!=64)||(Xt[0].length==64&&Xt.length==2)){
             m1 = weightMatrixPostions[j][currentStep]
         }
 

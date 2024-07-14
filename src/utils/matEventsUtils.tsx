@@ -945,15 +945,33 @@ export function outputVisClick(
     const btnX = (endPt1[0][0]+endPt2[0])/2;
     const btnY = endPt2[1];
 
+
+    const math = create(all, {});
+    const wMat = math.transpose(modelParams.weights[3]);
+
     //where we put out animation sequence
     let pathMap: any = null;
+
+    console.log("w mat pos", wMat)
+
+    let weightMatrixPostions:any = computeMatrixLocations(btnX, btnY+138*2, 1, rectW, featureChannels, [wMat], 0);
+    
+    console.log("w mat pos 1", weightMatrixPostions)
 
     const animateSeqAfterPath = [
         {func:()=>{drawBiasVector(g1, linBias.length, rectH, rectH, biasCoordCopy[0], myColor, linBias, layerID);}, delay: 200}, 
         {func:()=>{drawBiasPathOutputVis(biasCoord, controlPts, feaCoord);}, delay:200}, 
-        {func:()=>{drawWeightsVector(g1, resultWithoutBias, endPt2, rectH, rectH, myColor, modelParams.weights[3], startCoord,endPathAniCoord , 1)}, delay:200},
         {func:()=>{
-            drawWeightsVector(g1, result, outputCoord, rectH, rectH, myColor, modelParams.weights[3], startCoord, endPathAniCoord, 1, "procVis wRect");
+            drawWeightMatrix(btnX, btnY, 1, rectW, rectH, featureChannels, [wMat], 0, myColor, g1, weightMatrixPostions);
+        }, delay:aniSec},
+        {func:()=>{
+            console.log("Xv check wmat", wMat);
+            drawWeightsVector(g1, resultWithoutBias, endPt2, rectH, rectH, myColor, 
+                wMat, startCoord,endPathAniCoord , 1, weightMatrixPostions, 
+                featureChannels)
+        }, delay:200},
+        {func:()=>{
+            drawWeightsVector(g1, result, outputCoord, rectH, rectH, myColor, modelParams.weights[3], startCoord, endPathAniCoord, 1, weightMatrixPostions, featureChannels, "procVis wRect");
             //draw the path connect to 
             drawPathBtwOuputResult([endPt1[0]], endPt2);
             drawPathBtwOuputResult([endPt3], endPt4);
