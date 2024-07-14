@@ -703,8 +703,9 @@ export function featureVisClick(
             const Xt = math.transpose(weights[layerID]);
 
             intervalID = setInterval(() => {
+                //func: () => drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor, weights[layerID], startCoordList, endCoordList, curveDir, weightMatrixPostions, featureChannels), delay: aniSec},
                 drawAniPath(
-                    Xt,
+                    weights[layerID],
                     currentStep,
                     startCoordList,
                     endCoordList,

@@ -189,18 +189,6 @@ export function drawAniPath(
     
 }
 
-function calculateControlPoints(p0:any, p1:any, p2:any) {
-    const dx1 = p1[0] - p0[0];
-    const dy1 = p1[1] - p0[1];
-    const dx2 = p2[0] - p1[0];
-    const dy2 = p2[1] - p1[1];
-
-    const m1 = [p1[0] - dx1 / 2, p1[1] - dy1 / 2];
-    const m2 = [p1[0] + dx2 / 2, p1[1] + dy2 / 2];
-
-    return [m1, m2];
-}
-
 export function drawMatrixWeight(
     Xt: any,
     startCoordList:any,
@@ -235,7 +223,7 @@ export function drawMatrixWeight(
         }
 
         let m1 = [0,0];
-        // if(!flag){
+        // if(flag){
         //     m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
         //     console.log("m1 check",weightMatrixPostions,  m1);
         // }else{
