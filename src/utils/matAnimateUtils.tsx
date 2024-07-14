@@ -213,7 +213,9 @@ export function drawMatrixWeight(
         const math = create(all, {});
         Xt = math.transpose(Xt);
     }
-    if(Xt[0].length==2 && Xt.length==64){
+    if((Xt[0].length==2 && Xt.length==64)
+        ||(Xt[0].length==4 && Xt.length==2)
+    ){
         const math = create(all, {});
         Xt = math.transpose(Xt);
     }
@@ -241,13 +243,16 @@ export function drawMatrixWeight(
         // }else{
         //     m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
         // }
-        m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+        
         
 
         console.log("wanfeng", Xt);
 
-        if((Xt[0].length<Xt.length && Xt.length!=64)||(Xt[0].length==64&&Xt.length==2)){
+        if((Xt[0].length<Xt.length && Xt.length!=64)||(Xt[0].length==64&&Xt.length==2)
+        ||(Xt[0].length==4&&Xt.length==2)){
             m1 = weightMatrixPostions[j][currentStep]
+        }else{
+            m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
         }
 
         let controlPoint1 = [s1[0], m1[1]];

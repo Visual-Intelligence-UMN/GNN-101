@@ -20,7 +20,7 @@ import {
     resultVisMouseEvent
 } from "./matEventsUtils";
 import { drawPoints } from "./utils";
-import { AnimationController, drawAniPath, drawBiasPath, drawBiasVector, drawPathBtwOuputResult, drawPathInteractiveComponents, drawWeightsVector } from "./matAnimateUtils";
+import { AnimationController, computeMatrixLocations, drawAniPath, drawBiasPath, drawBiasVector, drawPathBtwOuputResult, drawPathInteractiveComponents, drawWeightMatrix, drawWeightsVector } from "./matAnimateUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
 import { roundToTwo } from "@/pages/WebUtils";
 import { drawSoftmaxDisplayerNodeClassifier } from "./matInteractionUtils";
@@ -881,15 +881,27 @@ export function visualizeNodeClassifierFeatures(
 
             let pathMap: any = null;
 
+
+    const wMat = math.transpose(modelParams.weights[3]);
+
+            let weightMatrixPostions:any = computeMatrixLocations(btnX, btnY+138*2, 1, 15, featureChannels, [wMat], 0);
+
             const animateSeqAfterPath = [
                 {func:()=>{
+                    drawWeightMatrix(btnX, btnY, 1, 15, 15, featureChannels, [wMat], 0, myColor, g1, weightMatrixPostions);
+                }, delay:aniSec},
+                {func:()=>{
                     const Xt = modelParams.weights[3];
-                    drawWeightsVector(g, vectorAfterMul, outputCoord, 15, 10, myColor, Xt, startPathCoords, endPathCoords, curveDir)
+                    drawWeightsVector(g, vectorAfterMul, outputCoord, 15, 10, 
+                        myColor, Xt, startPathCoords, endPathCoords, curveDir, weightMatrixPostions, featureChannels)
                     drawPathBtwOuputResult([prevFeatureCoord], outputCoord);
                 }, delay:aniSec},
                 {func:()=>{
                     //draw a final value output visualizer for testing
-                    drawWeightsVector(g, nthOutputVals, finalOutputCoord, 15, 10, myColor, modelParams.weights[3], startPathCoords, endPathCoords, curveDir, "procVis wRect");
+                    drawWeightsVector(g, nthOutputVals, finalOutputCoord, 
+                        15, 10, myColor, modelParams.weights[3], startPathCoords, 
+                        endPathCoords, curveDir, weightMatrixPostions, 
+                        featureChannels, "procVis wRect");
                     drawPathBtwOuputResult([vectorAfterMatMulPath], finalOutputCoord);  
                 }, delay:aniSec}, 
                 {func:()=>{drawBiasVector(g, 4, 15, 10, biasCoord, myColor, linBias, 4);}, delay:aniSec},
@@ -912,7 +924,9 @@ export function visualizeNodeClassifierFeatures(
                     intervalID = setInterval(() => {
                         const Xt = modelParams.weights[3];
                         const Xv = Xt[currentStep];
-                        drawAniPath(Xt, currentStep, startPathCoords, endPathCoords, curveDir, myColor, 0, outputCoord, 15, 10, vectorAfterMul, g1);
+                        drawAniPath(wMat, currentStep, startPathCoords, endPathCoords, 
+                            curveDir, myColor, 0, outputCoord, 15, 10, vectorAfterMul, 
+                            g1, weightMatrixPostions);
                         currentStep++;
                         console.log("i", currentStep);
                         if (currentStep >= 4) {
