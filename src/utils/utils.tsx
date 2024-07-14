@@ -450,6 +450,21 @@ export const myColor = d3.scaleLinear<string>()
 .range(["#1AFF1A", "white", "#4B0092"]);
 
 
+export function transposeAnyMatrix(matrix:any){
+  console.log("result mat 1", matrix);
+  let resultMat = [];
+  for(let i=0; i<matrix[0].length; i++){
+    let t = [];
+    for(let j=0; j<matrix.length; j++){
+      t.push(matrix[j][i]);
+    }
+    resultMat.push(t);
+  }
+  console.log("result mat", resultMat);
+  return resultMat;
+}
+
+
 export interface State {
   isClicked: boolean;
 }

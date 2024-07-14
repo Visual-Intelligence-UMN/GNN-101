@@ -2,7 +2,8 @@ import * as d3 from "d3";
 import { computeMids } from "./matFeaturesUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
 import { drawActivationExplanation } from "./matInteractionUtils";
-import { create, all } from "mathjs";
+import { create, all, transposeDependencies } from "mathjs";
+import { transposeAnyMatrix } from "./utils";
 
 export function animatePathDrawing(
     Xt: any,
@@ -417,6 +418,39 @@ export function drawWeightsVector(
 }
 
 
+export function computeMatrixLocations(
+    btnX:number,
+    btnY:number,
+    curveDir:number,
+    rectW:number,
+    featureChannels:number,
+    weights:number[][][],
+    layerID:number
+){
+    //draw weight matrix
+                //positioning
+                let offsetH = curveDir * 50;
+                if(curveDir==1)offsetH = (-curveDir * 50 + featureChannels * rectW);
+                const math = create(all, {});
+                const matX = btnX;
+                const matY = btnY - offsetH;
+                const coefficient = 1.25;
+                let weightMatrixPositions = [];
+                //draw matrix - change the computation mode here, when the dims are different
+                let weightMat = weights[layerID];
+                if(weightMat[0].length>weightMat.length)weightMat = math.transpose(weights[layerID]);
+                for(let i=0; i<weightMat.length; i++){
+                    let tempArr = [];
+                    for(let j=0; j<weightMat[i].length; j++){
+                        tempArr.push([matX+j*rectW/coefficient+rectW/(coefficient*2), matY+i*rectW/coefficient+rectW/(coefficient*2)]);
+                    }
+                    weightMatrixPositions.push(tempArr);
+                }
+                //draw connection
+                return weightMatrixPositions;
+    }
+
+
 export function drawWeightMatrix(
 btnX:number,
 btnY:number,
@@ -427,7 +461,8 @@ featureChannels:number,
 weights:number[][][],
 layerID:number,
 myColor:any,
-g:any
+g:any,
+weightMatrixPostions:any
 ){
 //draw weight matrix
             //positioning
@@ -437,16 +472,24 @@ g:any
             const matX = btnX;
             const matY = btnY - offsetH;
             const coefficient = 1.25;
-            let weightMatrixPositions = [];
             //draw matrix
             const weightMat = math.transpose(weights[layerID]);
-            for(let i=0; i<weightMat.length; i++){
+
+            let flag = true;
+            if(weightMat[0].length>weightMat.length){
+                //weightMatrixPostions = transposeAnyMatrix(weightMatrixPostions);
+                flag = false;
+                console.log("w mat flag")
+            }
+            console.log("w mat check", weightMatrixPostions, weightMat, weightMat[weightMat.length-1][0]);
+            for(let i=0; i<weightMatrixPostions.length; i++){
                 let tempArr = [];
-                for(let j=0; j<weightMat[i].length; j++){
+                for(let j=0; j<weightMatrixPostions[0].length; j++){
+                    //adjust the location if dimensions are different
                     if(i==0){
                         g.append("rect")
-                            .attr("x", matX+j*rectW/coefficient)
-                            .attr("y", matY+i*rectW/coefficient)
+                            .attr("x", weightMatrixPostions[i][j][0])
+                            .attr("y", weightMatrixPostions[i][j][1])
                             .attr("width", rectW/coefficient)
                             .attr("height", rectW/coefficient*weightMat.length)
                             .attr("fill", "none")
@@ -456,23 +499,26 @@ g:any
                             .attr("class", "columnUnit")
                             .attr("id", `columnUnit-${j}`);
                     }
+                    let colorVal = 0;
+                    if(flag)colorVal = weightMat[weightMat.length-i-1][j];
+                    else {
+                       // console.log(`w mat check2 ${i} ${j}`,weightMat[weightMat.length-i-1], weightMat[weightMat.length-i-1][j]);
+                        colorVal = weightMat[j][weightMat[0].length-i-1];
+                        console.log("w mat color", colorVal, j, weightMat[0].length-i-1);
+                    }
                     g.append("rect")
-                        .attr("x", matX+j*rectW/coefficient)
-                        .attr("y", matY+i*rectW/coefficient)
+                        .attr("x", weightMatrixPostions[i][j][0])
+                        .attr("y", weightMatrixPostions[i][j][1])
                         .attr("width", rectW/coefficient)
                         .attr("height", rectW/coefficient)
-                        .attr("fill", myColor(weightMat[featureChannels-i-1][j]))
+                        .attr("fill", myColor(colorVal))
                         .attr("class", "weightUnit")
                         .attr("id", `weightUnit-${j}`);
 
                     tempArr.push([matX+j*rectW/coefficient+rectW/(coefficient*2), matY+i*rectW/coefficient+rectW/(coefficient*2)]);
                 }
-            //    drawPoints(".mats", "red", tempArr)
-                weightMatrixPositions.push(tempArr);
             }
             d3.selectAll(".columnUnit").raise();
-            //draw connection
-            return weightMatrixPositions;
 }
 
 export function drawBiasVector(

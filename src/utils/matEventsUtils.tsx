@@ -25,6 +25,7 @@ import {
     drawBiasPathOutputVis,
     drawTanh,
     drawWeightMatrix,
+    computeMatrixLocations,
 } from "./matAnimateUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
 import { drawSoftmaxDisplayer } from "./matInteractionUtils";
@@ -618,7 +619,12 @@ export function featureVisClick(
     const aniSec = 500;
     const waitSec = 250 * featureChannels;
 
-    let weightMatrixPostions:any = [];
+    const btn = d3.select(".mats").append("g");
+    const radius = 10;
+    const btnX = playBtnCoord[0];
+    const btnY = playBtnCoord[1];
+
+    let weightMatrixPostions:any = computeMatrixLocations(btnX, btnY, curveDir, rectW, featureChannels, weights, layerID);
 
     let animateSeqAfterPath: any = [
         {func: () => drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir), delay: initSec + aniSec,},
@@ -632,9 +638,9 @@ export function featureVisClick(
             drawPathBtwOuputResult([coordFeatureVis], coordFeatureVis3)
         }, delay:aniSec*2},
         {func:()=>{
-            weightMatrixPostions = drawWeightMatrix(btnX, btnY, curveDir, rectW, rectH, featureChannels, weights, layerID, myColor, g);
+            drawWeightMatrix(btnX, btnY, curveDir, rectW, rectH, featureChannels, weights, layerID, myColor, g, weightMatrixPostions);
         }, delay:aniSec},
-        {func: () => drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor, math.transpose(weights[layerID]), startCoordList, endCoordList, curveDir, weightMatrixPostions, featureChannels), delay: aniSec},
+        {func: () => drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor, weights[layerID], startCoordList, endCoordList, curveDir, weightMatrixPostions, featureChannels), delay: aniSec},
         {func: () => drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2Copy, myColor, layerBias, layerID), delay: aniSec},
         {func: () => drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels), delay: aniSec,},
         {func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels), delay: 1,},
@@ -644,7 +650,7 @@ export function featureVisClick(
     ];
 
     if(activation=="tanh"){
-        animateSeqAfterPath[6].func = ()=>drawTanh(midX1, wmCoord, biasCoord, nextCoord);
+        animateSeqAfterPath[7].func = ()=>drawTanh(midX1, wmCoord, biasCoord, nextCoord);
     }
 
     AnimationController.runAnimations(0, animateSeqAfterPath);
@@ -654,10 +660,7 @@ export function featureVisClick(
         console.log("return intervalID", intervalID);
         return intervalID;
     }
-    const btn = d3.select(".mats").append("g");
-    const radius = 10;
-    const btnX = playBtnCoord[0];
-    const btnY = playBtnCoord[1];
+    
 
     let firstClick = true;
 
