@@ -213,7 +213,18 @@ export function drawMatrixWeight(
     id:string = "tempath",
     mode:string = "normal"
 ){
+    
+    let flag = true;
+    
+    if(Xt[0].length>Xt.length){
+        //weightMatrixPostions = transposeAnyMatrix(weightMatrixPostions);
+        flag = false;
+        console.log("w mat flag")
+        const math = create(all, {});
+        Xt = math.transpose(Xt);
+    }
     const Xv = Xt[currentStep];
+    console.log("Xv check", Xv, Xt);
     for (let j = 0; j < Xv.length; j++) {
         let s1 = startCoordList[j];
         let e1 = endCoordList[currentStep];
@@ -223,7 +234,11 @@ export function drawMatrixWeight(
          e1 = endCoordList[currentStep];
         }
 
-        const m1 = weightMatrixPostions[featureChannels-1-j][currentStep];
+        let m1 = weightMatrixPostions[featureChannels-1-j][currentStep];
+        if(!flag){
+            m1 = weightMatrixPostions[currentStep][featureChannels-1-j];
+            console.log("m1 check",weightMatrixPostions,  m1);
+        }
 
         let controlPoint1 = [s1[0], m1[1]];
         let controlPoint2 = [e1[0], m1[1]];
@@ -438,7 +453,9 @@ export function computeMatrixLocations(
                 let weightMatrixPositions = [];
                 //draw matrix - change the computation mode here, when the dims are different
                 let weightMat = weights[layerID];
-                if(weightMat[0].length>weightMat.length)weightMat = math.transpose(weights[layerID]);
+                console.log("comp w 0", weightMat)
+                //if(weightMat[0].length>weightMat.length || weightMat[0].length<weightMat.length)weightMat = math.transpose(weights[layerID]);
+                console.log("comp w", weightMat)
                 for(let i=0; i<weightMat.length; i++){
                     let tempArr = [];
                     for(let j=0; j<weightMat[i].length; j++){
@@ -473,12 +490,14 @@ weightMatrixPostions:any
             const matY = btnY - offsetH;
             const coefficient = 1.25;
             //draw matrix
-            const weightMat = math.transpose(weights[layerID]);
+            //const weightMat = math.transpose(weights[layerID]);
+            const weightMat = weights[layerID];
 
-            let flag = true;
-            if(weightMat[0].length>weightMat.length){
+            //determine matrix shape mode
+            let flag = false;
+            if(weightMat[0].length>weightMat.length || weightMat[0].length<weightMat.length){
                 //weightMatrixPostions = transposeAnyMatrix(weightMatrixPostions);
-                flag = false;
+                flag = true;
                 console.log("w mat flag")
             }
             console.log("w mat check", weightMatrixPostions, weightMat, weightMat[weightMat.length-1][0]);
@@ -499,8 +518,11 @@ weightMatrixPostions:any
                             .attr("class", "columnUnit")
                             .attr("id", `columnUnit-${j}`);
                     }
+                    //select the weight based on the shape of the matrix
                     let colorVal = 0;
-                    if(flag)colorVal = weightMat[weightMat.length-i-1][j];
+                    if(flag){
+                        colorVal = weightMat[weightMat.length-i-1][j];
+                    }
                     else {
                        // console.log(`w mat check2 ${i} ${j}`,weightMat[weightMat.length-i-1], weightMat[weightMat.length-i-1][j]);
                         colorVal = weightMat[j][weightMat[0].length-i-1];
