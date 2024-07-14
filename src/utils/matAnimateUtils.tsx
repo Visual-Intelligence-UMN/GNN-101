@@ -234,13 +234,15 @@ export function drawMatrixWeight(
          e1 = endCoordList[currentStep];
         }
 
-        let m1 = 0;
-        if(!flag){
-            m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
-            console.log("m1 check",weightMatrixPostions,  m1);
-        }else{
-            m1 = weightMatrixPostions[currentStep][weightMatrixPostions[0].length-1-j];
-        }
+        let m1 = [0,0];
+        // if(!flag){
+        //     m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+        //     console.log("m1 check",weightMatrixPostions,  m1);
+        // }else{
+        //     m1 = weightMatrixPostions[currentStep][weightMatrixPostions[0].length-1-j];
+        // }
+
+        m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
 
         let controlPoint1 = [s1[0], m1[1]];
         let controlPoint2 = [e1[0], m1[1]];
