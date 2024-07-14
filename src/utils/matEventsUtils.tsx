@@ -994,7 +994,7 @@ export function outputVisClick(
             intervalID = setInterval(() => {
                 const Xt = modelParams.weights[3];
                 const Xv = Xt[currentStep];
-                drawAniPath(Xt, currentStep, startCoord, endPathAniCoord, 1, myColor, 0, [resultWithoutBiasCoord[0][0], resultWithoutBiasCoord[0][1]+rectH/2], rectH, rectH, result, g1, featureChannels);
+                drawAniPath(wMat, currentStep, startCoord, endPathAniCoord, 1, myColor, 0, [resultWithoutBiasCoord[0][0], resultWithoutBiasCoord[0][1]+rectH/2], rectH, rectH, result, g1, weightMatrixPostions);
                 currentStep++;
                 console.log("i", currentStep);
                 if (currentStep >= 2) {
