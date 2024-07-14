@@ -232,6 +232,12 @@ export function drawMatrixWeight(
 
         m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
 
+        console.log("wanfeng", Xt);
+
+        if(Xt[0].length<Xt.length && Xt.length!=64){
+            m1 = weightMatrixPostions[j][currentStep]
+        }
+
         let controlPoint1 = [s1[0], m1[1]];
         let controlPoint2 = [e1[0], m1[1]];
 

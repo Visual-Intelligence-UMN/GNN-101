@@ -529,7 +529,9 @@ export function featureVisClick(
     let coordFeatureVis2Copy = deepClone(coordFeatureVis2);
 
     //adjust the position of the bias vector for special case
-    if(layerID==0 && oFeatureChannels==34)coordFeatureVis2Copy[0] += 50;
+    if(layerID==0 && oFeatureChannels==34){
+        coordFeatureVis2Copy[0] += 50;
+    }
 
     //draw paths from WMVisualizer and Bias Visualizer to final output
     const wmCoord: [number, number] = [
@@ -621,8 +623,12 @@ export function featureVisClick(
 
     const btn = d3.select(".mats").append("g");
     const radius = 10;
-    const btnX = playBtnCoord[0];
+    let btnX = playBtnCoord[0];
     const btnY = playBtnCoord[1];
+
+    if(layerID==0 && oFeatureChannels==34){
+        btnX += 100;
+    }
 
     let weightMatrixPostions:any = computeMatrixLocations(btnX, btnY, curveDir, rectW, featureChannels, weights, layerID);
 
