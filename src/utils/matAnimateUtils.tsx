@@ -216,7 +216,7 @@ export function drawMatrixWeight(
     
     let flag = true;
     
-    if(Xt[0].length>Xt.length){
+    if(Xt[0].length!=Xt.length){
         //weightMatrixPostions = transposeAnyMatrix(weightMatrixPostions);
         flag = false;
         console.log("w mat flag")
@@ -224,7 +224,7 @@ export function drawMatrixWeight(
         Xt = math.transpose(Xt);
     }
     const Xv = Xt[currentStep];
-    console.log("Xv check", Xv, Xt);
+    console.log("Xv check", Xv, Xt, weightMatrixPostions);
     for (let j = 0; j < Xv.length; j++) {
         let s1 = startCoordList[j];
         let e1 = endCoordList[currentStep];
@@ -234,10 +234,12 @@ export function drawMatrixWeight(
          e1 = endCoordList[currentStep];
         }
 
-        let m1 = weightMatrixPostions[featureChannels-1-j][currentStep];
+        let m1 = 0;
         if(!flag){
-            m1 = weightMatrixPostions[currentStep][featureChannels-1-j];
+            m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
             console.log("m1 check",weightMatrixPostions,  m1);
+        }else{
+            m1 = weightMatrixPostions[currentStep][weightMatrixPostions[0].length-1-j];
         }
 
         let controlPoint1 = [s1[0], m1[1]];
