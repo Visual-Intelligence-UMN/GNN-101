@@ -723,7 +723,8 @@ export function featureVisClick(
                     rectW,
                     dummy,
                     g,
-                    weightMatrixPostions
+                    weightMatrixPostions,
+                    X
                 );
                 d3.selectAll(".columnUnit").style("opacity", 0);
                 d3.selectAll(".weightUnit").style("opacity", 0).lower();

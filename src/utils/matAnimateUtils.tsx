@@ -139,7 +139,8 @@ export function drawAniPath(
     rectW:number,
     dummy:number[],
     g:any,
-    weightMatrixPostions:any
+    weightMatrixPostions:any,
+    X:any
 ) {
     d3.selectAll("#tempath").remove();
     if(currentStep==0){
@@ -176,6 +177,9 @@ export function drawAniPath(
         d3.selectAll(".weightUnit").style("opacity", 0).lower();
         d3.selectAll(`#weightUnit-${rectID}`).style("opacity", 1).raise();
         d3.select(`#columnUnit-${rectID}`).style("opacity", 1).raise();
+        drawDotProduct(
+            dummy, rectID, X, Xt, curveDir, coordFeatureVis, myColor
+        )
     });
     d3.selectAll(".interactRect").on("mouseout", function(){
         const rectID = d3.select(this).attr("rectID")
@@ -184,6 +188,7 @@ export function drawAniPath(
         d3.selectAll(".columnUnit").style("opacity", 0);
         d3.selectAll(".interactRect").style("opacity", 1).style("stroke", "gray").style("stroke-width", 0.1);
         d3.selectAll("#weightPath").remove();
+        d3.selectAll(".matmul-displayer").remove();
     });
 
     
@@ -485,7 +490,6 @@ export function drawWeightsVector(
         d3.selectAll(".weightUnit").style("opacity", 0).lower();
         d3.selectAll(`#weightUnit-${rectID}`).style("opacity", 1).raise();
         d3.select(`#columnUnit-${rectID}`).style("opacity", 1).raise();
-        const math = create(all, {});
         drawDotProduct(
         dummy, rectID, X, Xv, curveDir, coordFeatureVis, myColor
         )
