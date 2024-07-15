@@ -1,9 +1,9 @@
 import * as d3 from "d3";
 import { computeMids } from "./matFeaturesUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
-import { drawActivationExplanation } from "./matInteractionUtils";
+import { drawActivationExplanation, drawDotProduct } from "./matInteractionUtils";
 import { create, all, transposeDependencies } from "mathjs";
-import { transposeAnyMatrix } from "./utils";
+import { drawPoints, transposeAnyMatrix } from "./utils";
 
 export function animatePathDrawing(
     Xt: any,
@@ -433,7 +433,9 @@ export function drawWeightsVector(
     curveDir:number,
     weightMatrixPostions: any,
     featureChannels: number,
-    rectClass: string = "procVis removeRect wRect interactRect"
+    X:any,
+    rectClass: string = "procVis removeRect wRect interactRect",
+    
 ) {
     for (let m = 0; m < dummy.length; m++) {
         g.append("rect")
@@ -483,6 +485,11 @@ export function drawWeightsVector(
         d3.selectAll(".weightUnit").style("opacity", 0).lower();
         d3.selectAll(`#weightUnit-${rectID}`).style("opacity", 1).raise();
         d3.select(`#columnUnit-${rectID}`).style("opacity", 1).raise();
+        const math = create(all, {});
+        drawDotProduct(
+        dummy, rectID, X, Xv, curveDir, coordFeatureVis, myColor
+        )
+        
     });
     d3.selectAll(".interactRect").on("mouseout", function(){
         const rectID = d3.select(this).attr("rectID")
@@ -491,6 +498,9 @@ export function drawWeightsVector(
         d3.selectAll(".columnUnit").style("opacity", 0);
         d3.selectAll(".interactRect").style("opacity", 1).style("stroke", "gray").style("stroke-width", 0.1);
         d3.selectAll("#weightPath").remove();
+
+        //remove matmul-displayer
+        d3.selectAll(".matmul-displayer").remove();
     });
 }
 

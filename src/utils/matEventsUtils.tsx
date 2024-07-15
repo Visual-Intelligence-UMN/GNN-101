@@ -646,7 +646,7 @@ export function featureVisClick(
         {func:()=>{
             drawWeightMatrix(btnX, btnY, curveDir, rectW, rectH, featureChannels, weights, layerID, myColor, g, weightMatrixPostions);
         }, delay:aniSec},
-        {func: () => drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor, weights[layerID], startCoordList, endCoordList, curveDir, weightMatrixPostions, featureChannels), delay: aniSec},
+        {func: () => drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor, weights[layerID], startCoordList, endCoordList, curveDir, weightMatrixPostions, featureChannels, X), delay: aniSec},
         {func: () => drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2Copy, myColor, layerBias, layerID), delay: aniSec},
         {func: () => drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels), delay: aniSec,},
         {func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels), delay: 1,},

@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 import { roundToTwo } from "@/pages/WebUtils";
 import { softmax } from "./utils";
+import { create, all, transposeDependencies } from "mathjs";
 
 //---------------------------functions for the softmax interaction in the graph classifier------------------------------
 export function drawSoftmaxDisplayer(
@@ -520,4 +521,179 @@ export function drawActivationExplanation(x:number, y:number, title:string, form
         .attr("class", "math-displayer")
         .attr("font-size", unitSize)
         .attr("fill", "black");
+}
+
+export function drawDotProduct(
+dummy:any,
+rectID:any,
+X:any,
+Xv:any,
+curveDir:any,
+coordFeatureVis:any,
+myColor:any
+){
+
+        //data fetching - get the current value, aggregated vector, and weight vector
+        const math = create(all, {})
+        let currentVal = dummy[Number(rectID)];
+        let aggregatedVector:number[] = X;
+        let transposedXv = math.transpose(Xv);
+        let weightVector:number[] = transposedXv[Number(rectID)];
+
+        //first few data points for example
+        const dataSamples = [
+            aggregatedVector[0],
+            weightVector[0],
+            aggregatedVector[1],
+            weightVector[1]
+        ];
+        const operators = ["x", "+", "x", "... = "];
+
+        
+
+        //matmul-displayer interaction
+        let displayerOffset = -125;
+        if(curveDir==1)displayerOffset = 75;
+        let displayerX = coordFeatureVis[0];
+        let displayerY = coordFeatureVis[1] + displayerOffset;
+
+        const displayW = 150;
+        const displayH = 50;
+
+        //drawPoints(".mats", "red", [[displayerX, displayerY]])
+
+        d3.select(".mats")
+            .append("rect")
+            .attr("x", displayerX)
+            .attr("y", displayerY)
+            .attr("width", displayW)
+            .attr("height", displayH)
+            .attr("rx", 10)
+            .attr("ry", 10)
+            .style("fill", "white")
+            .style("stroke", "black")
+            .style("stroke-width", 2)
+            .attr("class", "matmul-displayer procVis")
+            .lower();
+        
+        const titleYOffset = 5;
+        const titleXOffset = 50;
+        d3.select(".mats")
+            .append("text")
+            .attr("x", displayerX + titleXOffset)
+            .attr("y", displayerY + titleYOffset)
+            .text("Matmul Visualization")
+            .attr("class", "matmul-displayer procVis")
+            .attr("font-size", titleYOffset)
+            .attr("fill", "black");
+        
+        const vectorLength = displayH - titleYOffset;
+        
+        let w = vectorLength / aggregatedVector.length;
+        if(w>vectorLength / weightVector.length)w = vectorLength / weightVector.length;
+        
+        console.log("data fetching from wv", currentVal, aggregatedVector, weightVector, w)
+
+        const eqXOffset = titleXOffset / 2;
+        const eqYOffset = titleYOffset * 2.5;
+        const unitSize = (eqXOffset / 3 + 3)/2;
+        const upperOffset = unitSize * 2;
+        d3.select(".mats")
+            .append("text")
+            .attr("x", displayerX + 3)
+            .attr("y", displayerY + vectorLength/2 + 3)
+            .text("dot(")
+            .attr("class", "matmul-displayer")
+            .attr("font-size", titleYOffset)
+            .attr("fill", "black");
+
+        d3.select(".mats")
+            .append("text")
+            .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength)
+            .attr("y", displayerY + vectorLength/2 + 3)
+            .text(",")
+            .attr("class", "matmul-displayer")
+            .attr("font-size", titleYOffset)
+            .attr("fill", "black");
+        
+        d3.select(".mats")
+            .append("text")
+            .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength + vectorLength/1.5)
+            .attr("y", displayerY + vectorLength/2 + 3)
+            .text(")")
+            .attr("class", "matmul-displayer")
+            .attr("font-size", titleYOffset)
+            .attr("fill", "black");
+
+        d3.select(".mats")
+            .append("text")
+            .attr("x", displayerX + 3)
+            .attr("y", displayerY + vectorLength/2 + 20)
+            .text("=")
+            .attr("class", "matmul-displayer")
+            .attr("font-size", titleYOffset)
+            .attr("fill", "black");
+
+        for(let i=0; i<dataSamples.length; i++){
+            d3.select(".mats")
+            .append("rect")
+            .attr("x", displayerX + 3 + unitSize*(i+1)+15*i)
+            .attr("y", displayerY + vectorLength/2 + 20 - unitSize/2)
+            .attr("width", unitSize)
+            .attr("height", unitSize)
+            .style("stroke", "black")
+            .attr("fill", myColor(dataSamples[i]))
+            .attr("class", "matmul-displayer")
+            .raise();
+        }
+
+        
+
+        for(let i=0; i<operators.length; i++){
+            d3.select(".mats")
+            .append("text")
+            .attr("x", displayerX + 3 + unitSize*(i+1) + 13*(i+1))
+            .attr("y", displayerY + vectorLength/2 + 20)
+            .text(operators[i])
+            .attr("font-size", unitSize)
+            .attr("class", "matmul-displayer")
+            .raise();
+        }
+
+        d3.select(".mats")
+            .append("rect")
+            .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength + vectorLength/1.5)
+            .attr("y", displayerY + vectorLength/2 + 20 - unitSize/2)
+            .attr("width", unitSize)
+            .attr("height", unitSize)
+            .style("stroke", "black")
+            .attr("fill", myColor(currentVal))
+            .attr("class", "matmul-displayer")
+            .raise();
+        
+        
+        //draw the aggregated vector
+        for(let i=0; i<aggregatedVector.length; i++){
+            d3.select(".mats")
+                .append("rect")
+                .attr("x", displayerX + eqXOffset+i*w/2)
+                .attr("y", displayerY + vectorLength/2)
+                .attr("width", w/2)
+                .attr("height", w/2)
+                .attr("fill", myColor(aggregatedVector[i])).attr("stroke", "gray").attr("stroke-width", 0.1)
+                .attr("class", "procVis matmul-displayer").raise();
+        }
+
+        //draw the weight vector
+        for(let i=0; i<weightVector.length; i++){
+            d3.select(".mats")
+                .append("rect")
+                .attr("x", displayerX + eqXOffset * 3)
+                .attr("y", displayerY + eqYOffset + i*w/2)
+                .attr("width", w/2)
+                .attr("height", w/2)
+                .attr("fill", myColor(weightVector[i])).attr("stroke", "gray").attr("stroke-width", 0.1)
+                .attr("class", "procVis matmul-displayer").raise();
+        }
+
 }
