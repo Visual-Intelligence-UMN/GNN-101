@@ -927,15 +927,15 @@ export function visualizeNodeClassifierFeatures(
                         drawAniPath(wMat, currentStep, startPathCoords, endPathCoords, 
                             curveDir, myColor, 0, outputCoord, 15, 10, vectorAfterMul, 
                             g1, weightMatrixPostions);
+                        d3.selectAll(".columnUnit").style("opacity", 0);
+                        d3.selectAll(".weightUnit").style("opacity", 0).lower();
+                        d3.selectAll(`#weightUnit-${currentStep}`).style("opacity", 1).raise();
+                        d3.select(`#columnUnit-${currentStep}`).style("opacity", 1).raise();
                         currentStep++;
                         console.log("i", currentStep);
                         if (currentStep >= 4) {
-                            // AnimationController.runAnimations(0, animateSeqAfterPath);
-                            // setTimeout(()=>{
-                            //     let dir = 1;
-                            //     if(clockwise==1)dir = 0;
-                            //     pathMap = drawPathInteractiveComponents(softmaxStartCoords, softmaxEndCoords, nthOutputVals, myColor, dir);
-                            // }, 1900);
+                            d3.selectAll(".weightUnit").style("opacity", 1);
+                            d3.selectAll(".columnUnit").style("opacity", 0);
                             btn.selectAll("*").remove();
                             injectPlayButtonSVG(
                                 btn,
@@ -948,7 +948,7 @@ export function visualizeNodeClassifierFeatures(
                         }
                     }, 250); 
                     d3.selectAll("path").lower();
-                    d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
+                    //d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
                     d3.selectAll("path").lower();
                 }, delay:initSec+aniSec},
             ];

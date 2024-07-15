@@ -995,9 +995,15 @@ export function outputVisClick(
                 const Xt = modelParams.weights[3];
                 const Xv = Xt[currentStep];
                 drawAniPath(wMat, currentStep, startCoord, endPathAniCoord, 1, myColor, 0, [resultWithoutBiasCoord[0][0], resultWithoutBiasCoord[0][1]+rectH/2], rectH, rectH, result, g1, weightMatrixPostions);
+                d3.selectAll(".columnUnit").style("opacity", 0);
+                d3.selectAll(".weightUnit").style("opacity", 0).lower();
+                d3.selectAll(`#weightUnit-${currentStep}`).style("opacity", 1).raise();
+                d3.select(`#columnUnit-${currentStep}`).style("opacity", 1).raise();
                 currentStep++;
                 console.log("i", currentStep);
                 if (currentStep >= 2) {
+                    d3.selectAll(".weightUnit").style("opacity", 1);
+                    d3.selectAll(".columnUnit").style("opacity", 0);
                     btn.selectAll("*").remove();
                     injectPlayButtonSVG(
                         btn,
