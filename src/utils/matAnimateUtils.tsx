@@ -219,6 +219,10 @@ export function drawMatrixWeight(
         const math = create(all, {});
         Xt = math.transpose(Xt);
     }
+    if((weightMatrixPostions.length==4&&weightMatrixPostions[0].length==2)){
+        const math = create(all, {});
+        Xt = math.transpose(Xt);
+    }
     const Xv = Xt[currentStep];
     console.log("Xv check", Xv, Xt, weightMatrixPostions);
     for (let j = 0; j < Xv.length; j++) {
@@ -246,13 +250,56 @@ export function drawMatrixWeight(
         
         
 
-        console.log("wanfeng", Xt);
+        console.log("wanfeng", Xt, Xv, weightMatrixPostions, curveDir);
 
-        if((Xt[0].length<Xt.length && Xt.length!=64)||(Xt[0].length==64&&Xt.length==2)
-        ||(Xt[0].length==4&&Xt.length==2)){
-            m1 = weightMatrixPostions[j][currentStep]
-        }else{
+        let changed = false;
+
+        if(weightMatrixPostions.length==4&&weightMatrixPostions[0].length==2){
+            if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+            else m1 = weightMatrixPostions[j][currentStep]
+            
+            console.log("wanfeng 3", curveDir)
+            changed = true;
+        }
+
+        if(weightMatrixPostions.length==2&&weightMatrixPostions[0].length==4){
+            if(curveDir==-1)m1 = weightMatrixPostions[j][currentStep]
+            else m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+            
+            console.log("wanfeng 4", curveDir)
+            changed = true;
+        } 
+
+        if(Xt.length==Xt[0].length || (Xt.length==64 && Xt[0].length==7)){
             m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+                
+            console.log("wanfeng 5", curveDir)
+            changed = true;
+        }
+
+        if(Xt.length==Xt[0].length && Xt.length==4){
+            if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+            else m1 = weightMatrixPostions[j][currentStep]
+                
+            console.log("wanfeng 7", curveDir)
+            changed = true;
+        }
+
+        if(!changed){
+            if((Xt[0].length<Xt.length && Xt.length!=64)||(Xt[0].length==64&&Xt.length==2)
+            ||(Xt[0].length==34&&Xt.length==4)
+            ||(Xt.length==34&&Xt[0].length==4)){
+                if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+                else m1 = weightMatrixPostions[j][currentStep]
+                
+                console.log("wanfeng 1", curveDir)
+            }
+            else{
+                if(curveDir==-1)m1 = weightMatrixPostions[j][currentStep]
+                else m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+
+                console.log("wanfeng 2", curveDir)
+            }
         }
 
         let controlPoint1 = [s1[0], m1[1]];
