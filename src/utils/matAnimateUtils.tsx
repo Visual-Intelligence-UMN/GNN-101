@@ -143,6 +143,7 @@ export function drawAniPath(
     X:any
 ) {
     d3.selectAll("#tempath").remove();
+    d3.selectAll(".matmul-displayer").remove();
     if(currentStep==0){
         g.append("text")
             .attr("x", coordFeatureVis[0] - (endCoordList[currentStep][0] - startCoordList[0][0])/2 - 20)
@@ -167,6 +168,10 @@ export function drawAniPath(
 
     drawMatrixWeight(Xt, startCoordList, endCoordList, curveDir, currentStep, myColor, weightMatrixPostions, featureChannels);
     d3.selectAll("#tempath").lower();
+
+    drawDotProduct(
+        dummy, currentStep, X, Xt, curveDir, coordFeatureVis, myColor
+    )
 
     d3.selectAll(".interactRect").on("mouseover", function(){
         const rectID = d3.select(this).attr("rectID")

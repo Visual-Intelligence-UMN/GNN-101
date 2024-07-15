@@ -698,6 +698,7 @@ export function featureVisClick(
                 //   d3.select(".mats").selectAll(".pauseRemove").remove();
                 d3.selectAll("#tempath").remove();
               //  d3.select(".mats").selectAll(".").remove();
+              d3.selectAll(".matmul-displayer").remove();
                 currentStep = 0; // 重置步骤
             }
             if (currentStep >= featureChannels) {
@@ -735,6 +736,7 @@ export function featureVisClick(
 
                 if(featureChannels==4&&layerID==2&&currentStep >= 2){
                     d3.selectAll("#tempath").remove();
+                    d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".weightUnit").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
                     injectPlayButtonSVG(
@@ -758,6 +760,7 @@ export function featureVisClick(
 
                 if (currentStep >= featureChannels || !lock) {
                     d3.selectAll("#tempath").remove();
+                    d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".weightUnit").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
                     injectPlayButtonSVG(
