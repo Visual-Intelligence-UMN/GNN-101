@@ -526,7 +526,7 @@ export function drawActivationExplanation(x:number, y:number, title:string, form
 export function drawDotProduct(
 dummy:any,
 rectID:any,
-X:any,
+X:number[],
 Xv:any,
 curveDir:any,
 coordFeatureVis:any,
@@ -534,11 +534,14 @@ myColor:any
 ){
 
         //data fetching - get the current value, aggregated vector, and weight vector
+        console.log("data fetching aw X", X)
         const math = create(all, {})
         let currentVal = dummy[Number(rectID)];
         let aggregatedVector:number[] = X;
         let transposedXv = math.transpose(Xv);
         let weightVector:number[] = transposedXv[Number(rectID)];
+
+        console.log("awvector", aggregatedVector, weightVector, X)
 
         //first few data points for example
         const dataSamples = [

@@ -18,7 +18,6 @@ import {
     drawWeightsVector,
     runAnimations,
     AnimationController,
-    animatePathDrawing,
     drawOutputVisualizer,
     drawPathInteractiveComponents,
     drawPathBtwOuputResult,
@@ -809,7 +808,8 @@ export function outputVisClick(
     one: any,
     result: any,
     myColor: any,
-    featureChannels: number
+    featureChannels: number,
+    poolingValues: number[]
 ) {
     const aniSec = 300;
 
@@ -962,6 +962,8 @@ export function outputVisClick(
     
     console.log("w mat pos 1", weightMatrixPostions)
 
+    //poolingValues = math.transpose(poolingValues);
+
     const animateSeqAfterPath = [
         {func:()=>{drawBiasVector(g1, linBias.length, rectH, rectH, biasCoordCopy[0], myColor, linBias, layerID);}, delay: 200}, 
         {func:()=>{drawBiasPathOutputVis(biasCoord, controlPts, feaCoord);}, delay:200}, 
@@ -972,7 +974,7 @@ export function outputVisClick(
             console.log("Xv check wmat", wMat);
             drawWeightsVector(g1, resultWithoutBias, endPt2, rectH, rectH, myColor, 
                 wMat, startCoord,endPathAniCoord , 1, weightMatrixPostions, 
-                featureChannels)
+                featureChannels, poolingValues)
         }, delay:200},
         {func:()=>{
             drawWeightsVector(g1, result, outputCoord, rectH, rectH, myColor, modelParams.weights[3], startCoord, endPathAniCoord, 1, weightMatrixPostions, featureChannels, "procVis wRect");
@@ -998,7 +1000,9 @@ export function outputVisClick(
             intervalID = setInterval(() => {
                 const Xt = modelParams.weights[3];
                 const Xv = Xt[currentStep];
-                drawAniPath(wMat, currentStep, startCoord, endPathAniCoord, 1, myColor, 0, [resultWithoutBiasCoord[0][0], resultWithoutBiasCoord[0][1]+rectH/2], rectH, rectH, result, g1, weightMatrixPostions);
+                drawAniPath(wMat, currentStep, startCoord, endPathAniCoord, 1,
+                     myColor, 0, [resultWithoutBiasCoord[0][0], resultWithoutBiasCoord[0][1]+rectH/2], 
+                     rectH, rectH, result, g1, weightMatrixPostions, poolingValues);
                 d3.selectAll(".columnUnit").style("opacity", 0);
                 d3.selectAll(".weightUnit").style("opacity", 0).lower();
                 d3.selectAll(`#weightUnit-${currentStep}`).style("opacity", 1).raise();

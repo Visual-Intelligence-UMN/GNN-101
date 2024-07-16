@@ -5,66 +5,6 @@ import { drawActivationExplanation, drawDotProduct } from "./matInteractionUtils
 import { create, all, transposeDependencies } from "mathjs";
 import { drawPoints, transposeAnyMatrix } from "./utils";
 
-export function animatePathDrawing(
-    Xt: any,
-    currentStep: number,
-    startCoordList: any,
-    endCoordList: any,
-    curveDir: number,
-    myColor: any,
-    featureChannels: number,
-    coordFeatureVis3:any,
-    rectH:number,
-    rectW:number,
-    dummy:number[],
-    g:any,
-    biasCoord:any,
-    res10:any,
-    res11:any,
-    nextCoord:any,
-    lock:boolean,
-    aniSec:number,
-    btn:any,
-    btnX:number,
-    btnY:number,
-    weightMatrixPostions:any
-){
-    const intervalID = setInterval(() => {
-        drawAniPath(
-            Xt, 
-            currentStep, 
-            startCoordList, 
-            endCoordList,
-            curveDir,
-            myColor,
-            featureChannels, 
-            coordFeatureVis3, 
-            rectH, 
-            rectW, 
-            dummy, 
-            g,
-            weightMatrixPostions
-        );
-        currentStep++;
-        console.log("i", currentStep);
-        if(currentStep>=featureChannels){
-            setTimeout(()=>{
-              //  drawBiasPath(biasCoord, res10, res11, nextCoord);
-            },aniSec + 100);
-        }
-        if (currentStep >= featureChannels || !lock) {
-            injectPlayButtonSVG(
-                btn,
-                btnX,
-                btnY - 30,
-                "./assets/SVGs/playBtn_play.svg"
-            );
-            clearInterval(intervalID);
-        }
-    }, 250);
-    return intervalID;
-}
-
 interface Animation {
     func: () => void;
     delay: number;
@@ -137,7 +77,7 @@ export function drawAniPath(
     coordFeatureVis:any,
     rectH:number,
     rectW:number,
-    dummy:number[],
+    dummy:any,
     g:any,
     weightMatrixPostions:any,
     X:any
@@ -432,7 +372,7 @@ export function drawSummationFeature(
 
 export function drawWeightsVector(
     g: any,
-    dummy: number[],
+    dummy: any,
     coordFeatureVis: any,
     rectH: number,
     rectW: number,

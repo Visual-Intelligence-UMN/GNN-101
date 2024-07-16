@@ -343,7 +343,8 @@ export function visualizeGraphClassifierFeatures(
                         one,
                         final,
                         myColor,
-                        featureChannels
+                        featureChannels,
+                        pooling
                     );
                     //update variables
                     resultVis = outputVisPack.resultVis;
@@ -826,7 +827,7 @@ export function visualizeNodeClassifierFeatures(
 
             //the vector after matrix multiplication - before adding the bias
             const math = create(all, {});
-            const prevCon3Val = [conv3[node][0], conv3[node][1]];
+            const prevCon3Val:number[] = [conv3[node][0], conv3[node][1]];
             const vectorAfterMul = math.multiply(prevCon3Val, math.transpose(matMulWeights));
 
             console.log("data fetching in the NC result layer",
@@ -892,16 +893,19 @@ export function visualizeNodeClassifierFeatures(
                 }, delay:aniSec},
                 {func:()=>{
                     const Xt = modelParams.weights[3];
+                    const prevCon3Val:number[] = [conv3[node][0], conv3[node][1]];
+                    console.log("data fetching wv 1", prevCon3Val)
                     drawWeightsVector(g, vectorAfterMul, outputCoord, 15, 10, 
-                        myColor, Xt, startPathCoords, endPathCoords, curveDir, weightMatrixPostions, featureChannels)
+                        myColor, wMat, startPathCoords, endPathCoords, curveDir, 
+                        weightMatrixPostions, featureChannels, prevCon3Val)
                     drawPathBtwOuputResult([prevFeatureCoord], outputCoord);
                 }, delay:aniSec},
                 {func:()=>{
                     //draw a final value output visualizer for testing
                     drawWeightsVector(g, nthOutputVals, finalOutputCoord, 
-                        15, 10, myColor, modelParams.weights[3], startPathCoords, 
+                        15, 10, myColor, wMat, startPathCoords, 
                         endPathCoords, curveDir, weightMatrixPostions, 
-                        featureChannels, "procVis wRect");
+                        featureChannels, prevCon3Val, "procVis wRect");
                     drawPathBtwOuputResult([vectorAfterMatMulPath], finalOutputCoord);  
                 }, delay:aniSec}, 
                 {func:()=>{drawBiasVector(g, 4, 15, 10, biasCoord, myColor, linBias, 4);}, delay:aniSec},
@@ -926,7 +930,7 @@ export function visualizeNodeClassifierFeatures(
                         const Xv = Xt[currentStep];
                         drawAniPath(wMat, currentStep, startPathCoords, endPathCoords, 
                             curveDir, myColor, 0, outputCoord, 15, 10, vectorAfterMul, 
-                            g1, weightMatrixPostions);
+                            g1, weightMatrixPostions, prevCon3Val);
                         d3.selectAll(".columnUnit").style("opacity", 0);
                         d3.selectAll(".weightUnit").style("opacity", 0).lower();
                         d3.selectAll(`#weightUnit-${currentStep}`).style("opacity", 1).raise();
