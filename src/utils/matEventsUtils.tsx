@@ -727,7 +727,7 @@ export function featureVisClick(
                     X
                 );
                 d3.selectAll(".columnUnit").style("opacity", 0);
-                d3.selectAll(".weightUnit").style("opacity", 0).lower();
+                d3.selectAll(".weightUnit").style("opacity", 0.3).lower();
                 d3.selectAll(`#weightUnit-${currentStep}`).style("opacity", 1).raise();
                 d3.select(`#columnUnit-${currentStep}`).style("opacity", 1).raise();
                 currentStep++;
@@ -1006,7 +1006,7 @@ export function outputVisClick(
                      myColor, 0, [resultWithoutBiasCoord[0][0], resultWithoutBiasCoord[0][1]+rectH/2], 
                      rectH, rectH, result, g1, weightMatrixPostions, poolingValues);
                 d3.selectAll(".columnUnit").style("opacity", 0);
-                d3.selectAll(".weightUnit").style("opacity", 0).lower();
+                d3.selectAll(".weightUnit").style("opacity", 0.3).lower();
                 d3.selectAll(`#weightUnit-${currentStep}`).style("opacity", 1).raise();
                 d3.select(`#columnUnit-${currentStep}`).style("opacity", 1).raise();
                 currentStep++;

@@ -932,7 +932,7 @@ export function visualizeNodeClassifierFeatures(
                             curveDir, myColor, 0, outputCoord, 15, 10, vectorAfterMul, 
                             g1, weightMatrixPostions, prevCon3Val);
                         d3.selectAll(".columnUnit").style("opacity", 0);
-                        d3.selectAll(".weightUnit").style("opacity", 0).lower();
+                        d3.selectAll(".weightUnit").style("opacity", 0.3).lower();
                         d3.selectAll(`#weightUnit-${currentStep}`).style("opacity", 1).raise();
                         d3.select(`#columnUnit-${currentStep}`).style("opacity", 1).raise();
                         currentStep++;
