@@ -549,8 +549,6 @@ myColor:any
         ];
         const operators = ["x", "+", "x", "... = "];
 
-        
-
         //matmul-displayer interaction
         let displayerOffset = -125;
         if(curveDir==1)displayerOffset = 75;
@@ -589,10 +587,12 @@ myColor:any
         
         const vectorLength = displayH - titleYOffset;
         
-        let w = vectorLength / aggregatedVector.length;
-        if(w>vectorLength / weightVector.length)w = vectorLength / weightVector.length;
-        
-        console.log("data fetching from wv", currentVal, aggregatedVector, weightVector, w)
+        let h = vectorLength / aggregatedVector.length;
+        let h2 = vectorLength / weightVector.length;
+        let w = 11.25;
+        if(h>vectorLength / weightVector.length)h = vectorLength / weightVector.length;
+
+        console.log("data fetching from wv", currentVal, aggregatedVector, weightVector, h)
 
         const eqXOffset = titleXOffset / 2;
         const eqYOffset = titleYOffset * 2.5;
@@ -676,11 +676,11 @@ myColor:any
         for(let i=0; i<aggregatedVector.length; i++){
             d3.select(".mats")
                 .append("rect")
-                .attr("x", displayerX + eqXOffset+i*w/2)
+                .attr("x", displayerX + eqXOffset+i*h/2)
                 .attr("y", displayerY + vectorLength/2)
-                .attr("width", w/2)
+                .attr("width", h/2)
                 .attr("height", w/2)
-                .attr("fill", myColor(aggregatedVector[i])).attr("stroke", "gray").attr("stroke-width", 0.1)
+                .attr("fill", myColor(aggregatedVector[i]))
                 .attr("class", "procVis matmul-displayer").raise();
         }
 
@@ -689,10 +689,10 @@ myColor:any
             d3.select(".mats")
                 .append("rect")
                 .attr("x", displayerX + eqXOffset * 3)
-                .attr("y", displayerY + eqYOffset + i*w/2)
+                .attr("y", displayerY + eqYOffset + i*h2/2)
                 .attr("width", w/2)
-                .attr("height", w/2)
-                .attr("fill", myColor(weightVector[i])).attr("stroke", "gray").attr("stroke-width", 0.1)
+                .attr("height", h2/2)
+                .attr("fill", myColor(weightVector[i]))
                 .attr("class", "procVis matmul-displayer").raise();
         }
 
