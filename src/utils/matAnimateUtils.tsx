@@ -376,7 +376,6 @@ export function drawWeightsVector(
     featureChannels: number,
     X:number[],
     rectClass: string = "procVis removeRect wRect interactRect",
-    
 ) {
     for (let m = 0; m < dummy.length; m++) {
         g.append("rect")
@@ -420,7 +419,7 @@ export function drawWeightsVector(
         d3.selectAll(`#weightUnit-${rectID}`).style("opacity", 1).raise();
         d3.select(`#columnUnit-${rectID}`).style("opacity", 1).raise();
         drawDotProduct(
-        dummy, rectID, X, Xv, curveDir, coordFeatureVis, myColor
+            dummy, rectID, X, Xv, curveDir, coordFeatureVis, myColor
         )
         
     });

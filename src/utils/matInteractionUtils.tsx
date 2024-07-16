@@ -639,15 +639,25 @@ myColor:any
 
         for(let i=0; i<dataSamples.length; i++){
             d3.select(".mats")
-            .append("rect")
-            .attr("x", displayerX + 3 + unitSize*(i+1)+15*i)
-            .attr("y", displayerY + vectorLength/2 + 20 - unitSize/2)
-            .attr("width", unitSize)
-            .attr("height", unitSize)
-            .style("stroke", "black")
-            .attr("fill", myColor(dataSamples[i]))
-            .attr("class", "matmul-displayer procVis")
-            .raise();
+                .append("rect")
+                .attr("x", displayerX + 3 + unitSize*(i+1)+15*i)
+                .attr("y", displayerY + vectorLength/2 + 20 - unitSize/2)
+                .attr("width", unitSize)
+                .attr("height", unitSize)
+                .style("stroke", "black")
+                .attr("fill", myColor(dataSamples[i]))
+                .attr("class", "matmul-displayer procVis")
+                .raise();
+            let color = "white";
+            if(dataSamples[i]<0.5){color = "black"}
+            d3.select(".mats")
+                .append("text")
+                .attr("x", displayerX + 3 + unitSize*(i+1)+15*i)
+                .attr("y", displayerY + vectorLength/2 + 20)
+                .text(roundToTwo(dataSamples[i]))
+                .attr("class", "matmul-displayer procVis")
+                .attr("font-size", unitSize / 2)
+                .attr("fill", color);
         }
 
         
@@ -673,6 +683,17 @@ myColor:any
             .attr("fill", myColor(currentVal))
             .attr("class", "matmul-displayer procVis")
             .raise();
+        
+            let color = "white";
+            if(currentVal<0.5){color = "black"}
+            d3.select(".mats")
+                .append("text")
+                .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength + vectorLength/1.5)
+                .attr("y", displayerY + vectorLength/2 + 20)
+                .text(roundToTwo(currentVal))
+                .attr("class", "matmul-displayer procVis")
+                .attr("font-size", unitSize / 2)
+                .attr("fill", color);
         
         
         //draw the aggregated vector
