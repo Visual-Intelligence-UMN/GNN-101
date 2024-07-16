@@ -4,6 +4,7 @@ import { injectPlayButtonSVG } from "./svgUtils";
 import { drawActivationExplanation, drawDotProduct } from "./matInteractionUtils";
 import { create, all, transposeDependencies } from "mathjs";
 import { drawPoints, transposeAnyMatrix } from "./utils";
+import { drawHintLabel } from "./matHelperUtils";
 
 interface Animation {
     func: () => void;
@@ -85,13 +86,9 @@ export function drawAniPath(
     d3.selectAll("#tempath").remove();
     d3.selectAll(".matmul-displayer").remove();
     if(currentStep==0){
-        g.append("text")
-            .attr("x", coordFeatureVis[0] - (endCoordList[currentStep][0] - startCoordList[0][0])/2 - 20)
-            .attr("y", coordFeatureVis[1] + rectH - curveDir*Xt[currentStep].length*(2))
-            .text("Matrix Multiplication")
-            .style("fill", "gray")
-            .style("font-size", "8px")
-            .attr("class", "procVis"); 
+        drawHintLabel(g, coordFeatureVis[0] - (endCoordList[currentStep][0] - startCoordList[0][0])/2 - 20, 
+        coordFeatureVis[1] + rectH - curveDir*Xt[currentStep].length*(2), 
+        "Matrix Multiplication", "procVis");
     }
     g.append("rect")
         .attr("x", coordFeatureVis[0] + rectW * currentStep)
@@ -323,13 +320,7 @@ export function drawSummationFeature(
         .attr("class", "procVis summation");
 
     //draw label
-    g1.append("text")
-            .attr("x", coordFeatureVis[0])
-            .attr("y", coordFeatureVis[1] + rectH * curveDir)
-            .text("Vectors Summation")
-            .style("fill", "gray")
-            .style("font-size", "8px")
-            .attr("class", "procVis"); 
+    drawHintLabel(g1, coordFeatureVis[0], coordFeatureVis[1] + rectH * curveDir, "Vector Summation", "procVis");
 
     //path connect - connect prev layer feature vis to intermediate feature vis
     const curve = d3.line().curve(d3.curveBasis);
@@ -401,14 +392,7 @@ export function drawWeightsVector(
             .attr("rectID", m)
             .attr("id", `weightRect${m}`);
     }
-
-        g.append("text")
-            .attr("x", coordFeatureVis[0])
-            .attr("y", coordFeatureVis[1] + rectH)
-            .text("Vector After Multiplication")
-            .style("fill", "gray")
-            .style("font-size", "8px")
-            .attr("class", "procVis"); 
+    drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH, "Matmul Result", "procVis");
 
     //draw frame
     g.append("rect")
@@ -600,13 +584,7 @@ export function drawBiasVector(
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("class", "procVis biasVector");
-    const label = g.append("text")
-        .attr("x", coordFeatureVis[0])
-        .attr("y", coordFeatureVis[1] + rectH)
-        .text("Bias Vector")
-        .style("fill", "gray")
-        .style("font-size", "8px")
-        .attr("class", "procVis biasVector"); 
+    const label = drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH, "Bias Vector", "procVis biasVector");
     d3.selectAll(".biasVector").transition().duration(100).attr("opacity", 1);
 }
 
@@ -691,14 +669,7 @@ export function drawReLU(
                 .raise();
             }
         });
-
-        relu.append("text")
-            .attr("x", cx1 - 20)
-            .attr("y", cy1 + radius * 4 + 12)
-            .text("ReLU Non-linear Function")
-            .style("fill", "gray")
-            .style("font-size", "8px")
-            .attr("class", "procVis"); 
+        drawHintLabel(relu, cx1-20, cy1+radius*4+12, "ReLU Non-linear Function", "procVis");
 
         relu.on("mouseover", function(event, d){
             const [x, y] = d3.pointer(event);
@@ -742,14 +713,8 @@ export function drawTanh(
                 .raise();
             }
         });
-
-        relu.append("text")
-            .attr("x", cx1 - 20)
-            .attr("y", cy1 + radius * 4 + 12)
-            .text("Tanh Non-linear Function")
-            .style("fill", "gray")
-            .style("font-size", "8px")
-            .attr("class", "procVis"); 
+        
+        drawHintLabel(relu, cx1-20, cy1+radius*4+12, "Tanh Non-linear Function", "procVis");
 
         relu.on("mouseover", function(event, d){
             const [x, y] = d3.pointer(event);
@@ -834,13 +799,9 @@ export function drawPathInteractiveComponents(
     }
     let yOffset = - clockwise*70;
     if(clockwise==0)yOffset = 80;
-    const label = d3.select(".mats").append("text")
-        .attr("x", (resultCoord[0][0]+endCoord[endCoord.length-1][0])/2-20)
-        .attr("y", (resultCoord[0][1]+endCoord[endCoord.length-1][1])/2 +yOffset)
-        .text("Softmax")
-        .style("fill", "gray")
-        .style("font-size", "8px")
-        .attr("class", "procVis"); 
+    const g = d3.select(".mats").append("g");
+    drawHintLabel(g, (resultCoord[0][0]+endCoord[endCoord.length-1][0])/2-20, 
+    (resultCoord[0][1]+endCoord[endCoord.length-1][1])/2 +yOffset, "Softmax", "procVis");
     return pathMap;
 }
 

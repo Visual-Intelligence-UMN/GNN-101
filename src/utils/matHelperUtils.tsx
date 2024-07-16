@@ -5,7 +5,22 @@ import {
 } from "./utils";
 import * as d3 from "d3";
 
-
+export function drawHintLabel(
+    g:any,
+    x:number,
+    y:number,
+    text:string,
+    classTag:string
+){
+    const label = g.append("text")
+        .attr("x", x)
+        .attr("y", y)
+        .text(text)
+        .style("fill", "gray")
+        .style("font-size", "12px")
+        .attr("class", classTag); 
+    return label;
+}
 
 //get node attributes from graph data
 export function getNodeAttributes(data: any) {
