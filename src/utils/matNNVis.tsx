@@ -91,7 +91,7 @@ async function initNodeClassifier(graph: any, features: any[][], intmData:any, g
     var myColor = d3
         .scaleLinear<string>()
         .domain([-1, 0, 1])
-        .range(["#1AFF1A", "white", "#4B0092"]);
+        .range(["#399918", "white", "#4B0092"]);
 
     const data = matrix_to_hmap(graph);
 
@@ -191,7 +191,7 @@ async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: str
     var myColor = d3
     .scaleLinear<string>()
     .domain([-1, 0, 1])
-    .range(["#1AFF1A", "white", "#4B0092"]);
+    .range(["#399918", "white", "#4B0092"]);
 
     const data = matrix_to_hmap(graph);
 

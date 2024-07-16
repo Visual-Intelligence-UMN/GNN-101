@@ -447,7 +447,7 @@ export async function prep_graphs(g_num: number, data: any) {
 
 export const myColor = d3.scaleLinear<string>()
 .domain([-1, 0, 1])
-.range(["#1AFF1A", "white", "#4B0092"]);
+.range(["#399918", "white", "#4B0092"]);
 
 
 export function transposeAnyMatrix(matrix:any){
