@@ -603,7 +603,7 @@ myColor:any
             .attr("x", displayerX + 3)
             .attr("y", displayerY + vectorLength/2 + 3)
             .text("dot(")
-            .attr("class", "matmul-displayer")
+            .attr("class", "matmul-displayer procVis")
             .attr("font-size", titleYOffset)
             .attr("fill", "black");
 
@@ -612,7 +612,7 @@ myColor:any
             .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength)
             .attr("y", displayerY + vectorLength/2 + 3)
             .text(",")
-            .attr("class", "matmul-displayer")
+            .attr("class", "matmul-displayer procVis")
             .attr("font-size", titleYOffset)
             .attr("fill", "black");
         
@@ -621,7 +621,7 @@ myColor:any
             .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength + vectorLength/1.5)
             .attr("y", displayerY + vectorLength/2 + 3)
             .text(")")
-            .attr("class", "matmul-displayer")
+            .attr("class", "matmul-displayer procVis")
             .attr("font-size", titleYOffset)
             .attr("fill", "black");
 
@@ -630,7 +630,7 @@ myColor:any
             .attr("x", displayerX + 3)
             .attr("y", displayerY + vectorLength/2 + 20)
             .text("=")
-            .attr("class", "matmul-displayer")
+            .attr("class", "matmul-displayer procVis")
             .attr("font-size", titleYOffset)
             .attr("fill", "black");
 
@@ -643,7 +643,7 @@ myColor:any
             .attr("height", unitSize)
             .style("stroke", "black")
             .attr("fill", myColor(dataSamples[i]))
-            .attr("class", "matmul-displayer")
+            .attr("class", "matmul-displayer procVis")
             .raise();
         }
 
@@ -656,7 +656,7 @@ myColor:any
             .attr("y", displayerY + vectorLength/2 + 20)
             .text(operators[i])
             .attr("font-size", unitSize)
-            .attr("class", "matmul-displayer")
+            .attr("class", "matmul-displayer procVis")
             .raise();
         }
 
@@ -668,7 +668,7 @@ myColor:any
             .attr("height", unitSize)
             .style("stroke", "black")
             .attr("fill", myColor(currentVal))
-            .attr("class", "matmul-displayer")
+            .attr("class", "matmul-displayer procVis")
             .raise();
         
         
@@ -695,5 +695,28 @@ myColor:any
                 .attr("fill", myColor(weightVector[i]))
                 .attr("class", "procVis matmul-displayer").raise();
         }
+
+        //draw franes
+        d3.select(".mats")
+            .append("rect")
+            .attr("x", displayerX + eqXOffset)
+            .attr("y", displayerY + vectorLength/2)
+            .attr("width", h/2 * aggregatedVector.length)
+            .attr("height", w/2)
+            .attr("fill", "none")
+            .attr("class", "procVis matmul-displayer")
+            .attr("stroke", "black")
+            .raise();
+
+        d3.select(".mats")
+            .append("rect")
+            .attr("x", displayerX + eqXOffset * 3)
+            .attr("y", displayerY + eqYOffset)
+            .attr("width", w/2)
+            .attr("height", h2/2 * weightVector.length)
+            .attr("fill", "none")
+            .attr("class", "procVis matmul-displayer")
+            .attr("stroke", "black")
+            .raise();
 
 }
