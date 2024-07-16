@@ -948,6 +948,7 @@ export function visualizeNodeClassifierFeatures(
                                 "./assets/SVGs/playBtn_play.svg"
                             );
                             d3.selectAll("#tempath").remove();
+                            d3.selectAll(".matmul-displayer").remove();
                             clearInterval(intervalID);
                         }
                     }, 250); 
@@ -985,6 +986,8 @@ export function visualizeNodeClassifierFeatures(
                 }
                 //replay controls
                 if (!isPlaying || currentStep >= 4 || currentStep == 0) {
+                    d3.selectAll("#tempath").remove();
+                    d3.selectAll(".matmul-displayer").remove();
                     btn.selectAll("*").remove();
                     injectPlayButtonSVG(
                         btn,
@@ -993,6 +996,8 @@ export function visualizeNodeClassifierFeatures(
                         "./assets/SVGs/playBtn_pause.svg"
                     );
                     if (currentStep >= 4) {
+                        d3.selectAll("#tempath").remove();
+                        d3.selectAll(".matmul-displayer").remove();
                         d3.select(".mats").selectAll(".removeRect").remove();
                         d3.select(".mats").selectAll(".pauseRemove").remove();
                         currentStep = 0; // 重置步骤
@@ -1001,12 +1006,6 @@ export function visualizeNodeClassifierFeatures(
                     }
                     animateSeq[0].delay = 1;
                     AnimationController.runAnimations(0, animateSeq);
-                    // setTimeout(()=>{
-                    //     AnimationController.runAnimations(0, animateSeqAfterPath);
-                    // }, 1500);
-                    // setTimeout(()=>{
-                    //     pathMap = drawPathInteractiveComponents(softmaxStartCoords, softmaxEndCoords, nthOutputVals, myColor, clockwise);
-                    // }, 3000);
                     isPlaying = true;
                 } else if (isPlaying) {
                     btn.selectAll("*").remove();

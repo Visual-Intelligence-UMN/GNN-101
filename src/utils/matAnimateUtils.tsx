@@ -383,7 +383,7 @@ export function drawWeightsVector(
     curveDir:number,
     weightMatrixPostions: any,
     featureChannels: number,
-    X:any,
+    X:number[],
     rectClass: string = "procVis removeRect wRect interactRect",
     
 ) {

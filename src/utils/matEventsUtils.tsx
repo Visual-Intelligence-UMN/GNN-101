@@ -977,7 +977,9 @@ export function outputVisClick(
                 featureChannels, poolingValues)
         }, delay:200},
         {func:()=>{
-            drawWeightsVector(g1, result, outputCoord, rectH, rectH, myColor, modelParams.weights[3], startCoord, endPathAniCoord, 1, weightMatrixPostions, featureChannels, "procVis wRect");
+            drawWeightsVector(g1, result, outputCoord, rectH, rectH, myColor, 
+                wMat, startCoord, endPathAniCoord, 1, weightMatrixPostions, 
+                featureChannels, poolingValues, "procVis wRect");
             //draw the path connect to 
             drawPathBtwOuputResult([endPt1[0]], endPt2);
             drawPathBtwOuputResult([endPt3], endPt4);
@@ -1010,6 +1012,7 @@ export function outputVisClick(
                 currentStep++;
                 console.log("i", currentStep);
                 if (currentStep >= 2) {
+                    d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".weightUnit").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
                     btn.selectAll("*").remove();
@@ -1067,6 +1070,7 @@ export function outputVisClick(
         //replay controls
         if (!isPlaying || currentStep >= 2 || currentStep == 0) {
             d3.selectAll("#tempath").remove();
+            d3.selectAll(".matmul-displayer").remove();
             injectPlayButtonSVG(
                 btn,
                 btnX,
@@ -1074,19 +1078,13 @@ export function outputVisClick(
                 "./assets/SVGs/playBtn_play.svg"
             );
             if (currentStep >= 2) {
+                d3.selectAll(".matmul-displayer").remove();
                 d3.selectAll("#tempath").remove();
                 d3.select(".mats").selectAll(".removeRect").remove();
-          //      d3.select(".mats").selectAll(".pauseRemove").remove();
                 currentStep = 0; // 重置步骤
             }
             animateSeq[0].delay = 1;
             AnimationController.runAnimations(0, animateSeq);
-            // setTimeout(()=>{
-            //     AnimationController.runAnimations(0, animateSeqAfterPath);
-            // }, 1500);
-            // setTimeout(()=>{
-            //     pathMap = drawPathInteractiveComponents(endCoord, resultCoord, result, myColor);
-            // }, 3000);
             isPlaying = true;
         } else if (isPlaying) {
             btn.selectAll("*").remove();
@@ -1103,7 +1101,7 @@ export function outputVisClick(
 
     for (let i = 0; i < layerID; i++)
         colorSchemesTable[i].style.opacity = "0.2";
-    // colorSchemesTable[colorSchemesTable.length - 1].style.opacity = "0.2";
+
     return {
         resultVis: resultVis,
         colorSchemesTable: colorSchemesTable,
