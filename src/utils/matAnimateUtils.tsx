@@ -85,11 +85,11 @@ export function drawAniPath(
 ) {
     d3.selectAll("#tempath").remove();
     d3.selectAll(".matmul-displayer").remove();
-    if(currentStep==0){
-        drawHintLabel(g, coordFeatureVis[0] - (endCoordList[currentStep][0] - startCoordList[0][0])/2 - 20, 
-        coordFeatureVis[1] + rectH - curveDir*Xt[currentStep].length*(2), 
-        "Matrix Multiplication", "procVis");
-    }
+    // if(currentStep==0){
+    //     drawHintLabel(g, coordFeatureVis[0] - (endCoordList[currentStep][0] - startCoordList[0][0])/2 - 20, 
+    //     coordFeatureVis[1] + rectH - curveDir*Xt[currentStep].length*(2), 
+    //     "Matrix Multiplication", "procVis");
+    // }
     g.append("rect")
         .attr("x", coordFeatureVis[0] + rectW * currentStep)
         .attr("y", coordFeatureVis[1] - rectH / 2)
