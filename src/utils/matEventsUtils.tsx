@@ -27,7 +27,7 @@ import {
     computeMatrixLocations,
 } from "./matAnimateUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
-import { drawSoftmaxDisplayer } from "./matInteractionUtils";
+import { drawMatmulExplanation, drawSoftmaxDisplayer } from "./matInteractionUtils";
 import path from "node:path/win32";
 
 //graph feature events interactions - mouseover
@@ -669,6 +669,17 @@ export function featureVisClick(
 
     let firstClick = true;
 
+    btn.on("mouseover", function(event, d){
+        const [x, y] = d3.pointer(event);
+        drawMatmulExplanation(
+            x, y, "Matrix Multiplication", "Click the icon to show the matrix multiplication process!"
+        );
+    });
+
+    btn.on("mouseout", function(event, d){
+        d3.selectAll(".math-displayer").remove();
+    });
+
     btn.on("click", function (event: any, d: any) {
         console.log("currentStep 1", currentStep);
         console.log("isPlaying", isPlaying);
@@ -1055,6 +1066,17 @@ export function outputVisClick(
     });
 
     let firstPlay = true;
+
+    btn.on("mouseover", function(event, d){
+        const [x, y] = d3.pointer(event);
+        drawMatmulExplanation(
+            x, y, "Matrix Multiplication", "Click the icon to show the matrix multiplication process!"
+        );
+    });
+
+    btn.on("mouseout", function(event, d){
+        d3.selectAll(".math-displayer").remove();
+    });
 
     // play button interaction add-ons
     btn.on("click", function (event: any, d: any) {

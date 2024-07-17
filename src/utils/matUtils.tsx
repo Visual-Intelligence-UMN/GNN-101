@@ -23,7 +23,7 @@ import { drawPoints } from "./utils";
 import { AnimationController, computeMatrixLocations, drawAniPath, drawBiasPath, drawBiasVector, drawPathBtwOuputResult, drawPathInteractiveComponents, drawWeightMatrix, drawWeightsVector } from "./matAnimateUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
 import { roundToTwo } from "@/pages/WebUtils";
-import { drawSoftmaxDisplayerNodeClassifier } from "./matInteractionUtils";
+import { drawMatmulExplanation, drawSoftmaxDisplayerNodeClassifier } from "./matInteractionUtils";
 import { create, all } from "mathjs";
 
 //Graph Classifier： features visualization pipeline: draw all feature visualizers for original features and GCNConv
@@ -972,6 +972,17 @@ export function visualizeNodeClassifierFeatures(
             }, initSec + aniSec * 2);
 
             let firstPlay = true;
+
+            btn.on("mouseover", function(event, d){
+                const [x, y] = d3.pointer(event);
+                drawMatmulExplanation(
+                    x, y, "Matrix Multiplication", "Click the icon to show the matrix multiplication process!"
+                );
+            });
+
+            btn.on("mouseout", function(event, d){
+                d3.selectAll(".math-displayer").remove();
+            });
 
             btn.on("click", function (event: any, d: any) {
               //  d3.select(".biasPath").remove();
