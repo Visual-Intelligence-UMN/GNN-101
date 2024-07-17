@@ -393,7 +393,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
 
     const runVisualization = async () => {
       if ((intmData == null || changed) && !predicted) {
-        await visualizeGraph(graph_path,() => handleSimulationComplete(visualizationId), false);
+        await visualizeGraph(graph_path,() => handleSimulationComplete(visualizationId), false, 1);
       } else {
        await visualizeGNN(5);
        handleSimulationComplete(visualizationId);

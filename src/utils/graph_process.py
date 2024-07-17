@@ -68,7 +68,7 @@ async def data_prep(o_data):
 
 
         # Write final_data to a JSON file
-        with open('./public/json_data/processed_graphs/processed_input0.json', 'w') as f:
+        with open('./public/json_data/processed_graphs/processed_node_input.json', 'w') as f:
             json.dump(final_data, f, indent=2)
 
         return final_data
@@ -80,7 +80,7 @@ async def data_prep(o_data):
         
 def main():
     print("Current Working Directory:", os.getcwd())
-    file_path = os.path.abspath('./public/json_data/graphs/input_graph0.json')
+    file_path = os.path.abspath('./public/json_data/nodes/karate_dataset.json')
     asyncio.run(data_prep(file_path))
 
 

@@ -13,6 +13,7 @@ import {
     graph_to_matrix,
     prepMatrices,
     get_features_origin,
+    loadNodesLocation,
 } from "@/utils/utils";
 import {
     HeatmapData,
@@ -735,10 +736,12 @@ let initialCoordinates: { [id: string]: { x: number; y: number } } = {};
 export function visualizeGraph(
     path: string,
     onComplete: () => void,
-    isAttribute: boolean
+    isAttribute: boolean,
+    mode: number
 ): Promise<void> {
     return new Promise<void>((resolve) => {
         const init = async (data: any) => {
+            const location = loadNodesLocation(mode);
             let allNodes: any[] = [];
             const offset = 600;
             const margin = { top: 10, right: 30, bottom: 30, left: 40 };
@@ -784,6 +787,17 @@ export function visualizeGraph(
                         .join("text")
                         .text((d: any) => d.name)
                         .attr("font-size", `20px`);
+                }
+
+                if (mode === 0) {
+                data.nodes.forEach((node: any, i: number) => {
+  
+                    if (location[0][i]) {
+                      node.x = location[0][i];
+                      node.y = location[1][i];
+                      initialCoordinates[i] = {x: node.x, y: node.y}
+                    } 
+                  });
                 }
                 // Define the simulation
                 console.log("in now");

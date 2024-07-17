@@ -1541,3 +1541,17 @@ export function graphToAdjList(graph:any){
 }
 
 
+export function loadNodesLocation(mode: number) {
+  let data; 
+  if (mode === 0) {
+    data = require("../../public/json_data/node_location/nodes_data0.json");
+  } 
+  if (mode === 1) {
+    //data = require("../../public/json_data/node_location/nodes_data1.json");
+    data = []
+
+  }
+  console.log("AWD",data);
+  return data;
+}
+
