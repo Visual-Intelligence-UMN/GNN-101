@@ -67,8 +67,8 @@ export function resultRectMouseover() {
 
 export function resultRectMouseout() {
     d3.select(".path1").style("opacity", 0.02);
-    d3.select(".poolingFrame").style("opacity", 0);
-    d3.select("#fr1").style("opacity", 0);
+    d3.select(".poolingFrame").style("opacity", 0.25);
+    d3.select("#fr1").style("opacity", 0.25);
     console.log("signal out!");
 }
 
@@ -81,7 +81,7 @@ export function oFeatureMouseOut(
 ) {
     console.log("Current layerID and node", layerID, node);
     const fr = frames["features"][Number(node)];
-    fr.style.opacity = "0";
+    fr.style.opacity = "0.25";
 
     //matrix frame interaction
     const matf = matFrames[Number(node)];
@@ -119,10 +119,10 @@ export function detailedViewRecovery(
     }, 2000);
 
     //recover all frames
-    d3.select(".poolingFrame").style("opacity", 0);
+    d3.select(".poolingFrame").style("opacity", 0.25);
     d3.selectAll(".colFrame").style("opacity", 0);
     d3.selectAll(".rowFrame").style("opacity", 0);
-    d3.selectAll(".frame").style("opacity", 0);
+    d3.selectAll(".frame").style("opacity", 0.25);
     //recover opacity of feature visualizers
     d3.selectAll(".featureVis").style("opacity", 1);
     d3.selectAll(".oFeature")
@@ -143,7 +143,7 @@ export function detailedViewRecovery(
         if (poolingOutEvent) poolingVis?.on("mouseout", poolingOutEvent);
         if (poolingOverEvent) poolingVis?.on("mouseover", poolingOverEvent);
         //recover frame
-        d3.select(".poolingFrame").style("opacity", 0);
+        d3.select(".poolingFrame").style("opacity", 0.25);
     } else if (transState == "result") {
         translateLayers(5, -300);
     } else if(transState=="resultLayer"){
@@ -301,7 +301,7 @@ export function featureVisMouseOut(
     else if (layerID == 1) fr = frames["GCNConv2"][node];
     else fr = frames["GCNConv3"][node];
     if (fr != null) {
-        fr.style.opacity = "0";
+        fr.style.opacity = "0.25";
     }
 
     //frame interactions
@@ -314,7 +314,7 @@ export function featureVisMouseOut(
     console.log("prev", layerID, prevVis, prevLayer);
     if (prevLayer != null) {
         prevVis.forEach((vis: number) => {
-            prevLayer[vis].style.opacity = "0";
+            prevLayer[vis].style.opacity = "0.25";
         });
     }
 
