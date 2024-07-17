@@ -780,14 +780,14 @@ export function visualizeGraph(
                     .style("stroke", "#69b3a2")
                     .style("fill", "white");
 
-                if (isAttribute) {
+
                     labels = g1
                         .selectAll("text")
                         .data(data.nodes)
                         .join("text")
                         .text((d: any) => d.name)
                         .attr("font-size", `20px`);
-                }
+                
 
                 if (mode === 0) {
                 data.nodes.forEach((node: any, i: number) => {
@@ -852,11 +852,11 @@ export function visualizeGraph(
                             (d: any) => d.y
                         );
 
-                        if (isAttribute) {
+
                             labels
                                 .attr("x", (d: any) => d.x - 6)
                                 .attr("y", (d: any) => d.y + 6);
-                        }
+                        
                     })
                     .on("end", function ended() {
                         let maxXDistance = 0;
