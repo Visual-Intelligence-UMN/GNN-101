@@ -321,7 +321,7 @@ export function outputVisualizer(
                     )
                     .attr("stroke", myColor(calculatedData[i]))
                     .attr("stroke-width", 1)
-                    .attr("class", `softmax${j} softmax to-be-removed`)
+                    .attr("class", `softmax${node.features.length - j - 1} softmax to-be-removed`)
                     .attr("opacity", 0)
                     .style("fill", "none");
             }
@@ -1615,6 +1615,7 @@ export function fcLayerCalculationVisualizer(
     document.addEventListener("click", function () {
         console.log("document clicked");
         d3.selectAll(".origin-to-aggregated").remove();
+        state.isClicked = false;
 
         d3.selectAll(".node-features-Copy").style("visibility", "hidden");
 
@@ -1630,7 +1631,7 @@ export function fcLayerCalculationVisualizer(
             );
         d3.selectAll("rect").style("opacity", 1);
         d3.select(".graph-displayer").remove();
-        state.isClicked = false;
+
     });
 }
 
@@ -1733,10 +1734,11 @@ function poolingLayerInteraction(
                 if (!state.isClicked) {
                     return;
                 }
-                d3.selectAll(".math-displayer").remove();
+                d3.selectAll(`#pooling-layer-rect-${i}`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
                 d3.select(".graph-displayer").attr("opacity", 0);
                 d3.selectAll("[id^='conv3-layer-rect-']").style("opacity", 1).style("stroke", "none").style("stroke-width", 0);
                 d3.selectAll("[id^='pooling-layer-rect-']").style("opacity", 1).style("stroke", "none").style("stroke-width", 0);
+                d3.selectAll(".math-displayer").remove();
             });
     }
 }
