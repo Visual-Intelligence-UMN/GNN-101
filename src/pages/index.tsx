@@ -43,7 +43,7 @@ export const inter3 = Inter({
 
 export default function Home() {
     const [model, setModel] = useState("graph classification");
-    const [selectedGraph, setSelectedGraph] = useState("graph_2");
+    const [selectedGraph, setSelectedGraph] = useState("graph_0");
     const inputRef = useRef<HTMLInputElement>(null);
     const [outputData, setOutputData] = useState(null);
 

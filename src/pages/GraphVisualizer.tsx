@@ -36,6 +36,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
   selectedButtons,
   simulationLoading,
   setSimulation,
+
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -132,6 +133,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             node.y = Math.random() * height;
           }
           if (i >= 4) {
+            node.x = offset * 2.95
             node.y = height / 3;
           }
         });
@@ -247,6 +249,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             }
             allNodes.push(node);
           });
+
           let maxXDistance = 0;
           let maxYDistance = 0;
           const limitedNodes = data.nodes.slice(0, 17); // Why is it 17?
@@ -390,7 +393,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
     const runVisualization = async () => {
       if ((intmData == null || changed) && !predicted) {
-        await visualizeGraph(graph_path,() => handleSimulationComplete(visualizationId), true);
+        await visualizeGraph(graph_path,() => handleSimulationComplete(visualizationId), true, 0);
       } else {
         await visualizeGNN(4);
         handleSimulationComplete(visualizationId);

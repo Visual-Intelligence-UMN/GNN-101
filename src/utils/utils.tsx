@@ -343,6 +343,11 @@ export async function data_prep(o_data: any) {
     var nodes = data.x;
     var edges = data.edge_index;
     var edge_attr = data.edge_attr;
+    let is_train = [];
+    if (data.train_mask) {
+      is_train = data.train_mask;
+    }
+
 
 
     // identify if the node is aromatic
@@ -366,17 +371,39 @@ export async function data_prep(o_data: any) {
 
 
     for (var i = 0; i < nodes.length; i++) {
+      let node_name;
       var feature_str = nodes[i].join(',');
       var atom_name = atom_map[feature_str] || "Unknown";
+      let node_train = "Unknown";
+      if (is_train.length != 0) {
+
+        if (is_train[i]) {
+          node_train = "T"
+        } else {
+          node_train = "F"
+        }
+
+
+        
+      }
       if (aromatic_node_index_set.has(i)) {
         is_aromatic = true;
       } else {
         is_aromatic = false;
       }
-  
+      
+
+
+      if (is_train.length != 0) {
+        node_name = node_train;
+      } else {
+        node_name = atom_name;
+      }
+ 
+      
       var new_node = {
         id: i,
-        name: atom_name,
+        name: node_name,
         features: nodes[i],
         is_aromatic: is_aromatic
       }
@@ -490,6 +517,7 @@ export function featureVisualizer(
   colorSchemes:any,
   mode: number
 ) {
+  state.isClicked = false;
 
   
   // 1. visualize feature
@@ -884,7 +912,7 @@ export function featureVisualizer(
           .style("fill", (d: number) => myColor(d))
           .style("stroke-width", 0.1)
           .style("stroke", "grey")
-          .style("opacity", 1);
+          .style("visibility", "visible");
 
 
           const frame = featureGroup.append("rect")
@@ -892,11 +920,11 @@ export function featureVisualizer(
           .attr("y", -190)
           .attr("width", 15)
           .attr("height", currRectHeight * (node.features.length))
-          .attr("class", `node-features`)
           .attr("id", (d: any, i: number) => rectName +"-layer-rect-" + i) 
           .style("fill", "none")
           .style("stroke", "black")
-          .style("stroke-width", 1);
+          .style("stroke-width", 1)
+          .style("visibility", "visible")
 
 
         const featureGroupCopy = g2.append("g")
@@ -1037,7 +1065,7 @@ export function featureVisualizer(
       movedNode = null;
       showAllLinks(allNodes);
       resetNodes(allNodes, convNum);
-      resetNodes(allNodes, convNum);
+
     }
   });
 }
@@ -1541,4 +1569,18 @@ export function graphToAdjList(graph:any){
     return adjList;
 }
 
+
+export function loadNodesLocation(mode: number) {
+  let data; 
+  if (mode === 0) {
+    data = require("../../public/json_data/node_location/nodes_data0.json");
+  } 
+  if (mode === 1) {
+    //data = require("../../public/json_data/node_location/nodes_data1.json");
+    data = []
+
+  }
+  console.log("AWD",data);
+  return data;
+}
 
