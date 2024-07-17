@@ -947,7 +947,7 @@ export function outputVisClick(
     const btn = d3.select(".mats").append("g").attr("class", "ctrlBtn");
     const radius = 10;
     const btnX = (endPt1[0][0]+endPt2[0])/2;
-    const btnY = endPt2[1] + rectH*2;
+    const btnY = endPt2[1]-rectH/2;
     //const btnY = resultWithoutBiasCoord[0][1];
 
     const math = create(all, {});

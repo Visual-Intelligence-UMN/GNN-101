@@ -871,7 +871,7 @@ export function visualizeNodeClassifierFeatures(
             const btn = d3.select(".mats").append("g").attr("class", "ctrlBtn");
             const radius = 10;
             const btnX = (prevFeatureCoord[0] + outputCoord[0])/2;
-            const btnY = prevFeatureCoord[1];
+            const btnY = prevFeatureCoord[1]-15/2;
 
             let currentStep = 0;
 
@@ -945,7 +945,7 @@ export function visualizeNodeClassifierFeatures(
                                 btn,
                                 btnX,
                                 btnY,
-                                "./assets/SVGs/playBtn_play.svg"
+                                "./assets/SVGs/matmul.svg"
                             );
                             d3.selectAll("#tempath").remove();
                             d3.selectAll(".matmul-displayer").remove();
@@ -967,7 +967,7 @@ export function visualizeNodeClassifierFeatures(
                     btn,
                     btnX,
                     btnY,
-                    "./assets/SVGs/playBtn_play.svg"
+                    "./assets/SVGs/matmul.svg"
                 );
             }, initSec + aniSec * 2);
 
@@ -1013,7 +1013,7 @@ export function visualizeNodeClassifierFeatures(
                         btn,
                         btnX,
                         btnY,
-                        "./assets/SVGs/playBtn_pause.svg"
+                        "./assets/SVGs/playBtn_play.svg"
                     );
                     isPlaying = false;
                 }
