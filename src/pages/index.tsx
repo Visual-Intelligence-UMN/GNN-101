@@ -22,6 +22,9 @@ import { Footer, NavBar } from "./Surfaces";
 import { Inter } from "@next/font/google";
 import NodeMatricesVisualizer from "./node_classifier/NodeMatrixVisualizer";
 import NodeGraphVisualizer from "./node_classifier/NodeGraphVisualizer";
+import { state } from "@/utils/utils";
+
+
 
 export const inter = Inter({
     variable: "--font-inter",
@@ -76,6 +79,7 @@ export default function Home() {
         setProbabilities([]);
         setPredicted(false);
         setSimulation(false);
+        state.isClicked = false;
     }
 
     useEffect(() => {
@@ -257,6 +261,8 @@ export default function Home() {
                                                 selectedButtons={selectedButtons}
                                                 simulationLoading={simulationLoading}
                                                 setSimulation={setSimulation}
+                                       
+                      
                                             />
                                         </>
                                     ) : (
@@ -280,6 +286,8 @@ export default function Home() {
                                         selectedButtons={selectedButtons}
                                         simulationLoading={simulationLoading}
                                         setSimulation={setSimulation}
+                                    
+
                                     />
                                 ) : (
                                     <NodeMatricesVisualizer

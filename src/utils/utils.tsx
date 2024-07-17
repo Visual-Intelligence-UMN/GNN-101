@@ -1043,30 +1043,35 @@ export function featureVisualizer(
   });
 
   // Add a global click event to the document to reset the moved node and isClicked flag
-  document.addEventListener("click", function(event: any) {
+  document.removeEventListener("click", handleClickEvent);
+
+  function handleClickEvent(event: any) {
+    console.log("document clicked", state.isClicked);
     if (!movedNode || !state.isClicked) {
       return;
     }
-
+  
     if (movedNode && (!event.target.classList.contains("vis-component"))) {
-      svg.selectAll(".vis-component")
-        .style("opacity", 0);
+      svg.selectAll(".vis-component").style("opacity", 0);
       let currMoveOffset = moveOffset;
-
-
-      for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "1";
-
+  
+      for (let i = 0; i < colorSchemes.length; i++) {
+        colorSchemes[i].style.opacity = "1";
+      }
+  
       if (mode === 0 && movedNode.graphIndex >= 4) {
         currMoveOffset = fcLayerMoveOffset;
       }
-      moveNextLayer(svg, movedNode, currMoveOffset, -1)
-      state.isClicked = false; 
+      moveNextLayer(svg, movedNode, currMoveOffset, -1);
       movedNode = null;
       showAllLinks(allNodes);
       resetNodes(allNodes, convNum);
-
+      state.isClicked = false;
     }
-  });
+  }
+  
+  // Add the event listener
+  document.addEventListener("click", handleClickEvent);
 }
 
 

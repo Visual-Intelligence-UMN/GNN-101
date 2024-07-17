@@ -1615,7 +1615,6 @@ export function fcLayerCalculationVisualizer(
     document.addEventListener("click", function () {
         console.log("document clicked");
         d3.selectAll(".origin-to-aggregated").remove();
-        state.isClicked = false;
 
         d3.selectAll(".node-features-Copy").style("visibility", "hidden");
 
@@ -1631,7 +1630,7 @@ export function fcLayerCalculationVisualizer(
             );
         d3.selectAll("rect").style("opacity", 1);
         d3.select(".graph-displayer").remove();
-
+        state.isClicked = false;
     });
 }
 
