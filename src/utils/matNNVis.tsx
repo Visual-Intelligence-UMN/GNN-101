@@ -89,9 +89,9 @@ async function initNodeClassifier(graph: any, features: any[][], intmData:any, g
     visualizeMatrixBody(gridSize, graph, width, height, margin);
 
     var myColor = d3
-        .scaleLinear<string>()
-        .domain([-1, 0, 1])
-        .range(["#399918", "white", "#4B0092"]);
+    .scaleLinear<string>()
+    .domain([-1, -0.1, 0, 0.1, 1])
+    .range(["#304E30","#B7EFB8", "white", "#BBB7EF", "#4B0092"]);
 
     const data = matrix_to_hmap(graph);
 
@@ -189,9 +189,9 @@ async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: str
     visualizeMatrixBody(gridSize, graph, width, height, margin);
 
     var myColor = d3
-    .scaleLinear<string>()
-    .domain([-1, 0, 1])
-    .range(["#399918", "white", "#4B0092"]);
+        .scaleLinear<string>()
+        .domain([-1, -0.1, 0, 0.1, 1])
+        .range(["#304E30","#B7EFB8", "white", "#BBB7EF", "#4B0092"]);
 
     const data = matrix_to_hmap(graph);
 
