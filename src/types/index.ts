@@ -21,3 +21,14 @@ export interface IntmDataNode{
 	final: Float32Array;
 	result: number[][];
 }
+
+export interface IntmDataLink{
+	conv1: Float32Array;
+	conv2: Float32Array;
+	decode_mul: Float32Array;
+	decode_sum: Float32Array;
+	prob_adj: number[][];
+	decode_all_final: number[][];
+}
+
+

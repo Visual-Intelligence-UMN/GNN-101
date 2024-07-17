@@ -7,7 +7,7 @@ import { env } from "onnxruntime-web";
 import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature, outputVisualizer, scaleFeatureGroup, nodeOutputVisualizer } from "@/utils/graphUtils";
 import { features, off } from 'process';
 
-import { IGraphData, IntmData, IntmDataNode } from "../types/";
+import { IGraphData, IntmData, IntmDataLink, IntmDataNode } from "../types/";
 
 import { 
   hideAllLinks, 
@@ -20,6 +20,7 @@ import {
 } from "@/utils/graphUtils"
 import { stat } from "fs";
 import { Yomogi } from "@next/font/google";
+import { dataPreparationLinkPred, indexingFeatures } from "./linkPredictionUtils";
 
 env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
@@ -42,10 +43,10 @@ export function preprocessFloat32ArrayToNumber(matrix: any): number[][] {
     let row = [];
     for(let j=0; j<matrix[0][i].length; j++){
       row.push(matrix[0][i][j]);
-      console.log("fetch loop row", matrix[0][i][j])
+     // console.log("fetch loop row", matrix[0][i][j])
     }
     mat.push(row)
-    console.log("fetch loop mat", mat)
+   // console.log("fetch loop mat", mat)
   }
 return mat;
 }
@@ -243,6 +244,24 @@ export async function graph_to_matrix(data: any) {
     return matrix;
 }
 
+
+//input a JSON file and transform it into a matrix representation of graph
+export function graphToMatrix(data: any) {
+  //get the number of nodes
+  const nodeCount = data.x.length;
+  //tranformation process
+  let matrix: number[][];
+  matrix = Array.from({ length: nodeCount }, () => Array(nodeCount).fill(0));
+  for (let i = 0; i < data.edge_index[0].length; i++) {
+      let source = data.edge_index[0][i];
+      let target = data.edge_index[1][i];
+    //  console.log("target:", target, "source:", source, "iter:", i);
+      matrix[source][target] = 1;
+  }
+ // console.log("matrix representation", matrix);
+  return matrix;
+}
+
 export function chunkArray<T>(inputArray: T[], chunkSize: number): T[][] {
   const result: T[][] = [];
   for (let i = 0; i < inputArray.length; i += chunkSize) {
@@ -427,8 +446,23 @@ export async function prep_graphs(g_num: number, data: any) {
 }
 
 export const myColor = d3.scaleLinear<string>()
-.domain([-0.25, 0, 0.25])
-.range(["orange", "white", "#69b3a2"]);
+.domain([-1, 0, 1])
+.range(["#399918", "white", "#4B0092"]);
+
+
+export function transposeAnyMatrix(matrix:any){
+  console.log("result mat 1", matrix);
+  let resultMat = [];
+  for(let i=0; i<matrix[0].length; i++){
+    let t = [];
+    for(let j=0; j<matrix.length; j++){
+      t.push(matrix[j][i]);
+    }
+    resultMat.push(t);
+  }
+  console.log("result mat", resultMat);
+  return resultMat;
+}
 
 
 export interface State {
@@ -1345,8 +1379,77 @@ export const graphPrediction = async (modelPath: string, graphPath: string) => {
 		};
 
 		return {prob, intmData};
-	
 }
+
+
+export const linkPrediction = async (modelPath: string, graphPath: string) => {
+ 
+  console.log("start classifying....a");
+  const session = await loadModel(modelPath);
+  const graphData: IGraphData = await load_json(graphPath);
+
+  console.log("graphData link pred", graphData);
+
+  // Convert `graphData` to tensor-like object expected by your ONNX model
+  const xTensor = new ort.Tensor(
+    "float32",
+    new Float32Array(graphData.x.flat()),
+    [graphData.x.length, graphData.x[0].length]
+  );
+
+  let int32Array = new Int32Array(
+    graphData["edge_index"].flat()
+  );
+  let bigInt64Array = new BigInt64Array(
+      int32Array.length
+  );
+  for (let i = 0; i < int32Array.length; i++) {
+      bigInt64Array[i] = BigInt(int32Array[i]);
+  }
+  let edgeIndexTensor = new ort.Tensor(
+      "int64",
+      bigInt64Array,
+      [
+          graphData.edge_index.length,
+          graphData.edge_index[0].length,
+      ]
+  );
+
+  const outputMap = await session.run({
+    x: xTensor,
+    edge_index: edgeIndexTensor,
+    edge_label_index: edgeIndexTensor,
+  });
+
+  const intmData: IntmDataLink = {
+    conv1: outputMap.conv1.cpuData,
+    conv2: outputMap.conv2.cpuData,
+    decode_mul: outputMap.decode_mul.cpuData,
+    decode_sum: outputMap.decode_sum.cpuData,
+    prob_adj: outputMap.prob_adj.cpuData,
+    decode_all_final: outputMap.decode_all_final.cpuData,
+  };
+
+  const prob = outputMap.prob_adj.cpuData;
+
+  console.log("link prediction result", prob, intmData);
+
+  const data = dataPreparationLinkPred(intmData);
+
+  const features = graphData.x;
+
+  console.log("debug link pred",data, features)
+
+
+    const indexedFeaturesI = indexingFeatures(
+      graphData, features, data.conv1Data, data.conv2Data, 241
+    );
+    console.log(`indexed `, indexedFeaturesI)
+
+  return {prob, intmData};
+
+}
+
 
 function splitArray(arr: number[], chunkSize: number): number[][] {
   const chunks: number[][] = [];
