@@ -623,7 +623,7 @@ export function featureVisClick(
     const btn = d3.select(".mats").append("g");
     const radius = 10;
     let btnX = playBtnCoord[0];
-    const btnY = playBtnCoord[1];
+    const btnY = playBtnCoord[1]+rectH;
 
     if(layerID==0 && oFeatureChannels==34){
         btnX += 100;
@@ -638,7 +638,7 @@ export function featureVisClick(
                 btn,
                 btnX,
                 btnY - 30,
-                "./assets/SVGs/playBtn_play.svg"
+                "./assets/SVGs/matmul.svg"
             );
             drawPathBtwOuputResult([coordFeatureVis], coordFeatureVis3)
         }, delay:aniSec*2},
@@ -742,7 +742,7 @@ export function featureVisClick(
                         btn,
                         btnX,
                         btnY - 30,
-                        "./assets/SVGs/playBtn_play.svg"
+                        "./assets/SVGs/matmul.svg"
                     );
                     isPlaying = false;
                     clearInterval(intervalID);
@@ -766,7 +766,7 @@ export function featureVisClick(
                         btn,
                         btnX,
                         btnY - 30,
-                        "./assets/SVGs/playBtn_play.svg"
+                        "./assets/SVGs/matmul.svg"
                     );
                     isPlaying = false;
                     clearInterval(intervalID);
@@ -947,8 +947,8 @@ export function outputVisClick(
     const btn = d3.select(".mats").append("g").attr("class", "ctrlBtn");
     const radius = 10;
     const btnX = (endPt1[0][0]+endPt2[0])/2;
-    const btnY = endPt2[1];
-
+    const btnY = endPt2[1] + rectH*2;
+    //const btnY = resultWithoutBiasCoord[0][1];
 
     const math = create(all, {});
     const wMat = math.transpose(modelParams.weights[3]);
@@ -991,7 +991,7 @@ export function outputVisClick(
                 btn,
                 btnX,
                 btnY,
-                "./assets/SVGs/playBtn_play.svg"
+                "./assets/SVGs/matmul.svg"
             );
         }, delay:200}
         //  {func:()=>{drawPathBtwOuputResult(one, endPt);}, delay:200}, 
@@ -1020,7 +1020,7 @@ export function outputVisClick(
                         btn,
                         btnX,
                         btnY,
-                        "./assets/SVGs/playBtn_play.svg"
+                        "./assets/SVGs/matmul.svg"
                     );
                     clearInterval(intervalID);
                     d3.selectAll("#tempath").transition().delay(200).duration(200).remove();
@@ -1075,7 +1075,7 @@ export function outputVisClick(
                 btn,
                 btnX,
                 btnY,
-                "./assets/SVGs/playBtn_play.svg"
+                "./assets/SVGs/matmul.svg"
             );
             if (currentStep >= 2) {
                 d3.selectAll(".matmul-displayer").remove();
