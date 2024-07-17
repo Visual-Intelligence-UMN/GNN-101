@@ -813,7 +813,7 @@ export function visualizeGraph(
                     .force("center", d3.forceCenter(width / 2, height / 2.8))
                     .force(
                         "collide",
-                        d3.forceCollide().radius(20).strength(0.8)
+                        d3.forceCollide().radius(20).strength(0.3)
                     )
                     .force(
                         "aromatic",

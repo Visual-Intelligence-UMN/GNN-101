@@ -105,6 +105,7 @@ export function highlightNodes(node: any) {
 }
 
 export function resetNodes(allNodes: any[], convNum: number) {
+
     allNodes.forEach((node) => {
         scaleFeatureGroup(node, 0.5)
         if (node.graphIndex < convNum) {
@@ -164,6 +165,7 @@ export function outputVisualizer(
     mode: number
 
 ) {
+    weights = weights[node.graphIndex - 1];
 
 
 
@@ -550,7 +552,7 @@ export function outputVisualizer(
 
 export function calculationVisualizer(
     node: any,
-    currentWeights: any,
+    weights: any,
     bias: any,
     normalizedAdjMatrix: any,
     aggregatedDataMap: any[],
@@ -572,6 +574,7 @@ export function calculationVisualizer(
         return;
     }
     showFeature(node);
+    let currentWeights = weights[node.graphIndex - 1]
 
 
     let biasData = bias;
@@ -1179,7 +1182,6 @@ function weightAnimation(
     document.addEventListener("click", () => {
         state.isClicked = false
         isAnimating = false;
-        state.isClicked = false;
         clearInterval(intervalID); 
         d3.selectAll(".bias").remove();
         d3.selectAll(".vis-component").remove();
@@ -1290,7 +1292,7 @@ function GraphViewDrawPaths(
         }
         let s = startCoordList[prevLayerFeatureLength - 1 - j];
         let e = endCoordList[i];
-        console.log("AWD", e)
+
 
 
         let start_x = s[0];
@@ -1613,7 +1615,6 @@ export function fcLayerCalculationVisualizer(
 
 
     document.addEventListener("click", function () {
-        console.log("document clicked");
         d3.selectAll(".origin-to-aggregated").remove();
 
         d3.selectAll(".node-features-Copy").style("visibility", "hidden");
@@ -1759,6 +1760,7 @@ export function nodeOutputVisualizer(
 
 ) {
 showFeature(node)
+weights = weights[node.graphIndex - 1]
 
 
     
@@ -1776,46 +1778,7 @@ showFeature(node)
     );
     const featureGroupCopy = svg.append("g")
         .attr("transform", `translate(${node.featureGroupLocation.xPos - 7.5}, ${node.featureGroupLocation.yPos})`);
-    featureGroupCopy.selectAll("rect")
-        .data(node.features)
-        .enter()
-        .append("rect")
-        .attr("x", 0)
-        .attr("y", (d: any, i: number) => i * rectHeight)
-        .attr("width", rectWidth)
-        .attr("height",rectHeight)
-        .attr("class", `node-features-copy`)
-        .style("fill", (d: number) => myColor(d))
-        .style("stroke-width", 0.1)
-        .style("stroke", "grey")
-   
 
-        const frame = featureGroupCopy.append("rect")
-        .attr("x", 0)  
-        .attr("y", 0)
-        .attr("width", rectWidth)
-        .attr("height", rectHeight * (node.features.length) )
-        .attr("class", `node-features-copy`)
-        .style("fill", "none")
-        .style("stroke", "black")
-        .style("stroke-width", 1);
-
-        featureGroupCopy.append("text")
-          .attr("x", rectWidth / 2)
-          .attr("y", node.features.length * rectHeight + 12)
-          .attr("class", `node-features-copy`)
-          .attr("dy", ".35em")
-          .text(node.id)
-          .style("font-size", "12px")
-          .style("fill", "black")
-          .style("text-anchor", "middle");
-
-          featureGroupCopy.style('visibility', 'hidden');      
-
-          setTimeout(() => {
-            featureGroupCopy.style('visibility', 'visible');      
-
-          }, 500)
 
     node.featureGroup
         .transition()
@@ -2189,7 +2152,9 @@ showFeature(node)
             .attr(
                 "transform",
                 `translate(${node.x - 7.5}, ${node.y + 25}) rotate(0)`
-            );
+            )
+            .style("visibility", "hidden");
+                
     });
 }
 

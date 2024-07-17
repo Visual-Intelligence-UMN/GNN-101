@@ -799,9 +799,9 @@ export function featureVisualizer(
             hideAllLinks(allNodes);
 
            if (mode === 1 && graphIndex === 4) {
-            nodeOutputVisualizer(node, weights[3], bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
+            nodeOutputVisualizer(node, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
            } else {
-            calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
+            calculationVisualizer(node, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
            };
 
             
@@ -847,9 +847,9 @@ export function featureVisualizer(
             hideAllLinks(allNodes);
 
             if (mode === 1 && graphIndex === 4) {
-              nodeOutputVisualizer(node, weights[3], bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
+              nodeOutputVisualizer(node, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
              } else {
-              calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
+              calculationVisualizer(node, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
              };
             
             let relatedNodes: any = [];
@@ -1043,9 +1043,10 @@ export function featureVisualizer(
   });
 
   // Add a global click event to the document to reset the moved node and isClicked flag
-  document.removeEventListener("click", handleClickEvent);
 
-  function handleClickEvent(event: any) {
+
+
+  let handleClickEvent = function(event: any) {
     console.log("document clicked", state.isClicked);
     if (!movedNode || !state.isClicked) {
       return;
@@ -1068,9 +1069,10 @@ export function featureVisualizer(
       resetNodes(allNodes, convNum);
       state.isClicked = false;
     }
-  }
+  };
   
   // Add the event listener
+  document.removeEventListener("click", handleClickEvent);
   document.addEventListener("click", handleClickEvent);
 }
 

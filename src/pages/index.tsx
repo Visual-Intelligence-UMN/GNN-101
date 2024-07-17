@@ -22,8 +22,6 @@ import { Footer, NavBar } from "./Surfaces";
 import { Inter } from "@next/font/google";
 import NodeMatricesVisualizer from "./node_classifier/NodeMatrixVisualizer";
 import NodeGraphVisualizer from "./node_classifier/NodeGraphVisualizer";
-import { state } from "@/utils/utils";
-
 
 
 export const inter = Inter({
@@ -79,7 +77,6 @@ export default function Home() {
         setProbabilities([]);
         setPredicted(false);
         setSimulation(false);
-        state.isClicked = false;
     }
 
     useEffect(() => {
@@ -134,6 +131,7 @@ export default function Home() {
                                         const newModel = e.target.value;
                                         setModel(newModel);
                                         setPredicted(false);
+                                        setSimulation(false);
                                         setProbabilities([]);
                                         setIntmData(null);
                                         if (newModel === "node classification") {
@@ -241,6 +239,7 @@ export default function Home() {
                                     <ViewSwitch
                                         handleChange={() => {
                                             setIsGraphView(!isGraphView);
+                                            setSimulation(false);
                                         }}
                                         checked={isGraphView}
                                         labels={["Graph View", "Matrix View"]}
