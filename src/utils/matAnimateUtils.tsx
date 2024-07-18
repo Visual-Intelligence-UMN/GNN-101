@@ -487,6 +487,7 @@ weightMatrixPostions:any
 ){
 //draw weight matrix
             //positioning
+            console.log("mat wl", weightMatrixPostions)
             let offsetH = curveDir * 50;
             if(curveDir==1)offsetH = (-curveDir * 50 + featureChannels * rectW);
             const math = create(all, {});

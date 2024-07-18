@@ -153,7 +153,7 @@ export function resetNodes(allNodes: any[], convNum: number) {
 
 export function outputVisualizer(
     node: any,
-    weights: any[],
+    allWeights: any[],
     bias: any[],
     svg: any,
     offset: number,
@@ -167,7 +167,7 @@ export function outputVisualizer(
     mode: number
 
 ) {
-    weights = weights[3];
+    let weights = allWeights[3];
 
 
 
@@ -254,13 +254,17 @@ export function outputVisualizer(
         let s: [number, number] = [node.x + 20 + i * rectHeight - temp, node.y - 15];
         endCoordList.push(s);
     }
-
-    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, 2, node.features.length, weights, 3);
-drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, 2, 2, node.features.length, weights, 3, myColor, svg, weightsLocation)
-
-
     const math = create(all, {});
-    const Xt = math.transpose(weights);
+    const wMat = math.transpose(allWeights[3]);
+    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, 2, node.features.length, [wMat], 0);
+
+    console.log("jgug", weightsLocation)
+
+drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, 2, 2, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
+
+
+
+    const Xt = weights;
 
     const BiasGroup = svg
         .append("g")
@@ -542,6 +546,8 @@ drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, 2, 2, nod
 
     document.addEventListener("click", function () {
         d3.selectAll(".node-features-Copy").style("visibility", "hidden")
+        d3.selectAll(".weightUnit").remove();
+        d3.selectAll(".columnUnit").remove();
     
         d3.selectAll(".graph-displayer").remove();
         for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "1";
@@ -757,7 +763,11 @@ export function calculationVisualizer(
 
 
 let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, 2, node.features.length, weights, node.graphIndex - 1);
+
 drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, 2, 2, node.features.length, weights, node.graphIndex - 1, myColor, svg, weightsLocation)
+
+
+
 
 
 const g4 = g3
@@ -786,19 +796,6 @@ const displayer = g4
 .lower();
 
 hoverOverHandler(node, state, g4, displayHeight, rectL, myColor, weights, node.graphIndex - 1, weightsLocation)
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1231,7 +1228,10 @@ function weightAnimation(
     });
 
     const math = create(all, {});
-    const Xt = math.transpose(weights);
+    let Xt = math.transpose(weights);
+    if (node.graphIndex === 1) {
+        Xt = math.transpose(Xt);
+    }
 
     d3.selectAll(".aniRect").style("opacity", 0);
 
@@ -1281,6 +1281,7 @@ function weightAnimation(
                 //     prevLayerFeatureLength,
                 //     state
                 // );
+                
                 graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg)
  
                 i++;
@@ -1808,7 +1809,7 @@ function poolingLayerInteraction(
 
 export function nodeOutputVisualizer(
     node: any,
-    weights: any[],
+    allWeights: number[][][],
     bias: any[],
     svg: any,
     offset: number,
@@ -1823,7 +1824,7 @@ export function nodeOutputVisualizer(
 
 ) {
 showFeature(node)
-weights = weights[node.graphIndex - 1]
+let weights = allWeights[node.graphIndex - 1]
 
 
     
@@ -1912,12 +1913,15 @@ weights = weights[node.graphIndex - 1]
         let s: [number, number] = [xPos - moveOffset + 20 + i * rectHeight - temp, node.y - 15];
         endCoordList.push(s);
     }
-
-    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, 2, node.features.length, weights, node.graphIndex - 1);
-drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, 2, 2, node.features.length, weights, node.graphIndex - 1, myColor, svg, weightsLocation)
-
-
     const math = create(all, {});
+    const wMat = math.transpose(allWeights[3]);
+
+    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, 2, node.features.length, [wMat], 0);
+    console.log("jgug", weightsLocation)
+drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, 2, 2, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
+
+
+
     const Xt = math.transpose(weights);
 
     const BiasGroup = svg
@@ -2212,6 +2216,8 @@ drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, 2, 2, nod
 
 
         d3.selectAll(".graph-displayer").remove();
+        d3.selectAll(".weightUnit").remove();
+        d3.selectAll(".columnUnit").remove();
         for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "1";
         moveFeaturesBack(node.relatedNodes, originalCoordinates);
         node.featureGroup

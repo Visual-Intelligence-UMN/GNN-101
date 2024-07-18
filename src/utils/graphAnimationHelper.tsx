@@ -199,7 +199,7 @@ export function hoverOverHandler(node: any, state: State, g: any, displayHeight:
                 drawGraphVisWeightVector(weightsLocation, rectL, weights, index, g, i)
 
                 const featureGroup = g.append("g")
-                .attr("transform", `translate(${80}, ${displayHeight - 30})`);
+                .attr("transform", `translate(${130}, ${displayHeight - 30})`);
                 featureGroup.selectAll("rect")
                 .data(node.features)
                 .enter()
