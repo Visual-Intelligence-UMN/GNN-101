@@ -16,6 +16,8 @@ import { off } from "process";
 import { injectPlayButtonSVGForGraphView } from "./svgUtils";
 import { stat } from "fs";
 import { drawActivationExplanation } from "./matInteractionUtils";
+import { computeMatrixLocations, drawMatrixWeight, drawWeightMatrix } from "./matAnimateUtils";
+import { graphVisDrawMatrixWeight, hoverOverHandler } from "./graphAnimationHelper";
 
 export const pathColor = d3
     .scaleLinear<string>()
@@ -165,7 +167,7 @@ export function outputVisualizer(
     mode: number
 
 ) {
-    weights = weights[node.graphIndex - 1];
+    weights = weights[3];
 
 
 
@@ -252,8 +254,11 @@ export function outputVisualizer(
         let s: [number, number] = [node.x + 20 + i * rectHeight - temp, node.y - 15];
         endCoordList.push(s);
     }
-    console.log("start", startCoordList);
-    console.log("end", endCoordList);
+
+    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, 2, node.features.length, weights, 3);
+drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, 2, 2, node.features.length, weights, 3, myColor, svg, weightsLocation)
+
+
     const math = create(all, {});
     const Xt = math.transpose(weights);
 
@@ -298,6 +303,7 @@ export function outputVisualizer(
             rectHeight,
             prevRectHeight,
             state,
+            weightsLocation,
             mode
         );
 
@@ -749,6 +755,55 @@ export function calculationVisualizer(
         endCoordList.push(s);
     }
 
+
+let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, 2, node.features.length, weights, node.graphIndex - 1);
+drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, 2, 2, node.features.length, weights, node.graphIndex - 1, myColor, svg, weightsLocation)
+
+
+const g4 = g3
+.append("g")
+.attr("transform", `translate(${ 3.5 * offset +
+    node.relatedNodes[0].features.length * 2 * prevRectHeight +
+    100}, ${height / 5 + 50})`);
+
+let rectL = 0.5;
+let displayerWidth = 300; // Width of the graph-displayer
+let displayHeight = 75;
+
+const displayer = g4
+.append("rect")
+.attr("x", (node.graphIndex - 2) * 1)
+.attr("y", 0)
+.attr("width", displayerWidth)
+.attr("height", displayHeight)
+.attr("rx", 10)
+.attr("ry", 10)
+.style("fill", "transparent")
+.style("stroke", "black")
+.style("stroke-width", 2)
+.attr("class", "graph-displayer")
+.attr("opacity", 0)
+.lower();
+
+hoverOverHandler(node, state, g4, displayHeight, rectL, myColor, weights, node.graphIndex - 1, weightsLocation)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     intermediateFeatureGroups.push(calculatedFeatureGroup);
 
     const BiasGroup = g3
@@ -828,6 +883,7 @@ export function calculationVisualizer(
             rectHeight,
             prevRectHeight,
             state,
+            weightsLocation,
             mode
         );
       
@@ -1066,6 +1122,8 @@ export function calculationVisualizer(
     document.addEventListener("click", () => {
         moveFeaturesBack(node.relatedNodes, originalCoordinates);
         d3.selectAll(".to-be-removed").remove();
+        d3.selectAll(".weightUnit").remove();
+        d3.selectAll(".columnUnit").remove();
         
     });
 }
@@ -1114,6 +1172,7 @@ function weightAnimation(
     rectHeight: number,
     prevRectHeight: number,
     state: State,
+    weightsLocation: number[][][],
     mode: number
 ) {
 
@@ -1194,7 +1253,7 @@ function weightAnimation(
         if (!state.isClicked) {
             return;
         }
-
+        d3.selectAll(".weightUnit").style("opacity", 0.3).lower();
         if (i >= endNumber) {
             i = 0; // Reset the index to replay the animation
         }
@@ -1208,22 +1267,29 @@ function weightAnimation(
             d3.selectAll(`#tempath${i - 1}`).attr("opacity", 0);
     
             if (isAnimating) {
-                GraphViewDrawPaths(
-                    Xt,
-                    myColor,
-                    i,
-                    startCoordList,
-                    endCoordList,
-                    svg,
-                    isAnimating,
-                    btn,
-                    node,
-                    featureLength,
-                    prevLayerFeatureLength,
-                    state
-                );
+                // GraphViewDrawPaths(
+                //     Xt,
+                //     myColor,
+                //     i,
+                //     startCoordList,
+                //     endCoordList,
+                //     svg,
+                //     isAnimating,
+                //     btn,
+                //     node,
+                //     featureLength,
+                //     prevLayerFeatureLength,
+                //     state
+                // );
+                graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg)
  
                 i++;
+
+                d3.selectAll(`#weightUnit-${i-1}`).style("opacity", 0.3).lower();
+                d3.select(`#columnUnit-${i-1}`).style("opacity", 0).lower();
+                d3.selectAll(`#weightUnit-${i}`).style("opacity", 1).raise();
+                d3.select(`#columnUnit-${i}`).style("opacity", 1).raise();
+
                 if (i >= endNumber) {
                     clearInterval(intervalID);
                     isPlaying = false;
@@ -1847,6 +1913,10 @@ weights = weights[node.graphIndex - 1]
         endCoordList.push(s);
     }
 
+    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, 2, node.features.length, weights, node.graphIndex - 1);
+drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, 2, 2, node.features.length, weights, node.graphIndex - 1, myColor, svg, weightsLocation)
+
+
     const math = create(all, {});
     const Xt = math.transpose(weights);
 
@@ -1891,6 +1961,7 @@ weights = weights[node.graphIndex - 1]
             rectHeight,
             prevRectHeight,
             state,
+            weightsLocation,
             mode
         );
 

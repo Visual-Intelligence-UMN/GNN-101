@@ -85,11 +85,11 @@ export function drawAniPath(
 ) {
     d3.selectAll("#tempath").remove();
     d3.selectAll(".matmul-displayer").remove();
-    // if(currentStep==0){
-    //     drawHintLabel(g, coordFeatureVis[0] - (endCoordList[currentStep][0] - startCoordList[0][0])/2 - 20, 
-    //     coordFeatureVis[1] + rectH - curveDir*Xt[currentStep].length*(2), 
-    //     "Matrix Multiplication", "procVis");
-    // }
+    if(currentStep==0){
+        drawHintLabel(g, coordFeatureVis[0] - (endCoordList[currentStep][0] - startCoordList[0][0])/2 - 20, 
+        coordFeatureVis[1] + rectH - curveDir*Xt[currentStep].length*(2), 
+        "Matrix Multiplication", "procVis");
+    }
     g.append("rect")
         .attr("x", coordFeatureVis[0] + rectW * currentStep)
         .attr("y", coordFeatureVis[1] - rectH / 2)
@@ -320,7 +320,7 @@ export function drawSummationFeature(
         .attr("class", "procVis summation");
 
     //draw label
-    drawHintLabel(g1, coordFeatureVis[0], coordFeatureVis[1] + rectH * curveDir * 1.1, "Vector Summation", "procVis");
+    drawHintLabel(g1, coordFeatureVis[0], coordFeatureVis[1] + rectH * curveDir, "Vector Summation", "procVis");
 
     //path connect - connect prev layer feature vis to intermediate feature vis
     const curve = d3.line().curve(d3.curveBasis);
@@ -391,7 +391,7 @@ export function drawWeightsVector(
             .attr("rectID", m)
             .attr("id", `weightRect${m}`);
     }
-    drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+2, "Matmul Result", "procVis");
+    drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH, "Matmul Result", "procVis");
 
     //draw frame
     g.append("rect")
@@ -505,12 +505,6 @@ weightMatrixPostions:any
                 console.log("w mat flag")
             }
             console.log("w mat check", weightMatrixPostions, weightMat, weightMat[weightMat.length-1][0]);
-            
-            //draw label hint
-            drawHintLabel(g, weightMatrixPostions[0][0][0], 
-                weightMatrixPostions[0][0][1] - 12, "Weight Matrix", 
-                "procVis");
-
             for(let i=0; i<weightMatrixPostions.length; i++){
                 let tempArr = [];
                 for(let j=0; j<weightMatrixPostions[0].length; j++){
@@ -589,7 +583,7 @@ export function drawBiasVector(
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("class", "procVis biasVector");
-    const label = drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+2, "Bias Vector", "procVis biasVector");
+    const label = drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH, "Bias Vector", "procVis biasVector");
     d3.selectAll(".biasVector").transition().duration(100).attr("opacity", 1);
 }
 

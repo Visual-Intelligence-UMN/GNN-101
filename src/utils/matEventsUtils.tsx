@@ -27,7 +27,7 @@ import {
     computeMatrixLocations,
 } from "./matAnimateUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
-import { drawMatmulExplanation, drawSoftmaxDisplayer } from "./matInteractionUtils";
+import { drawSoftmaxDisplayer } from "./matInteractionUtils";
 import path from "node:path/win32";
 
 //graph feature events interactions - mouseover
@@ -67,8 +67,8 @@ export function resultRectMouseover() {
 
 export function resultRectMouseout() {
     d3.select(".path1").style("opacity", 0.02);
-    d3.select(".poolingFrame").style("opacity", 0.25);
-    d3.select("#fr1").style("opacity", 0.25);
+    d3.select(".poolingFrame").style("opacity", 0);
+    d3.select("#fr1").style("opacity", 0);
     console.log("signal out!");
 }
 
@@ -81,7 +81,7 @@ export function oFeatureMouseOut(
 ) {
     console.log("Current layerID and node", layerID, node);
     const fr = frames["features"][Number(node)];
-    fr.style.opacity = "0.25";
+    fr.style.opacity = "0";
 
     //matrix frame interaction
     const matf = matFrames[Number(node)];
@@ -119,10 +119,10 @@ export function detailedViewRecovery(
     }, 2000);
 
     //recover all frames
-    d3.select(".poolingFrame").style("opacity", 0.25);
+    d3.select(".poolingFrame").style("opacity", 0);
     d3.selectAll(".colFrame").style("opacity", 0);
     d3.selectAll(".rowFrame").style("opacity", 0);
-    d3.selectAll(".frame").style("opacity", 0.25);
+    d3.selectAll(".frame").style("opacity", 0);
     //recover opacity of feature visualizers
     d3.selectAll(".featureVis").style("opacity", 1);
     d3.selectAll(".oFeature")
@@ -143,7 +143,7 @@ export function detailedViewRecovery(
         if (poolingOutEvent) poolingVis?.on("mouseout", poolingOutEvent);
         if (poolingOverEvent) poolingVis?.on("mouseover", poolingOverEvent);
         //recover frame
-        d3.select(".poolingFrame").style("opacity", 0.25);
+        d3.select(".poolingFrame").style("opacity", 0);
     } else if (transState == "result") {
         translateLayers(5, -300);
     } else if(transState=="resultLayer"){
@@ -301,7 +301,7 @@ export function featureVisMouseOut(
     else if (layerID == 1) fr = frames["GCNConv2"][node];
     else fr = frames["GCNConv3"][node];
     if (fr != null) {
-        fr.style.opacity = "0.25";
+        fr.style.opacity = "0";
     }
 
     //frame interactions
@@ -314,7 +314,7 @@ export function featureVisMouseOut(
     console.log("prev", layerID, prevVis, prevLayer);
     if (prevLayer != null) {
         prevVis.forEach((vis: number) => {
-            prevLayer[vis].style.opacity = "0.25";
+            prevLayer[vis].style.opacity = "0";
         });
     }
 
@@ -623,7 +623,7 @@ export function featureVisClick(
     const btn = d3.select(".mats").append("g");
     const radius = 10;
     let btnX = playBtnCoord[0];
-    const btnY = playBtnCoord[1]+rectH;
+    const btnY = playBtnCoord[1];
 
     if(layerID==0 && oFeatureChannels==34){
         btnX += 100;
@@ -638,7 +638,7 @@ export function featureVisClick(
                 btn,
                 btnX,
                 btnY - 30,
-                "./assets/SVGs/matmul.svg"
+                "./assets/SVGs/playBtn_play.svg"
             );
             drawPathBtwOuputResult([coordFeatureVis], coordFeatureVis3)
         }, delay:aniSec*2},
@@ -668,17 +668,6 @@ export function featureVisClick(
     
 
     let firstClick = true;
-
-    btn.on("mouseover", function(event, d){
-        const [x, y] = d3.pointer(event);
-        drawMatmulExplanation(
-            x, y, "Matrix Multiplication", "Click the icon to show the matrix multiplication process!"
-        );
-    });
-
-    btn.on("mouseout", function(event, d){
-        d3.selectAll(".math-displayer").remove();
-    });
 
     btn.on("click", function (event: any, d: any) {
         console.log("currentStep 1", currentStep);
@@ -753,7 +742,7 @@ export function featureVisClick(
                         btn,
                         btnX,
                         btnY - 30,
-                        "./assets/SVGs/matmul.svg"
+                        "./assets/SVGs/playBtn_play.svg"
                     );
                     isPlaying = false;
                     clearInterval(intervalID);
@@ -777,7 +766,7 @@ export function featureVisClick(
                         btn,
                         btnX,
                         btnY - 30,
-                        "./assets/SVGs/matmul.svg"
+                        "./assets/SVGs/playBtn_play.svg"
                     );
                     isPlaying = false;
                     clearInterval(intervalID);
@@ -958,8 +947,8 @@ export function outputVisClick(
     const btn = d3.select(".mats").append("g").attr("class", "ctrlBtn");
     const radius = 10;
     const btnX = (endPt1[0][0]+endPt2[0])/2;
-    const btnY = endPt2[1]-rectH/2;
-    //const btnY = resultWithoutBiasCoord[0][1];
+    const btnY = endPt2[1];
+
 
     const math = create(all, {});
     const wMat = math.transpose(modelParams.weights[3]);
@@ -1002,7 +991,7 @@ export function outputVisClick(
                 btn,
                 btnX,
                 btnY,
-                "./assets/SVGs/matmul.svg"
+                "./assets/SVGs/playBtn_play.svg"
             );
         }, delay:200}
         //  {func:()=>{drawPathBtwOuputResult(one, endPt);}, delay:200}, 
@@ -1031,7 +1020,7 @@ export function outputVisClick(
                         btn,
                         btnX,
                         btnY,
-                        "./assets/SVGs/matmul.svg"
+                        "./assets/SVGs/playBtn_play.svg"
                     );
                     clearInterval(intervalID);
                     d3.selectAll("#tempath").transition().delay(200).duration(200).remove();
@@ -1067,17 +1056,6 @@ export function outputVisClick(
 
     let firstPlay = true;
 
-    btn.on("mouseover", function(event, d){
-        const [x, y] = d3.pointer(event);
-        drawMatmulExplanation(
-            x, y, "Matrix Multiplication", "Click the icon to show the matrix multiplication process!"
-        );
-    });
-
-    btn.on("mouseout", function(event, d){
-        d3.selectAll(".math-displayer").remove();
-    });
-
     // play button interaction add-ons
     btn.on("click", function (event: any, d: any) {
         console.log("isPlaying", isPlaying);
@@ -1097,7 +1075,7 @@ export function outputVisClick(
                 btn,
                 btnX,
                 btnY,
-                "./assets/SVGs/matmul.svg"
+                "./assets/SVGs/playBtn_play.svg"
             );
             if (currentStep >= 2) {
                 d3.selectAll(".matmul-displayer").remove();
