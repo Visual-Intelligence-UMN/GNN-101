@@ -472,9 +472,10 @@ export async function prep_graphs(g_num: number, data: any) {
   return graphs;
 }
 
-export const myColor = d3.scaleLinear<string>()
-.domain([-1, 0, 1])
-.range(["#399918", "white", "#4B0092"]);
+export const myColor = d3
+.scaleLinear<string>()
+.domain([-1, -0.1, 0, 0.1, 1])
+.range(["#304E30","#B7EFB8", "white", "#BBB7EF", "#4B0092"]);
 
 
 export function transposeAnyMatrix(matrix:any){

@@ -23,7 +23,7 @@ import { drawPoints } from "./utils";
 import { AnimationController, computeMatrixLocations, drawAniPath, drawBiasPath, drawBiasVector, drawPathBtwOuputResult, drawPathInteractiveComponents, drawWeightMatrix, drawWeightsVector } from "./matAnimateUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
 import { roundToTwo } from "@/pages/WebUtils";
-import { drawSoftmaxDisplayerNodeClassifier } from "./matInteractionUtils";
+import { drawMatmulExplanation, drawSoftmaxDisplayerNodeClassifier } from "./matInteractionUtils";
 import { create, all } from "mathjs";
 
 //Graph Classifier： features visualization pipeline: draw all feature visualizers for original features and GCNConv
@@ -559,7 +559,7 @@ export function visualizeNodeClassifierFeatures(
         if (!lock) {
             //paths interactions
             const node = Number(d3.select(this).attr("node"));
-            resultVisMouseEvent(node, resultPaths, frames, adjList, matFrames, colFrames, "0", "0.25")
+            resultVisMouseEvent(node, resultPaths, frames, adjList, matFrames, colFrames, "0.25", "0.25")
             resultLabelsList[node].style.fill = "gray";
         }
     });
@@ -871,7 +871,7 @@ export function visualizeNodeClassifierFeatures(
             const btn = d3.select(".mats").append("g").attr("class", "ctrlBtn");
             const radius = 10;
             const btnX = (prevFeatureCoord[0] + outputCoord[0])/2;
-            const btnY = prevFeatureCoord[1];
+            const btnY = prevFeatureCoord[1]-15/2;
 
             let currentStep = 0;
 
@@ -945,7 +945,7 @@ export function visualizeNodeClassifierFeatures(
                                 btn,
                                 btnX,
                                 btnY,
-                                "./assets/SVGs/playBtn_play.svg"
+                                "./assets/SVGs/matmul.svg"
                             );
                             d3.selectAll("#tempath").remove();
                             d3.selectAll(".matmul-displayer").remove();
@@ -967,11 +967,22 @@ export function visualizeNodeClassifierFeatures(
                     btn,
                     btnX,
                     btnY,
-                    "./assets/SVGs/playBtn_play.svg"
+                    "./assets/SVGs/matmul.svg"
                 );
             }, initSec + aniSec * 2);
 
             let firstPlay = true;
+
+            btn.on("mouseover", function(event, d){
+                const [x, y] = d3.pointer(event);
+                drawMatmulExplanation(
+                    x, y, "Matrix Multiplication", "Click the icon to show the matrix multiplication process!"
+                );
+            });
+
+            btn.on("mouseout", function(event, d){
+                d3.selectAll(".math-displayer").remove();
+            });
 
             btn.on("click", function (event: any, d: any) {
               //  d3.select(".biasPath").remove();
@@ -1013,7 +1024,7 @@ export function visualizeNodeClassifierFeatures(
                         btn,
                         btnX,
                         btnY,
-                        "./assets/SVGs/playBtn_pause.svg"
+                        "./assets/SVGs/playBtn_play.svg"
                     );
                     isPlaying = false;
                 }
