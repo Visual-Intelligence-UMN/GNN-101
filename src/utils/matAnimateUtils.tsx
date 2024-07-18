@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { computeMids } from "./matFeaturesUtils";
+import { computeMids, computeMidsVertical } from "./matFeaturesUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
 import { drawActivationExplanation, drawDotProduct } from "./matInteractionUtils";
 import { create, all, transposeDependencies } from "mathjs";
@@ -112,12 +112,16 @@ export function drawAniPath(
 
     d3.selectAll(".interactRect").on("mouseover", function(){
         const rectID = d3.select(this).attr("rectID")
+
+        d3.select(".wMatLink").style("opacity", 0.3);
+
         console.log("rectID",rectID);
         d3.selectAll(".interactRect").style("opacity", 0.5);
         d3.select(`.interactRect[rectID="${rectID}"]`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
         drawMatrixWeight(Xt, startCoordList, endCoordList, curveDir, Number(rectID), myColor, weightMatrixPostions, featureChannels, "weightPath");
         d3.selectAll(".weightUnit").style("opacity", 0.3).lower();
         d3.selectAll(`#weightUnit-${rectID}`).style("opacity", 1).raise();
+        d3.select(`#columnUnit-${Number(rectID)-1}`).style("opacity", 0);
         d3.select(`#columnUnit-${rectID}`).style("opacity", 1).raise();
         drawDotProduct(
             dummy, rectID, X, Xt, curveDir, coordFeatureVis, myColor
@@ -125,6 +129,9 @@ export function drawAniPath(
     });
     d3.selectAll(".interactRect").on("mouseout", function(){
         const rectID = d3.select(this).attr("rectID")
+
+        d3.select(".wMatLink").style("opacity", 1);
+
         d3.selectAll(".weightUnit").style("opacity", 1);
         console.log("rectID quit",rectID)
         d3.selectAll(".columnUnit").style("opacity", 0);
@@ -202,16 +209,20 @@ export function drawMatrixWeight(
         let changed = false;
 
         if(weightMatrixPostions.length==4&&weightMatrixPostions[0].length==2){
-            if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
-            else m1 = weightMatrixPostions[j][currentStep]
+            // if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+            // else m1 = weightMatrixPostions[j][currentStep]
+
+            m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
             
             console.log("wanfeng 3", curveDir)
             changed = true;
         }
 
         if(weightMatrixPostions.length==2&&weightMatrixPostions[0].length==4){
-            if(curveDir==-1)m1 = weightMatrixPostions[j][currentStep]
-            else m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+            // if(curveDir==-1)m1 = weightMatrixPostions[j][currentStep]
+            // else m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+
+            m1 = weightMatrixPostions[j][currentStep]
             
             console.log("wanfeng 4", curveDir)
             changed = true;
@@ -224,18 +235,21 @@ export function drawMatrixWeight(
             changed = true;
         }
 
-        if(Xt.length==Xt[0].length && Xt.length==4){
-            if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
-            else m1 = weightMatrixPostions[j][currentStep]
+        if((Xt.length==Xt[0].length && Xt.length==4)
+            ||(Xt[0].length==34&&Xt.length==4)
+            ||(Xt.length==34&&Xt[0].length==4)
+        ){
+            // if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+            // else m1 = weightMatrixPostions[j][currentStep]
+
+            m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
                 
             console.log("wanfeng 7", curveDir)
             changed = true;
         }
 
         if(!changed){
-            if((Xt[0].length<Xt.length && Xt.length!=64)||(Xt[0].length==64&&Xt.length==2)
-            ||(Xt[0].length==34&&Xt.length==4)
-            ||(Xt.length==34&&Xt[0].length==4)){
+            if((Xt[0].length<Xt.length && Xt.length!=64)||(Xt[0].length==64&&Xt.length==2)){
                 if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
                 else m1 = weightMatrixPostions[j][currentStep]
                 
@@ -409,6 +423,8 @@ export function drawWeightsVector(
     d3.selectAll(".interactRect").on("mouseover", function(){
         let paintMode = "reverse";
         if(curveDir==-1)paintMode = "normal";
+
+        d3.select(".wMatLink").style("opacity", 0.3);
         
         const rectID = d3.select(this).attr("rectID")
         console.log("rectID",rectID);
@@ -417,6 +433,7 @@ export function drawWeightsVector(
         drawMatrixWeight(Xv, startCoordList, endCoordList, curveDir, Number(rectID), myColor, weightMatrixPostions, featureChannels, "weightPath", paintMode);
         d3.selectAll(".weightUnit").style("opacity", 0.3).lower();
         d3.selectAll(`#weightUnit-${rectID}`).style("opacity", 1).raise();
+        d3.select(`#columnUnit-${Number(rectID)-1}`).style("opacity", 0);
         d3.select(`#columnUnit-${rectID}`).style("opacity", 1).raise();
         drawDotProduct(
             dummy, rectID, X, Xv, curveDir, coordFeatureVis, myColor
@@ -425,6 +442,9 @@ export function drawWeightsVector(
     });
     d3.selectAll(".interactRect").on("mouseout", function(){
         const rectID = d3.select(this).attr("rectID")
+
+        d3.select(".wMatLink").style("opacity", 1);
+
         d3.selectAll(".weightUnit").style("opacity", 1);
         console.log("rectID quit",rectID)
         d3.selectAll(".columnUnit").style("opacity", 0);
@@ -448,8 +468,8 @@ export function computeMatrixLocations(
 ){
     //draw weight matrix
                 //positioning
-                let offsetH = curveDir * 50;
-                if(curveDir==1)offsetH = (-curveDir * 50 + featureChannels * rectW);
+                let offsetH = -1 * 50;
+                if(curveDir==1)offsetH = (60 + weights[layerID].length * rectW);
                 const math = create(all, {});
                 const matX = btnX;
                 const matY = btnY - offsetH;
@@ -485,11 +505,37 @@ myColor:any,
 g:any,
 weightMatrixPostions:any
 ){
+    //draw the connection
+    
+    const len = weightMatrixPostions.length;
+    let btnPt:[number, number] = [btnX+10, btnY-15];
+    let wMatPt:[number, number] = [
+        (weightMatrixPostions[0][0][0]+weightMatrixPostions[0][weightMatrixPostions[0].length-1][0])/2,
+        weightMatrixPostions[0][0][1]
+    ];
+    if(curveDir==1){
+        wMatPt = [
+            (weightMatrixPostions[0][0][0]+weightMatrixPostions[0][weightMatrixPostions[0].length-1][0])/2,
+            weightMatrixPostions[len-1][0][1]
+        ];
+    }
+
+    const curve = d3.line().curve(d3.curveBasis);
+        const res = computeMidsVertical(btnPt, wMatPt);
+        const hpoint:[number, number] = res[0];
+        const lpoint:[number, number] = res[1];
+        d3.select(".mats")
+            .append("path")
+            .attr("d", curve([btnPt, hpoint, lpoint, wMatPt]))
+            .attr("stroke", "black")
+            .attr("opacity", 1)
+            .attr("fill", "none")
+            .attr("class", "procVis wMatLink").lower();
+
 //draw weight matrix
             //positioning
             let offsetH = curveDir * 50;
-            if(curveDir==1)offsetH = (-curveDir * 50 + featureChannels * rectW);
-            const math = create(all, {});
+            if(curveDir==1)offsetH = -1*(curveDir * 50 + featureChannels * rectW + 100);
             const matX = btnX;
             const matY = btnY - offsetH;
             const coefficient = 1.25;

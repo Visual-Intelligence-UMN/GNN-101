@@ -885,7 +885,9 @@ export function visualizeNodeClassifierFeatures(
 
     const wMat = math.transpose(modelParams.weights[3]);
 
-            let weightMatrixPostions:any = computeMatrixLocations(btnX, btnY+138*2, 1, 15, featureChannels, [wMat], 0);
+            let weightMatrixPostions:any = computeMatrixLocations(btnX, btnY+30, curveDir, 15, featureChannels, [wMat], 0);
+            
+            drawPoints(".mats", "red", [[btnX+10, btnY+30-15]])
 
             const animateSeqAfterPath = [
                 {func:()=>{

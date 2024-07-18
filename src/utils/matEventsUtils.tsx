@@ -707,6 +707,7 @@ export function featureVisClick(
                 d3.select(".mats").selectAll(".removeRect").remove();
                 //   d3.select(".mats").selectAll(".pauseRemove").remove();
                 d3.selectAll("#tempath").remove();
+                d3.select(".wMatLink").style("opacity", 1);
               //  d3.select(".mats").selectAll(".").remove();
               d3.selectAll(".matmul-displayer").remove();
                 currentStep = 0; // 重置步骤
@@ -718,6 +719,8 @@ export function featureVisClick(
                 currentStep = 0; // 重置步骤
             }
             const Xt = math.transpose(weights[layerID]);
+
+            d3.select(".wMatLink").style("opacity", 0.3);
 
             intervalID = setInterval(() => {
                 //func: () => drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor, weights[layerID], startCoordList, endCoordList, curveDir, weightMatrixPostions, featureChannels), delay: aniSec},
@@ -746,6 +749,7 @@ export function featureVisClick(
 
                 if(featureChannels==4&&layerID==2&&currentStep >= 2){
                     d3.selectAll("#tempath").remove();
+                    d3.select(".wMatLink").style("opacity", 1);
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".weightUnit").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
@@ -770,6 +774,7 @@ export function featureVisClick(
 
                 if (currentStep >= featureChannels || !lock) {
                     d3.selectAll("#tempath").remove();
+                    d3.select(".wMatLink").style("opacity", 1);
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".weightUnit").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
@@ -784,7 +789,7 @@ export function featureVisClick(
                 }
                 //        drawPoints(".mats", "red", [coordStartPoint, coordFinalPoint]);
                 // d3.selectAll("circle").raise();
-            }, 250); // 每2秒执行一次drawPaths
+            }, 25); // 每2秒执行一次drawPaths
 
             setIntervalID(intervalID);
             isPlaying = true;
@@ -1092,6 +1097,7 @@ export function outputVisClick(
         //replay controls
         if (!isPlaying || currentStep >= 2 || currentStep == 0) {
             d3.selectAll("#tempath").remove();
+            d3.select(".wMatLink").style("opacity", 1);
             d3.selectAll(".matmul-displayer").remove();
             injectPlayButtonSVG(
                 btn,
@@ -1101,6 +1107,7 @@ export function outputVisClick(
             );
             if (currentStep >= 2) {
                 d3.selectAll(".matmul-displayer").remove();
+                d3.select(".wMatLink").style("opacity", 1);
                 d3.selectAll("#tempath").remove();
                 d3.select(".mats").selectAll(".removeRect").remove();
                 currentStep = 0; // 重置步骤
