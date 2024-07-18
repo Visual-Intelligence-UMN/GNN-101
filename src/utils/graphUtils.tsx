@@ -810,7 +810,7 @@ const g4 = g3
 .append("g")
 .attr("transform", `translate(${ 3.5 * offset +
     node.relatedNodes[0].features.length * 2 * prevRectHeight +
-    100}, ${height / 5 + 50})`);
+    100}, ${height / 5 + 10})`);
 
 let rectL = 0.5;
 if (mode === 1) {
@@ -1286,11 +1286,7 @@ function weightAnimation(
         }
     }
 
-    svg.append("circle")
-    .attr("cx", 1331)
-    .attr("cy", 305)
-    .attr("fill", "red")
-    .attr("r", 1)
+
  
 
     if (!svg.selectAll) {
@@ -1302,17 +1298,14 @@ function weightAnimation(
 
 
 
-    let btnYOffset = 100;
-    if(node.relatedNodes.length==2)btnYOffset = 150;
-
-    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - 2 * btnYOffset, "./assets/SVGs/playBtn_pause.svg")
+    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_pause.svg")
 
     btn.on("click", function (event: any) {
         event.stopPropagation();
         isPlaying = !isPlaying;
         console.log(isPlaying);
-        if(isPlaying)injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - 2 * btnYOffset, "./assets/SVGs/playBtn_pause.svg");
-        else injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y -  2 * btnYOffset, "./assets/SVGs/playBtn_play.svg")
+        if(isPlaying)injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_pause.svg");
+        else injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_play.svg")
         if (isPlaying && state.isClicked) {
             
             startAnimation(endNumber);
@@ -1390,7 +1383,7 @@ function weightAnimation(
                     clearInterval(intervalID);
                     isPlaying = false;
                 
-                    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y -  2 * btnYOffset , "./assets/SVGs/playBtn_play.svg")
+                    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_play.svg")
                     setTimeout(() => {
                         d3.selectAll(".bias").style("opacity", 1);
                         d3.selectAll(".softmax").attr("opacity", 0.07);
@@ -1789,7 +1782,7 @@ export function fcLayerCalculationVisualizer(
                 `translate(${xPos - 300 - 15 / 2}, ${yPos}) rotate(0)`
             );
         d3.selectAll("rect").style("opacity", 1);
-        d3.select(".graph-displayer").remove();
+        d3.selectAll(".graph-displayer").remove();
 
     });
 }
