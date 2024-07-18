@@ -41,7 +41,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const lastIntmData = useRef(intmData);
   const svgRef = useRef<SVGSVGElement | null>(null);
-  const currentVisualizationId = useRef(0);
+  const currentVisualizationId = useRef(1);
 
   if (intmData != null) {
     console.log("From Visualizer:", intmData);
@@ -335,7 +335,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
               value.forEach((arr: any) => {
                 mergedArray = mergedArray.concat(Array.from(arr));
               });
-              value = mergedArray;
+              value = mergedArray; // value here is a 33 by 4 matrice
             }
             let absMax = 1;
             if (value != null) {
@@ -393,7 +393,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
 
     const runVisualization = async () => {
       if ((intmData == null || changed) && !predicted) {
-        await visualizeGraph(graph_path,() => handleSimulationComplete(visualizationId), false);
+        await visualizeGraph(graph_path,() => handleSimulationComplete(visualizationId), false, 1);
       } else {
        await visualizeGNN(5);
        handleSimulationComplete(visualizationId);

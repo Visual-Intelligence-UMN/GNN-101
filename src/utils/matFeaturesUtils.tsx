@@ -237,7 +237,7 @@ export function drawNodeFeatures(
             .attr("width", rectW * featureChannels)
             .attr("height", rectH)
             .attr("fill", "none")
-            .attr("opacity", 0)
+            .attr("opacity", 0.25)
             .attr("stroke", "black")
             .attr("stroke-width", 1)
             .attr("node", i)
@@ -319,7 +319,7 @@ export function drawSingleGCNConvFeature(
         .attr("width", rectW * featureChannels)
         .attr("height", rectH)
         .attr("fill", "none")
-        .attr("opacity", 0)
+        .attr("opacity", 0.25)
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("node", i)
@@ -1068,7 +1068,7 @@ export function drawPoolingVis(
         .attr("width", rectW * featureChannels)
         .attr("height", rectH)
         .attr("fill", "none")
-        .attr("opacity", 0)
+        .attr("opacity", 0.25)
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("layerID", 4)
@@ -1100,11 +1100,11 @@ export function drawPoolingVis(
             });
         }
         //interaction with frame
-        d3.select(".poolingFrame").style("opacity", 0);
+        d3.select(".poolingFrame").style("opacity", 0.25);
         //d3.selectAll('[layerID="3"][class="frame"]').attr("opacity", 0);
         const layerFrames = frames["GCNConv3"];
         layerFrames.forEach((frame: HTMLElement) => {
-            frame.style.opacity = "0";
+            frame.style.opacity = "0.25";
         });
     });
 
@@ -1167,7 +1167,7 @@ export function drawTwoLayers(one: any, final: any, myColor: any, featureChannel
         .attr("width", 2 * rectH)
         .attr("height", rectH)
         .attr("fill", "none")
-        .attr("opacity", 0)
+        .attr("opacity", 0.25)
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("layerID", 4)
@@ -1252,7 +1252,7 @@ export function drawResultLayer(
             .attr("width", rectW * 4)
             .attr("height", rectH)
             .attr("fill", "none")
-            .attr("opacity", 0)
+            .attr("opacity", 0.25)
             .attr("stroke", "black")
             .attr("stroke-width", 1)
             .attr("node", i)

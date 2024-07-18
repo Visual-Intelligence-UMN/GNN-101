@@ -105,6 +105,7 @@ export function highlightNodes(node: any) {
 }
 
 export function resetNodes(allNodes: any[], convNum: number) {
+
     allNodes.forEach((node) => {
         scaleFeatureGroup(node, 0.5)
         if (node.graphIndex < convNum) {
@@ -164,6 +165,7 @@ export function outputVisualizer(
     mode: number
 
 ) {
+    weights = weights[node.graphIndex - 1];
 
 
 
@@ -321,7 +323,7 @@ export function outputVisualizer(
                     )
                     .attr("stroke", myColor(calculatedData[i]))
                     .attr("stroke-width", 1)
-                    .attr("class", `softmax${j} softmax to-be-removed`)
+                    .attr("class", `softmax${node.features.length - j - 1} softmax to-be-removed`)
                     .attr("opacity", 0)
                     .style("fill", "none");
             }
@@ -534,7 +536,7 @@ export function outputVisualizer(
 
     document.addEventListener("click", function () {
         d3.selectAll(".node-features-Copy").style("visibility", "hidden")
-        state.isClicked = false;
+    
         d3.selectAll(".graph-displayer").remove();
         for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "1";
         moveFeaturesBack(node.relatedNodes, originalCoordinates);
@@ -550,7 +552,7 @@ export function outputVisualizer(
 
 export function calculationVisualizer(
     node: any,
-    currentWeights: any,
+    weights: any,
     bias: any,
     normalizedAdjMatrix: any,
     aggregatedDataMap: any[],
@@ -572,6 +574,7 @@ export function calculationVisualizer(
         return;
     }
     showFeature(node);
+    let currentWeights = weights[node.graphIndex - 1]
 
 
     let biasData = bias;
@@ -688,7 +691,7 @@ export function calculationVisualizer(
             `translate(${
                 3.5 * offset +
                 node.relatedNodes[0].features.length * 2 * prevRectHeight +
-                30
+                100
             }, ${height / 5 + 150})`
         );
 
@@ -740,7 +743,7 @@ export function calculationVisualizer(
             node.graphIndex * offset +
                 i * rectHeight +
                 node.relatedNodes[0].features.length * 2 * prevRectHeight +
-                30,
+                100,
             height / 5 + 150 + 25,
         ];
         endCoordList.push(s);
@@ -755,7 +758,7 @@ export function calculationVisualizer(
             `translate(${
                 3.5 * offset +
                 node.relatedNodes[0].features.length * 2 * prevRectHeight +
-                30
+                100
             }, ${height / 5 + 100})`
         );
 
@@ -872,13 +875,13 @@ export function calculationVisualizer(
                 3.5 * offset +
                 node.relatedNodes[0].features.length * prevRectHeight * 2 +
                 node.features.length * 3 +
-                30;
+                100;
             start_y = height / 5 + 150 + 7.5;
             end_x =
                 3.5 * offset +
                 node.relatedNodes[0].features.length * prevRectHeight * 2 +
                 node.features.length * rectHeight +
-                100; // the horizontal distance is offset(600) + moveoffset(300)
+                175; // the horizontal distance is offset(600) + moveoffset(300)
             end_y = height / 5 + 150 + 7.5;
 
             color = calculateAverage(node.features); // to be determined
@@ -898,7 +901,7 @@ export function calculationVisualizer(
                 3.5 * offset +
                 node.relatedNodes[0].features.length * 2 * prevRectHeight +
                 node.features.length * 3 +
-                30;
+                100;
             start_y = height / 5 + 100 + 7.5;
 
             let control1_x = start_x + (end_x - start_x) * 0.2;
@@ -967,7 +970,7 @@ export function calculationVisualizer(
                 3.5 * offset +
                 node.relatedNodes[0].features.length * 2 * prevRectHeight +
                 node.features.length * rectHeight +
-                95
+                175
             }, ${height / 5 + 150})`
         );
 
@@ -1016,7 +1019,7 @@ export function calculationVisualizer(
                 3.5 * offset +
                 node.relatedNodes[0].features.length * 2 * prevRectHeight +
                 node.features.length * rectHeight +
-                95
+                175
             }, ${height / 5 + 150})`
         );
 
@@ -1033,7 +1036,7 @@ export function calculationVisualizer(
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 0.1)
         .style("stroke", "grey")
-        .attr("opacity", 0);    
+        .attr("opacity", 0);
 
 
 
@@ -1151,17 +1154,26 @@ function weightAnimation(
 
 
 
+<<<<<<< HEAD
     let btnYOffset = 100;
     if(node.relatedNodes.length==2)btnYOffset = 150;
 
     injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - 2 * btnYOffset, "./assets/SVGs/playBtn_pause.svg")
+=======
+    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 90, endCoordList[0][1] - 30, "./assets/SVGs/playBtn_pause.svg")
+>>>>>>> f9805c469788cae66b00c05c17247467f389e1e4
 
     btn.on("click", function (event: any) {
         event.stopPropagation();
         isPlaying = !isPlaying;
         console.log(isPlaying);
+<<<<<<< HEAD
         if(isPlaying)injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - 2 * btnYOffset, "./assets/SVGs/playBtn_pause.svg");
         else injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y -  2 * btnYOffset, "./assets/SVGs/playBtn_play.svg")
+=======
+        if(isPlaying)injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 90, endCoordList[0][1] - 30, "./assets/SVGs/playBtn_pause.svg");
+        else injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 90, endCoordList[0][1] - 30, "./assets/SVGs/playBtn_play.svg")
+>>>>>>> f9805c469788cae66b00c05c17247467f389e1e4
         if (isPlaying && state.isClicked) {
             
             startAnimation(endNumber);
@@ -1177,9 +1189,8 @@ function weightAnimation(
     d3.selectAll(".aniRect").style("opacity", 0);
 
     document.addEventListener("click", () => {
-        state.isClicked = false
+
         isAnimating = false;
-        state.isClicked = false;
         clearInterval(intervalID); 
         d3.selectAll(".bias").remove();
         d3.selectAll(".vis-component").remove();
@@ -1229,7 +1240,11 @@ function weightAnimation(
                     clearInterval(intervalID);
                     isPlaying = false;
                 
+<<<<<<< HEAD
                     injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y -  2 * btnYOffset , "./assets/SVGs/playBtn_play.svg")
+=======
+                    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 90, endCoordList[0][1] - 30, "./assets/SVGs/playBtn_play.svg")
+>>>>>>> f9805c469788cae66b00c05c17247467f389e1e4
                     setTimeout(() => {
                         d3.selectAll(".bias").style("opacity", 1);
                         d3.selectAll(".softmax").attr("opacity", 0.07);
@@ -1246,7 +1261,7 @@ function weightAnimation(
                                 "transform",
                                 `translate(${
                                     node.featureGroupLocation.xPos - 2.5 * offset + (moveOffset - node.features.length * rectHeight - node.relatedNodes[0].features.length *
-                                            2 * prevRectHeight) - 100 + 12.5
+                                            2 * prevRectHeight) - 180 + 12.5
                                 }, ${
                                     node.featureGroupLocation.yPos -
                                     height / 5 -
@@ -1290,7 +1305,7 @@ function GraphViewDrawPaths(
         }
         let s = startCoordList[prevLayerFeatureLength - 1 - j];
         let e = endCoordList[i];
-        console.log("AWD", e)
+
 
 
         let start_x = s[0];
@@ -1613,7 +1628,6 @@ export function fcLayerCalculationVisualizer(
 
 
     document.addEventListener("click", function () {
-        console.log("document clicked");
         d3.selectAll(".origin-to-aggregated").remove();
 
         d3.selectAll(".node-features-Copy").style("visibility", "hidden");
@@ -1630,7 +1644,7 @@ export function fcLayerCalculationVisualizer(
             );
         d3.selectAll("rect").style("opacity", 1);
         d3.select(".graph-displayer").remove();
-        state.isClicked = false;
+
     });
 }
 
@@ -1733,10 +1747,11 @@ function poolingLayerInteraction(
                 if (!state.isClicked) {
                     return;
                 }
-                d3.selectAll(".math-displayer").remove();
+                d3.selectAll(`#pooling-layer-rect-${i}`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
                 d3.select(".graph-displayer").attr("opacity", 0);
                 d3.selectAll("[id^='conv3-layer-rect-']").style("opacity", 1).style("stroke", "none").style("stroke-width", 0);
                 d3.selectAll("[id^='pooling-layer-rect-']").style("opacity", 1).style("stroke", "none").style("stroke-width", 0);
+                d3.selectAll(".math-displayer").remove();
             });
     }
 }
@@ -1758,6 +1773,7 @@ export function nodeOutputVisualizer(
 
 ) {
 showFeature(node)
+weights = weights[node.graphIndex - 1]
 
 
     
@@ -1775,46 +1791,7 @@ showFeature(node)
     );
     const featureGroupCopy = svg.append("g")
         .attr("transform", `translate(${node.featureGroupLocation.xPos - 7.5}, ${node.featureGroupLocation.yPos})`);
-    featureGroupCopy.selectAll("rect")
-        .data(node.features)
-        .enter()
-        .append("rect")
-        .attr("x", 0)
-        .attr("y", (d: any, i: number) => i * rectHeight)
-        .attr("width", rectWidth)
-        .attr("height",rectHeight)
-        .attr("class", `node-features-copy`)
-        .style("fill", (d: number) => myColor(d))
-        .style("stroke-width", 0.1)
-        .style("stroke", "grey")
-   
 
-        const frame = featureGroupCopy.append("rect")
-        .attr("x", 0)  
-        .attr("y", 0)
-        .attr("width", rectWidth)
-        .attr("height", rectHeight * (node.features.length) )
-        .attr("class", `node-features-copy`)
-        .style("fill", "none")
-        .style("stroke", "black")
-        .style("stroke-width", 1);
-
-        featureGroupCopy.append("text")
-          .attr("x", rectWidth / 2)
-          .attr("y", node.features.length * rectHeight + 12)
-          .attr("class", `node-features-copy`)
-          .attr("dy", ".35em")
-          .text(node.id)
-          .style("font-size", "12px")
-          .style("fill", "black")
-          .style("text-anchor", "middle");
-
-          featureGroupCopy.style('visibility', 'hidden');      
-
-          setTimeout(() => {
-            featureGroupCopy.style('visibility', 'visible');      
-
-          }, 500)
 
     node.featureGroup
         .transition()
@@ -2174,11 +2151,11 @@ showFeature(node)
 
     document.addEventListener("click", function () {
         setTimeout(() => {
-            d3.selectAll(".node-features-Copy").remove()
+            d3.selectAll(".node-features-Copy").style("opacity", "hidden");
             
         }, 500);
 
-        state.isClicked = false;
+
         d3.selectAll(".graph-displayer").remove();
         for(let i=0; i<4; i++)colorSchemes[i].style.opacity = "1";
         moveFeaturesBack(node.relatedNodes, originalCoordinates);
@@ -2188,7 +2165,9 @@ showFeature(node)
             .attr(
                 "transform",
                 `translate(${node.x - 7.5}, ${node.y + 25}) rotate(0)`
-            );
+            )
+            .style("visibility", "hidden");
+                
     });
 }
 

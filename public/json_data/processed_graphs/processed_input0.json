@@ -1,0 +1,492 @@
+{
+  "nodes": [
+    {
+      "id": 0,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 1,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 2,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 3,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 4,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 5,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 6,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 7,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 8,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 9,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 10,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 11,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 12,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 13,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 14,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 15,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 16,
+      "name": "Unknown",
+      "features": [
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": false
+    },
+    {
+      "id": 17,
+      "name": "Unknown",
+      "features": [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": false
+    },
+    {
+      "id": 18,
+      "name": "Unknown",
+      "features": [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": false
+    }
+  ],
+  "links": [
+    {
+      "source": 0,
+      "target": 1,
+      "type": "Unknown"
+    },
+    {
+      "source": 0,
+      "target": 13,
+      "type": "Unknown"
+    },
+    {
+      "source": 1,
+      "target": 0,
+      "type": "Unknown"
+    },
+    {
+      "source": 1,
+      "target": 2,
+      "type": "Unknown"
+    },
+    {
+      "source": 2,
+      "target": 1,
+      "type": "Unknown"
+    },
+    {
+      "source": 2,
+      "target": 3,
+      "type": "Unknown"
+    },
+    {
+      "source": 2,
+      "target": 11,
+      "type": "Unknown"
+    },
+    {
+      "source": 3,
+      "target": 2,
+      "type": "Unknown"
+    },
+    {
+      "source": 3,
+      "target": 4,
+      "type": "Unknown"
+    },
+    {
+      "source": 4,
+      "target": 3,
+      "type": "Unknown"
+    },
+    {
+      "source": 4,
+      "target": 5,
+      "type": "Unknown"
+    },
+    {
+      "source": 5,
+      "target": 4,
+      "type": "Unknown"
+    },
+    {
+      "source": 5,
+      "target": 6,
+      "type": "Unknown"
+    },
+    {
+      "source": 5,
+      "target": 10,
+      "type": "Unknown"
+    },
+    {
+      "source": 6,
+      "target": 5,
+      "type": "Unknown"
+    },
+    {
+      "source": 6,
+      "target": 7,
+      "type": "Unknown"
+    },
+    {
+      "source": 7,
+      "target": 6,
+      "type": "Unknown"
+    },
+    {
+      "source": 7,
+      "target": 8,
+      "type": "Unknown"
+    },
+    {
+      "source": 8,
+      "target": 7,
+      "type": "Unknown"
+    },
+    {
+      "source": 8,
+      "target": 9,
+      "type": "Unknown"
+    },
+    {
+      "source": 8,
+      "target": 16,
+      "type": "Unknown"
+    },
+    {
+      "source": 9,
+      "target": 8,
+      "type": "Unknown"
+    },
+    {
+      "source": 9,
+      "target": 10,
+      "type": "Unknown"
+    },
+    {
+      "source": 9,
+      "target": 15,
+      "type": "Unknown"
+    },
+    {
+      "source": 10,
+      "target": 5,
+      "type": "Unknown"
+    },
+    {
+      "source": 10,
+      "target": 9,
+      "type": "Unknown"
+    },
+    {
+      "source": 10,
+      "target": 11,
+      "type": "Unknown"
+    },
+    {
+      "source": 11,
+      "target": 2,
+      "type": "Unknown"
+    },
+    {
+      "source": 11,
+      "target": 10,
+      "type": "Unknown"
+    },
+    {
+      "source": 11,
+      "target": 12,
+      "type": "Unknown"
+    },
+    {
+      "source": 12,
+      "target": 11,
+      "type": "Unknown"
+    },
+    {
+      "source": 12,
+      "target": 13,
+      "type": "Unknown"
+    },
+    {
+      "source": 12,
+      "target": 14,
+      "type": "Unknown"
+    },
+    {
+      "source": 13,
+      "target": 0,
+      "type": "Unknown"
+    },
+    {
+      "source": 13,
+      "target": 12,
+      "type": "Unknown"
+    },
+    {
+      "source": 14,
+      "target": 12,
+      "type": "Unknown"
+    },
+    {
+      "source": 14,
+      "target": 15,
+      "type": "Unknown"
+    },
+    {
+      "source": 15,
+      "target": 9,
+      "type": "Unknown"
+    },
+    {
+      "source": 15,
+      "target": 14,
+      "type": "Unknown"
+    },
+    {
+      "source": 16,
+      "target": 8,
+      "type": "Unknown"
+    },
+    {
+      "source": 16,
+      "target": 17,
+      "type": "Unknown"
+    },
+    {
+      "source": 16,
+      "target": 18,
+      "type": "Unknown"
+    },
+    {
+      "source": 17,
+      "target": 16,
+      "type": "Unknown"
+    },
+    {
+      "source": 18,
+      "target": 16,
+      "type": "Unknown"
+    }
+  ]
+}

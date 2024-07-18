@@ -13,6 +13,7 @@ import {
     graph_to_matrix,
     prepMatrices,
     get_features_origin,
+    loadNodesLocation,
 } from "@/utils/utils";
 import {
     HeatmapData,
@@ -735,10 +736,12 @@ let initialCoordinates: { [id: string]: { x: number; y: number } } = {};
 export function visualizeGraph(
     path: string,
     onComplete: () => void,
-    isAttribute: boolean
+    isAttribute: boolean,
+    mode: number
 ): Promise<void> {
     return new Promise<void>((resolve) => {
         const init = async (data: any) => {
+            const location = loadNodesLocation(mode);
             let allNodes: any[] = [];
             const offset = 600;
             const margin = { top: 10, right: 30, bottom: 30, left: 40 };
@@ -777,13 +780,24 @@ export function visualizeGraph(
                     .style("stroke", "#69b3a2")
                     .style("fill", "white");
 
-                if (isAttribute) {
+
                     labels = g1
                         .selectAll("text")
                         .data(data.nodes)
                         .join("text")
                         .text((d: any) => d.name)
                         .attr("font-size", `20px`);
+                
+
+                if (mode === 0) {
+                data.nodes.forEach((node: any, i: number) => {
+  
+                    if (location[0][i]) {
+                      node.x = location[0][i];
+                      node.y = location[1][i];
+                      initialCoordinates[i] = {x: node.x, y: node.y}
+                    } 
+                  });
                 }
                 // Define the simulation
                 console.log("in now");
@@ -799,7 +813,7 @@ export function visualizeGraph(
                     .force("center", d3.forceCenter(width / 2, height / 2.8))
                     .force(
                         "collide",
-                        d3.forceCollide().radius(20).strength(0.8)
+                        d3.forceCollide().radius(20).strength(0.3)
                     )
                     .force(
                         "aromatic",
@@ -838,11 +852,11 @@ export function visualizeGraph(
                             (d: any) => d.y
                         );
 
-                        if (isAttribute) {
+
                             labels
                                 .attr("x", (d: any) => d.x - 6)
                                 .attr("y", (d: any) => d.y + 6);
-                        }
+                        
                     })
                     .on("end", function ended() {
                         let maxXDistance = 0;

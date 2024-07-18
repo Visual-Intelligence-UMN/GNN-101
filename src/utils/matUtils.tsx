@@ -23,7 +23,7 @@ import { drawPoints } from "./utils";
 import { AnimationController, computeMatrixLocations, drawAniPath, drawBiasPath, drawBiasVector, drawPathBtwOuputResult, drawPathInteractiveComponents, drawWeightMatrix, drawWeightsVector } from "./matAnimateUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
 import { roundToTwo } from "@/pages/WebUtils";
-import { drawSoftmaxDisplayerNodeClassifier } from "./matInteractionUtils";
+import { drawMatmulExplanation, drawSoftmaxDisplayerNodeClassifier } from "./matInteractionUtils";
 import { create, all } from "mathjs";
 
 //Graph Classifier： features visualization pipeline: draw all feature visualizers for original features and GCNConv
@@ -343,7 +343,8 @@ export function visualizeGraphClassifierFeatures(
                         one,
                         final,
                         myColor,
-                        featureChannels
+                        featureChannels,
+                        pooling
                     );
                     //update variables
                     resultVis = outputVisPack.resultVis;
@@ -558,7 +559,7 @@ export function visualizeNodeClassifierFeatures(
         if (!lock) {
             //paths interactions
             const node = Number(d3.select(this).attr("node"));
-            resultVisMouseEvent(node, resultPaths, frames, adjList, matFrames, colFrames, "0", "0.25")
+            resultVisMouseEvent(node, resultPaths, frames, adjList, matFrames, colFrames, "0.25", "0.25")
             resultLabelsList[node].style.fill = "gray";
         }
     });
@@ -826,7 +827,7 @@ export function visualizeNodeClassifierFeatures(
 
             //the vector after matrix multiplication - before adding the bias
             const math = create(all, {});
-            const prevCon3Val = [conv3[node][0], conv3[node][1]];
+            const prevCon3Val:number[] = [conv3[node][0], conv3[node][1]];
             const vectorAfterMul = math.multiply(prevCon3Val, math.transpose(matMulWeights));
 
             console.log("data fetching in the NC result layer",
@@ -870,7 +871,7 @@ export function visualizeNodeClassifierFeatures(
             const btn = d3.select(".mats").append("g").attr("class", "ctrlBtn");
             const radius = 10;
             const btnX = (prevFeatureCoord[0] + outputCoord[0])/2;
-            const btnY = prevFeatureCoord[1];
+            const btnY = prevFeatureCoord[1]-15/2;
 
             let currentStep = 0;
 
@@ -892,16 +893,19 @@ export function visualizeNodeClassifierFeatures(
                 }, delay:aniSec},
                 {func:()=>{
                     const Xt = modelParams.weights[3];
+                    const prevCon3Val:number[] = [conv3[node][0], conv3[node][1]];
+                    console.log("data fetching wv 1", prevCon3Val)
                     drawWeightsVector(g, vectorAfterMul, outputCoord, 15, 10, 
-                        myColor, Xt, startPathCoords, endPathCoords, curveDir, weightMatrixPostions, featureChannels)
+                        myColor, wMat, startPathCoords, endPathCoords, curveDir, 
+                        weightMatrixPostions, featureChannels, prevCon3Val)
                     drawPathBtwOuputResult([prevFeatureCoord], outputCoord);
                 }, delay:aniSec},
                 {func:()=>{
                     //draw a final value output visualizer for testing
                     drawWeightsVector(g, nthOutputVals, finalOutputCoord, 
-                        15, 10, myColor, modelParams.weights[3], startPathCoords, 
+                        15, 10, myColor, wMat, startPathCoords, 
                         endPathCoords, curveDir, weightMatrixPostions, 
-                        featureChannels, "procVis wRect");
+                        featureChannels, prevCon3Val, "procVis wRect");
                     drawPathBtwOuputResult([vectorAfterMatMulPath], finalOutputCoord);  
                 }, delay:aniSec}, 
                 {func:()=>{drawBiasVector(g, 4, 15, 10, biasCoord, myColor, linBias, 4);}, delay:aniSec},
@@ -926,9 +930,9 @@ export function visualizeNodeClassifierFeatures(
                         const Xv = Xt[currentStep];
                         drawAniPath(wMat, currentStep, startPathCoords, endPathCoords, 
                             curveDir, myColor, 0, outputCoord, 15, 10, vectorAfterMul, 
-                            g1, weightMatrixPostions);
+                            g1, weightMatrixPostions, prevCon3Val);
                         d3.selectAll(".columnUnit").style("opacity", 0);
-                        d3.selectAll(".weightUnit").style("opacity", 0).lower();
+                        d3.selectAll(".weightUnit").style("opacity", 0.3).lower();
                         d3.selectAll(`#weightUnit-${currentStep}`).style("opacity", 1).raise();
                         d3.select(`#columnUnit-${currentStep}`).style("opacity", 1).raise();
                         currentStep++;
@@ -941,9 +945,10 @@ export function visualizeNodeClassifierFeatures(
                                 btn,
                                 btnX,
                                 btnY,
-                                "./assets/SVGs/playBtn_play.svg"
+                                "./assets/SVGs/matmul.svg"
                             );
                             d3.selectAll("#tempath").remove();
+                            d3.selectAll(".matmul-displayer").remove();
                             clearInterval(intervalID);
                         }
                     }, 250); 
@@ -962,11 +967,22 @@ export function visualizeNodeClassifierFeatures(
                     btn,
                     btnX,
                     btnY,
-                    "./assets/SVGs/playBtn_play.svg"
+                    "./assets/SVGs/matmul.svg"
                 );
             }, initSec + aniSec * 2);
 
             let firstPlay = true;
+
+            btn.on("mouseover", function(event, d){
+                const [x, y] = d3.pointer(event);
+                drawMatmulExplanation(
+                    x, y, "Matrix Multiplication", "Click the icon to show the matrix multiplication process!"
+                );
+            });
+
+            btn.on("mouseout", function(event, d){
+                d3.selectAll(".math-displayer").remove();
+            });
 
             btn.on("click", function (event: any, d: any) {
               //  d3.select(".biasPath").remove();
@@ -981,6 +997,8 @@ export function visualizeNodeClassifierFeatures(
                 }
                 //replay controls
                 if (!isPlaying || currentStep >= 4 || currentStep == 0) {
+                    d3.selectAll("#tempath").remove();
+                    d3.selectAll(".matmul-displayer").remove();
                     btn.selectAll("*").remove();
                     injectPlayButtonSVG(
                         btn,
@@ -989,6 +1007,8 @@ export function visualizeNodeClassifierFeatures(
                         "./assets/SVGs/playBtn_pause.svg"
                     );
                     if (currentStep >= 4) {
+                        d3.selectAll("#tempath").remove();
+                        d3.selectAll(".matmul-displayer").remove();
                         d3.select(".mats").selectAll(".removeRect").remove();
                         d3.select(".mats").selectAll(".pauseRemove").remove();
                         currentStep = 0; // 重置步骤
@@ -997,12 +1017,6 @@ export function visualizeNodeClassifierFeatures(
                     }
                     animateSeq[0].delay = 1;
                     AnimationController.runAnimations(0, animateSeq);
-                    // setTimeout(()=>{
-                    //     AnimationController.runAnimations(0, animateSeqAfterPath);
-                    // }, 1500);
-                    // setTimeout(()=>{
-                    //     pathMap = drawPathInteractiveComponents(softmaxStartCoords, softmaxEndCoords, nthOutputVals, myColor, clockwise);
-                    // }, 3000);
                     isPlaying = true;
                 } else if (isPlaying) {
                     btn.selectAll("*").remove();
@@ -1010,7 +1024,7 @@ export function visualizeNodeClassifierFeatures(
                         btn,
                         btnX,
                         btnY,
-                        "./assets/SVGs/playBtn_pause.svg"
+                        "./assets/SVGs/playBtn_play.svg"
                     );
                     isPlaying = false;
                 }
