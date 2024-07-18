@@ -23,6 +23,7 @@ import { Inter } from "@next/font/google";
 import NodeMatricesVisualizer from "./node_classifier/NodeMatrixVisualizer";
 import NodeGraphVisualizer from "./node_classifier/NodeGraphVisualizer";
 
+
 export const inter = Inter({
     variable: "--font-inter",
     weight: "500",
@@ -130,6 +131,7 @@ export default function Home() {
                                         const newModel = e.target.value;
                                         setModel(newModel);
                                         setPredicted(false);
+                                        setSimulation(false);
                                         setProbabilities([]);
                                         setIntmData(null);
                                         if (newModel === "node classification") {
@@ -237,6 +239,7 @@ export default function Home() {
                                     <ViewSwitch
                                         handleChange={() => {
                                             setIsGraphView(!isGraphView);
+                                            setSimulation(false);
                                         }}
                                         checked={isGraphView}
                                         labels={["Graph View", "Matrix View"]}
@@ -257,6 +260,8 @@ export default function Home() {
                                                 selectedButtons={selectedButtons}
                                                 simulationLoading={simulationLoading}
                                                 setSimulation={setSimulation}
+                                       
+                      
                                             />
                                         </>
                                     ) : (
@@ -280,6 +285,8 @@ export default function Home() {
                                         selectedButtons={selectedButtons}
                                         simulationLoading={simulationLoading}
                                         setSimulation={setSimulation}
+                                    
+
                                     />
                                 ) : (
                                     <NodeMatricesVisualizer

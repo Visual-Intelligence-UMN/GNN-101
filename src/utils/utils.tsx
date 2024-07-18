@@ -517,7 +517,9 @@ export function featureVisualizer(
   colorSchemes:any,
   mode: number
 ) {
+  let handleClickEvent;
   state.isClicked = false;
+
 
   
   // 1. visualize feature
@@ -800,9 +802,9 @@ export function featureVisualizer(
             hideAllLinks(allNodes);
 
            if (mode === 1 && graphIndex === 4) {
-            nodeOutputVisualizer(node, weights[3], bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
+            nodeOutputVisualizer(node, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
            } else {
-            calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
+            calculationVisualizer(node, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
            };
 
             
@@ -840,6 +842,7 @@ export function featureVisualizer(
               return;
             }
 
+
             for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
 
             colorSchemes[node.graphIndex].style.opacity = "1";
@@ -848,10 +851,11 @@ export function featureVisualizer(
             hideAllLinks(allNodes);
 
             if (mode === 1 && graphIndex === 4) {
-              nodeOutputVisualizer(node, weights[3], bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
+              nodeOutputVisualizer(node, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
              } else {
-              calculationVisualizer(node, currentWeights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
+              calculationVisualizer(node, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
              };
+             state.isClicked = true;
             
             let relatedNodes: any = [];
             if (node.relatedNodes) {
@@ -859,7 +863,7 @@ export function featureVisualizer(
             } // to make sure relatedNodes is not null
             reduceNodeOpacity(allNodes, relatedNodes, node);
             
-            state.isClicked = true;
+     
 
             if (movedNode === node) {
               return; // Do nothing if the node is already moved
@@ -996,7 +1000,6 @@ export function featureVisualizer(
           if (state.isClicked) {
             return;
           }
-          state.isClicked = true;
 
 
 
@@ -1012,7 +1015,7 @@ export function featureVisualizer(
               fcLayerCalculationVisualizer(node, relatedNodes, offset, height, currMoveOffset, node.graphIndex, g2, state, currRectHeight, colorSchemes, mode);
             }
             if (node.graphIndex === 5) {
-              console.log("CAWCAW", node.relatedNodes, weights, bias)
+
               outputVisualizer(node, weights[3], bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
             }
             
@@ -1044,30 +1047,37 @@ export function featureVisualizer(
   });
 
   // Add a global click event to the document to reset the moved node and isClicked flag
-  document.addEventListener("click", function(event: any) {
+
+
+
+  handleClickEvent = function(event: any) {
+    console.log("document clicked", state.isClicked);
     if (!movedNode || !state.isClicked) {
       return;
     }
-
+  
     if (movedNode && (!event.target.classList.contains("vis-component"))) {
-      svg.selectAll(".vis-component")
-        .style("opacity", 0);
+      svg.selectAll(".vis-component").style("opacity", 0);
       let currMoveOffset = moveOffset;
-
-
-      for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "1";
-
+  
+      for (let i = 0; i < colorSchemes.length; i++) {
+        colorSchemes[i].style.opacity = "1";
+      }
+  
       if (mode === 0 && movedNode.graphIndex >= 4) {
         currMoveOffset = fcLayerMoveOffset;
       }
-      moveNextLayer(svg, movedNode, currMoveOffset, -1)
-      state.isClicked = false; 
+      moveNextLayer(svg, movedNode, currMoveOffset, -1);
       movedNode = null;
       showAllLinks(allNodes);
       resetNodes(allNodes, convNum);
-
+      state.isClicked = false;
     }
-  });
+  };
+  
+  // Add the event listener
+  document.removeEventListener("click", handleClickEvent);
+  document.addEventListener("click", handleClickEvent);
 }
 
 

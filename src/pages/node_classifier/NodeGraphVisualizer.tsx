@@ -41,7 +41,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const lastIntmData = useRef(intmData);
   const svgRef = useRef<SVGSVGElement | null>(null);
-  const currentVisualizationId = useRef(0);
+  const currentVisualizationId = useRef(1);
 
   if (intmData != null) {
     console.log("From Visualizer:", intmData);
