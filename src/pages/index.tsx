@@ -137,7 +137,7 @@ export default function Home() {
                     if (newModel === "node classification") {
                       setSelectedGraph("karate");
                     } else if (newModel === "graph classification") {
-                      setSelectedGraph("graph_0");
+                      setSelectedGraph("graph_2");
                     } else {
                       setSelectedGraph("twitch_EN");
                     }
@@ -188,7 +188,7 @@ export default function Home() {
                       //     OptionList={Object.keys(nodeList)}
                       //   />
 
-                      <span className="text-2xl">Zachary's karate club </span>
+                      <span className="text-2xl">Zachary's Karate Club </span>
                     ) : (
                       <Selector
                         selectedOption={selectedGraph}
