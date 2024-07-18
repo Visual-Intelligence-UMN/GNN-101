@@ -920,7 +920,7 @@ export function outputVisClick(
     //     drawPoints(".mats", "red", resultCoord);
     biasCoord = deepClone(aOne);
     biasCoord[0][0] -= 130 + 2 * rectH;
-    biasCoord[0][1] += 50;
+    biasCoord[0][1] -= 50;
     const linBias = modelParams.bias[3];
 
     const resultWithoutBias = [
@@ -974,7 +974,7 @@ export function outputVisClick(
 
     console.log("w mat pos", wMat)
 
-    let weightMatrixPostions:any = computeMatrixLocations(btnX, btnY+138*2, 1, rectW, featureChannels, [wMat], 0);
+    let weightMatrixPostions:any = computeMatrixLocations(btnX, btnY+138*3, 1, rectW, featureChannels, [wMat], 0);
     
     console.log("w mat pos 1", weightMatrixPostions)
 
