@@ -694,7 +694,7 @@ export function calculationVisualizer(
             `translate(${
                 3.5 * offset +
                 node.relatedNodes[0].features.length * 2 * prevRectHeight +
-                100
+                30
             }, ${height / 5 + 150})`
         );
 
@@ -746,7 +746,7 @@ export function calculationVisualizer(
             node.graphIndex * offset +
                 i * rectHeight +
                 node.relatedNodes[0].features.length * 2 * prevRectHeight +
-                100,
+                30,
             height / 5 + 150 + 25,
         ];
         endCoordList.push(s);
@@ -761,7 +761,7 @@ export function calculationVisualizer(
             `translate(${
                 3.5 * offset +
                 node.relatedNodes[0].features.length * 2 * prevRectHeight +
-                100
+                30
             }, ${height / 5 + 100})`
         );
 
@@ -878,13 +878,13 @@ export function calculationVisualizer(
                 3.5 * offset +
                 node.relatedNodes[0].features.length * prevRectHeight * 2 +
                 node.features.length * 3 +
-                100;
+                30;
             start_y = height / 5 + 150 + 7.5;
             end_x =
                 3.5 * offset +
                 node.relatedNodes[0].features.length * prevRectHeight * 2 +
                 node.features.length * rectHeight +
-                175; // the horizontal distance is offset(600) + moveoffset(300)
+                100; // the horizontal distance is offset(600) + moveoffset(300)
             end_y = height / 5 + 150 + 7.5;
 
             color = calculateAverage(node.features); // to be determined
@@ -904,7 +904,7 @@ export function calculationVisualizer(
                 3.5 * offset +
                 node.relatedNodes[0].features.length * 2 * prevRectHeight +
                 node.features.length * 3 +
-                100;
+                30;
             start_y = height / 5 + 100 + 7.5;
 
             let control1_x = start_x + (end_x - start_x) * 0.2;
@@ -973,7 +973,7 @@ export function calculationVisualizer(
                 3.5 * offset +
                 node.relatedNodes[0].features.length * 2 * prevRectHeight +
                 node.features.length * rectHeight +
-                175
+                95
             }, ${height / 5 + 150})`
         );
 
@@ -1022,7 +1022,7 @@ export function calculationVisualizer(
                 3.5 * offset +
                 node.relatedNodes[0].features.length * 2 * prevRectHeight +
                 node.features.length * rectHeight +
-                175
+                95
             }, ${height / 5 + 150})`
         );
 
@@ -1039,7 +1039,7 @@ export function calculationVisualizer(
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 0.1)
         .style("stroke", "grey")
-        .attr("opacity", 0);
+        .attr("opacity", 0);    
 
 
 
@@ -1158,14 +1158,17 @@ function weightAnimation(
 
 
 
-    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 90, endCoordList[0][1] - 30, "./assets/SVGs/playBtn_pause.svg")
+    let btnYOffset = 100;
+    if(node.relatedNodes.length==2)btnYOffset = 150;
+
+    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - btnYOffset, "./assets/SVGs/playBtn_pause.svg")
 
     btn.on("click", function (event: any) {
         event.stopPropagation();
         isPlaying = !isPlaying;
         console.log(isPlaying);
-        if(isPlaying)injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 90, endCoordList[0][1] - 30, "./assets/SVGs/playBtn_pause.svg");
-        else injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 90, endCoordList[0][1] - 30, "./assets/SVGs/playBtn_play.svg")
+        if(isPlaying)injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - btnYOffset, "./assets/SVGs/playBtn_pause.svg");
+        else injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - btnYOffset, "./assets/SVGs/playBtn_play.svg")
         if (isPlaying && state.isClicked) {
             
             startAnimation(endNumber);
@@ -1235,7 +1238,7 @@ function weightAnimation(
                     clearInterval(intervalID);
                     isPlaying = false;
                 
-                    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 90, endCoordList[0][1] - 30, "./assets/SVGs/playBtn_play.svg")
+                    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - btnYOffset, "./assets/SVGs/playBtn_play.svg")
                     setTimeout(() => {
                         d3.selectAll(".bias").style("opacity", 1);
                         d3.selectAll(".softmax").attr("opacity", 0.07);
@@ -1252,7 +1255,7 @@ function weightAnimation(
                                 "transform",
                                 `translate(${
                                     node.featureGroupLocation.xPos - 2.5 * offset + (moveOffset - node.features.length * rectHeight - node.relatedNodes[0].features.length *
-                                            2 * prevRectHeight) - 180 + 12.5
+                                            2 * prevRectHeight) - 100 + 12.5
                                 }, ${
                                     node.featureGroupLocation.yPos -
                                     height / 5 -
@@ -2148,7 +2151,7 @@ weights = weights[node.graphIndex - 1]
             return;
         }
         setTimeout(() => {
-            d3.selectAll(".node-features-Copy").style("opacity", "hidden");
+            d3.selectAll(".node-features-Copy").remove()
             
         }, 500);
 
