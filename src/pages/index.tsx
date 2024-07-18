@@ -5,7 +5,7 @@ import ClassifyGraph from "./ClassifyGraph";
 // import { CSSTransition } from 'react-transition-group';
 import MatricesVisualizer from "./MatricesVisualizer";
 import { IntmData, IntmDataNode } from "../types";
-import { graphList, linkList, modelList, nodeList } from "./const";
+import { graphList, linkList, modelList, nodeList, DatasetInfo } from "./const";
 import Sidebar from "./Sidebar";
 import styles from "./index.module.css";
 
@@ -22,6 +22,7 @@ import { Footer, NavBar } from "./Surfaces";
 import { Inter } from "@next/font/google";
 import NodeMatricesVisualizer from "./node_classifier/NodeMatrixVisualizer";
 import NodeGraphVisualizer from "./node_classifier/NodeGraphVisualizer";
+import { mod } from "mathjs";
 
 export const inter = Inter({
   variable: "--font-inter",
@@ -123,7 +124,7 @@ export default function Home() {
                 className="flex gap-x-2 items-center"
                 style={{ paddingTop: "40px" }}
               >
-                <h1 className="text-3xl font-black">GNN Model</h1>
+                <h1 className="text-3xl min-w-48 font-black">GNN Model</h1>
                 <Selector
                   selectedOption={model}
                   handleChange={(e) => {
@@ -169,11 +170,10 @@ export default function Home() {
               <hr className="border-t border-gray-300 my-4"></hr>
 
               {/* graph data */}
-              <div className="flex gap-x-4 items-center mb-3  ">
-                <h1 className="text-3xl font-black">Input Graph</h1>
+              <div className="flex gap-x-4 items-center  mb-3 ">
+                <h1 className="text-3xl font-black min-w-48">Input Graph </h1>
 
                 <div className="flex items-center gap-x-4 ">
-                  <Hint text={"Select a graph"} />
                   <div className={inter3.className}>
                     {model == "graph classification" ? (
                       <Selector
@@ -182,11 +182,13 @@ export default function Home() {
                         OptionList={Object.keys(graphList)}
                       />
                     ) : model == "node classification" ? (
-                      <Selector
-                        selectedOption={selectedGraph}
-                        handleChange={handleGraphSelection}
-                        OptionList={Object.keys(nodeList)}
-                      />
+                      //   <Selector
+                      //     selectedOption={selectedGraph}
+                      //     handleChange={handleGraphSelection}
+                      //     OptionList={Object.keys(nodeList)}
+                      //   />
+
+                      <span className="text-2xl">Zachary's karate club </span>
                     ) : (
                       <Selector
                         selectedOption={selectedGraph}
@@ -194,6 +196,7 @@ export default function Home() {
                         OptionList={Object.keys(linkList)}
                       />
                     )}
+                    <p>{DatasetInfo[model]}</p>
                   </div>
                 </div>
 
@@ -207,7 +210,7 @@ export default function Home() {
                 ) : null}
               </div>
 
-              {/* <hr className="border-t border-gray-300 my-4"></hr> */}
+              <hr className="border-t border-gray-300 my-4"></hr>
 
               {/* <ClassifyGraph
                 graphPath={graphList[selectedGraph]}
@@ -220,12 +223,6 @@ export default function Home() {
                 setProbabilities={setProbabilities}
                 simulationLoading={simulationLoading}
               /> */}
-
-              {modelList[model] == "./gnn_node_model.onnx" ? (
-                <></>
-              ) : (
-                <hr className="border-t border-gray-300 my-4"></hr>
-              )}
 
               {/* model visualization */}
 
