@@ -516,7 +516,9 @@ export function featureVisualizer(
   colorSchemes:any,
   mode: number
 ) {
+  let handleClickEvent;
   state.isClicked = false;
+
 
   
   // 1. visualize feature
@@ -838,6 +840,7 @@ export function featureVisualizer(
             if (state.isClicked) {
               return;
             }
+            state.isClicked = true;
 
             for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
 
@@ -858,7 +861,7 @@ export function featureVisualizer(
             } // to make sure relatedNodes is not null
             reduceNodeOpacity(allNodes, relatedNodes, node);
             
-            state.isClicked = true;
+     
 
             if (movedNode === node) {
               return; // Do nothing if the node is already moved
@@ -1046,7 +1049,7 @@ export function featureVisualizer(
 
 
 
-  let handleClickEvent = function(event: any) {
+  handleClickEvent = function(event: any) {
     console.log("document clicked", state.isClicked);
     if (!movedNode || !state.isClicked) {
       return;

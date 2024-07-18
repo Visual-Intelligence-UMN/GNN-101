@@ -535,6 +535,9 @@ export function outputVisualizer(
     }
 
     document.addEventListener("click", function () {
+        if (!state.isClicked) {
+            return;
+        }
         d3.selectAll(".node-features-Copy").style("visibility", "hidden")
         state.isClicked = false;
         d3.selectAll(".graph-displayer").remove();
@@ -1064,6 +1067,7 @@ export function calculationVisualizer(
     node.intermediateFeatureGroups = intermediateFeatureGroups;
 
     document.addEventListener("click", () => {
+
         moveFeaturesBack(node.relatedNodes, originalCoordinates);
         d3.selectAll(".to-be-removed").remove();
         
@@ -1177,6 +1181,9 @@ function weightAnimation(
     d3.selectAll(".aniRect").style("opacity", 0);
 
     document.addEventListener("click", () => {
+        if (!state.isClicked) {
+            return;
+        }
         state.isClicked = false
         isAnimating = false;
         clearInterval(intervalID); 
@@ -1612,6 +1619,9 @@ export function fcLayerCalculationVisualizer(
 
 
     document.addEventListener("click", function () {
+        if (!state.isClicked) {
+            return;
+        }
         d3.selectAll(".origin-to-aggregated").remove();
 
         d3.selectAll(".node-features-Copy").style("visibility", "hidden");
@@ -2134,6 +2144,9 @@ weights = weights[node.graphIndex - 1]
     }
 
     document.addEventListener("click", function () {
+        if (!state.isClicked) {
+            return;
+        }
         setTimeout(() => {
             d3.selectAll(".node-features-Copy").style("opacity", "hidden");
             
