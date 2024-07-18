@@ -788,7 +788,7 @@ export function visualizeGraph(
                 .selectAll("text")
                 .data(data.nodes)
                 .join("text")
-                .text((d: any) => d.id)
+                .text((d: any) => d.name)
                 .attr("font-size", `17px`);
                 
                 data.nodes.forEach((node: any, i: number) => {
