@@ -927,8 +927,11 @@ export function visualizeGraph(
                             .attr("stroke", "black")
                             .attr("fill", "none")
                             .attr("transform", transform);
-                        onComplete();
-                        resolve();
+                        setTimeout(() => {
+                            onComplete();
+                            resolve();
+                        }, 1000)
+                        
                     });
             }
         };
