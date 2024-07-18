@@ -153,7 +153,10 @@ export default function Sidebar(props: Props) {
             over the lazy dog.
           </p>
 
-          <p>We are working on adding more GNN layers, please stay tuned!</p>
+          <p>
+            We are working on adding other types of GNN layers, please stay
+            tuned!
+          </p>
         </div>
 
         <div className="p-4">
