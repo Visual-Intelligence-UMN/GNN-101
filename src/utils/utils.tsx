@@ -1580,14 +1580,18 @@ export function graphToAdjList(graph:any){
 }
 
 
-export function loadNodesLocation(mode: number) {
+export function loadNodesLocation(mode: number, path: string) {
+  
   let data; 
   if (mode === 0) {
-    data = require("../../public/json_data/node_location/nodes_data0.json");
+    if (path === "0") data = require("../../public/json_data/node_location/nodes_data0.json");
+
+    if (path === "1") data = require("../../public/json_data/node_location/nodes_data1.json");
+
+    if (path === "2") data = require("../../public/json_data/node_location/nodes_data2.json");
   } 
   if (mode === 1) {
-    //data = require("../../public/json_data/node_location/nodes_data1.json");
-    data = []
+    data = require("../../public/json_data/node_location/nodes_data_karate.json");
 
   }
   console.log("AWD",data);

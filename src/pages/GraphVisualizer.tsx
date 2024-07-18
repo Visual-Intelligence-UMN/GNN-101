@@ -404,7 +404,6 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
     const visualizeGNN = async (num: number) => {
       try {
         setIsLoading(true);
-        // Process data
 
         const processedData = await data_prep(graph_path);
 

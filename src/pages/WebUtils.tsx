@@ -741,14 +741,15 @@ export function visualizeGraph(
 ): Promise<void> {
     return new Promise<void>((resolve) => {
         const init = async (data: any) => {
-            const location = loadNodesLocation(mode);
-            let allNodes: any[] = [];
+            const parse = path.match(/(\d+)\.json$/);
+            const select = parse ? parse[1] : '';
+            const location = loadNodesLocation(mode, select);
+            console.log('location', location);
             const offset = 600;
             const margin = { top: 10, right: 30, bottom: 30, left: 40 };
             const width = 6 * offset - margin.left - margin.right;
             const height = 1000 - margin.top - margin.bottom;
 
-            let labels: any;
 
             // Append the SVG object to the body of the page
             d3.select("#my_dataviz").selectAll("svg").remove();
@@ -758,11 +759,11 @@ export function visualizeGraph(
                 .attr("width", width)
                 .attr("height", height);
 
-            if (data.nodes) {
                 const xOffset = -2.5 * offset;
                 const g1 = svg
-                    .append("g")
-                    .attr("transform", `translate(${xOffset},${margin.top})`);
+                .append("g")
+                .attr("class", "layerVis")
+                .attr("transform", `translate(${xOffset},${margin.top})`)
 
                 // Initialize the links
                 const link = g1
@@ -773,56 +774,42 @@ export function visualizeGraph(
 
                 // Initialize the nodes
                 const node = g1
-                    .selectAll("circle")
-                    .data(data.nodes)
-                    .join("circle")
-                    .attr("r", 17)
-                    .style("stroke", "#69b3a2")
-                    .style("fill", "white");
+                .selectAll("circle")
+                .data(data.nodes)
+                .join("circle")
+                .attr("r", 17)
+                .style("fill", "white")
+                .style("stroke", "#69b3a2")
+                .style("stroke-width", 1)
+                .style("stroke-opacity", 1)
+                .attr("opacity", 1)
 
-
-                    labels = g1
-                        .selectAll("text")
-                        .data(data.nodes)
-                        .join("text")
-                        .text((d: any) => d.name)
-                        .attr("font-size", `20px`);
+                const labels = g1
+                .selectAll("text")
+                .data(data.nodes)
+                .join("text")
+                .text((d: any) => d.id)
+                .attr("font-size", `17px`);
                 
-
-                if (mode === 0) {
                 data.nodes.forEach((node: any, i: number) => {
   
-                    if (location[0][i]) {
-                      node.x = location[0][i];
-                      node.y = location[1][i];
-                      initialCoordinates[i] = {x: node.x, y: node.y}
-                    } 
+                    if (location[i.toString()]) {
+                      node.x = location[i.toString()].x;
+                      node.y = location[i.toString()].y;
+                    } else {
+                        node.x = Math.random() * width;
+                        node.y = Math.random() * height;
+                      }
                   });
-                }
-                // Define the simulation
-                console.log("in now");
-                const simulation = d3
-                    .forceSimulation(data.nodes)
-                    .force(
-                        "link",
-                        d3
-                            .forceLink(data.links)
-                            .id((d: any) => d.id)
-                            .distance(10)
-                    )
-                    .force("center", d3.forceCenter(width / 2, height / 2.8))
-                    .force(
-                        "collide",
-                        d3.forceCollide().radius(20).strength(0.3)
-                    )
-                    .force(
-                        "aromatic",
-                        d3
-                            .forceManyBody()
-                            .strength((d: any) => (d.is_aromatic ? -210 : -100))
-                            .theta(0.9)
-                    )
-                    .on("tick", function ticked() {
+                
+
+                	
+                  d3.forceSimulation(data.nodes)
+                  .force("link", d3.forceLink(data.links).id((d: any) => d.id).distance(20))
+                  .stop()
+                  .on("tick", ticked);
+                
+                    function ticked() {
                         link.attr("x1", (d: any) => d.source.x)
                             .attr("y1", (d: any) => d.source.y)
                             .attr("x2", (d: any) => d.target.x)
@@ -857,8 +844,32 @@ export function visualizeGraph(
                                 .attr("x", (d: any) => d.x - 6)
                                 .attr("y", (d: any) => d.y + 6);
                         
-                    })
-                    .on("end", function ended() {
+                    }
+                    function updatePositions() {
+                        link
+                        .attr("x1", (d: any) => d.source.x)
+                        .attr("y1", (d: any) => d.source.y)
+                        .attr("x2", (d: any) => d.target.x)
+                        .attr("y2", (d: any) => d.target.y)
+                        .attr("transform", function (d: any) {
+                          if (d.type === "double") {
+                            const dx = d.target.x - d.source.x;
+                            const dy = d.target.y - d.source.y;
+                            const dr = Math.sqrt(dx * dx + dy * dy);
+                            const offsetX = 5 * (dy / dr);
+                            const offsetY = 5 * (-dx / dr);
+                            return `translate(${offsetX}, ${offsetY})`;
+                          }
+                          return null;
+                        })
+                        .style("stroke", function (d: any) {
+                          return d.type === "aromatic" ? "purple" : "#aaa";
+                        });
+                      node.attr("cx", (d: any) => d.x)
+                        .attr("cy", (d: any) => d.y);
+                        labels
+            .attr("x", (d: any) => d.x - 6)
+            .attr("y", (d: any) => d.y + 6);
                         let maxXDistance = 0;
                         let maxYDistance = 0;
                         initialCoordinates = {};
@@ -867,7 +878,7 @@ export function visualizeGraph(
                                 x: node1.x,
                                 y: node1.y,
                             };
-
+                            
                             data.nodes.forEach((node2: any) => {
                                 if (node1 !== node2) {
                                     const xDistance = Math.abs(
@@ -887,6 +898,7 @@ export function visualizeGraph(
                                 }
                             });
                         });
+                        console.log('initialCoordinates', initialCoordinates, path);
                         const graphWidth = maxXDistance + 20;
                         const graphHeight = maxYDistance + 20;
                         const point1 = { x: 0.9 * offset - 260, y: height / 8 };
@@ -927,13 +939,12 @@ export function visualizeGraph(
                             .attr("stroke", "black")
                             .attr("fill", "none")
                             .attr("transform", transform);
-                        setTimeout(() => {
                             onComplete();
                             resolve();
-                        }, 1000)
                         
-                    });
-            }
+                        
+                    }
+                    updatePositions();
         };
 
         const visualizeG = async () => {
