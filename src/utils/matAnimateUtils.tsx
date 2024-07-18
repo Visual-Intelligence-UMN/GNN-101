@@ -533,11 +533,11 @@ weightMatrixPostions:any
             .attr("fill", "none")
             .attr("class", "procVis wMatLink").lower();
     }else{
-        let tlpoint:[number, number] = [hpoint[0], lpoint[1]];
-        let thpoint:[number, number] = [lpoint[0], hpoint[1]];
+        let tlpoint:[number, number] = [lpoint[0], lpoint[1]];
+        let thpoint:[number, number] = [hpoint[0], hpoint[1]];
         d3.select(".mats")
             .append("path")
-            .attr("d", curve([wMatPt, thpoint, tlpoint, btnPt]))
+            .attr("d", curve([wMatPt, tlpoint, thpoint, btnPt]))
             .attr("stroke", "black")
             .attr("opacity", 1)
             .attr("fill", "none")

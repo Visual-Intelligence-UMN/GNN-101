@@ -4,6 +4,7 @@ import {
     calculatePrevFeatureVisPos,
     loadWeights,
     loadNodeWeights,
+    drawHintLabel,
 } from "./matHelperUtils";
 import { computeMids } from "./matFeaturesUtils";
 import * as d3 from "d3";
@@ -640,6 +641,7 @@ export function featureVisClick(
                 btnY - 30,
                 "./assets/SVGs/matmul.svg"
             );
+            drawHintLabel(g, btnX, btnY - 36, "Click for Animation", "procVis");
             drawPathBtwOuputResult([coordFeatureVis], coordFeatureVis3)
         }, delay:aniSec*2},
         {func:()=>{
@@ -974,7 +976,7 @@ export function outputVisClick(
 
     console.log("w mat pos", wMat)
 
-    let weightMatrixPostions:any = computeMatrixLocations(btnX+30, btnY+30, -1, rectW, featureChannels, [wMat], 0);
+    let weightMatrixPostions:any = computeMatrixLocations(btnX+42, btnY+30, -1, rectW, featureChannels, [wMat], 0);
     
     console.log("w mat pos 1", weightMatrixPostions)
 
@@ -1009,6 +1011,7 @@ export function outputVisClick(
                 btnY,
                 "./assets/SVGs/matmul.svg"
             );
+            drawHintLabel(g1, btnX, btnY-12, "Click for Animation", "procVis");
         }, delay:200}
         //  {func:()=>{drawPathBtwOuputResult(one, endPt);}, delay:200}, 
     ]
