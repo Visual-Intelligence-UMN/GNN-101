@@ -1154,26 +1154,17 @@ function weightAnimation(
 
 
 
-<<<<<<< HEAD
     let btnYOffset = 100;
     if(node.relatedNodes.length==2)btnYOffset = 150;
 
     injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - 2 * btnYOffset, "./assets/SVGs/playBtn_pause.svg")
-=======
-    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 90, endCoordList[0][1] - 30, "./assets/SVGs/playBtn_pause.svg")
->>>>>>> f9805c469788cae66b00c05c17247467f389e1e4
 
     btn.on("click", function (event: any) {
         event.stopPropagation();
         isPlaying = !isPlaying;
         console.log(isPlaying);
-<<<<<<< HEAD
         if(isPlaying)injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - 2 * btnYOffset, "./assets/SVGs/playBtn_pause.svg");
         else injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y -  2 * btnYOffset, "./assets/SVGs/playBtn_play.svg")
-=======
-        if(isPlaying)injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 90, endCoordList[0][1] - 30, "./assets/SVGs/playBtn_pause.svg");
-        else injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 90, endCoordList[0][1] - 30, "./assets/SVGs/playBtn_play.svg")
->>>>>>> f9805c469788cae66b00c05c17247467f389e1e4
         if (isPlaying && state.isClicked) {
             
             startAnimation(endNumber);
@@ -1240,11 +1231,7 @@ function weightAnimation(
                     clearInterval(intervalID);
                     isPlaying = false;
                 
-<<<<<<< HEAD
                     injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y -  2 * btnYOffset , "./assets/SVGs/playBtn_play.svg")
-=======
-                    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 90, endCoordList[0][1] - 30, "./assets/SVGs/playBtn_play.svg")
->>>>>>> f9805c469788cae66b00c05c17247467f389e1e4
                     setTimeout(() => {
                         d3.selectAll(".bias").style("opacity", 1);
                         d3.selectAll(".softmax").attr("opacity", 0.07);
