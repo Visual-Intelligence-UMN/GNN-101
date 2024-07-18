@@ -841,7 +841,7 @@ export function featureVisualizer(
             if (state.isClicked) {
               return;
             }
-            state.isClicked = true;
+
 
             for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
 
@@ -855,6 +855,7 @@ export function featureVisualizer(
              } else {
               calculationVisualizer(node, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
              };
+             state.isClicked = true;
             
             let relatedNodes: any = [];
             if (node.relatedNodes) {
@@ -999,7 +1000,6 @@ export function featureVisualizer(
           if (state.isClicked) {
             return;
           }
-          state.isClicked = true;
 
 
 
@@ -1015,7 +1015,7 @@ export function featureVisualizer(
               fcLayerCalculationVisualizer(node, relatedNodes, offset, height, currMoveOffset, node.graphIndex, g2, state, currRectHeight, colorSchemes, mode);
             }
             if (node.graphIndex === 5) {
-              console.log("CAWCAW", node.relatedNodes, weights, bias)
+
               outputVisualizer(node, weights[3], bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
             }
             
