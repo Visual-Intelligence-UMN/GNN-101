@@ -473,7 +473,7 @@ export function computeMatrixLocations(
                 const math = create(all, {});
                 const matX = btnX;
                 const matY = btnY - offsetH;
-                const coefficient = 1.25;
+                const coefficient = 1;
                 let weightMatrixPositions = [];
                 //draw matrix - change the computation mode here, when the dims are different
                 let weightMat = weights[layerID];
@@ -521,9 +521,10 @@ weightMatrixPostions:any
     }
 
     const curve = d3.line().curve(d3.curveBasis);
-        const res = computeMidsVertical(btnPt, wMatPt);
-        const hpoint:[number, number] = res[0];
-        const lpoint:[number, number] = res[1];
+    const res = computeMidsVertical(btnPt, wMatPt);
+    const hpoint:[number, number] = res[0];
+    const lpoint:[number, number] = res[1];
+    if(curveDir==1){
         d3.select(".mats")
             .append("path")
             .attr("d", curve([btnPt, hpoint, lpoint, wMatPt]))
@@ -531,6 +532,17 @@ weightMatrixPostions:any
             .attr("opacity", 1)
             .attr("fill", "none")
             .attr("class", "procVis wMatLink").lower();
+    }else{
+        let tlpoint:[number, number] = [hpoint[0], lpoint[1]];
+        let thpoint:[number, number] = [lpoint[0], hpoint[1]];
+        d3.select(".mats")
+            .append("path")
+            .attr("d", curve([wMatPt, thpoint, tlpoint, btnPt]))
+            .attr("stroke", "black")
+            .attr("opacity", 1)
+            .attr("fill", "none")
+            .attr("class", "procVis wMatLink").lower();
+    }
 
 //draw weight matrix
             //positioning
@@ -538,7 +550,7 @@ weightMatrixPostions:any
             if(curveDir==1)offsetH = -1*(curveDir * 50 + featureChannels * rectW + 100);
             const matX = btnX;
             const matY = btnY - offsetH;
-            const coefficient = 1.25;
+            const coefficient = 1;
             //draw matrix
             //const weightMat = math.transpose(weights[layerID]);
             const weightMat = weights[layerID];
