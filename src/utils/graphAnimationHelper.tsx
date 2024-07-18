@@ -20,6 +20,7 @@ export function graphVisDrawMatrixWeight(
     if (!g.selectAll) {
         g = d3.select(g)
     }
+
     
     let flag = true;
 
@@ -124,6 +125,7 @@ export function graphVisDrawMatrixWeight(
         let controlPoint1 = [s1[0], m1[1]];
         let controlPoint2 = [e1[0], m1[1]];
 
+
         const pathData1 = `
             M${s1[0]},${s1[1]}
             Q${controlPoint1[0]},${controlPoint1[1]} ${m1[0]},${m1[1]}
@@ -158,8 +160,13 @@ export function drawGraphVisWeightVector(weightMatrixPositions: number[][][], re
     if (!g.selectAll) {
         g = d3.selectAll(g)
     }
-    const weightMat = weights[index]
+    let weightMat = weights[index]
     console.log("WAD", weights, index, currentStep, weightMat)
+    if (index === 0) {
+        const math = create(all, {});
+        weightMat = math.transpose(weightMat);
+    }
+
 
     for (let j = 0; j < weightMat[currentStep].length; j++)
     g.append("rect")
@@ -199,7 +206,7 @@ export function hoverOverHandler(node: any, state: State, g: any, displayHeight:
                 drawGraphVisWeightVector(weightsLocation, rectL, weights, index, g, i)
 
                 const featureGroup = g.append("g")
-                .attr("transform", `translate(${130}, ${displayHeight - 30})`);
+                .attr("transform", `translate(${70}, ${displayHeight - 40})`);
                 featureGroup.selectAll("rect")
                 .data(node.features)
                 .enter()
@@ -221,7 +228,7 @@ export function hoverOverHandler(node: any, state: State, g: any, displayHeight:
                     .attr("x", 70 - 25)
                     .attr("y", displayHeight - 30)
                     .attr("xml:space", "preserve")
-                    .text("dot(                  ,              )")
+                    .text("dot(                   ,                 )")
                     .attr("class", "math-displayer")
                     .attr("font-size", "10");
 
@@ -242,3 +249,115 @@ export function hoverOverHandler(node: any, state: State, g: any, displayHeight:
             });
     }
 }
+
+export function graphVisDrawActivationExplanation(x:number, y:number, title:string, formula:string, description:string, svg: any){
+    const displayW = 250;
+    const displayH = 75;
+
+    //find coordination for the math displayer first
+    const displayX = x + 10;
+    const displayY = y - 10;
+
+    if (!svg.selectAll) {
+        svg = d3.selectAll(svg);
+    }
+
+    //add displayer
+    svg
+        .append("rect")
+        .attr("x", displayX)
+        .attr("y", displayY)
+        .attr("width", displayW)
+        .attr("height", displayH)
+        .attr("rx", 10)
+        .attr("ry", 10)
+        .style("fill", "white")
+        .style("stroke", "black")
+        .style("stroke-width", 2)
+        .attr("class", "math-displayer")
+        .raise();
+
+    const titleYOffset = 10;
+    const titleXOffset = 50;
+    svg
+        .append("text")
+        .attr("x", displayX + titleXOffset)
+        .attr("y", displayY + titleYOffset)
+        .text(title)
+        .attr("class", "math-displayer")
+        .attr("font-size", titleYOffset)
+        .attr("fill", "black");
+    const eqXOffset = titleXOffset / 2;
+    const eqYOffset = titleYOffset * 2.5;
+    const unitSize = eqXOffset / 3 + 3;
+    const upperOffset = unitSize * 2;
+    svg
+        .append("text")
+        .attr("x", displayX + eqXOffset)
+        .attr("y", displayY + eqYOffset)
+        .text(formula)
+        .attr("class", "math-displayer")
+        .attr("font-size", unitSize)
+        .attr("fill", "black");
+    svg
+        .append("text")
+        .attr("x", displayX + eqXOffset)
+        .attr("y", displayY + eqYOffset + unitSize * 1.5)
+        .text(description)
+        .attr("class", "math-displayer")
+        .attr("font-size", unitSize)
+        .attr("fill", "black");
+}
+
+export function graphVisDrawMatmulExplanation(x:number, y:number, title:string, description:string, svg: any){
+    const displayW = 350;
+    const displayH = 50;
+
+    //find coordination for the math displayer first
+    const displayX = x + 10;
+    const displayY = y - 10;
+
+    if (!svg.selectAll) {
+        svg = d3.selectAll(svg);
+    }
+
+    //add displayer
+    svg
+        .append("rect")
+        .attr("x", displayX)
+        .attr("y", displayY)
+        .attr("width", displayW)
+        .attr("height", displayH)
+        .attr("rx", 10)
+        .attr("ry", 10)
+        .style("fill", "white")
+        .style("stroke", "black")
+        .style("stroke-width", 2)
+        .attr("class", "math-displayer")
+        .raise();
+
+    const titleYOffset = 10;
+    const titleXOffset = 50;
+    svg
+        .append("text")
+        .attr("x", displayX + 100)
+        .attr("y", displayY + titleYOffset)
+        .text(title)
+        .attr("class", "math-displayer")
+        .attr("font-size", titleYOffset)
+        .attr("fill", "black").raise();
+    const eqXOffset = titleXOffset / 2;
+    const eqYOffset = titleYOffset * 2.5;
+    const unitSize = eqXOffset / 3 + 3;
+    const upperOffset = unitSize * 2;
+    svg
+        .append("text")
+        .attr("x", displayX + eqXOffset)
+        .attr("y", displayY + eqYOffset)
+        .text(description)
+        .attr("class", "math-displayer")
+        .attr("font-size", unitSize)
+        .attr("fill", "black").raise();
+}
+
+
