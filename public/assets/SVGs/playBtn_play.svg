@@ -1,28 +1,15 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
-<svg
-   width="15mm"
-   height="15mm"
-   viewBox="0 0 15 15"
-   version="1.1"
-   id="svg1"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
-  <defs
-     id="defs1" />
-  <g
-     id="layer1">
-    <ellipse
-       style="fill:#ffffff;fill-opacity:1;stroke:#9d9d9d;stroke-width:0.876288;stroke-dasharray:none;stroke-opacity:1"
-       id="path1"
-       cx="7.798965"
-       cy="7.4764962"
-       rx="6.4037399"
-       ry="6.6067758" />
-    <path
-       style="fill:#a2a2a2;fill-opacity:1;stroke:#9e9e9e;stroke-width:0.707555;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-       d="m 5.580028,4.1821016 -0.0919,6.6142794 5.893113,-3.3941702 z"
-       id="path2" />
-  </g>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 15" width="15mm" height="15mm">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+        stroke: #606161;
+        stroke-miterlimit: 10;
+        stroke-width: .53px;
+      }
+    </style>
+  </defs>
+<circle class="cls-1" cx="7.5" cy="7.5" r="6.75"/>
+  <path class="cls-1" d="M6.077,4.442c1.782,1.033,3.564,2.066,5.346,3.099,.005,.005,.074,.088,.043,.193-.027,.089-.107,.124-.118,.128-1.757,1.091-3.514,2.182-5.271,3.273-.135,.135-.366,.039-.366-.152,0-2.13,0-4.26,0-6.39,0-.04,.025-.138,.1-.181,.081-.047,.192-.007,.266,.03Z"/>
 </svg>
