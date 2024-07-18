@@ -1016,7 +1016,7 @@ export function featureVisualizer(
             }
             if (node.graphIndex === 5) {
 
-              outputVisualizer(node, weights[3], bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
+              outputVisualizer(node, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
             }
             
             reduceNodeOpacity(allNodes, relatedNodes, node);

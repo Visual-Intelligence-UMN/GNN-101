@@ -45,7 +45,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({ graphPath, modelPath, set
 	};
 
 	const prediction = !predicted ? (
-		onlyShownButton && simulationLoading ? (
+		onlyShownButton ? (
 			<button
 				onClick={classifyGraph}
 				className=" border border-2 opacity-60 hover:opacity-90 hover:border-4 py-1 px-2 rounded-lg text-xl"

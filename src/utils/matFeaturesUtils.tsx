@@ -116,12 +116,24 @@ export function drawCrossConnection(
 }
 
 //compute mid point for basis curve drawing
-export function computeMids(point1: any, point2: any) {
+export function computeMids(point1: any, point2: any) :[[number, number], [number, number]]{
     //find mid - x
     const midX = (point1[0] + point2[0]) / 2;
-    const res = [
+    const res :[[number, number], [number, number]] = [
         [midX - 20, point1[1]],
         [midX + 20, point2[1]],
+    ];
+    console.log("res", res);
+    return res;
+}
+
+//compute mid point for basis curve drawing - vertical orient
+export function computeMidsVertical(point1: any, point2: any) :[[number, number], [number, number]]{
+    //find mid - x
+    const midY = (point1[1] + point2[1]) / 2;
+    const res :[[number, number], [number, number]] = [
+        [point1[0], midY-20],
+        [point2[0], midY+20],
     ];
     console.log("res", res);
     return res;
