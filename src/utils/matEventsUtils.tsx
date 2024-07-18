@@ -974,7 +974,7 @@ export function outputVisClick(
 
     console.log("w mat pos", wMat)
 
-    let weightMatrixPostions:any = computeMatrixLocations(btnX, btnY+138*3, 1, rectW, featureChannels, [wMat], 0);
+    let weightMatrixPostions:any = computeMatrixLocations(btnX+30, btnY+30, -1, rectW, featureChannels, [wMat], 0);
     
     console.log("w mat pos 1", weightMatrixPostions)
 
@@ -984,7 +984,7 @@ export function outputVisClick(
         {func:()=>{drawBiasVector(g1, linBias.length, rectH, rectH, biasCoordCopy[0], myColor, linBias, layerID);}, delay: 200}, 
         {func:()=>{drawBiasPathOutputVis(biasCoord, controlPts, feaCoord);}, delay:200}, 
         {func:()=>{
-            drawWeightMatrix(btnX, btnY, 1, rectW, rectH, featureChannels, [wMat], 0, myColor, g1, weightMatrixPostions);
+            drawWeightMatrix(btnX, btnY+30, -1, rectW, rectH, featureChannels, [wMat], 0, myColor, g1, weightMatrixPostions);
         }, delay:aniSec},
         {func:()=>{
             console.log("Xv check wmat", wMat);
