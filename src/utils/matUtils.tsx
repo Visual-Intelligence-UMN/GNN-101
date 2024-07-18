@@ -887,11 +887,11 @@ export function visualizeNodeClassifierFeatures(
 
             let weightMatrixPostions:any = computeMatrixLocations(btnX, btnY+30, curveDir, 15, featureChannels, [wMat], 0);
             
-            drawPoints(".mats", "red", [[btnX+10, btnY+30-15]])
+           // drawPoints(".mats", "red", [[btnX+10, btnY+30-15]])
 
             const animateSeqAfterPath = [
                 {func:()=>{
-                    drawWeightMatrix(btnX, btnY, 1, 15, 15, featureChannels, [wMat], 0, myColor, g1, weightMatrixPostions);
+                    drawWeightMatrix(btnX, btnY+15, 1, 15, 15, featureChannels, [wMat], 0, myColor, g1, weightMatrixPostions);
                 }, delay:aniSec},
                 {func:()=>{
                     const Xt = modelParams.weights[3];
