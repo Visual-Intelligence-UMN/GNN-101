@@ -116,7 +116,7 @@ export default function Sidebar(props: Props) {
 
                 <div className="p-4">
                     <h1 className="text-3xl font-semibold text-3xl">
-                        Convolutions inside a Graph:
+                        Convolutions on a Graph:
                     </h1>
                     <p>
                         Graphs have an irregular structure can directly use traditional neural networks, which are designed to operate on
@@ -135,7 +135,7 @@ export default function Sidebar(props: Props) {
                         Isomorphism Network (GIN), etc. We will start with GCN, which is one
                         of the most popular GNN architectures.
                     </p>
-                    <span className={styles.button}>Click to show GCNConv </span>
+                    <span className={styles.button} onClick={() => { }}>Click to show GCNConv </span>
                     <ol className="list-inside list-disc">
                         <li>
                             <b className="font-bold">Aggregation with Normalization: </b>
@@ -174,20 +174,22 @@ export default function Sidebar(props: Props) {
                             tasks, please stay tuned!
                         </p>
                         <span className={styles.tag}>Graph-Level Tasks </span>
+                        <span className={styles.button} onClick={() => { }}>Click to Predict a Graph </span>
                         <p>
                             Given a input graph, GNN can predict the properties of the entire
                             graph. For example, in the MUTAG dataset, the task is to predict
-                            whether a molecule is mutagenic or not. A global mean pooling
+                            whether a molecule is mutagenic or not. After sevela layers of GCNConv, a <b className="font-bold">global mean pooling </b>
                             layer is used to aggregate the node features into a single graph
-                            feature, which is then fed into a fully connected layer to make
+                            feature, which is then fed into <b className="font-bold">a fully connected layer</b> to make
                             the prediction.
                         </p>
                         <span className={styles.tag}>Node-Level Tasks </span>
+                        <span className={styles.button} onClick={() => { }}>Click to Predict Nodes </span>
                         <p>
                             Given a input graph, GNN can predict the properties of each node
                             in the graph. For example, in the Karate dataset, the task is to
-                            predict the community of each person in the social network. A node
-                            classification layer is used to predict the label of each node.
+                            predict the community of each person in the social network.
+                            After sevela layers of GCNConv, we apply a <b className="font-bold">fully connected layer </b> to each node to make the prediction.
                         </p>
                         <span className={styles.tag}>Edge-Level Tasks </span>
                         <p>Coming Soon!</p>
