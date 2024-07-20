@@ -85,11 +85,11 @@ export function drawAniPath(
 ) {
     d3.selectAll("#tempath").remove();
     d3.selectAll(".matmul-displayer").remove();
-    if(currentStep==0){
-        drawHintLabel(g, coordFeatureVis[0] - (endCoordList[currentStep][0] - startCoordList[0][0])/2 - 20, 
-        coordFeatureVis[1] + rectH - curveDir*Xt[currentStep].length*(2), 
-        "Matrix Multiplication", "procVis");
-    }
+    // if(currentStep==0){
+    //     drawHintLabel(g, coordFeatureVis[0] - (endCoordList[currentStep][0] - startCoordList[0][0])/2 - 20, 
+    //     coordFeatureVis[1] + rectH - curveDir*Xt[currentStep].length*(2), 
+    //     "Matrix Multiplication", "procVis");
+    // }
     g.append("rect")
         .attr("x", coordFeatureVis[0] + rectW * currentStep)
         .attr("y", coordFeatureVis[1] - rectH / 2)
@@ -160,22 +160,25 @@ export function drawMatrixWeight(
 
     console.log("Xv check 1", Xt, weightMatrixPostions);
     
-    if(Xt[0].length!=Xt.length){
+    if(Xt[0].length!=Xt.length
+        && (!(Xt[0].length==2 && Xt.length==64)
+        ||!(Xt[0].length==4 && Xt.length==2))
+    ){
         //weightMatrixPostions = transposeAnyMatrix(weightMatrixPostions);
         flag = false;
         console.log("w mat flag")
         const math = create(all, {});
         Xt = math.transpose(Xt);
     }
-    if((Xt[0].length==2 && Xt.length==64)
-        ||(Xt[0].length==4 && Xt.length==2)
-    ){
-        const math = create(all, {});
-        Xt = math.transpose(Xt);
-    }
+    // if((Xt[0].length==2 && Xt.length==64)
+    //     ||(Xt[0].length==4 && Xt.length==2)
+    // ){
+    //     const math = create(all, {});
+    //     Xt = math.transpose(Xt);
+    // }
     if((weightMatrixPostions.length==4&&weightMatrixPostions[0].length==2)){
         const math = create(all, {});
-        Xt = math.transpose(Xt);
+        Xt = math.transpose(math.transpose(Xt));
     }
     const Xv = Xt[currentStep];
     console.log("Xv check", Xv, Xt, weightMatrixPostions);
@@ -334,7 +337,7 @@ export function drawSummationFeature(
         .attr("class", "procVis summation");
 
     //draw label
-    drawHintLabel(g1, coordFeatureVis[0], coordFeatureVis[1] + rectH * curveDir, "Vector Summation", "procVis");
+    drawHintLabel(g1, coordFeatureVis[0], coordFeatureVis[1] + rectH * curveDir * 1.1, "Vector Summation", "procVis");
 
     //path connect - connect prev layer feature vis to intermediate feature vis
     const curve = d3.line().curve(d3.curveBasis);
@@ -405,7 +408,7 @@ export function drawWeightsVector(
             .attr("rectID", m)
             .attr("id", `weightRect${m}`);
     }
-    drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH, "Matmul Result", "procVis");
+    drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+2, "Matmul Result", "procVis");
 
     //draw frame
     g.append("rect")
@@ -473,7 +476,7 @@ export function computeMatrixLocations(
                 const math = create(all, {});
                 const matX = btnX;
                 const matY = btnY - offsetH;
-                const coefficient = 1.25;
+                const coefficient = 1;
                 let weightMatrixPositions = [];
                 //draw matrix - change the computation mode here, when the dims are different
                 let weightMat = weights[layerID];
@@ -521,9 +524,21 @@ weightMatrixPostions:any
     }
 
     const curve = d3.line().curve(d3.curveBasis);
-        const res = computeMidsVertical(btnPt, wMatPt);
-        const hpoint:[number, number] = res[0];
-        const lpoint:[number, number] = res[1];
+    const res = computeMidsVertical(btnPt, wMatPt);
+    const hpoint:[number, number] = res[0];
+    const lpoint:[number, number] = res[1];
+    if(curveDir==1){
+        let tlpoint:[number, number] = [lpoint[0], lpoint[1]];
+        let thpoint:[number, number] = [hpoint[0], hpoint[1]];
+        d3.select(".mats")
+            .append("path")
+            .attr("d", curve([wMatPt, tlpoint, thpoint, btnPt]))
+            .attr("stroke", "black")
+            .attr("opacity", 1)
+            .attr("fill", "none")
+            .attr("class", "procVis wMatLink").lower();
+        
+    }else{
         d3.select(".mats")
             .append("path")
             .attr("d", curve([btnPt, hpoint, lpoint, wMatPt]))
@@ -531,15 +546,15 @@ weightMatrixPostions:any
             .attr("opacity", 1)
             .attr("fill", "none")
             .attr("class", "procVis wMatLink").lower();
+    }
 
 //draw weight matrix
             //positioning
-            console.log("mat wl", weightMatrixPostions)
             let offsetH = curveDir * 50;
             if(curveDir==1)offsetH = -1*(curveDir * 50 + featureChannels * rectW + 100);
             const matX = btnX;
             const matY = btnY - offsetH;
-            const coefficient = 1.25;
+            const coefficient = 1;
             //draw matrix
             //const weightMat = math.transpose(weights[layerID]);
             const weightMat = weights[layerID];
@@ -552,6 +567,12 @@ weightMatrixPostions:any
                 console.log("w mat flag")
             }
             console.log("w mat check", weightMatrixPostions, weightMat, weightMat[weightMat.length-1][0]);
+            
+            //draw label hint
+            drawHintLabel(g, weightMatrixPostions[0][0][0], 
+                weightMatrixPostions[0][0][1] - 12, "Weight Matrix", 
+                "procVis");
+
             for(let i=0; i<weightMatrixPostions.length; i++){
                 let tempArr = [];
                 for(let j=0; j<weightMatrixPostions[0].length; j++){
@@ -630,7 +651,7 @@ export function drawBiasVector(
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("class", "procVis biasVector");
-    const label = drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH, "Bias Vector", "procVis biasVector");
+    const label = drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+2, "Bias Vector", "procVis biasVector");
     d3.selectAll(".biasVector").transition().duration(100).attr("opacity", 1);
 }
 

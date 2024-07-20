@@ -10,14 +10,15 @@ export function drawHintLabel(
     x:number,
     y:number,
     text:string,
-    classTag:string
+    classTag:string,
+    textSize:string = "12px"
 ){
     const label = g.append("text")
         .attr("x", x)
         .attr("y", y)
         .text(text)
         .style("fill", "gray")
-        .style("font-size", "12px")
+        .style("font-size", textSize)
         .attr("class", classTag); 
     return label;
 }
