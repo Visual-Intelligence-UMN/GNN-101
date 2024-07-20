@@ -113,16 +113,9 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           .style("stroke-opacity", 1)
           .attr("opacity", 1)
 
-        const labels = g1
-          .selectAll("text")
-          .data(data.nodes)
-          .join("text")
-          .text((d: any) => d.id)
-          .attr("font-size", `17px`);
+        
 
-        if (i >= 4) {
-          labels.attr("opacity", 0);
-        }
+       
         data.nodes.forEach((node: any) => {
   
           if (initialCoords[node.id]) {
@@ -178,9 +171,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             .attr("cy", (d: any) => d.y);
 
 
-          labels
-            .attr("x", (d: any) => d.x - 6)
-            .attr("y", (d: any) => d.y + 6);
+          
         }
         updatePositions();
         function updatePositions() {
@@ -206,8 +197,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           node.attr("cx", (d: any) => d.x)
             .attr("cy", (d: any) => d.y);
 
-          labels.attr("x", (d: any) => d.x - 6)
-            .attr("y", (d: any) => d.y + 6);
+          
 
 
 
@@ -332,6 +322,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             .attr("x", text_x)
             .attr("y", text_y)
             .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "central")
             .attr("fill", "black")
             .attr("font-size", "15px")
             .text(text)

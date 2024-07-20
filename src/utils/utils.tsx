@@ -380,7 +380,7 @@ export async function data_prep(o_data: any) {
         if (is_train[i]) {
           node_train = "T"
         } else {
-          node_train = "F"
+          node_train = "?"
         }
 
 
@@ -646,19 +646,23 @@ export function featureVisualizer(
 
 
           node.text = g2.append("text")
-          .attr("x", node.x - 6)
-          .attr("y", node.y + 6)
+          .attr("x", node.x)
+          .attr("y", node.y)
           .join("text")
           .text(name)
+          .attr("text-anchor", "middle")
+          .attr("dominant-baseline", "central")
           .attr("font-size", `17px`)
           .attr("opacity", 1);
 
         }
         else {
         node.text = g2.append("text")
-          .attr("x", node.x - 6)
-          .attr("y", node.y + 6)
+          .attr("x", node.x)
+          .attr("y", node.y)
           .join("text")
+          .attr("text-anchor", "middle")
+          .attr("dominant-baseline", "central")
           .text(node.id)
           .attr("font-size", `17px`)
           .attr("opacity", 1);

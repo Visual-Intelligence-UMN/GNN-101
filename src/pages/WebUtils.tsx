@@ -789,8 +789,11 @@ export function visualizeGraph(
                 .data(data.nodes)
                 .join("text")
                 .text((d: any) => d.name)
-                .attr("font-size", `17px`);
-                
+                .attr("font-size", `17px`)
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "central")
+                                
+
                 data.nodes.forEach((node: any, i: number) => {
   
                     if (location[i.toString()]) {
@@ -808,7 +811,6 @@ export function visualizeGraph(
                   .force("link", d3.forceLink(data.links).id((d: any) => d.id).distance(20))
                   .stop()
                   .on("tick", ticked);
-                
                     function ticked() {
                         link.attr("x1", (d: any) => d.source.x)
                             .attr("y1", (d: any) => d.source.y)
@@ -839,11 +841,8 @@ export function visualizeGraph(
                             (d: any) => d.y
                         );
 
+                            
 
-                            labels
-                                .attr("x", (d: any) => d.x - 6)
-                                .attr("y", (d: any) => d.y + 6);
-                        
                     }
                     function updatePositions() {
                         link
@@ -868,8 +867,8 @@ export function visualizeGraph(
                       node.attr("cx", (d: any) => d.x)
                         .attr("cy", (d: any) => d.y);
                         labels
-            .attr("x", (d: any) => d.x - 6)
-            .attr("y", (d: any) => d.y + 6);
+                        .attr("x", (d: any) => d.x)
+                        .attr("y", (d: any) => d.y);
                         let maxXDistance = 0;
                         let maxYDistance = 0;
                         initialCoordinates = {};
