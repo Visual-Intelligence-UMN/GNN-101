@@ -38,7 +38,7 @@ export function showAllLinks(nodes: any) {
     nodes.forEach((node: any) => {
         if (node.links) {
             node.links.forEach((link: any) => {
-                link.style("opacity", 0.1).lower();
+                link.style("opacity", 0).lower();
             });
         }
     });
@@ -132,7 +132,7 @@ export function resetNodes(allNodes: any[], convNum: number) {
 
             if (node.links) {
                 node.links.forEach((link: any) => {
-                    link.style("opacity", 0.1).lower();
+                    link.style("opacity", 0).lower();
                 });
             }
 
