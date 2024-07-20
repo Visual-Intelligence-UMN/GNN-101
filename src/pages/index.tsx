@@ -5,7 +5,7 @@ import ClassifyGraph from "./ClassifyGraph";
 // import { CSSTransition } from 'react-transition-group';
 import MatricesVisualizer from "./MatricesVisualizer";
 import { IntmData, IntmDataNode } from "../types";
-import { graphList, linkList, modelList, nodeList, DatasetInfo } from "./const";
+import { graphList, linkList, modelList, nodeList, DatasetInfo } from "../utils/const";
 import Sidebar from "./Sidebar";
 import styles from "./index.module.css";
 
@@ -17,8 +17,8 @@ import {
   GraphAnalysisViewer,
   NodeClassifierButtonChain,
   LinkClassifierButtonChain,
-} from "./WebUtils";
-import { Footer, NavBar } from "./Surfaces";
+} from "../utils/WebUtils";
+import { Footer, NavBar } from "../utils/Surfaces";
 import { Inter } from "@next/font/google";
 import NodeMatricesVisualizer from "./node_classifier/NodeMatrixVisualizer";
 import NodeGraphVisualizer from "./node_classifier/NodeGraphVisualizer";
@@ -188,7 +188,7 @@ export default function Home() {
                       //     OptionList={Object.keys(nodeList)}
                       //   />
 
-                      <span className="text-2xl">Zachary's Karate Club </span>
+                      <span className="text-2xl">Zachary&apos;s Karate Club </span>
                     ) : (
                       <Selector
                         selectedOption={selectedGraph}

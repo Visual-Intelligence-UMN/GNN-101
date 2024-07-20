@@ -10,7 +10,7 @@ import {
   myColor,
 } from "../../utils/utils";
 
-import { visualizeGraph, getInitialCoordinates } from "../WebUtils";
+import { visualizeGraph, getInitialCoordinates } from "../../utils/WebUtils";
 import { aggregationCalculator } from "@/utils/graphUtils";
 import { sources } from "next/dist/compiled/webpack/webpack";
 import { buildBinaryLegend, buildLegend } from "@/utils/matHelperUtils";

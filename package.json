@@ -4,12 +4,11 @@
   "private": true,
   "homepage": "https://Visual-Intelligence-UMN.github.io/web-gnn-vis",
   "scripts": {
-    "predeploy":"npm run build",
-    "deploy":"gh-pages -d build",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "predeploy": "npm run build && echo > out/.nojekyll",
+    "deploy": "gh-pages -d out -t true"
   },
   "dependencies": {
     "@fontsource/inter": "^5.0.18",

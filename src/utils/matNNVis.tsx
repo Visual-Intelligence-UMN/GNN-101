@@ -20,7 +20,7 @@ import {
     drawNodeAttributes,
     getNodeAttributes
 } from "../utils/matHelperUtils";
-import { visualizeMatrixBody } from "@/pages/WebUtils";
+import { visualizeMatrixBody } from "./WebUtils";
 
 //find absolute max value in an 1d array
 export function findAbsMax(arr: number[]) {

@@ -19,7 +19,7 @@ import {
     HeatmapData,
     drawNodeAttributes,
     getNodeAttributes,
-} from "../utils/matHelperUtils";
+} from "./matHelperUtils";
 
 import { Tooltip } from "react-tooltip";
 
@@ -618,8 +618,8 @@ export const PredictionVisualizer: React.FC<PredictionVisualizerProps> = ({
         <div className="flex gap-x-4">
             <div>
                 <p>
-                    {Object.keys(result).map((key) => (
-                        <span>
+                    {Object.keys(result).map((key, index) => (
+                        <span key={index}>
                             {key}
                             <br />
                         </span>
