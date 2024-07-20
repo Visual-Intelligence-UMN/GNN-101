@@ -415,7 +415,7 @@ export async function data_prep(o_data: any) {
         if (is_train[i]) {
           node_train = "T"
         } else {
-          node_train = "F"
+          node_train = "?"
         }
 
 
@@ -681,19 +681,23 @@ export function featureVisualizer(
 
 
           node.text = g2.append("text")
-          .attr("x", node.x - 6)
-          .attr("y", node.y + 6)
+          .attr("x", node.x)
+          .attr("y", node.y)
           .join("text")
           .text(name)
+          .attr("text-anchor", "middle")
+          .attr("dominant-baseline", "central")
           .attr("font-size", `17px`)
           .attr("opacity", 1);
 
         }
         else {
         node.text = g2.append("text")
-          .attr("x", node.x - 6)
-          .attr("y", node.y + 6)
+          .attr("x", node.x)
+          .attr("y", node.y)
           .join("text")
+          .attr("text-anchor", "middle")
+          .attr("dominant-baseline", "central")
           .text(node.id)
           .attr("font-size", `17px`)
           .attr("opacity", 1);
@@ -1012,7 +1016,6 @@ export function featureVisualizer(
           if (!state.isClicked) {
             if (node.links) {
               node.links.forEach((link: any) => {
-                const avg = calculateAverage(node.features);
                 link.style("opacity", 1)
               });
             }
@@ -1024,7 +1027,7 @@ export function featureVisualizer(
             if (node.links) {
               node.links.forEach((link: any) => {
               
-                link.style("opacity", 0.1);
+                link.style("opacity", 0);
               });
             }
           }
@@ -1189,7 +1192,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
                 `)
                 .style("stroke", linkStrength(avg))
                 .style("stroke-width", 1)
-                .style("opacity", 0.1)
+                .style("opacity", 0)
                 .style("fill", "none");
 
 
@@ -1216,7 +1219,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
               const path = svg.append("path")
                 .attr("d", `M ${node.x + xOffset1 + 16} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffsetNext - 16} ${nextNode.y + 10}`)
                 .style("stroke-width", 1)
-                .style("opacity", 0.1)
+                .style("opacity", 0)
                 .style("stroke", linkStrength(avg))
                 .style("fill", "none");
   
@@ -1615,14 +1618,18 @@ export function graphToAdjList(graph:any){
 }
 
 
-export function loadNodesLocation(mode: number) {
+export function loadNodesLocation(mode: number, path: string) {
+  
   let data; 
   if (mode === 0) {
-    data = require("../../public/json_data/node_location/nodes_data0.json");
+    if (path === "0") data = require("../../public/json_data/node_location/nodes_data0.json");
+
+    if (path === "1") data = require("../../public/json_data/node_location/nodes_data1.json");
+
+    if (path === "2") data = require("../../public/json_data/node_location/nodes_data2.json");
   } 
   if (mode === 1) {
-    //data = require("../../public/json_data/node_location/nodes_data1.json");
-    data = []
+    data = require("../../public/json_data/node_location/nodes_data_karate.json");
 
   }
   console.log("AWD",data);

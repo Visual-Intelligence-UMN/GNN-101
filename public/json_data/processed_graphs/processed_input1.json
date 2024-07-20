@@ -1,0 +1,246 @@
+{
+  "nodes": [
+    {
+      "id": 0,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 1,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 2,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 3,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 4,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 5,
+      "name": "Unknown",
+      "features": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": true
+    },
+    {
+      "id": 6,
+      "name": "Unknown",
+      "features": [
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": false
+    },
+    {
+      "id": 7,
+      "name": "Unknown",
+      "features": [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": false
+    },
+    {
+      "id": 8,
+      "name": "Unknown",
+      "features": [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": false
+    },
+    {
+      "id": 9,
+      "name": "Unknown",
+      "features": [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "is_aromatic": false
+    }
+  ],
+  "links": [
+    {
+      "source": 0,
+      "target": 1,
+      "type": "Unknown"
+    },
+    {
+      "source": 0,
+      "target": 5,
+      "type": "Unknown"
+    },
+    {
+      "source": 1,
+      "target": 0,
+      "type": "Unknown"
+    },
+    {
+      "source": 1,
+      "target": 2,
+      "type": "Unknown"
+    },
+    {
+      "source": 2,
+      "target": 1,
+      "type": "Unknown"
+    },
+    {
+      "source": 2,
+      "target": 3,
+      "type": "Unknown"
+    },
+    {
+      "source": 2,
+      "target": 9,
+      "type": "Unknown"
+    },
+    {
+      "source": 3,
+      "target": 2,
+      "type": "Unknown"
+    },
+    {
+      "source": 3,
+      "target": 4,
+      "type": "Unknown"
+    },
+    {
+      "source": 4,
+      "target": 3,
+      "type": "Unknown"
+    },
+    {
+      "source": 4,
+      "target": 5,
+      "type": "Unknown"
+    },
+    {
+      "source": 5,
+      "target": 0,
+      "type": "Unknown"
+    },
+    {
+      "source": 5,
+      "target": 4,
+      "type": "Unknown"
+    },
+    {
+      "source": 5,
+      "target": 6,
+      "type": "Unknown"
+    },
+    {
+      "source": 6,
+      "target": 5,
+      "type": "Unknown"
+    },
+    {
+      "source": 6,
+      "target": 7,
+      "type": "Unknown"
+    },
+    {
+      "source": 6,
+      "target": 8,
+      "type": "Unknown"
+    },
+    {
+      "source": 7,
+      "target": 6,
+      "type": "Unknown"
+    },
+    {
+      "source": 8,
+      "target": 6,
+      "type": "Unknown"
+    },
+    {
+      "source": 9,
+      "target": 2,
+      "type": "Unknown"
+    }
+  ]
+}
