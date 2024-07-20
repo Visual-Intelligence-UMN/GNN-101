@@ -206,8 +206,8 @@ export default function Sidebar(props: Props) {
                     </p>
                     🤸 Team Members:
                     <ul className="list-disc list-inside px-4">
-                        <li>Harry Lu</li>
-                        <li>Cheongwei Chen</li>
+                        <li>Yilin(Harry) Lu</li>
+                        <li>Chongwei Chen</li>
                         <li>Matthew Xu</li>
                         <li>Qianwen Wang</li>
                     </ul>
