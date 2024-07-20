@@ -411,6 +411,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
         const graphsData = await prep_graphs(num, processedData);
    
         const initialCoordinates = getInitialCoordinates();
+        console.log('initialCoordinates', initialCoordinates);
         // Initialize and run D3 visualization with processe  d data
         await init(graphsData, initialCoordinates);
       } catch (error) {

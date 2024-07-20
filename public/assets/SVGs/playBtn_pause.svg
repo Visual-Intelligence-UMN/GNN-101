@@ -1,72 +1,26 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 15" width="15mm" height="15mm">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+        stroke-miterlimit: 10;
+        stroke-width: 0.5px;
+      }
 
-<svg
-   width="6.5mm"
-   height="6.5mm"
-   viewBox="0 0 6.5 6.5"
-   version="1.1"
-   id="svg1"
-   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
-   sodipodi:docname="playBtn_pause.svg"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
-  <sodipodi:namedview
-     id="namedview1"
-     pagecolor="#ffffff"
-     bordercolor="#111111"
-     borderopacity="1"
-     inkscape:showpageshadow="0"
-     inkscape:pageopacity="0"
-     inkscape:pagecheckerboard="1"
-     inkscape:deskcolor="#d1d1d1"
-     inkscape:document-units="mm"
-     inkscape:zoom="22.153314"
-     inkscape:cx="14.918761"
-     inkscape:cy="13.022882"
-     inkscape:window-width="1649"
-     inkscape:window-height="1266"
-     inkscape:window-x="3159"
-     inkscape:window-y="534"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="layer1" />
-  <defs
-     id="defs1" />
-  <g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
-     id="layer1">
-    <g
-       id="g1">
-      <g
-         id="layer2"
-         transform="translate(0.04606693,0.15604723)">
-        <ellipse
-           style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.107209;stroke-opacity:1"
-           id="path1"
-           cx="3.1825042"
-           cy="3.0557461"
-           rx="3.0592785"
-           ry="2.956984" />
-      </g>
-      <rect
-         style="fill:#000000;stroke:#000000;stroke-width:0.3;stroke-linejoin:round"
-         id="rect1"
-         width="0.63299412"
-         height="2.818615"
-         x="1.9586986"
-         y="-4.6578808"
-         transform="scale(1,-1)" />
-      <rect
-         style="fill:#000000;stroke:#000000;stroke-width:0.3;stroke-linejoin:round"
-         id="rect1-7"
-         width="0.63299412"
-         height="2.818615"
-         x="3.7816327"
-         y="-4.6737165"
-         transform="scale(1,-1)" />
-    </g>
-  </g>
+      .cls-1, .cls-2 {
+        stroke: #606161;
+      }
+
+      .cls-2 {
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 0.4px;
+      }
+    </style>
+  </defs>
+<circle class="cls-1" cx="7.5" cy="7.5" r="6.75"/>
+  <path class="cls-2" d="M6.2708,10.9459c-.0197,.0114-.1158,.0643-.2656,.0643s-.2459-.0529-.2656-.0643V3.8541c.0318-.0138,.1277-.0518,.2656-.0518s.2338,.038,.2656,.0518V10.9459Z"/>
+  <path class="cls-2" d="M9.4604,10.9325c-.0197,.0114-.1158,.0643-.2656,.0643s-.2459-.0529-.2656-.0643V3.8407c.0318-.0138,.1277-.0518,.2656-.0518s.2338,.038,.2656,.0518V10.9325Z"/>
 </svg>
