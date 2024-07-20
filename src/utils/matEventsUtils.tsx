@@ -791,7 +791,7 @@ export function featureVisClick(
                 }
                 //        drawPoints(".mats", "red", [coordStartPoint, coordFinalPoint]);
                 // d3.selectAll("circle").raise();
-            }, 25); // 每2秒执行一次drawPaths
+            }, 200); // 每2秒执行一次drawPaths
 
             setIntervalID(intervalID);
             isPlaying = true;

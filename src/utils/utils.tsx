@@ -26,6 +26,41 @@ env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
 };
 
+
+// Function to flip a matrix upside down
+export function flipVertically(matrix: number[][]): number[][] {
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+  const flippedMatrix: number[][] = new Array(rows).fill(0).map(() => new Array(cols).fill(0));
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      flippedMatrix[i][j] = matrix[rows - 1 - i][j];
+    }
+  }
+
+  return flippedMatrix;
+}
+
+// Function to flip a matrix left to right
+export function flipHorizontally(matrix: number[][]): number[][] {
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+  const flippedMatrix: number[][] = new Array(rows).fill(0).map(() => new Array(cols).fill(0));
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      flippedMatrix[i][j] = matrix[i][cols - 1 - j];
+    }
+  }
+
+  return flippedMatrix;
+}
+
+
+
+
+
 export interface FeatureGroupLocation {
   xPos: number;
   yPos: number;

@@ -160,22 +160,25 @@ export function drawMatrixWeight(
 
     console.log("Xv check 1", Xt, weightMatrixPostions);
     
-    if(Xt[0].length!=Xt.length){
+    if(Xt[0].length!=Xt.length
+        && (!(Xt[0].length==2 && Xt.length==64)
+        ||!(Xt[0].length==4 && Xt.length==2))
+    ){
         //weightMatrixPostions = transposeAnyMatrix(weightMatrixPostions);
         flag = false;
         console.log("w mat flag")
         const math = create(all, {});
         Xt = math.transpose(Xt);
     }
-    if((Xt[0].length==2 && Xt.length==64)
-        ||(Xt[0].length==4 && Xt.length==2)
-    ){
-        const math = create(all, {});
-        Xt = math.transpose(Xt);
-    }
+    // if((Xt[0].length==2 && Xt.length==64)
+    //     ||(Xt[0].length==4 && Xt.length==2)
+    // ){
+    //     const math = create(all, {});
+    //     Xt = math.transpose(Xt);
+    // }
     if((weightMatrixPostions.length==4&&weightMatrixPostions[0].length==2)){
         const math = create(all, {});
-        Xt = math.transpose(Xt);
+        Xt = math.transpose(math.transpose(Xt));
     }
     const Xv = Xt[currentStep];
     console.log("Xv check", Xv, Xt, weightMatrixPostions);
@@ -525,19 +528,20 @@ weightMatrixPostions:any
     const hpoint:[number, number] = res[0];
     const lpoint:[number, number] = res[1];
     if(curveDir==1){
-        d3.select(".mats")
-            .append("path")
-            .attr("d", curve([btnPt, hpoint, lpoint, wMatPt]))
-            .attr("stroke", "black")
-            .attr("opacity", 1)
-            .attr("fill", "none")
-            .attr("class", "procVis wMatLink").lower();
-    }else{
         let tlpoint:[number, number] = [lpoint[0], lpoint[1]];
         let thpoint:[number, number] = [hpoint[0], hpoint[1]];
         d3.select(".mats")
             .append("path")
             .attr("d", curve([wMatPt, tlpoint, thpoint, btnPt]))
+            .attr("stroke", "black")
+            .attr("opacity", 1)
+            .attr("fill", "none")
+            .attr("class", "procVis wMatLink").lower();
+        
+    }else{
+        d3.select(".mats")
+            .append("path")
+            .attr("d", curve([btnPt, hpoint, lpoint, wMatPt]))
             .attr("stroke", "black")
             .attr("opacity", 1)
             .attr("fill", "none")
