@@ -5,36 +5,36 @@
   "devFiles": [],
   "ampDevFiles": [],
   "lowPriorityFiles": [
-    "static/XLO0LLsx3nKYwhsUm49U9/_buildManifest.js",
-    "static/XLO0LLsx3nKYwhsUm49U9/_ssgManifest.js"
+    "static/vJFD4rOvnMw3rSMPNwwZL/_buildManifest.js",
+    "static/vJFD4rOvnMw3rSMPNwwZL/_ssgManifest.js"
   ],
   "rootMainFiles": [],
   "pages": {
     "/": [
-      "static/chunks/webpack-6e7c0654be166608.js",
+      "static/chunks/webpack-64e53a54636207ac.js",
       "static/chunks/framework-291fcc666dd940a9.js",
-      "static/chunks/main-2c91feb999b405af.js",
+      "static/chunks/main-2fcc50da7d0f56c8.js",
       "static/chunks/6f5856c5-a889a0630c4a8a20.js",
       "static/chunks/978-f5dd8569cd59eefa.js",
-      "static/chunks/764-8d5984d9c14c30a6.js",
+      "static/chunks/764-78544a699109e316.js",
       "static/chunks/785-5e4823b0c31d26ed.js",
       "static/chunks/164-eaf8ad6f984cf58b.js",
-      "static/css/1cf4ed49c4496ad6.css",
-      "static/chunks/pages/index-bdd49a4e3f6f156b.js"
+      "static/css/bb195e80d967bd14.css",
+      "static/chunks/pages/index-8e57a1b5ec22be6a.js"
     ],
     "/ClassifyGraph": [
-      "static/chunks/webpack-6e7c0654be166608.js",
+      "static/chunks/webpack-64e53a54636207ac.js",
       "static/chunks/framework-291fcc666dd940a9.js",
-      "static/chunks/main-2c91feb999b405af.js",
+      "static/chunks/main-2fcc50da7d0f56c8.js",
       "static/chunks/6f5856c5-a889a0630c4a8a20.js",
       "static/chunks/978-f5dd8569cd59eefa.js",
       "static/chunks/785-5e4823b0c31d26ed.js",
       "static/chunks/pages/ClassifyGraph-402a9f3789630ee5.js"
     ],
     "/GraphVisualizer": [
-      "static/chunks/webpack-6e7c0654be166608.js",
+      "static/chunks/webpack-64e53a54636207ac.js",
       "static/chunks/framework-291fcc666dd940a9.js",
-      "static/chunks/main-2c91feb999b405af.js",
+      "static/chunks/main-2fcc50da7d0f56c8.js",
       "static/chunks/6f5856c5-a889a0630c4a8a20.js",
       "static/chunks/978-f5dd8569cd59eefa.js",
       "static/chunks/785-5e4823b0c31d26ed.js",
@@ -42,9 +42,9 @@
       "static/chunks/pages/GraphVisualizer-fa0a32749b2e037a.js"
     ],
     "/MatricesVisualizer": [
-      "static/chunks/webpack-6e7c0654be166608.js",
+      "static/chunks/webpack-64e53a54636207ac.js",
       "static/chunks/framework-291fcc666dd940a9.js",
-      "static/chunks/main-2c91feb999b405af.js",
+      "static/chunks/main-2fcc50da7d0f56c8.js",
       "static/chunks/6f5856c5-a889a0630c4a8a20.js",
       "static/chunks/978-f5dd8569cd59eefa.js",
       "static/chunks/785-5e4823b0c31d26ed.js",
@@ -52,30 +52,30 @@
       "static/chunks/pages/MatricesVisualizer-b014fb71997c9a77.js"
     ],
     "/Sidebar": [
-      "static/chunks/webpack-6e7c0654be166608.js",
+      "static/chunks/webpack-64e53a54636207ac.js",
       "static/chunks/framework-291fcc666dd940a9.js",
-      "static/chunks/main-2c91feb999b405af.js",
-      "static/chunks/764-8d5984d9c14c30a6.js",
-      "static/css/1456738ad1b200fc.css",
+      "static/chunks/main-2fcc50da7d0f56c8.js",
+      "static/chunks/764-78544a699109e316.js",
+      "static/css/2e190b5c35563a41.css",
       "static/chunks/pages/Sidebar-e3df27f6e0b58792.js"
     ],
     "/_app": [
-      "static/chunks/webpack-6e7c0654be166608.js",
+      "static/chunks/webpack-64e53a54636207ac.js",
       "static/chunks/framework-291fcc666dd940a9.js",
-      "static/chunks/main-2c91feb999b405af.js",
+      "static/chunks/main-2fcc50da7d0f56c8.js",
       "static/css/e5e99710e7fd2353.css",
       "static/chunks/pages/_app-a875484c7b4c4180.js"
     ],
     "/_error": [
-      "static/chunks/webpack-6e7c0654be166608.js",
+      "static/chunks/webpack-64e53a54636207ac.js",
       "static/chunks/framework-291fcc666dd940a9.js",
-      "static/chunks/main-2c91feb999b405af.js",
+      "static/chunks/main-2fcc50da7d0f56c8.js",
       "static/chunks/pages/_error-0d8ca40f7c5f72ca.js"
     ],
     "/node_classifier/NodeGraphVisualizer": [
-      "static/chunks/webpack-6e7c0654be166608.js",
+      "static/chunks/webpack-64e53a54636207ac.js",
       "static/chunks/framework-291fcc666dd940a9.js",
-      "static/chunks/main-2c91feb999b405af.js",
+      "static/chunks/main-2fcc50da7d0f56c8.js",
       "static/chunks/6f5856c5-a889a0630c4a8a20.js",
       "static/chunks/978-f5dd8569cd59eefa.js",
       "static/chunks/785-5e4823b0c31d26ed.js",
@@ -83,9 +83,9 @@
       "static/chunks/pages/node_classifier/NodeGraphVisualizer-f2d0495194872f41.js"
     ],
     "/node_classifier/NodeMatrixVisualizer": [
-      "static/chunks/webpack-6e7c0654be166608.js",
+      "static/chunks/webpack-64e53a54636207ac.js",
       "static/chunks/framework-291fcc666dd940a9.js",
-      "static/chunks/main-2c91feb999b405af.js",
+      "static/chunks/main-2fcc50da7d0f56c8.js",
       "static/chunks/6f5856c5-a889a0630c4a8a20.js",
       "static/chunks/978-f5dd8569cd59eefa.js",
       "static/chunks/785-5e4823b0c31d26ed.js",
