@@ -335,13 +335,13 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
            let cst:any = null;
           
           if(i==0){
-            cst = buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x, text_y + 50, g1)
+            cst = buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x, text_y + 150, g1)
           }
           else if(i==5){
-            cst = buildBinaryLegend(myColor, value[0], value[1], text+" Color Scheme", text_x, text_y + 50, g1)
+            cst = buildBinaryLegend(myColor, value[0], value[1], text+" Color Scheme", text_x, text_y + 150, g1)
           }
           else {
-            cst = buildLegend(myColor, absMax, text+" Color Scheme", text_x - 50, text_y + 50, g1);
+            cst = buildLegend(myColor, absMax, text+" Color Scheme", text_x - 50, text_y + 150, g1);
           }
 
           colorSchemes.push(cst);

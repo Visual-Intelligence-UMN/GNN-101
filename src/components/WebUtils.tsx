@@ -990,14 +990,14 @@ export function visualizeMatrixBody(gridSize: number, graph: any, width: number,
 
     g.append("g")
         .attr("class", "x-axis")
-        .attr("transform", `translate(0,${gridSize + 50})`)
+        .attr("transform", `translate(0,${gridSize + 150})`)
         .call(d3.axisBottom(x));
 
     var y = d3.scaleBand().range([0, gridSize]).domain(myVars).padding(0.01);
 
     g.append("g")
         .attr("class", "y-axis")
-        .attr("transform", "translate(0,50)")
+        .attr("transform", "translate(0,150)")
         .call(d3.axisLeft(y));
 
     if (0 == 0) {
@@ -1028,7 +1028,7 @@ export function visualizeMatrixBody(gridSize: number, graph: any, width: number,
         .enter()
         .append("rect")
         .attr("x", (d: HeatmapData) => x(d.group)!)
-        .attr("y", (d: HeatmapData) => y(d.variable)! + 50)
+        .attr("y", (d: HeatmapData) => y(d.variable)! + 150)
         .attr("width", x.bandwidth())
         .attr("height", y.bandwidth())
         .style("fill", (d: HeatmapData) => myColor(d.value))
@@ -1053,7 +1053,7 @@ export function visualizeMatrix(
         //visualize matrix body part
         visualizeMatrixBody(gridSize, graph, width, height, margin);
 
-        if (isAttribute) drawNodeAttributes(nodeAttrs, graph, 50);
+        if (isAttribute) drawNodeAttributes(nodeAttrs, graph, 150);
     };
 
     const visualizeMat = async (path: string) => {

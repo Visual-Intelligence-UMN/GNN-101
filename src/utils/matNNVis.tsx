@@ -210,7 +210,7 @@ async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: str
         adjList,
         colorSchemeTable
     );
-    drawNodeAttributes(nodeAttrs, graph, 50);
+    drawNodeAttributes(nodeAttrs, graph, 150);
 
     const intervalID = featuresManager.getIntervalID();
     console.log("get interval ID init G", intervalID);
