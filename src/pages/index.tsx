@@ -17,8 +17,8 @@ import {
   GraphAnalysisViewer,
   NodeClassifierButtonChain,
   LinkClassifierButtonChain,
-} from "../utils/WebUtils";
-import { Footer, NavBar } from "../utils/Surfaces";
+} from "../components/WebUtils";
+import { Footer, NavBar } from "../components/Surfaces";
 import { Inter } from "@next/font/google";
 import NodeMatricesVisualizer from "./node_classifier/NodeMatrixVisualizer";
 import NodeGraphVisualizer from "./node_classifier/NodeGraphVisualizer";

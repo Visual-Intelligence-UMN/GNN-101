@@ -7,7 +7,7 @@ import {
     myColor,
     state,
 } from "./utils";
-import { roundToTwo } from "./WebUtils";
+import { roundToTwo } from "../components/WebUtils";
 import { drawHintLabel, loadWeights } from "./matHelperUtils";
 import * as math from "mathjs";
 import { create, all, matrix } from "mathjs";

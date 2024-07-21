@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent } from "react";
 import { graphPrediction, linkPrediction, nodePrediction } from "@/utils/utils";
-import { Hint, PredictionVisualizer } from "../utils/WebUtils";
+import { Hint, PredictionVisualizer } from "../components/WebUtils";
 import { on } from "events";
 import { useEffect } from "react";
 import { IntmData, IntmDataLink, IntmDataNode } from "@/types";

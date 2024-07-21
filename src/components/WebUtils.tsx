@@ -1,6 +1,6 @@
 //A web utilities file for general UI building
 import { useEffect, useState, useRef } from "react";
-import { Panel } from "react-resizable-panels";
+//import "./webUtils.css";
 import * as d3 from "d3";
 import {
     analyzeGraph,
@@ -19,7 +19,7 @@ import {
     HeatmapData,
     drawNodeAttributes,
     getNodeAttributes,
-} from "./matHelperUtils";
+} from "../utils/matHelperUtils";
 
 import { Tooltip } from "react-tooltip";
 

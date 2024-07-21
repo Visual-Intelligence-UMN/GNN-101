@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { roundToTwo } from "./WebUtils";
+import { roundToTwo } from "../components/WebUtils";
 import { softmax } from "./utils";
 import { create, all, transposeDependencies } from "mathjs";
 

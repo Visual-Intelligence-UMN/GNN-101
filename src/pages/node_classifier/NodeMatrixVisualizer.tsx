@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import { visualizeMatrix } from "../../utils/WebUtils";
+import { visualizeMatrix } from "../../components/WebUtils";
 import { visualizeGraphClassifier, visualizeNodeClassifier } from "@/utils/matNNVis";
 
 interface NodeMatricesVisualizerProps {
