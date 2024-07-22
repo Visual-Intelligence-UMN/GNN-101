@@ -891,12 +891,10 @@ export function visualizeNodeClassifierFeatures(
 
             const animateSeqAfterPath = [
                 {func:()=>{
-                    drawWeightMatrix(btnX, btnY+15, 1, 15, 15, featureChannels, [wMat], 0, myColor, g1, weightMatrixPostions);
-                }, delay:aniSec},
-                {func:()=>{
                     const Xt = modelParams.weights[3];
                     const prevCon3Val:number[] = [conv3[node][0], conv3[node][1]];
                     console.log("data fetching wv 1", prevCon3Val)
+                    drawWeightMatrix(btnX, btnY+15, 1, 15, 15, featureChannels, [wMat], 0, myColor, g1, weightMatrixPostions);
                     drawWeightsVector(g, vectorAfterMul, outputCoord, 15, 10, 
                         myColor, wMat, startPathCoords, endPathCoords, curveDir, 
                         weightMatrixPostions, featureChannels, prevCon3Val)
@@ -971,7 +969,7 @@ export function visualizeNodeClassifierFeatures(
                     btnY,
                     "./assets/SVGs/matmul.svg"
                 );
-            }, initSec + aniSec * 2);
+            }, aniSec);
 
             let firstPlay = true;
 
