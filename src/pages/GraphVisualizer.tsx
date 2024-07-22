@@ -283,7 +283,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             transform = `scale(1, 1)`;
           } 
           const text_x = point1.x
-          const text_y = point4.y + 100;
+          const text_y = point4.y;
           if (i >= 4) {
             point1.y -= 130;
             point2.y -= 130;
@@ -333,15 +333,15 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
            console.log("array value", value)
 
            let cst:any = null;
-          
+          const cstOffset = 25;
           if(i==0){
-            cst = buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x, text_y + 150, g1)
+            cst = buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x, text_y + cstOffset, g1)
           }
           else if(i==5){
-            cst = buildBinaryLegend(myColor, value[0], value[1], text+" Color Scheme", text_x, text_y + 150, g1)
+            cst = buildBinaryLegend(myColor, value[0], value[1], text+" Color Scheme", text_x, text_y + cstOffset, g1)
           }
           else {
-            cst = buildLegend(myColor, absMax, text+" Color Scheme", text_x - 50, text_y + 150, g1);
+            cst = buildLegend(myColor, absMax, text+" Color Scheme", text_x - 50, text_y + cstOffset, g1);
           }
 
           colorSchemes.push(cst);

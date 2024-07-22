@@ -344,14 +344,15 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
             
      
             let cst:any = null;
+            const cstOffset = 25;
             
              if(i==0){
-               cst = buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x, text_y + 50, g1)
+               cst = buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x, text_y + cstOffset, g1)
              }
      
              else {
               console.log("AWD", value,absMax,text,i)
-               cst = buildLegend(myColor, absMax, text+" Color Scheme", text_x - 50, text_y + 50, g1);
+               cst = buildLegend(myColor, absMax, text+" Color Scheme", text_x - 50, text_y + cstOffset, g1);
              }
    
              colorSchemes.push(cst);
