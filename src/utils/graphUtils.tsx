@@ -1082,11 +1082,11 @@ export function calculationVisualizer(
             //set-up the paramtere for the math displayer
             let text = "ReLU Non-Linear Function";
             let formular = "f(x) = max(0, x)";
-            let descirption = "some description about relu"
+            let descirption = "Range:  [0 to Infinity)."
             if (mode === 1) {
                 text = "Tanh Non-Linear Function";
                 formular = "f(x) = (e^x - e^(-x)) / (e^x + e^(-x))";
-                descirption = "some description about tanh"
+                descirption = "Range:  (-1 to 1)."
 
 
             }
