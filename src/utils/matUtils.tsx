@@ -173,6 +173,7 @@ export function visualizeGraphClassifierFeatures(
     let poolingOverEvent: any = null;
     let poolingOutEvent: any = null;
     d3.selectAll(".mats, .switchBtn").on("click", function (event, d) {
+        console.log("click mats switchBtn")
         if (event.target && event.target.id === "btn") {
             return;
         }

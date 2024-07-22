@@ -208,7 +208,7 @@ export const ButtonChain = ({
                     >
                         Global Mean Pooling
                     </button>
-                    <button
+                    {/* <button
                         disabled={!predicted}
                         className={`bg-emerald-200  ${predicted
                             ? "hover:border-black hover:bg-green-300"
@@ -220,17 +220,17 @@ export const ButtonChain = ({
                         onClick={() => handleButtonClick(5)}
                     >
                         FC
-                    </button>
+                    </button> */}
                     <button
                         disabled={!predicted}
                         className={`bg-gray-200  ${predicted
                             ? "hover:border-black hover:bg-gray-300"
                             : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[6]
+                            } text-black py-1 px-2 rounded ${selectedButtons[5]
                                 ? "outline outline-2 outline-black bg-gray-300"
                                 : ""
                             }`}
-                        onClick={() => handleButtonClick(6)}
+                        onClick={() => handleButtonClick(5)}
                     >
                         Output
                     </button>

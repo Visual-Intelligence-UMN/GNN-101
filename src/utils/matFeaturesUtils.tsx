@@ -221,7 +221,7 @@ export function drawNodeFeatures(
     if(drawPaths)drawCrossConnection(graph, locations, featureChannels * rectW, gap+2, 0);
 
     //using locations to find the positions for first feature visualizers
-    const firstLayer = d3.select(".mats").append("g").attr("id", "layerNum_0");
+    const firstLayer = d3.select(".mats").append("g").attr("id", "layerNum_0").attr("class", "layerVis");
     // const rectW = 10;
     // const rectH = 15;
     for (let i = 0; i < locations.length; i++) {
@@ -269,8 +269,8 @@ export function drawNodeFeatures(
     //drawPoints(".mats", "red", schemeLocations);
     //add layer label for the first one
 
-    if(featureChannels!=34)addLayerName(locations, "Graph Features", 0, 30, firstLayer);
-    else addLayerName(locations, "Graph Features", 0, 70, firstLayer);
+    if(featureChannels!=34)addLayerName(locations, "Input", 0, 30, firstLayer);
+    else addLayerName(locations, "Input", 0, 70, firstLayer);
     return {
         locations: locations,
         frames: frames,
