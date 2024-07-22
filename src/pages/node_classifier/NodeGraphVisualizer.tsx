@@ -433,23 +433,23 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
       .each(function (d, i) {
         const g1 = d3.select(this);
 
-        g1.selectAll("text.layer-label")
+        g1.selectAll("text.layerName")
           .transition()
           .duration(140)
           .style("opacity", () => {
-            if ((i <= 2 && selectedButtons[i]) ||
-              (i === 3 && selectedButtons[4]) ||
-              (i === 4 && selectedButtons[5]) ||
-              (i === 5 && selectedButtons[6])) {
+            if ((i <= 1 && selectedButtons[i]) ||
+              (i === 2 && selectedButtons[2]) ||
+              (i === 4 && selectedButtons[4]) ||
+              (i === 3 && selectedButtons[3])) {
               return 1;
             }
             return 0.5;
           })
           .attr("font-size", () => {
-            if ((i <= 2 && selectedButtons[i]) ||
-              (i === 3 && selectedButtons[4]) ||
-              (i === 4 && selectedButtons[5]) ||
-              (i === 5 && selectedButtons[6])) {
+            if ((i <= 1 && selectedButtons[i]) ||
+              (i === 2 && selectedButtons[2]) ||
+              (i === 3 && selectedButtons[3]) ||
+              (i === 4 && selectedButtons[4])) {
               return "18px";
             }
             return "15px";

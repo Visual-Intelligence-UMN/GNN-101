@@ -167,7 +167,7 @@ export const ButtonChain = ({
                             }`}
                         onClick={() => handleButtonClick(1)}
                     >
-                        GNNConv1
+                        GCNConv1
                     </button>
                     <button
                         disabled={!predicted}
@@ -180,7 +180,7 @@ export const ButtonChain = ({
                             }`}
                         onClick={() => handleButtonClick(2)}
                     >
-                        GNNConv2
+                        GCNConv2
                     </button>
                     <button
                         disabled={!predicted}
@@ -193,7 +193,7 @@ export const ButtonChain = ({
                             }`}
                         onClick={() => handleButtonClick(3)}
                     >
-                        GNNConv3
+                        GCNConv3
                     </button>
                     <button
                         disabled={!predicted}
@@ -297,7 +297,7 @@ export const NodeClassifierButtonChain = ({
                             }`}
                         onClick={() => handleButtonClick(1)}
                     >
-                        GNNConv1
+                        GCNConv1
                     </button>
                     <button
                         disabled={!predicted}
@@ -310,7 +310,7 @@ export const NodeClassifierButtonChain = ({
                             }`}
                         onClick={() => handleButtonClick(2)}
                     >
-                        GNNConv2
+                        GCNConv2
                     </button>
                     <button
                         disabled={!predicted}
@@ -323,9 +323,9 @@ export const NodeClassifierButtonChain = ({
                             }`}
                         onClick={() => handleButtonClick(3)}
                     >
-                        GNNConv3
+                        GCNConv3
                     </button>
-                    <button
+                    {/* <button
                         disabled={!predicted}
                         className={`bg-emerald-200  ${predicted
                             ? "hover:border-black hover:bg-green-300"
@@ -337,17 +337,17 @@ export const NodeClassifierButtonChain = ({
                         onClick={() => handleButtonClick(5)}
                     >
                         FC
-                    </button>
+                    </button> */}
                     <button
                         disabled={!predicted}
                         className={`bg-gray-200  ${predicted
                             ? "hover:border-black hover:bg-gray-300"
                             : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[6]
+                            } text-black py-1 px-2 rounded ${selectedButtons[4]
                                 ? "outline outline-2 outline-black bg-gray-300"
                                 : ""
                             }`}
-                        onClick={() => handleButtonClick(6)}
+                        onClick={() => handleButtonClick(4)}
                     >
                         Output
                     </button>
