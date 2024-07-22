@@ -283,7 +283,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             transform = `scale(1, 1)`;
           } 
           const text_x = point1.x
-          const text_y = point4.y + 100;
+          const text_y = point4.y;
           if (i >= 4) {
             point1.y -= 130;
             point2.y -= 130;
@@ -333,15 +333,15 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
            console.log("array value", value)
 
            let cst:any = null;
-          
+          const cstOffset = 25;
           if(i==0){
-            cst = buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x, text_y + 50, g1)
+            cst = buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x, text_y + cstOffset, g1)
           }
           else if(i==5){
-            cst = buildBinaryLegend(myColor, value[0], value[1], text+" Color Scheme", text_x, text_y + 50, g1)
+            cst = buildBinaryLegend(myColor, value[0], value[1], text+" Color Scheme", text_x, text_y + cstOffset, g1)
           }
           else {
-            cst = buildLegend(myColor, absMax, text+" Color Scheme", text_x - 50, text_y + 50, g1);
+            cst = buildLegend(myColor, absMax, text+" Color Scheme", text_x - 50, text_y + cstOffset, g1);
           }
 
           colorSchemes.push(cst);
@@ -425,19 +425,21 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           .transition()
           .duration(140)
           .style("opacity", () => {
-            if ((i <= 2 && selectedButtons[i]) ||
-              (i === 3 && selectedButtons[4]) ||
-              (i === 4 && selectedButtons[5]) ||
-              (i === 5 && selectedButtons[6])) {
+            if ((i <= 1 && selectedButtons[i]) ||
+              (i === 2 && selectedButtons[2]) ||
+              (i === 4 && selectedButtons[4]) ||
+              (i === 3 && selectedButtons[3]) ||
+              (i === 5 && selectedButtons[5])) {
               return 1;
             }
             return 0.5;
           })
           .attr("font-size", () => {
-            if ((i <= 2 && selectedButtons[i]) ||
-              (i === 3 && selectedButtons[4]) ||
-              (i === 4 && selectedButtons[5]) ||
-              (i === 5 && selectedButtons[6])) {
+            if ((i <= 1 && selectedButtons[i]) ||
+              (i === 2 && selectedButtons[2]) ||
+              (i === 3 && selectedButtons[3]) ||
+              (i === 4 && selectedButtons[4]) ||
+              (i === 5 && selectedButtons[5])) {
               return "18px";
             }
             return "15px";

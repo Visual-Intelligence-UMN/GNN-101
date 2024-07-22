@@ -685,6 +685,14 @@ export function calculationVisualizer(
             `translate(${3.5 * offset + node.relatedNodes[0].features.length * prevRectHeight
             }, ${height / 5 + 150})`
         );
+    
+    aggregatedFeatureGroup.on("mouseover", function(event:any, d:any){
+        d3.selectAll(".parameter").style("opacity", 1);
+    });
+
+    aggregatedFeatureGroup.on("mouseout", function(event:any, d:any){
+        d3.selectAll(".parameter").style("opacity", 0);
+    });
 
     aggregatedFeatureGroup
         .selectAll("rect")
@@ -953,8 +961,9 @@ export function calculationVisualizer(
                         .attr("x", start_x + 20)
                         .attr("y", start_y - 10)
                         .text(adjMatrixSlice[i])
+                        .attr("font-size", 7.5)
                         .attr("class", "parameter")
-                        .attr("opacity", 1).raise();
+                        .attr("opacity", 0).raise();
 
                     const originToAggregated = g3
                         .append("path")
@@ -1082,11 +1091,11 @@ export function calculationVisualizer(
             //set-up the paramtere for the math displayer
             let text = "ReLU Non-Linear Function";
             let formular = "f(x) = max(0, x)";
-            let descirption = "some description about relu"
+            let descirption = "Range:  [0 to Infinity)."
             if (mode === 1) {
                 text = "Tanh Non-Linear Function";
                 formular = "f(x) = (e^x - e^(-x)) / (e^x + e^(-x))";
-                descirption = "some description about tanh"
+                descirption = "Range:  (-1 to 1)."
 
 
             }

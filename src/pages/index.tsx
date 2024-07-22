@@ -8,6 +8,7 @@ import { IntmData, IntmDataNode } from "../types";
 import { graphList, linkList, modelList, nodeList, DatasetInfo } from "../utils/const";
 import Sidebar from "./Sidebar";
 import styles from "./index.module.css";
+import * as d3 from "d3";
 
 import {
   Selector,
@@ -237,6 +238,8 @@ export default function Home() {
                     handleChange={() => {
                       setIsGraphView(!isGraphView);
                       setSimulation(false);
+                      d3.select(document).on("click", null);
+                      
                     }}
                     checked={isGraphView}
                     labels={["Graph View", "Matrix View"]}

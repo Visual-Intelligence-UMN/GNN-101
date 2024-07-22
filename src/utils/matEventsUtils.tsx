@@ -643,16 +643,24 @@ export function featureVisClick(
             );
             drawHintLabel(g, btnX, btnY - 36, "Click for Animation", "procVis");
             drawPathBtwOuputResult([coordFeatureVis], coordFeatureVis3)
-        }, delay:aniSec*2},
-        {func:()=>{
             drawWeightMatrix(btnX, btnY, curveDir, rectW, rectH, featureChannels, weights, layerID, myColor, g, weightMatrixPostions);
-        }, delay:aniSec},
-        {func: () => drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor, weights[layerID], startCoordList, endCoordList, curveDir, weightMatrixPostions, featureChannels, X), delay: aniSec},
-        {func: () => drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2Copy, myColor, layerBias, layerID), delay: aniSec},
-        {func: () => drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels), delay: aniSec,},
-        {func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels), delay: 1,},
-        {func: () => drawReLU(midX1, wmCoord, biasCoord, nextCoord), delay: aniSec,},
-        {func: () => {curNode.style.opacity = "1";},delay: aniSec,},
+            drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor, weights[layerID], startCoordList, endCoordList, curveDir, weightMatrixPostions, featureChannels, X)
+            drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2Copy, myColor, layerBias, layerID)
+        }, delay:aniSec*2},
+        // {func:()=>{
+            
+        // }, delay:aniSec},
+        // {func: () => {}, delay: aniSec},
+        // {func: () => , delay: aniSec},
+        {func: () => {
+            drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels)
+            drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels)
+            drawReLU(midX1, wmCoord, biasCoord, nextCoord)
+            curNode.style.opacity = "1";
+        }, delay: aniSec*2},
+        // {func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels), delay: 1,},
+        // {func: () => drawReLU(midX1, wmCoord, biasCoord, nextCoord), delay: aniSec,},
+        // {func: () => {curNode.style.opacity = "1";},delay: aniSec,},
         {func: () => {d3.select(".ctrlBtn").style("pointer-events", "auto");},delay: 1,},
     ];
 
@@ -983,27 +991,12 @@ export function outputVisClick(
     //poolingValues = math.transpose(poolingValues);
 
     const animateSeqAfterPath = [
-        {func:()=>{drawBiasVector(g1, linBias.length, rectH, rectH, biasCoordCopy[0], myColor, linBias, layerID);}, delay: 200}, 
-        {func:()=>{drawBiasPathOutputVis(biasCoord, controlPts, feaCoord);}, delay:200}, 
         {func:()=>{
             drawWeightMatrix(btnX, btnY+30, -1, rectW, rectH, featureChannels, [wMat], 0, myColor, g1, weightMatrixPostions);
-        }, delay:aniSec},
-        {func:()=>{
-            console.log("Xv check wmat", wMat);
             drawWeightsVector(g1, resultWithoutBias, endPt2, rectH, rectH, myColor, 
                 wMat, startCoord,endPathAniCoord , 1, weightMatrixPostions, 
                 featureChannels, poolingValues)
-        }, delay:200},
-        {func:()=>{
-            drawWeightsVector(g1, result, outputCoord, rectH, rectH, myColor, 
-                wMat, startCoord, endPathAniCoord, 1, weightMatrixPostions, 
-                featureChannels, poolingValues, "procVis wRect");
-            //draw the path connect to 
             drawPathBtwOuputResult([endPt1[0]], endPt2);
-            drawPathBtwOuputResult([endPt3], endPt4);
-        }, delay:200},
-        {func:()=>{pathMap = drawPathInteractiveComponents(resultStartCoord, resultCoord, result, myColor);}, delay:200},
-        {func:()=>{
             btn.selectAll("*").remove();
             injectPlayButtonSVG(
                 btn,
@@ -1012,8 +1005,17 @@ export function outputVisClick(
                 "./assets/SVGs/matmul.svg"
             );
             drawHintLabel(g1, btnX, btnY-12, "Click for Animation", "procVis");
-        }, delay:200}
-        //  {func:()=>{drawPathBtwOuputResult(one, endPt);}, delay:200}, 
+        }, delay:aniSec+600},
+        {func:()=>{
+            //console.log("Xv check wmat", wMat);
+            drawBiasVector(g1, linBias.length, rectH, rectH, biasCoordCopy[0], myColor, linBias, layerID);
+            drawBiasPathOutputVis(biasCoord, controlPts, feaCoord);
+            drawWeightsVector(g1, result, outputCoord, rectH, rectH, myColor, 
+                wMat, startCoord, endPathAniCoord, 1, weightMatrixPostions, 
+                featureChannels, poolingValues, "procVis wRect");
+            drawPathBtwOuputResult([endPt3], endPt4);
+        }, delay:200},
+        {func:()=>{pathMap = drawPathInteractiveComponents(resultStartCoord, resultCoord, result, myColor);}, delay:200}
     ]
 
     const animateSeq = [

@@ -48,26 +48,24 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
               .transition()
               .duration(140)
               .style("opacity", () => {
-                if ( 
-                    (i === 0 && selectedButtons[1]) ||
-                    (i === 1 && selectedButtons[2]) ||  
-                    (i === 2 && selectedButtons[3]) ||  
-                    (i === 3 && selectedButtons[4]) ||  
-                    (i === 4 && selectedButtons[5])) {  
-                  return 1;
-                }
-                return 0.5;
-              })
-              .attr("font-size", () => {
-                if (
-                    (i === 0 && selectedButtons[1]) ||
-                    (i === 1 && selectedButtons[2]) ||
-                    (i === 2 && selectedButtons[3]) ||
-                    (i === 3 && selectedButtons[4]) ||
-                    (i === 4 && selectedButtons[5])) {
-                  return "18px";
-                }
-                return "15px";
+                if ((i <= 1 && selectedButtons[i]) ||
+              (i === 2 && selectedButtons[2]) ||
+              (i === 4 && selectedButtons[4]) ||
+              (i === 3 && selectedButtons[3]) ||
+              (i === 5 && selectedButtons[5])) {
+              return 1;
+            }
+            return 0.5;
+          })
+          .attr("font-size", () => {
+            if ((i <= 1 && selectedButtons[i]) ||
+              (i === 2 && selectedButtons[2]) ||
+              (i === 3 && selectedButtons[3]) ||
+              (i === 4 && selectedButtons[4]) ||
+              (i === 5 && selectedButtons[5])) {
+              return "18px";
+            }
+            return "15px";
               });
           });
       };

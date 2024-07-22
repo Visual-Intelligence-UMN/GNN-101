@@ -141,6 +141,7 @@ export function computeMidsVertical(point1: any, point2: any) :[[number, number]
 
 //draw aid utils for matrix visualization(column and row frames)
 export function drawMatrixPreparation(graph: any, locations: any, gridSize:number) {
+    const offset = 100;
     let colLocations = [];
     for (let i = 0; i < graph.length; i++) {
         const x =
@@ -153,12 +154,13 @@ export function drawMatrixPreparation(graph: any, locations: any, gridSize:numbe
     const rowHeight = gridSize / graph.length;
     //drawPoints(".mats", "red", colLocations);
     let colFrames: SVGElement[] = []; //a
+  //  drawPoints(".mats", "red", colLocations)
     for (let i = 0; i < colLocations.length; i++) {
         const r = d3
             .select(".mats")
             .append("rect")
             .attr("x", colLocations[i][0])
-            .attr("y", colLocations[i][1] / ratio)
+            .attr("y", colLocations[i][1] / ratio + offset)
             .attr("height", gridSize)
             .attr("width", gridSize / graph.length)
             .attr("fill", "none")
@@ -179,7 +181,7 @@ export function drawMatrixPreparation(graph: any, locations: any, gridSize:numbe
             .select(".mats")
             .append("rect")
             .attr("x", locations[i][0] - gridSize + rowHeight / 2)
-            .attr("y", startY + i * rowHeight)
+            .attr("y", startY + i * rowHeight + offset)
             .attr("height", rowHeight)
             .attr("width", gridSize)
             .attr("fill", "none")
@@ -219,7 +221,7 @@ export function drawNodeFeatures(
     if(drawPaths)drawCrossConnection(graph, locations, featureChannels * rectW, gap+2, 0);
 
     //using locations to find the positions for first feature visualizers
-    const firstLayer = d3.select(".mats").append("g").attr("id", "layerNum_0");
+    const firstLayer = d3.select(".mats").append("g").attr("id", "layerNum_0").attr("class", "layerVis");
     // const rectW = 10;
     // const rectH = 15;
     for (let i = 0; i < locations.length; i++) {
@@ -267,8 +269,8 @@ export function drawNodeFeatures(
     //drawPoints(".mats", "red", schemeLocations);
     //add layer label for the first one
 
-    if(featureChannels!=34)addLayerName(locations, "Graph Features", 0, 30, firstLayer);
-    else addLayerName(locations, "Graph Features", 0, 70, firstLayer);
+    if(featureChannels!=34)addLayerName(locations, "Input", 0, 30, firstLayer);
+    else addLayerName(locations, "Input", 0, 70, firstLayer);
     return {
         locations: locations,
         frames: frames,
@@ -517,7 +519,7 @@ export function drawGCNConvGraphModel(
         const l5 = d3.select(`g#layerNum_5`);
         const l6 = d3.select(`g#layerNum_6`);
 
-        const schemeOffset = 150;
+        const schemeOffset = 250;
 
         const infoTable = {
             valueTable:[
@@ -692,7 +694,7 @@ export function drawGCNConvNodeModel(
     const l3 = d3.select(`g#layerNum_3`);
     const l4 = d3.select(`g#layerNum_4`);
 
-    const schemeOffset =600;
+    const schemeOffset =700;
 
     const infoTable = {
         valueTable:[
@@ -770,7 +772,7 @@ export function drawPoolingVis(
     locations[locations.length - 1][1] += rectH;
     //find mid point
     const midY =
-        (locations[locations.length - 1][1] - locations[0][1]) / 2 + 50;
+        (locations[locations.length - 1][1] - locations[0][1]) / 2 + 150;
     //all paths should connect to mid point
     const one = [[locations[0][0] + 102, midY + 2]];
     //drawPoints(".mats", "red", one);
@@ -785,7 +787,7 @@ export function drawPoolingVis(
 
     //coordination for the math formula display
     const displayX = locations[0][0] + 102;
-    const displayY = midY - 100;
+    const displayY = midY - 200;
 
     //width and height of displayer
     const displayW = 300;
@@ -1046,7 +1048,7 @@ export function drawPoolingVis(
     }
 
     //add text
-    addLayerName(locations, "Pooling", 102, -182, gg);
+    addLayerName(locations, "Pooling", 102, -200+10, gg);
     //draw the cross connections btw last GCN layer and pooling layer
 
     //do some transformations on the original locations

@@ -744,7 +744,7 @@ export function drawReLU(
             //set-up the paramtere for the math displayer
            drawActivationExplanation(
             x, y, "ReLU Non-Linear Function",
-            "f(x) = max(0, x)", "some description about relu"
+            "f(x) = max(0, x)", "Range: [ 0 to infinity)"
             );
             
         });
@@ -789,7 +789,7 @@ export function drawTanh(
             //set-up the paramtere for the math displayer
            drawActivationExplanation(
             x, y, "Tanh Non-Linear Function",
-            "f(x) = (e^x - e^(-x)) / (e^x + e^(-x))", "some description about tanh"
+            "f(x) = (e^x - e^(-x)) / (e^x + e^(-x))", "Range:  (-1 to 1)."
             );
             
         });

@@ -167,7 +167,7 @@ export const ButtonChain = ({
                             }`}
                         onClick={() => handleButtonClick(1)}
                     >
-                        GNNConv1
+                        GCNConv1
                     </button>
                     <button
                         disabled={!predicted}
@@ -180,7 +180,7 @@ export const ButtonChain = ({
                             }`}
                         onClick={() => handleButtonClick(2)}
                     >
-                        GNNConv2
+                        GCNConv2
                     </button>
                     <button
                         disabled={!predicted}
@@ -193,7 +193,7 @@ export const ButtonChain = ({
                             }`}
                         onClick={() => handleButtonClick(3)}
                     >
-                        GNNConv3
+                        GCNConv3
                     </button>
                     <button
                         disabled={!predicted}
@@ -208,7 +208,7 @@ export const ButtonChain = ({
                     >
                         Global Mean Pooling
                     </button>
-                    <button
+                    {/* <button
                         disabled={!predicted}
                         className={`bg-emerald-200  ${predicted
                             ? "hover:border-black hover:bg-green-300"
@@ -220,17 +220,17 @@ export const ButtonChain = ({
                         onClick={() => handleButtonClick(5)}
                     >
                         FC
-                    </button>
+                    </button> */}
                     <button
                         disabled={!predicted}
                         className={`bg-gray-200  ${predicted
                             ? "hover:border-black hover:bg-gray-300"
                             : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[6]
+                            } text-black py-1 px-2 rounded ${selectedButtons[5]
                                 ? "outline outline-2 outline-black bg-gray-300"
                                 : ""
                             }`}
-                        onClick={() => handleButtonClick(6)}
+                        onClick={() => handleButtonClick(5)}
                     >
                         Output
                     </button>
@@ -297,7 +297,7 @@ export const NodeClassifierButtonChain = ({
                             }`}
                         onClick={() => handleButtonClick(1)}
                     >
-                        GNNConv1
+                        GCNConv1
                     </button>
                     <button
                         disabled={!predicted}
@@ -310,7 +310,7 @@ export const NodeClassifierButtonChain = ({
                             }`}
                         onClick={() => handleButtonClick(2)}
                     >
-                        GNNConv2
+                        GCNConv2
                     </button>
                     <button
                         disabled={!predicted}
@@ -323,9 +323,9 @@ export const NodeClassifierButtonChain = ({
                             }`}
                         onClick={() => handleButtonClick(3)}
                     >
-                        GNNConv3
+                        GCNConv3
                     </button>
-                    <button
+                    {/* <button
                         disabled={!predicted}
                         className={`bg-emerald-200  ${predicted
                             ? "hover:border-black hover:bg-green-300"
@@ -337,17 +337,17 @@ export const NodeClassifierButtonChain = ({
                         onClick={() => handleButtonClick(5)}
                     >
                         FC
-                    </button>
+                    </button> */}
                     <button
                         disabled={!predicted}
                         className={`bg-gray-200  ${predicted
                             ? "hover:border-black hover:bg-gray-300"
                             : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[6]
+                            } text-black py-1 px-2 rounded ${selectedButtons[4]
                                 ? "outline outline-2 outline-black bg-gray-300"
                                 : ""
                             }`}
-                        onClick={() => handleButtonClick(6)}
+                        onClick={() => handleButtonClick(4)}
                     >
                         Output
                     </button>
@@ -990,14 +990,14 @@ export function visualizeMatrixBody(gridSize: number, graph: any, width: number,
 
     g.append("g")
         .attr("class", "x-axis")
-        .attr("transform", `translate(0,${gridSize + 50})`)
+        .attr("transform", `translate(0,${gridSize + 150})`)
         .call(d3.axisBottom(x));
 
     var y = d3.scaleBand().range([0, gridSize]).domain(myVars).padding(0.01);
 
     g.append("g")
         .attr("class", "y-axis")
-        .attr("transform", "translate(0,50)")
+        .attr("transform", "translate(0,150)")
         .call(d3.axisLeft(y));
 
     if (0 == 0) {
@@ -1028,7 +1028,7 @@ export function visualizeMatrixBody(gridSize: number, graph: any, width: number,
         .enter()
         .append("rect")
         .attr("x", (d: HeatmapData) => x(d.group)!)
-        .attr("y", (d: HeatmapData) => y(d.variable)! + 50)
+        .attr("y", (d: HeatmapData) => y(d.variable)! + 150)
         .attr("width", x.bandwidth())
         .attr("height", y.bandwidth())
         .style("fill", (d: HeatmapData) => myColor(d.value))
@@ -1053,7 +1053,7 @@ export function visualizeMatrix(
         //visualize matrix body part
         visualizeMatrixBody(gridSize, graph, width, height, margin);
 
-        if (isAttribute) drawNodeAttributes(nodeAttrs, graph, 50);
+        if (isAttribute) drawNodeAttributes(nodeAttrs, graph, 150);
     };
 
     const visualizeMat = async (path: string) => {
