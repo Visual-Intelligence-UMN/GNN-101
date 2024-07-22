@@ -7,10 +7,11 @@ import {
   connectCrossGraphNodes,
   featureVisualizer,
   softmax,
-  myColor
+  myColor,
+  loadNodesLocation
 } from "../utils/utils";
 
-import { visualizeGraph, getInitialCoordinates } from "../components/WebUtils";
+import { visualizeGraph } from "../components/WebUtils";
 import { aggregationCalculator } from "@/utils/graphUtils";
 import { sources } from "next/dist/compiled/webpack/webpack";
 import { buildBinaryLegend, buildLegend } from "@/utils/matHelperUtils";
@@ -36,13 +37,15 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
   selectedButtons,
   simulationLoading,
   setSimulation,
-
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const lastIntmData = useRef(intmData);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const currentVisualizationId = useRef(0);
+  const parse = graph_path.match(/(\d+)\.json$/);
+  const select = parse ? parse[1] : '';
+  const location = loadNodesLocation(0, select);
 
   if (intmData != null) {
     console.log("From Visualizer:", intmData);
@@ -52,7 +55,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
     setSimulation(false)
     const visualizationId = ++currentVisualizationId.current;
 
-    const init = async (graphs: any[], initialCoords: { [id: string]: { x: number, y: number } }) => {
+    const init = async (graphs: any[]) => {
       
       
       if (intmData != null) {
@@ -64,6 +67,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
       const margin = { top: 10, right: 30, bottom: 30, left: 40 };
       const width = 8 * offset - margin.left - margin.right;
       const height = 1000 - margin.top - margin.bottom;
+      let initialCoords = {} as any;
 
       // Append the SVG object to the body of the page
       d3.select("#my_dataviz").selectAll("svg").remove();
@@ -113,22 +117,22 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           .style("stroke-opacity", 1)
           .attr("opacity", 1)
 
-        
 
-       
-        data.nodes.forEach((node: any) => {
-  
-          if (initialCoords[node.id]) {
-            node.x = initialCoords[node.id].x;
-            node.y = initialCoords[node.id].y;
+        data.nodes.forEach((node: any, i: number) => {
+
+          if (location[i.toString()]) {
+            node.x = location[i.toString()].x;
+            node.y = location[i.toString()].y;
           } else {
-            node.x = Math.random() * width;
-            node.y = Math.random() * height;
-          }
-          if (i >= 4) {
-            node.x = offset * 2.95
-            node.y = height / 3;
-          }
+              node.x = Math.random() * width;
+              node.y = Math.random() * height;
+            }
+        });
+        data.nodes.forEach((node1: any) => {
+          initialCoords[node1.id] = {
+              x: node1.x,
+              y: node1.y,
+          };
         });
         // This is needed to connect links to the nodes within its own graph.
         d3.forceSimulation(data.nodes)
@@ -399,9 +403,8 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
         const processedData = await data_prep(graph_path);
 
         const graphsData = await prep_graphs(num, processedData);
-        const initialCoordinates = getInitialCoordinates();
         // Initialize and run D3 visualization with processe  d data
-        await init(graphsData, initialCoordinates);
+        await init(graphsData);
       } catch (error) {
         console.error("Error in visualizeGNN:", error);
       } finally {

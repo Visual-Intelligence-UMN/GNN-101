@@ -70,6 +70,8 @@ export default function Home() {
     false,
   ]);
   const [probabilities, setProbabilities] = useState<number[] | number[][]>([]);
+  const [showDatasetInfo, setShowDatasetInfo] = useState(false);
+
 
   function handleGraphSelection(e: React.ChangeEvent<HTMLSelectElement>): void {
     console.log("graph handler", e.target.value);
@@ -197,10 +199,39 @@ export default function Home() {
                         OptionList={Object.keys(linkList)}
                       />
                     )}
-                    <p>{DatasetInfo[model]}</p>
                   </div>
-                </div>
 
+                </div>
+                <div className="relative"
+                style={{
+                  zIndex: 50 
+                }}>
+                <button 
+                  onClick={() => setShowDatasetInfo(!showDatasetInfo)}
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-center"
+                  style={{
+                    width: '50px',
+                    height: '40px',
+                    
+                  }}
+                  >
+                  
+                  {'?'}
+                </button>
+                <div 
+                  className={`absolute left-0 mt-2 p-4 bg-white border border-gray-300 rounded shadow-lg transition-all duration-300 ease-in-out overflow-hidden ${
+                    showDatasetInfo ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                  style={{
+                    transform: showDatasetInfo ? 'translateY(0)' : 'translateY(-10px)',
+                    transitionProperty: 'max-height, opacity, transform',
+                    width: '300px',  
+                    maxWidth: '100vw'  
+                  }}
+                >
+                  <p>{DatasetInfo[model]}</p>
+                </div>
+              </div>
                 {selectedGraph &&
                 (graphList[selectedGraph] || nodeList[selectedGraph]) ? (
                   model == "graph classification" ? (
