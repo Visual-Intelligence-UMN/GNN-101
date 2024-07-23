@@ -208,14 +208,13 @@ export default function Home() {
                 }}>
                 <button 
                   onClick={() => setShowDatasetInfo(!showDatasetInfo)}
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-center"
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-center flex justify-center items-center"
                   style={{
-                    width: '50px',
+                    width: '45px',
                     height: '40px',
                     
                   }}
                   >
-                  
                   {'?'}
                 </button>
                 <div 
@@ -225,7 +224,7 @@ export default function Home() {
                   style={{
                     transform: showDatasetInfo ? 'translateY(0)' : 'translateY(-10px)',
                     transitionProperty: 'max-height, opacity, transform',
-                    width: '300px',  
+                    width: '300px',
                     maxWidth: '100vw'  
                   }}
                 >
@@ -332,7 +331,8 @@ export default function Home() {
 
                 {/* overlay text on visualizer when not predicted */}
                 {probabilities.length == 0 && (
-                  <div className="absolute top-1/2 left-1/2 ">
+                  <div className="absolute top-1/2"
+                  style={{right:'300px'}}>
                     <h1 className="text-4xl text-gray-300">
                       Model Visualization will show after prediction
                     </h1>
