@@ -655,7 +655,11 @@ export function featureVisClick(
         {func: () => {
             drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels)
             drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels)
-            drawReLU(midX1, wmCoord, biasCoord, nextCoord)
+            if(activation=="tanh"){
+                drawTanh(midX1, wmCoord, biasCoord, nextCoord);
+            }else{
+                drawReLU(midX1, wmCoord, biasCoord, nextCoord)
+            }
             curNode.style.opacity = "1";
         }, delay: aniSec*2},
         // {func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels), delay: 1,},
@@ -664,9 +668,9 @@ export function featureVisClick(
         {func: () => {d3.select(".ctrlBtn").style("pointer-events", "auto");},delay: 1,},
     ];
 
-    if(activation=="tanh"){
-        animateSeqAfterPath[7].func = ()=>drawTanh(midX1, wmCoord, biasCoord, nextCoord);
-    }
+    // if(activation=="tanh"){
+    //     animateSeqAfterPath[7].func = ()=>drawTanh(midX1, wmCoord, biasCoord, nextCoord);
+    // }
 
     AnimationController.runAnimations(0, animateSeqAfterPath);
     //     d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);

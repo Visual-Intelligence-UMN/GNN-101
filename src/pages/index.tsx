@@ -239,6 +239,7 @@ export default function Home() {
                       setIsGraphView(!isGraphView);
                       setSimulation(false);
                       d3.select(document).on("click", null);
+                      d3.select(".mats").selectAll(".procVis").remove()
                       
                     }}
                     checked={isGraphView}
