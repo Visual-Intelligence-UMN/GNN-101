@@ -69,7 +69,6 @@ export const GraphAnalysisViewer: React.FC<GraphAnalysisViewerProps> = ({
             setData(result);
             console.log("Finished Analysis!");
         };
-        console.log("PPP", path);
         analysis();
     }, [path]);
 
@@ -913,7 +912,7 @@ export function visualizeGraph(
                             x: 0.9 * offset - 260,
                             y: height / 1.5,
                         };
-                        const tolerance = 120;
+                        const tolerance = 100;
 
                         const x_dist = Math.abs(point1.x - point2.x);
                         const y_dist = Math.abs(point1.y - point4.y);
@@ -948,12 +947,8 @@ export function visualizeGraph(
 
         const visualizeG = async () => {
             try {
-                console.log("node graph path", path);
-                console.log("started visualize....");
                 const pData = await data_prep(path);
-                console.log("s pdata", pData);
                 const gData = await prep_graphs(1, pData);
-                console.log("s gData", gData);
                 await init(gData[0]);
             } catch (error) {
                 console.log("Error in single graph visualizer", error);
@@ -962,10 +957,6 @@ export function visualizeGraph(
 
         visualizeG();
     });
-}
-// Helper get function for initial coordinates
-export function getInitialCoordinates() {
-    return initialCoordinates;
 }
 
 //helper to get the matrix body visualize

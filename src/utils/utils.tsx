@@ -550,7 +550,7 @@ export function featureVisualizer(
   rectHeight: number, 
   outputLayerRectHeight: number,
   colorSchemes:any,
-  mode: number
+  mode: number,
 ) {
   let handleClickEvent;
   state.isClicked = false;
