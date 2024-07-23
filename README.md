@@ -2,6 +2,8 @@
 
 An visualization project about the Graph Convolutional Neural Network. 
 
+GiHub Page Version: https://Visual-Intelligence-UMN.github.io/web-gnn-vis 
+
 ## Getting Started
 
 First, install all dependencies by using: 
