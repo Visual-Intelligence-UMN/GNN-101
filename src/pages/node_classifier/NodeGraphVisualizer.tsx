@@ -443,7 +443,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
       .each(function (d, i) {
         const g1 = d3.select(this);
 
-        g1.selectAll("text.layerName")
+        g1.selectAll("text.layer-label")
           .transition()
           .duration(140)
           .style("opacity", () => {
