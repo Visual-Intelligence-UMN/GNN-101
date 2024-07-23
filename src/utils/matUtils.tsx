@@ -890,8 +890,11 @@ export function visualizeNodeClassifierFeatures(
             
            // drawPoints(".mats", "red", [[btnX+10, btnY+30-15]])
 
+           d3.select(".mats").style("pointer-events", "none");
+
             const animateSeqAfterPath = [
                 {func:()=>{
+                  //  d3.select(".mats").style("pointer-events", "none");
                     const Xt = modelParams.weights[3];
                     const prevCon3Val:number[] = [conv3[node][0], conv3[node][1]];
                     console.log("data fetching wv 1", prevCon3Val)
@@ -916,6 +919,7 @@ export function visualizeNodeClassifierFeatures(
             let dir = 1;
             if(clockwise==1)dir = 0;
             pathMap = drawPathInteractiveComponents(softmaxStartCoords, softmaxEndCoords, nthOutputVals, myColor, dir);
+            d3.select(".mats").style("pointer-events", "auto");
            }, delay:aniSec},     
            {func:()=>{
                     //display the result feature visualizer

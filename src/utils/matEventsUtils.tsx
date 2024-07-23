@@ -630,10 +630,20 @@ export function featureVisClick(
         btnX += 100;
     }
 
+
+
     let weightMatrixPostions:any = computeMatrixLocations(btnX, btnY, curveDir, rectW, featureChannels, weights, layerID);
 
+    d3.select(".mats").style("pointer-events", "none");
+
     let animateSeqAfterPath: any = [
-        {func: () => drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir), delay: initSec + aniSec,},
+        {func: () => {
+            drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir)
+            
+            d3.select(".ctrlBtn").style("pointer-events", "none");
+        }, 
+            delay: initSec + aniSec,
+        },
         {func: ()=>{
             injectPlayButtonSVG(
                 btn,
@@ -661,11 +671,15 @@ export function featureVisClick(
                 drawReLU(midX1, wmCoord, biasCoord, nextCoord)
             }
             curNode.style.opacity = "1";
+            
         }, delay: aniSec*2},
         // {func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels), delay: 1,},
         // {func: () => drawReLU(midX1, wmCoord, biasCoord, nextCoord), delay: aniSec,},
         // {func: () => {curNode.style.opacity = "1";},delay: aniSec,},
-        {func: () => {d3.select(".ctrlBtn").style("pointer-events", "auto");},delay: 1,},
+        {func: () => {
+            d3.select(".ctrlBtn").style("pointer-events", "auto");
+            d3.select(".mats").style("pointer-events", "auto");
+        },delay: 1,},
     ];
 
     // if(activation=="tanh"){
@@ -994,8 +1008,11 @@ export function outputVisClick(
 
     //poolingValues = math.transpose(poolingValues);
 
+    d3.select(".mats").style("pointer-events", "none");
+
     const animateSeqAfterPath = [
         {func:()=>{
+      //  d3.select(".mats").style("pointer-events", "none");
             drawWeightMatrix(btnX, btnY+30, -1, rectW, rectH, featureChannels, [wMat], 0, myColor, g1, weightMatrixPostions);
             drawWeightsVector(g1, resultWithoutBias, endPt2, rectH, rectH, myColor, 
                 wMat, startCoord,endPathAniCoord , 1, weightMatrixPostions, 
@@ -1019,7 +1036,10 @@ export function outputVisClick(
                 featureChannels, poolingValues, "procVis wRect");
             drawPathBtwOuputResult([endPt3], endPt4);
         }, delay:200},
-        {func:()=>{pathMap = drawPathInteractiveComponents(resultStartCoord, resultCoord, result, myColor);}, delay:200}
+        {func:()=>{
+        pathMap = drawPathInteractiveComponents(resultStartCoord, resultCoord, result, myColor);
+        d3.select(".mats").style("pointer-events", "auto");
+        }, delay:200}
     ]
 
     const animateSeq = [
