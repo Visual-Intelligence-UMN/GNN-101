@@ -615,7 +615,6 @@ export function featureVisualizer(
 
 
 
-    const occupiedPositions: { x: number; y: number }[] = []; 
 
     let xOffset = (graphIndex - 2.5) * offset;
     if (graphIndex >= 4 && mode === 0) {
@@ -642,12 +641,7 @@ export function featureVisualizer(
 
 
       // collision detection. if the locaion is occupied, add 20 to the x coordination
-      occupiedPositions.forEach(pos => {
-        if (Math.abs(xPos - pos.x) < 20) {
-          xPos = pos.x + 20;
-        }
-      });
-      occupiedPositions.push({ x: xPos, y: yPos });
+
 
 
       if (graphIndex < convNum) {
@@ -809,11 +803,13 @@ export function featureVisualizer(
         });
 
         node.text.on("mouseout", function() {
+          console.log("VAW", state.isClicked, graphIndex)
           if (!state.isClicked) {
             resetNodes(allNodes, convNum);
           }
         });
         node.svgElement.addEventListener("mouseout", function(this: any) {
+
           if (!state.isClicked) {
             resetNodes(allNodes, convNum);
           }
