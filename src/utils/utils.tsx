@@ -551,7 +551,6 @@ export function featureVisualizer(
   outputLayerRectHeight: number,
   colorSchemes:any,
   mode: number,
-  featureCoords: any[] = [{x: 0, y: 0}, {x: 0, y: 0}]
 ) {
   let handleClickEvent;
   state.isClicked = false;
