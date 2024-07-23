@@ -912,7 +912,7 @@ export function visualizeGraph(
                             x: 0.9 * offset - 260,
                             y: height / 1.5,
                         };
-                        const tolerance = 120;
+                        const tolerance = 100;
 
                         const x_dist = Math.abs(point1.x - point2.x);
                         const y_dist = Math.abs(point1.y - point4.y);

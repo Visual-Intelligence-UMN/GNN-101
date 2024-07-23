@@ -297,7 +297,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
           const centerX = (point1.x + point3.x) / 2;
           const centerY = (point1.y + point3.y) / 2;
 
-          const tolerance = 140;
+          const tolerance = 120;
 
           let scaleX = ((graphWidth + tolerance + 20) / x_dist);
           let scaleY = ((graphHeight + tolerance + 20) / y_dist);
