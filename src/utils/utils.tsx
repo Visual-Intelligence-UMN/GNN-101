@@ -615,7 +615,6 @@ export function featureVisualizer(
 
 
 
-    const occupiedPositions: { x: number; y: number }[] = []; 
 
     let xOffset = (graphIndex - 2.5) * offset;
     if (graphIndex >= 4 && mode === 0) {
@@ -642,21 +641,20 @@ export function featureVisualizer(
 
 
       // collision detection. if the locaion is occupied, add 20 to the x coordination
-      occupiedPositions.forEach(pos => {
-        if (Math.abs(xPos - pos.x) < 20) {
-          xPos = pos.x + 20;
-        }
-      });
-      occupiedPositions.push({ x: xPos, y: yPos });
+
 
 
       if (graphIndex < convNum) {
         // featureGroup in the convolutional layers and the last three layers are different.
 
         // add svgElement to each node simplify the interaction process (maybe)
-        node.svgElement = g2.append("circle")
-          .attr("cx", node.x)
-          .attr("cy", node.y)
+
+        const nodeGroup = g2.append("g")
+          .attr("class", "node-group")
+          .attr("transform", `translate(${node.x},${node.y})`);
+        node.svgElement = nodeGroup.append("circle")
+          .attr("cx", 0)
+          .attr("cy", 0)
           .attr("r", 17)
           .attr("fill", "white")
           .attr("stroke", "#69b3a2")
@@ -680,9 +678,9 @@ export function featureVisualizer(
           }
 
 
-          node.text = g2.append("text")
-          .attr("x", node.x)
-          .attr("y", node.y)
+          node.text = nodeGroup.append("text")
+          .attr("x", 0)
+          .attr("y", 0)
           .join("text")
           .text(name)
           .attr("text-anchor", "middle")
@@ -692,9 +690,9 @@ export function featureVisualizer(
 
         }
         else {
-        node.text = g2.append("text")
-          .attr("x", node.x)
-          .attr("y", node.y)
+        node.text = nodeGroup.append("text")
+          .attr("x", 0)
+          .attr("y", 0)
           .join("text")
           .attr("text-anchor", "middle")
           .attr("dominant-baseline", "central")
@@ -791,7 +789,7 @@ export function featureVisualizer(
         scaleFeatureGroup(node, 0.5);
 
         // add interaction 
-        node.svgElement.addEventListener("mouseover", function(this: any) {
+        nodeGroup.on("mouseover", function(this: any) {
           if (!state.isClicked) {
             highlightNodes(node);
             if (node.relatedNodes) {
@@ -799,21 +797,8 @@ export function featureVisualizer(
               } 
           }
         });
-        node.text.on("mouseover", function() {
-          if (!state.isClicked) {
-            highlightNodes(node);
-            if (node.relatedNodes) {
-              reduceNodeOpacity(allNodes, node.relatedNodes, node);
-            } 
-          }
-        });
 
-        node.text.on("mouseout", function() {
-          if (!state.isClicked) {
-            resetNodes(allNodes, convNum);
-          }
-        });
-        node.svgElement.addEventListener("mouseout", function(this: any) {
+        nodeGroup.on("mouseout", function() {
           if (!state.isClicked) {
             resetNodes(allNodes, convNum);
           }
@@ -822,7 +807,7 @@ export function featureVisualizer(
 
         //click logic
         if (node.graphIndex != 0) {
-          node.text.on("click", function(event:any) {
+          nodeGroup.on("click", function(event:any) {
             event.stopPropagation();
             event.preventDefault();
             if (state.isClicked) {
@@ -853,7 +838,6 @@ export function featureVisualizer(
             } 
             reduceNodeOpacity(allNodes, relatedNodes, node);
             
-            state.isClicked = true;
 
 
             // prevent clicking on other nodes and move the layers to the right again
@@ -870,54 +854,9 @@ export function featureVisualizer(
             
             moveNextLayer(svg, node, currMoveOffset, 1);
             movedNode = node;
+            state.isClicked = true;
           });
 
-
-          node.svgElement.addEventListener("click", function(event: any) {
-            console.log("pre",prevRectHeight)
-            event.stopPropagation();
-            event.preventDefault();
-            if (state.isClicked) {
-              return;
-            }
-
-
-            for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
-
-            colorSchemes[node.graphIndex].style.opacity = "1";
-            colorSchemes[node.graphIndex - 1].style.opacity = "1";
-
-            hideAllLinks(allNodes);
-
-            if (mode === 1 && graphIndex === 4) {
-              nodeOutputVisualizer(node, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
-             } else {
-              calculationVisualizer(node, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
-             };
-             state.isClicked = true;
-            
-            let relatedNodes: any = [];
-            if (node.relatedNodes) {
-              relatedNodes = node.relatedNodes;
-            } // to make sure relatedNodes is not null
-            reduceNodeOpacity(allNodes, relatedNodes, node);
-            
-     
-
-            if (movedNode === node) {
-              return; // Do nothing if the node is already moved
-            }
-
-            if (movedNode && movedNode != node) {
-              // Move back the previously moved node and its layer
-              moveNextLayer(svg, movedNode, currMoveOffset, -1)
-              state.isClicked = false; 
-              movedNode = null;
-            }
-
-            moveNextLayer(svg, node, currMoveOffset, 1);
-            movedNode = node; // Update the moved node
-        });
       }
 
   
