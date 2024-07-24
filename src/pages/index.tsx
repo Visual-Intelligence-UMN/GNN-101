@@ -240,7 +240,6 @@ export default function Home() {
                       setSimulation(false);
                       d3.select(document).on("click", null);
                       d3.select(".mats").selectAll(".procVis").remove()
-                      
                     }}
                     checked={isGraphView}
                     labels={["Graph View", "Matrix View"]}
