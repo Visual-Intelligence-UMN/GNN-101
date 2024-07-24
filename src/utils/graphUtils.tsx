@@ -948,7 +948,7 @@ export function calculationVisualizer(
                 if (n.featureGroupLocation) {
                     start_x =
                         3.5 * offset - 70 + n.features.length * prevRectHeight;
-                    start_y = height / 5 + 90 + 50 * i;
+                    start_y = height / 5 + 90 + 45 * i;
 
                     const control1_x = start_x + (end_x - start_x) * 0.3;
                     const control1_y = start_y;
