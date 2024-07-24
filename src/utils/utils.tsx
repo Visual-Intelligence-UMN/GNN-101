@@ -789,7 +789,7 @@ export function featureVisualizer(
         scaleFeatureGroup(node, 0.5);
 
         // add interaction 
-        nodeGroup.on("mouseover", function(this: any) {
+        nodeGroup.on("mouseenter", function(this: any) {
           if (!state.isClicked) {
             highlightNodes(node);
             if (node.relatedNodes) {
@@ -798,7 +798,7 @@ export function featureVisualizer(
           }
         });
 
-        nodeGroup.on("mouseout", function() {
+        nodeGroup.on("mouseleave", function() {
           if (!state.isClicked) {
             resetNodes(allNodes, convNum);
           }
