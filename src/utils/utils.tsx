@@ -799,7 +799,7 @@ export function featureVisualizer(
               } 
           }
         });
-        node.text.on("mouseover", function() {
+        node.text.on("mouseover", function(this: any) {
           if (!state.isClicked) {
             highlightNodes(node);
             if (node.relatedNodes) {
@@ -808,7 +808,7 @@ export function featureVisualizer(
           }
         });
 
-        node.text.on("mouseout", function() {
+        node.text.on("mouseout", function(this: any) {
           if (!state.isClicked) {
             resetNodes(allNodes, convNum);
           }

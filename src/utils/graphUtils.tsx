@@ -120,9 +120,7 @@ export function resetNodes(allNodes: any[], convNum: number) {
                 node.featureGroup.style("transition", "opacity 0.2s ease-out, visibility 0.2s ease-out")
                     .style("opacity", 0)
                     .style("pointer-events", "none");
-                setTimeout(() => {
-                    node.featureGroup.style("visibility", "hidden");
-                }, 200);
+                
             }
             if (node.svgElement) {
                 d3.select(node.svgElement).attr("stroke-width", 1);
@@ -133,9 +131,7 @@ export function resetNodes(allNodes: any[], convNum: number) {
                     relatedNode.featureGroup.style("transition", "opacity 0.2s ease-out, visibility 0.2s ease-out")
                         .style("opacity", 0)
                         .style("pointer-events", "none");
-                    setTimeout(() => {
-                        relatedNode.featureGroup.style("visibility", "hidden");
-                    }, 200);
+                    
                 });
             }
             if (node.intermediateFeatureGroups) {
@@ -144,9 +140,7 @@ export function resetNodes(allNodes: any[], convNum: number) {
                         intermediateFeatureGroup.style("transition", "opacity 0.2s ease-out, visibility 0.2s ease-out")
                             .style("opacity", 0)
                             .style("pointer-events", "none");
-                        setTimeout(() => {
-                            intermediateFeatureGroup.style("visibility", "hidden");
-                        }, 200);
+                        
                     }
                 );
             }
