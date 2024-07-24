@@ -316,7 +316,7 @@ export function outputVisualizer(
         .attr("opacity", 0)
         .lower();
 
-    hoverOverHandler(node, state, g5, DisplayHeight, RectL, myColor, [wMat], 0, weightsLocation)
+    hoverOverHandler(node, calculatedData, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation)
 
 
 
@@ -866,7 +866,7 @@ export function calculationVisualizer(
         .attr("opacity", 0)
         .lower();
 
-    hoverOverHandler(node, state, g4, displayHeight, rectL, myColor, weights, node.graphIndex - 1, weightsLocation)
+    hoverOverHandler(node, aggregatedData, state, g4, displayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, weights, node.graphIndex - 1, weightsLocation)
 
 
 
@@ -2060,7 +2060,7 @@ export function nodeOutputVisualizer(
         .attr("opacity", 0)
         .lower();
 
-    hoverOverHandler(node, state, g5, DisplayHeight, RectL, myColor, [wMat], 0, weightsLocation)
+    hoverOverHandler(node, calculatedData, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation)
 
 
 
