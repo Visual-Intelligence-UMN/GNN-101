@@ -1743,7 +1743,10 @@ export function fcLayerCalculationVisualizer(
             let end_y = moveToY + 150;
             start_x =
                 3.5 * offset + n.features.length * rectHeight - offset - moveOffset + 135;
-            start_y = height / 7 + 100 + 45 * i - 7.5;
+                start_y = height / 20 + 100 + 45 * i - 7.5;
+                if (node.relatedNodes.length <= 8) {
+                    start_y = height / 5 + 100 + 45 * i - 7.5;
+                }
             const control1_x = start_x + (end_x - start_x) * 0.3;
             const control1_y = start_y;
             const control2_x = start_x + (end_x - start_x) * 0.7;
