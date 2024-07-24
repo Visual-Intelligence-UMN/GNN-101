@@ -227,6 +227,17 @@ export function outputVisualizer(
         startCoordList.push(s);
     }
 
+    // for (let i = 0; i < 64; i++) {
+    //     let s: [number, number] = [
+    //         node.graphIndex * offset +
+    //         i * prevRectHeight +
+    //         node.relatedNodes[0].features.length * prevRectHeight + prevRectHeight / 2,
+    //         height / 5 + 150 + 25,
+    //     ];
+    //     startCoordList.push(s);
+    // }
+
+
     console.log(calculatedData);
     const calculatedFeatureGroup = svg
         .append("g")
@@ -267,7 +278,7 @@ export function outputVisualizer(
     }
     const math = create(all, {});
     const wMat = math.transpose(allWeights[3]);
-    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, 1, 2, node.features.length, [wMat], 0);
+    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, 2, node.features.length, [wMat], 0);
 
 
     drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, 1, 2, 2, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
@@ -1596,7 +1607,7 @@ function moveFeatures(relatedNodes: any, xPos: number, yPos: number) {
             n.featureGroup
                 .transition()
                 .delay(2000)
-                .duration(1000)
+                .duration(1500)
                 .attr(
                     "transform",
                     `translate(${xPos + 27.5}, ${yPos + i * 45 + 100
@@ -2016,9 +2027,9 @@ export function nodeOutputVisualizer(
     const math = create(all, {});
     const wMat = math.transpose(allWeights[3]);
 
-    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, 2, node.features.length, [wMat], 0);
+    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, 10, node.features.length, [wMat], 0);
     console.log("jgug", weightsLocation)
-    drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, 2, 2, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
+    drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, 10, 10, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
 
     const g5 = svg
         .append("g")
