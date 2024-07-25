@@ -827,11 +827,13 @@ export function featureVisualizer(
 
             hideAllLinks(allNodes);
 
+
            if (mode === 1 && graphIndex === 4) {
             nodeOutputVisualizer(node, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
            } else {
             calculationVisualizer(node, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
            };
+           state.isClicked = true;
 
             
             let relatedNodes: any = [];
@@ -856,7 +858,7 @@ export function featureVisualizer(
             
             moveNextLayer(svg, node, currMoveOffset, 1);
             movedNode = node;
-            state.isClicked = true;
+        
           });
 
       }
