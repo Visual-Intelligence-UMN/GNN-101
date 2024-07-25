@@ -111,13 +111,11 @@ export function detailedViewRecovery(
     gap:number,
     resultLabelsList:any
 ) {
-    console.log("click!", dview, lock);
+    console.log("click! detailedViewRecovery", dview, lock, transState);
 
     //remove calculation process visualizer
-    d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 0);
-    setTimeout(() => {
-        d3.selectAll(".procVis").remove();
-    }, 2000);
+    //d3.selectAll(".procVis").transition().duration(500).attr("opacity", 0);
+    d3.selectAll(".procVis").remove();
 
     //recover all frames
     d3.select(".poolingFrame").style("opacity", 0.25);
@@ -129,6 +127,8 @@ export function detailedViewRecovery(
     d3.selectAll(".oFeature")
         .style("opacity", 1)
         .style("pointer-events", "auto");
+    
+    setTimeout(()=>{
     //recover layers positions
     if (transState == "GCNConv") {
         if (recordLayerID >= 0) {
@@ -161,6 +161,12 @@ export function detailedViewRecovery(
         translateLayers(4, -300);
     }
 
+    d3.selectAll("path").style("opacity", 0.05);
+    d3.select(".mats").selectAll(".lastLayerConnections").style("opacity", 0.25);
+    d3.selectAll(".twoLayer").style("opacity", 1);
+    d3.select(".pooling").style("opacity", 1);
+    },100);
+
     //recover all feature visualizers and paths
     setTimeout(() => {
         d3.select(".pooling")
@@ -180,12 +186,8 @@ export function detailedViewRecovery(
             });
 
         d3.selectAll(".twoLayer")
-            .style("pointer-events", "auto")
-            .style("opacity", 1);
-
-        d3.selectAll("path").style("opacity", 0.05);
-        d3.select(".mats").selectAll(".lastLayerConnections").style("opacity", 0.25);
-    }, 1750);
+            .style("pointer-events", "auto");
+    }, 150);
 
     //recover color schemes opacity
     colorSchemesTable.forEach((d: any, i: any) => {
