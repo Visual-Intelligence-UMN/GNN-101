@@ -120,9 +120,7 @@ export function resetNodes(allNodes: any[], convNum: number) {
                 node.featureGroup.style("transition", "opacity 0.2s ease-out, visibility 0.2s ease-out")
                     .style("opacity", 0)
                     .style("pointer-events", "none");
-                setTimeout(() => {
-                    node.featureGroup.style("visibility", "hidden");
-                }, 200);
+                
             }
             if (node.svgElement) {
                 d3.select(node.svgElement).attr("stroke-width", 1);
@@ -133,9 +131,7 @@ export function resetNodes(allNodes: any[], convNum: number) {
                     relatedNode.featureGroup.style("transition", "opacity 0.2s ease-out, visibility 0.2s ease-out")
                         .style("opacity", 0)
                         .style("pointer-events", "none");
-                    setTimeout(() => {
-                        relatedNode.featureGroup.style("visibility", "hidden");
-                    }, 200);
+                    
                 });
             }
             if (node.intermediateFeatureGroups) {
@@ -144,9 +140,7 @@ export function resetNodes(allNodes: any[], convNum: number) {
                         intermediateFeatureGroup.style("transition", "opacity 0.2s ease-out, visibility 0.2s ease-out")
                             .style("opacity", 0)
                             .style("pointer-events", "none");
-                        setTimeout(() => {
-                            intermediateFeatureGroup.style("visibility", "hidden");
-                        }, 200);
+                        
                     }
                 );
             }
@@ -233,6 +227,17 @@ export function outputVisualizer(
         startCoordList.push(s);
     }
 
+    // for (let i = 0; i < 64; i++) {
+    //     let s: [number, number] = [
+    //         node.graphIndex * offset +
+    //         i * prevRectHeight +
+    //         node.relatedNodes[0].features.length * prevRectHeight + prevRectHeight / 2,
+    //         height / 5 + 150 + 25,
+    //     ];
+    //     startCoordList.push(s);
+    // }
+
+
     console.log(calculatedData);
     const calculatedFeatureGroup = svg
         .append("g")
@@ -273,7 +278,7 @@ export function outputVisualizer(
     }
     const math = create(all, {});
     const wMat = math.transpose(allWeights[3]);
-    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, 1, 2, node.features.length, [wMat], 0);
+    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, 2, node.features.length, [wMat], 0);
 
 
     drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, 1, 2, 2, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
@@ -305,7 +310,7 @@ export function outputVisualizer(
         .attr("opacity", 0)
         .lower();
 
-    hoverOverHandler(node, state, g5, DisplayHeight, RectL, myColor, [wMat], 0, weightsLocation)
+    hoverOverHandler(node, calculatedData, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation)
 
 
 
@@ -657,21 +662,19 @@ export function calculationVisualizer(
     let end_x = 0;
     let end_y = 0;
 
-    let xPos = 0;
-    let yPos = 0;
 
     let moveToX = 3.5 * offset - 100;
-    let moverToY = height / 5;
+    let moveToY = height / 20;
+    if (node.relatedNodes.length <= 8) {
+        moveToY = height / 5;
+    }
     let originalCoordinates = moveFeatures(
         node.relatedNodes,
         moveToX,
-        moverToY
+        moveToY
     ); //record the original cooridinates for restoring
 
-    if (node.featureGroupLocation) {
-        xPos = node.featureGroupLocation.xPos;
-        yPos = node.featureGroupLocation.yPos;
-    }
+  
 
     let paths: any = [];
     let intermediateFeatureGroups: any = [];
@@ -855,7 +858,7 @@ export function calculationVisualizer(
         .attr("opacity", 0)
         .lower();
 
-    hoverOverHandler(node, state, g4, displayHeight, rectL, myColor, weights, node.graphIndex - 1, weightsLocation)
+    hoverOverHandler(node, aggregatedData, state, g4, displayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, weights, node.graphIndex - 1, weightsLocation)
 
 
 
@@ -948,8 +951,10 @@ export function calculationVisualizer(
                 if (n.featureGroupLocation) {
                     start_x =
                         3.5 * offset - 70 + n.features.length * prevRectHeight;
-                    start_y = height / 5 + 90 + 50 * i;
-
+                    start_y = height / 20 + 90 + 45 * i;
+                    if (node.relatedNodes.length <= 8) {
+                        start_y = height / 5 + 90 + 45 * i
+                    }
                     const control1_x = start_x + (end_x - start_x) * 0.3;
                     const control1_y = start_y;
                     const control2_x = start_x + (end_x - start_x) * 0.7;
@@ -1316,14 +1321,14 @@ function weightAnimation(
     let btnYOffset = 100;
     if (node.relatedNodes.length == 2) btnYOffset = 150;
 
-    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - 1.5 * btnYOffset, "./assets/SVGs/playBtn_pause.svg")
+    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_pause.svg")
 
     btn.on("click", function (event: any) {
         event.stopPropagation();
         isPlaying = !isPlaying;
         console.log(isPlaying);
-        if (isPlaying) injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - 1.5 * btnYOffset, "./assets/SVGs/playBtn_pause.svg");
-        else injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - 1.5 * btnYOffset, "./assets/SVGs/playBtn_play.svg")
+        if(isPlaying)injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_pause.svg");
+        else injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_play.svg")
         if (isPlaying && state.isClicked) {
 
             startAnimation(endNumber);
@@ -1401,7 +1406,7 @@ function weightAnimation(
                     clearInterval(intervalID);
                     isPlaying = false;
 
-                    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 100, node.y - 1.5 * btnYOffset, "./assets/SVGs/playBtn_play.svg")
+                    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_play.svg")
                     setTimeout(() => {
                         d3.selectAll(".bias").style("opacity", 1);
                         d3.selectAll(".softmax").attr("opacity", 0.07);
@@ -1602,7 +1607,7 @@ function moveFeatures(relatedNodes: any, xPos: number, yPos: number) {
             n.featureGroup
                 .transition()
                 .delay(2000)
-                .duration(1000)
+                .duration(1500)
                 .attr(
                     "transform",
                     `translate(${xPos + 27.5}, ${yPos + i * 45 + 100
@@ -1657,7 +1662,8 @@ export function fcLayerCalculationVisualizer(
     d3.selectAll(".node-features-Copy").style("visibility", "visible");
     d3.selectAll(".node-features-Copy").raise();
     let moveToX = graphIndex * offset - 350;
-    let moveToY = height / 7;
+    let moveToY = height / 20;
+    
     let originalCoordinates = moveFeatures(relatedNodes, moveToX, moveToY);
 
     if (!svg.selectAll) {
@@ -1748,7 +1754,10 @@ export function fcLayerCalculationVisualizer(
             let end_y = moveToY + 150;
             start_x =
                 3.5 * offset + n.features.length * rectHeight - offset - moveOffset + 135;
-            start_y = height / 7 + 100 + 45 * i - 7.5;
+                start_y = height / 20 + 100 + 45 * i - 7.5;
+                if (node.relatedNodes.length <= 8) {
+                    start_y = height / 5 + 100 + 45 * i - 7.5;
+                }
             const control1_x = start_x + (end_x - start_x) * 0.3;
             const control1_y = start_y;
             const control2_x = start_x + (end_x - start_x) * 0.7;
@@ -2018,9 +2027,9 @@ export function nodeOutputVisualizer(
     const math = create(all, {});
     const wMat = math.transpose(allWeights[3]);
 
-    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, 2, node.features.length, [wMat], 0);
+    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, 10, node.features.length, [wMat], 0);
     console.log("jgug", weightsLocation)
-    drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, 2, 2, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
+    drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, 10, 10, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
 
     const g5 = svg
         .append("g")
@@ -2049,7 +2058,7 @@ export function nodeOutputVisualizer(
         .attr("opacity", 0)
         .lower();
 
-    hoverOverHandler(node, state, g5, DisplayHeight, RectL, myColor, [wMat], 0, weightsLocation)
+    hoverOverHandler(node, calculatedData, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation)
 
 
 

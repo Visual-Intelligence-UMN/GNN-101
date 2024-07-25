@@ -7,10 +7,11 @@ import {
   connectCrossGraphNodes,
   featureVisualizer,
   softmax,
-  myColor
+  myColor,
+  loadNodesLocation
 } from "../utils/utils";
 
-import { visualizeGraph, getInitialCoordinates } from "../components/WebUtils";
+import { visualizeGraph } from "../components/WebUtils";
 import { aggregationCalculator } from "@/utils/graphUtils";
 import { sources } from "next/dist/compiled/webpack/webpack";
 import { buildBinaryLegend, buildLegend } from "@/utils/matHelperUtils";
@@ -36,23 +37,23 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
   selectedButtons,
   simulationLoading,
   setSimulation,
-
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const lastIntmData = useRef(intmData);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const currentVisualizationId = useRef(0);
+  const parse = graph_path.match(/(\d+)\.json$/);
+  const select = parse ? parse[1] : '';
+  const location = loadNodesLocation(0, select);
 
-  if (intmData != null) {
-    console.log("From Visualizer:", intmData);
-  }
+  
   
   useEffect(() => {
     setSimulation(false)
     const visualizationId = ++currentVisualizationId.current;
 
-    const init = async (graphs: any[], initialCoords: { [id: string]: { x: number, y: number } }) => {
+    const init = async (graphs: any[]) => {
       
       
       if (intmData != null) {
@@ -64,6 +65,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
       const margin = { top: 10, right: 30, bottom: 30, left: 40 };
       const width = 8 * offset - margin.left - margin.right;
       const height = 1000 - margin.top - margin.bottom;
+      let initialCoords = {} as any;
 
       // Append the SVG object to the body of the page
       d3.select("#my_dataviz").selectAll("svg").remove();
@@ -80,7 +82,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
 
       graphs.forEach((data, i) => {
-        console.log("i", i);
+        console.log("we are at position", i);
         console.log(data);
 
         let xOffset = (i - 2.5) * offset;
@@ -112,24 +114,55 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           .style("stroke-width", 1)
           .style("stroke-opacity", 1)
           .attr("opacity", 1)
+          let maxXDistance = 0;
+          let maxYDistance = 0;
+          let limitedNodes = data.nodes.slice(0, 17); 
 
-        
+          limitedNodes.forEach((node1: any) => {
+            limitedNodes.forEach((node2: any) => {
+              if (node1 !== node2) {
+                const xDistance = Math.abs(node1.x - node2.x);
+                const yDistance = Math.abs(node1.y - node2.y);
+                if (xDistance > maxXDistance) {
+                  maxXDistance = xDistance;
+                }
 
-       
-        data.nodes.forEach((node: any) => {
-  
-          if (initialCoords[node.id]) {
-            node.x = initialCoords[node.id].x;
-            node.y = initialCoords[node.id].y;
-          } else {
-            node.x = Math.random() * width;
-            node.y = Math.random() * height;
-          }
-          if (i >= 4) {
-            node.x = offset * 2.95
-            node.y = height / 3;
-          }
+                if (yDistance > maxYDistance) {
+                  maxYDistance = yDistance;
+                }
+              }
+            });
+          });
+
+          let point1 = { x: 3.0 * offset, y: height / 8 };
+          let point3 = { x: 2.9 * offset, y: height / 1.7 };
+
+          
+          let centerX = (point1.x + point3.x) / 2;
+          let centerY = (point1.y + point3.y) / 2;
+        if (i < 4) {
+          data.nodes.forEach((node: any, j: number) => {
+            if (location[i.toString()]) {
+              node.x = location[j.toString()].x;
+              node.y = location[j.toString()].y;
+            } else {
+                node.x = Math.random() * width;
+                node.y = Math.random() * height;
+              }
+          });
+          data.nodes.forEach((node1: any) => {
+            initialCoords[node1.id] = {
+                x: node1.x,
+                y: node1.y,
+            };
         });
+      } else {
+        data.nodes.forEach((node: any, j: number) => {
+          node.x = centerX + 10
+          node.y = centerY - 10
+      });
+      }
+
         // This is needed to connect links to the nodes within its own graph.
         d3.forceSimulation(data.nodes)
           .force("link", d3.forceLink(data.links).id((d: any) => d.id).distance(20))
@@ -197,9 +230,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           node.attr("cx", (d: any) => d.x)
             .attr("cy", (d: any) => d.y);
 
-          
-
-
+        
 
 
           let value:number[] = [];
@@ -232,17 +263,16 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             }
 
 
-
-
             if (value != null && i >= 5) {
               node.features = value;
             }
             allNodes.push(node);
           });
 
+          
           let maxXDistance = 0;
           let maxYDistance = 0;
-          const limitedNodes = data.nodes.slice(0, 17); // Why is it 17?
+          let limitedNodes = data.nodes.slice(0, 17); 
 
           limitedNodes.forEach((node1: any) => {
             limitedNodes.forEach((node2: any) => {
@@ -260,18 +290,18 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             });
           });
 
-          const graphWidth = maxXDistance + 20
-          const graphHeight = maxYDistance + 20;
+          let graphWidth = maxXDistance + 20
+          let graphHeight = maxYDistance + 20;
 
-          const point1 = { x: 3.0 * offset, y: height / 8 };
-          const point2 = { x: 2.9 * offset, y: height / 20 };
-          const point3 = { x: 2.9 * offset, y: height / 1.7 };
-          const point4 = { x: 3.0 * offset, y: height / 1.5 };
+          let point1 = { x: 3.0 * offset, y: height / 8 };
+          let point2 = { x: 2.9 * offset, y: height / 20 };
+          let point3 = { x: 2.9 * offset, y: height / 1.7 };
+          let point4 = { x: 3.0 * offset, y: height / 1.5 };
 
-          const x_dist = Math.abs(point1.x - point2.x);
-          const y_dist = Math.abs(point1.y - point4.y)
-          const centerX = (point1.x + point3.x) / 2;
-          const centerY = (point1.y + point3.y) / 2;
+          let x_dist = Math.abs(point1.x - point2.x);
+          let y_dist = Math.abs(point1.y - point4.y)
+          let centerX = (point1.x + point3.x) / 2;
+          let centerY = (point1.y + point3.y) / 2;
 
           const tolerance = 140;
 
@@ -301,7 +331,13 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             .attr("stroke", "black")
             .attr("fill", "none")
             .attr('transform', transform);
-          
+          let featureCoords = [{ x: 0, y: 0 }, { x: 0, y: 0 }];
+          if (i == 4) {
+            featureCoords[0] = { x: centerX, y: centerY };
+          }
+          if (i == 5) {
+            featureCoords[1] = {x: centerX, y: centerY};
+          }
 
 
           let text = " ";
@@ -363,6 +399,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
               .attr("opacity", 0);
 
             if (intmData) {
+              console.log('index is',i)
               featureVisualizer(svg, allNodes, offset, height, graphs, 900, 600, 15, 10, 3, 20, colorSchemes, 0); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
               //function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, graphs: any[], moveOffset: number, fcLayerMoveOffset: number, rectWidth: number, firstLayerRectHeight: number, rectHeight: number, outputLayerRectHeight: number)
             }
@@ -399,9 +436,8 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
         const processedData = await data_prep(graph_path);
 
         const graphsData = await prep_graphs(num, processedData);
-        const initialCoordinates = getInitialCoordinates();
         // Initialize and run D3 visualization with processe  d data
-        await init(graphsData, initialCoordinates);
+        await init(graphsData);
       } catch (error) {
         console.error("Error in visualizeGNN:", error);
       } finally {

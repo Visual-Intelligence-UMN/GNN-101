@@ -167,3 +167,28 @@ path {
   animation-duration: 1.2s;
   animation-iteration-count: infinite;
 }
+.dropdown-enter {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.dropdown-enter-active {
+  max-height: 500px; 
+  opacity: 1;
+  transform: translateY(0);
+  transition: max-height 300ms, opacity 300ms, transform 300ms;
+}
+
+.dropdown-exit {
+  max-height: 500px;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dropdown-exit-active {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: max-height 300ms, opacity 300ms, transform 300ms;
+}
