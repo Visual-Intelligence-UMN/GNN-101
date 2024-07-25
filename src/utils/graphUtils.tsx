@@ -13,7 +13,7 @@ import * as math from "mathjs";
 import { create, all, matrix } from "mathjs";
 import { inter } from "@/pages";
 import { off } from "process";
-import { injectPlayButtonSVGForGraphView } from "./svgUtils";
+import { injectPlayButtonSVGForGraphView, injectSVG } from "./svgUtils";
 import { stat } from "fs";
 import { drawActivationExplanation } from "./matInteractionUtils";
 import { computeMatrixLocations, drawMatrixWeight, drawWeightMatrix } from "./matAnimateUtils";
@@ -1322,6 +1322,10 @@ function weightAnimation(
     if (node.relatedNodes.length == 2) btnYOffset = 150;
 
     injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_pause.svg")
+
+
+    const gLabel = svg.append("g");
+    injectSVG(gLabel, endCoordList[0][0] - 80-120, endCoordList[0][1] - 22.5-120, "./assets/SVGs/interactionHint.svg", "to-be-removed");
 
     btn.on("click", function (event: any) {
         event.stopPropagation();
