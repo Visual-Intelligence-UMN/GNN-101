@@ -1,6 +1,7 @@
 import { Inter } from "@next/font/google";
 import { Scrollbar } from "react-scrollbars-custom";
 import styles from "./sidebar.module.css";
+import { AnnotatedImage } from "@/components/WebUtils";
 
 const inter = Inter({
     variable: "--font-inter",
@@ -112,6 +113,7 @@ export default function Sidebar(props: Props) {
                         nitrogen, etc.
                         {/* TODO: maybe also show node features before clicking prediction */}
                     </p>
+                    <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/graphFeatures.png" label="Node Features" />
                 </div>
 
                 <div className="p-4">
@@ -135,7 +137,11 @@ export default function Sidebar(props: Props) {
                         Isomorphism Network (GIN), etc. We will start with GCN, which is one
                         of the most popular GNN architectures.
                     </p>
-                    <span className={styles.button} onClick={() => { }}>Click to show GCNConv </span>
+                    {/* <span className={styles.button} onClick={() => { }}>Click to show GCNConv </span> */}
+                    {/* <span>
+                        <img src="./assets/PNGs/annotatedSrcShots/gcnconv.png" alt="GCNConv"></img>
+                    </span> */}
+                    <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/gcnconv.png" label="GCNConv" />
                     <ol className="list-inside list-disc">
                         <li>
                             <b className="font-bold">Aggregation with Normalization: </b>
@@ -174,7 +180,7 @@ export default function Sidebar(props: Props) {
                             tasks, please stay tuned!
                         </p>
                         <span className={styles.tag}>Graph-Level Tasks </span>
-                        <span className={styles.button} onClick={() => { }}>Click to Predict a Graph </span>
+                        {/* <span className={styles.button} onClick={() => { }}>Click to Predict a Graph </span> */}
                         <p>
                             Given a input graph, GNN can predict the properties of the entire
                             graph. For example, in the MUTAG dataset, the task is to predict
@@ -184,7 +190,7 @@ export default function Sidebar(props: Props) {
                             the prediction.
                         </p>
                         <span className={styles.tag}>Node-Level Tasks </span>
-                        <span className={styles.button} onClick={() => { }}>Click to Predict Nodes </span>
+                        {/* <span className={styles.button} onClick={() => { }}>Click to Predict Nodes </span> */}
                         <p>
                             Given a input graph, GNN can predict the properties of each node
                             in the graph. For example, in the Karate dataset, the task is to
