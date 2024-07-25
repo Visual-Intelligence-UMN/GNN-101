@@ -715,10 +715,10 @@ export function calculationVisualizer(
     //draw label
     aggregatedFeatureGroup.append("text")
         .attr("x", 0)
-        .attr("y", -3)
+        .attr("y", -5)
         .text("Vectors Summation")
         .style("fill", "gray")
-        .style("font-size", "8px")
+        .style("font-size", "12px")
         .attr("class", "aggregatedFeatureGroup to-be-removed")
         .style("opacity", 0);
 
@@ -785,10 +785,10 @@ export function calculationVisualizer(
     //draw label
     calculatedFeatureGroup.append("text")
         .attr("x", 0)
-        .attr("y", -3)
+        .attr("y", -5)
         .text("Matrix Multiplication")
         .style("fill", "gray")
-        .style("font-size", "8px")
+        .style("font-size", "12px")
         .attr("class", "calFrame to-be-removed")
         .style("opacity", 0);
 
@@ -893,10 +893,10 @@ export function calculationVisualizer(
     //draw label
     BiasGroup.append("text")
         .attr("x", 0)
-        .attr("y", 23)
+        .attr("y", -5)
         .text("Bias Vector")
         .style("fill", "gray")
-        .style("font-size", "8px")
+        .style("font-size", "12px")
         .attr("class", "bias to-be-removed").style("opacity", 0);
 
     const BiasFrame = BiasGroup.append("rect")
@@ -1120,10 +1120,10 @@ export function calculationVisualizer(
         //draw label
         relu.append("text")
             .attr("x", end_x - 45)
-            .attr("y", end_y - 25)
+            .attr("y", end_y - 20)
             .text(labelText)
             .style("fill", "gray")
-            .style("font-size", "8px")
+            .style("font-size", "12px")
             .attr("class", "relu to-be-removed").attr("opacity", 0);
     }, 3500);
 
@@ -1144,10 +1144,10 @@ export function calculationVisualizer(
     //draw label
     outputGroup.append("text")
         .attr("x", 0)
-        .attr("y", 23)
+        .attr("y", 28)
         .text("Final Output Vector")
         .style("fill", "gray")
-        .style("font-size", "8px")
+        .style("font-size", "12px")
         .attr("class", "relu output").style("opacity", 0);
 
     outputGroup
@@ -1219,10 +1219,10 @@ export function calculationVisualizer(
     //draw label
     outputGroupCopy.append("text")
         .attr("x", 0)
-        .attr("y", 23)
+        .attr("y", 28)
         .text("Final Output Vector")
         .style("fill", "gray")
-        .style("font-size", "8px")
+        .style("font-size", "12px")
         .attr("class", "relu").style("opacity", 0);
 
     intermediateFeatureGroups.push(outputGroup);

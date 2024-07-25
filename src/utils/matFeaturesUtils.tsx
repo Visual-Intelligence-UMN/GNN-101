@@ -1288,10 +1288,10 @@ export function drawResultLayer(
         //draw label
         const label = g.append("text")
                         .attr("x", x + 45)
-                        .attr("y", y + 5)
+                        .attr("y", y + 7)
                         .text(resultLabel)
                         .style("fill", "gray")
-                        .style("font-size", "8px"); 
+                        .style("font-size", "12px"); 
 
 
         resultLabelsList.push(label.node() as SVGElement);
