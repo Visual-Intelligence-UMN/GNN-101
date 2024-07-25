@@ -120,9 +120,7 @@ export function resetNodes(allNodes: any[], convNum: number) {
                 node.featureGroup.style("transition", "opacity 0.2s ease-out, visibility 0.2s ease-out")
                     .style("opacity", 0)
                     .style("pointer-events", "none");
-                setTimeout(() => {
-                    node.featureGroup.style("visibility", "hidden");
-                }, 200);
+                
             }
             if (node.svgElement) {
                 d3.select(node.svgElement).attr("stroke-width", 1);
@@ -133,9 +131,7 @@ export function resetNodes(allNodes: any[], convNum: number) {
                     relatedNode.featureGroup.style("transition", "opacity 0.2s ease-out, visibility 0.2s ease-out")
                         .style("opacity", 0)
                         .style("pointer-events", "none");
-                    setTimeout(() => {
-                        relatedNode.featureGroup.style("visibility", "hidden");
-                    }, 200);
+                    
                 });
             }
             if (node.intermediateFeatureGroups) {
@@ -144,9 +140,7 @@ export function resetNodes(allNodes: any[], convNum: number) {
                         intermediateFeatureGroup.style("transition", "opacity 0.2s ease-out, visibility 0.2s ease-out")
                             .style("opacity", 0)
                             .style("pointer-events", "none");
-                        setTimeout(() => {
-                            intermediateFeatureGroup.style("visibility", "hidden");
-                        }, 200);
+                        
                     }
                 );
             }
@@ -668,21 +662,19 @@ export function calculationVisualizer(
     let end_x = 0;
     let end_y = 0;
 
-    let xPos = 0;
-    let yPos = 0;
 
     let moveToX = 3.5 * offset - 100;
-    let moverToY = height / 5;
+    let moveToY = height / 20;
+    if (node.relatedNodes.length <= 8) {
+        moveToY = height / 5;
+    }
     let originalCoordinates = moveFeatures(
         node.relatedNodes,
         moveToX,
-        moverToY
+        moveToY
     ); //record the original cooridinates for restoring
 
-    if (node.featureGroupLocation) {
-        xPos = node.featureGroupLocation.xPos;
-        yPos = node.featureGroupLocation.yPos;
-    }
+  
 
     let paths: any = [];
     let intermediateFeatureGroups: any = [];
@@ -959,8 +951,10 @@ export function calculationVisualizer(
                 if (n.featureGroupLocation) {
                     start_x =
                         3.5 * offset - 70 + n.features.length * prevRectHeight;
-                    start_y = height / 5 + 90 + 50 * i;
-
+                    start_y = height / 20 + 90 + 45 * i;
+                    if (node.relatedNodes.length <= 8) {
+                        start_y = height / 5 + 90 + 45 * i
+                    }
                     const control1_x = start_x + (end_x - start_x) * 0.3;
                     const control1_y = start_y;
                     const control2_x = start_x + (end_x - start_x) * 0.7;
@@ -1668,7 +1662,8 @@ export function fcLayerCalculationVisualizer(
     d3.selectAll(".node-features-Copy").style("visibility", "visible");
     d3.selectAll(".node-features-Copy").raise();
     let moveToX = graphIndex * offset - 350;
-    let moveToY = height / 7;
+    let moveToY = height / 20;
+    
     let originalCoordinates = moveFeatures(relatedNodes, moveToX, moveToY);
 
     if (!svg.selectAll) {
@@ -1759,7 +1754,10 @@ export function fcLayerCalculationVisualizer(
             let end_y = moveToY + 150;
             start_x =
                 3.5 * offset + n.features.length * rectHeight - offset - moveOffset + 135;
-            start_y = height / 7 + 100 + 45 * i - 7.5;
+                start_y = height / 20 + 100 + 45 * i - 7.5;
+                if (node.relatedNodes.length <= 8) {
+                    start_y = height / 5 + 100 + 45 * i - 7.5;
+                }
             const control1_x = start_x + (end_x - start_x) * 0.3;
             const control1_y = start_y;
             const control2_x = start_x + (end_x - start_x) * 0.7;
