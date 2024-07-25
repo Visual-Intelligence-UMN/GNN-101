@@ -1003,6 +1003,7 @@ export function outputVisClick(
     console.log("w mat pos", wMat)
 
     let weightMatrixPostions:any = computeMatrixLocations(btnX+42, btnY+30, -1, rectW, featureChannels, [wMat], 0);
+    console.log("AWDAW", wMat)
     
     console.log("w mat pos 1", weightMatrixPostions)
 

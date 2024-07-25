@@ -14,7 +14,7 @@ import { create, all, matrix } from "mathjs";
 import { inter } from "@/pages";
 import { off } from "process";
 import { injectPlayButtonSVGForGraphView } from "./svgUtils";
-import { stat } from "fs";
+import { stat, truncateSync } from "fs";
 import { drawActivationExplanation } from "./matInteractionUtils";
 import { computeMatrixLocations, drawMatrixWeight, drawWeightMatrix } from "./matAnimateUtils";
 import { graphVisDrawActivationExplanation, graphVisDrawMatrixWeight, hoverOverHandler } from "./graphAnimationHelper";
@@ -281,7 +281,7 @@ export function outputVisualizer(
     let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, 2, node.features.length, [wMat], 0);
 
 
-    drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, 1, 2, 2, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
+    drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, 1, 10, 10, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
 
     const g5 = svg
         .append("g")
@@ -438,6 +438,20 @@ export function outputVisualizer(
             .style("fill", "none")
             .attr("class", "output-path to-be-removed")
             .attr("opacity", 0);
+
+
+
+
+
+
+
+
+            d3.selectAll(".bias").style("opacity", 1);
+            d3.selectAll(".softmax").attr("opacity", 0.07);
+            d3.selectAll(".relu").style("opacity", 1);
+            d3.selectAll(".output-path").attr("opacity", 1);
+            d3.selectAll(".softmaxLabel").attr("opacity", 1);
+            d3.selectAll(".intermediate-path").attr("opacity", 0)    
     }, 2000);
 
     const g4 = svg
@@ -763,7 +777,7 @@ export function calculationVisualizer(
             }, ${height / 5 + 150})`
         );
 
-    d3.selectAll(".aniRect").style("opacity", 0);
+
     calculatedFeatureGroup
         .selectAll("rect")
         .data(calculatedData)
@@ -792,7 +806,7 @@ export function calculationVisualizer(
         .attr("class", "calFrame to-be-removed")
         .style("opacity", 0);
 
-    d3.selectAll(".aniRect").style("opacity", 0);
+
 
 
     const calFrame = calculatedFeatureGroup.append("rect")
@@ -821,8 +835,12 @@ export function calculationVisualizer(
     if (mode === 1) { matrixRectSize = 10 }
     let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, matrixRectSize, node.features.length, weights, node.graphIndex - 1);
 
-    drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, matrixRectSize, matrixRectSize, node.features.length, weights, node.graphIndex - 1, myColor, svg, weightsLocation)
+    setTimeout(()=> {
+        drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, matrixRectSize, matrixRectSize, node.features.length, weights, node.graphIndex - 1, myColor, svg, weightsLocation)
 
+
+    }, 4000)
+   
 
 
 
@@ -1070,6 +1088,14 @@ export function calculationVisualizer(
             node.intermediatePaths = paths;
         }
 
+                                d3.selectAll(".bias").style("opacity", 1);
+                        d3.selectAll(".softmax").attr("opacity", 0.07);
+                        d3.selectAll(".relu").style("opacity", 1);
+                        d3.selectAll(".output-path").attr("opacity", 1);
+                        d3.selectAll(".softmaxLabel").attr("opacity", 1);
+                        d3.selectAll(".intermediate-path").attr("opacity", 0);
+                        d3.selectAll(".aniRect").style("opacity", 1);
+
         // relu
         const relu = g3.append("g");
         let svgPath = "./assets/SVGs/ReLU.svg";
@@ -1125,6 +1151,17 @@ export function calculationVisualizer(
             .style("fill", "gray")
             .style("font-size", "8px")
             .attr("class", "relu to-be-removed").attr("opacity", 0);
+
+
+
+
+            d3.selectAll(".bias").style("opacity", 1);
+            d3.selectAll(".softmax").attr("opacity", 0.07);
+            d3.selectAll(".relu").style("opacity", 1);
+            d3.selectAll(".output-path").attr("opacity", 1);
+            d3.selectAll(".softmaxLabel").attr("opacity", 1);
+            d3.selectAll(".intermediate-path").attr("opacity", 0)        
+            
     }, 3500);
 
 
@@ -1293,7 +1330,6 @@ function weightAnimation(
 
     let i = 0;
     let intervalID: any;
-    let isPlaying = true;
     let isAnimating = true;
     let endNumber = 64;
     if (node.graphIndex === 5) {
@@ -1321,15 +1357,27 @@ function weightAnimation(
     let btnYOffset = 100;
     if (node.relatedNodes.length == 2) btnYOffset = 150;
 
-    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_pause.svg")
+    injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/matmul.svg")
+
+
+    let isSwitched = 0;
+    state.isPlaying = false;
+
+
+ 
 
     btn.on("click", function (event: any) {
+        if (isSwitched === 0) {
+            d3.selectAll(".aniRect").style("opacity", 0);
+        }
+        isSwitched ++;
+
         event.stopPropagation();
-        isPlaying = !isPlaying;
-        console.log(isPlaying);
-        if(isPlaying)injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_pause.svg");
+        state.isPlaying = !state.isPlaying;
+        console.log(state.isPlaying);
+        if(state.isPlaying)injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_pause.svg");
         else injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_play.svg")
-        if (isPlaying && state.isClicked) {
+        if (state.isPlaying && state.isClicked) {
 
             startAnimation(endNumber);
         } else {
@@ -1361,9 +1409,10 @@ function weightAnimation(
     let featureLength = node.features.length;
     let prevLayerFeatureLength = node.relatedNodes[0].features.length;
     function startAnimation(endNumber: number) {
-        if (!state.isClicked) {
+        if (!state.isClicked || !state.isPlaying) {
             return;
         }
+
         d3.selectAll(".weightUnit").style("opacity", 0.3).lower();
         if (i >= endNumber) {
             i = 0; // Reset the index to replay the animation
@@ -1393,6 +1442,7 @@ function weightAnimation(
                 //     state
                 // );
 
+
                 graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg)
 
                 i++;
@@ -1402,18 +1452,19 @@ function weightAnimation(
                 d3.selectAll(`#weightUnit-${i}`).style("opacity", 1).raise();
                 d3.select(`#columnUnit-${i}`).style("opacity", 1).raise();
 
+
                 if (i >= endNumber) {
+        
+                    d3.selectAll(`#tempath${i - 1}`).attr("opacity", 0);
+                    d3.selectAll(".aniRect").style("opacity", 1);
+
+    
                     clearInterval(intervalID);
-                    isPlaying = false;
+                    state.isPlaying = false;
 
                     injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_play.svg")
                     setTimeout(() => {
-                        d3.selectAll(".bias").style("opacity", 1);
-                        d3.selectAll(".softmax").attr("opacity", 0.07);
-                        d3.selectAll(".relu").style("opacity", 1);
-                        d3.selectAll(".output-path").attr("opacity", 1);
-                        d3.selectAll(".softmaxLabel").attr("opacity", 1);
-                        d3.selectAll(".intermediate-path").attr("opacity", 0)
+
                         d3.selectAll(".output")
                             .transition()
                             .delay(2000)
@@ -1935,7 +1986,7 @@ export function nodeOutputVisualizer(
 
 ) {
     showFeature(node)
-    let weights = allWeights[node.graphIndex - 1]
+    let weights = allWeights[3]
 
 
 
@@ -2027,9 +2078,9 @@ export function nodeOutputVisualizer(
     const math = create(all, {});
     const wMat = math.transpose(allWeights[3]);
 
+
     let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, 10, node.features.length, [wMat], 0);
-    console.log("jgug", weightsLocation)
-    drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, 10, 10, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
+    drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, 1, 10, 10, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
 
     const g5 = svg
         .append("g")
