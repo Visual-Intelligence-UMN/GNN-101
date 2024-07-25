@@ -263,10 +263,10 @@ export function outputVisualizer(
 
     calculatedFeatureGroup.append("text")
         .attr("x", 5)
-        .attr("y", -38)
+        .attr("y", -43)
         .text("Matrix Multiplication")
         .style("fill", "gray")
-        .style("font-size", "8px")
+        .style("font-size", "12px")
         .attr("class", "bias")
         .style("opacity", 1);
 
@@ -339,10 +339,10 @@ export function outputVisualizer(
 
     BiasGroup.append("text")
         .attr("x", 5 - moveOffset)
-        .attr("y", 23)
+        .attr("y", 28)
         .text("Bias Vector")
         .style("fill", "gray")
-        .style("font-size", "8px")
+        .style("font-size", "12px")
         .attr("class", "bias")
         .style("opacity", 0);
 
@@ -392,10 +392,10 @@ export function outputVisualizer(
 
         svg.append("text")
             .attr("x", (start_x - 30 + end_x) / 2)
-            .attr("y", end_y + 50)
+            .attr("y", end_y + 55)
             .text("Softmax")
             .style("fill", "gray")
-            .style("font-size", "8px")
+            .style("font-size", "12px")
             .attr("class", "to-be-removed softmaxLabel")
             .style("opacity", 1);
 
@@ -2011,10 +2011,10 @@ export function nodeOutputVisualizer(
 
     calculatedFeatureGroup.append("text")
         .attr("x", 5)
-        .attr("y", -38)
+        .attr("y", -43)
         .text("Matrix Multiplication")
         .style("fill", "gray")
-        .style("font-size", "8px")
+        .style("font-size", "12px")
         .attr("class", "bias")
         .style("opacity", 1);
 
@@ -2084,10 +2084,10 @@ export function nodeOutputVisualizer(
 
     BiasGroup.append("text")
         .attr("x", 5)
-        .attr("y", 23)
+        .attr("y", 28)
         .text("Bias Vector")
         .style("fill", "gray")
-        .style("font-size", "8px")
+        .style("font-size", "12px")
         .attr("class", "bias")
         .style("opacity", 0);
 
@@ -2140,10 +2140,10 @@ export function nodeOutputVisualizer(
 
         svg.append("text")
             .attr("x", (start_x - 30 + end_x) / 2)
-            .attr("y", end_y + 50)
+            .attr("y", end_y + 55)
             .text("Softmax")
             .style("fill", "gray")
-            .style("font-size", "8px")
+            .style("font-size", "12px")
             .attr("class", "to-be-removed softmaxLabel")
             .style("opacity", 1);
 
