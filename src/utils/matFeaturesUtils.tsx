@@ -11,6 +11,7 @@ import { addLayerName, buildBinaryLegend, buildLegend } from "./matHelperUtils";
 import * as d3 from "d3";
 import { roundToTwo } from "../components/WebUtils";
 import { deprecate } from "util";
+import { injectSVG } from "./svgUtils";
 
 //draw cross connections between feature visualizers
 export function drawCrossConnection(
@@ -442,6 +443,14 @@ export function drawGCNConvGraphModel(
             }
         }
 
+       // drawPoints(".mats", "red", [[locations[0][0], locations[0][1]]])
+
+        //draw hint label
+        if(k==0){
+            const hintLabelPos = [locations[0][0] - 120, locations[0][1] - 120];
+            const gLabel = d3.select(".mats").append("g");
+            injectSVG(gLabel, hintLabelPos[0], hintLabelPos[1], "./assets/SVGs/interactionHint.svg", "hintLabel")
+        }
         addLayerName(
             locations,
             "GCNConv" + (k + 1),
@@ -626,6 +635,12 @@ export function drawGCNConvNodeModel(
             } else {
                 locations[i][0] += 34 * 5 + 150;
             }
+        }
+
+        if(k==0){
+            const hintLabelPos = [locations[0][0] - 120, locations[0][1] - 120];
+            const gLabel = d3.select(".mats").append("g");
+            injectSVG(gLabel, hintLabelPos[0], hintLabelPos[1], "./assets/SVGs/interactionHint.svg", "hintLabel")
         }
 
         addLayerName(
