@@ -239,6 +239,21 @@ export const ButtonChain = ({
     );
 };
 
+export const AnnotatedImage = ({
+    imgSrc,
+    label
+}: {
+    imgSrc:string;
+    label:string
+}) => {
+    return (
+      <div className="flex flex-col items-center">
+        <img src={imgSrc} alt={label} />
+        <span className="mt-2 text-center">{label}</span>
+      </div>
+    );
+}
+
 //we may want to find a smater way to do the button chain
 export const NodeClassifierButtonChain = ({
     selectedButtons,

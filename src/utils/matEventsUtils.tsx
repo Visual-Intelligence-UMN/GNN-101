@@ -27,7 +27,7 @@ import {
     drawWeightMatrix,
     computeMatrixLocations,
 } from "./matAnimateUtils";
-import { injectPlayButtonSVG } from "./svgUtils";
+import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import { drawMatmulExplanation, drawSoftmaxDisplayer } from "./matInteractionUtils";
 import path from "node:path/win32";
 
@@ -111,13 +111,11 @@ export function detailedViewRecovery(
     gap:number,
     resultLabelsList:any
 ) {
-    console.log("click!", dview, lock);
+    console.log("click! detailedViewRecovery", dview, lock, transState);
 
     //remove calculation process visualizer
-    d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 0);
-    setTimeout(() => {
-        d3.selectAll(".procVis").remove();
-    }, 2000);
+    //d3.selectAll(".procVis").transition().duration(500).attr("opacity", 0);
+    d3.selectAll(".procVis").remove();
 
     //recover all frames
     d3.select(".poolingFrame").style("opacity", 0.25);
@@ -129,6 +127,8 @@ export function detailedViewRecovery(
     d3.selectAll(".oFeature")
         .style("opacity", 1)
         .style("pointer-events", "auto");
+    
+    setTimeout(()=>{
     //recover layers positions
     if (transState == "GCNConv") {
         if (recordLayerID >= 0) {
@@ -161,6 +161,14 @@ export function detailedViewRecovery(
         translateLayers(4, -300);
     }
 
+    d3.selectAll("path").style("opacity", 0.05);
+    d3.select(".mats").selectAll(".lastLayerConnections").style("opacity", 0.25);
+    d3.selectAll(".twoLayer").style("opacity", 1);
+    d3.select(".pooling").style("opacity", 1);
+    d3.select(".hintLabel").style("opacity", 1);
+    d3.selectAll(".hintPath").style("opacity", 1);
+    },100);
+
     //recover all feature visualizers and paths
     setTimeout(() => {
         d3.select(".pooling")
@@ -180,13 +188,13 @@ export function detailedViewRecovery(
             });
 
         d3.selectAll(".twoLayer")
-            .style("pointer-events", "auto")
-            .style("opacity", 1);
+            .style("pointer-events", "auto");
 
-        d3.selectAll("path").style("opacity", 0.05);
-        d3.select(".mats").selectAll(".lastLayerConnections").style("opacity", 0.25);
-    }, 1750);
+            
 
+    }, 150);
+
+    
     //recover color schemes opacity
     colorSchemesTable.forEach((d: any, i: any) => {
         d.style.opacity = "1";
@@ -407,6 +415,8 @@ export function featureVisClick(
     translateLayers(layerID, (gap+2) * 3 + 5 * featureChannels * 2);
     //record the layerID
     recordLayerID = layerID;
+
+    d3.select(".hintLabel").style("opacity", 0);
 
     //reduce color schemes opacity
     console.log("CST before modification", colorSchemesTable);
@@ -651,7 +661,11 @@ export function featureVisClick(
                 btnY - 30,
                 "./assets/SVGs/matmul.svg"
             );
-            drawHintLabel(g, btnX, btnY - 36, "Click for Animation", "procVis");
+            //drawHintLabel(g, btnX, btnY - 36, "Click for Animation", "procVis");
+
+            const gLabel = d3.select(".mats").append("g");
+            injectSVG(gLabel, btnX-120, btnY-30-120, "./assets/SVGs/interactionHint.svg", "procVis");
+
             drawPathBtwOuputResult([coordFeatureVis], coordFeatureVis3)
             drawWeightMatrix(btnX, btnY, curveDir, rectW, rectH, featureChannels, weights, layerID, myColor, g, weightMatrixPostions);
             drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor, weights[layerID], startCoordList, endCoordList, curveDir, weightMatrixPostions, featureChannels, X)
@@ -897,6 +911,8 @@ export function outputVisClick(
     const layerID = 4;
     translateLayers(layerID, 300);
 
+    d3.select(".hintLabel").style("opacity", 0);
+
     //locations calculation
     //find the next position
     one[0][0] += 350;
@@ -1025,7 +1041,9 @@ export function outputVisClick(
                 btnY,
                 "./assets/SVGs/matmul.svg"
             );
-            drawHintLabel(g1, btnX, btnY-12, "Click for Animation", "procVis");
+            //drawHintLabel(g1, btnX, btnY-12, "Click for Animation", "procVis");
+            const gLabel = d3.select(".mats").append("g");
+            injectSVG(gLabel, btnX-120, btnY-120, "./assets/SVGs/interactionHint.svg", "procVis");
         }, delay:aniSec+600},
         {func:()=>{
             //console.log("Xv check wmat", wMat);

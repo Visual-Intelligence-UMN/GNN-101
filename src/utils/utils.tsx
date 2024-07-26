@@ -1027,34 +1027,34 @@ export function featureVisualizer(
 
 
 
-  handleClickEvent = function(event: any) {
-    console.log("document clicked", state.isClicked);
-    if (!movedNode || !state.isClicked) {
-      return;
-    }
+  // handleClickEvent = function(event: any) {
+  //   console.log("document clicked", state.isClicked);
+  //   if (!movedNode || !state.isClicked) {
+  //     return;
+  //   }
   
-    if (movedNode && (!event.target.classList.contains("vis-component"))) {
-      svg.selectAll(".vis-component").style("opacity", 0);
-      let currMoveOffset = moveOffset;
+  //   if (movedNode && (!event.target.classList.contains("vis-component"))) {
+  //     svg.selectAll(".vis-component").style("opacity", 0);
+  //     let currMoveOffset = moveOffset;
   
-      for (let i = 0; i < colorSchemes.length; i++) {
-        colorSchemes[i].style.opacity = "1";
-      }
+  //     for (let i = 0; i < colorSchemes.length; i++) {
+  //       colorSchemes[i].style.opacity = "1";
+  //     }
   
-      if (mode === 0 && movedNode.graphIndex >= 4) {
-        currMoveOffset = fcLayerMoveOffset;
-      }
-      moveNextLayer(svg, movedNode, currMoveOffset, -1);
-      movedNode = null;
-      showAllLinks(allNodes);
-      resetNodes(allNodes, convNum);
-      state.isClicked = false;
-    }
-  };
+  //     if (mode === 0 && movedNode.graphIndex >= 4) {
+  //       currMoveOffset = fcLayerMoveOffset;
+  //     }
+  //     moveNextLayer(svg, movedNode, currMoveOffset, -1);
+  //     movedNode = null;
+  //     showAllLinks(allNodes);
+  //     resetNodes(allNodes, convNum);
+  //     state.isClicked = false;
+  //   }
+  // };
   
-  // Add the event listener
-  document.removeEventListener("click", handleClickEvent);
-  document.addEventListener("click", handleClickEvent);
+  // // Add the event listener
+  // document.removeEventListener("click", handleClickEvent);
+  // document.addEventListener("click", handleClickEvent);
 }
 
 

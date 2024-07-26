@@ -21,7 +21,7 @@ import {
 } from "./matEventsUtils";
 import { drawPoints } from "./utils";
 import { AnimationController, computeMatrixLocations, drawAniPath, drawBiasPath, drawBiasVector, drawPathBtwOuputResult, drawPathInteractiveComponents, drawWeightMatrix, drawWeightsVector } from "./matAnimateUtils";
-import { injectPlayButtonSVG } from "./svgUtils";
+import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import { roundToTwo } from "../components/WebUtils";
 import { drawMatmulExplanation, drawSoftmaxDisplayerNodeClassifier } from "./matInteractionUtils";
 import { create, all } from "mathjs";
@@ -699,6 +699,8 @@ export function visualizeNodeClassifierFeatures(
             d3.selectAll(".featureVis").style("opacity", 0.2);
             d3.selectAll(".oFeature").style("opacity", 0.2);
 
+            d3.select(".hintLabel").style("opacity", 0);
+
             //------------------the actual interaction codes part --------------------------------
             const layerID = 3;
             const node = Number(d3.select(this).attr("node"));
@@ -974,6 +976,8 @@ export function visualizeNodeClassifierFeatures(
                     btnY,
                     "./assets/SVGs/matmul.svg"
                 );
+                const gLabel = d3.select(".mats").append("g");
+            injectSVG(gLabel, btnX-120, btnY-120, "./assets/SVGs/interactionHint.svg", "procVis");
             }, aniSec);
 
             let firstPlay = true;

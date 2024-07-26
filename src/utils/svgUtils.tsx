@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import { gcd } from "mathjs";
 
 //a specific function for SVG injection for play-pause button
 export function injectPlayButtonSVG(btn:any, btnX: number, btnY: number, SVGPath:string){
@@ -29,5 +30,14 @@ export function injectPlayButtonSVGForGraphView(btn:any, btnX: number, btnY: num
         .on("mouseout", function(event){
             d3.select(play).select("circle").style("fill", "rgb(255, 255, 255)");
         });
+    });
+}
+
+export function injectSVG(g:any, x: number, y: number, SVGPath:string, svgClass:string){
+    g.selectAll("*").remove();
+    d3.xml(SVGPath).then(function(data) {
+        console.log("xml", data.documentElement)
+        const play = g!.node()!.appendChild(data.documentElement)
+        d3.select(play).attr("x", x).attr("y", y).attr("class", svgClass)
     });
 }

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="32mm"
+   height="32mm"
+   viewBox="0 0 32 32"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   sodipodi:docname="interactionHint.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#111111"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="5.5383285"
+     inkscape:cx="85.314549"
+     inkscape:cy="80.800551"
+     inkscape:window-width="1649"
+     inkscape:window-height="1266"
+     inkscape:window-x="3659"
+     inkscape:window-y="672"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <rect
+       x="6.5001561"
+       y="11.555833"
+       width="108.5165"
+       height="46.584452"
+       id="rect2" />
+    <rect
+       x="9.2085543"
+       y="16.06983"
+       width="35.209179"
+       height="36.111977"
+       id="rect1" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       transform="matrix(0.16575929,0,0,0.16259375,2.5243259,4.3213356)"
+       id="text1"
+       style="white-space:pre;shape-inside:url(#rect2);fill:#868686;fill-opacity:1"><tspan
+         x="6.5"
+         y="22.504604"
+         id="tspan1">Click here for 
+</tspan><tspan
+         x="6.5"
+         y="37.504604"
+         id="tspan3">interaction!</tspan></text>
+    <path
+       style="fill:none;fill-opacity:1;stroke:#b6b6b6;stroke-width:0.264583;stroke-opacity:1"
+       d="m 13.280932,11.752192 c 0.955463,12.850974 8.646938,14.761899 9.267989,15.191858 0.621051,0.429958 8.121433,2.531975 8.121433,2.531975"
+       id="path2" class="hintPath"/>
+    <path
+       style="fill:#b6b6b6;fill-opacity:1;stroke:#b6b6b6;stroke-width:0.264583;stroke-opacity:1"
+       d="m 30.605322,29.482113 -1.672145,0.472932 0.616497,-1.815714 z"
+       id="path3" class="hintPath"/>
+  </g>
+</svg>
