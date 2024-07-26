@@ -16,6 +16,7 @@ import { aggregationCalculator } from "@/utils/graphUtils";
 import { sources } from "next/dist/compiled/webpack/webpack";
 import { buildBinaryLegend, buildLegend } from "@/utils/matHelperUtils";
 import { findAbsMax } from "@/utils/matNNVis";
+import { injectSVG } from "@/utils/svgUtils";
 
 
 
@@ -47,9 +48,13 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
   const select = parse ? parse[1] : '';
   const location = loadNodesLocation(0, select);
 
+  console.log("location graphVIs", location)
+
   
   
   useEffect(() => {
+
+     
     setSimulation(false)
     const visualizationId = ++currentVisualizationId.current;
 
@@ -73,7 +78,13 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
         .select("#my_dataviz")
         .append("svg")
         .attr("width", width)
-        .attr("height", height);
+        .attr("height", height)
+        .attr("class", "gvis");
+
+        //TODO: put the hint label position into the injection function, using class attr for the interactions
+     const gLabel = d3.select(".gvis").append("g");
+     injectSVG(gLabel, location[0].x-1650, location[0].y-120, "./assets/SVGs/interactionHint.svg", "hintLabel");
+     
 
 
       svgRef.current = svg.node();
@@ -162,6 +173,8 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           node.y = centerY - 10
       });
       }
+
+     
 
         // This is needed to connect links to the nodes within its own graph.
         d3.forceSimulation(data.nodes)
