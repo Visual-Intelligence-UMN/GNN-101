@@ -141,7 +141,7 @@ export function graphVisDrawMatrixWeight(
         g
             .append("path")
             .attr("d", pathData1)
-            .attr("class", "intermediate-path to-be-removed")
+            .attr("class", "tempath to-be-removed")
             .style("fill", "none")
             .attr("stroke", "black").attr("id", `tempath${currentStep}`)
             .attr("stroke-width", 2).attr("stroke", myColor(Xv[j])).lower();
@@ -149,7 +149,7 @@ export function graphVisDrawMatrixWeight(
         g
             .append("path")
             .attr("d", pathData2)
-            .attr("class", "intermediate-path to-be-removed")
+            .attr("class", "tempath to-be-removed")
             .style("fill", "none")
             .attr("stroke", "black").attr("id", `tempath${currentStep}`)
             .attr("stroke-width", 2).attr("stroke", myColor(Xv[j])).lower();
@@ -167,7 +167,7 @@ export function drawGraphVisWeightVector(weightMatrixPositions: number[][][], re
         const math = create(all, {});
         weightMat = math.transpose(weightMat);
     }
-
+    console.log("wei:",weightMat)
 
     for (let j = 0; j < weightMat[currentStep].length; j++)
     g.append("rect")
@@ -179,7 +179,7 @@ export function drawGraphVisWeightVector(weightMatrixPositions: number[][][], re
                             .attr("stroke", "gray")
                             .attr("stroke-width", 0.1)
                             .attr("opacity", 1)
-                            .attr("class", "columnUnit")
+                            .attr("class", "columnUnit math-displayer")
                             .attr("id", `columnUnit-${j}`);
 
 }
@@ -202,10 +202,11 @@ export function hoverOverHandler(node: any, aggregatedData: any, state: State, g
                 d3.select(".graph-displayer").attr("opacity", 1);
 
 
-
+                d3.selectAll(".weightUnit").style("opacity", 0.3);
                 d3.selectAll(`#tempath${i}`).attr("opacity", 1).raise();
                 d3.selectAll(`#weightUnit-${i}`).style("opacity", 1).raise();
                 d3.selectAll(`#columnUnit-${i}`).style("opacity", 1).raise();
+                
 
         
 
@@ -214,6 +215,17 @@ export function hoverOverHandler(node: any, aggregatedData: any, state: State, g
 
                 const featureGroup = g.append("g")
                 .attr("transform", `translate(${70}, ${displayHeight - 40})`);
+
+
+
+                g.append("text")
+                .attr("x", 70 - 25)
+                .attr("y", displayHeight - 65)
+                .text("Matmul Visualization")
+                .attr("class", "math-displayer")
+                .attr("font-size", "10");
+
+
                 featureGroup.selectAll("rect")
                 .data(aggregatedData)
                 .enter()
@@ -374,7 +386,8 @@ export function hoverOverHandler(node: any, aggregatedData: any, state: State, g
                 d3.selectAll(`#weightUnit-${i}`).style("opacity", 0.3).raise();
                 d3.selectAll(`#columnUnit-${i}`).style("opacity", 0).raise();
                 d3.selectAll(`#tempath${i}`).attr("opacity", 0).raise();
-                d3.selectAll(`.columnUnit`).remove();
+                d3.selectAll(".weightUnit").style("opacity", 1);
+                
 
             });
     }
