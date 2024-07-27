@@ -182,13 +182,15 @@ export function buildBinaryLegend(
         .style("font-size", "5px")
         .text((d: number) => format(d));
 
-    g0.append("text")
-        .text(label)
-        .attr("x", 10)
-        .attr("y", 50)
-        .attr("text-anchor", "center")
-        .attr("font-size", 7.5);
-
+    // g0.append("text")
+    //     .text(label)
+    //     .attr("x", 10)
+    //     .attr("y", 50)
+    //     .attr("text-anchor", "center")
+    //     .attr("font-size", 7.5);
+    
+    const hint:any = drawHintLabel(g0, -50, 50, label, "", "17px");
+    hint.attr("text-anchor", "center");
     return g0.node() as SVGElement;
 }
 
@@ -246,13 +248,15 @@ export function buildLegend(
         .style("font-size", "5px")
         .text((d: number) => format(d));
 
-    g0.append("text")
-        .text(label)
-        .attr("x", absVal * 10)
-        .attr("y", 50)
-        .attr("text-anchor", "center")
-        .attr("font-size", 7.5);
-
+    // g0.append("text")
+    //     .text(label)
+    //     .attr("x", absVal * 10)
+    //     .attr("y", 50)
+    //     .attr("text-anchor", "center")
+    //     .attr("font-size", 7.5);
+    
+    const hint = drawHintLabel(g0, absVal * 10, 50, label, "", "17px");
+    hint.attr("text-anchor", "center");
     return g0.node() as SVGElement;
 }
 
