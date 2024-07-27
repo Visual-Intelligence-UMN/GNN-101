@@ -642,7 +642,7 @@ export function featureVisClick(
 
 
 
-    let weightMatrixPostions:any = computeMatrixLocations(btnX, btnY, curveDir, rectW, featureChannels, weights, layerID);
+    let weightMatrixPostions:any = computeMatrixLocations(btnX+15, btnY, curveDir, rectW, featureChannels, weights, layerID);
 
     d3.select(".mats").style("pointer-events", "none");
 

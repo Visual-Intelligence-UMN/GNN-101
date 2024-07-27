@@ -133,8 +133,8 @@ export function computeMidsVertical(point1: any, point2: any) :[[number, number]
     //find mid - x
     const midY = (point1[1] + point2[1]) / 2;
     const res :[[number, number], [number, number]] = [
-        [point1[0], midY-20],
-        [point2[0], midY+20],
+        [point1[0], midY],
+        [point2[0], midY],
     ];
     console.log("res", res);
     return res;
