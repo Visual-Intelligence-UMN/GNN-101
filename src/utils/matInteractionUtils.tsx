@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import { roundToTwo } from "../components/WebUtils";
-import { softmax } from "./utils";
+import { flipVertically, softmax } from "./utils";
 import { create, all, transposeDependencies } from "mathjs";
 
 //---------------------------functions for the softmax interaction in the graph classifier------------------------------
@@ -586,6 +586,7 @@ myColor:any
         let currentVal = dummy[Number(rectID)];
         let aggregatedVector:number[] = X;
         let transposedXv = math.transpose(Xv);
+        transposedXv = flipVertically(transposedXv);
         let weightVector:number[] = transposedXv[Number(rectID)];
 
         console.log("awvector", aggregatedVector, weightVector, X)

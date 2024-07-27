@@ -3,7 +3,7 @@ import { computeMids, computeMidsVertical } from "./matFeaturesUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
 import { drawActivationExplanation, drawDotProduct } from "./matInteractionUtils";
 import { create, all, transposeDependencies } from "mathjs";
-import { drawPoints, transposeAnyMatrix } from "./utils";
+import { drawPoints, flipVertically, transposeAnyMatrix } from "./utils";
 import { drawHintLabel } from "./matHelperUtils";
 
 interface Animation {
@@ -180,8 +180,14 @@ export function drawMatrixWeight(
         const math = create(all, {});
         Xt = math.transpose(math.transpose(Xt));
     }
+
+   // Xt = flipVertically(Xt);
+
     const Xv = Xt[currentStep];
     console.log("Xv check", Xv, Xt, weightMatrixPostions);
+
+
+
     for (let j = 0; j < Xv.length; j++) {
         let s1 = startCoordList[j];
         let e1 = endCoordList[currentStep];
@@ -557,7 +563,7 @@ weightMatrixPostions:any
             const coefficient = 1;
             //draw matrix
             //const weightMat = math.transpose(weights[layerID]);
-            const weightMat = weights[layerID];
+            let weightMat = weights[layerID];
 
             //determine matrix shape mode
             let flag = false;
@@ -572,6 +578,9 @@ weightMatrixPostions:any
             drawHintLabel(g, weightMatrixPostions[0][0][0], 
                 weightMatrixPostions[0][0][1] - 12, "Weight Matrix", 
                 "procVis");
+
+            //flip
+          //  weightMat = flipVertically(weightMat);
 
             for(let i=0; i<weightMatrixPostions.length; i++){
                 let tempArr = [];
