@@ -595,22 +595,22 @@ export function outputVisualizer(
             });
     }
 
-    document.addEventListener("click", function () {
-        d3.selectAll(".node-features-Copy").style("visibility", "hidden")
-        d3.selectAll(".weightUnit").remove();
-        d3.selectAll(".columnUnit").remove();
+    // document.addEventListener("click", function () {
+    //     d3.selectAll(".node-features-Copy").style("visibility", "hidden")
+    //     d3.selectAll(".weightUnit").remove();
+    //     d3.selectAll(".columnUnit").remove();
 
-        d3.selectAll(".graph-displayer").remove();
-        for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "1";
-        moveFeaturesBack(node.relatedNodes, originalCoordinates);
-        node.featureGroup
-            .transition()
-            .duration(1000)
-            .attr(
-                "transform",
-                `translate(${node.x - 7.5}, ${node.y + 170 + 5}) rotate(0)`
-            );
-    });
+    //     d3.selectAll(".graph-displayer").remove();
+    //     for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "1";
+    //     moveFeaturesBack(node.relatedNodes, originalCoordinates);
+    //     node.featureGroup
+    //         .transition()
+    //         .duration(1000)
+    //         .attr(
+    //             "transform",
+    //             `translate(${node.x - 7.5}, ${node.y + 170 + 5}) rotate(0)`
+    //         );
+    // });
 }
 
 export function calculationVisualizer(
@@ -1228,14 +1228,14 @@ export function calculationVisualizer(
     intermediateFeatureGroups.push(outputGroup);
     node.intermediateFeatureGroups = intermediateFeatureGroups;
 
-    document.addEventListener("click", () => {
-        moveFeaturesBack(node.relatedNodes, originalCoordinates);
-        d3.selectAll(".to-be-removed").remove();
-        d3.selectAll(".weightUnit").remove();
-        d3.selectAll(".columnUnit").remove();
-        d3.selectAll(".procVis").remove();
+    // document.addEventListener("click", () => {
+    //     moveFeaturesBack(node.relatedNodes, originalCoordinates);
+    //     d3.selectAll(".to-be-removed").remove();
+    //     d3.selectAll(".weightUnit").remove();
+    //     d3.selectAll(".columnUnit").remove();
+    //     d3.selectAll(".procVis").remove();
 
-    });
+    // });
 }
 
 export function moveNextLayer(
@@ -1350,18 +1350,18 @@ function weightAnimation(
 
     d3.selectAll(".aniRect").style("opacity", 0);
 
-    document.addEventListener("click", () => {
+    // document.addEventListener("click", () => {
 
-        isAnimating = false;
-        clearInterval(intervalID);
-        d3.selectAll(".bias").remove();
-        d3.selectAll(".vis-component").remove();
-        d3.selectAll(".relu").remove();
-        d3.selectAll(".intermediate-path").remove();
-        d3.selectAll(".parameter").remove();
-        d3.selectAll(".to-be-removed").remove();
-        d3.selectAll(".intermediate-path").remove();
-    });
+    //     isAnimating = false;
+    //     clearInterval(intervalID);
+    //     d3.selectAll(".bias").remove();
+    //     d3.selectAll(".vis-component").remove();
+    //     d3.selectAll(".relu").remove();
+    //     d3.selectAll(".intermediate-path").remove();
+    //     d3.selectAll(".parameter").remove();
+    //     d3.selectAll(".to-be-removed").remove();
+    //     d3.selectAll(".intermediate-path").remove();
+    // });
     let featureLength = node.features.length;
     let prevLayerFeatureLength = node.relatedNodes[0].features.length;
     function startAnimation(endNumber: number) {
@@ -1793,25 +1793,25 @@ export function fcLayerCalculationVisualizer(
     }, 1000);
 
 
-    document.addEventListener("click", function () {
-        d3.selectAll(".origin-to-aggregated").remove();
+    // document.addEventListener("click", function () {
+    //     d3.selectAll(".origin-to-aggregated").remove();
 
-        d3.selectAll(".node-features-Copy").style("visibility", "hidden");
+    //     d3.selectAll(".node-features-Copy").style("visibility", "hidden");
 
-        for (let i = 0; i < colorSchemes.length; i++)colorSchemes[i].style.opacity = "1";
+    //     for (let i = 0; i < colorSchemes.length; i++)colorSchemes[i].style.opacity = "1";
 
-        moveFeaturesBack(relatedNodes, originalCoordinates);
-        node.featureGroup
-            .transition()
-            .duration(1000)
-            .attr(
-                "transform",
-                `translate(${xPos - 300 - 15 / 2}, ${yPos}) rotate(0)`
-            );
-        d3.selectAll("rect").style("opacity", 1);
-        d3.selectAll(".graph-displayer").remove();
+    //     moveFeaturesBack(relatedNodes, originalCoordinates);
+    //     node.featureGroup
+    //         .transition()
+    //         .duration(1000)
+    //         .attr(
+    //             "transform",
+    //             `translate(${xPos - 300 - 15 / 2}, ${yPos}) rotate(0)`
+    //         );
+    //     d3.selectAll("rect").style("opacity", 1);
+    //     d3.selectAll(".graph-displayer").remove();
 
-    });
+    // });
 }
 
 function poolingLayerInteraction(
@@ -2350,27 +2350,27 @@ export function nodeOutputVisualizer(
             });
     }
 
-    document.addEventListener("click", function () {
-        setTimeout(() => {
-            d3.selectAll(".node-features-Copy").style("opacity", "hidden");
+    // document.addEventListener("click", function () {
+    //     setTimeout(() => {
+    //         d3.selectAll(".node-features-Copy").style("opacity", "hidden");
 
-        }, 500);
+    //     }, 500);
 
 
-        d3.selectAll(".graph-displayer").remove();
-        d3.selectAll(".weightUnit").remove();
-        d3.selectAll(".columnUnit").remove();
-        for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "1";
-        moveFeaturesBack(node.relatedNodes, originalCoordinates);
-        node.featureGroup
-            .transition()
-            .duration(1000)
-            .attr(
-                "transform",
-                `translate(${node.x - 7.5}, ${node.y + 25}) rotate(0)`
-            )
-            .style("visibility", "hidden");
+    //     d3.selectAll(".graph-displayer").remove();
+    //     d3.selectAll(".weightUnit").remove();
+    //     d3.selectAll(".columnUnit").remove();
+    //     for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "1";
+    //     moveFeaturesBack(node.relatedNodes, originalCoordinates);
+    //     node.featureGroup
+    //         .transition()
+    //         .duration(1000)
+    //         .attr(
+    //             "transform",
+    //             `translate(${node.x - 7.5}, ${node.y + 25}) rotate(0)`
+    //         )
+    //         .style("visibility", "hidden");
 
-    });
+    // });
 }
 
