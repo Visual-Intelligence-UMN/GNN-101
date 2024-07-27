@@ -22,6 +22,8 @@ import {
 } from "../utils/matHelperUtils";
 import { visualizeMatrixBody } from "../components/WebUtils";
 
+import { myColor } from "../utils/utils";
+
 //find absolute max value in an 1d array
 export function findAbsMax(arr: number[]) {
     let max: number = Math.abs(Math.max(...arr));
@@ -88,10 +90,10 @@ async function initNodeClassifier(graph: any, features: any[][], intmData:any, g
     d3.select("#matvis").selectAll("*").remove();
     visualizeMatrixBody(gridSize, graph, width, height, margin);
 
-    var myColor = d3
-    .scaleLinear<string>()
-    .domain([-3, -1, -0.1, 0, 0.1, 1, 3])
-    .range(["#304E30","#3DBA41","#B7EFB8", "white", "#BBB7EF", "#6E09CD","#4B0092"]);
+    // var myColor = d3
+    // .scaleLinear<string>()
+    // .domain([-3, -1, -0.1, 0, 0.1, 1, 3])
+    // .range(["#304E30","#3DBA41","#B7EFB8", "white", "#BBB7EF", "#6E09CD","#4B0092"]);
 
     const data = matrix_to_hmap(graph);
 
@@ -188,10 +190,10 @@ async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: str
     d3.select("#matvis").selectAll("*").remove();
     visualizeMatrixBody(gridSize, graph, width, height, margin);
 
-    var myColor = d3
-    .scaleLinear<string>()
-    .domain([-3, -1, -0.1, 0, 0.1, 1, 3])
-    .range(["#304E30","#3DBA41","#B7EFB8", "white", "#BBB7EF", "#6E09CD","#4B0092"]);
+    // var myColor = d3
+    // .scaleLinear<string>()
+    // .domain([-3, -1, -0.1, 0, 0.1, 1, 3])
+    // .range(["#304E30","#3DBA41","#B7EFB8", "white", "#BBB7EF", "#6E09CD","#4B0092"]);
 
     const data = matrix_to_hmap(graph);
 

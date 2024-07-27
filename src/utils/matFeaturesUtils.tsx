@@ -638,7 +638,7 @@ export function drawGCNConvNodeModel(
         }
 
         if(k==0){
-            const hintLabelPos = [locations[0][0] - 132 - 64, locations[0][1] - 132 - 64];
+            const hintLabelPos = [locations[0][0] - 132 - 32, locations[0][1] - 132 - 32];
             const gLabel = d3.select(".mats").append("g");
             injectSVG(gLabel, hintLabelPos[0], hintLabelPos[1], "./assets/SVGs/interactionHint.svg", "hintLabel")
         }
