@@ -118,6 +118,7 @@ export default function Home() {
               isGraphView={isGraphView}
               setIsGraphView={setIsGraphView}
               predicted={predicted}
+              modelMode={model}
             />
 
             {/* <Panel className="ml-4"> */}

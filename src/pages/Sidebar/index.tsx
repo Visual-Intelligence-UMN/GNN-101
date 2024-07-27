@@ -13,6 +13,7 @@ type Props = {
     isGraphView: boolean;
     setIsGraphView: (isGraphView: boolean) => void;
     predicted: boolean;
+    modelMode: string;
 };
 export default function Sidebar(props: Props) {
     return (
@@ -113,7 +114,8 @@ export default function Sidebar(props: Props) {
                         nitrogen, etc.
                         {/* TODO: maybe also show node features before clicking prediction */}
                     </p>
-                    <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/graphFeatures.png" label="Node Features" />
+                    {props.isGraphView ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/graphViewFeatures.png" label="Node Features" /> :
+                        <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/graphFeatures.png" label="Node Features" />}
                 </div>
 
                 <div className="p-4">
@@ -147,21 +149,26 @@ export default function Sidebar(props: Props) {
                     {/* <span>
                         <img src="./assets/PNGs/annotatedSrcShots/gcnconv.png" alt="GCNConv"></img>
                     </span> */}
-                    <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/gcnconv.png" label="GCNConv" />
+                    {props.isGraphView ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/gcnconvGraph.png" label="GCNConv" /> :
+                        <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/gcnconv.png" label="GCNConv" />
+                    }
                     <ol className="list-inside list-disc">
                         <li>
                             <b className="font-bold">Aggregation with Normalization: </b>
                             First, a node aggregates the feature vectors of its neighbors and itself via a normalized degree matrix.
                             Intuitively, this reduces the influence of information from nodes with too many neighbors and strengthens the influence from those with fewer neighbors.
                         </li>
+                        <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/summation.png" label="Aggregated Vector" />
                         <li>
                             <b className="font-bold">Weighted Transformation:</b> The aggregated information is then transformed by a learnable weight matrix.
                             This matrix allows the model to learn the importance of different features for the central node.
                         </li>
+                        <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/matmul.png" label="Weighted Transformation" />
                         <li>
                             <b className="font-bold">Activation Function: </b>
                             Finally, we add a bias vector and a non-linear activation function (ReLU) to the aggregated information to obtain an updated feature vector of this node.
                         </li>
+                        <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/activation.png" label="Activation Function" />
                         Note that the learnable weight matrix and bias vector are shared across all nodes in the graph, mimicking the convolution operation in CNNs and minimizing the number of parameters.
                     </ol>
 
@@ -177,6 +184,7 @@ export default function Sidebar(props: Props) {
                         <h1 className="text-3xl font-semibold text-3xl">
                             Tasks that GNNs can solve:
                         </h1>
+                        <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/modelMenu.png" label="Model Selection Menu" />
                         <p>
                             By learning the features of each node, GNNs can then use
                             these node features to solve tasks at different levels of
@@ -194,6 +202,9 @@ export default function Sidebar(props: Props) {
                             After sevela layers of GCNConv, we apply a <b className="font-bold">fully connected layer </b> to each node to make the prediction.
                         </p>
 
+                        {props.modelMode=="node classification"?(props.isGraphView ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCGraphNode.png" label="Fully Connected Layer" /> :
+                            <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCMatrixNode.png" label="Fully Connected Layer" />):<></>}
+
                         <span className={styles.tag}>Graph-Level Tasks </span>
                         {/* <span className={styles.button} onClick={() => { }}>Click to Predict a Graph </span> */}
                         <p>
@@ -204,6 +215,10 @@ export default function Sidebar(props: Props) {
                             feature, which is then fed into <b className="font-bold">a fully connected layer</b> to make
                             the prediction.
                         </p>
+
+                        {props.modelMode=="graph classification" ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/pooling.png" label="Pooling Layer" />:<></>}
+                        {props.modelMode=="graph classification" ? (props.isGraphView ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCGraphGraph.png" label="Fully Connected Layer" /> :
+                                                    <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCMatrixGraph.png" label="Fully Connected Layer" />) : <></>}
 
                         <span className={styles.tag}>Edge-Level Tasks </span>
                         <p>

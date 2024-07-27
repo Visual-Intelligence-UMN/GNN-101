@@ -1325,7 +1325,7 @@ function weightAnimation(
 
 
     const gLabel = svg.append("g");
-    injectSVG(gLabel, endCoordList[0][0] - 80-120, endCoordList[0][1] - 22.5-120, "./assets/SVGs/interactionHint.svg", "to-be-removed");
+    injectSVG(gLabel, endCoordList[0][0] - 80-120-64, endCoordList[0][1] - 22.5-120-64, "./assets/SVGs/interactionHint.svg", "to-be-removed");
 
     btn.on("click", function (event: any) {
         event.stopPropagation();

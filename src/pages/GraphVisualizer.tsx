@@ -83,7 +83,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
         //TODO: put the hint label position into the injection function, using class attr for the interactions
      const gLabel = d3.select(".gvis").append("g");
-     injectSVG(gLabel, location[0].x-1650, location[0].y-120, "./assets/SVGs/interactionHint.svg", "hintLabel");
+     injectSVG(gLabel, location[0].x-1650-64, location[0].y-120-64, "./assets/SVGs/interactionHint.svg", "hintLabel");
      
 
 
