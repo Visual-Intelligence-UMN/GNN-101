@@ -560,7 +560,7 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
     if (mode === 0 && movedNode.graphIndex >= 4) {
       currMoveOffset = fcLayerMoveOffset;
     }
-    console.log("vjghjgjkghjgyikyughkgjhvhk")
+
     moveNextLayer(svg, movedNode, currMoveOffset, -1);
     movedNode = null;
     showAllLinks(allNodes);
@@ -865,7 +865,7 @@ export function featureVisualizer(
 
 
            if (mode === 1 && graphIndex === 4) {
-            nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
+            nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, svg, mode)
            } else {
             calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
            };
@@ -1027,11 +1027,11 @@ export function featureVisualizer(
             } // to make sure relatedNodes is not null
             showFeature(node);
             if (node.graphIndex === 4) {
-              fcLayerCalculationVisualizer(node, allNodes, relatedNodes, offset, height, currMoveOffset, node.graphIndex, g2, state, currRectHeight, colorSchemes, convNum, mode);
+              fcLayerCalculationVisualizer(node, allNodes, relatedNodes, offset, height, currMoveOffset, node.graphIndex, g2, state, currRectHeight, colorSchemes, convNum, svg, mode);
             }
             if (node.graphIndex === 5) {
 
-              outputVisualizer(node, allNodes, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, convNum, mode)
+              outputVisualizer(node, allNodes, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, convNum, svg, mode)
             }
             
             reduceNodeOpacity(allNodes, relatedNodes, node);

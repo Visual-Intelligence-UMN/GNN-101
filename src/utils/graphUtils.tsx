@@ -175,6 +175,7 @@ export function outputVisualizer(
     rectWidth: number,
     colorSchemes: any,
     convNum: number,
+    originalSvg: any,
     mode: number
 
 ) {
@@ -628,7 +629,7 @@ export function outputVisualizer(
                     `translate(${node.x - 7.5}, ${node.y + 170 + 5}) rotate(0)`
                 );
 
-                handleClickEvent(svg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state)
+                handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state)
 
 
     })
@@ -1316,10 +1317,10 @@ export function moveNextLayer(
     if (!svg.selectAll) {
         svg = d3.selectAll(svg);
     } // when svg is passed into a function, it should be selected again
-
     svg.selectAll("g[layerNum]")
         .filter((d: any, i: any, nodes: any) => {
             const layerNum = d3.select(nodes[i]).attr("layerNum");
+        
             return (
                 layerNum !== null &&
                 parseInt(layerNum) > 0 &&
@@ -1338,6 +1339,12 @@ export function moveNextLayer(
             }
             return `translate(${moveOffset},10)`; // Default fallback
         });
+
+
+
+
+
+
 }
 
 function weightAnimation(
@@ -1750,6 +1757,7 @@ export function fcLayerCalculationVisualizer(
     rectHeight: number,
     colorSchemes: any,
     convNum: number,
+    originalSvg: any,
     mode: number
 ) {
 
@@ -1904,7 +1912,7 @@ export function fcLayerCalculationVisualizer(
                 );
             d3.selectAll("rect").style("opacity", 1);
             d3.selectAll(".graph-displayer").remove();
-            handleClickEvent(svg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
+            handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
        
 
 
@@ -2033,6 +2041,7 @@ export function nodeOutputVisualizer(
     rectHeight: number,
     rectWidth: number,
     colorSchemes: any,
+    originalSvg: any,
     mode: number
 
 ) {
@@ -2460,7 +2469,7 @@ export function nodeOutputVisualizer(
                 d3.selectAll(".node-features-Copy").style("opacity", "hidden");
                 d3.selectAll(".procVis").remove();
                 d3.selectAll(".to-be-removed").remove();
-                handleClickEvent(svg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
+                handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
     
 
     
