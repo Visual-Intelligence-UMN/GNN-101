@@ -1568,6 +1568,19 @@ export function graphToAdjList(graph:any){
 }
 
 
+export function rotateMatrixCounterClockwise(matrix: number[][]): number[][] {
+  const n = matrix.length;
+  const rotatedMatrix: number[][] = Array.from({ length: n }, () => Array(n).fill(0));
+
+  for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+          rotatedMatrix[n - 1 - j][i] = matrix[i][j];
+      }
+  }
+
+  return rotatedMatrix;
+}
+
 export function loadNodesLocation(mode: number, path: string) {
   
   let data; 

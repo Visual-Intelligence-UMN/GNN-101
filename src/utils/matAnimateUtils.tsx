@@ -3,8 +3,8 @@ import { computeMids, computeMidsVertical } from "./matFeaturesUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
 import { drawActivationExplanation, drawDotProduct } from "./matInteractionUtils";
 import { create, all, transposeDependencies } from "mathjs";
-import { drawPoints, flipVertically, transposeAnyMatrix } from "./utils";
-import { drawHintLabel } from "./matHelperUtils";
+import { drawPoints, flipHorizontally, flipVertically, rotateMatrixCounterClockwise, transposeAnyMatrix } from "./utils";
+import { drawHintLabel, drawMatrixValid, rotateMatrix } from "./matHelperUtils";
 
 interface Animation {
     func: () => void;
@@ -183,9 +183,28 @@ export function drawMatrixWeight(
 
    // Xt = flipVertically(Xt);
 
-    const Xv = Xt[currentStep];
-    console.log("Xv check", Xv, Xt, weightMatrixPostions);
+   //adjust matrix value alignment for GCNConv - square weight matri
+   if(Xt[0].length==Xt.length){
+    if(curveDir==1){
+    Xt = rotateMatrix(Xt)
+    Xt = rotateMatrix(Xt)
+    Xt = rotateMatrix(Xt)
+    Xt = flipHorizontally(Xt);
+    }else{
+        //anti-clockwise rotation
+        Xt = rotateMatrixCounterClockwise(Xt)
+        Xt = flipHorizontally(Xt);
+    }
+    //Xt = flipVertically(Xt);
+    //Xt = flipHorizontally(Xt);
+}
+   
+//drawMatrixValid(Xt, startCoordList[0][0], startCoordList[0][1]+20, 10, 10)
 
+
+    let Xv = Xt[currentStep];
+    console.log("Xv check", Xv, Xt, weightMatrixPostions);
+    
 
 
     for (let j = 0; j < Xv.length; j++) {
@@ -582,6 +601,23 @@ weightMatrixPostions:any
             //flip
           //  weightMat = flipVertically(weightMat);
 
+         // drawMatrixValid(Xt, startCoordList[0][0], startCoordList[0][1]+20, 10, 10)
+
+          if(weightMat[0].length==weightMat.length){
+            weightMat = rotateMatrix(weightMat)
+            console.log("rotated!", weightMat)
+            if(curveDir==1){
+                weightMat = rotateMatrix(weightMat)
+                weightMat = rotateMatrix(weightMat)
+               weightMat = flipVertically(weightMat);
+               weightMat = rotateMatrix(weightMat)
+            }else{
+                weightMat = rotateMatrix(weightMat)
+               weightMat = flipVertically(weightMat);
+            }
+        }
+        console.log("rotated! 1", weightMat)
+
             for(let i=0; i<weightMatrixPostions.length; i++){
                 let tempArr = [];
                 for(let j=0; j<weightMatrixPostions[0].length; j++){
@@ -608,6 +644,9 @@ weightMatrixPostions:any
                        // console.log(`w mat check2 ${i} ${j}`,weightMat[weightMat.length-i-1], weightMat[weightMat.length-i-1][j]);
                         colorVal = weightMat[j][weightMat[0].length-i-1];
                         console.log("w mat color", colorVal, j, weightMat[0].length-i-1);
+                    }
+                    if(weightMat[0].length==weightMat.length){
+                        colorVal = weightMat[i][j];
                     }
                     g.append("rect")
                         .attr("x", weightMatrixPostions[i][j][0])

@@ -1,7 +1,8 @@
 import {
     deepClone,
     get_cood_from_parent,
-    get_coordination
+    get_coordination,
+    myColor
 } from "./utils";
 import * as d3 from "d3";
 
@@ -359,3 +360,34 @@ export function loadWeights() {
     console.log("weights array", weights, bias);
     return { weights: weights, bias: bias };
 }
+
+export function drawMatrixValid(matrix:number[][], x:number, y:number, w:number, h:number){
+    for(let i=0; i<matrix.length; i++){
+        for(let j=0; j<matrix[i].length; j++){
+            d3.select(".mats")
+            .append("rect")
+            .attr("x", x + j*w)
+            .attr("y", y + i*h)
+            .attr("width", w)
+            .attr("height", h)
+            .style("fill", myColor(matrix[i][j]))
+            .attr("class", "procVis");
+        }
+    }
+}
+
+export function rotateMatrix(matrix: number[][]): number[][] {
+    const n = matrix.length;
+    const rotatedMatrix: number[][] = Array.from({ length: n }, () => Array(n).fill(0));
+
+    for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+            rotatedMatrix[j][n - 1 - i] = matrix[i][j];
+        }
+    }
+
+    return rotatedMatrix;
+}
+
+
+

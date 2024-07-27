@@ -5,6 +5,7 @@ import {
     loadWeights,
     loadNodeWeights,
     drawHintLabel,
+    drawMatrixValid,
 } from "./matHelperUtils";
 import { computeMids } from "./matFeaturesUtils";
 import * as d3 from "d3";
@@ -500,6 +501,8 @@ export function featureVisClick(
     }
     const dummy: number[] = math.multiply(math.transpose(weights[layerID]), X);
     const Xt = math.transpose(weights[layerID]);
+
+    //drawMatrixValid(Xt, coordFeatureVis[0], coordFeatureVis[1]-75, 10, 10)
 
     console.log("compute x'", mulValues, dList, layerID, X.toString(), dummy);
 
