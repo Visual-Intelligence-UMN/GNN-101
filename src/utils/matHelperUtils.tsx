@@ -179,7 +179,7 @@ export function buildBinaryLegend(
             "transform",
             (d: number, i: number) => `rotate(-90, ${i * offsetText}, 0)`
         )
-        .style("font-size", "5px")
+        .style("font-size", "7px").style("fill", "gray")
         .text((d: number) => format(d));
 
     // g0.append("text")
@@ -189,7 +189,7 @@ export function buildBinaryLegend(
     //     .attr("text-anchor", "center")
     //     .attr("font-size", 7.5);
     
-    const hint:any = drawHintLabel(g0, -50, 50, label, "", "17px");
+    const hint:any = drawHintLabel(g0, -50, 65, label, "", "17px");
     hint.attr("text-anchor", "center");
     return g0.node() as SVGElement;
 }
@@ -245,7 +245,7 @@ export function buildLegend(
             "transform",
             (d: number, i: number) => `rotate(-90, ${i * offsetText}, 0)`
         )
-        .style("font-size", "5px")
+        .style("font-size", "7px").style("fill", "gray")
         .text((d: number) => format(d));
 
     // g0.append("text")
@@ -255,7 +255,7 @@ export function buildLegend(
     //     .attr("text-anchor", "center")
     //     .attr("font-size", 7.5);
     
-    const hint = drawHintLabel(g0, absVal * 10, 50, label, "", "17px");
+    const hint = drawHintLabel(g0, absVal * 10, 65, label, "", "17px");
     hint.attr("text-anchor", "center");
     return g0.node() as SVGElement;
 }
