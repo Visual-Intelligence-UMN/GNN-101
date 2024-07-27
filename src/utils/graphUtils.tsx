@@ -14,8 +14,11 @@ import * as math from "mathjs";
 import { create, all, matrix } from "mathjs";
 import { inter } from "@/pages";
 import { off } from "process";
-import { injectPlayButtonSVGForGraphView } from "./svgUtils";
+
+import { injectPlayButtonSVGForGraphView, injectSVG} from "./svgUtils";
 import { stat, truncateSync } from "fs";
+
+
 import { drawActivationExplanation } from "./matInteractionUtils";
 import { computeMatrixLocations, drawMatrixWeight, drawWeightMatrix } from "./matAnimateUtils";
 import { graphVisDrawActivationExplanation, graphVisDrawMatrixWeight, hoverOverHandler } from "./graphAnimationHelper";
@@ -269,12 +272,14 @@ export function outputVisualizer(
 
     calculatedFeatureGroup.append("text")
         .attr("x", 5)
-        .attr("y", -38)
+        .attr("y", -43)
         .text("Matrix Multiplication")
         .style("fill", "gray")
-        .style("font-size", "8px")
+
+        .style("font-size", "12px")
         .attr("class", "bias to-be-removed")
         .style("opacity", 0);
+
 
     let endCoordList = [];
 
@@ -353,11 +358,13 @@ export function outputVisualizer(
 
     BiasGroup.append("text")
         .attr("x", 5 - moveOffset)
-        .attr("y", 23)
+        .attr("y", 28)
         .text("Bias Vector")
         .style("fill", "gray")
-        .style("font-size", "8px")
+
+        .style("font-size", "12px")
         .attr("class", "bias to-be-removed")
+
         .style("opacity", 0);
 
     setTimeout(() => {
@@ -407,10 +414,10 @@ export function outputVisualizer(
 
         svg.append("text")
             .attr("x", (start_x - 30 + end_x) / 2)
-            .attr("y", end_y + 50)
+            .attr("y", end_y + 55)
             .text("Softmax")
             .style("fill", "gray")
-            .style("font-size", "8px")
+            .style("font-size", "12px")
             .attr("class", "to-be-removed softmaxLabel")
             .style("opacity", 1);
 
@@ -610,6 +617,7 @@ export function outputVisualizer(
     }
 
 
+
     d3.select("#my_dataviz").on("click", function(event: any) {
      
             d3.selectAll(".node-features-Copy").style("visibility", "hidden")
@@ -633,6 +641,7 @@ export function outputVisualizer(
 
 
     })
+
 }
 
 export function calculationVisualizer(
@@ -739,10 +748,10 @@ export function calculationVisualizer(
     //draw label
     aggregatedFeatureGroup.append("text")
         .attr("x", 0)
-        .attr("y", -3)
+        .attr("y", -5)
         .text("Vectors Summation")
         .style("fill", "gray")
-        .style("font-size", "8px")
+        .style("font-size", "12px")
         .attr("class", "aggregatedFeatureGroup to-be-removed")
         .style("opacity", 0);
 
@@ -809,10 +818,10 @@ export function calculationVisualizer(
     //draw label
     calculatedFeatureGroup.append("text")
         .attr("x", 0)
-        .attr("y", -3)
+        .attr("y", -5)
         .text("Matrix Multiplication")
         .style("fill", "gray")
-        .style("font-size", "8px")
+        .style("font-size", "12px")
         .attr("class", "calFrame to-be-removed")
         .style("opacity", 0);
 
@@ -924,10 +933,10 @@ export function calculationVisualizer(
     //draw label
     BiasGroup.append("text")
         .attr("x", 0)
-        .attr("y", 23)
+        .attr("y", -5)
         .text("Bias Vector")
         .style("fill", "gray")
-        .style("font-size", "8px")
+        .style("font-size", "12px")
         .attr("class", "bias to-be-removed").style("opacity", 0);
 
     const BiasFrame = BiasGroup.append("rect")
@@ -1163,10 +1172,10 @@ export function calculationVisualizer(
         //draw label
         relu.append("text")
             .attr("x", end_x - 45)
-            .attr("y", end_y - 25)
+            .attr("y", end_y - 20)
             .text(labelText)
             .style("fill", "gray")
-            .style("font-size", "8px")
+            .style("font-size", "12px")
             .attr("class", "relu to-be-removed").attr("opacity", 0);
 
 
@@ -1199,11 +1208,13 @@ export function calculationVisualizer(
     //draw label
     outputGroup.append("text")
         .attr("x", 0)
-        .attr("y", 23)
+        .attr("y", 28)
         .text("Final Output Vector")
         .style("fill", "gray")
-        .style("font-size", "8px")
+
+        .style("font-size", "12px")
         .attr("class", "relu output to-be-removed").style("opacity", 0);
+
 
     outputGroup
         .selectAll("rect")
@@ -1274,14 +1285,17 @@ export function calculationVisualizer(
     //draw label
     outputGroupCopy.append("text")
         .attr("x", 0)
-        .attr("y", 23)
+        .attr("y", 28)
         .text("Final Output Vector")
         .style("fill", "gray")
-        .style("font-size", "8px")
+
+        .style("font-size", "12px")
         .attr("class", "relu to-be-removed").style("opacity", 0);
+
 
     intermediateFeatureGroups.push(outputGroup);
     node.intermediateFeatureGroups = intermediateFeatureGroups;
+
 
     d3.select("#my_dataviz").on("click", function(event: any) {
         if (!state.isClicked) {
@@ -1306,6 +1320,7 @@ export function calculationVisualizer(
         handleClickEvent(svg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
 
     }) 
+
 }
 
 export function moveNextLayer(
@@ -1404,6 +1419,10 @@ function weightAnimation(
     state.isPlaying = false;
 
 
+
+    const gLabel = svg.append("g");
+    injectSVG(gLabel, endCoordList[0][0] - 80-120, endCoordList[0][1] - 22.5-120, "./assets/SVGs/interactionHint.svg", "to-be-removed");
+
     btn.on("click", function (event: any) {
         if (isSwitched === 0) {
             d3.selectAll(".aniRect").style("opacity", 0);
@@ -1432,19 +1451,7 @@ function weightAnimation(
 
     d3.selectAll(".aniRect").style("opacity", 0);
 
-    // document.addEventListener("click", () => {
 
-        // isAnimating = false;
-        // clearInterval(intervalID);
-        // d3.selectAll(".bias").remove();
-        // d3.selectAll(".vis-component").remove();
-        // d3.selectAll(".relu").remove();
-        // d3.selectAll(".intermediate-path").remove();
-        // d3.selectAll(".parameter").remove();
-        // d3.selectAll(".to-be-removed").remove();
-        // d3.selectAll(".intermediate-path").remove();
-        
-    // });
     let featureLength = node.features.length;
     let prevLayerFeatureLength = node.relatedNodes[0].features.length;
     function startAnimation(endNumber: number) {
@@ -1893,6 +1900,7 @@ export function fcLayerCalculationVisualizer(
 
 
 
+
     d3.select("#my_dataviz").on("click", function(event: any) {
         
 
@@ -1917,6 +1925,7 @@ export function fcLayerCalculationVisualizer(
 
 
     })
+
 }
 
 function poolingLayerInteraction(
@@ -2125,11 +2134,13 @@ export function nodeOutputVisualizer(
 
     calculatedFeatureGroup.append("text")
         .attr("x", 5)
-        .attr("y", -38)
+        .attr("y", -43)
         .text("Matrix Multiplication")
         .style("fill", "gray")
-        .style("font-size", "8px")
+
+        .style("font-size", "12px")
         .attr("class", "bia to-be-removed")
+
         .style("opacity", 1);
 
     let endCoordList = [];
@@ -2211,11 +2222,13 @@ export function nodeOutputVisualizer(
 
     BiasGroup.append("text")
         .attr("x", 5)
-        .attr("y", 23)
+        .attr("y", 28)
         .text("Bias Vector")
         .style("fill", "gray")
-        .style("font-size", "8px")
+
+        .style("font-size", "12px")
         .attr("class", "bias to-be-removed")
+
         .style("opacity", 0);
 
     setTimeout(() => {
@@ -2268,10 +2281,10 @@ export function nodeOutputVisualizer(
 
         svg.append("text")
             .attr("x", (start_x - 30 + end_x) / 2)
-            .attr("y", end_y + 50)
+            .attr("y", end_y + 55)
             .text("Softmax")
             .style("fill", "gray")
-            .style("font-size", "8px")
+            .style("font-size", "12px")
             .attr("class", "to-be-removed softmaxLabel")
             .style("opacity", 1);
 
@@ -2462,6 +2475,7 @@ export function nodeOutputVisualizer(
 
 
 
+
     d3.select("#my_dataviz").on("click", function(event: any) {
         if (!state.isClicked) {
             return;
@@ -2490,6 +2504,7 @@ export function nodeOutputVisualizer(
     
 
     })
+
 
 
 
