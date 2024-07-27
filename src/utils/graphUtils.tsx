@@ -4,6 +4,7 @@ import {
     State,
     calculateAverage,
     deepClone,
+    handleClickEvent,
     myColor,
     state,
 } from "./utils";
@@ -161,6 +162,7 @@ export function resetNodes(allNodes: any[], convNum: number) {
 
 export function outputVisualizer(
     node: any,
+    allNodes: any[],
     allWeights: any[],
     bias: any[],
     svg: any,
@@ -172,6 +174,7 @@ export function outputVisualizer(
     rectHeight: number,
     rectWidth: number,
     colorSchemes: any,
+    convNum: number,
     mode: number
 
 ) {
@@ -182,7 +185,8 @@ export function outputVisualizer(
     }
 
 
-
+    let intervalID = 0;
+    state.isClicked = true;
 
     d3.selectAll(".to-be-removed").remove();
     d3.selectAll(".node-features-Copy").style("visibility", "visible").lower();
@@ -370,6 +374,7 @@ export function outputVisualizer(
             prevRectHeight,
             state,
             weightsLocation,
+            intervalID,
             mode
         );
 
@@ -471,7 +476,7 @@ export function outputVisualizer(
 
 
 
-    state.isClicked = true;
+
 
     for (let i = 0; i < node.features.length; i++) {
         d3.select(`#output-layer-rect-${i}`)
@@ -603,28 +608,35 @@ export function outputVisualizer(
             });
     }
 
-    document.addEventListener("click", function () {
-        d3.selectAll(".node-features-Copy").style("visibility", "hidden")
-        d3.selectAll(".weightUnit").remove();
-        d3.selectAll(".columnUnit").remove();
-        d3.selectAll(".procVis").remove();
-        d3.selectAll(".to-be-removed").remove();
 
-        d3.selectAll(".graph-displayer").remove();
-        for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "1";
-        moveFeaturesBack(node.relatedNodes, originalCoordinates);
-        node.featureGroup
-            .transition()
-            .duration(1000)
-            .attr(
-                "transform",
-                `translate(${node.x - 7.5}, ${node.y + 170 + 5}) rotate(0)`
-            );
-    });
+    d3.select("#my_dataviz").on("click", function(event: any) {
+     
+            d3.selectAll(".node-features-Copy").style("visibility", "hidden")
+            d3.selectAll(".weightUnit").remove();
+            d3.selectAll(".columnUnit").remove();
+            d3.selectAll(".procVis").remove();
+            d3.selectAll(".to-be-removed").remove();
+    
+            d3.selectAll(".graph-displayer").remove();
+            for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "1";
+            moveFeaturesBack(node.relatedNodes, originalCoordinates);
+            node.featureGroup
+                .transition()
+                .duration(1000)
+                .attr(
+                    "transform",
+                    `translate(${node.x - 7.5}, ${node.y + 170 + 5}) rotate(0)`
+                );
+
+                handleClickEvent(svg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state)
+
+
+    })
 }
 
 export function calculationVisualizer(
     node: any,
+    allNodes: any[],
     weights: any,
     bias: any,
     normalizedAdjMatrix: any,
@@ -633,7 +645,8 @@ export function calculationVisualizer(
     svg: any,
     offset: number,
     height: number,
-    isClicked: boolean,
+    colorSchemes: any,
+    convNum: number,
     moveOffset: number,
     prevRectHeight: number,
     rectHeight: number,
@@ -641,11 +654,11 @@ export function calculationVisualizer(
     state: State,
     mode: number
 ) {
-    if (state.isClicked || aggregatedDataMap == null || calculatedDataMap == null) {
-        d3.selectAll(".to-be-removed").remove();
+    console.log("CWAcWA", state.isClicked)
 
-        return;
-    }
+
+    let intervalID = 0;
+
     d3.selectAll(".graph-displayer").remove();
     showFeature(node);
     let currentWeights = weights[node.graphIndex - 1]
@@ -831,7 +844,11 @@ export function calculationVisualizer(
     let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, matrixRectSize, node.features.length, weights, node.graphIndex - 1);
 
     setTimeout(()=> {
+        if (!state.isClicked) {
+            return;
+        }
         drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, matrixRectSize, matrixRectSize, node.features.length, weights, node.graphIndex - 1, myColor, svg, weightsLocation)
+
 
 
     }, 4000)
@@ -939,6 +956,7 @@ export function calculationVisualizer(
 
 
     setTimeout(() => {
+        console.log("AWDAWDAD,", state.isClicked)
         if (!state.isClicked) {
             return;
         }
@@ -956,8 +974,10 @@ export function calculationVisualizer(
             prevRectHeight,
             state,
             weightsLocation,
+            intervalID,
             mode
         );
+
 
         if (node.relatedNodes) {
             node.relatedNodes.forEach((n: any, i: number) => {
@@ -1083,7 +1103,7 @@ export function calculationVisualizer(
             node.intermediatePaths = paths;
         }
 
-                                d3.selectAll(".bias").style("opacity", 1);
+                        d3.selectAll(".bias").style("opacity", 1);
                         d3.selectAll(".softmax").attr("opacity", 0.07);
                         d3.selectAll(".relu").style("opacity", 1);
                         d3.selectAll(".output-path").attr("opacity", 1);
@@ -1156,7 +1176,8 @@ export function calculationVisualizer(
             d3.selectAll(".relu").style("opacity", 1);
             d3.selectAll(".output-path").attr("opacity", 1);
             d3.selectAll(".softmaxLabel").attr("opacity", 1);
-            d3.selectAll(".intermediate-path").attr("opacity", 0)        
+            d3.selectAll(".intermediate-path").attr("opacity", 0)     
+            clearInterval(intervalID)   
             
     }, 3500);
 
@@ -1181,14 +1202,14 @@ export function calculationVisualizer(
         .text("Final Output Vector")
         .style("fill", "gray")
         .style("font-size", "8px")
-        .attr("class", "relu output").style("opacity", 0);
+        .attr("class", "relu output to-be-removed").style("opacity", 0);
 
     outputGroup
         .selectAll("rect")
         .data(node.features)
         .enter()
         .append("rect")
-        .attr("class", "relu output")
+        .attr("class", "relu output to-be-removed")
         .attr("x", (d: any, i: number) => i * rectHeight)
         .attr("y", 0)
         .attr("width", rectHeight)
@@ -1202,7 +1223,7 @@ export function calculationVisualizer(
     const outputFrame = outputGroup.append("rect")
         .attr("x", 0)
         .attr("y", 0)
-        .attr("class", "relu output")
+        .attr("class", "relu output to-be-removed")
         .attr("width", rectHeight * node.features.length)
         .attr("height", rectWidth)
         .style("fill", "none")
@@ -1226,7 +1247,7 @@ export function calculationVisualizer(
         .data(node.features)
         .enter()
         .append("rect")
-        .attr("class", "relu")
+        .attr("class", "relu to-be-removed")
         .attr("x", (d: any, i: number) => i * rectHeight)
         .attr("y", 0)
         .attr("width", rectHeight)
@@ -1241,7 +1262,7 @@ export function calculationVisualizer(
     const outputFrameCopy = outputGroupCopy.append("rect")
         .attr("x", 0)
         .attr("y", 0)
-        .attr("class", "relu")
+        .attr("class", "relu to-be-removed")
         .attr("width", rectHeight * node.features.length)
         .attr("height", rectWidth)
         .style("fill", "none")
@@ -1256,19 +1277,34 @@ export function calculationVisualizer(
         .text("Final Output Vector")
         .style("fill", "gray")
         .style("font-size", "8px")
-        .attr("class", "relu").style("opacity", 0);
+        .attr("class", "relu to-be-removed").style("opacity", 0);
 
     intermediateFeatureGroups.push(outputGroup);
     node.intermediateFeatureGroups = intermediateFeatureGroups;
 
-    document.addEventListener("click", () => {
+    d3.select("#my_dataviz").on("click", function(event: any) {
+        if (!state.isClicked) {
+            return;
+        }
         moveFeaturesBack(node.relatedNodes, originalCoordinates);
         d3.selectAll(".to-be-removed").remove();
         d3.selectAll(".weightUnit").remove();
         d3.selectAll(".columnUnit").remove();
         d3.selectAll(".procVis").remove();
 
-    });
+
+        state.isPlaying = false;
+        clearInterval(intervalID);
+        d3.selectAll(".bias").remove();
+        d3.selectAll(".vis-component").remove();
+        d3.selectAll(".relu").remove();
+        d3.selectAll(".intermediate-path").remove();
+        d3.selectAll(".parameter").remove();
+        d3.selectAll(".to-be-removed").remove();
+        d3.selectAll(".intermediate-path").remove();
+        handleClickEvent(svg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
+
+    }) 
 }
 
 export function moveNextLayer(
@@ -1278,7 +1314,7 @@ export function moveNextLayer(
     indicator: number
 ) {
     if (!svg.selectAll) {
-        svg = d3.select(svg);
+        svg = d3.selectAll(svg);
     } // when svg is passed into a function, it should be selected again
 
     svg.selectAll("g[layerNum]")
@@ -1316,6 +1352,7 @@ function weightAnimation(
     prevRectHeight: number,
     state: State,
     weightsLocation: number[][][],
+    intervalID: any,
     mode: number
 ) {
 
@@ -1325,8 +1362,8 @@ function weightAnimation(
     }
 
     let i = 0;
-    let intervalID: any;
-    let isAnimating = true;
+
+
     let endNumber = 64;
     if (node.graphIndex === 5) {
         endNumber = 2;
@@ -1388,19 +1425,19 @@ function weightAnimation(
 
     d3.selectAll(".aniRect").style("opacity", 0);
 
-    document.addEventListener("click", () => {
+    // document.addEventListener("click", () => {
 
-        isAnimating = false;
-        clearInterval(intervalID);
-        d3.selectAll(".bias").remove();
-        d3.selectAll(".vis-component").remove();
-        d3.selectAll(".relu").remove();
-        d3.selectAll(".intermediate-path").remove();
-        d3.selectAll(".parameter").remove();
-        d3.selectAll(".to-be-removed").remove();
-        d3.selectAll(".intermediate-path").remove();
+        // isAnimating = false;
+        // clearInterval(intervalID);
+        // d3.selectAll(".bias").remove();
+        // d3.selectAll(".vis-component").remove();
+        // d3.selectAll(".relu").remove();
+        // d3.selectAll(".intermediate-path").remove();
+        // d3.selectAll(".parameter").remove();
+        // d3.selectAll(".to-be-removed").remove();
+        // d3.selectAll(".intermediate-path").remove();
         
-    });
+    // });
     let featureLength = node.features.length;
     let prevLayerFeatureLength = node.relatedNodes[0].features.length;
     function startAnimation(endNumber: number) {
@@ -1414,6 +1451,7 @@ function weightAnimation(
         }
         intervalID = setInterval(() => {
             if (!state.isClicked) {
+                clearInterval(intervalID)
                 return;
             }
 
@@ -1421,7 +1459,7 @@ function weightAnimation(
             d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1);
             d3.selectAll(`#tempath${i - 1}`).attr("opacity", 0);
 
-            if (isAnimating) {
+            if (state.isPlaying) {
                 // GraphViewDrawPaths(
                 //     Xt,
                 //     myColor,
@@ -1701,6 +1739,7 @@ function moveFeaturesBack(
 
 export function fcLayerCalculationVisualizer(
     node: any,
+    allNodes: any[],
     relatedNodes: any,
     offset: number,
     height: number,
@@ -1710,6 +1749,7 @@ export function fcLayerCalculationVisualizer(
     state: State,
     rectHeight: number,
     colorSchemes: any,
+    convNum: number,
     mode: number
 ) {
 
@@ -1843,25 +1883,32 @@ export function fcLayerCalculationVisualizer(
     }, 1000);
 
 
-    document.addEventListener("click", function () {
-        d3.selectAll(".origin-to-aggregated").remove();
 
-        d3.selectAll(".node-features-Copy").style("visibility", "hidden");
 
-        for (let i = 0; i < colorSchemes.length; i++)colorSchemes[i].style.opacity = "1";
+    d3.select("#my_dataviz").on("click", function(event: any) {
+        
 
-        moveFeaturesBack(relatedNodes, originalCoordinates);
-        node.featureGroup
-            .transition()
-            .duration(1000)
-            .attr(
-                "transform",
-                `translate(${xPos - 300 - 15 / 2}, ${yPos}) rotate(0)`
-            );
-        d3.selectAll("rect").style("opacity", 1);
-        d3.selectAll(".graph-displayer").remove();
+            d3.selectAll(".origin-to-aggregated").remove();
+    
+            d3.selectAll(".node-features-Copy").style("visibility", "hidden");
+    
+            for (let i = 0; i < colorSchemes.length; i++)colorSchemes[i].style.opacity = "1";
+    
+            moveFeaturesBack(relatedNodes, originalCoordinates);
+            node.featureGroup
+                .transition()
+                .duration(1000)
+                .attr(
+                    "transform",
+                    `translate(${xPos - 300 - 15 / 2}, ${yPos}) rotate(0)`
+                );
+            d3.selectAll("rect").style("opacity", 1);
+            d3.selectAll(".graph-displayer").remove();
+            handleClickEvent(svg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
+       
 
-    });
+
+    })
 }
 
 function poolingLayerInteraction(
@@ -1974,11 +2021,12 @@ function poolingLayerInteraction(
 
 export function nodeOutputVisualizer(
     node: any,
+    allNodes: any,
     allWeights: number[][][],
     bias: any[],
     svg: any,
     offset: number,
-    isClicked: boolean,
+    convNum: number,
     moveOffset: number,
     height: number,
     prevRectHeight: number,
@@ -1991,6 +2039,8 @@ export function nodeOutputVisualizer(
 
     showFeature(node)
     let weights = allWeights[3]
+    let intervalID = 0;
+    state.isClicked = true;
 
 
 
@@ -2174,6 +2224,7 @@ export function nodeOutputVisualizer(
             prevRectHeight,
             state,
             weightsLocation,
+            intervalID,
             mode
         );
 
@@ -2266,7 +2317,7 @@ export function nodeOutputVisualizer(
 
 
 
-    state.isClicked = true;
+
 
     for (let i = 0; i < node.features.length; i++) {
         d3.selectAll(`#output-layer-rect-${i}`)
@@ -2399,29 +2450,39 @@ export function nodeOutputVisualizer(
             });
     }
 
-    document.addEventListener("click", function () {
-        setTimeout(() => {
-            d3.selectAll(".node-features-Copy").style("opacity", "hidden");
-            d3.selectAll(".procVis").remove();
-            d3.selectAll(".to-be-removed").remove();
-
-        }, 500);
 
 
-        d3.selectAll(".graph-displayer").remove();
-        d3.selectAll(".weightUnit").remove();
-        d3.selectAll(".columnUnit").remove();
-        for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "1";
-        moveFeaturesBack(node.relatedNodes, originalCoordinates);
-        node.featureGroup
-            .transition()
-            .duration(1000)
-            .attr(
-                "transform",
-                `translate(${node.x - 7.5}, ${node.y + 25}) rotate(0)`
-            )
-            .style("visibility", "hidden");
 
-    });
+    d3.select("#my_dataviz").on("click", function(event: any) {
+        if (!state.isClicked) {
+            return;
+        }
+                d3.selectAll(".node-features-Copy").style("opacity", "hidden");
+                d3.selectAll(".procVis").remove();
+                d3.selectAll(".to-be-removed").remove();
+                handleClickEvent(svg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
+    
+
+    
+    
+            d3.selectAll(".graph-displayer").remove();
+            d3.selectAll(".weightUnit").remove();
+            d3.selectAll(".columnUnit").remove();
+            for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "1";
+            moveFeaturesBack(node.relatedNodes, originalCoordinates);
+            node.featureGroup
+                .transition()
+                .duration(1000)
+                .attr(
+                    "transform",
+                    `translate(${node.x - 7.5}, ${node.y + 25}) rotate(0)`
+                )
+                .style("visibility", "hidden");
+    
+
+    })
+
+
+
 }
 

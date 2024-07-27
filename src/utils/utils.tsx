@@ -535,7 +535,38 @@ export interface State {
 
 export const state: State = {
   isClicked: false, // if isClicked is true, all mouseover/out operation would be banned and some certain functions would be called
-  isPlaying: false
+  isPlaying: false,
+};
+
+
+export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffset: number, colorSchemes: any, allNodes: any[], convNum: number, mode: number, state: State, fcLayerMoveOffset: number = 600) {
+
+  if (!svg.selectAll) {
+    svg = d3.selectAll(svg)
+  }
+  console.log("document clicked", state.isClicked, movedNode.id);
+  if (!movedNode || !state.isClicked) {
+    return;
+  }
+
+  if (movedNode && (!event.target.classList.contains("vis-component"))) {
+    svg.selectAll(".vis-component").style("opacity", 0);
+    let currMoveOffset = moveOffset;
+
+    for (let i = 0; i < colorSchemes.length; i++) {
+      colorSchemes[i].style.opacity = "1";
+    }
+
+    if (mode === 0 && movedNode.graphIndex >= 4) {
+      currMoveOffset = fcLayerMoveOffset;
+    }
+    console.log("vjghjgjkghjgyikyughkgjhvhk")
+    moveNextLayer(svg, movedNode, currMoveOffset, -1);
+    movedNode = null;
+    showAllLinks(allNodes);
+    resetNodes(allNodes, convNum);
+    state.isClicked = false;
+  }
 };
 
 
@@ -554,7 +585,6 @@ export function featureVisualizer(
   colorSchemes:any,
   mode: number,
 ) {
-  let handleClickEvent;
   state.isClicked = false;
 
 
@@ -815,6 +845,12 @@ export function featureVisualizer(
             if (state.isClicked) {
               return;
             }
+            state.isClicked = true;
+
+                    //  // prevent clicking on other nodes and move the layers to the right again
+                    //  if (movedNode === node) {
+                    //   return; 
+                    // }
 
 
             //color schemes interaction logic
@@ -829,11 +865,11 @@ export function featureVisualizer(
 
 
            if (mode === 1 && graphIndex === 4) {
-            nodeOutputVisualizer(node, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
+            nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
            } else {
-            calculationVisualizer(node, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, state.isClicked, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
+            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
            };
-           state.isClicked = true;
+
 
             
             let relatedNodes: any = [];
@@ -844,16 +880,13 @@ export function featureVisualizer(
             
 
 
-            // prevent clicking on other nodes and move the layers to the right again
-            if (movedNode === node) {
-              return; 
-            }
+   
           
-            if (movedNode) {
-              moveNextLayer(svg, movedNode, currMoveOffset, -1)
-              state.isClicked = false; 
-              movedNode = null;
-            }
+            // if (movedNode) {
+            //   moveNextLayer(svg, movedNode, currMoveOffset, -1)
+            //   state.isClicked = false; 
+            //   movedNode = null;
+            // }
 
             
             moveNextLayer(svg, node, currMoveOffset, 1);
@@ -981,6 +1014,7 @@ export function featureVisualizer(
           if (state.isClicked) {
             return;
           }
+          state.isClicked = true;
 
 
 
@@ -993,16 +1027,16 @@ export function featureVisualizer(
             } // to make sure relatedNodes is not null
             showFeature(node);
             if (node.graphIndex === 4) {
-              fcLayerCalculationVisualizer(node, relatedNodes, offset, height, currMoveOffset, node.graphIndex, g2, state, currRectHeight, colorSchemes, mode);
+              fcLayerCalculationVisualizer(node, allNodes, relatedNodes, offset, height, currMoveOffset, node.graphIndex, g2, state, currRectHeight, colorSchemes, convNum, mode);
             }
             if (node.graphIndex === 5) {
 
-              outputVisualizer(node, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, mode)
+              outputVisualizer(node, allNodes, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, convNum, mode)
             }
             
             reduceNodeOpacity(allNodes, relatedNodes, node);
             event.stopPropagation(); // Prevent the click event from bubbling up
-            state.isClicked = true;
+
 
             if (movedNode === node) {
               return; // Do nothing if the node is already moved
@@ -1031,34 +1065,8 @@ export function featureVisualizer(
 
 
 
-  handleClickEvent = function(event: any) {
-    console.log("document clicked", state.isClicked);
-    if (!movedNode || !state.isClicked) {
-      return;
-    }
-  
-    if (movedNode && (!event.target.classList.contains("vis-component"))) {
-      svg.selectAll(".vis-component").style("opacity", 0);
-      let currMoveOffset = moveOffset;
-  
-      for (let i = 0; i < colorSchemes.length; i++) {
-        colorSchemes[i].style.opacity = "1";
-      }
-  
-      if (mode === 0 && movedNode.graphIndex >= 4) {
-        currMoveOffset = fcLayerMoveOffset;
-      }
-      moveNextLayer(svg, movedNode, currMoveOffset, -1);
-      movedNode = null;
-      showAllLinks(allNodes);
-      resetNodes(allNodes, convNum);
-      state.isClicked = false;
-    }
-  };
-  
-  // Add the event listener
-  document.removeEventListener("click", handleClickEvent);
-  document.addEventListener("click", handleClickEvent);
+
+
 }
 
 
