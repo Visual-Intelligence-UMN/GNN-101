@@ -2,8 +2,8 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="32mm"
-   height="32mm"
+   width="48mm"
+   height="48mm"
    viewBox="0 0 32 32"
    version="1.1"
    id="svg1"
@@ -53,16 +53,16 @@
      id="layer1">
     <text
        xml:space="preserve"
-       transform="matrix(0.16575929,0,0,0.16259375,2.5243259,4.3213356)"
+       transform="matrix(0.24,0,0,0.24,2.5243259,4.3213356)"
        id="text1"
        style="white-space:pre;shape-inside:url(#rect2);fill:#868686;fill-opacity:1"><tspan
          x="6.5"
-         y="22.504604"
+         y="10"
          id="tspan1">Click here for 
 </tspan><tspan
          x="6.5"
-         y="37.504604"
-         id="tspan3">interaction!</tspan></text>
+         y="25"
+         id="tspan3">more details!</tspan></text>
     <path
        style="fill:none;fill-opacity:1;stroke:#b6b6b6;stroke-width:0.264583;stroke-opacity:1"
        d="m 13.280932,11.752192 c 0.955463,12.850974 8.646938,14.761899 9.267989,15.191858 0.621051,0.429958 8.121433,2.531975 8.121433,2.531975"

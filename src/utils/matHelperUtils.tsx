@@ -11,7 +11,7 @@ export function drawHintLabel(
     y:number,
     text:string,
     classTag:string,
-    textSize:string = "12px"
+    textSize:string = "17px"
 ){
     const label = g.append("text")
         .attr("x", x)

@@ -414,7 +414,7 @@ export function drawWeightsVector(
             .attr("rectID", m)
             .attr("id", `weightRect${m}`);
     }
-    drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+2, "Matmul Result", "procVis");
+    drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+6, "Matmul Result", "procVis");
 
     //draw frame
     g.append("rect")
@@ -660,7 +660,7 @@ export function drawBiasVector(
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("class", "procVis biasVector");
-    const label = drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+2, "Bias Vector", "procVis biasVector");
+    const label = drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+6, "Bias Vector", "procVis biasVector");
     d3.selectAll(".biasVector").transition().duration(100).attr("opacity", 1);
 }
 
@@ -745,7 +745,7 @@ export function drawReLU(
                 .raise();
             }
         });
-        drawHintLabel(relu, cx1-20, cy1+radius*4+12, "ReLU Non-linear Function", "procVis");
+        drawHintLabel(relu, cx1-20, cy1+radius*4+12+4, "ReLU Non-linear Function", "procVis");
 
         relu.on("mouseover", function(event, d){
             const [x, y] = d3.pointer(event);
@@ -790,7 +790,7 @@ export function drawTanh(
             }
         });
         
-        drawHintLabel(relu, cx1-20, cy1+radius*4+12, "Tanh Non-linear Function", "procVis");
+        drawHintLabel(relu, cx1-20, cy1+radius*4+12+4, "Tanh Non-linear Function", "procVis");
 
         relu.on("mouseover", function(event, d){
             const [x, y] = d3.pointer(event);

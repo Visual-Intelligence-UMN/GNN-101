@@ -664,7 +664,7 @@ export function featureVisClick(
             //drawHintLabel(g, btnX, btnY - 36, "Click for Animation", "procVis");
 
             const gLabel = d3.select(".mats").append("g");
-            injectSVG(gLabel, btnX-120, btnY-30-120, "./assets/SVGs/interactionHint.svg", "procVis");
+            injectSVG(gLabel, btnX-120-64, btnY-30-120-64, "./assets/SVGs/interactionHint.svg", "procVis");
 
             drawPathBtwOuputResult([coordFeatureVis], coordFeatureVis3)
             drawWeightMatrix(btnX, btnY, curveDir, rectW, rectH, featureChannels, weights, layerID, myColor, g, weightMatrixPostions);
@@ -1043,7 +1043,7 @@ export function outputVisClick(
             );
             //drawHintLabel(g1, btnX, btnY-12, "Click for Animation", "procVis");
             const gLabel = d3.select(".mats").append("g");
-            injectSVG(gLabel, btnX-120, btnY-120, "./assets/SVGs/interactionHint.svg", "procVis");
+            injectSVG(gLabel, btnX-120-64, btnY-120-64, "./assets/SVGs/interactionHint.svg", "procVis");
         }, delay:aniSec+600},
         {func:()=>{
             //console.log("Xv check wmat", wMat);
