@@ -977,7 +977,7 @@ export function visualizeNodeClassifierFeatures(
                     "./assets/SVGs/matmul.svg"
                 );
                 const gLabel = d3.select(".mats").append("g");
-            injectSVG(gLabel, btnX-120, btnY-120, "./assets/SVGs/interactionHint.svg", "procVis");
+            injectSVG(gLabel, btnX-120-64, btnY-120-64, "./assets/SVGs/interactionHint.svg", "procVis");
             }, aniSec);
 
             let firstPlay = true;

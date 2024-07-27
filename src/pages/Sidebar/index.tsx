@@ -205,6 +205,8 @@ export default function Sidebar(props: Props) {
                         {props.modelMode=="node classification"?(props.isGraphView ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCGraphNode.png" label="Fully Connected Layer" /> :
                             <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCMatrixNode.png" label="Fully Connected Layer" />):<></>}
 
+                        {props.modelMode=="node classification" ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCDetails.png" label="FC in Details" />:<></>}
+
                         <span className={styles.tag}>Graph-Level Tasks </span>
                         {/* <span className={styles.button} onClick={() => { }}>Click to Predict a Graph </span> */}
                         <p>
@@ -219,6 +221,7 @@ export default function Sidebar(props: Props) {
                         {props.modelMode=="graph classification" ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/pooling.png" label="Pooling Layer" />:<></>}
                         {props.modelMode=="graph classification" ? (props.isGraphView ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCGraphGraph.png" label="Fully Connected Layer" /> :
                                                     <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCMatrixGraph.png" label="Fully Connected Layer" />) : <></>}
+                        {props.modelMode=="graph classification" ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCDetails.png" label="FC in Details" />:<></>}
 
                         <span className={styles.tag}>Edge-Level Tasks </span>
                         <p>
