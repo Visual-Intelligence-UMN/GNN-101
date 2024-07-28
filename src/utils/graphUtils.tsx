@@ -2064,7 +2064,7 @@ function poolingLayerInteraction(
                 if (!state.isClicked) {
                     return;
                 }
-                d3.selectAll(".node-features").style("opacity", 0.3);
+                d3.selectAll(".node-features").style("opacity", 0.5);
                 d3.select(`#pooling-layer-rect-${i}`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
                 d3.selectAll(`#conv3-layer-rect-${i}`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
                 d3.select(".graph-displayer").attr("opacity", 1);
@@ -2138,6 +2138,7 @@ function poolingLayerInteraction(
                 if (!state.isClicked) {
                     return;
                 }
+                d3.selectAll(".node-features").style("opacity", 1);
                 d3.selectAll(`#pooling-layer-rect-${i}`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
                 d3.select(".graph-displayer").attr("opacity", 0);
                 d3.selectAll("[id^='conv3-layer-rect-']").style("opacity", 1).style("stroke", "none").style("stroke-width", 0);
