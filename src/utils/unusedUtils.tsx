@@ -16,7 +16,7 @@ export function crossConnectionMatrices(
     offsetMat: number
 ) {
     const cood1 = get_cood_from_parent(".mats", "rect");
-    console.log("FINAL coord", cood1);
+
     if (graphs.length > 1) {
         //calculate the offset
         for (let i = 0; i < locations.length; i++) {
@@ -121,7 +121,7 @@ export function tooltipBars64(
 ) {
     let t = d3.select(target).text();
     let num = Number(t);
-    console.log("TEXT", t);
+
 
     //how to determine the layer?
     let layer = null;
@@ -139,7 +139,7 @@ export function tooltipBars64(
     if (layer != null) {
         let mat = layer[num];
 
-        console.log("MAT", mat);
+
 
         let k = 0;
 
@@ -180,7 +180,7 @@ export function tooltipBars7(
     let k = 0;
     for (let i = 0; i < 7; i++) {
         const cate = get_category_node(features[num]) * 100;
-        console.log("CATE", cate);
+
 
         tooltipG
             .append("rect")
@@ -194,7 +194,7 @@ export function tooltipBars7(
             .attr("stroke", "black")
             .attr("stroke-width", 1);
 
-        console.log("node feature", features[num]);
+
         k++;
     }
     interactRowCol(xAxis, tooltipG, sqSize, gridNum);

@@ -61,13 +61,13 @@ export const GraphAnalysisViewer: React.FC<GraphAnalysisViewerProps> = ({
 
     useEffect(() => {
         const analysis = async () => {
-            console.log("Ganalysis path", path);
+
             const graphData: any = await load_json(path);
-            console.log("GDATA", graphData);
+
             const result: any = analyzeGraph(graphData);
-            console.log("Start Analysis!");
+
             setData(result);
-            console.log("Finished Analysis!");
+
         };
         analysis();
     }, [path]);
@@ -581,7 +581,7 @@ export const PredictionVisualizer: React.FC<PredictionVisualizerProps> = ({
     result,
 }) => {
     useEffect(() => {
-        //console.log("RESULTS", result1, result2);
+
         //VIS
         const width = 500;
         const height = 50;
@@ -758,7 +758,7 @@ export function visualizeGraph(
             const parse = path.match(/(\d+)\.json$/);
             const select = parse ? parse[1] : '';
             const location = loadNodesLocation(mode, select);
-            console.log('location', location);
+
             const offset = 600;
             const margin = { top: 10, right: 30, bottom: 30, left: 40 };
             const width = 6 * offset - margin.left - margin.right;
@@ -911,7 +911,7 @@ export function visualizeGraph(
                                 }
                             });
                         });
-                        console.log('initialCoordinates', initialCoordinates, path);
+
                         const graphWidth = maxXDistance + 20;
                         const graphHeight = maxYDistance + 20;
                         const point1 = { x: 0.9 * offset - 260, y: height / 8 };
@@ -966,7 +966,7 @@ export function visualizeGraph(
                 const gData = await prep_graphs(1, pData);
                 await init(gData[0]);
             } catch (error) {
-                console.log("Error in single graph visualizer", error);
+
             }
         };
 
@@ -1026,7 +1026,7 @@ export function visualizeMatrixBody(gridSize: number, graph: any, width: number,
         .domain([1, 100]);
 
     const data = matrix_to_hmap(graph);
-    console.log("accepted data:", data);
+
     const filteredData = data.filter((d): d is HeatmapData => !!d);
 
     g.selectAll("rect")
@@ -1064,21 +1064,21 @@ export function visualizeMatrix(
 
     const visualizeMat = async (path: string) => {
         //const features = await get_features_origin(data);
-        //console.log("o features", features);
+
         try {
-            console.log("mat path", path);
+
             const data = await load_json(path);
             const nodeAttrs = getNodeAttributes(data);
             const features = await get_features_origin(data);
-            console.log("VIS features", features);
+
             const processedData = await graph_to_matrix(data);
-            console.log("VIS pData matvis", processedData);
+
             //const graphsData = await prepMatrices(1, processedData);
-            //console.log("VIS gData", graphsData);
+
             // Initialize and run D3 visualization with processe  d data
             await init(processedData, features, nodeAttrs);
         } catch (error) {
-            console.log("Error in single matrix visualizer", error);
+
         }
     };
 

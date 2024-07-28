@@ -39,7 +39,7 @@ export function oFeatureMouseOver(
     frames: any,
     matFrames: any
 ) {
-    console.log("Current layerID and node", layerID, node);
+
     const fr = frames["features"][Number(node)];
     fr.style.opacity = "1";
 
@@ -56,22 +56,22 @@ export function oFeatureMouseOver(
 }
 
 export function resultRectMouseover() {
-    //  console.log("event.target.classList", event.target.classList);
+
     const a = d3.select(".path1").style("opacity", 1);
     const b = d3.select(".poolingFrame").style("opacity", 1);
     const c = d3.select("#fr1").style("opacity", 1);
-    console.log("mouse in", a, b, c);
+
     // fr1!.style.opacity = "1";
     // poolingFrame!.style.opacity = "1";
     // path1!.style.opacity = "1";
-    console.log("signal!");
+
 }
 
 export function resultRectMouseout() {
     d3.select(".path1").style("opacity", 0.02);
     d3.select(".poolingFrame").style("opacity", 0.25);
     d3.select("#fr1").style("opacity", 0.25);
-    console.log("signal out!");
+
 }
 
 //graph feature events interactions - mouseout
@@ -81,7 +81,7 @@ export function oFeatureMouseOut(
     frames: any,
     matFrames: any
 ) {
-    console.log("Current layerID and node", layerID, node);
+
     const fr = frames["features"][Number(node)];
     fr.style.opacity = "0.25";
 
@@ -112,7 +112,7 @@ export function detailedViewRecovery(
     gap:number,
     resultLabelsList:any
 ) {
-    console.log("click! detailedViewRecovery", dview, lock, transState);
+
 
     //remove calculation process visualizer
     //d3.selectAll(".procVis").transition().duration(500).attr("opacity", 0);
@@ -233,9 +233,9 @@ export function featureVisMouseOver(
     colFrames: any,
     featureChannels: number
 ) {
-    console.log("Current layerID and node", layerID, node);
+
     if (paths != null) {
-        console.log("grouped", paths[layerID][node]);
+
         const changePaths = paths[layerID][node];
         changePaths.forEach((div: HTMLElement) => {
             div.style.opacity = "1";
@@ -258,7 +258,7 @@ export function featureVisMouseOver(
     if (Number(layerID) == 0) prevLayer = frames["features"];
     else if (Number(layerID) == 1) prevLayer = frames["GCNConv1"];
     else if (Number(layerID) == 2) prevLayer = frames["GCNConv2"];
-    console.log("prev", layerID, prevVis, prevLayer);
+
     if (prevLayer != null) {
         prevVis.forEach((vis: number) => {
             prevLayer[vis].style.opacity = "1";
@@ -296,10 +296,10 @@ export function featureVisMouseOut(
     matFrames: any,
     colFrames: any
 ) {
-    console.log("Current layerID and node", layerID, node);
+
     //paths interactions
     if (paths != null) {
-        console.log("grouped", paths[layerID][node]);
+
         const changePaths = paths[layerID][node];
         changePaths.forEach((div: HTMLElement) => {
             div.style.opacity = "0.05";
@@ -321,7 +321,7 @@ export function featureVisMouseOut(
     if (Number(layerID) == 0) prevLayer = frames["features"];
     else if (Number(layerID) == 1) prevLayer = frames["GCNConv1"];
     else if (Number(layerID) == 2) prevLayer = frames["GCNConv2"];
-    console.log("prev", layerID, prevVis, prevLayer);
+
     if (prevLayer != null) {
         prevVis.forEach((vis: number) => {
             prevLayer[vis].style.opacity = "0.25";
@@ -360,7 +360,7 @@ export function resultVisMouseEvent(
     pathOpacity:string
 ){
     //paths interactions
-    //console.log("result paths vis", resultPaths);
+
     //d3.select(".mats").select("path#endingNode"+node).attr("opacity", pathOpacity)
 
     resultPaths.paths[node].style.opacity = pathOpacity;
@@ -412,7 +412,7 @@ export function featureVisClick(
     // const rectH = 15;
     // const rectW = 5;
     const rectW7 = 10;
-    console.log("Current layerID and node", layerID, node);
+
     translateLayers(layerID, (gap+2) * 3 + 5 * featureChannels * 2);
     //record the layerID
     recordLayerID = layerID;
@@ -420,18 +420,8 @@ export function featureVisClick(
     d3.select(".hintLabel").style("opacity", 0);
 
     //reduce color schemes opacity
-    console.log("CST before modification", colorSchemesTable);
-    colorSchemesTable.forEach((d: any, i: any) => {
-        console.log(
-            `Before modification: Element ${i} opacity`,
-            d.style.opacity
-        );
-        d.style.opacity = "0.2";
-        console.log(
-            `After modification: Element ${i} opacity`,
-            d.style.opacity
-        );
-    });
+
+    
     //choose the right color schemes to display
     colorSchemesTable[layerID].style.opacity = "1";
     colorSchemesTable[layerID + 1].style.opacity = "1";
@@ -469,7 +459,7 @@ export function featureVisClick(
         rectW,
         oRectW
     );
-    console.log("coord", coord);
+
 
     //find position for intermediate feature vis
     let coordFeatureVis = deepClone(coord);
@@ -494,7 +484,7 @@ export function featureVisClick(
         let mulV = 1 / Math.sqrt(dList[node_i] * dList[node_j]);
         mulValues.push(mulV);
         //compute x'
-        console.log("compute x loop", featuresTable[layerID][node_j]);
+
         const prepMat = [...featuresTable[layerID][node_j]];
         let matA = math.matrix(prepMat);
         X = math.add(math.multiply(prepMat, mulV), X);
@@ -504,13 +494,13 @@ export function featureVisClick(
 
     //drawMatrixValid(Xt, coordFeatureVis[0], coordFeatureVis[1]-75, 10, 10)
 
-    console.log("compute x'", mulValues, dList, layerID, X.toString(), dummy);
+
 
     const g = d3.select(".mats").append("g").attr("class", "procVis");
     let w = 5;
     if (Xt[0].length < featureChannels) {
         w = 10;
-        console.log("compute x 0");
+
     } else if(Xt[0].length<10){
         w = 10;
     }
@@ -534,7 +524,7 @@ export function featureVisClick(
     btnPos = [coordFeatureVis[0], coordFeatureVis[1] - 50];
     //determine if we need upper-curves or lower-curves
     if (node < midNode) curveDir = -1;
-    console.log("curveDir", curveDir);
+
     //draw paths from intermediate result -> final result
     const layerBias = bias[layerID];
     coordFeatureVis2[1] += curveDir * 50;
@@ -627,7 +617,7 @@ export function featureVisClick(
     //drawPoints(".mats", "red", endCoordList);
     //draw paths
 
-    console.log("curNode", curNode, d3.select(curNode).selectAll(".frame"));
+
 
     //aniamtion sequence
     const initSec = 1000;
@@ -707,7 +697,7 @@ export function featureVisClick(
     //     d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
 
     function getIntervalID() {
-        console.log("return intervalID", intervalID);
+
         return intervalID;
     }
     
@@ -726,8 +716,8 @@ export function featureVisClick(
     });
 
     btn.on("click", function (event: any, d: any) {
-        console.log("currentStep 1", currentStep);
-        console.log("isPlaying", isPlaying);
+
+
         event.stopPropagation();
         if (intervalID) {
             //d3.selectAll("#tempath").remove();
@@ -747,7 +737,7 @@ export function featureVisClick(
                 d3.selectAll(".removeRect").remove();
                 firstClick = false;
             }
-            console.log("currentStep", currentStep);
+
             if(featureChannels==4&&layerID==2&&currentStep >= 2){
                 d3.select(".mats").selectAll(".removeRect").remove();
                 //   d3.select(".mats").selectAll(".pauseRemove").remove();
@@ -790,7 +780,7 @@ export function featureVisClick(
                 d3.selectAll(`#weightUnit-${currentStep}`).style("opacity", 1).raise();
                 d3.select(`#columnUnit-${currentStep}`).style("opacity", 1).raise();
                 currentStep++;
-                console.log("currentStep", currentStep);
+
 
                 if(featureChannels==4&&layerID==2&&currentStep >= 2){
                     d3.selectAll("#tempath").remove();
@@ -963,7 +953,7 @@ export function outputVisClick(
     resultCoord[1][0] += 175 - rectH * 3.75;
     resultCoord[0][1] += rectH;
     resultCoord[1][1] += rectH;
-    console.log("comp coord", resultCoord, endCoord);
+
     //     drawPoints(".mats", "red", resultCoord);
     biasCoord = deepClone(aOne);
     biasCoord[0][0] -= 130 + 2 * rectH;
@@ -1019,12 +1009,12 @@ export function outputVisClick(
     //where we put out animation sequence
     let pathMap: any = null;
 
-    console.log("w mat pos", wMat)
+
 
     let weightMatrixPostions:any = computeMatrixLocations(btnX+42, btnY+30, -1, rectW, featureChannels, [wMat], 0);
-    console.log("AWDAW", wMat)
+
     
-    console.log("w mat pos 1", weightMatrixPostions)
+
 
     //poolingValues = math.transpose(poolingValues);
 
@@ -1050,7 +1040,7 @@ export function outputVisClick(
             injectSVG(gLabel, btnX-120-64, btnY-120-64, "./assets/SVGs/interactionHint.svg", "procVis");
         }, delay:aniSec+600},
         {func:()=>{
-            //console.log("Xv check wmat", wMat);
+
             drawBiasVector(g1, linBias.length, rectH, rectH, biasCoordCopy[0], myColor, linBias, layerID);
             drawBiasPathOutputVis(biasCoord, controlPts, feaCoord);
             drawWeightsVector(g1, result, outputCoord, rectH, rectH, myColor, 
@@ -1077,7 +1067,7 @@ export function outputVisClick(
                 d3.selectAll(`#weightUnit-${currentStep}`).style("opacity", 1).raise();
                 d3.select(`#columnUnit-${currentStep}`).style("opacity", 1).raise();
                 currentStep++;
-                console.log("i", currentStep);
+
                 if (currentStep >= 2) {
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".weightUnit").style("opacity", 1);
@@ -1106,7 +1096,7 @@ export function outputVisClick(
     .style("pointer-events", "auto")
     .on("mouseover", function (event) {
         event.stopPropagation();
-        console.log("IN!");
+
         const id: number = Number(d3.select(this).attr("id"));
         //here's the place to place the softmax displayer
         if(pathMap!=null)drawSoftmaxDisplayer(pathMap, endCoord, result, id, myColor);
@@ -1136,7 +1126,7 @@ export function outputVisClick(
 
     // play button interaction add-ons
     btn.on("click", function (event: any, d: any) {
-        console.log("isPlaying", isPlaying);
+
         event.stopPropagation();
         if(firstPlay){
             d3.select(".mats").selectAll(".removeRect").remove();

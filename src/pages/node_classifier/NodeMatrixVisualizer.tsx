@@ -24,9 +24,9 @@ const NodeMatricesVisualizer: React.FC<NodeMatricesVisualizerProps> = ({
 
     // This is really messy but init will stay at the top to remain in the scope of all functions
 
-    console.log("updated Node", intmData);
+
     if (intmData != null) {
-        console.log("From Node Visualizer:", intmData);
+
     }
 
     useEffect(() => {
@@ -35,7 +35,7 @@ const NodeMatricesVisualizer: React.FC<NodeMatricesVisualizerProps> = ({
         } else {
            visualizeNodeClassifier(setIsLoading, graph_path, intmData);
         }
-        console.log("i fire once");
+
     }, [graph_path, intmData, changed]);
 
     // In your component
@@ -77,7 +77,7 @@ const NodeMatricesVisualizer: React.FC<NodeMatricesVisualizerProps> = ({
         if (svg && !isLoading) {
           updateTextElements(svg, selectedButtons);
         }
-        console.log("selectBtn", selectedButtons);
+
       }, [selectedButtons, isLoading]);
     
 

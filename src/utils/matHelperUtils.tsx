@@ -29,7 +29,7 @@ export function getNodeAttributes(data: any) {
     let nodeAttrs = [];
     for (let i = 0; i < data.x.length; i++) {
         const idx = data.x[i].findIndex((element: number) => element === 1);
-        console.log("attr", i, idx);
+
         let attr = "C";
         switch (idx) {
             case 1:
@@ -60,7 +60,7 @@ export function getNodeAttributes(data: any) {
 export function drawNodeAttributes(nodeAttrs: any, graph: any, offset: number) {
     //visualize node attributes
     const textCood = get_cood_from_parent(".y-axis", "text");
-    console.log("textCood", textCood);
+
     //drawPoints(".mats", "red", textCood);
     //get the node attr as an array
 
@@ -75,13 +75,13 @@ export function drawNodeAttributes(nodeAttrs: any, graph: any, offset: number) {
     }
     //for x-axis
     const rectCood = get_cood_from_parent(".mats", "rect");
-    console.log("rectCood", rectCood);
+
     const step = graph.length;
     let xTextCood = [];
     for (let i = step - 1; i < graph.length * graph.length; i += step) {
         xTextCood.push(rectCood[i]);
     }
-    console.log("xTextCood", xTextCood);
+
     //drawPoints(".mats", "red", xTextCood);
     for (let i = 0; i < xTextCood.length; i++) {
         d3.select(".mats")
@@ -151,7 +151,7 @@ export function buildBinaryLegend(
         .attr("class", "binary-legend")
         .attr("transform", `translate(${x}, ${y}) scale(0.7)`);
 
-    console.log("Dummies", dummies);
+
 
     g0.selectAll(".rect")
         .data(dummies)
@@ -217,7 +217,7 @@ export function buildLegend(
         .attr("transform", `translate(${x}, ${y}) scale(0.7)`)
         .attr("class", "legend");
 
-    console.log("Dummies", dummies);
+
 
     g0.selectAll(".rect")
         .data(dummies)
@@ -307,7 +307,7 @@ export function calculatePrevFeatureVisPos(
         coord[0] += (featureChannels*rectW/2);
     }
     coord[1] += 10;
-    console.log("coord", coord);
+
     return coord;
 }
 
@@ -317,8 +317,8 @@ export function loadNodeWeights(){
     let bias: any = []; // DS to manage bias for each layer
 
     const weightsJSON: any = require("../../public/node_weights.json");
-    console.log("weightsJSON", weightsJSON);
-    console.log("weights", weightsJSON["onnx::MatMul_311"]);
+
+
 
     weights = [
         weightsJSON["onnx::MatMul_271"],
@@ -332,7 +332,7 @@ export function loadNodeWeights(){
         weightsJSON["conv3.bias"],
         weightsJSON["classifier.bias"],
     ];
-    console.log("weights array", weights, bias);
+
     return { weights: weights, bias: bias };
 }
 
@@ -342,8 +342,8 @@ export function loadWeights() {
     let bias: any = []; // DS to manage bias for each layer
 
     const weightsJSON: any = require("../../public/weights.json");
-    console.log("weightsJSON", weightsJSON);
-    console.log("weights", weightsJSON["onnx::MatMul_311"]);
+
+
 
     weights = [
         weightsJSON["onnx::MatMul_311"],
@@ -357,7 +357,7 @@ export function loadWeights() {
         weightsJSON["conv3.bias"],
         weightsJSON["lin.bias"],
     ];
-    console.log("weights array", weights, bias);
+
     return { weights: weights, bias: bias };
 }
 

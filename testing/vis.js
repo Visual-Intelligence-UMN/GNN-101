@@ -11,7 +11,7 @@ const height = 1000 - margin.top - margin.bottom;
 async function init(graphs) {
     // Append the SVG object to the body of the page
     let allNodes = [];
-    console.log(graphs);
+
     const svg = d3
         .select("#my_dataviz")
         .append("svg")
@@ -80,7 +80,7 @@ async function init(graphs) {
 //cross connect graphs in the visualization system
 function connectCrossGraphNodes(nodes, svg, graphs) {
     const nodesById = d3.group(nodes, (d) => d.id);
-    console.log(nodesById);
+
     nodesById.forEach((nodes, id) => {
         nodes.forEach((node, i) => {
             if (i < nodes.length - 1) {
@@ -88,10 +88,10 @@ function connectCrossGraphNodes(nodes, svg, graphs) {
                 const xOffset1 = node.graphIndex * 500;
                 const xOffset2 = nextNode.graphIndex * 500;
 
-                console.log("first cood");
-                console.log(nodes[i].x, nodes[i].y);
-                console.log("second cood");
-                console.log(nextNode.x, nextNode.y);
+
+
+
+
 
                 svg.append("line")
                     .attr("x1", nodes[i].x + xOffset1)

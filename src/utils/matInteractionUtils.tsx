@@ -39,15 +39,15 @@ export function drawSoftmaxDisplayer(
 
     //data preparation and preprocessing
     //model outputs and the values after softmax
-    console.log("ouputvis", result);
+
     const finalResult = softmax(result);
-    console.log("ouputvis 1", finalResult);
+
     //title fetch
     let title = "Softmax Score for 'Mutagenic'";
     if (id == 0) {
         title = "Softmax Score for 'Non-Mutagenic'";
     }
-    console.log("outputvis title", title);
+
 
     //add contents into the math displayer
     //add title
@@ -581,7 +581,7 @@ myColor:any
 ){
 
         //data fetching - get the current value, aggregated vector, and weight vector
-        console.log("data fetching aw X", X)
+
         const math = create(all, {})
         let currentVal = dummy[Number(rectID)];
         let aggregatedVector:number[] = X;
@@ -589,7 +589,7 @@ myColor:any
         transposedXv = flipVertically(transposedXv);
         let weightVector:number[] = transposedXv[Number(rectID)];
 
-        console.log("awvector", aggregatedVector, weightVector, X)
+
 
         //first few data points for example
         const dataSamples = [
@@ -643,7 +643,7 @@ myColor:any
         let w = 11.25;
         if(h>vectorLength / weightVector.length)h = vectorLength / weightVector.length;
 
-        console.log("data fetching from wv", currentVal, aggregatedVector, weightVector, h)
+
 
         const eqXOffset = titleXOffset / 2;
         const eqYOffset = titleYOffset * 2.5;

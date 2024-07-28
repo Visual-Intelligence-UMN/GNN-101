@@ -31,7 +31,7 @@ export const AnimationController = {
             }
             this.currentAnimationIndex = index;
         } else {
-            console.log("All animations completed");
+
         }
     },
     pauseAnimations() {
@@ -63,7 +63,7 @@ export function runAnimations(index:number, animations:any) {
             runAnimations(index + 1, animations);
         }, delay);
     } else {
-        console.log("All animations completed");
+
     }
 }
 
@@ -115,7 +115,7 @@ export function drawAniPath(
 
         d3.select(".wMatLink").style("opacity", 0.3);
 
-        console.log("rectID",rectID);
+
         d3.selectAll(".interactRect").style("opacity", 0.5);
         d3.select(`.interactRect[rectID="${rectID}"]`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
         drawMatrixWeight(Xt, startCoordList, endCoordList, curveDir, Number(rectID), myColor, weightMatrixPostions, featureChannels, "weightPath");
@@ -133,7 +133,7 @@ export function drawAniPath(
         d3.select(".wMatLink").style("opacity", 1);
 
         d3.selectAll(".weightUnit").style("opacity", 1);
-        console.log("rectID quit",rectID)
+
         d3.selectAll(".columnUnit").style("opacity", 0);
         d3.selectAll(".interactRect").style("opacity", 1).style("stroke", "gray").style("stroke-width", 0.1);
         d3.selectAll("#weightPath").remove();
@@ -158,7 +158,7 @@ export function drawMatrixWeight(
     
     let flag = true;
 
-    console.log("Xv check 1", Xt, weightMatrixPostions);
+
     
     if(Xt[0].length!=Xt.length
         && (!(Xt[0].length==2 && Xt.length==64)
@@ -166,7 +166,7 @@ export function drawMatrixWeight(
     ){
         //weightMatrixPostions = transposeAnyMatrix(weightMatrixPostions);
         flag = false;
-        console.log("w mat flag")
+
         const math = create(all, {});
         Xt = math.transpose(Xt);
     }
@@ -203,7 +203,7 @@ export function drawMatrixWeight(
 
 
     let Xv = Xt[currentStep];
-    console.log("Xv check", Xv, Xt, weightMatrixPostions);
+
     
 
 
@@ -219,7 +219,7 @@ export function drawMatrixWeight(
         let m1 = [0,0];
         // if(flag){
         //     m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
-        //     console.log("m1 check",weightMatrixPostions,  m1);
+
         // }else{
         //     m1 = weightMatrixPostions[currentStep][weightMatrixPostions[0].length-1-j];
         // }
@@ -232,7 +232,7 @@ export function drawMatrixWeight(
         
         
 
-        console.log("wanfeng", Xt, Xv, weightMatrixPostions, curveDir);
+
 
         let changed = false;
 
@@ -242,7 +242,7 @@ export function drawMatrixWeight(
 
             m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
             
-            console.log("wanfeng 3", curveDir)
+
             changed = true;
         }
 
@@ -252,14 +252,14 @@ export function drawMatrixWeight(
 
             m1 = weightMatrixPostions[j][currentStep]
             
-            console.log("wanfeng 4", curveDir)
+
             changed = true;
         } 
 
         if(Xt.length==Xt[0].length || (Xt.length==64 && Xt[0].length==7)){
             m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
                 
-            console.log("wanfeng 5", curveDir)
+
             changed = true;
         }
 
@@ -272,7 +272,7 @@ export function drawMatrixWeight(
 
             m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
                 
-            console.log("wanfeng 7", curveDir)
+
             changed = true;
         }
 
@@ -281,13 +281,13 @@ export function drawMatrixWeight(
                 if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
                 else m1 = weightMatrixPostions[j][currentStep]
                 
-                console.log("wanfeng 1", curveDir)
+
             }
             else{
                 if(curveDir==-1)m1 = weightMatrixPostions[j][currentStep]
                 else m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
 
-                console.log("wanfeng 2", curveDir)
+
             }
         }
 
@@ -370,7 +370,7 @@ export function drawSummationFeature(
         const res = computeMids(posList[i], coordFeatureVis);
         const hpoint = res[0];
         const lpoint = res[1];
-        console.log("control points", hpoint, lpoint);
+
         d3.select(".mats")
             .append("path")
             .attr("d", curve([posList[i], hpoint, lpoint, coordFeatureVis]))
@@ -383,7 +383,7 @@ export function drawSummationFeature(
         //draw multipliers
         let x = (coordFeatureVis[0] - posList[i][0]) / 2 + posList[i][0];
         let y = (coordFeatureVis[1] - posList[i][1]) / 2 + posList[i][1];
-        console.log("text point", x, y, posList[i][0], posList[i][1]);
+
         d3.select(".mats")
             .append("text")
             .text(mulValues[i].toFixed(2))
@@ -455,7 +455,7 @@ export function drawWeightsVector(
         d3.select(".wMatLink").style("opacity", 0.3);
         
         const rectID = d3.select(this).attr("rectID")
-        console.log("rectID",rectID);
+
         d3.selectAll(".interactRect").style("opacity", 0.5);
         d3.select(`.interactRect[rectID="${rectID}"]`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
         drawMatrixWeight(Xv, startCoordList, endCoordList, curveDir, Number(rectID), myColor, weightMatrixPostions, featureChannels, "weightPath", paintMode);
@@ -474,7 +474,7 @@ export function drawWeightsVector(
         d3.select(".wMatLink").style("opacity", 1);
 
         d3.selectAll(".weightUnit").style("opacity", 1);
-        console.log("rectID quit",rectID)
+
         d3.selectAll(".columnUnit").style("opacity", 0);
         d3.selectAll(".interactRect").style("opacity", 1).style("stroke", "gray").style("stroke-width", 0.1);
         d3.selectAll("#weightPath").remove();
@@ -505,9 +505,9 @@ export function computeMatrixLocations(
                 let weightMatrixPositions = [];
                 //draw matrix - change the computation mode here, when the dims are different
                 let weightMat = weights[layerID];
-                console.log("comp w 0", weightMat)
+
                 //if(weightMat[0].length>weightMat.length || weightMat[0].length<weightMat.length)weightMat = math.transpose(weights[layerID]);
-                console.log("comp w", weightMat)
+
                 for(let i=0; i<weightMat.length; i++){
                     let tempArr = [];
                     for(let j=0; j<weightMat[i].length; j++){
@@ -589,9 +589,9 @@ weightMatrixPostions:any
             if(weightMat[0].length>weightMat.length || weightMat[0].length<weightMat.length){
                 //weightMatrixPostions = transposeAnyMatrix(weightMatrixPostions);
                 flag = true;
-                console.log("w mat flag")
+
             }
-            console.log("w mat check", weightMatrixPostions, weightMat, weightMat[weightMat.length-1][0]);
+
             
             //draw label hint
             drawHintLabel(g, weightMatrixPostions[0][0][0], 
@@ -605,7 +605,7 @@ weightMatrixPostions:any
 
           if(weightMat[0].length==weightMat.length){
             weightMat = rotateMatrix(weightMat)
-            console.log("rotated!", weightMat)
+
             if(curveDir==1){
                 weightMat = rotateMatrix(weightMat)
                 weightMat = rotateMatrix(weightMat)
@@ -624,7 +624,7 @@ weightMatrixPostions:any
             weightMat = flipHorizontally(weightMat);
             weightMat = flipVertically(weightMat);
         }
-        console.log("rotated! 1", weightMat)
+
 
             for(let i=0; i<weightMatrixPostions.length; i++){
                 let tempArr = [];
@@ -649,9 +649,9 @@ weightMatrixPostions:any
                         colorVal = weightMat[weightMat.length-i-1][j];
                     }
                     else {
-                       // console.log(`w mat check2 ${i} ${j}`,weightMat[weightMat.length-i-1], weightMat[weightMat.length-i-1][j]);
+
                         colorVal = weightMat[j][weightMat[0].length-i-1];
-                        console.log("w mat color", colorVal, j, weightMat[0].length-i-1);
+
                     }
                     if(weightMat[0].length==weightMat.length){
                         colorVal = weightMat[i][j];
@@ -782,7 +782,7 @@ export function drawReLU(
         const cy1 = nextCoord[1] - 15;
 
         d3.xml("./assets/SVGs/ReLU.svg").then(function (data) {
-            console.log("xml", data.documentElement);
+
             if(relu.node()!=null){
             const ReLU = relu!.node()!.appendChild(data.documentElement);
             d3.select(ReLU)
@@ -826,7 +826,7 @@ export function drawTanh(
         const cy1 = nextCoord[1] - 15;
 
         d3.xml("./assets/SVGs/tanh.svg").then(function (data) {
-            console.log("xml", data.documentElement);
+
             if(relu.node()!=null){
             const ReLU = relu!.node()!.appendChild(data.documentElement);
             d3.select(ReLU)
