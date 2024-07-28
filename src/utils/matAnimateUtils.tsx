@@ -193,8 +193,13 @@ export function drawMatrixWeight(
         Xt = flipVertically(Xt)
        // Xt = flipHorizontally(Xt);
     }
+
+    if(Xt.length==64&&Xt[0].length==7){
+        Xt = flipVertically(Xt)
+         Xt = flipHorizontally(Xt);
+    }
    
-drawMatrixValid(Xt, startCoordList[0][0], startCoordList[0][1]+20, 10, 10)
+//drawMatrixValid(Xt, startCoordList[0][0], startCoordList[0][1]+20, 10, 10)
 
 
     let Xv = Xt[currentStep];
@@ -612,6 +617,10 @@ weightMatrixPostions:any
             }
         }
         if((weightMat.length==2 && weightMat[0].length==4)){
+            weightMat = flipHorizontally(weightMat);
+            weightMat = flipVertically(weightMat);
+        }
+        if(weightMat.length==7&&weightMat[0].length==64){
             weightMat = flipHorizontally(weightMat);
             weightMat = flipVertically(weightMat);
         }
