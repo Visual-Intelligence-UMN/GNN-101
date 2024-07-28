@@ -1116,7 +1116,7 @@ export function calculationVisualizer(
             const aggregatedToCalculated = g3
                 .append("path")
                 .attr("d", `M${start_x},${start_y} ${end_x},${end_y}`)
-                .style("stroke", pathColor(color))
+                .style("stroke", "black")
                 .style("stroke-width", 1)
                 .style("fill", "none")
                 .attr("class", "relu to-be-removed output-path")
@@ -1142,7 +1142,7 @@ export function calculationVisualizer(
             const calculatedToFinal = g3
                 .append("path")
                 .attr("d", `M${start_x},${start_y} ${end_x},${end_y}`)
-                .style("stroke", pathColor(color))
+                .style("stroke", "black")
                 .style("stroke-width", 1)
                 .style("fill", "none")
                 .attr("class", "relu to-be-removed")
@@ -1170,7 +1170,7 @@ export function calculationVisualizer(
                     `M${start_x},${start_y} C ${control1_x} ${control1_y}, ${control2_x} ${control2_y} ${end_x - 30
                     },${end_y}`
                 )
-                .style("stroke", pathColor(color))
+                .style("stroke", "black")
                 .style("opacity", 0.7)
                 .style("stroke-width", 1)
                 .style("fill", "none")
