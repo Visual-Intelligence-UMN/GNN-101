@@ -21,7 +21,7 @@ import { stat, truncateSync } from "fs";
 
 import { drawActivationExplanation } from "./matInteractionUtils";
 import { computeMatrixLocations, drawMatrixWeight, drawWeightMatrix } from "./matAnimateUtils";
-import { graphVisDrawActivationExplanation, graphVisDrawMatrixWeight, hoverOverHandler } from "./graphAnimationHelper";
+import { graphVisDrawActivationExplanation, graphVisDrawMatrixWeight, displayerHandler, hoverOverHandler} from "./graphAnimationHelper";
 
 export const pathColor = d3
     .scaleLinear<string>()
@@ -375,6 +375,7 @@ export function outputVisualizer(
             startCoordList,
             endCoordList,
             Xt,
+            calculatedData,
             offset,
             height,
             moveOffset,
@@ -383,6 +384,7 @@ export function outputVisualizer(
             state,
             weightsLocation,
             intervalID,
+            allWeights,
             mode
         );
 
@@ -977,6 +979,7 @@ export function calculationVisualizer(
             startCoordList,
             endCoordList,
             currentWeights,
+            aggregatedData,
             offset,
             height,
             moveOffset,
@@ -985,6 +988,7 @@ export function calculationVisualizer(
             state,
             weightsLocation,
             intervalID,
+            weights,
             mode
         );
 
@@ -1358,8 +1362,6 @@ export function moveNextLayer(
 
 
 
-
-
 }
 
 function weightAnimation(
@@ -1367,6 +1369,7 @@ function weightAnimation(
     node: any, startCoordList: number[][],
     endCoordList: number[][],
     weights: any,
+    aggregatedData: any,
     offset: number,
     height: number,
     moveOffset: number,
@@ -1375,6 +1378,7 @@ function weightAnimation(
     state: State,
     weightsLocation: number[][][],
     intervalID: any,
+    allWeights: number[][][],
     mode: number
 ) {
 
@@ -1488,6 +1492,7 @@ function weightAnimation(
                 //     prevLayerFeatureLength,
                 //     state
                 // );
+                // displayerHandler(node, aggregatedData, state, svg, 300, (20 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, allWeights, node.graphIndex, weightsLocation, i)
 
 
                 graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg)
@@ -2239,6 +2244,7 @@ export function nodeOutputVisualizer(
             startCoordList,
             endCoordList,
             Xt,
+            calculatedData,
             offset,
             height,
             moveOffset,
@@ -2247,6 +2253,7 @@ export function nodeOutputVisualizer(
             state,
             weightsLocation,
             intervalID,
+            allWeights,
             mode
         );
 

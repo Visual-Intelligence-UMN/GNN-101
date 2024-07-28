@@ -183,22 +183,12 @@ export function drawGraphVisWeightVector(weightMatrixPositions: number[][][], re
                             .attr("id", `columnUnit-${j}`);
 
 }
+export function displayerHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], i: number) {
 
-
-
-export function hoverOverHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][]) {
-
-
-
-
-    
-
-    for (let i = 0; i < node.features.length; i++) {
-        d3.select(`.calculatedFeatures${i}`)
-            .on("mouseover", function () {
-                if (!state.isClicked) {
-                    return;
+                if (!g.selectAll) {
+                    g = d3.selectAll(g)
                 }
+
                 d3.select(".graph-displayer").attr("opacity", 1);
 
 
@@ -209,7 +199,7 @@ export function hoverOverHandler(node: any, aggregatedData: any, state: State, g
                 
 
         
-
+                
 
                 drawGraphVisWeightVector(weightsLocation, wmRectL, weights, index, g, i)
 
@@ -369,6 +359,27 @@ export function hoverOverHandler(node: any, aggregatedData: any, state: State, g
                 .text(roundToTwo(node.features[i]))
                 .attr("class", "math-displayer")
                 .attr("font-size", "3");
+
+
+
+
+
+
+
+    }
+
+
+export function hoverOverHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][]) {
+
+    
+
+    for (let i = 0; i < node.features.length; i++) {
+        d3.select(`.calculatedFeatures${i}`)
+            .on("mouseover", function () {
+                if (!state.isClicked) {
+                    return;
+                }
+                displayerHandler(node, aggregatedData, state, g, displayHeight, rectL, wmRectL, myColor, weights, index, weightsLocation, i)
 
 
 
