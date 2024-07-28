@@ -5,6 +5,7 @@ import {
     loadWeights,
     loadNodeWeights,
     drawHintLabel,
+    drawMatrixValid,
 } from "./matHelperUtils";
 import { computeMids } from "./matFeaturesUtils";
 import * as d3 from "d3";
@@ -501,6 +502,8 @@ export function featureVisClick(
     const dummy: number[] = math.multiply(math.transpose(weights[layerID]), X);
     const Xt = math.transpose(weights[layerID]);
 
+    //drawMatrixValid(Xt, coordFeatureVis[0], coordFeatureVis[1]-75, 10, 10)
+
     console.log("compute x'", mulValues, dList, layerID, X.toString(), dummy);
 
     const g = d3.select(".mats").append("g").attr("class", "procVis");
@@ -642,7 +645,7 @@ export function featureVisClick(
 
 
 
-    let weightMatrixPostions:any = computeMatrixLocations(btnX, btnY, curveDir, rectW, featureChannels, weights, layerID);
+    let weightMatrixPostions:any = computeMatrixLocations(btnX+15, btnY, curveDir, rectW, featureChannels, weights, layerID);
 
     d3.select(".mats").style("pointer-events", "none");
 
@@ -664,7 +667,7 @@ export function featureVisClick(
             //drawHintLabel(g, btnX, btnY - 36, "Click for Animation", "procVis");
 
             const gLabel = d3.select(".mats").append("g");
-            injectSVG(gLabel, btnX-120, btnY-30-120, "./assets/SVGs/interactionHint.svg", "procVis");
+            injectSVG(gLabel, btnX-120-64, btnY-30-120-64, "./assets/SVGs/interactionHint.svg", "procVis");
 
             drawPathBtwOuputResult([coordFeatureVis], coordFeatureVis3)
             drawWeightMatrix(btnX, btnY, curveDir, rectW, rectH, featureChannels, weights, layerID, myColor, g, weightMatrixPostions);
@@ -1019,6 +1022,7 @@ export function outputVisClick(
     console.log("w mat pos", wMat)
 
     let weightMatrixPostions:any = computeMatrixLocations(btnX+42, btnY+30, -1, rectW, featureChannels, [wMat], 0);
+    console.log("AWDAW", wMat)
     
     console.log("w mat pos 1", weightMatrixPostions)
 
@@ -1043,7 +1047,7 @@ export function outputVisClick(
             );
             //drawHintLabel(g1, btnX, btnY-12, "Click for Animation", "procVis");
             const gLabel = d3.select(".mats").append("g");
-            injectSVG(gLabel, btnX-120, btnY-120, "./assets/SVGs/interactionHint.svg", "procVis");
+            injectSVG(gLabel, btnX-120-64, btnY-120-64, "./assets/SVGs/interactionHint.svg", "procVis");
         }, delay:aniSec+600},
         {func:()=>{
             //console.log("Xv check wmat", wMat);

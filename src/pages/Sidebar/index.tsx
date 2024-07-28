@@ -13,6 +13,7 @@ type Props = {
     isGraphView: boolean;
     setIsGraphView: (isGraphView: boolean) => void;
     predicted: boolean;
+    modelMode: string;
 };
 export default function Sidebar(props: Props) {
     return (
@@ -113,7 +114,8 @@ export default function Sidebar(props: Props) {
                         nitrogen, etc.
                         {/* TODO: maybe also show node features before clicking prediction */}
                     </p>
-                    <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/graphFeatures.png" label="Node Features" />
+                    {props.isGraphView ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/graphViewFeatures.png" label="Node Features" /> :
+                        <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/graphFeatures.png" label="Node Features" />}
                 </div>
 
                 <div className="p-4">
@@ -123,39 +125,50 @@ export default function Sidebar(props: Props) {
                     <p>
                         Graphs have an irregular structure can directly use traditional neural networks, which are designed to operate on
                         a fixed, grid-like structure input (such as sentences, images and video).
-                        To process graphs, GNNs employ a technique called message passing, where neighboring nodes exchange information and update
+                        To process graphs, GNNs employ a technique called <span className="font-bold">message passing</span>, where neighboring nodes exchange information and update
                         each other’s embeddings  to better reflect their interconnectedness and individual features.
                     </p>
 
                     {!props.predicted &&
-                        "Click on the right side to predict and show inner layers"}
+                        `Click the "click to predict" button on the right side and show inner layers`}
 
                     <p>
                         Message-passing forms the backbone of many GNN architectures,
                         including Graph Convolutional Networks (GCN), Graph Attention
                         Networks (GAT), Graph Sample and Aggregate (GraphSAGE), Graph
-                        Isomorphism Network (GIN), etc. We will start with GCN, which is one
+                        Isomorphism Network (GIN), etc.
+                        The main differences between these GNN variants are the way they aggregate information from neighbors and the way they update node embeddings.
+
+                    </p>
+
+                    <p>We will start with GCN, which is one
                         of the most popular GNN architectures.
+
                     </p>
                     {/* <span className={styles.button} onClick={() => { }}>Click to show GCNConv </span> */}
                     {/* <span>
                         <img src="./assets/PNGs/annotatedSrcShots/gcnconv.png" alt="GCNConv"></img>
                     </span> */}
-                    <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/gcnconv.png" label="GCNConv" />
+                    {props.isGraphView ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/gcnconvGraph.png" label="GCNConv" /> :
+                        <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/gcnconv.png" label="GCNConv" />
+                    }
                     <ol className="list-inside list-disc">
                         <li>
                             <b className="font-bold">Aggregation with Normalization: </b>
                             First, a node aggregates the feature vectors of its neighbors and itself via a normalized degree matrix.
                             Intuitively, this reduces the influence of information from nodes with too many neighbors and strengthens the influence from those with fewer neighbors.
                         </li>
+                        <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/summation.png" label="Aggregated Vector" />
                         <li>
                             <b className="font-bold">Weighted Transformation:</b> The aggregated information is then transformed by a learnable weight matrix.
                             This matrix allows the model to learn the importance of different features for the central node.
                         </li>
+                        <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/matmul.png" label="Weighted Transformation" />
                         <li>
                             <b className="font-bold">Activation Function: </b>
                             Finally, we add a bias vector and a non-linear activation function (ReLU) to the aggregated information to obtain an updated feature vector of this node.
                         </li>
+                        <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/activation.png" label="Activation Function" />
                         Note that the learnable weight matrix and bias vector are shared across all nodes in the graph, mimicking the convolution operation in CNNs and minimizing the number of parameters.
                     </ol>
 
@@ -171,6 +184,7 @@ export default function Sidebar(props: Props) {
                         <h1 className="text-3xl font-semibold text-3xl">
                             Tasks that GNNs can solve:
                         </h1>
+                        <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/modelMenu.png" label="Model Selection Menu" />
                         <p>
                             By learning the features of each node, GNNs can then use
                             these node features to solve tasks at different levels of
@@ -179,26 +193,44 @@ export default function Sidebar(props: Props) {
                             and node-level tasks. We are working on adding support for other
                             tasks, please stay tuned!
                         </p>
+
+                        <span className={styles.tag}>Node-Level Tasks </span>
+                        {/* <span className={styles.button} onClick={() => { }}>Click to Predict Nodes </span> */}
+                        <p>
+                            Given the learned features of each node, GNN can directly predict the node properties. For example, in the Karate dataset, the task is to
+                            predict the community of each person in the social network.
+                            After sevela layers of GCNConv, we apply a <b className="font-bold">fully connected layer </b> to each node to make the prediction.
+                        </p>
+
+                        {props.modelMode=="node classification"?(props.isGraphView ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCGraphNode.png" label="Fully Connected Layer" /> :
+                            <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCMatrixNode.png" label="Fully Connected Layer" />):<></>}
+
+                        {props.modelMode=="node classification" ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCDetails.png" label="FC in Details" />:<></>}
+
                         <span className={styles.tag}>Graph-Level Tasks </span>
                         {/* <span className={styles.button} onClick={() => { }}>Click to Predict a Graph </span> */}
                         <p>
-                            Given a input graph, GNN can predict the properties of the entire
-                            graph. For example, in the MUTAG dataset, the task is to predict
+                            GNN can predict the properties of the entire
+                            graph by aggregating the learned feature of all graph nodes. For example, in the MUTAG dataset, the task is to predict
                             whether a molecule is mutagenic or not. After sevela layers of GCNConv, a <b className="font-bold">global mean pooling </b>
                             layer is used to aggregate the node features into a single graph
                             feature, which is then fed into <b className="font-bold">a fully connected layer</b> to make
                             the prediction.
                         </p>
-                        <span className={styles.tag}>Node-Level Tasks </span>
-                        {/* <span className={styles.button} onClick={() => { }}>Click to Predict Nodes </span> */}
-                        <p>
-                            Given a input graph, GNN can predict the properties of each node
-                            in the graph. For example, in the Karate dataset, the task is to
-                            predict the community of each person in the social network.
-                            After sevela layers of GCNConv, we apply a <b className="font-bold">fully connected layer </b> to each node to make the prediction.
-                        </p>
+
+                        {props.modelMode=="graph classification" ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/pooling.png" label="Pooling Layer" />:<></>}
+                        {props.modelMode=="graph classification" ? (props.isGraphView ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCGraphGraph.png" label="Fully Connected Layer" /> :
+                                                    <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCMatrixGraph.png" label="Fully Connected Layer" />) : <></>}
+                        {props.modelMode=="graph classification" ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCDetails.png" label="FC in Details" />:<></>}
+
                         <span className={styles.tag}>Edge-Level Tasks </span>
-                        <p>Coming Soon!</p>
+                        <p>
+                            GNN can predict the properties of each edge
+                            in the graph. For example, in the PPI dataset, the task is to
+                            predict whether two proteins interact with each other. After several layers of GCNConv,
+                            we combine the features of the two nodes of a given edge (e.g., by concatenation) and then apply a fully connected layer to make the prediction.
+                        </p>
+                        <p>The interactive visualization about edge classification is coming soon!</p>
                     </>
                 </div>
 

@@ -888,7 +888,7 @@ export function visualizeNodeClassifierFeatures(
 
     const wMat = math.transpose(modelParams.weights[3]);
 
-            let weightMatrixPostions:any = computeMatrixLocations(btnX, btnY+30, curveDir, 15, featureChannels, [wMat], 0);
+            let weightMatrixPostions:any = computeMatrixLocations(btnX+15, btnY+30, curveDir, 15, featureChannels, [wMat], 0);
             
            // drawPoints(".mats", "red", [[btnX+10, btnY+30-15]])
 
@@ -977,7 +977,7 @@ export function visualizeNodeClassifierFeatures(
                     "./assets/SVGs/matmul.svg"
                 );
                 const gLabel = d3.select(".mats").append("g");
-            injectSVG(gLabel, btnX-120, btnY-120, "./assets/SVGs/interactionHint.svg", "procVis");
+            injectSVG(gLabel, btnX-120-64, btnY-120-64, "./assets/SVGs/interactionHint.svg", "procVis");
             }, aniSec);
 
             let firstPlay = true;

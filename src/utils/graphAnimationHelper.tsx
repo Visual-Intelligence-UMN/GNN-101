@@ -141,18 +141,20 @@ export function graphVisDrawMatrixWeight(
         g
             .append("path")
             .attr("d", pathData1)
-            .attr("class", "intermediate-path to-be-removed")
+            .attr("class", "tempath to-be-removed")
             .style("fill", "none")
             .attr("stroke", "black").attr("id", `tempath${currentStep}`)
-            .attr("stroke-width", 2).attr("stroke", myColor(Xv[j])).lower();
+            .attr("stroke-width", 2).attr("stroke", myColor(Xv[j])).lower()
+            .style("opacity", 1)
 
         g
             .append("path")
             .attr("d", pathData2)
-            .attr("class", "intermediate-path to-be-removed")
+            .attr("class", "tempath to-be-removed")
             .style("fill", "none")
             .attr("stroke", "black").attr("id", `tempath${currentStep}`)
-            .attr("stroke-width", 2).attr("stroke", myColor(Xv[j])).lower();
+            .attr("stroke-width", 2).attr("stroke", myColor(Xv[j])).lower()
+            .style("opacity", 1)
     }
 }
 
@@ -167,7 +169,7 @@ export function drawGraphVisWeightVector(weightMatrixPositions: number[][][], re
         const math = create(all, {});
         weightMat = math.transpose(weightMat);
     }
-
+    console.log("wei:",weightMat)
 
     for (let j = 0; j < weightMat[currentStep].length; j++)
     g.append("rect")
@@ -179,41 +181,64 @@ export function drawGraphVisWeightVector(weightMatrixPositions: number[][][], re
                             .attr("stroke", "gray")
                             .attr("stroke-width", 0.1)
                             .attr("opacity", 1)
-                            .attr("class", "columnUnit")
+                            .attr("class", "columnUnit math-displayer")
                             .attr("id", `columnUnit-${j}`);
 
 }
+export function displayerHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], i: number) {
 
-
-
-export function hoverOverHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][]) {
-
-
-
-
-    
-
-    for (let i = 0; i < node.features.length; i++) {
-        d3.select(`.calculatedFeatures${i}`)
-            .on("mouseover", function () {
-                if (!state.isClicked) {
-                    return;
+                if (!g.selectAll) {
+                    g = d3.selectAll(g)
                 }
+
                 d3.select(".graph-displayer").attr("opacity", 1);
 
 
-
+                d3.selectAll(".weightUnit").style("opacity", 0.3);
                 d3.selectAll(`#tempath${i}`).attr("opacity", 1).raise();
                 d3.selectAll(`#weightUnit-${i}`).style("opacity", 1).raise();
                 d3.selectAll(`#columnUnit-${i}`).style("opacity", 1).raise();
+                
 
         
+            
+                let weightMat = weights[index]
+            
+                if (index === 0) {
+                    const math = create(all, {});
+                    weightMat = math.transpose(weightMat);
+                }
 
+                console.log("BVUAEGF", weightMat)
 
-                drawGraphVisWeightVector(weightsLocation, wmRectL, weights, index, g, i)
+            
+                for (let j = 0; j < weightMat[i].length; j++)
+                g.append("rect")
+                                        .attr("x", 130)
+                                        .attr("y", 20 + wmRectL * j)
+                                        .attr("width", 7)
+                                        .attr("height", wmRectL)
+                                        .attr("fill", myColor(weightMat[i][j]))
+                                        .attr("stroke", "gray")
+                                        .attr("stroke-width", 0.1)
+                                        .attr("opacity", 1)
+                                        .attr("class", "columnUnit math-displayer")
+                                        .attr("id", `columnUnit-${j}`)
+                                        .style("opacity", 1)
 
                 const featureGroup = g.append("g")
                 .attr("transform", `translate(${70}, ${displayHeight - 40})`);
+
+
+
+                g.append("text")
+                .attr("x", 70 - 25)
+                .attr("y", displayHeight - 65)
+                .text("Matmul Visualization")
+                .attr("class", "math-displayer")
+                .attr("font-size", "10");
+
+
                 featureGroup.selectAll("rect")
                 .data(aggregatedData)
                 .enter()
@@ -364,6 +389,31 @@ export function hoverOverHandler(node: any, aggregatedData: any, state: State, g
 
 
 
+    }
+
+
+export function hoverOverHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], Xt: any, startCoordList: any, endCoordList: any, svg: any) {
+
+    
+
+    for (let i = 0; i < node.features.length; i++) {
+        d3.select(`.calculatedFeatures${i}`)
+            .on("mouseover", function () {
+                if (!state.isClicked) {
+                    return;
+                }
+                graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg)
+                d3.selectAll(".calculatedRect").style("opacity", 0.2)
+                d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1)
+                d3.selectAll(`#tempath${i}`).style("opacity", 1);
+                displayerHandler(node, aggregatedData, state, g, displayHeight, rectL, wmRectL, myColor, weights, index, weightsLocation, i)
+
+
+
+
+
+
+
     })
             .on("mouseout", function () {
                 if (!state.isClicked) {
@@ -373,8 +423,10 @@ export function hoverOverHandler(node: any, aggregatedData: any, state: State, g
                 d3.selectAll(".graph-displayer").attr("opacity", 0);
                 d3.selectAll(`#weightUnit-${i}`).style("opacity", 0.3).raise();
                 d3.selectAll(`#columnUnit-${i}`).style("opacity", 0).raise();
-                d3.selectAll(`#tempath${i}`).attr("opacity", 0).raise();
-                d3.selectAll(`.columnUnit`).remove();
+                d3.selectAll(`#tempath${i}`).style("opacity", 0).raise();
+                d3.selectAll(".weightUnit").style("opacity", 1);
+                d3.selectAll(".calculatedRect").style("opacity", 1)
+                
 
             });
     }

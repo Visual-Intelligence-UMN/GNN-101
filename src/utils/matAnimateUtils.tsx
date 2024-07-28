@@ -3,8 +3,8 @@ import { computeMids, computeMidsVertical } from "./matFeaturesUtils";
 import { injectPlayButtonSVG } from "./svgUtils";
 import { drawActivationExplanation, drawDotProduct } from "./matInteractionUtils";
 import { create, all, transposeDependencies } from "mathjs";
-import { drawPoints, transposeAnyMatrix } from "./utils";
-import { drawHintLabel } from "./matHelperUtils";
+import { drawPoints, flipHorizontally, flipVertically, rotateMatrixCounterClockwise, transposeAnyMatrix } from "./utils";
+import { drawHintLabel, drawMatrixValid, rotateMatrix } from "./matHelperUtils";
 
 interface Animation {
     func: () => void;
@@ -180,8 +180,33 @@ export function drawMatrixWeight(
         const math = create(all, {});
         Xt = math.transpose(math.transpose(Xt));
     }
-    const Xv = Xt[currentStep];
+
+   // Xt = flipVertically(Xt);
+
+   //adjust matrix value alignment for GCNConv - square weight matri
+    if(Xt[0].length==Xt.length){
+        Xt = rotateMatrixCounterClockwise(Xt)
+        Xt = flipHorizontally(Xt);
+    }
+
+    if(Xt[0].length==2&&Xt.length==4){
+        Xt = flipVertically(Xt)
+       // Xt = flipHorizontally(Xt);
+    }
+
+    if(Xt.length==64&&Xt[0].length==7){
+        Xt = flipVertically(Xt)
+         Xt = flipHorizontally(Xt);
+    }
+   
+//drawMatrixValid(Xt, startCoordList[0][0], startCoordList[0][1]+20, 10, 10)
+
+
+    let Xv = Xt[currentStep];
     console.log("Xv check", Xv, Xt, weightMatrixPostions);
+    
+
+
     for (let j = 0; j < Xv.length; j++) {
         let s1 = startCoordList[j];
         let e1 = endCoordList[currentStep];
@@ -408,7 +433,7 @@ export function drawWeightsVector(
             .attr("rectID", m)
             .attr("id", `weightRect${m}`);
     }
-    drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+2, "Matmul Result", "procVis");
+    drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+6, "Matmul Result", "procVis");
 
     //draw frame
     g.append("rect")
@@ -557,7 +582,7 @@ weightMatrixPostions:any
             const coefficient = 1;
             //draw matrix
             //const weightMat = math.transpose(weights[layerID]);
-            const weightMat = weights[layerID];
+            let weightMat = weights[layerID];
 
             //determine matrix shape mode
             let flag = false;
@@ -572,6 +597,34 @@ weightMatrixPostions:any
             drawHintLabel(g, weightMatrixPostions[0][0][0], 
                 weightMatrixPostions[0][0][1] - 12, "Weight Matrix", 
                 "procVis");
+
+            //flip
+          //  weightMat = flipVertically(weightMat);
+
+         // drawMatrixValid(Xt, startCoordList[0][0], startCoordList[0][1]+20, 10, 10)
+
+          if(weightMat[0].length==weightMat.length){
+            weightMat = rotateMatrix(weightMat)
+            console.log("rotated!", weightMat)
+            if(curveDir==1){
+                weightMat = rotateMatrix(weightMat)
+                weightMat = rotateMatrix(weightMat)
+               weightMat = flipVertically(weightMat);
+               weightMat = rotateMatrix(weightMat)
+            }else{
+                weightMat = rotateMatrix(weightMat)
+               weightMat = flipVertically(weightMat);
+            }
+        }
+        if((weightMat.length==2 && weightMat[0].length==4)){
+            weightMat = flipHorizontally(weightMat);
+            weightMat = flipVertically(weightMat);
+        }
+        if(weightMat.length==7&&weightMat[0].length==64){
+            weightMat = flipHorizontally(weightMat);
+            weightMat = flipVertically(weightMat);
+        }
+        console.log("rotated! 1", weightMat)
 
             for(let i=0; i<weightMatrixPostions.length; i++){
                 let tempArr = [];
@@ -599,6 +652,9 @@ weightMatrixPostions:any
                        // console.log(`w mat check2 ${i} ${j}`,weightMat[weightMat.length-i-1], weightMat[weightMat.length-i-1][j]);
                         colorVal = weightMat[j][weightMat[0].length-i-1];
                         console.log("w mat color", colorVal, j, weightMat[0].length-i-1);
+                    }
+                    if(weightMat[0].length==weightMat.length){
+                        colorVal = weightMat[i][j];
                     }
                     g.append("rect")
                         .attr("x", weightMatrixPostions[i][j][0])
@@ -651,7 +707,7 @@ export function drawBiasVector(
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("class", "procVis biasVector");
-    const label = drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+2, "Bias Vector", "procVis biasVector");
+    const label = drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+6, "Bias Vector", "procVis biasVector");
     d3.selectAll(".biasVector").transition().duration(100).attr("opacity", 1);
 }
 
@@ -736,7 +792,7 @@ export function drawReLU(
                 .raise();
             }
         });
-        drawHintLabel(relu, cx1-20, cy1+radius*4+12, "ReLU Non-linear Function", "procVis");
+        drawHintLabel(relu, cx1-20, cy1+radius*4+12+4, "ReLU Non-linear Function", "procVis");
 
         relu.on("mouseover", function(event, d){
             const [x, y] = d3.pointer(event);
@@ -781,7 +837,7 @@ export function drawTanh(
             }
         });
         
-        drawHintLabel(relu, cx1-20, cy1+radius*4+12, "Tanh Non-linear Function", "procVis");
+        drawHintLabel(relu, cx1-20, cy1+radius*4+12+4, "Tanh Non-linear Function", "procVis");
 
         relu.on("mouseover", function(event, d){
             const [x, y] = d3.pointer(event);

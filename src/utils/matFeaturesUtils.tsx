@@ -133,8 +133,8 @@ export function computeMidsVertical(point1: any, point2: any) :[[number, number]
     //find mid - x
     const midY = (point1[1] + point2[1]) / 2;
     const res :[[number, number], [number, number]] = [
-        [point1[0], midY-20],
-        [point2[0], midY+20],
+        [point1[0], midY],
+        [point2[0], midY],
     ];
     console.log("res", res);
     return res;
@@ -447,7 +447,7 @@ export function drawGCNConvGraphModel(
 
         //draw hint label
         if(k==0){
-            const hintLabelPos = [locations[0][0] - 120, locations[0][1] - 120];
+            const hintLabelPos = [locations[0][0] - 120 - 64, locations[0][1] - 120 - 64];
             const gLabel = d3.select(".mats").append("g");
             injectSVG(gLabel, hintLabelPos[0], hintLabelPos[1], "./assets/SVGs/interactionHint.svg", "hintLabel")
         }
@@ -638,7 +638,7 @@ export function drawGCNConvNodeModel(
         }
 
         if(k==0){
-            const hintLabelPos = [locations[0][0] - 120, locations[0][1] - 120];
+            const hintLabelPos = [locations[0][0] - 132 - 32, locations[0][1] - 132 - 32];
             const gLabel = d3.select(".mats").append("g");
             injectSVG(gLabel, hintLabelPos[0], hintLabelPos[1], "./assets/SVGs/interactionHint.svg", "hintLabel")
         }
