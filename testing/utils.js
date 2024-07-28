@@ -70,7 +70,7 @@ async function prep_graphs(g_num, data) {
 //process the json file and return the appropriate data structure
 async function process() {
     var data = await data_prep("./input_graph.json");
-    console.log(data);
+
     return data;
 }
 
@@ -112,12 +112,12 @@ function analyzeGraph(graphData) {
 
     const hasIsolatedNode = degreeMap.some((degree) => degree === 0);
 
-    console.log(`Node Count: ${nodeCount}`);
-    console.log(`Edge Count: ${edges}`);
-    console.log(`Average Node Degree: ${averageDegree}`);
-    console.log(`Has Isolated Node: ${hasIsolatedNode}`);
-    console.log(`Has Loop: ${hasLoop.size > 0}`);
-    console.log(`Is Directed: ${isDirected}`);
+
+
+
+
+
+
 
     return {
         node_count: nodeCount,
@@ -132,4 +132,4 @@ function analyzeGraph(graphData) {
 export {load_json, data_prep, prep_graphs, process, get_weights, analyzeGraph};
 
 //testing code
-console.log(get_weights());
+

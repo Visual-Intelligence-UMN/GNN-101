@@ -5,7 +5,7 @@ let session;
 async function loadModel() {
     // await session.loadModel("gnn_model.onnx");
     session = await ort.InferenceSession.create("gnn_model.onnx");
-    console.log("Model loaded successfully");
+
 }
 
 /**
@@ -32,7 +32,7 @@ function softmax(logits) {
 window.onload = loadModel;
 
 function classifyGraph() {
-    console.log("start classifying....a");
+
     const inputElement = document.getElementById("graphInput");
     if (inputElement.files.length > 0) {
         const file = inputElement.files[0];
@@ -66,25 +66,25 @@ function classifyGraph() {
                 edge_index: edgeIndexTensor,
                 batch: batchTensor,
             });
-            console.log(outputMap);
+
             const outputTensor = outputMap.final;
 
             //conv1 data
-            console.log("Conv1");
-            console.log(outputMap.conv1.cpuData);
+
+
 
             //conv2 data
-            console.log("Conv2");
-            console.log(outputMap.conv2.cpuData);
+
+
 
             //conv3 data
-            console.log("Conv3");
-            console.log(outputMap.conv3.cpuData);
+
+
 
             //the final output of gcn model data
-            console.log("Final");
-            console.log(outputTensor);
-            console.log(outputTensor.cpuData);
+
+
+
 
             const probabilities = softmax(outputTensor.cpuData);
             // Process and display the results

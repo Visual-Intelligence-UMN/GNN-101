@@ -24,9 +24,9 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
 
     // This is really messy but init will stay at the top to remain in the scope of all functions
 
-    console.log("updated", intmData);
+
     if (intmData != null) {
-        console.log("From Visualizer:", intmData);
+
     }
 
     useEffect(() => {
@@ -35,7 +35,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
         } else {
             visualizeGraphClassifier(setIsLoading, graph_path, intmData);
         }
-        console.log("i fire once");
+
     }, [graph_path, intmData, changed]);
 
     const updateTextElements = (svg: SVGSVGElement, selectedButtons: boolean[]) => {
@@ -76,7 +76,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
         if (svg && !isLoading) {
           updateTextElements(svg, selectedButtons);
         }
-        console.log("selectBtn", selectedButtons);
+
       }, [selectedButtons, isLoading]);
 
     
