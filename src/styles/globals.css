@@ -192,3 +192,5 @@ path {
   transform: translateY(-10px);
   transition: max-height 300ms, opacity 300ms, transform 300ms;
 }
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
