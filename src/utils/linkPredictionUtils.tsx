@@ -19,7 +19,7 @@ export function dataPreparationLinkPred(intmData: IntmDataLink){
         [chunkArray(intmData["prob_adj"], 7126)]
     );
 
-    console.log("preproc pipeline", processedConv1, processedConv2, probAdj);
+
     
     return {
         conv1Data: processedConv1,
@@ -37,9 +37,9 @@ export function indexingFeatures(
 ){
     // Convert graph to adjacency matrix and adjacency list
     const mat = graphToMatrix(graph);
-    console.log("indexed mat", mat);
+
     const adjList = graphToAdjList(mat);
-    console.log("indexed adjlist", adjList);
+
 
     //add a self loop
     for(let i=0; i<adjList.length; i++){
@@ -88,7 +88,7 @@ export function indexingFeatures(
         }
     }
 
-    //console.log("sets", addedConv1Nodes, addedConv2Nodes, addedFeatureNodes)
+
     const sets = [addedConv1Nodes, addedConv2Nodes, addedFeatureNodes]
 
     return {graph: computeGraph, sets: sets};

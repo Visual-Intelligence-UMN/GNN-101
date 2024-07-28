@@ -20,7 +20,6 @@ function graph_list_generate(num: number) {
   for (let i = 0; i < num; i++) {
     res[`graph_${i}`] = `./json_data/graphs/input_graph${i}.json`;
   }
-  console.log("Graphs List", res);
   return res;
 }
 

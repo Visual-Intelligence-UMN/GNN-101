@@ -74,7 +74,6 @@ export default function Home() {
 
 
     function handleGraphSelection(e: React.ChangeEvent<HTMLSelectElement>): void {
-        console.log("graph handler", e.target.value);
         setSelectedGraph(e.target.value);
         setChangedG(true);
         setProbabilities([]);
@@ -138,7 +137,6 @@ export default function Home() {
                                         } else {
                                             setSelectedGraph("twitch_EN");
                                         }
-                                        console.log("selectedGraph from selector", selectedGraph);
                                     }}
                                     OptionList={Object.keys(modelList)}
                                 />

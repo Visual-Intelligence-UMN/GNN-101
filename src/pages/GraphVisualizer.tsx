@@ -48,7 +48,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
   const select = parse ? parse[1] : '';
   const location = loadNodesLocation(0, select);
 
-  console.log("location graphVIs", location)
+
 
   
   
@@ -62,9 +62,9 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
       
       
       if (intmData != null) {
-        console.log("From Visualizer:", intmData);
+
       }
-      console.log("path", graph_path);
+
       let allNodes: any[] = [];
       const offset = 600;
       const margin = { top: 10, right: 30, bottom: 30, left: 40 };
@@ -93,8 +93,8 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
 
       graphs.forEach((data, i) => {
-        console.log("we are at position", i);
-        console.log(data);
+
+
 
         let xOffset = (i - 2.5) * offset;
         if (i >= 4) {
@@ -379,7 +379,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             .attr('opacity', 0.5);
 
             const absMax = findAbsMax(value);
-           console.log("array value", value)
+
 
            let cst:any = null;
           const cstOffset = 25;
@@ -395,7 +395,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
           colorSchemes.push(cst);
 
-          console.log("colorSchemes", colorSchemes);
+
 
           // doesn't show the text, need to be fixed 
           if (i === graphs.length - 1) { // 6 layers in total, call the connect when reaching the last layer of convolutional layer.
@@ -412,7 +412,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
               .attr("opacity", 0);
 
             if (intmData) {
-              console.log('index is',i)
+
               featureVisualizer(svg, allNodes, offset, height, graphs, 900, 600, 15, 10, 3, 20, colorSchemes, 0); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
               //function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, graphs: any[], moveOffset: number, fcLayerMoveOffset: number, rectWidth: number, firstLayerRectHeight: number, rectHeight: number, outputLayerRectHeight: number)
             }
@@ -499,7 +499,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
     if (svgRef.current && !isLoading) {
       updateTextElements(svgRef.current, selectedButtons);
     }
-    console.log("selectBtn", selectedButtons);
+
   }, [selectedButtons, isLoading]);
 
   return (

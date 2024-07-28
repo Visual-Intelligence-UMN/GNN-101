@@ -247,7 +247,6 @@ export function outputVisualizer(
     // }
 
 
-    console.log(calculatedData);
     const calculatedFeatureGroup = svg
         .append("g")
         .attr("transform", `translate(${node.x - temp}, ${node.y})`);
@@ -1528,7 +1527,6 @@ function weightAnimation(
 
         event.stopPropagation();
         state.isPlaying = !state.isPlaying;
-        console.log(state.isPlaying);
         if(state.isPlaying)injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_pause.svg");
         else injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_play.svg")
         if (state.isPlaying && state.isClicked) {
@@ -1793,9 +1791,6 @@ export function matrixMultiplication(matrix_a: any[], matrix_b: any[]) {
     const colsB = matrix_b[0].length;
 
     if (colsA !== rowsB) {
-        console.log(matrix_a.length, matrix_a[0].length);
-        console.log(matrix_b.length, matrix_b[0].length);
-        console.log("can't do");
         return [];
     }
 
@@ -2225,7 +2220,6 @@ export function nodeOutputVisualizer(
         startCoordList.push(s);
     }
 
-    console.log(calculatedData);
     const calculatedFeatureGroup = svg
         .append("g")
         .attr("transform", `translate(${xPos - temp - moveOffset}, ${node.y})`);

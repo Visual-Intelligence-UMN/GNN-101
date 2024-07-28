@@ -48,7 +48,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
   const location = loadNodesLocation(1, select);
   
   if (intmData != null) {
-    console.log("From Visualizer:", intmData);
+
   }
   
   useEffect(() => {
@@ -59,9 +59,9 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
       
       
       if (intmData != null) {
-        console.log("From Visualizer:", intmData);
+
       }
-      console.log("path", graph_path);
+
       let allNodes: any[] = [];
       const offset = 600;
       const margin = { top: 10, right: 30, bottom: 30, left: 40 };
@@ -85,8 +85,8 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
           return;
         }
 
-        console.log("i", i);
-        console.log(data);
+
+
 
         let xOffset = (i - 2.5) * offset;
 
@@ -362,7 +362,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
              }
      
              else {
-              console.log("AWD", value,absMax,text,i)
+
                cst = buildLegend(myColor, absMax, text+" Color Scheme", text_x - 50, text_y + cstOffset, g1);
              }
    
@@ -470,7 +470,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
     if (svgRef.current && !isLoading) {
       updateTextElements(svgRef.current, selectedButtons);
     }
-    console.log("selectBtn", selectedButtons);
+
   }, [selectedButtons, isLoading]);
 
   return (
