@@ -562,7 +562,7 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
     }
 
     moveNextLayer(svg, movedNode, currMoveOffset, -1);
-    movedNode = null;
+
     showAllLinks(allNodes);
     resetNodes(allNodes, convNum);
     state.isClicked = false;
@@ -1038,17 +1038,17 @@ export function featureVisualizer(
             event.stopPropagation(); // Prevent the click event from bubbling up
 
 
-            if (movedNode === node) {
-              return; // Do nothing if the node is already moved
-            }
+            // if (movedNode === node) {
+            //   return; // Do nothing if the node is already moved
+            // }
           
 
-            if (movedNode) {
-              // Move back the previously moved node and its layer
-              moveNextLayer(svg, movedNode, currMoveOffset, -1)
-              state.isClicked = false; 
-              movedNode = null;
-            }
+            // if (movedNode) {
+            //   // Move back the previously moved node and its layer
+            //   moveNextLayer(svg, movedNode, currMoveOffset, -1)
+            //   state.isClicked = false; 
+            //   movedNode = null;
+            // }
 
             
             moveNextLayer(svg, node, currMoveOffset, 1);

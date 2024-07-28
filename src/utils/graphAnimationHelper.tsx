@@ -144,7 +144,8 @@ export function graphVisDrawMatrixWeight(
             .attr("class", "tempath to-be-removed")
             .style("fill", "none")
             .attr("stroke", "black").attr("id", `tempath${currentStep}`)
-            .attr("stroke-width", 2).attr("stroke", myColor(Xv[j])).lower();
+            .attr("stroke-width", 2).attr("stroke", myColor(Xv[j])).lower()
+            .style("opacity", 0)
 
         g
             .append("path")
@@ -152,7 +153,8 @@ export function graphVisDrawMatrixWeight(
             .attr("class", "tempath to-be-removed")
             .style("fill", "none")
             .attr("stroke", "black").attr("id", `tempath${currentStep}`)
-            .attr("stroke-width", 2).attr("stroke", myColor(Xv[j])).lower();
+            .attr("stroke-width", 2).attr("stroke", myColor(Xv[j])).lower()
+            .style("opacity", 0)
     }
 }
 
@@ -183,22 +185,12 @@ export function drawGraphVisWeightVector(weightMatrixPositions: number[][][], re
                             .attr("id", `columnUnit-${j}`);
 
 }
+export function displayerHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], i: number) {
 
-
-
-export function hoverOverHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][]) {
-
-
-
-
-    
-
-    for (let i = 0; i < node.features.length; i++) {
-        d3.select(`.calculatedFeatures${i}`)
-            .on("mouseover", function () {
-                if (!state.isClicked) {
-                    return;
+                if (!g.selectAll) {
+                    g = d3.selectAll(g)
                 }
+
                 d3.select(".graph-displayer").attr("opacity", 1);
 
 
@@ -209,7 +201,7 @@ export function hoverOverHandler(node: any, aggregatedData: any, state: State, g
                 
 
         
-
+                
 
                 drawGraphVisWeightVector(weightsLocation, wmRectL, weights, index, g, i)
 
@@ -376,6 +368,30 @@ export function hoverOverHandler(node: any, aggregatedData: any, state: State, g
 
 
 
+    }
+
+
+export function hoverOverHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][]) {
+
+    
+
+    for (let i = 0; i < node.features.length; i++) {
+        d3.select(`.calculatedFeatures${i}`)
+            .on("mouseover", function () {
+                if (!state.isClicked) {
+                    return;
+                }
+                d3.selectAll(".calculatedRect").style("opacity", 0.2)
+                d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1)
+                d3.selectAll(`#tempath${i}`).style("opacity", 1);
+                displayerHandler(node, aggregatedData, state, g, displayHeight, rectL, wmRectL, myColor, weights, index, weightsLocation, i)
+
+
+
+
+
+
+
     })
             .on("mouseout", function () {
                 if (!state.isClicked) {
@@ -385,8 +401,9 @@ export function hoverOverHandler(node: any, aggregatedData: any, state: State, g
                 d3.selectAll(".graph-displayer").attr("opacity", 0);
                 d3.selectAll(`#weightUnit-${i}`).style("opacity", 0.3).raise();
                 d3.selectAll(`#columnUnit-${i}`).style("opacity", 0).raise();
-                d3.selectAll(`#tempath${i}`).attr("opacity", 0).raise();
+                d3.selectAll(`#tempath${i}`).style("opacity", 0).raise();
                 d3.selectAll(".weightUnit").style("opacity", 1);
+                d3.selectAll(".calculatedRect").style("opacity", 1)
                 
 
             });

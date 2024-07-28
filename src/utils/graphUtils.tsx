@@ -21,7 +21,7 @@ import { stat, truncateSync } from "fs";
 
 import { drawActivationExplanation } from "./matInteractionUtils";
 import { computeMatrixLocations, drawMatrixWeight, drawWeightMatrix } from "./matAnimateUtils";
-import { graphVisDrawActivationExplanation, graphVisDrawMatrixWeight, hoverOverHandler } from "./graphAnimationHelper";
+import { graphVisDrawActivationExplanation, graphVisDrawMatrixWeight, displayerHandler, hoverOverHandler} from "./graphAnimationHelper";
 
 export const pathColor = d3
     .scaleLinear<string>()
@@ -212,7 +212,7 @@ export function outputVisualizer(
             `translate(${node.x - 100}, ${node.y - 25}) rotate(-90)`
         );
 
-    let temp = 475;
+    let temp = 600;
 
     let calculatedData: number[] = [];
     for (let i = 0; i < 2; i++) {
@@ -230,7 +230,7 @@ export function outputVisualizer(
             node.x +
             prevRectHeight * i -
             offset -
-            moveOffset + temp - 215,
+            moveOffset - temp + 855,
             node.y - 15,
         ];
         startCoordList.push(s);
@@ -263,7 +263,7 @@ export function outputVisualizer(
         .attr("height", rectWidth)
         .attr(
             "class",
-            (d: number, i: number) => `calculatedFeatures${i} to-be-removed bias`
+            (d: number, i: number) => `calculatedFeatures${i} to-be-removed bias calculatedRect`
         )
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 1)
@@ -289,14 +289,14 @@ export function outputVisualizer(
     }
     const math = create(all, {});
     const wMat = math.transpose(allWeights[3]);
-    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, rectHeight, node.features.length, [wMat], 0);
+    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, rectHeight / 3, node.features.length, [wMat], 0);
 
 
     setTimeout(() => {
         if (!state.isClicked) {
             return;
         }
-        drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, 1, rectHeight, rectHeight, node.features.length, [wMat], 0, myColor, svg, weightsLocation);
+        drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, 1, rectHeight / 3, rectHeight / 3, node.features.length, [wMat], 0, myColor, svg, weightsLocation);
         if (state.isClicked) {
         d3.selectAll(".bias").style("opacity", 1);
         d3.selectAll(".softmax").attr("opacity", 0.07);
@@ -331,16 +331,50 @@ export function outputVisualizer(
 
     hoverOverHandler(node, calculatedData, state, g5, DisplayHeight, rectHeight, (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation)
 
-
-
-
-
+    let outputData = [];
+    for (let i = 0; i < calculatedData.length; i++) {
+        outputData.push(calculatedData[i] + bias[i])
+    }
 
     const Xt = weights;
 
+
+
+    const outputGroup = svg
+        .append("g")
+        .attr("transform", `translate(${node.x + 150}, ${node.y - 30})`);
+
+    outputGroup.selectAll("rect")
+        .data(outputData)
+        .enter()
+        .append("rect")
+        .attr("class", "bias to-be-removed")
+        .attr("x", (d: any, i: number) => i * rectHeight + 5 - moveOffset)
+        .attr("y", 0)
+        .attr("width", rectHeight)
+        .attr("height", rectWidth)
+        .style("fill", (d: number) => myColor(d))
+        .style("stroke-width", 1)
+        .style("stroke", "grey")
+        .style("opacity", 0);
+
+    outputGroup.append("text")
+        .attr("x", 5 - moveOffset)
+        .attr("y", 28)
+        .text("Matmul")
+        .style("fill", "gray")
+
+        .style("font-size", "12px")
+        .attr("class", "bias to-be-removed")
+
+        .style("opacity", 0);
+
+
+
+
     const BiasGroup = svg
         .append("g")
-        .attr("transform", `translate(${node.x - 200}, ${node.y + 30})`);
+        .attr("transform", `translate(${node.x}, ${node.y + 30})`);
 
     BiasGroup.selectAll("rect")
         .data(bias)
@@ -368,6 +402,9 @@ export function outputVisualizer(
         .style("opacity", 0);
 
     setTimeout(() => {
+        if (!state.isClicked) {
+            return;
+        }
 
         weightAnimation(
             svg,
@@ -375,6 +412,7 @@ export function outputVisualizer(
             startCoordList,
             endCoordList,
             Xt,
+            calculatedData,
             offset,
             height,
             moveOffset,
@@ -383,13 +421,17 @@ export function outputVisualizer(
             state,
             weightsLocation,
             intervalID,
+            allWeights,
             mode
         );
 
-        let start_x = node.x + 40 + 5 - temp;
+        let start_x = node.x + 170 - temp;
         let start_y = node.y - 22.5;
-        let end_x = node.x + 200 - 40 - 5 - temp + 50;
+        let end_x = node.x + 300 - 10 - 5 - temp + 50;
         let end_y = node.y - 22.5;
+    
+
+
 
         let control_x = (start_x + end_x) / 2;
         let control_y = start_y + 50;
@@ -400,7 +442,7 @@ export function outputVisualizer(
                     .append("path")
                     .attr(
                         "d",
-                        `M${start_x + 20 * i - 30},${start_y + 7.5
+                        `M${start_x + 20 * i},${start_y + 7.5
                         } Q${control_x},${control_y} ${end_x - 20 * j},${end_y + 7.5
                         }`
                     )
@@ -424,10 +466,9 @@ export function outputVisualizer(
 
         let color = calculateAverage(node.features); // to be determined
 
-        start_y = node.y + 40;
-        start_x = start_x - moveOffset + temp - 200;
-        end_x = end_x - 200;
-
+        start_y += 60
+        start_x -= 125
+        end_x -= 180;
         let control1_x = start_x + (end_x - start_x) * 0.2;
         let control1_y = start_y;
         let control2_x = start_x + (end_x - start_x) * 0.4;
@@ -445,7 +486,28 @@ export function outputVisualizer(
             .style("stroke-width", 1)
             .style("fill", "none")
             .attr("class", "bias to-be-removed")
-            .style("opacity", 0);
+            .style("opacity", 1);
+
+
+            start_y -= 60;
+            const calculatedToFinal = svg
+            .append("path")
+            .attr(
+                "d",
+                `M${start_x},${start_y} L ${end_x},${end_y}`
+            )
+            .style("stroke", pathColor(color))
+            .style("opacity", 0.7)
+            .style("stroke-width", 1)
+            .style("fill", "none")
+            .attr("class", "bias to-be-removed")
+            .style("opacity", 1);
+
+
+
+            start_y = node.y + 40;
+            start_x = start_x - moveOffset + temp - 205;
+            end_x = end_x - 150;
 
 
 
@@ -455,11 +517,12 @@ export function outputVisualizer(
                 "d",
                 `M${start_x + 6},${start_y - 65} L${end_x},${end_y}`
             )
-            .style("stroke", pathColor(color))
+            .style("stroke", "black")
             .style("stroke-width", 1)
             .style("fill", "none")
             .attr("class", "output-path to-be-removed")
-            .attr("opacity", 0);
+            .attr("opacity", 1)
+            .lower();
 
 
 
@@ -664,7 +727,7 @@ export function calculationVisualizer(
     state: State,
     mode: number
 ) {
-    console.log("CWAcWA", state.isClicked)
+
 
 
     let intervalID = 0;
@@ -808,7 +871,7 @@ export function calculationVisualizer(
         .attr("height", rectWidth)
         .attr(
             "class",
-            (d: number, i: number) => `calculatedFeatures${i} to-be-removed aniRect`
+            (d: number, i: number) => `calculatedFeatures${i} to-be-removed aniRect calculatedRect`
         )
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 0.1)
@@ -851,6 +914,9 @@ export function calculationVisualizer(
     }
 
     let matrixRectSize = rectHeight;
+    if (mode === 1 && node.graphIndex === 1) {
+        matrixRectSize /= 2
+    }
     let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, matrixRectSize, node.features.length, weights, node.graphIndex - 1);
 
     setTimeout(()=> {
@@ -898,8 +964,7 @@ export function calculationVisualizer(
         .attr("opacity", 0)
         .lower();
 
-    hoverOverHandler(node, aggregatedData, state, g4, displayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, weights, node.graphIndex - 1, weightsLocation)
-
+    
 
 
 
@@ -966,7 +1031,6 @@ export function calculationVisualizer(
 
 
     setTimeout(() => {
-        console.log("AWDAWDAD,", state.isClicked)
         if (!state.isClicked) {
             return;
         }
@@ -977,6 +1041,7 @@ export function calculationVisualizer(
             startCoordList,
             endCoordList,
             currentWeights,
+            aggregatedData,
             offset,
             height,
             moveOffset,
@@ -985,8 +1050,11 @@ export function calculationVisualizer(
             state,
             weightsLocation,
             intervalID,
+            weights,
             mode
         );
+        hoverOverHandler(node, aggregatedData, state, g4, displayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, weights, node.graphIndex - 1, weightsLocation)
+
 
 
         if (node.relatedNodes) {
@@ -1048,7 +1116,7 @@ export function calculationVisualizer(
             const aggregatedToCalculated = g3
                 .append("path")
                 .attr("d", `M${start_x},${start_y} ${end_x},${end_y}`)
-                .style("stroke", pathColor(color))
+                .style("stroke", "black")
                 .style("stroke-width", 1)
                 .style("fill", "none")
                 .attr("class", "relu to-be-removed output-path")
@@ -1074,7 +1142,7 @@ export function calculationVisualizer(
             const calculatedToFinal = g3
                 .append("path")
                 .attr("d", `M${start_x},${start_y} ${end_x},${end_y}`)
-                .style("stroke", pathColor(color))
+                .style("stroke", "black")
                 .style("stroke-width", 1)
                 .style("fill", "none")
                 .attr("class", "relu to-be-removed")
@@ -1102,7 +1170,7 @@ export function calculationVisualizer(
                     `M${start_x},${start_y} C ${control1_x} ${control1_y}, ${control2_x} ${control2_y} ${end_x - 30
                     },${end_y}`
                 )
-                .style("stroke", pathColor(color))
+                .style("stroke", "black")
                 .style("opacity", 0.7)
                 .style("stroke-width", 1)
                 .style("fill", "none")
@@ -1358,8 +1426,6 @@ export function moveNextLayer(
 
 
 
-
-
 }
 
 function weightAnimation(
@@ -1367,6 +1433,7 @@ function weightAnimation(
     node: any, startCoordList: number[][],
     endCoordList: number[][],
     weights: any,
+    aggregatedData: any,
     offset: number,
     height: number,
     moveOffset: number,
@@ -1375,6 +1442,7 @@ function weightAnimation(
     state: State,
     weightsLocation: number[][][],
     intervalID: any,
+    allWeights: number[][][],
     mode: number
 ) {
 
@@ -1454,6 +1522,10 @@ function weightAnimation(
 
     let featureLength = node.features.length;
     let prevLayerFeatureLength = node.relatedNodes[0].features.length;
+
+    for (let j = 0; j < endNumber; j++) {
+        graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, j, myColor, weightsLocation, node.features.length, svg)
+    }
     function startAnimation(endNumber: number) {
         if (!state.isClicked || !state.isPlaying) {
             return;
@@ -1471,7 +1543,7 @@ function weightAnimation(
 
 
             d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1);
-            d3.selectAll(`#tempath${i - 1}`).attr("opacity", 0);
+            d3.selectAll(`#tempath${i - 1}`).style("opacity", 0);
 
             if (state.isPlaying) {
                 // GraphViewDrawPaths(
@@ -1488,9 +1560,11 @@ function weightAnimation(
                 //     prevLayerFeatureLength,
                 //     state
                 // );
+                // displayerHandler(node, aggregatedData, state, svg, 300, (20 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, allWeights, node.graphIndex, weightsLocation, i)
 
 
-                graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg)
+                
+                d3.selectAll(`#tempath${i}`).style("opacity", 1);
                 d3.selectAll(`#weightUnit-${i - 1}`).style("opacity", 0.3).lower();
                 d3.select(`#columnUnit-${i - 1}`).style("opacity", 0).lower();
                 d3.selectAll(`#weightUnit-${i}`).style("opacity", 1).raise();
@@ -2125,12 +2199,13 @@ export function nodeOutputVisualizer(
         .attr("height", rectWidth)
         .attr(
             "class",
-            (d: number, i: number) => `calculatedFeatures${i} to-be-removed`
+            (d: number, i: number) => `calculatedFeatures${i} to-be-removed calculatedRect bias`
         )
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 1)
         .style("stroke", "grey")
-        .style("opacity", 1);
+     
+        .style("opacity", 0);
 
     calculatedFeatureGroup.append("text")
         .attr("x", 5)
@@ -2139,9 +2214,9 @@ export function nodeOutputVisualizer(
         .style("fill", "gray")
 
         .style("font-size", "12px")
-        .attr("class", "bia to-be-removed")
+        .attr("class", "bias to-be-removed")
 
-        .style("opacity", 1);
+        .style("opacity", 0);
 
     let endCoordList = [];
 
@@ -2167,12 +2242,12 @@ export function nodeOutputVisualizer(
         d3.selectAll(".output-path").attr("opacity", 1);
         d3.selectAll(".softmaxLabel").attr("opacity", 1);
         }
-    })
+    }, 1500)
 
 
     const g5 = svg
         .append("g")
-        .attr("transform", `translate(${endCoordList[0][0] - 90}, ${endCoordList[0][1] - 90})`);
+        .attr("transform", `translate(${endCoordList[0][0]}, ${endCoordList[0][1] - 150})`);
 
     let RectL = 0.5;
     if (mode === 1) {
@@ -2202,9 +2277,43 @@ export function nodeOutputVisualizer(
 
     const Xt = math.transpose(weights);
 
+    let outputData = [];
+    for (let i = 0; i < calculatedData.length; i++) {
+        outputData.push(calculatedData[i] + bias[i])
+    }
+
+    const outputGroup = svg
+        .append("g")
+        .attr("transform", `translate(${xPos - temp - moveOffset + 170}, ${node.y - 30})`);
+
+    outputGroup.selectAll("rect")
+        .data(outputData)
+        .enter()
+        .append("rect")
+        .attr("class", "bias to-be-removed")
+        .attr("x", (d: any, i: number) => i * rectHeight + 5)
+        .attr("y", 0)
+        .attr("width", rectHeight)
+        .attr("height", rectWidth)
+        .style("fill", (d: number) => myColor(d))
+        .style("stroke-width", 1)
+        .style("stroke", "grey")
+        .style("opacity", 0);
+
+    outputGroup.append("text")
+        .attr("x", 5)
+        .attr("y", 28)
+        .text("Matmul Result")
+        .style("fill", "gray")
+
+        .style("font-size", "12px")
+        .attr("class", "bias to-be-removed")
+
+        .style("opacity", 0);
+
     const BiasGroup = svg
         .append("g")
-        .attr("transform", `translate(${xPos - temp - moveOffset - 225}, ${node.y + 30})`);
+        .attr("transform", `translate(${xPos - temp - moveOffset}, ${node.y + 30})`);
 
     BiasGroup.selectAll("rect")
         .data(bias)
@@ -2232,6 +2341,9 @@ export function nodeOutputVisualizer(
         .style("opacity", 0);
 
     setTimeout(() => {
+        if (!state.isClicked) {
+            return;
+        }
 
         weightAnimation(
             svg,
@@ -2239,6 +2351,7 @@ export function nodeOutputVisualizer(
             startCoordList,
             endCoordList,
             Xt,
+            calculatedData,
             offset,
             height,
             moveOffset,
@@ -2247,11 +2360,12 @@ export function nodeOutputVisualizer(
             state,
             weightsLocation,
             intervalID,
+            allWeights,
             mode
         );
 
         let start_x = xPos - temp - moveOffset
-            + prevRectHeight * 4 - 40;
+            + prevRectHeight * 4 + 140;
         let start_y = node.y - 22.5;
         let end_x = xPos - temp - moveOffset
             + prevRectHeight * 4 + 200;
@@ -2292,8 +2406,9 @@ export function nodeOutputVisualizer(
         let color = calculateAverage(node.features); // to be determined
 
         start_y = node.y + 40;
-        start_x = start_x - 200;
-        end_x = end_x - 200;
+        start_x = xPos - temp - moveOffset + node.features.length * rectHeight;
+        end_x -= node.features.length * rectHeight;
+
 
         let control1_x = start_x + (end_x - start_x) * 0.2;
         let control1_y = start_y;
@@ -2321,7 +2436,33 @@ export function nodeOutputVisualizer(
             .append("path")
             .attr(
                 "d",
-                `M${start_x - 20},${start_y - 65} L${end_x},${end_y}`
+                `M${start_x - 270},${start_y - 65} L${end_x - 195},${end_y}`
+            )
+            .style("stroke", pathColor(color))
+            .style("stroke-width", 1)
+            .style("fill", "none")
+            .attr("class", "output-path to-be-removed")
+            .attr("opacity", 1)
+            .lower();
+
+            const calculatedToOutput = svg
+            .append("path")
+            .attr(
+                "d",
+                `M${end_x - 130},${start_y - 65} L${end_x},${end_y}`
+            )
+            .style("stroke", pathColor(color))
+            .style("stroke-width", 1)
+            .style("fill", "none")
+            .attr("class", "output-path to-be-removed")
+            .attr("opacity", 1)
+            .lower();
+
+            const outputToFinal = svg
+            .append("path")
+            .attr(
+                "d",
+                `M${end_x + 45},${start_y - 65} L${end_x + 200},${end_y}`
             )
             .style("stroke", pathColor(color))
             .style("stroke-width", 1)
