@@ -48,10 +48,10 @@ export function visualizeGraphClassifierFeatures(
     let resultVis: any = null; //tp manage result visualizer
     //load weights and bias
     const dataPackage = loadWeights();
-
+    console.log("weights, data", dataPackage);
     const weights = dataPackage["weights"];
     const bias = dataPackage["bias"];
-
+    console.log("weights, data", weights, bias);
     //table that manage all feature visualizers for GCNConv
     let featureVisTable: SVGElement[][] = [[], [], [], []];
     //table that manage color schemes
@@ -74,8 +74,8 @@ export function visualizeGraphClassifierFeatures(
         GCNConv3: [],
     };
     var schemeLocations: any = [];
-
-
+    console.log("Received", maxVals);
+    console.log("adjList", adjList);
 
     //--------------------------------DRAW FRAMES--------------------------------
     const framePackage = drawMatrixPreparation(graph, locations, 400);
@@ -173,7 +173,7 @@ export function visualizeGraphClassifierFeatures(
     let poolingOverEvent: any = null;
     let poolingOutEvent: any = null;
     d3.selectAll(".mats, .switchBtn").on("click", function (event, d) {
-
+        console.log("click mats switchBtn")
         if (event.target && event.target.id === "btn") {
             return;
         }
@@ -200,18 +200,18 @@ export function visualizeGraphClassifierFeatures(
             poolingOutEvent = recoverPackage.poolingOutEvent;
             poolingOverEvent = recoverPackage.poolingOverEvent;
             colorSchemesTable = recoverPackage.colorSchemesTable;
-
+            console.log("interval .mats", intervalID);
             clearInterval(intervalID);
         }
     });
 
     function setIntervalID(id: any) {
         intervalID = id;
-
+        console.log("Interval ID set to:", intervalID);
     }
 
     function getIntervalID(){
-
+        console.log("get interval ID from vGCF", intervalID);
         return intervalID;
     }
 
@@ -223,7 +223,7 @@ export function visualizeGraphClassifierFeatures(
             lock = true;
             event.stopPropagation();
             dview = true;
-
+            console.log("click! - fVis", dview, lock);
             //lock all feature visualizers and transparent paths
             d3.selectAll(".oFeature")
                 .style("pointer-events", "none")
@@ -269,7 +269,7 @@ export function visualizeGraphClassifierFeatures(
             featureVisTable = featureVisPack.featureVisTable;
             features = featureVisPack.features;
             intervalID = featureVisPack.getIntervalID();
-
+            console.log("interval", intervalID);
             //path connect - connect intermediate feature vis to current feature vis
         }
     });
@@ -336,7 +336,7 @@ export function visualizeGraphClassifierFeatures(
                     lock = true;
                     event.stopPropagation();
                     dview = true;
-
+                    console.log("click! - fVis", dview, lock);
                     //lock all feature visualizers and transparent paths
                     const outputVisPack = outputVisClick(
                         resultVis,
@@ -383,10 +383,10 @@ export function visualizeNodeClassifierFeatures(
     let resultVis: any = null; //tp manage result visualizer
     //load weights and bias
     const dataPackage = loadNodeWeights();
-
+    console.log("weights, data", dataPackage);
     const weights = dataPackage["weights"];
     const bias = dataPackage["bias"];
-
+    console.log("weights, data", weights, bias);
     //table that manage all feature visualizers for GCNConv
     let featureVisTable: SVGElement[][] = [[], [], [], [], []];
     //table that manage color schemes
@@ -411,8 +411,8 @@ export function visualizeNodeClassifierFeatures(
         results: []
     };
     var schemeLocations: any = [];
-
-
+    console.log("Received", maxVals);
+    console.log("adjList", adjList);
 
     //--------------------------------DRAW FRAMES--------------------------------
     const framePackage = drawMatrixPreparation(graph, locations, 800);
@@ -471,7 +471,7 @@ export function visualizeNodeClassifierFeatures(
     let paths = GCNConvPackage.paths;
     let resultPaths = GCNConvPackage.resultPaths;
 
-
+    console.log("resultPaths in nc", resultPaths)
 
     // clearInterval(intervalID);
 
@@ -595,18 +595,18 @@ export function visualizeNodeClassifierFeatures(
             poolingOutEvent = recoverPackage.poolingOutEvent;
             poolingOverEvent = recoverPackage.poolingOverEvent;
             colorSchemesTable = recoverPackage.colorSchemesTable;
-
+            console.log("interval .mats", intervalID);
             clearInterval(intervalID);
         }
     });
 
     function setIntervalID(id: any) {
         intervalID = id;
-
+        console.log("Interval ID set to:", intervalID);
     }
 
     function getIntervalID(){
-
+        console.log("get interval ID from vGCF", intervalID);
         return intervalID;
     }
 
@@ -618,7 +618,7 @@ export function visualizeNodeClassifierFeatures(
             lock = true;
             event.stopPropagation();
             dview = true;
-
+            console.log("click! - fVis", dview, lock);
             //lock all feature visualizers and transparent paths
             d3.selectAll(".resultVis")
                 .style("pointer-events", "none")
@@ -668,7 +668,7 @@ export function visualizeNodeClassifierFeatures(
             featureVisTable = featureVisPack.featureVisTable;
             features = featureVisPack.features;
             intervalID = featureVisPack.getIntervalID();
-
+            console.log("interval", intervalID);
             //path connect - connect intermediate feature vis to current feature vis
         }
     });
@@ -680,7 +680,7 @@ export function visualizeNodeClassifierFeatures(
             lock = true;
             event.stopPropagation();
             dview = true;
-
+            console.log("click! - fVis", dview, lock);
             //lock all feature visualizers and transparent paths
             d3.selectAll(".resultVis")
                 .style("pointer-events", "none")
@@ -706,14 +706,14 @@ export function visualizeNodeClassifierFeatures(
             const node = Number(d3.select(this).attr("node"));
             translateLayers(3, 250);
 
-
+            console.log("CST before modification", colorSchemesTable);
             colorSchemesTable.forEach((d: any, i: any) => {
-
+                console.log(
                     `Before modification: Element ${i} opacity`,
                     d.style.opacity
                 );
                 d.style.opacity = "0.2";
-
+                console.log(
                     `After modification: Element ${i} opacity`,
                     d.style.opacity
                 );
@@ -833,7 +833,7 @@ export function visualizeNodeClassifierFeatures(
             const prevCon3Val:number[] = [conv3[node][0], conv3[node][1]];
             const vectorAfterMul = math.multiply(prevCon3Val, math.transpose(matMulWeights));
 
-
+            console.log("data fetching in the NC result layer",
                 linBias,
                 matMulWeights,
                 nthOutputVals,
@@ -851,7 +851,7 @@ export function visualizeNodeClassifierFeatures(
             if(node < 17)clockwise = 1;
 
             //smart ui detections & transparent
-
+            console.log("smart ui", featureVisTable);
             //transparent prevLayer(featureVisTable[3]) && curLayer(featureVisTable[4])
             if(node<17){
                 //process prevLayer
@@ -899,7 +899,7 @@ export function visualizeNodeClassifierFeatures(
                   //  d3.select(".mats").style("pointer-events", "none");
                     const Xt = modelParams.weights[3];
                     const prevCon3Val:number[] = [conv3[node][0], conv3[node][1]];
-
+                    console.log("data fetching wv 1", prevCon3Val)
                     drawWeightMatrix(btnX, btnY+15, 1, 15, 15, featureChannels, [wMat], 0, myColor, g1, weightMatrixPostions);
                     drawWeightsVector(g, vectorAfterMul, outputCoord, 15, 10, 
                         myColor, wMat, startPathCoords, endPathCoords, curveDir, 
@@ -943,7 +943,7 @@ export function visualizeNodeClassifierFeatures(
                         d3.selectAll(`#weightUnit-${currentStep}`).style("opacity", 1).raise();
                         d3.select(`#columnUnit-${currentStep}`).style("opacity", 1).raise();
                         currentStep++;
-
+                        console.log("i", currentStep);
                         if (currentStep >= 4) {
                             d3.selectAll(".weightUnit").style("opacity", 1);
                             d3.selectAll(".columnUnit").style("opacity", 0);
@@ -999,7 +999,7 @@ export function visualizeNodeClassifierFeatures(
                 d3.selectAll(".removeRect").remove();
                 firstPlay = false;
               }
-
+                console.log("isPlaying", isPlaying);
                 event.stopPropagation();
                 if (intervalID) {
                     clearInterval(intervalID);
@@ -1055,10 +1055,10 @@ export function visualizeNodeClassifierFeatures(
 
 
                         const rectID = d3.select(this).attr("rectID");
-
+                        console.log("resultRect event", node, rectID);
                         const nthResult = result[node];
                         //data needed - pathMap(path inetraction), result and final for displayer
-
+                        console.log("data fetching result rect", pathMap, nthResult, nthOutputVals, titles[Number(rectID)]);
                         //path interaction
                         for(let i=0; i<pathMap.length; i++){
                             pathMap[i][rectID].style.opacity = "1";

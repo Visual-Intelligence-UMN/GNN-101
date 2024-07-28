@@ -22,7 +22,7 @@ export function drawCrossConnection(
     layerID: number
 ) {
     const rectH = 15;
-
+    console.log("layerID", layerID);
     let alocations = deepClone(locations);
     for (let i = 0; i < alocations.length; i++) {
         alocations[i][0] += firstVisSize;
@@ -34,7 +34,7 @@ export function drawCrossConnection(
         blocations[i][0] += gapSize;
     }
     // drawPoints(".mats", "red", blocations);
-
+    console.log("location length", alocations.length);
     //draw one-one paths
     for (let i = 0; i < alocations.length; i++) {
         d3.select(".mats")
@@ -55,7 +55,7 @@ export function drawCrossConnection(
                 const res = computeMids(alocations[i], blocations[j]);
                 const hpoint = res[0];
                 const lpoint = res[1];
-
+                console.log("control points", hpoint, lpoint);
                 d3.select(".mats")
                     .append("path")
                     .attr(
@@ -70,7 +70,7 @@ export function drawCrossConnection(
                     .attr("class", "crossConnection");
                 pts.push(hpoint);
                 pts.push(lpoint);
-
+                console.log(
                     "odata",
                     alocations[i],
                     blocations[i],
@@ -112,7 +112,7 @@ export function drawCrossConnection(
 
             return acc;
         }, {});
-
+    console.log("groupedPath", groupedPaths);
     return groupedPaths;
 }
 
@@ -124,7 +124,7 @@ export function computeMids(point1: any, point2: any) :[[number, number], [numbe
         [midX - 20, point1[1]],
         [midX + 20, point2[1]],
     ];
-
+    console.log("res", res);
     return res;
 }
 
@@ -136,7 +136,7 @@ export function computeMidsVertical(point1: any, point2: any) :[[number, number]
         [point1[0], midY],
         [point2[0], midY],
     ];
-
+    console.log("res", res);
     return res;
 }
 
@@ -193,7 +193,7 @@ export function drawMatrixPreparation(graph: any, locations: any, gridSize:numbe
 
         matFrames.push(r.node() as SVGElement);
     }
-
+    console.log("matFrames", matFrames);
     return { colFrames: colFrames, matFrames: matFrames };
 }
 
@@ -304,11 +304,11 @@ export function drawSingleGCNConvFeature(
         .attr("node", i)
         .attr("layerID", k + 1);
 
-
+    console.log("new", gcnFeature);
 
     //loop through each node
     let nodeMat = gcnFeature[i];
-
+    console.log("nodeMat", i, nodeMat);
     //where we met encounter issue
     for (let m = 0; m < featureChannels; m++) {
         const rect = g
@@ -370,7 +370,7 @@ export function drawColorSchremeSequence(infoTable:any, myColor:any){
     let colorSchemesTable:any = [];
 
     for(let i=0; i<layerTable.length; i++){
-
+        console.log("cst loop", i, myColor, valueTable[i],
             nameTable[i], xLocationTable[i], yLocationTable[i],
             layerTable[i])
         if(schemeTypeTable[i]=="binary"){
@@ -424,9 +424,9 @@ export function drawGCNConvGraphModel(
     const gcnFeatures = [conv1, conv2, conv3];
     //a table to save all rects in the last GCNConv layer
     let thirdGCN: any = Array.from({ length: featureChannels }, () => []);
-
-
-
+    console.log("thirdGCN", thirdGCN);
+    console.log("gcnf", gcnFeatures);
+    console.log("CONV1", conv1);
     for (let k = 0; k < 3; k++) {
         const rectH = 15;
         const rectW = 5;
@@ -472,7 +472,7 @@ export function drawGCNConvGraphModel(
             schemeLocations = sgfPack.schemeLocations;
             featureVisTable = sgfPack.featureVisTable;
         }
-
+        console.log("FVT", featureVisTable);
         if (k != 2) {
             // visualize cross connections btw 1st, 2nd, 3rd GCNConv
             paths = drawCrossConnection(
@@ -482,7 +482,7 @@ export function drawGCNConvGraphModel(
                 102,
                 k + 1
             );
-
+            console.log("grouped grouped", paths);
         } else {
             //visualize pooling layer
             const poolingPack = drawPoolingVis(
@@ -498,8 +498,8 @@ export function drawGCNConvGraphModel(
             one = poolingPack["one"];
             poolingVis = poolingPack["g"];
             poolingFrame = poolingPack["poolingFrame"];
-
-
+            console.log("poolingVis", poolingVis);
+            console.log("ONE", one);
             schemeLocations.push([one[0][0], 350]);
             //visualize last layer and softmax output
             const tlPack = drawTwoLayers(one, final, myColor, featureChannels);
@@ -508,17 +508,17 @@ export function drawGCNConvGraphModel(
             resultVis = tlPack["g1"];
             path1 = tlPack["path1"];
             fr1 = tlPack["fr1"];
-
+            console.log("AAA", aOne);
             if (aOne != undefined) {
                 schemeLocations.push([aOne[0][0], 350]);
             }
             schemeLocations.push([aOne[1][0] - 20, 350]);
         }
-
+        console.log("schemeLocations", schemeLocations);
         //drawPoints(".mats", "red", schemeLocations);
         //let max1 = findAbsMax(maxVals.conv1);
         let result = softmax(final);
-
+        console.log("debug", schemeLocations);
 
         //select layers
         const l1 = d3.select(`g#layerNum_1`);
@@ -570,7 +570,7 @@ export function drawGCNConvGraphModel(
         colorSchemesTable = drawColorSchremeSequence(infoTable, myColor);
     }
 
-
+    console.log("thirdGCN after filled", thirdGCN);
 
     return {
         locations: locations,
@@ -617,9 +617,9 @@ export function drawGCNConvNodeModel(
     const gcnFeatures = [conv1, conv2, conv3];
     //a table to save all rects in the last GCNConv layer
     let thirdGCN: any = Array.from({ length: featureChannels }, () => []);
-
-
-
+    console.log("thirdGCN", thirdGCN);
+    console.log("gcnf", gcnFeatures);
+    console.log("CONV1", conv1);
     let resultLabelsList: any;
     for (let k = 0; k < 3; k++) {
         const rectH = 15;
@@ -678,7 +678,7 @@ export function drawGCNConvNodeModel(
                 featureVisTable = sgfPack.featureVisTable;
             }
         }
-
+        console.log("FVT", featureVisTable);
         if (k != 2) {
             // visualize cross connections btw 1st, 2nd, 3rd GCNConv
             paths = drawCrossConnection(
@@ -688,7 +688,7 @@ export function drawGCNConvNodeModel(
                 152,
                 k + 1
             );
-
+            console.log("grouped grouped", paths);
         } else {
             //here's the place we draw the result layer
             //do locations tranformation
@@ -700,7 +700,7 @@ export function drawGCNConvNodeModel(
             //drawPoints(".mats", "red", layerLocations);
             resultLabelsList = resultPaths.resultLabelsList;
         }
-
+        console.log("schemeLocations", schemeLocations);
     }
 
     //select layers
@@ -746,7 +746,7 @@ export function drawGCNConvNodeModel(
 
     colorSchemesTable = drawColorSchremeSequence(infoTable, myColor);
 
-
+    console.log("thirdGCN after filled", thirdGCN);
 
     return {
         locations: locations,
@@ -774,7 +774,7 @@ export function drawPoolingVis(
     conv3: any,
     featureChannels: number
 ) {
-
+    console.log("thirdGCN from pooling vis", thirdGCN);
 
     let poolingFrame:any = null;
 
@@ -792,7 +792,7 @@ export function drawPoolingVis(
     const one = [[locations[0][0] + 102, midY + 2]];
     //drawPoints(".mats", "red", one);
     //draw the pooling layer
-
+    console.log("from feature vis", pooling);
     const gg = d3
         .select(".mats")
         .append("g")
@@ -825,9 +825,9 @@ export function drawPoolingVis(
             .attr("id", `${i}`)
             .on("mouseover", function (event) {
                 const id: number = Number(d3.select(this).attr("id"));
-
+                console.log("thirdGCN, mouseover", id, thirdGCN[id]);
                 //interact with pooling vis
-
+                console.log("poolingRect", poolingRects);
                 if(poolingRects!=null){
                     for (let ii = 0; ii < poolingRects.length; ii++) {
                         if (ii != id) {
@@ -902,19 +902,19 @@ export function drawPoolingVis(
                 }
 
                 //dummy data
-
+                console.log("fetch pooling conv3", conv3);
                 const matConv3: any = chunkArray(conv3, featureChannels);
-
+                console.log("fetch 1", matConv3);
                 const aMat = preprocessFloat32ArrayToNumber(matConv3);
-
+                console.log("fetch 2", aMat);
                 const matConv3t: any = transposeMat(aMat);
-
+                console.log("fecth 3", matConv3t);
                 const numFromFeatures: any = matConv3t[id];
-
+                console.log("fetch 4", numFromFeatures);
                 const numFromResult = pooling;
 
                 //draw rects based on the coordination
-
+                console.log("oover", yIncr, numRect);
                 const rectL = Math.abs(yIncr) - 3;
                 let color = "white";
                 for (let i = 0; i < numRect.length; i++) {
@@ -1031,7 +1031,7 @@ export function drawPoolingVis(
             })
             .on("mouseout", function (event) {
                 const id: number = Number(d3.select(this).attr("id"));
-
+                console.log("thirdGCN, mouseout", id, thirdGCN[id]);
 
                 if(poolingRects!=null){
                     for (let ii = 0; ii < poolingRects.length; ii++) {
@@ -1106,7 +1106,7 @@ export function drawPoolingVis(
     d3.selectAll("path").lower();
 
     g.on("mouseover", function (event, d) {
-
+        console.log("over", paths);
         //interaction with paths
         if (paths != null) {
             paths.forEach((div: HTMLElement) => {
@@ -1222,7 +1222,7 @@ export function drawTwoLayers(one: any, final: any, myColor: any, featureChannel
     //drawPoints(".mats","red",aOne);
     aOne[0][1] -= rectW / 2;
 
-
+    console.log("mat result", result);
     let cOne = deepClone(aOne);
 
     return { locations: [aOne[0], cOne[0]], g: g, g1: null, fr1:fr1.node(), path1:path1.node() };
@@ -1316,7 +1316,7 @@ export function drawResultLayer(
 
     //visualize paths
     let paths:any = [];
-
+    console.log("layerID", 4);
     let alocations = deepClone(locations);
     for (let i = 0; i < alocations.length; i++) {
         alocations[i][0] += 20;
@@ -1328,7 +1328,7 @@ export function drawResultLayer(
         blocations[i][0] += 202;
     }
     // drawPoints(".mats", "red", blocations);
-
+    console.log("location length", alocations.length);
     //draw one-one paths
     for (let i = 0; i < alocations.length; i++) {
         const path = d3.select(".mats")
@@ -1343,7 +1343,7 @@ export function drawResultLayer(
         paths.push(path.node() as SVGPathElement);
     }
 
-
+    console.log("result paths", paths);
 
     addLayerName(
         layerLocations,

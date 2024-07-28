@@ -5,7 +5,7 @@ import { gcd } from "mathjs";
 export function injectPlayButtonSVG(btn:any, btnX: number, btnY: number, SVGPath:string){
     btn.selectAll("*").remove();
     d3.xml(SVGPath).then(function(data) {
-
+        console.log("xml", data.documentElement)
         const play = btn!.node()!.appendChild(data.documentElement)
         d3.select(play).attr("x", btnX).attr("y", btnY).attr("class", "procVis ctrlBtn")
         .on("mouseover", function(event){
@@ -21,7 +21,7 @@ export function injectPlayButtonSVG(btn:any, btnX: number, btnY: number, SVGPath
 export function injectPlayButtonSVGForGraphView(btn:any, btnX: number, btnY: number, SVGPath:string){
     btn.selectAll("*").remove();
     d3.xml(SVGPath).then(function(data) {
-
+        console.log("xml", data.documentElement)
         const play = btn!.node()!.appendChild(data.documentElement)
         d3.select(play).attr("x", btnX).attr("y", btnY).attr("class", "vis-component")
         .on("mouseover", function(event){
@@ -36,7 +36,7 @@ export function injectPlayButtonSVGForGraphView(btn:any, btnX: number, btnY: num
 export function injectSVG(g:any, x: number, y: number, SVGPath:string, svgClass:string){
     g.selectAll("*").remove();
     d3.xml(SVGPath).then(function(data) {
-
+        console.log("xml", data.documentElement)
         const play = g!.node()!.appendChild(data.documentElement)
         d3.select(play).attr("x", x).attr("y", y).attr("class", svgClass)
     });

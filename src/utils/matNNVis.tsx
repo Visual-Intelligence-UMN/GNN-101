@@ -35,7 +35,7 @@ export function findAbsMax(arr: number[]) {
 
 //----------------------function for visualizing node classifier----------------------------
 async function initNodeClassifier(graph: any, features: any[][], intmData:any, graph_path:string, trainingNodes: number[])  {
-
+    console.log("start initNodeC");
     let colorSchemeTable: any = null;
     //a data structure to record the link relationship
     //fill up the linkMap
@@ -47,19 +47,19 @@ async function initNodeClassifier(graph: any, features: any[][], intmData:any, g
         result: number[][] = [],
         final = null;
 
-
+    console.log("intmData", intmData);
     if (intmData != null) {
         //max abs find
         let conv1Max = findAbsMax(intmData.conv1);
-
+        console.log("conv1Max", conv1Max);
         let conv2Max = findAbsMax(intmData.conv2);
-
+        console.log("conv2Max", conv2Max);
         let conv3Max = findAbsMax(intmData.conv3);
-
+        console.log("conv3Max", conv3Max);
         let finalMax = findAbsMax(intmData.final);
-
+        console.log("finalMax", finalMax);
         let resultMax = findAbsMax(intmData.result.map((arr:any) => Array.from(arr)).flat());
-
+        console.log("resultMax", resultMax, intmData.result.flat());
 
         colorSchemeTable = {
             conv1: conv1Max,
@@ -69,7 +69,7 @@ async function initNodeClassifier(graph: any, features: any[][], intmData:any, g
             result: resultMax
         };
 
-
+        console.log("From Visualizer:", intmData);
         conv1 = splitIntoMatrices(intmData.conv1, 4);
         conv2 = splitIntoMatrices(intmData.conv2, 4);
         conv3 = splitIntoMatrices(intmData.conv3, 2);
@@ -77,10 +77,10 @@ async function initNodeClassifier(graph: any, features: any[][], intmData:any, g
         final = splitIntoMatrices(intmData.final, 4);
     }
 
-
+    console.log("path ", graph_path);
 
     const gLen = graph.length;
-
+    console.log("gLen", gLen);
     const gridSize = 800;
     const margin = { top: 10, right: 80, bottom: 30, left: 80 };
     const width = 20 * gLen + 50 + 6 * 102 + 1200 * 2;
@@ -116,13 +116,13 @@ async function initNodeClassifier(graph: any, features: any[][], intmData:any, g
     // drawNodeAttributes(nodeAttrs, graph, 50);
 
     // const intervalID = featuresManager.getIntervalID();
-
+    // console.log("get interval ID init G", intervalID);
     // clearInterval(intervalID);
 
-
-
-
-
+    console.log("initNode", intmData, data, locations, adjList);
+    console.log("conv", conv1, conv2, conv3, final, result);
+    console.log("initNode CST", colorSchemeTable);
+    console.log("initNode features", features);
 
     //drawPoints(".mats", "red", locations);
 };
@@ -142,21 +142,21 @@ async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: str
         pooling: number[] = [],
         final = null;
 
-
+    console.log("intmData", intmData);
     if (intmData != null) {
         //max abs find
         let conv1Max = findAbsMax(intmData.conv1);
-
+        console.log("conv1Max", conv1Max);
         let conv2Max = findAbsMax(intmData.conv2);
-
+        console.log("conv2Max", conv2Max);
         let conv3Max = findAbsMax(intmData.conv3);
-
+        console.log("conv3Max", conv3Max);
         let poolingMax = findAbsMax(intmData.pooling);
-
+        console.log("poolingMax", poolingMax);
         let dropMax = findAbsMax(intmData.dropout);
-
+        console.log("dropMax", dropMax);
         let finalMax = findAbsMax(intmData.final);
-
+        console.log("finalMax", finalMax);
 
         colorSchemeTable = {
             conv1: conv1Max,
@@ -167,7 +167,7 @@ async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: str
             final: finalMax,
         };
 
-
+        console.log("From Visualizer:", intmData);
         conv1 = splitIntoMatrices(intmData.conv1);
         conv2 = splitIntoMatrices(intmData.conv2);
         conv3 = splitIntoMatrices(intmData.conv3);
@@ -175,12 +175,12 @@ async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: str
         final = intmData.final;
     }
 
+    console.log("from mat vis pooling", pooling);
 
-
-
+    console.log("path ", graph_path);
     let allNodes: any[] = [];
     const gLen = graph.length;
-
+    console.log("gLen", gLen);
     const gridSize = 400;
     const margin = { top: 10, right: 80, bottom: 30, left: 80 };
     const width = 20 * gLen + 50 + 6 * 102 + 1200 * 2;
@@ -215,7 +215,7 @@ async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: str
     drawNodeAttributes(nodeAttrs, graph, 150);
 
     const intervalID = featuresManager.getIntervalID();
-
+    console.log("get interval ID init G", intervalID);
     clearInterval(intervalID);
 };
 
@@ -224,22 +224,22 @@ export async function visualizeGraphClassifier(setIsLoading:any, graph_path:stri
     try {
         setIsLoading(true);
         // Process data
-
+        console.log("path matvis", graph_path);
         const data = await load_json(graph_path);
-
+        console.log("data matvis", data);
 
         //node attributes extraction
-
+        console.log("data.x", data.x);
         const nodeAttrs = getNodeAttributes(data);
 
-
+        console.log("node attr array", nodeAttrs);
 
         //accept the features from original json file
         const features = await get_features_origin(data);
-
+        console.log("o features", features);
 
         const processedData = await graph_to_matrix(data);
-
+        console.log("pData matvis", processedData);
         // Initialize and run D3 visualization with processe  d data
         await initGraphClassifier(processedData, features, nodeAttrs, intmData, graph_path);
     } catch (error) {
@@ -254,20 +254,20 @@ export async function visualizeNodeClassifier(setIsLoading:any, graph_path:strin
     try {
         setIsLoading(true);
         // Process data
-
+        console.log("path matvis", graph_path);
         const data = await load_json(graph_path);
-
+        console.log("data matvis", data);
 
         //training nodes
         const trainingNodes = data.train_nodes;
-
+        console.log("train nodes", trainingNodes)
 
         //accept the features from original json file
         const features = await get_features_origin(data);
-
+        console.log("o features", features);
 
         const processedData = await graph_to_matrix(data);
-
+        console.log("pData matvis", processedData);
         // Initialize and run D3 visualization with processe  d data
         await initNodeClassifier(processedData, features, intmData, graph_path, trainingNodes);
     } catch (error) {

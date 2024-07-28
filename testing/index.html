@@ -20,7 +20,7 @@
                 session = await ort.InferenceSession.create(
                     "gnn_link_model.onnx"
                 );
-
+                console.log("Model loaded successfully");
             }
 
             /**
@@ -54,7 +54,7 @@
             window.onload = loadModel;
 
             function classifyGraph() {
-
+                console.log("start classifying....a");
                 const inputElement = document.getElementById("graphInput");
                 if (inputElement.files.length > 0) {
                     const file = inputElement.files[0];
@@ -93,7 +93,7 @@
                             edge_index: edgeIndexTensor,
                             edge_label_index: edgeIndexTensor
                         });
-
+                        console.log("outputMap",outputMap);
                         
                     };
                     reader.readAsText(file);

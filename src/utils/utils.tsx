@@ -78,26 +78,26 @@ export function preprocessFloat32ArrayToNumber(matrix: any): number[][] {
     let row = [];
     for(let j=0; j<matrix[0][i].length; j++){
       row.push(matrix[0][i][j]);
-
+     // console.log("fetch loop row", matrix[0][i][j])
     }
     mat.push(row)
-
+   // console.log("fetch loop mat", mat)
   }
 return mat;
 }
 
 export function transposeMat<T>(matrix: T[][]): T[][] {
-
+  console.log("fetch 2.1", matrix)
   const rows = matrix.length;
   const cols = matrix[0].length;
   const transposed: T[][] = Array.from({ length: cols }, () => new Array<T>(rows)); 
-
+  console.log("fetch 2.2", transposed)
   for (let i = 0; i < cols; i++) {
       for (let j = 0; j < rows; j++) {
           transposed[i][j] = matrix[j][i];
       }
   }
-
+  console.log("fetch 2.3", transposed)
   return transposed;
 }
 
@@ -158,7 +158,7 @@ export function get_cood_from_parent(
         const r = get_coordination(children.node());
         res.push(r);
     });
-
+    console.log("COOD", res);
     return res;
 }
 
@@ -167,14 +167,14 @@ export function get_cood_from_parent(
 export function printAxisTextCoordinates(): void {
     d3.selectAll<SVGTextElement, any>(".x-axis text").each(function () {
         const bbox = this.getBBox();
-
+        console.log(
             `X Axis Text: [x: ${bbox.x}, y: ${bbox.y}, width: ${bbox.width}, height: ${bbox.height}]`
         );
     });
 
     d3.selectAll<SVGTextElement, any>(".y-axis text").each(function () {
         const bbox = this.getBBox();
-
+        console.log(
             `Y Axis Text: [x: ${bbox.x}, y: ${bbox.y}, width: ${bbox.width}, height: ${bbox.height}]`
         );
     });
@@ -272,10 +272,10 @@ export async function graph_to_matrix(data: any) {
     for (let i = 0; i < data.edge_index[0].length; i++) {
         let source = data.edge_index[0][i];
         let target = data.edge_index[1][i];
-
+        console.log("target:", target, "source:", source, "iter:", i);
         matrix[source][target] = 1;
     }
-
+    console.log("matrix representation", matrix);
     return matrix;
 }
 
@@ -290,10 +290,10 @@ export function graphToMatrix(data: any) {
   for (let i = 0; i < data.edge_index[0].length; i++) {
       let source = data.edge_index[0][i];
       let target = data.edge_index[1][i];
-
+    //  console.log("target:", target, "source:", source, "iter:", i);
       matrix[source][target] = 1;
   }
-
+ // console.log("matrix representation", matrix);
   return matrix;
 }
 
@@ -324,11 +324,11 @@ export async function prepMatrices(n: number, mat: number[][]) {
 
 export const load_json = async (path: string) => {
   try {
-
+    console.log('entered load_json', path);
     const response = await fetch(path);
-
+    console.log("response", response);
     const data = await response.json();
-
+    console.log("data", data)
     return data;
   } catch (error) {
     console.error('There has been a problem with your fetch operation:', error);
@@ -458,7 +458,7 @@ export async function data_prep(o_data: any) {
         type: edge_type
       }
       final_data.links.push(new_relation);
-
+      console.log(new_relation);
     }
 
 
@@ -514,7 +514,7 @@ export const myColor = d3
 
 
 export function transposeAnyMatrix(matrix:any){
-
+  console.log("result mat 1", matrix);
   let resultMat = [];
   for(let i=0; i<matrix[0].length; i++){
     let t = [];
@@ -523,7 +523,7 @@ export function transposeAnyMatrix(matrix:any){
     }
     resultMat.push(t);
   }
-
+  console.log("result mat", resultMat);
   return resultMat;
 }
 
@@ -544,7 +544,7 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
   if (!svg.selectAll) {
     svg = d3.selectAll(svg)
   }
-
+  console.log("document clicked", state.isClicked, movedNode.id);
   if (!movedNode || !state.isClicked) {
     return;
   }
@@ -854,10 +854,10 @@ export function featureVisualizer(
 
 
             //color schemes interaction logic
-
+            // console.log("node", node.graphIndex);
             for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
-
-
+            console.log(node.graphIndex)
+            console.log(colorSchemes)
             colorSchemes[node.graphIndex].style.opacity = "1";
             colorSchemes[node.graphIndex - 1].style.opacity = "1";
 
@@ -1284,7 +1284,7 @@ export function deepClone(obj: any) {
 
 export async function process() {
     var data = await data_prep("./graphs/input_graph.json");
-
+    console.log(data);
     return data;
 }
 
@@ -1292,9 +1292,9 @@ export async function loadModel(modelPath:string) {
   let session: any;
   try {
     session = await ort.InferenceSession.create(modelPath, { executionProviders: ['wasm'] });
-
+    console.log("Model loaded successfully");
   } catch (error) {
-
+    console.log("Load model failed", error);
   }
   return session;
 }
@@ -1346,12 +1346,12 @@ export function analyzeGraph(graphData: any) {
   const averageDegree = totalDegree / nodeCount;
   const hasIsolatedNode = degreeMap.some((degree) => degree === 0);
 
-
-
-
-
-
-
+    console.log(`Node Count: ${nodeCount}`);
+    console.log(`Edge Count: ${edges}`);
+    console.log(`Average Node Degree: ${averageDegree}`);
+    console.log(`Has Isolated Node: ${hasIsolatedNode}`);
+    console.log(`Has Loop: ${hasLoop.size > 0}`);
+    console.log(`Is Directed: ${isDirected}`);
 
   return {
     node_count: nodeCount,
@@ -1365,7 +1365,7 @@ export function analyzeGraph(graphData: any) {
 
 export const graphPrediction = async (modelPath: string, graphPath: string) => {
  
-
+		console.log("start classifying....a");
 		const session = await loadModel(modelPath);
 		const graphData: IGraphData = await load_json(graphPath);
 
@@ -1412,11 +1412,11 @@ export const graphPrediction = async (modelPath: string, graphPath: string) => {
 
 export const linkPrediction = async (modelPath: string, graphPath: string) => {
  
-
+  console.log("start classifying....a");
   const session = await loadModel(modelPath);
   const graphData: IGraphData = await load_json(graphPath);
 
-
+  console.log("graphData link pred", graphData);
 
   // Convert `graphData` to tensor-like object expected by your ONNX model
   const xTensor = new ort.Tensor(
@@ -1460,19 +1460,19 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
 
   const prob = outputMap.prob_adj.cpuData;
 
-
+  console.log("link prediction result", prob, intmData);
 
   const data = dataPreparationLinkPred(intmData);
 
   const features = graphData.x;
 
-
+  console.log("debug link pred",data, features)
 
 
     const indexedFeaturesI = indexingFeatures(
       graphData, features, data.conv1Data, data.conv2Data, 241
     );
-
+    console.log(`indexed `, indexedFeaturesI)
 
   return {prob, intmData};
 
@@ -1494,11 +1494,11 @@ type PredictionResult = {
 
 export const nodePrediction = async (modelPath: string, graphPath: string): Promise<PredictionResult> => {
  
-
+		console.log("start classifying....", modelPath, graphPath);
 		const session = await loadModel(modelPath);
 		const graphData: any = await load_json(graphPath);
 
-
+    console.log("graphData", graphData);
 
 		// Convert `graphData` to tensor-like object expected by your ONNX model
 		const xTensor = new ort.Tensor(
@@ -1547,7 +1547,7 @@ export const nodePrediction = async (modelPath: string, graphPath: string): Prom
       result: prob
 		};
 
-
+    console.log("prediction result from node classifier", intmData, prob);
 
 		return {prob, intmData};
 	
@@ -1596,7 +1596,7 @@ export function loadNodesLocation(mode: number, path: string) {
     data = require("../../public/json_data/node_location/nodes_data_karate.json");
 
   }
-
+  console.log("AWD",data);
   return data;
 }
 
