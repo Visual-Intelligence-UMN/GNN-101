@@ -263,7 +263,7 @@ export function outputVisualizer(
         .attr("height", rectWidth)
         .attr(
             "class",
-            (d: number, i: number) => `calculatedFeatures${i} to-be-removed bias`
+            (d: number, i: number) => `calculatedFeatures${i} to-be-removed bias calculatedRect`
         )
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 1)
@@ -666,7 +666,7 @@ export function calculationVisualizer(
     state: State,
     mode: number
 ) {
-    console.log("CWAcWA", state.isClicked)
+
 
 
     let intervalID = 0;
@@ -810,7 +810,7 @@ export function calculationVisualizer(
         .attr("height", rectWidth)
         .attr(
             "class",
-            (d: number, i: number) => `calculatedFeatures${i} to-be-removed aniRect`
+            (d: number, i: number) => `calculatedFeatures${i} to-be-removed aniRect calculatedRect`
         )
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 0.1)
@@ -2130,7 +2130,7 @@ export function nodeOutputVisualizer(
         .attr("height", rectWidth)
         .attr(
             "class",
-            (d: number, i: number) => `calculatedFeatures${i} to-be-removed`
+            (d: number, i: number) => `calculatedFeatures${i} to-be-removed calculatedRect`
         )
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 1)

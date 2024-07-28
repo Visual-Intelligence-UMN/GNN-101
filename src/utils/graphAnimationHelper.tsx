@@ -379,6 +379,8 @@ export function hoverOverHandler(node: any, aggregatedData: any, state: State, g
                 if (!state.isClicked) {
                     return;
                 }
+                d3.selectAll(".calculatedRect").style("opacity", 0.2)
+                d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1)
                 displayerHandler(node, aggregatedData, state, g, displayHeight, rectL, wmRectL, myColor, weights, index, weightsLocation, i)
 
 
@@ -398,6 +400,7 @@ export function hoverOverHandler(node: any, aggregatedData: any, state: State, g
                 d3.selectAll(`#columnUnit-${i}`).style("opacity", 0).raise();
                 d3.selectAll(`#tempath${i}`).attr("opacity", 0).raise();
                 d3.selectAll(".weightUnit").style("opacity", 1);
+                d3.selectAll(".calculatedRect").style("opacity", 1)
                 
 
             });
