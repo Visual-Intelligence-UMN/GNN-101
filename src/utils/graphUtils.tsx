@@ -297,14 +297,14 @@ export function outputVisualizer(
             return;
         }
         drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, 1, rectHeight / 3, rectHeight / 3, node.features.length, [wMat], 0, myColor, svg, weightsLocation);
-        if (state.isClicked) {
+
         d3.selectAll(".bias").style("opacity", 1);
         d3.selectAll(".softmax").attr("opacity", 0.07);
         d3.selectAll(".relu").style("opacity", 1);
         d3.selectAll(".output-path").attr("opacity", 1);
         d3.selectAll(".softmaxLabel").attr("opacity", 1);
-        }
-    }, 1500)
+        
+    }, 2000)
 
     const g5 = svg
         .append("g")
@@ -329,14 +329,13 @@ export function outputVisualizer(
         .attr("opacity", 0)
         .lower();
 
-    hoverOverHandler(node, calculatedData, state, g5, DisplayHeight, rectHeight, (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation)
+        const Xt = weights;
+    hoverOverHandler(node, calculatedData, state, g5, DisplayHeight, rectHeight, (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg)
 
     let outputData = [];
     for (let i = 0; i < calculatedData.length; i++) {
         outputData.push(calculatedData[i] + bias[i])
     }
-
-    const Xt = weights;
 
 
 
@@ -422,6 +421,7 @@ export function outputVisualizer(
             weightsLocation,
             intervalID,
             allWeights,
+            g5,
             mode
         );
 
@@ -737,6 +737,9 @@ export function calculationVisualizer(
     let currentWeights = weights[node.graphIndex - 1]
 
 
+    
+
+
     let biasData = bias;
 
     const g3 = svg
@@ -919,6 +922,21 @@ export function calculationVisualizer(
     }
     let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, matrixRectSize, node.features.length, weights, node.graphIndex - 1);
 
+
+
+
+    const math = create(all, {});
+    let Xt = math.transpose(currentWeights);
+    if (node.graphIndex === 1) {
+        Xt = math.transpose(Xt);
+    }
+
+    
+
+
+
+    
+
     setTimeout(()=> {
         if (!state.isClicked) {
             return;
@@ -927,7 +945,7 @@ export function calculationVisualizer(
 
 
 
-    }, 4000)
+    }, 2000)
    
 
 
@@ -1051,9 +1069,10 @@ export function calculationVisualizer(
             weightsLocation,
             intervalID,
             weights,
+            g4,
             mode
         );
-        hoverOverHandler(node, aggregatedData, state, g4, displayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, weights, node.graphIndex - 1, weightsLocation)
+        hoverOverHandler(node, aggregatedData, state, g4, displayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, weights, node.graphIndex - 1, weightsLocation, Xt, startCoordList, endCoordList, svg)
 
 
 
@@ -1443,6 +1462,7 @@ function weightAnimation(
     weightsLocation: number[][][],
     intervalID: any,
     allWeights: number[][][],
+    displayerSVG: any,
     mode: number
 ) {
 
@@ -1523,9 +1543,6 @@ function weightAnimation(
     let featureLength = node.features.length;
     let prevLayerFeatureLength = node.relatedNodes[0].features.length;
 
-    for (let j = 0; j < endNumber; j++) {
-        graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, j, myColor, weightsLocation, node.features.length, svg)
-    }
     function startAnimation(endNumber: number) {
         if (!state.isClicked || !state.isPlaying) {
             return;
@@ -1560,11 +1577,11 @@ function weightAnimation(
                 //     prevLayerFeatureLength,
                 //     state
                 // );
-                // displayerHandler(node, aggregatedData, state, svg, 300, (20 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, allWeights, node.graphIndex, weightsLocation, i)
+                //displayerHandler(node, aggregatedData, state, displayerSVG, 300, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, allWeights, node.graphIndex - 1, weightsLocation, i)
 
 
                 
-                d3.selectAll(`#tempath${i}`).style("opacity", 1);
+                graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg)
                 d3.selectAll(`#weightUnit-${i - 1}`).style("opacity", 0.3).lower();
                 d3.select(`#columnUnit-${i - 1}`).style("opacity", 0).lower();
                 d3.selectAll(`#weightUnit-${i}`).style("opacity", 1).raise();
@@ -1919,6 +1936,8 @@ export function fcLayerCalculationVisualizer(
         posPlus.push(c);
     }
 
+    
+
     setTimeout(() => {
         poolingLayerInteraction(
             node,
@@ -2235,14 +2254,14 @@ export function nodeOutputVisualizer(
         }
         drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, 1, 10, 10, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
 
-        if (state.isClicked) {
+
         d3.selectAll(".bias").style("opacity", 1);
         d3.selectAll(".softmax").attr("opacity", 0.3);
         d3.selectAll(".relu").style("opacity", 1);
         d3.selectAll(".output-path").attr("opacity", 1);
         d3.selectAll(".softmaxLabel").attr("opacity", 1);
-        }
-    }, 1500)
+        
+    }, 2000)
 
 
     const g5 = svg
@@ -2272,10 +2291,10 @@ export function nodeOutputVisualizer(
         .attr("opacity", 0)
         .lower();
 
-    hoverOverHandler(node, calculatedData, state, g5, DisplayHeight, (20 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation)
+        const Xt = math.transpose(weights);
+    hoverOverHandler(node, calculatedData, state, g5, DisplayHeight, (20 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg)
 
 
-    const Xt = math.transpose(weights);
 
     let outputData = [];
     for (let i = 0; i < calculatedData.length; i++) {
@@ -2361,6 +2380,7 @@ export function nodeOutputVisualizer(
             weightsLocation,
             intervalID,
             allWeights,
+            g5,
             mode
         );
 
