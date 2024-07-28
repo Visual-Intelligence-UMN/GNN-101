@@ -145,7 +145,7 @@ export function graphVisDrawMatrixWeight(
             .style("fill", "none")
             .attr("stroke", "black").attr("id", `tempath${currentStep}`)
             .attr("stroke-width", 2).attr("stroke", myColor(Xv[j])).lower()
-            .style("opacity", 0)
+            .style("opacity", 1)
 
         g
             .append("path")
@@ -154,7 +154,7 @@ export function graphVisDrawMatrixWeight(
             .style("fill", "none")
             .attr("stroke", "black").attr("id", `tempath${currentStep}`)
             .attr("stroke-width", 2).attr("stroke", myColor(Xv[j])).lower()
-            .style("opacity", 0)
+            .style("opacity", 1)
     }
 }
 
@@ -201,9 +201,30 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
                 
 
         
-                
+            
+                let weightMat = weights[index]
+            
+                if (index === 0) {
+                    const math = create(all, {});
+                    weightMat = math.transpose(weightMat);
+                }
 
-                drawGraphVisWeightVector(weightsLocation, wmRectL, weights, index, g, i)
+                console.log("BVUAEGF", weightMat)
+
+            
+                for (let j = 0; j < weightMat[i].length; j++)
+                g.append("rect")
+                                        .attr("x", 130)
+                                        .attr("y", 20 + wmRectL * j)
+                                        .attr("width", 7)
+                                        .attr("height", wmRectL)
+                                        .attr("fill", myColor(weightMat[i][j]))
+                                        .attr("stroke", "gray")
+                                        .attr("stroke-width", 0.1)
+                                        .attr("opacity", 1)
+                                        .attr("class", "columnUnit math-displayer")
+                                        .attr("id", `columnUnit-${j}`)
+                                        .style("opacity", 1)
 
                 const featureGroup = g.append("g")
                 .attr("transform", `translate(${70}, ${displayHeight - 40})`);
@@ -371,7 +392,7 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
     }
 
 
-export function hoverOverHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][]) {
+export function hoverOverHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], Xt: any, startCoordList: any, endCoordList: any, svg: any) {
 
     
 
@@ -381,6 +402,7 @@ export function hoverOverHandler(node: any, aggregatedData: any, state: State, g
                 if (!state.isClicked) {
                     return;
                 }
+                graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg)
                 d3.selectAll(".calculatedRect").style("opacity", 0.2)
                 d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1)
                 d3.selectAll(`#tempath${i}`).style("opacity", 1);

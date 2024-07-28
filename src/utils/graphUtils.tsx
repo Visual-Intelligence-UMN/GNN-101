@@ -297,14 +297,14 @@ export function outputVisualizer(
             return;
         }
         drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, 1, rectHeight / 3, rectHeight / 3, node.features.length, [wMat], 0, myColor, svg, weightsLocation);
-        if (state.isClicked) {
+
         d3.selectAll(".bias").style("opacity", 1);
         d3.selectAll(".softmax").attr("opacity", 0.07);
         d3.selectAll(".relu").style("opacity", 1);
         d3.selectAll(".output-path").attr("opacity", 1);
         d3.selectAll(".softmaxLabel").attr("opacity", 1);
-        }
-    }, 1500)
+        
+    }, 2000)
 
     const g5 = svg
         .append("g")
@@ -329,14 +329,14 @@ export function outputVisualizer(
         .attr("opacity", 0)
         .lower();
 
-    hoverOverHandler(node, calculatedData, state, g5, DisplayHeight, rectHeight, (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation)
+        const Xt = weights;;
+
+    hoverOverHandler(node, node.relatedNodes[0].features, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg)
 
     let outputData = [];
     for (let i = 0; i < calculatedData.length; i++) {
         outputData.push(calculatedData[i] + bias[i])
     }
-
-    const Xt = weights;
 
 
 
@@ -412,7 +412,7 @@ export function outputVisualizer(
             startCoordList,
             endCoordList,
             Xt,
-            calculatedData,
+            node.relatedNodes[0].features,
             offset,
             height,
             moveOffset,
@@ -422,6 +422,8 @@ export function outputVisualizer(
             weightsLocation,
             intervalID,
             allWeights,
+            g5,
+            displayHeight,
             mode
         );
 
@@ -682,6 +684,8 @@ export function outputVisualizer(
 
 
     d3.select("#my_dataviz").on("click", function(event: any) {
+        d3.selectAll(".math-displayer").remove();
+        d3.selectAll(".graph-displayer").remove();
      
             d3.selectAll(".node-features-Copy").style("visibility", "hidden")
             d3.selectAll(".weightUnit").remove();
@@ -735,6 +739,9 @@ export function calculationVisualizer(
     d3.selectAll(".graph-displayer").remove();
     showFeature(node);
     let currentWeights = weights[node.graphIndex - 1]
+
+
+    
 
 
     let biasData = bias;
@@ -919,6 +926,21 @@ export function calculationVisualizer(
     }
     let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, matrixRectSize, node.features.length, weights, node.graphIndex - 1);
 
+
+
+
+    const math = create(all, {});
+    let Xt = math.transpose(currentWeights);
+    if (node.graphIndex === 1) {
+        Xt = math.transpose(Xt);
+    }
+
+    
+
+
+
+    
+
     setTimeout(()=> {
         if (!state.isClicked) {
             return;
@@ -927,7 +949,7 @@ export function calculationVisualizer(
 
 
 
-    }, 4000)
+    }, 2000)
    
 
 
@@ -1051,9 +1073,11 @@ export function calculationVisualizer(
             weightsLocation,
             intervalID,
             weights,
+            g4,
+            displayHeight,
             mode
         );
-        hoverOverHandler(node, aggregatedData, state, g4, displayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, weights, node.graphIndex - 1, weightsLocation)
+        hoverOverHandler(node, aggregatedData, state, g4, displayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, weights, node.graphIndex - 1, weightsLocation, Xt, startCoordList, endCoordList, svg)
 
 
 
@@ -1369,6 +1393,8 @@ export function calculationVisualizer(
         if (!state.isClicked) {
             return;
         }
+        d3.selectAll(".math-displayer").remove();
+        d3.selectAll(".graph-displayer").remove();
         moveFeaturesBack(node.relatedNodes, originalCoordinates);
         d3.selectAll(".to-be-removed").remove();
         d3.selectAll(".weightUnit").remove();
@@ -1443,6 +1469,8 @@ function weightAnimation(
     weightsLocation: number[][][],
     intervalID: any,
     allWeights: number[][][],
+    displayerSVG: any,
+    displayerHeight: number,
     mode: number
 ) {
 
@@ -1493,6 +1521,7 @@ function weightAnimation(
 
     btn.on("click", function (event: any) {
         if (isSwitched === 0) {
+            
             d3.selectAll(".aniRect").style("opacity", 0);
         }
         isSwitched ++;
@@ -1523,9 +1552,6 @@ function weightAnimation(
     let featureLength = node.features.length;
     let prevLayerFeatureLength = node.relatedNodes[0].features.length;
 
-    for (let j = 0; j < endNumber; j++) {
-        graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, j, myColor, weightsLocation, node.features.length, svg)
-    }
     function startAnimation(endNumber: number) {
         if (!state.isClicked || !state.isPlaying) {
             return;
@@ -1544,6 +1570,7 @@ function weightAnimation(
 
             d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1);
             d3.selectAll(`#tempath${i - 1}`).style("opacity", 0);
+            d3.selectAll(".math-displayer").remove();
 
             if (state.isPlaying) {
                 // GraphViewDrawPaths(
@@ -1560,11 +1587,19 @@ function weightAnimation(
                 //     prevLayerFeatureLength,
                 //     state
                 // );
-                // displayerHandler(node, aggregatedData, state, svg, 300, (20 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, allWeights, node.graphIndex, weightsLocation, i)
+                if (mode === 0 && node.graphIndex === 5) {
+                    const math = create(all, {});
+                    const wMat = math.transpose(allWeights[3]);
+
+                    displayerHandler(node, aggregatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, i)
+                } else {
+                displayerHandler(node, aggregatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, allWeights, node.graphIndex - 1, weightsLocation, i)
+                }
 
 
                 
-                d3.selectAll(`#tempath${i}`).style("opacity", 1);
+                graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg)
+
                 d3.selectAll(`#weightUnit-${i - 1}`).style("opacity", 0.3).lower();
                 d3.select(`#columnUnit-${i - 1}`).style("opacity", 0).lower();
                 d3.selectAll(`#weightUnit-${i}`).style("opacity", 1).raise();
@@ -1583,12 +1618,15 @@ function weightAnimation(
     
                     clearInterval(intervalID);
                     state.isPlaying = false;
+                    d3.selectAll(".math-displayer").remove();
+                    d3.selectAll(".graph-displayer").remove();
 
                     injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_play.svg")
                     d3.selectAll(".aniRect").style("opacity", 1);
                     d3.selectAll(".weightUnit").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
-                    d3.selectAll(`#tempath${i - 1}`).attr("opacity", 0);
+                    d3.selectAll(`#tempath${i - 1}`).style("opacity", 0);
+                  
        
                     setTimeout(() => {
    
@@ -1919,6 +1957,8 @@ export function fcLayerCalculationVisualizer(
         posPlus.push(c);
     }
 
+    
+
     setTimeout(() => {
         poolingLayerInteraction(
             node,
@@ -1976,6 +2016,8 @@ export function fcLayerCalculationVisualizer(
 
 
     d3.select("#my_dataviz").on("click", function(event: any) {
+        d3.selectAll(".math-displayer").remove();
+        d3.selectAll(".graph-displayer").remove();
         
 
             d3.selectAll(".origin-to-aggregated").remove();
@@ -2235,14 +2277,14 @@ export function nodeOutputVisualizer(
         }
         drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, 1, 10, 10, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
 
-        if (state.isClicked) {
+
         d3.selectAll(".bias").style("opacity", 1);
         d3.selectAll(".softmax").attr("opacity", 0.3);
         d3.selectAll(".relu").style("opacity", 1);
         d3.selectAll(".output-path").attr("opacity", 1);
         d3.selectAll(".softmaxLabel").attr("opacity", 1);
-        }
-    }, 1500)
+        
+    }, 2000)
 
 
     const g5 = svg
@@ -2272,10 +2314,10 @@ export function nodeOutputVisualizer(
         .attr("opacity", 0)
         .lower();
 
-    hoverOverHandler(node, calculatedData, state, g5, DisplayHeight, (20 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation)
+        const Xt = math.transpose(weights);
+    hoverOverHandler(node, calculatedData, state, g5, DisplayHeight, (20 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg)
 
 
-    const Xt = math.transpose(weights);
 
     let outputData = [];
     for (let i = 0; i < calculatedData.length; i++) {
@@ -2361,6 +2403,8 @@ export function nodeOutputVisualizer(
             weightsLocation,
             intervalID,
             allWeights,
+            g5,
+            displayHeight,
             mode
         );
 
@@ -2621,6 +2665,8 @@ export function nodeOutputVisualizer(
         if (!state.isClicked) {
             return;
         }
+        d3.selectAll(".math-displayer").remove();
+        d3.selectAll(".graph-displayer").remove();
                 d3.selectAll(".node-features-Copy").style("opacity", "hidden");
                 d3.selectAll(".procVis").remove();
                 d3.selectAll(".to-be-removed").remove();
