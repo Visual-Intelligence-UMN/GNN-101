@@ -184,22 +184,17 @@ export function drawMatrixWeight(
    // Xt = flipVertically(Xt);
 
    //adjust matrix value alignment for GCNConv - square weight matri
-   if(Xt[0].length==Xt.length){
-    if(curveDir==1){
-    Xt = rotateMatrix(Xt)
-    Xt = rotateMatrix(Xt)
-    Xt = rotateMatrix(Xt)
-    Xt = flipHorizontally(Xt);
-    }else{
-        //anti-clockwise rotation
+    if(Xt[0].length==Xt.length){
         Xt = rotateMatrixCounterClockwise(Xt)
         Xt = flipHorizontally(Xt);
     }
-    //Xt = flipVertically(Xt);
-    //Xt = flipHorizontally(Xt);
-}
+
+    if(Xt[0].length==2&&Xt.length==4){
+        Xt = flipVertically(Xt)
+       // Xt = flipHorizontally(Xt);
+    }
    
-//drawMatrixValid(Xt, startCoordList[0][0], startCoordList[0][1]+20, 10, 10)
+drawMatrixValid(Xt, startCoordList[0][0], startCoordList[0][1]+20, 10, 10)
 
 
     let Xv = Xt[currentStep];
@@ -615,6 +610,10 @@ weightMatrixPostions:any
                 weightMat = rotateMatrix(weightMat)
                weightMat = flipVertically(weightMat);
             }
+        }
+        if((weightMat.length==2 && weightMat[0].length==4)){
+            weightMat = flipHorizontally(weightMat);
+            weightMat = flipVertically(weightMat);
         }
         console.log("rotated! 1", weightMat)
 
