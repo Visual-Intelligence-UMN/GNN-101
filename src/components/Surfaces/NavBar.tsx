@@ -6,7 +6,7 @@ export default function Navbar() {
             <div className="flex flex-wrap items-center justify-between mx-20">
                 <a href="#" className="flex items-center space-x-3 rtl:space-x-reverse">
                     {/* <img src="#" className="h-8" alt="Flowbite Logo" /> */}
-                    <span className="self-center text-2xl font-semibold whitespace-nowrap text-white">Name and Logo Here</span>
+                    <span className="self-center text-2xl font-semibold whitespace-nowrap text-white">GNN 101</span>
                 </a>
                 <div id="navbar-default">
                     <ul className="font-medium flex flex-row md:space-x-8 rtl:space-x-reverse">

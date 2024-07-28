@@ -2630,7 +2630,7 @@ export function nodeOutputVisualizer(
                     .attr("y", 10 + rectL / 2)
                     .text(roundToTwo(calculatedData[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5").style("fill", "white");
+                    .attr("font-size", "5").style("fill", "black");
 
                 g5.append("text")
                     .attr("x", 100 - 27)
@@ -2644,7 +2644,7 @@ export function nodeOutputVisualizer(
                     .attr("y", displayHeight - 30)
                     .text("+")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "12").style("fill", "white");
+                    .attr("font-size", "12");
 
 
                     g5.append("text")
@@ -2652,7 +2652,7 @@ export function nodeOutputVisualizer(
                     .attr("y", displayHeight - 30)
                     .text("+")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "12").style("fill", "white");
+                    .attr("font-size", "12");
 
 
 
@@ -2662,7 +2662,7 @@ export function nodeOutputVisualizer(
                     .attr("xml:space", "preserve")
                     .text("exp(          )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "8").style("fill", "white");
+                    .attr("font-size", "8");
 
                 g5.append("text")
                     .attr("x", 50 - 20)
@@ -2670,7 +2670,7 @@ export function nodeOutputVisualizer(
                     .attr("xml:space", "preserve")
                     .text("exp(            )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "8").style("fill", "white");
+                    .attr("font-size", "8");
 
                 g5.append("text")
                     .attr("x", displayerWidth - 150 - 20)
@@ -2678,7 +2678,7 @@ export function nodeOutputVisualizer(
                     .attr("xml:space", "preserve")
                     .text("exp(          )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "8").style("fill", "white");
+                    .attr("font-size", "8");
 
                     g5.append("text")
                     .attr("x", displayerWidth - 100 - 20)
@@ -2686,7 +2686,7 @@ export function nodeOutputVisualizer(
                     .attr("xml:space", "preserve")
                     .text("exp(          )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "8").style("fill", "white");
+                    .attr("font-size", "8");
 
                     g5.append("text")
                     .attr("x", 100 - 20)
@@ -2694,7 +2694,7 @@ export function nodeOutputVisualizer(
                     .attr("xml:space", "preserve")
                     .text("exp(        )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "8").style("fill", "white");
+                    .attr("font-size", "8");
 
 
                 g5.append("line")
