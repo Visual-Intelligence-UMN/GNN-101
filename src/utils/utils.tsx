@@ -938,8 +938,8 @@ export function featureVisualizer(
           .attr("x", -10)  
           .attr("y", -190)
           .attr("width", 15)
+          .attr("class", "node-features")
           .attr("height", currRectHeight * (node.features.length))
-          .attr("id", (d: any, i: number) => rectName +"-layer-rect-" + i) 
           .style("fill", "none")
           .style("stroke", "black")
           .style("stroke-width", 1)
@@ -965,17 +965,17 @@ export function featureVisualizer(
           .lower();
 
 
-          const frameCopy = featureGroup.append("rect")
+          const frameCopy = featureGroupCopy.append("rect")
           .attr("x", -10)  
           .attr("y", -190)
           .attr("width", 15)
-          .attr("height", currRectHeight * (node.features.length))
           .attr("class", "node-features-Copy")
+          .attr("height", currRectHeight * (node.features.length))
           .style("fill", "none")
           .style("stroke", "black")
           .style("stroke-width", 1)
           .style("visibility", "hidden")
-
+          .lower()
           
 
           
@@ -990,6 +990,7 @@ export function featureVisualizer(
         
         node.featureGroup.on("mouseover", function() {
           if (!state.isClicked) {
+            console.log('mouseover function')
             if (node.links) {
               node.links.forEach((link: any) => {
                 link.style("opacity", 1)

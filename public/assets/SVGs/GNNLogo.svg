@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128.9942 45.3697">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+
+      .cls-1, .cls-2 {
+        stroke: #231f20;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-2, .cls-3 {
+        fill: #fff;
+      }
+
+      .cls-3 {
+        font-family: 'Inter', sans-serif;
+        font-size: 21px;
+      }
+    </style>
+  </defs>
+  <circle class="cls-2" cx="8.8375" cy="8.8375" r="8.3375"/>
+  <line class="cls-1" x1="15.1901" y1="14.2353" x2="18.9089" y2="17.5235"/>
+  <circle class="cls-2" cx="25.1536" cy="23.045" r="8.3375"/>
+  <line class="cls-1" x1="20.0444" y1="29.8248" x2="16.1798" y2="32.9403"/>
+  <circle class="cls-2" cx="8.8375" cy="36.5322" r="8.3375"/>
+  <text class="cls-3" transform="translate(41.4562 30.3794)"><tspan x="0" y="0">GNN 101</tspan></text>
+</svg>
