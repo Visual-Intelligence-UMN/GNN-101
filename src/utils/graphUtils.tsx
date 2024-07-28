@@ -308,7 +308,7 @@ export function outputVisualizer(
 
     const g5 = svg
         .append("g")
-        .attr("transform", `translate(${endCoordList[0][0] - 90}, ${endCoordList[0][1] - 120})`);
+        .attr("transform", `translate(${endCoordList[0][0] - 90}, ${endCoordList[0][1] - 180})`);
 
 
     let DisplayerWidth = 300; // Width of the graph-displayer
@@ -374,7 +374,7 @@ export function outputVisualizer(
 
     const BiasGroup = svg
         .append("g")
-        .attr("transform", `translate(${node.x}, ${node.y + 30})`);
+        .attr("transform", `translate(${node.x}, ${node.y - 90})`);
 
     BiasGroup.selectAll("rect")
         .data(bias)
@@ -451,7 +451,7 @@ export function outputVisualizer(
                     .attr("stroke", myColor(calculatedData[i]))
                     .attr("stroke-width", 1)
                     .attr("class", `softmax${node.features.length - j - 1} softmax to-be-removed`)
-                    .attr("opacity", 0)
+                    .attr("opacity", 0.07)
                     .style("fill", "none");
             }
         }
@@ -468,7 +468,7 @@ export function outputVisualizer(
 
         let color = calculateAverage(node.features); // to be determined
 
-        start_y += 60
+        start_y -= 60
         start_x -= 125
         end_x -= 180;
         let control1_x = start_x + (end_x - start_x) * 0.2;
@@ -491,7 +491,7 @@ export function outputVisualizer(
             .style("opacity", 1);
 
 
-            start_y -= 60;
+            start_y += 60;
             const calculatedToFinal = svg
             .append("path")
             .attr(
@@ -676,7 +676,7 @@ export function outputVisualizer(
                 }
                 d3.selectAll(".math-displayer").remove();
                 d3.selectAll(".graph-displayer").attr("opacity", 0);
-                d3.selectAll(".softmax").attr("opacity", 0);
+                d3.selectAll(".softmax").attr("opacity", 0.07);
                 d3.selectAll(`.softmax${i}`).attr("opacity", 0.07);
             });
     }
@@ -2431,7 +2431,7 @@ export function nodeOutputVisualizer(
                     .attr("stroke", myColor(calculatedData[i]))
                     .attr("stroke-width", 1)
                     .attr("class", `softmax${j} softmax to-be-removed`)
-                    .attr("opacity", 1)
+                    .attr("opacity", 0.07)
                     .style("fill", "none")
 
             }
@@ -2630,7 +2630,7 @@ export function nodeOutputVisualizer(
                     .attr("y", 10 + rectL / 2)
                     .text(roundToTwo(calculatedData[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "5").style("fill", "white");
 
                 g5.append("text")
                     .attr("x", 100 - 27)
@@ -2644,14 +2644,15 @@ export function nodeOutputVisualizer(
                     .attr("y", displayHeight - 30)
                     .text("+")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "12");
+                    .attr("font-size", "12").style("fill", "white");
+
 
                     g5.append("text")
                     .attr("x", displayerWidth - 25 - 152)
                     .attr("y", displayHeight - 30)
                     .text("+")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "12");
+                    .attr("font-size", "12").style("fill", "white");
 
 
 
@@ -2661,7 +2662,7 @@ export function nodeOutputVisualizer(
                     .attr("xml:space", "preserve")
                     .text("exp(          )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "8");
+                    .attr("font-size", "8").style("fill", "white");
 
                 g5.append("text")
                     .attr("x", 50 - 20)
@@ -2669,7 +2670,7 @@ export function nodeOutputVisualizer(
                     .attr("xml:space", "preserve")
                     .text("exp(            )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "8");
+                    .attr("font-size", "8").style("fill", "white");
 
                 g5.append("text")
                     .attr("x", displayerWidth - 150 - 20)
@@ -2677,7 +2678,7 @@ export function nodeOutputVisualizer(
                     .attr("xml:space", "preserve")
                     .text("exp(          )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "8");
+                    .attr("font-size", "8").style("fill", "white");
 
                     g5.append("text")
                     .attr("x", displayerWidth - 100 - 20)
@@ -2685,7 +2686,7 @@ export function nodeOutputVisualizer(
                     .attr("xml:space", "preserve")
                     .text("exp(          )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "8");
+                    .attr("font-size", "8").style("fill", "white");
 
                     g5.append("text")
                     .attr("x", 100 - 20)
@@ -2693,7 +2694,7 @@ export function nodeOutputVisualizer(
                     .attr("xml:space", "preserve")
                     .text("exp(        )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "8");
+                    .attr("font-size", "8").style("fill", "white");
 
 
                 g5.append("line")
@@ -2710,7 +2711,7 @@ export function nodeOutputVisualizer(
                     .attr("y", 35)
                     .text("=")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "15");
+                    .attr("font-size", "15").style("fill", "white");
 
                 g5.append("rect")
                     .attr("x", displayerWidth - 50)
@@ -2719,14 +2720,14 @@ export function nodeOutputVisualizer(
                     .attr("height", rectL)
                     .style("stroke", "black")
                     .attr("fill", myColor(node.features[i]))
-                    .attr("class", "math-displayer")
+                    .attr("class", "math-displayer").style("fill", "white")
                     .lower();
                 g5.append("text")
                     .attr("x", displayerWidth - 50)
                     .attr("y", 25 + rectL / 2)
                     .text(roundToTwo(node.features[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "5").style("fill", "white");
             })
             .on("mouseout", function () {
                 if (!state.isClicked) {
@@ -2734,7 +2735,7 @@ export function nodeOutputVisualizer(
                 }
                 d3.selectAll(".math-displayer").remove();
                 d3.selectAll(".graph-displayer").attr("opacity", 0);
-                d3.selectAll(".softmax").attr("opacity", 0);
+                d3.selectAll(".softmax").attr("opacity", 0.07);
                 d3.selectAll(`.softmax${i}`).attr("opacity", 0.07);
             });
     }
