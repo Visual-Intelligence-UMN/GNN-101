@@ -2536,7 +2536,7 @@ export function nodeOutputVisualizer(
                 d3.selectAll(".graph-displayer").attr("opacity", 1);
                 d3.selectAll(`.softmax${i}`).attr("opacity", 1);
                 g5.append("rect")
-                    .attr("x", 70)
+                    .attr("x", 50)
                     .attr("y", displayHeight - 40)
                     .attr("width", rectL)
                     .attr("height", rectL)
@@ -2545,14 +2545,14 @@ export function nodeOutputVisualizer(
                     .attr("class", "math-displayer")
                     .lower();
                 g5.append("text")
-                    .attr("x", 70)
+                    .attr("x", 50)
                     .attr("y", displayHeight - 40 + rectL / 2)
                     .text(roundToTwo(calculatedData[0]))
                     .attr("class", "math-displayer")
                     .attr("font-size", "5");
 
                 g5.append("rect")
-                    .attr("x", displayerWidth - 130)
+                    .attr("x", 100)
                     .attr("y", displayHeight - 40)
                     .attr("width", rectL)
                     .attr("height", rectL)
@@ -2561,11 +2561,60 @@ export function nodeOutputVisualizer(
                     .attr("class", "math-displayer")
                     .lower();
                 g5.append("text")
-                    .attr("x", displayerWidth - 130)
+                    .attr("x", 100)
                     .attr("y", displayHeight - 40 + rectL / 2)
                     .text(roundToTwo(calculatedData[1]))
                     .attr("class", "math-displayer")
                     .attr("font-size", "5");
+
+
+
+                    g5.append("rect")
+                    .attr("x", displayerWidth - 150)
+                    .attr("y", displayHeight - 40)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(calculatedData[2]))
+                    .attr("class", "math-displayer")
+                    .lower();
+                g5.append("text")
+                    .attr("x", displayerWidth - 150)
+                    .attr("y", displayHeight - 40 + rectL / 2)
+                    .text(roundToTwo(calculatedData[2]))
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "5");
+
+
+                    g5.append("rect")
+                    .attr("x", displayerWidth - 100)
+                    .attr("y", displayHeight - 40)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(calculatedData[3]))
+                    .attr("class", "math-displayer")
+                    .lower();
+                g5.append("text")
+                    .attr("x", displayerWidth - 100)
+                    .attr("y", displayHeight - 40 + rectL / 2)
+                    .text(roundToTwo(calculatedData[3]))
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "5");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                 g5.append("rect")
                     .attr("x", 100)
@@ -2584,35 +2633,68 @@ export function nodeOutputVisualizer(
                     .attr("font-size", "5");
 
                 g5.append("text")
-                    .attr("x", displayerWidth / 2 - 50)
+                    .attr("x", 100 - 27)
                     .attr("y", displayHeight - 30)
                     .text("+")
                     .attr("class", "math-displayer")
                     .attr("font-size", "12");
 
+                    g5.append("text")
+                    .attr("x", displayerWidth - 25 - 105)
+                    .attr("y", displayHeight - 30)
+                    .text("+")
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "12");
+
+                    g5.append("text")
+                    .attr("x", displayerWidth - 25 - 152)
+                    .attr("y", displayHeight - 30)
+                    .text("+")
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "12");
+
+
+
                 g5.append("text")
-                    .attr("x", 100 - 25)
+                    .attr("x", 100 - 20)
                     .attr("y", 20)
                     .attr("xml:space", "preserve")
-                    .text("exp(        )")
+                    .text("exp(          )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "10");
+                    .attr("font-size", "8");
 
                 g5.append("text")
-                    .attr("x", 70 - 25)
+                    .attr("x", 50 - 20)
+                    .attr("y", displayHeight - 30)
+                    .attr("xml:space", "preserve")
+                    .text("exp(            )")
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "8");
+
+                g5.append("text")
+                    .attr("x", displayerWidth - 150 - 20)
+                    .attr("y", displayHeight - 30)
+                    .attr("xml:space", "preserve")
+                    .text("exp(          )")
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "8");
+
+                    g5.append("text")
+                    .attr("x", displayerWidth - 100 - 20)
+                    .attr("y", displayHeight - 30)
+                    .attr("xml:space", "preserve")
+                    .text("exp(          )")
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "8");
+
+                    g5.append("text")
+                    .attr("x", 100 - 20)
                     .attr("y", displayHeight - 30)
                     .attr("xml:space", "preserve")
                     .text("exp(        )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "10");
+                    .attr("font-size", "8");
 
-                g5.append("text")
-                    .attr("x", displayerWidth - 130 - 25)
-                    .attr("y", displayHeight - 30)
-                    .attr("xml:space", "preserve")
-                    .text("exp(        )")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "10");
 
                 g5.append("line")
                     .attr("x1", 20)
