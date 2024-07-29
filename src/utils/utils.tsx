@@ -1153,7 +1153,11 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
               const avg = calculateAverage(node.features)
 
               const path = svg.append("path")
-                .attr("d", `M ${node.x + xOffset1 + 16} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffsetNext - 16} ${nextNode.y + 10}`)
+                .attr("d", 
+                  `M ${node.x + xOffset1 + 16} ${node.y + 10} 
+                   C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, 
+                   ${nextNode.x + xOffsetNext - 16} ${nextNode.y + 10}`
+                )
                 .style("stroke-width", 1)
                 .style("opacity", 0)
                 .style("stroke", linkStrength(avg))
