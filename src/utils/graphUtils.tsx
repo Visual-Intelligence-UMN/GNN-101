@@ -1230,7 +1230,7 @@ export function calculationVisualizer(
                     .attr("x", end_x - 45)
                     .attr("y", end_y - 15)
                     .attr("class", "relu to-be-removed mats procVis")
-                    .attr("opacity", 0)
+                    .attr("opacity", 1)
                     .raise();
             }
         });
