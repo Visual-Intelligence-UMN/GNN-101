@@ -974,20 +974,25 @@ export function visualizeNodeClassifierFeatures(
             }, aniSec);
 
             let firstPlay = true;
+            let allowExpl = true;
 
             btn.on("mouseover", function (event, d) {
                 const [x, y] = d3.pointer(event);
-                drawMatmulExplanation(
-                    x, y, "Matrix Multiplication", "Click the icon to show the matrix multiplication process!"
-                );
+                if(allowExpl){
+                    drawMatmulExplanation(
+                        x, y, "Matrix Multiplication", "Click the icon to show the matrix multiplication process!"
+                    );
+                }
             });
 
             btn.on("mouseout", function (event, d) {
+                allowExpl = true;
                 d3.selectAll(".math-displayer").remove();
             });
 
             btn.on("click", function (event: any, d: any) {
                 //  d3.select(".biasPath").remove();
+                allowExpl = false;
                 if (firstPlay) {
                     d3.selectAll(".removeRect").remove();
                     firstPlay = false;

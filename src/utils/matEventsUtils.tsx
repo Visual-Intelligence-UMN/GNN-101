@@ -704,18 +704,25 @@ export function featureVisClick(
 
     let firstClick = true;
 
+    let allowExpl = true;
+
     btn.on("mouseover", function(event, d){
+        event.stopPropagation();
         const [x, y] = d3.pointer(event);
+        if(allowExpl){
         drawMatmulExplanation(
             x, y, "Matrix Multiplication", "Click the icon to show the matrix multiplication process!"
         );
+    }
     });
 
-    btn.on("mouseout", function(event, d){
+    btn.on("mouseout", function(event, d){ 
+        allowExpl = true;
         d3.selectAll(".math-displayer").remove();
     });
 
     btn.on("click", function (event: any, d: any) {
+        allowExpl = false;
 
 
         event.stopPropagation();
@@ -1112,15 +1119,19 @@ export function outputVisClick(
     });
 
     let firstPlay = true;
+    let allowExpl = true;
 
     btn.on("mouseover", function(event, d){
         const [x, y] = d3.pointer(event);
-        drawMatmulExplanation(
-            x, y, "Matrix Multiplication", "Click the icon to show the matrix multiplication process!"
-        );
+        if(allowExpl){
+            drawMatmulExplanation(
+                x, y, "Matrix Multiplication", "Click the icon to show the matrix multiplication process!"
+            );
+        }
     });
 
     btn.on("mouseout", function(event, d){
+        allowExpl = true;
         d3.selectAll(".math-displayer").remove();
     });
 
@@ -1128,6 +1139,9 @@ export function outputVisClick(
     btn.on("click", function (event: any, d: any) {
 
         event.stopPropagation();
+
+        allowExpl = false;
+        
         if(firstPlay){
             d3.select(".mats").selectAll(".removeRect").remove();
             firstPlay = false;
