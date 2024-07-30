@@ -1052,7 +1052,7 @@ export function outputVisClick(
             drawBiasPathOutputVis(biasCoord, controlPts, feaCoord);
             drawWeightsVector(g1, result, outputCoord, rectH, rectH, myColor, 
                 wMat, startCoord, endPathAniCoord, 1, weightMatrixPostions, 
-                featureChannels, poolingValues, "procVis wRect");
+                featureChannels, poolingValues, "procVis wRect", "");
             drawPathBtwOuputResult([endPt3], endPt4);
         }, delay:200},
         {func:()=>{

@@ -418,6 +418,7 @@ export function drawWeightsVector(
     featureChannels: number,
     X:number[],
     rectClass: string = "procVis removeRect wRect interactRect",
+    labelName = "Matmul Result"
 ) {
     for (let m = 0; m < dummy.length; m++) {
         g.append("rect")
@@ -433,7 +434,7 @@ export function drawWeightsVector(
             .attr("rectID", m)
             .attr("id", `weightRect${m}`);
     }
-    drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+6, "Matmul Result", "procVis");
+    drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+6, labelName, "procVis");
 
     //draw frame
     g.append("rect")
