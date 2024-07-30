@@ -43,7 +43,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
   const lastIntmData = useRef(intmData);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const currentVisualizationId = useRef(1);
-  const parse = graph_path.match(/(\d+)\.json$/);
+  const parse = typeof graph_path === 'string' ? graph_path.match(/(\d+)\.json$/) : null;
   const select = parse ? parse[1] : '';
   const location = loadNodesLocation(1, select);
   
