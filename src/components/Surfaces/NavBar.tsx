@@ -18,6 +18,9 @@ export default function Navbar() {
                         <li>
                             <a href="https://github.com/Visual-Intelligence-UMN/web-gnn-vis" target='_blank' className="text-gray-900 md:hover:text-blue-300 md:p-0 text-white ">Github</a>
                         </li>
+                        <li>
+                            <a href="https://youtu.be/_0jXy4Zoh-o" target='_blank' className="text-gray-900 md:hover:text-blue-300 md:p-0 text-white ">Video</a>
+                        </li>
                     </ul>
                 </div>
             </div>
