@@ -1,5 +1,7 @@
 # GNN101: Visual Learning of Graph Neural Networks in Your Web Browser 
 
+![image](https://github.com/user-attachments/assets/907c37fc-0218-4b38-9e34-8a347895c37f)
+
 Team: Yilin(Harry) Lu, Chongwei Chen, Matthew Xu, Qianwen Wang
 
 GNN101 is a web-based tool that provides visual learning experience for the graph neural networks. 
