@@ -11,7 +11,7 @@ export const linkList: { [k: string]: string } = {
 export const modelList: { [k: string]: string } = {
   "graph classification": "./gnn_model2.onnx",
   "node classification": "./gnn_node_model.onnx",
-  //  "link classification": "./gnn_link_model.onnx",
+  "link classification": "./gnn_link_model.onnx",
 };
 
 function graph_list_generate(num: number) {
