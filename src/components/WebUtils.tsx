@@ -650,7 +650,7 @@ export const PredictionVisualizer: React.FC<PredictionVisualizerProps> = ({
 
 import React from "react";
 import { i } from "mathjs";
-import { convertToAdjacencyMatrix, getLeafNodesCompGraph } from "@/utils/linkPredictionUtils";
+import { convertToAdjacencyMatrix, getNodeSet } from "@/utils/linkPredictionUtils";
 import { extractSubgraph } from "@/utils/graphDataUtils";
 
 interface ViewSwitchProps {
@@ -1096,8 +1096,8 @@ export function visualizePartialGraphMatrix(
         const width = gridSize + margin.left + margin.right;
         const height = (gridSize + margin.top + margin.bottom) * 2;
         //get the nodes
-        let nodesA:number[] = getLeafNodesCompGraph(graph, hubNodeA);
-        let nodesB:number[] = getLeafNodesCompGraph(graph, hubNodeB);
+        let nodesA:number[] = getNodeSet(graph, hubNodeA)[0];
+        let nodesB:number[] = getNodeSet(graph, hubNodeB)[0];
 
         console.log("nodesA", nodesA);
         console.log("nodesB", nodesB);

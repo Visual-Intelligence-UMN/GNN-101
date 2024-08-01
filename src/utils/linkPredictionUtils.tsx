@@ -100,7 +100,7 @@ export function constructComputationalGraph(
     return computeGraph;
 }
 
-export function getLeafNodesCompGraph(
+export function getNodeSet(
     graph: any, 
     hubNode: number
 ){
@@ -110,6 +110,15 @@ export function getLeafNodesCompGraph(
     adjList = removeDuplicatesFromSubarrays(adjList);
 
     let addedFeatureNodes: Set<number> = new Set();
+    let addedConv1Nodes: Set<number> = new Set();
+
+    for(let i = 0; i < adjList[hubNode].length; i++){
+        const neighborNode = adjList[hubNode][i];
+        console.log("add edge", hubNode, neighborNode);
+        if (!addedConv1Nodes.has(neighborNode)) {
+            addedConv1Nodes.add(neighborNode);
+        }
+    }
 
     // Compute features of nodes involved and add to computeGraph
     for(let i = 0; i < adjList[hubNode].length; i++){
@@ -126,12 +135,14 @@ export function getLeafNodesCompGraph(
     }
 
     const nodesNeedConstruct:number[] = Array.from(addedFeatureNodes);
+    const nodesNeedConstruct1:number[] = Array.from(addedConv1Nodes);
+    const mergedNodes = [nodesNeedConstruct, nodesNeedConstruct1];
     //const subgraph = extractSubgraph(mat, nodesNeedConstruct);
 
     //basically, we generate a computational graph based on the input graph and the features - computeGraph
     //then we have a set of nodes that we have added to the computeGraph - sets
     //we also need to construct a subgraph based on the nodes that we have added to the computeGraph - subgraph
-    return nodesNeedConstruct;
+    return mergedNodes;
 }
 
 type AdjacencyDict = { [key: string]: number[] };

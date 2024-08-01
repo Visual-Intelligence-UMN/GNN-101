@@ -22,8 +22,8 @@ import {
 import { visualizeMatrixBody } from "../components/WebUtils";
 
 import { myColor } from "../utils/utils";
-import { convertToAdjacencyMatrix, getLeafNodesCompGraph } from "./linkPredictionUtils";
-import { extractSubgraph } from "./graphDataUtils";
+import { convertToAdjacencyMatrix, getNodeSet } from "./linkPredictionUtils";
+import { extractSubgraph, removeDuplicatesFromSubarrays } from "./graphDataUtils";
 import { decode } from "punycode";
 
 //find absolute max value in an 1d array
@@ -275,8 +275,10 @@ export async function visualizeLinkClassifier(setIsLoading:any, graph_path:strin
         const graph = await graph_to_matrix(data);
 
         //get the nodes
-        let nodesA:number[] = getLeafNodesCompGraph(graph, hubNodeA);
-        let nodesB:number[] = getLeafNodesCompGraph(graph, hubNodeB);
+
+        
+        let nodesA:number[] = getNodeSet(graph, hubNodeA)[0];
+        let nodesB:number[] = getNodeSet(graph, hubNodeB)[0];
 
         console.log("nodesA", nodesA);
         console.log("nodesB", nodesB);
@@ -299,7 +301,7 @@ export async function visualizeLinkClassifier(setIsLoading:any, graph_path:strin
         console.log("subMatrix", subMatrix);
 
         // Initialize and run D3 visualization with processe  d data
-        await initLinkClassifier(subMatrix, features, intmData, graph_path);
+        await initLinkClassifier(subMatrix, features, intmData, graph_path, hubNodeA, hubNodeB);
     } catch (error) {
         console.error("Error in visualizeGNN:", error);
     } finally {
@@ -310,7 +312,18 @@ export async function visualizeLinkClassifier(setIsLoading:any, graph_path:strin
 
 
 //----------------------function for visualizing link classifier----------------------------
-async function initLinkClassifier(graph: any, features: any[][], intmData:any, graph_path:string)  {
+async function initLinkClassifier(
+    graph: any, 
+    features: any[][], 
+    intmData:any, 
+    graph_path:string,
+    hubNodeA:number,
+    hubNodeB:number
+)  {
+
+    //process the origin data
+    const oData = await load_json(graph_path);
+    const LargeGraph = await graph_to_matrix(oData);
 
     let colorSchemeTable: any = null;
     //a data structure to record the link relationship
@@ -319,45 +332,35 @@ async function initLinkClassifier(graph: any, features: any[][], intmData:any, g
 
     let conv1: number[][] = [],
         conv2: number[][] = [],
-        decode_mul: number[][] = [],
-        decode_sum: number[][] = [],
-        prob_adj = null;
+        prob_adj:number[][] = [];
 
 
     if (intmData != null) {
         //max abs find
-        let conv1Max = findAbsMax(intmData.conv1);
+        // let conv1Max = findAbsMax(intmData.conv1);
 
-        let conv2Max = findAbsMax(intmData.conv2);
+        // let conv2Max = findAbsMax(intmData.conv2);
 
-        let decodeMulMax = findAbsMax(intmData.decode_mul);
-
-        let decodeSumMax = findAbsMax(intmData.decode_sum);
-
-        let probAdjMax = findAbsMax(intmData.prob_adj);
+        // let probAdjMax = findAbsMax(intmData.prob_adj);
 
 
-        colorSchemeTable = {
-            conv1: conv1Max,
-            conv2: conv2Max,
-            decodeMul: decodeMulMax,
-            decodeSum: decodeSumMax,
-            probAdj: probAdjMax
-        };
+        // colorSchemeTable = {
+        //     conv1: conv1Max,
+        //     conv2: conv2Max,
+        //     probAdj: probAdjMax
+        // };
 
-
+        console.log("test len",intmData.prob_adj.length)
         conv1 = splitIntoMatrices(intmData.conv1, 64);
         conv2 = splitIntoMatrices(intmData.conv2, 64);
-        decode_mul = splitIntoMatrices(intmData.conv3, 2);
-        decode_sum = intmData.result;
-        prob_adj = splitIntoMatrices(intmData.final, Math.sqrt(intmData.prob_adj.length));
+        prob_adj = splitIntoMatrices(intmData.prob_adj, Math.sqrt(intmData.prob_adj.length));
     }
 
 
 
     const gLen = graph.length;
 
-    const gridSize = 800;
+    const gridSize = 600;
     const margin = { top: 10, right: 80, bottom: 30, left: 80 };
     const width = 20 * gLen + 50 + 6 * 102 + 1200 * 2;
     const height = (gridSize + margin.top + margin.bottom) * 2;
@@ -369,29 +372,60 @@ async function initLinkClassifier(graph: any, features: any[][], intmData:any, g
     const data = matrix_to_hmap(graph);
 
     locations = get_cood_locations(data, locations);
-    //crossConnectionMatrices(graphs, locations, offsetMat, pathMatrix);
-    const featuresManager = visualizeNodeClassifierFeatures(
-        locations,
-        features,
-        myColor,
-        conv1,
-        conv2,
-        conv3,
-        result,
-        final,
-        graph,
-        adjList,
-        colorSchemeTable,
-        trainingNodes
-    );
-    drawNodeAttributes(nodeAttrs, graph, 50);
 
-    const intervalID = featuresManager.getIntervalID();
+    //features fetching - select the right features to viaualize
+    // get the set 
+    console.log("graph", graph);
+    const setA = getNodeSet(LargeGraph, hubNodeA);
+    const setB = getNodeSet(LargeGraph, hubNodeB);
 
-    clearInterval(intervalID);
+    //get the set of nodes
+    const featuresIndicesLayerOne:number[] = removeDuplicatesFromSubarrays([[...setA[0], ...setB[0]]])[0];
+    const featuresIndicesLayerTwo:number[] = removeDuplicatesFromSubarrays([[...setA[1], ...setB[1]]])[0];
+
+
+    //indexing the node/intermediate features by set
+    let featuresLayerOne = [];
+    let featuresLayerTwo = [];
+    for(let i = 0; i < featuresIndicesLayerOne.length; i++){
+        featuresLayerOne.push({[featuresIndicesLayerOne[i]]:features[featuresIndicesLayerOne[i]]});
+    }
+    for(let i = 0; i < featuresIndicesLayerTwo.length; i++){
+        featuresLayerTwo.push({[featuresIndicesLayerTwo[i]]:conv1[featuresIndicesLayerTwo[i]]});
+    }
+
+    //get the feature from decoding phase z @ z.t() where z is the matrix from the conv2
+    let featuresLayerThree = [{[hubNodeA]:conv2[hubNodeA]}, {[hubNodeB]:conv2[hubNodeB]}];
+
+    //get the final result from probability matrix
+    let featuresLayerFour = 0//prob_adj[hubNodeA][hubNodeB];
+
+    //summarize them as a table
+    const featuresDataTable = [featuresLayerOne, featuresLayerTwo, featuresLayerThree, featuresLayerFour];
+    console.log("featuresDataTable", featuresDataTable);
+    // //crossConnectionMatrices(graphs, locations, offsetMat, pathMatrix);
+    // const featuresManager = visualizeNodeClassifierFeatures(
+    //     locations,
+    //     features,
+    //     myColor,
+    //     conv1,
+    //     conv2,
+    //     conv3,
+    //     result,
+    //     final,
+    //     graph,
+    //     adjList,
+    //     colorSchemeTable,
+    //     trainingNodes
+    // );
+    // drawNodeAttributes(nodeAttrs, graph, 50);
+
+    // const intervalID = featuresManager.getIntervalID();
+
+    // clearInterval(intervalID);
     drawPoints(".mats", "red", locations);
 
-    console.log("finished visulizing link classifier", conv1, conv2, decode_mul, decode_sum, prob_adj, locations);
+   // console.log("finished visulizing link classifier", conv1, conv2, decode_mul, decode_sum, prob_adj, locations);
 };
 
 // Node 148: Sum 33 : Values (2, 7, 24)

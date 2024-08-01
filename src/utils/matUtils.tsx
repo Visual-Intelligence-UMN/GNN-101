@@ -1087,15 +1087,59 @@ export function visualizeNodeClassifierFeatures(
         }
 
     });
-
-
-
-
-
-
     return null;
 }
 
 
+export function visualizeLinkClassifierFeatures(
+    locations: any,
+    features: any,
+    myColor: any,
+    conv1: any,
+    conv2: any,
+    decodeMul: any,
+    decodeSum: any,
+    probAdj: any,
+    graph: any,
+    adjList: any,
+    maxVals: any,
+    trainingNodes: number[]
+) {
+    //--------------------------------DATA PREP MANAGEMENT--------------------------------
+    let intervalID: any = null; // to manage animation controls
 
+    let poolingVis = null; //to manage pooling visualizer
+    let outputVis = null; //to manage model output
+    let resultVis: any = null; //tp manage result visualizer
+    //load weights and bias
+    const dataPackage = loadNodeWeights();
+
+    const weights = dataPackage["weights"];
+    const bias = dataPackage["bias"];
+
+    //table that manage all feature visualizers for GCNConv
+    let featureVisTable: SVGElement[][] = [[], [], [], [], []];
+    //table that manage color schemes
+    let colorSchemesTable: SVGElement[] = [];
+    //control detail view
+    let dview = false;
+    //control lock and unlock
+    let lock = false;
+    //a data structure to store all feature vis frames information
+    interface FrameDS {
+        features: any[];
+        GCNConv1: any[];
+        GCNConv2: any[];
+        GCNConv3: any[];
+        results: any[];
+    }
+    var frames: FrameDS = {
+        features: [],
+        GCNConv1: [],
+        GCNConv2: [],
+        GCNConv3: [],
+        results: []
+    };
+    var schemeLocations: any = [];
+}
 
