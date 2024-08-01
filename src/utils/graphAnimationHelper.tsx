@@ -204,7 +204,7 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
                 let weightMat = weights[index]
                 const math = create(all, {});
                 weightMat = math.transpose(weightMat);
-                // weightMat = weightMat.map((row: any) => row.reverse());
+                weightMat = weightMat.map((row: any) => row.reverse());
 
 
                 // console.log('weights matrix is', weightMat, 'at index', index, 'and i is', i)
