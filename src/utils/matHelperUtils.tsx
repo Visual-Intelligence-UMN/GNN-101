@@ -1,5 +1,6 @@
 import {
     deepClone,
+    drawPoints,
     get_cood_from_parent,
     get_coordination,
     myColor
@@ -76,21 +77,27 @@ export function drawNodeAttributes(nodeAttrs: any, graph: any, offset: number) {
     //for x-axis
     const rectCood = get_cood_from_parent(".mats", "rect");
 
+    console.log("rectCoord", rectCood);
+
     const step = graph.length;
     let xTextCood = [];
     for (let i = step - 1; i < graph.length * graph.length; i += step) {
         xTextCood.push(rectCood[i]);
     }
 
-    //drawPoints(".mats", "red", xTextCood);
+    console.log("xTextCood", xTextCood);
+
+    // drawPoints(".mats", "red", xTextCood);
     for (let i = 0; i < xTextCood.length; i++) {
         d3.select(".mats")
             .append("text")
             .attr("x", xTextCood[i][0] - 2.5)
-            .attr("y", xTextCood[i][1] + 60)
+            .attr("y", xTextCood[i][1] + 75)
             .attr("font-size", "10px")
             .text(nodeAttrs[i]);
     }
+    //drawPoints(".mats", "red", rectCood);
+    console.log("rectCoord", rectCood);
 }
 
 export interface HeatmapData {

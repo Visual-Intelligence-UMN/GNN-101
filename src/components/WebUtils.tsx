@@ -1111,6 +1111,9 @@ export function visualizePartialGraphMatrix(
 
         console.log("subGraph", subGraph);
 
+        //get node attribute
+        const keys = Object.keys(subGraph).map(Number);
+
         //transform the subgraph to adjacent matrix
         const subMatrix = convertToAdjacencyMatrix(subGraph);
 
@@ -1118,6 +1121,8 @@ export function visualizePartialGraphMatrix(
 
         //visualize matrix body part
         visualizeMatrixBody(gridSize, subMatrix, width, height, margin);
+
+        drawNodeAttributes(keys, subMatrix, 150);
     };
 
     const visualizeMat = async (path: string) => {

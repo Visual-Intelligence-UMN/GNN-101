@@ -22,6 +22,9 @@ import {
 import { visualizeMatrixBody } from "../components/WebUtils";
 
 import { myColor } from "../utils/utils";
+import { convertToAdjacencyMatrix, getLeafNodesCompGraph } from "./linkPredictionUtils";
+import { extractSubgraph } from "./graphDataUtils";
+import { decode } from "punycode";
 
 //find absolute max value in an 1d array
 export function findAbsMax(arr: number[]) {
@@ -223,22 +226,12 @@ export async function visualizeGraphClassifier(setIsLoading:any, graph_path:stri
     try {
         setIsLoading(true);
         // Process data
-
         const data = await load_json(graph_path);
-
-
         //node attributes extraction
-
         const nodeAttrs = getNodeAttributes(data);
-
-
-
         //accept the features from original json file
         const features = await get_features_origin(data);
-
-
         const processedData = await graph_to_matrix(data);
-
         // Initialize and run D3 visualization with processe  d data
         await initGraphClassifier(processedData, features, nodeAttrs, intmData, graph_path);
     } catch (error) {
@@ -253,20 +246,12 @@ export async function visualizeNodeClassifier(setIsLoading:any, graph_path:strin
     try {
         setIsLoading(true);
         // Process data
-
         const data = await load_json(graph_path);
-
-
         //training nodes
         const trainingNodes = data.train_nodes;
-
-
         //accept the features from original json file
         const features = await get_features_origin(data);
-
-
         const processedData = await graph_to_matrix(data);
-
         // Initialize and run D3 visualization with processe  d data
         await initNodeClassifier(processedData, features, intmData, graph_path, trainingNodes);
     } catch (error) {
@@ -276,4 +261,150 @@ export async function visualizeNodeClassifier(setIsLoading:any, graph_path:strin
     }
 };
 
+//Visualization Pipeline for Link Classifier
+export async function visualizeLinkClassifier(setIsLoading:any, graph_path:string, intmData:any, hubNodeA:number, hubNodeB:number) {
+    try {
+        console.log("start visualizing...", graph_path, intmData, hubNodeA, hubNodeB);
+        setIsLoading(true);
+        // Process data
+        const data = await load_json(graph_path);
+        //training nodes
+        //const trainingNodes = data.train_nodes;
+        //accept the features from original json file
+        const features = await get_features_origin(data);
+        const graph = await graph_to_matrix(data);
 
+        //get the nodes
+        let nodesA:number[] = getLeafNodesCompGraph(graph, hubNodeA);
+        let nodesB:number[] = getLeafNodesCompGraph(graph, hubNodeB);
+
+        console.log("nodesA", nodesA);
+        console.log("nodesB", nodesB);
+
+        const mergedNodes = [...nodesA, ...nodesB];
+
+        console.log("mergedNodes", mergedNodes);
+
+        //compute the structure of the subgraph
+        const subGraph = extractSubgraph(graph, mergedNodes);
+
+        console.log("subGraph", subGraph);
+
+        //get node attribute
+        const keys = Object.keys(subGraph).map(Number);
+
+        //transform the subgraph to adjacent matrix
+        const subMatrix = convertToAdjacencyMatrix(subGraph);
+
+        console.log("subMatrix", subMatrix);
+
+        // Initialize and run D3 visualization with processe  d data
+        await initLinkClassifier(subMatrix, features, intmData, graph_path);
+    } catch (error) {
+        console.error("Error in visualizeGNN:", error);
+    } finally {
+        setIsLoading(false);
+    }
+};
+
+
+
+//----------------------function for visualizing link classifier----------------------------
+async function initLinkClassifier(graph: any, features: any[][], intmData:any, graph_path:string)  {
+
+    let colorSchemeTable: any = null;
+    //a data structure to record the link relationship
+    //fill up the linkMap
+    let adjList = graphToAdjList(graph);
+
+    let conv1: number[][] = [],
+        conv2: number[][] = [],
+        decode_mul: number[][] = [],
+        decode_sum: number[][] = [],
+        prob_adj = null;
+
+
+    if (intmData != null) {
+        //max abs find
+        let conv1Max = findAbsMax(intmData.conv1);
+
+        let conv2Max = findAbsMax(intmData.conv2);
+
+        let decodeMulMax = findAbsMax(intmData.decode_mul);
+
+        let decodeSumMax = findAbsMax(intmData.decode_sum);
+
+        let probAdjMax = findAbsMax(intmData.prob_adj);
+
+
+        colorSchemeTable = {
+            conv1: conv1Max,
+            conv2: conv2Max,
+            decodeMul: decodeMulMax,
+            decodeSum: decodeSumMax,
+            probAdj: probAdjMax
+        };
+
+
+        conv1 = splitIntoMatrices(intmData.conv1, 64);
+        conv2 = splitIntoMatrices(intmData.conv2, 64);
+        decode_mul = splitIntoMatrices(intmData.conv3, 2);
+        decode_sum = intmData.result;
+        prob_adj = splitIntoMatrices(intmData.final, Math.sqrt(intmData.prob_adj.length));
+    }
+
+
+
+    const gLen = graph.length;
+
+    const gridSize = 800;
+    const margin = { top: 10, right: 80, bottom: 30, left: 80 };
+    const width = 20 * gLen + 50 + 6 * 102 + 1200 * 2;
+    const height = (gridSize + margin.top + margin.bottom) * 2;
+
+    let locations: number[][] = [];
+    d3.select("#matvis").selectAll("*").remove();
+    visualizeMatrixBody(gridSize, graph, width, height, margin);
+
+    const data = matrix_to_hmap(graph);
+
+    locations = get_cood_locations(data, locations);
+    //crossConnectionMatrices(graphs, locations, offsetMat, pathMatrix);
+    const featuresManager = visualizeNodeClassifierFeatures(
+        locations,
+        features,
+        myColor,
+        conv1,
+        conv2,
+        conv3,
+        result,
+        final,
+        graph,
+        adjList,
+        colorSchemeTable,
+        trainingNodes
+    );
+    drawNodeAttributes(nodeAttrs, graph, 50);
+
+    const intervalID = featuresManager.getIntervalID();
+
+    clearInterval(intervalID);
+    drawPoints(".mats", "red", locations);
+
+    console.log("finished visulizing link classifier", conv1, conv2, decode_mul, decode_sum, prob_adj, locations);
+};
+
+// Node 148: Sum 33 : Values (2, 7, 24)
+// Node 407: Sum 32 : Values (2, 6, 24)
+// Node 79: Sum 31 : Values (2, 7, 22)
+// Node 116: Sum 28 : Values (3, 11, 14)
+// Node 994: Sum 28 : Values (3, 11, 14)
+// Node 632: Sum 27 : Values (2, 6, 19)
+// Node 71: Sum 21 : Values (2, 5, 14)
+// Node 110: Sum 21 : Values (2, 5, 14)
+// Node 420: Sum 19 : Values (3, 8, 8)
+// Node 772: Sum 19 : Values (2, 6, 11)
+// Node 394: Sum 17 : Values (2, 6, 9)
+// Node 109: Sum 16 : Values (2, 7, 7)
+// Node 241: Sum 8 : Values (2, 5, 1)
+// Node 471: Sum 8 : Values (2, 5, 1)

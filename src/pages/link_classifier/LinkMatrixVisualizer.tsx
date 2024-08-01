@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { visualizeMatrix, visualizePartialGraphMatrix } from "../../components/WebUtils";
-import { visualizeGraphClassifier, visualizeNodeClassifier } from "@/utils/matNNVis";
+import { visualizeLinkClassifier } from "@/utils/matNNVis";
 
 interface LinkMatricesVisualizerProps {
     graph_path: string;
@@ -31,9 +31,9 @@ const LinkMatricesVisualizer: React.FC<LinkMatricesVisualizerProps> = ({
     useEffect(() => {
         if ((intmData == null || changed) && !predicted) {
             console.log("visualize partial graph");
-            visualizePartialGraphMatrix(graph_path, false, 800, hubNodeA, hubNodeB);
+            visualizePartialGraphMatrix(graph_path, false, 600, hubNodeA, hubNodeB);
         } else {
-           //visualizeNodeClassifier(setIsLoading, graph_path, intmData);
+           visualizeLinkClassifier(setIsLoading, graph_path, intmData, hubNodeA, hubNodeB);
         }
     }, [graph_path, intmData, changed, hubNodeA, hubNodeB]);
 

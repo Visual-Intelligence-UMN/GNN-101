@@ -148,12 +148,9 @@ export function convertToAdjacencyMatrix(adjDict: AdjacencyDict): number[][] {
             }
         }
     }
-    
+
     return adjMatrix;
 }
-
-
-
 
 
 
