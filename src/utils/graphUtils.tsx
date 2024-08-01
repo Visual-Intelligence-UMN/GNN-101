@@ -329,7 +329,7 @@ export function outputVisualizer(
         .attr("opacity", 0)
         .lower();
 
-        const Xt = weights;;
+        const Xt = weights;
 
     hoverOverHandler(node, node.relatedNodes[0].features, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg)
 
