@@ -100,8 +100,57 @@ export function constructComputationalGraph(
     return computeGraph;
 }
 
+export function getLeafNodesCompGraph(
+    graph: any, 
+    hubNode: number
+){
+    // Convert graph to adjacency matrix and adjacency list
+    //const mat = graphToMatrix(graph);
+    let adjList:number[][] = graphToAdjList(graph);
+    adjList = removeDuplicatesFromSubarrays(adjList);
 
+    let addedFeatureNodes: Set<number> = new Set();
 
+    // Compute features of nodes involved and add to computeGraph
+    for(let i = 0; i < adjList[hubNode].length; i++){
+        const node = adjList[hubNode][i];
+        console.log("neighborNode 2", adjList[node]);
+        for(let j = 0; j < adjList[node].length; j++){
+            const neighborNode = adjList[node][j];
+            console.log("neighborNode hop 2", neighborNode);
+            console.log("add edge hop 2", node, neighborNode);
+            if (!addedFeatureNodes.has(neighborNode)) {
+                addedFeatureNodes.add(neighborNode);            
+            }
+        }
+    }
+
+    const nodesNeedConstruct:number[] = Array.from(addedFeatureNodes);
+    //const subgraph = extractSubgraph(mat, nodesNeedConstruct);
+
+    //basically, we generate a computational graph based on the input graph and the features - computeGraph
+    //then we have a set of nodes that we have added to the computeGraph - sets
+    //we also need to construct a subgraph based on the nodes that we have added to the computeGraph - subgraph
+    return nodesNeedConstruct;
+}
+
+type AdjacencyDict = { [key: string]: number[] };
+
+export function convertToAdjacencyMatrix(adjDict: AdjacencyDict): number[][] {
+    const keys = Object.keys(adjDict).map(Number);
+    let adjMatrix: number[][] = Array(keys.length).fill(0).map(() => Array(keys.length).fill(0));
+    for (const key in adjDict) {
+        if (adjDict.hasOwnProperty(key)) {
+            const values = adjDict[key];
+            // console.log(`Key: ${key}, Values: ${values}`);
+            for(let i = 0; i < values.length; i++){
+                adjMatrix[keys.indexOf(Number(key))][keys.indexOf(values[i])] = 1;
+            }
+        }
+    }
+    
+    return adjMatrix;
+}
 
 
 

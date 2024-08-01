@@ -24,6 +24,7 @@ import { Inter } from "@next/font/google";
 import NodeMatricesVisualizer from "./node_classifier/NodeMatrixVisualizer";
 import NodeGraphVisualizer from "./node_classifier/NodeGraphVisualizer";
 import { mod } from "mathjs";
+import LinkMatricesVisualizer from "./link_classifier/LinkMatrixVisualizer";
 
 export const inter = Inter({
     variable: "--font-inter",
@@ -319,7 +320,15 @@ export default function Home() {
                                 ) : isGraphView ? (
                                     <>Graph View</>
                                 ) : (
-                                    <>Matrix View</>
+                                    <LinkMatricesVisualizer
+                                        graph_path={linkList[selectedGraph]}
+                                        intmData={intmData}
+                                        changed={changedG}
+                                        predicted={predicted}
+                                        selectedButtons={selectedButtons}
+                                        hubNodeA={241}
+                                        hubNodeB={109}
+                                    />
                                 )}
 
                                 {/* overlay text on visualizer when not predicted */}
