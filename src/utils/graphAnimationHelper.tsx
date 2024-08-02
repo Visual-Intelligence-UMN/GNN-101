@@ -184,13 +184,14 @@ export function drawGraphVisWeightVector(weightMatrixPositions: number[][][], re
                             .attr("id", `columnUnit-${j}`);
 
 }
-export function displayerHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], i: number) {
+export function displayerHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], i: number, mode: number, isOutput: boolean) {
 
                 if (!g.selectAll) {
                     g = d3.selectAll(g)
                 }
 
                 d3.select(".graph-displayer").attr("opacity", 1);
+                console.log('weight before transformations', weights)
 
 
                 d3.selectAll(".weightUnit").style("opacity", 0.3);
@@ -200,33 +201,36 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
                 
 
         
-                
                 let weightMat = weights[index]
-                const math = create(all, {});
+                const math = create(all, {});   
                 weightMat = math.transpose(weightMat);
-                if (index !== 1)
-                {
-                weightMat = weightMat.map((row: any) => row.reverse());} else {
+                if (mode === 1) {
+                    if (index !== 1 && !isOutput) {
+                        weightMat = weightMat.map((row: any) => row.reverse());
+                    } else {
+                        weightMat = weightMat.slice().reverse()
+                    }
+                } else if (mode === 0) {
                     weightMat = weightMat.slice().reverse()
                 }
 
 
-                console.log('weights matrix is', weightMat, 'at index', index, 'and i is', i)
-            
-                for (let j = 0; j < weightMat[i].length; j++)
-                g.append("rect")
-                                        .attr("x", 130)
-                                        .attr("y", 20 + wmRectL * j)
-                                        .attr("width", 7)
-                                        .attr("height", wmRectL)
-                                        .attr("fill", myColor(weightMat[i][j]))
-                                        .attr("stroke", "gray")
-                                        .attr("stroke-width", 0.1)
-                                        .attr("opacity", 1)
-                                        .attr("class", "columnUnit math-displayer")
-                                        .attr("id", `columnUnit-${j}`)
-                                        .style("opacity", 1)
-
+                console.log('weights matrix is', weightMat, 'at index', index, 'and i is', i, 'which means the column selected is', weightMat[i])
+                for (let j = 0; j < weightMat[i].length; j++) {
+                    console.log(j)
+                    g.append("rect")
+                    .attr("x", 130)
+                    .attr("y", 20 + wmRectL * j)
+                    .attr("width", 7)
+                    .attr("height", wmRectL)
+                    .attr("fill", myColor(weightMat[i][j]))
+                    .attr("stroke", "gray")
+                    .attr("stroke-width", 0.1)
+                    .attr("opacity", 1)
+                    .attr("class", "columnUnit math-displayer")
+                    .attr("id", `columnUnit-${j}`)
+                    .style("opacity", 1)
+                }
                 const featureGroup = g.append("g")
                 .attr("transform", `translate(${70}, ${displayHeight - 40})`);
 
@@ -393,7 +397,7 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
     }
 
 
-export function hoverOverHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], Xt: any, startCoordList: any, endCoordList: any, svg: any) {
+export function hoverOverHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], Xt: any, startCoordList: any, endCoordList: any, svg: any, mode: number, isOutput: boolean) {
 
     
 
@@ -403,11 +407,12 @@ export function hoverOverHandler(node: any, aggregatedData: any, state: State, g
                 if (!state.isClicked || state.isPlaying) {
                     return;
                 }
+                console.log('Xt', Xt)
                 graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg)
                 d3.selectAll(".calculatedRect").style("opacity", 0.2)
                 d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1)
                 d3.selectAll(`#tempath${i}`).style("opacity", 1);
-                displayerHandler(node, aggregatedData, state, g, displayHeight, rectL, wmRectL, myColor, weights, index, weightsLocation, i)
+                displayerHandler(node, aggregatedData, state, g, displayHeight, rectL, wmRectL, myColor, weights, index, weightsLocation, i, mode, isOutput)
 
 
 
