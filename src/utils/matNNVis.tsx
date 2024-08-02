@@ -411,6 +411,10 @@ async function initLinkClassifier(
 
     //get the feature from decoding phase z @ z.t() where z is the matrix from the conv2
     let featuresLayerThree = [{[hubNodeA]:conv2[hubNodeA]}, {[hubNodeB]:conv2[hubNodeB]}];
+    //sort the third data table
+    if(hubNodeB<hubNodeA){
+        featuresLayerThree = [{[hubNodeB]:conv2[hubNodeB]}, {[hubNodeA]:conv2[hubNodeA]}];
+    }
 
     //get the final result from probability matrix
     let featuresLayerFour = 0//prob_adj[hubNodeA][hubNodeB];
