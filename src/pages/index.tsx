@@ -5,7 +5,7 @@ import ClassifyGraph from "./ClassifyGraph";
 // import { CSSTransition } from 'react-transition-group';
 import MatricesVisualizer from "./MatricesVisualizer";
 import { IntmData, IntmDataNode } from "../types";
-import { graphList, linkList, modelList, nodeList, DatasetInfo } from "../utils/const";
+import { graphList, linkList, modelList, nodeList, DatasetInfo, nodeSelectionList } from "../utils/const";
 import Sidebar from "./Sidebar";
 import styles from "./index.module.css";
 import * as d3 from "d3";
@@ -18,6 +18,7 @@ import {
     GraphAnalysisViewer,
     NodeClassifierButtonChain,
     LinkClassifierButtonChain,
+    NodeSelector,
 } from "../components/WebUtils";
 import { Footer, NavBar } from "../components/Surfaces";
 import { Inter } from "@next/font/google";
@@ -56,6 +57,9 @@ export default function Home() {
     const [show, setShow] = useState(false);
     const [predicted, setPredicted] = useState(false);
     const [simulationLoading, setSimulation] = useState(false);
+
+    const [hubNodeA, setHubNodeA] = useState(241);
+    const [hubNodeB, setHubNodeB] = useState(109);
 
     //intermediate output
     const [intmData, setIntmData] = useState<IntmData | IntmDataNode | null>(
@@ -139,7 +143,6 @@ export default function Home() {
                                         } else {
                                             setSelectedGraph("twitch_EN");
                                         }
-
                                     }}
                                     OptionList={Object.keys(modelList)}
                                 />
@@ -195,7 +198,6 @@ export default function Home() {
                                             />
                                         )}
                                     </div>
-
                                 </div>
                                 <div className="relative"
                                     style={{
@@ -225,6 +227,22 @@ export default function Home() {
                                         <p>{DatasetInfo[model]}</p>
                                     </div>
                                 </div>
+                                {model == "link classification" ?<>
+                                    Predict a link from node 
+                                    <NodeSelector
+                                        nodeList={nodeSelectionList}
+                                        selectedNode={hubNodeA}
+                                        dependNode={hubNodeB}
+                                        setSelectedNode={setHubNodeA} 
+                                    />
+                                     to node 
+                                    <NodeSelector
+                                        nodeList={nodeSelectionList}
+                                        selectedNode={hubNodeB}
+                                        dependNode={hubNodeA}
+                                        setSelectedNode={setHubNodeB}
+                                    />
+                                </>:<></>}
                                 {selectedGraph &&
                                     (graphList[selectedGraph] || nodeList[selectedGraph]) ? (
                                     model == "graph classification" ? (
@@ -326,8 +344,8 @@ export default function Home() {
                                         changed={changedG}
                                         predicted={predicted}
                                         selectedButtons={selectedButtons}
-                                        hubNodeA={241}
-                                        hubNodeB={109}
+                                        hubNodeA={hubNodeA}
+                                        hubNodeB={hubNodeB}
                                     />
                                 )}
 

@@ -41,6 +41,33 @@ export function chunkArray<T>(inputArray: T[], chunkSize: number): T[][] {
     return result;
 }
 
+
+//node selector in link prediction
+
+export const NodeSelector:React.FC<{
+    nodeList: number[], selectedNode: number, dependNode:number, setSelectedNode: Function
+}> = ({nodeList, selectedNode, dependNode, setSelectedNode}) => {
+    return (
+        <select
+            className="text-2xl rounded-md px-3 shadow-none border-solid border-gray-200 border-2 min-w-80 bg-white text-gray-600"
+            value={selectedNode}
+            onChange={(e) => {
+                if(Number(e.target.value)!=dependNode){
+                    setSelectedNode(e.target.value);
+                }else{
+                    window.alert("Can't select the same node for link prediction");
+                }
+            }}
+        >
+            {nodeList.map((item, index) => (
+                <option key={index} value={item}>
+                    {item}
+                </option>
+            ))}
+        </select>
+    );
+}
+
 interface GraphAnalysisViewerProps {
     path: string;
 }
