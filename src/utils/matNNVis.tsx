@@ -417,7 +417,7 @@ async function initLinkClassifier(
     }
 
     //get the final result from probability matrix
-    let featuresLayerFour = 0//prob_adj[hubNodeA][hubNodeB];
+    let featuresLayerFour = prob_adj[hubNodeA][hubNodeB];
 
     //summarize them as a table
     const featuresDataTable = [featuresLayerOne, featuresLayerTwo, featuresLayerThree, featuresLayerFour];
@@ -447,17 +447,4 @@ async function initLinkClassifier(
    // console.log("finished visulizing link classifier", conv1, conv2, decode_mul, decode_sum, prob_adj, locations);
 };
 
-// Node 148: Sum 33 : Values (2, 7, 24)
-// Node 407: Sum 32 : Values (2, 6, 24)
-// Node 79: Sum 31 : Values (2, 7, 22)
-// Node 116: Sum 28 : Values (3, 11, 14)
-// Node 994: Sum 28 : Values (3, 11, 14)
-// Node 632: Sum 27 : Values (2, 6, 19)
-// Node 71: Sum 21 : Values (2, 5, 14)
-// Node 110: Sum 21 : Values (2, 5, 14)
-// Node 420: Sum 19 : Values (3, 8, 8)
-// Node 772: Sum 19 : Values (2, 6, 11)
-// Node 394: Sum 17 : Values (2, 6, 9)
-// Node 109: Sum 16 : Values (2, 7, 7)
-// Node 241: Sum 8 : Values (2, 5, 1)
-// Node 471: Sum 8 : Values (2, 5, 1)
+
