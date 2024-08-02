@@ -11,6 +11,7 @@ import {
 } from "../utils/utils";
 import {
     visualizeGraphClassifierFeatures,
+    visualizeLinkClassifierFeatures,
     visualizeNodeClassifierFeatures
 } from "@/utils/matUtils";
 import {
@@ -343,8 +344,6 @@ async function initLinkClassifier(
         // let conv2Max = findAbsMax(intmData.conv2);
 
         // let probAdjMax = findAbsMax(intmData.prob_adj);
-
-
         // colorSchemeTable = {
         //     conv1: conv1Max,
         //     conv2: conv2Max,
@@ -374,6 +373,11 @@ async function initLinkClassifier(
     const data = matrix_to_hmap(graph);
 
     locations = get_cood_locations(data, locations);
+
+    //shift the locations
+    for(let i = 0; i < locations.length; i++){
+        locations[i][0] += 25;
+    }
 
     //features fetching - select the right features to viaualize
     // get the set 
@@ -422,27 +426,21 @@ async function initLinkClassifier(
     //summarize them as a table
     const featuresDataTable = [featuresLayerOne, featuresLayerTwo, featuresLayerThree, featuresLayerFour];
     console.log("featuresDataTable", featuresDataTable);
-    // //crossConnectionMatrices(graphs, locations, offsetMat, pathMatrix);
-    // const featuresManager = visualizeLinkClassifierFeatures(
-    //     locations,
-    //     features,
-    //     myColor,
-    //     conv1,
-    //     conv2,
-    //     conv3,
-    //     result,
-    //     final,
-    //     graph,
-    //     adjList,
-    //     colorSchemeTable,
-    //     trainingNodes
-    // );
+
+    let featuresArray:any = [];
+
+    featuresLayerOne.forEach(obj => {
+        let key:number = Number(Object.keys(obj)[0]); 
+        featuresArray.push(obj[key]);  
+    });
+    //crossConnectionMatrices(graphs, locations, offsetMat, pathMatrix);
+    const featuresManager = visualizeLinkClassifierFeatures(locations, featuresArray, myColor, graph);
     
 
     // const intervalID = featuresManager.getIntervalID();
 
     // clearInterval(intervalID);
-    // drawPoints(".mats", "red", locations);
+    drawPoints(".mats", "red", locations);
 
    // console.log("finished visulizing link classifier", conv1, conv2, decode_mul, decode_sum, prob_adj, locations);
 };

@@ -1095,15 +1095,13 @@ export function visualizeLinkClassifierFeatures(
     locations: any,
     features: any,
     myColor: any,
-    conv1: any,
-    conv2: any,
-    decodeMul: any,
-    decodeSum: any,
-    probAdj: any,
+    // conv1: any,
+    // conv2: any,
+    // probAdj: any,
     graph: any,
-    adjList: any,
-    maxVals: any,
-    trainingNodes: number[]
+    // adjList: any,
+    // maxVals: any,
+    // trainingNodes: number[]
 ) {
     //--------------------------------DATA PREP MANAGEMENT--------------------------------
     let intervalID: any = null; // to manage animation controls
@@ -1141,5 +1139,30 @@ export function visualizeLinkClassifierFeatures(
         results: []
     };
     var schemeLocations: any = [];
+
+    //--------------------------------DRAW FRAMES--------------------------------
+    const framePackage = drawMatrixPreparation(graph, locations, 800);
+    let colFrames: SVGElement[] = framePackage.colFrames; //a
+    let matFrames: SVGElement[] = framePackage.matFrames; //a
+
+    const firstLayerPackage = drawNodeFeatures(
+        locations,
+        graph,
+        myColor,
+        features,
+        frames,
+        schemeLocations,
+        featureVisTable,
+        128,
+        2.5,
+        15,
+        150
+    );
+    //updated variables
+    locations = firstLayerPackage.locations;
+    frames = firstLayerPackage.frames;
+    schemeLocations = firstLayerPackage.schemeLocations;
+    featureVisTable = firstLayerPackage.featureVisTable;
+    const firstLayer = firstLayerPackage.firstLayer;
 }
 
