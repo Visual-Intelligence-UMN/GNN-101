@@ -331,7 +331,7 @@ export function outputVisualizer(
 
         const Xt = weights;
 
-    hoverOverHandler(node, node.relatedNodes[0].features, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg)
+    hoverOverHandler(node, node.relatedNodes[0].features, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true)
 
     let outputData = [];
     for (let i = 0; i < calculatedData.length; i++) {
@@ -1077,7 +1077,7 @@ export function calculationVisualizer(
             displayHeight,
             mode
         );
-        hoverOverHandler(node, aggregatedData, state, g4, displayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, weights, node.graphIndex - 1, weightsLocation, Xt, startCoordList, endCoordList, svg)
+        hoverOverHandler(node, aggregatedData, state, g4, displayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, weights, node.graphIndex - 1, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, false)
 
 
 
@@ -1591,9 +1591,9 @@ function weightAnimation(
                     const math = create(all, {});
                     const wMat = math.transpose(allWeights[3]);
 
-                    displayerHandler(node, aggregatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, i)
+                    displayerHandler(node, aggregatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, i, mode, true)
                 } else {
-                displayerHandler(node, aggregatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, allWeights, node.graphIndex - 1, weightsLocation, i)
+                displayerHandler(node, aggregatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, allWeights, node.graphIndex - 1, weightsLocation, i, mode, false)
                 }
 
 
@@ -2316,7 +2316,7 @@ export function nodeOutputVisualizer(
         .lower();
 
         const Xt = math.transpose(weights);
-    hoverOverHandler(node, calculatedData, state, g5, DisplayHeight, (20 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg)
+    hoverOverHandler(node, calculatedData, state, g5, DisplayHeight, (20 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true)
 
 
 
