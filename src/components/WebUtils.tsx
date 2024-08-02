@@ -45,14 +45,16 @@ export function chunkArray<T>(inputArray: T[], chunkSize: number): T[][] {
 //node selector in link prediction
 
 export const NodeSelector:React.FC<{
-    nodeList: number[], selectedNode: number, dependNode:number, setSelectedNode: Function
-}> = ({nodeList, selectedNode, dependNode, setSelectedNode}) => {
+    nodeList: number[], selectedNode: number, dependNode:number, setSelectedNode: Function,
+    handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+}> = ({nodeList, selectedNode, dependNode, setSelectedNode, handleChange}) => {
     return (
         <select
             className="text-2xl rounded-md px-3 shadow-none border-solid border-gray-200 border-2 min-w-80 bg-white text-gray-600"
             value={selectedNode}
             onChange={(e) => {
                 if(Number(e.target.value)!=dependNode){
+                    handleChange(e);
                     setSelectedNode(e.target.value);
                 }else{
                     window.alert("Can't select the same node for link prediction");

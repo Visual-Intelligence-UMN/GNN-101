@@ -87,6 +87,15 @@ export default function Home() {
         setSimulation(false);
     }
 
+    function handleNodeSelection(e: React.ChangeEvent<HTMLSelectElement>): void {
+
+        //setSelectedGraph(e.target.value);
+        setChangedG(true);
+        setProbabilities([]);
+        setPredicted(false);
+        setSimulation(false);
+    }
+
     useEffect(() => {
         (document.body.style as any).zoom = "70%";
     }, []);
@@ -234,6 +243,7 @@ export default function Home() {
                                         selectedNode={hubNodeA}
                                         dependNode={hubNodeB}
                                         setSelectedNode={setHubNodeA} 
+                                        handleChange={handleNodeSelection}
                                     />
                                      to node 
                                     <NodeSelector
@@ -241,6 +251,7 @@ export default function Home() {
                                         selectedNode={hubNodeB}
                                         dependNode={hubNodeA}
                                         setSelectedNode={setHubNodeB}
+                                        handleChange={handleNodeSelection}
                                     />
                                 </>:<></>}
                                 {selectedGraph &&

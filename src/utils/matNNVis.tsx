@@ -301,7 +301,7 @@ export async function visualizeLinkClassifier(setIsLoading:any, graph_path:strin
         console.log("subMatrix", subMatrix);
 
         // Initialize and run D3 visualization with processe  d data
-        await initLinkClassifier(subMatrix, features, intmData, graph_path, hubNodeA, hubNodeB);
+        await initLinkClassifier(subMatrix, features, intmData, graph_path, hubNodeA, hubNodeB, keys);
     } catch (error) {
         console.error("Error in visualizeGNN:", error);
     } finally {
@@ -318,7 +318,8 @@ async function initLinkClassifier(
     intmData:any, 
     graph_path:string,
     hubNodeA:number,
-    hubNodeB:number
+    hubNodeB:number,
+    keys: number[]
 )  {
 
     //process the origin data
@@ -368,6 +369,7 @@ async function initLinkClassifier(
     let locations: number[][] = [];
     d3.select("#matvis").selectAll("*").remove();
     visualizeMatrixBody(gridSize, graph, width, height, margin);
+    drawNodeAttributes(keys, graph, 150);
 
     const data = matrix_to_hmap(graph);
 
@@ -418,7 +420,7 @@ async function initLinkClassifier(
     //     colorSchemeTable,
     //     trainingNodes
     // );
-    // drawNodeAttributes(nodeAttrs, graph, 50);
+    
 
     // const intervalID = featuresManager.getIntervalID();
 
