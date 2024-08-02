@@ -396,6 +396,19 @@ async function initLinkClassifier(
         featuresLayerTwo.push({[featuresIndicesLayerTwo[i]]:conv1[featuresIndicesLayerTwo[i]]});
     }
 
+    //sort two features data tables
+    featuresLayerOne.sort((a, b) => {
+        let keyA = Object.keys(a)[0]; 
+        let keyB = Object.keys(b)[0]; 
+        return Number(keyA) - Number(keyB); 
+    });
+    
+    featuresLayerTwo.sort((a, b) => {
+        let keyA = Object.keys(a)[0]; 
+        let keyB = Object.keys(b)[0]; 
+        return Number(keyA) - Number(keyB); 
+    });
+
     //get the feature from decoding phase z @ z.t() where z is the matrix from the conv2
     let featuresLayerThree = [{[hubNodeA]:conv2[hubNodeA]}, {[hubNodeB]:conv2[hubNodeB]}];
 
