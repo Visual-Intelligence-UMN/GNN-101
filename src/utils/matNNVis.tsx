@@ -404,7 +404,7 @@ async function initLinkClassifier(
     const featuresDataTable = [featuresLayerOne, featuresLayerTwo, featuresLayerThree, featuresLayerFour];
     console.log("featuresDataTable", featuresDataTable);
     // //crossConnectionMatrices(graphs, locations, offsetMat, pathMatrix);
-    // const featuresManager = visualizeNodeClassifierFeatures(
+    // const featuresManager = visualizeLinkClassifierFeatures(
     //     locations,
     //     features,
     //     myColor,
@@ -423,7 +423,7 @@ async function initLinkClassifier(
     // const intervalID = featuresManager.getIntervalID();
 
     // clearInterval(intervalID);
-    drawPoints(".mats", "red", locations);
+    // drawPoints(".mats", "red", locations);
 
    // console.log("finished visulizing link classifier", conv1, conv2, decode_mul, decode_sum, prob_adj, locations);
 };

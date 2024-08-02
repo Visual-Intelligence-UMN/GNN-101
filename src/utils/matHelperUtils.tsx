@@ -343,6 +343,27 @@ export function loadNodeWeights(){
     return { weights: weights, bias: bias };
 }
 
+export function loadLinkWeights(){
+    // weights data preparation
+    let weights: any = []; // DS to manage weights for each layer
+    let bias: any = []; // DS to manage bias for each layer
+
+    const weightsJSON: any = require("../../public/link_weights.json");
+
+
+
+    weights = [
+        weightsJSON["onnx::MatMul_196"],
+        weightsJSON["onnx::MatMul_199"]
+    ];
+    bias = [
+        weightsJSON["conv1.bias"],
+        weightsJSON["conv2.bias"]
+    ];
+
+    return { weights: weights, bias: bias };
+}
+
 export function loadWeights() {
     // weights data preparation
     let weights: any = []; // DS to manage weights for each layer
