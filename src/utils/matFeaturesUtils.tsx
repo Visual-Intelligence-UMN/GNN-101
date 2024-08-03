@@ -37,21 +37,7 @@ export function drawCrossConnectionForSubgraph(
         blocations[i][0] += gapSize;
     }
     // drawPoints(".mats", "red", blocations);
-
-    //draw one-one paths
-    for (let i = 0; i < alocations.length; i++) {
-        if(startKeys.includes(totalKeys[i]) && endKeys.includes(totalKeys[i])){
-            d3.select(".mats")
-                .append("path")
-                .attr("d", d3.line()([alocations[i], blocations[i]]))
-                .attr("stroke", "black")
-                .attr("opacity", 0.05)
-                .attr("fill", "none")
-                .attr("endingNode", i)
-                .attr("layerID", layerID).attr("class", "crossConnection");
-        }
-    }
-    //draw one-multiple paths - three
+    //draw one-multiple & one-one paths - three
     let pts: number[][] = [];
     const curve = d3.line().curve(d3.curveBasis);
     for (let i = 0; i < graph.length; i++) {
@@ -81,6 +67,39 @@ export function drawCrossConnectionForSubgraph(
     }
 
     //TODO: paths data structure management
+
+    d3.selectAll("path").lower();
+
+    //group all path elements by LayerID and Ending Node
+    interface GroupedPaths {
+        [layerID: string]: {
+            [endingNode: string]: SVGPathElement[];
+        };
+    }
+    const paths = d3.selectAll<SVGPathElement, any>("path");
+
+    const groupedPaths: GroupedPaths = paths
+        .nodes()
+        .reduce((acc: GroupedPaths, path: SVGPathElement) => {
+            const layerID: string = path.getAttribute("layerID") || ""; // 确保 layerID 和 endingNode 不是 null
+            const endingNode: string = path.getAttribute("endingNode") || "";
+
+            if (!acc[layerID]) {
+                acc[layerID] = {};
+            }
+
+            if (!acc[layerID][endingNode]) {
+                acc[layerID][endingNode] = [];
+            }
+
+            acc[layerID][endingNode].push(path);
+
+            return acc;
+        }, {});
+
+    console.log("groupedPaths", groupedPaths); 
+
+    return groupedPaths;
 
 }
 
@@ -218,7 +237,7 @@ export function drawMatrixPreparation(graph: any, locations: any, gridSize:numbe
     const ratio = locations[0][1] / 61.875365257263184;
     const startY = locations[0][1] / ratio;
     const rowHeight = gridSize / graph.length;
-    //drawPoints(".mats", "red", colLocations);
+    drawPoints(".mats", "red", colLocations);
     let colFrames: SVGElement[] = []; //a
   //  drawPoints(".mats", "red", colLocations)
     for (let i = 0; i < colLocations.length; i++) {
