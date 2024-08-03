@@ -225,7 +225,7 @@ export function computeMidsVertical(point1: any, point2: any) :[[number, number]
 }
 
 //draw aid utils for matrix visualization(column and row frames)
-export function drawMatrixPreparation(graph: any, locations: any, gridSize:number) {
+export function drawMatrixPreparation(graph: any, locations: any, gridSize:number, xOffset:number=0) {
     const offset = 100;
     let colLocations = [];
     for (let i = 0; i < graph.length; i++) {
@@ -244,7 +244,7 @@ export function drawMatrixPreparation(graph: any, locations: any, gridSize:numbe
         const r = d3
             .select(".mats")
             .append("rect")
-            .attr("x", colLocations[i][0])
+            .attr("x", colLocations[i][0] + xOffset)
             .attr("y", colLocations[i][1] / ratio + offset)
             .attr("height", gridSize)
             .attr("width", gridSize / graph.length)
@@ -265,7 +265,7 @@ export function drawMatrixPreparation(graph: any, locations: any, gridSize:numbe
         const r = d3
             .select(".mats")
             .append("rect")
-            .attr("x", locations[i][0] - gridSize + rowHeight / 2)
+            .attr("x", locations[i][0] - gridSize + rowHeight / 2 + xOffset)
             .attr("y", startY + i * rowHeight + offset)
             .attr("height", rowHeight)
             .attr("width", gridSize)

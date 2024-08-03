@@ -1145,7 +1145,7 @@ export function visualizeLinkClassifierFeatures(
     var schemeLocations: any = [];
 
     //--------------------------------DRAW FRAMES--------------------------------
-    const framePackage = drawMatrixPreparation(graph, locations, 600);
+    const framePackage = drawMatrixPreparation(graph, locations, 600, -25);
     let colFrames: SVGElement[] = framePackage.colFrames; //a
     let matFrames: SVGElement[] = framePackage.matFrames; //a
 
