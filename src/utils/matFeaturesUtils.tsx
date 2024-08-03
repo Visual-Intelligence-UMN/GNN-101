@@ -1649,9 +1649,12 @@ export function drawResultVisForLinkModel(
     const trueProb = sigmoid(prob);
     const falseProb = 1 - trueProb;
     const probs = [trueProb, falseProb];
+
+    //add a featureVisualizer
+    const featureVisualizer = g.append("g");
     
     for(let i=0; i<2; i++){
-        g.append("rect")
+        featureVisualizer.append("rect")
             .attr("x", featureX + i * 15)
             .attr("y", midYForFeature-15/2)
             .attr("width", 15)
@@ -1662,6 +1665,21 @@ export function drawResultVisForLinkModel(
             .attr("class", "resultRect")
             .attr("id", `resultRect`);
     }
+
+    g.append("rect")
+        .attr("x", featureX)
+        .attr("y", midYForFeature-15/2)
+        .attr("width", 30)
+        .attr("height", 15)
+        .attr("fill", "none")
+        .attr("stroke", "black")
+        .attr("opacity", 0.25)
+        .attr("stroke-width", 1)
+        .attr("class", "resultFrame")
+        .raise();
+        // .attr("class", "resultRect")
+        // .attr("id", `resultRect`);
+
     //draw the connection between two layers
     const res1 = computeMids(startingPoint1, endingPoint);
     const hpoint1:[number, number] = res1[0];
@@ -1683,7 +1701,7 @@ export function drawResultVisForLinkModel(
         .attr("opacity", 0.25)
         .attr("fill", "none")
         .attr("layerID", 3)
-        .attr("class", "crossConnection");
+        .attr("class", "pathsToResult");
 
     d3.select(".mats")
         .append("path")
@@ -1695,8 +1713,22 @@ export function drawResultVisForLinkModel(
         .attr("opacity", 0.25)
         .attr("fill", "none")
         .attr("layerID", 3)
-        .attr("class", "crossConnection");
+        .attr("class", "pathsToResult");
+    
+    featureVisualizer.on("mouseover", function (event) {
+        d3.selectAll(".pathsToResult").attr("opacity", 1);
+        d3.select(".resultFrame").attr("opacity", 1);
+        d3.selectAll(".frame[layerID='2']").attr("opacity", 1);
+        
+    });
+    featureVisualizer.on("mouseout", function (event) {
+        d3.selectAll(".pathsToResult").attr("opacity", 0.25);
+        d3.select(".resultFrame").attr("opacity", 0.25);
+        d3.selectAll(".frame[layerID='2']").attr("opacity", 0.25);
+    });
+    featureVisualizer.on("click", function (event) {
 
+    });
 }
 
 
