@@ -1366,11 +1366,10 @@ export function visualizeLinkClassifierFeatures(
                 setIntervalID,
                 featureChannels,
                 15,
-                10,
-                90,
-                34,
                 5,
-                "relu"
+                90,
+                128,
+                2.5,
             );
             // update variables
             recordLayerID = featureVisPack.recordLayerID;

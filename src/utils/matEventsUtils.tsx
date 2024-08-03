@@ -504,6 +504,9 @@ export function featureVisClick(
     } else if(Xt[0].length<10){
         w = 10;
     }
+    if(oFeatureChannels==128 && Xt[0].length==128){
+        w = 2.5;
+    }
     let intervalID: any;
     let curveDir = 1;
     const midNode = adjList.length / 2;
