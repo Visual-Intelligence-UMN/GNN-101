@@ -54,8 +54,8 @@ export const NodeSelector:React.FC<{
             value={selectedNode}
             onChange={(e) => {
                 if(Number(e.target.value)!=dependNode){
+                    setSelectedNode(Number(e.target.value));
                     handleChange(e);
-                    setSelectedNode(e.target.value);
                 }else{
                     window.alert("Can't select the same node for link prediction");
                 }
