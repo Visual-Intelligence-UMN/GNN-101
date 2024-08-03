@@ -5,6 +5,7 @@ import {
     drawGCNConvGraphModel,
     drawGCNConvNodeModel,
     computeMids,
+    drawGCNConvLinkModel,
 } from "./matFeaturesUtils";
 import * as d3 from "d3";
 import {
@@ -1095,12 +1096,14 @@ export function visualizeLinkClassifierFeatures(
     locations: any,
     features: any,
     myColor: any,
-    // conv1: any,
-    // conv2: any,
+    conv1: any,
+    conv2: any,
     // probAdj: any,
     graph: any,
     // adjList: any,
-    // maxVals: any,
+    maxVals: any,
+    featureKeys: number[],
+    featureKeysEachLayer: number[][]
     // trainingNodes: number[]
 ) {
     //--------------------------------DATA PREP MANAGEMENT--------------------------------
@@ -1141,10 +1144,11 @@ export function visualizeLinkClassifierFeatures(
     var schemeLocations: any = [];
 
     //--------------------------------DRAW FRAMES--------------------------------
-    const framePackage = drawMatrixPreparation(graph, locations, 800);
+    const framePackage = drawMatrixPreparation(graph, locations, 600);
     let colFrames: SVGElement[] = framePackage.colFrames; //a
     let matFrames: SVGElement[] = framePackage.matFrames; //a
 
+    //-----------------------------------FIRST LAYER-----------------------------------------------
     const firstLayerPackage = drawNodeFeatures(
         locations,
         graph,
@@ -1164,5 +1168,36 @@ export function visualizeLinkClassifierFeatures(
     schemeLocations = firstLayerPackage.schemeLocations;
     featureVisTable = firstLayerPackage.featureVisTable;
     const firstLayer = firstLayerPackage.firstLayer;
+
+    //-----------------------------------GCNConv LAYERS-----------------------------------------------
+    const featureChannels = 64;
+    
+    // we need have the locations and indices of the nodes involved during the computation
+
+    const GCNConvPackage = drawGCNConvLinkModel(
+        conv1,
+        conv2,
+        locations,
+        myColor,
+        frames,
+        schemeLocations,
+        featureVisTable,
+        graph,
+        colorSchemesTable,
+        firstLayer,
+        maxVals,
+        featureChannels,
+        featureKeys,
+        featureKeysEachLayer
+    );
+    // locations = GCNConvPackage.locations;
+    // frames = GCNConvPackage.frames;
+    // schemeLocations = GCNConvPackage.schemeLocations;
+    // featureVisTable = GCNConvPackage.featureVisTable;
+    // colorSchemesTable = GCNConvPackage.colorSchemesTable;
+    // maxVals = GCNConvPackage.maxVals;
+    // let resultLabelsList = GCNConvPackage.resultLabelsList;
+    // let paths = GCNConvPackage.paths;
+    // let resultPaths = GCNConvPackage.resultPaths;
 }
 

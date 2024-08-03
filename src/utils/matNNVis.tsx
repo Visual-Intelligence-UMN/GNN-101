@@ -390,6 +390,12 @@ async function initLinkClassifier(
     const featuresIndicesLayerTwo:number[] = removeDuplicatesFromSubarrays([[...setA[1], ...setB[1]]])[0];
 
 
+    const keysForEach = [
+        featuresIndicesLayerOne.sort((a, b) => a - b), 
+        featuresIndicesLayerTwo.sort((a, b) => a - b), 
+        [hubNodeA, hubNodeB].sort((a, b) => a - b)
+    ];
+
     //indexing the node/intermediate features by set
     let featuresLayerOne = [];
     let featuresLayerTwo = [];
@@ -427,20 +433,30 @@ async function initLinkClassifier(
     const featuresDataTable = [featuresLayerOne, featuresLayerTwo, featuresLayerThree, featuresLayerFour];
     console.log("featuresDataTable", featuresDataTable);
 
+    //feature value extractions
     let featuresArray:any = [];
+    // let secondLayerFeaturesArray:number[][] = [];
+    // let thirdLayerFeaturesArray:number[][] = [conv];
 
     featuresLayerOne.forEach(obj => {
         let key:number = Number(Object.keys(obj)[0]); 
         featuresArray.push(obj[key]);  
     });
+    // featuresLayerTwo.forEach(obj => {
+    //     let key:number = Number(Object.keys(obj)[0]); 
+    //     secondLayerFeaturesArray.push(obj[key]);  
+    // });
     //crossConnectionMatrices(graphs, locations, offsetMat, pathMatrix);
-    const featuresManager = visualizeLinkClassifierFeatures(locations, featuresArray, myColor, graph);
+
+
+
+    const featuresManager = visualizeLinkClassifierFeatures(locations, featuresArray, myColor, conv1, conv2, graph, [], keys, keysForEach);
     
 
     // const intervalID = featuresManager.getIntervalID();
 
     // clearInterval(intervalID);
-    drawPoints(".mats", "red", locations);
+    // drawPoints(".mats", "red", locations);
 
    // console.log("finished visulizing link classifier", conv1, conv2, decode_mul, decode_sum, prob_adj, locations);
 };

@@ -754,6 +754,148 @@ export function drawGCNConvNodeModel(
     };
 }
 
+
+
+//draw intermediate features from GCNConv process
+export function drawGCNConvLinkModel(
+    conv1: any,
+    conv2: any,
+    locations: any,
+    myColor: any,
+    frames: any,
+    schemeLocations: any,
+    featureVisTable: any,
+    graph: any,
+    colorSchemesTable: any,
+    firstLayer: any,
+    maxVals: any,
+    featureChannels: number,
+    featureKeys:number[], //an number array that record all node indexes involved in the computation
+    featureKeysEachLayer: number[][], //an 2d array that record all node indexes involved in the computation for each layer
+) {
+    //GCNCov Visualizer
+    let paths: any;
+    const gcnFeatures = [conv1, conv2];
+
+    for (let k = 0; k < 2; k++) {
+        const rectH = 15;
+        const rectW = 5;
+        const layer = d3
+            .select(".mats")
+            .append("g")
+            .attr("class", "layerVis")
+            .attr("id", `layerNum_${k + 1}`);
+        for (let i = 0; i < locations.length; i++) {
+            if (k != 0) {
+                locations[i][0] += rectW * featureChannels + 100;
+            } else {
+                locations[i][0] += 128 * 2.5 + 100;
+            }
+        }
+
+       // drawPoints(".mats", "red", [[locations[0][0], locations[0][1]]])
+
+        //draw hint label
+        if(k==0){
+            const hintLabelPos = [locations[0][0] - 120 - 64, locations[0][1] - 120 - 64];
+            const gLabel = d3.select(".mats").append("g");
+            injectSVG(gLabel, hintLabelPos[0], hintLabelPos[1], "./assets/SVGs/interactionHint.svg", "hintLabel")
+        }
+        addLayerName(
+            locations,
+            "GCNConv" + (k + 1),
+            0,
+            30,
+            d3.select(`g#layerNum_${k + 1}`)
+        );
+
+        //drawPoints(".mats","red",locations);
+        const gcnFeature = gcnFeatures[k];
+
+        for (let i = 0; i < locations.length; i++) {
+            // a special checking here - to see if this node involved in the computation or not
+            if(featureKeysEachLayer[k+1].includes(featureKeys[i])){
+                const sgfPack = drawSingleGCNConvFeature(
+                    layer, i, k, gcnFeature, featureChannels, locations, 
+                    rectW, rectH, myColor, [], frames,
+                    schemeLocations, featureVisTable
+                );
+                schemeLocations = sgfPack.schemeLocations;
+                featureVisTable = sgfPack.featureVisTable;
+            }
+        }
+
+        if (k != 1) {
+            // visualize cross connections btw 1st, 2nd GCNConv
+            // we need have another special cross connection for this one
+            // paths = drawCrossConnection(
+            //     graph,
+            //     locations,
+            //     (featureChannels-2) * rectW,
+            //     102,
+            //     k + 1
+            // );
+
+        } else {
+            //visualize the result layer
+        }
+
+        //drawPoints(".mats", "red", schemeLocations);
+        //let max1 = findAbsMax(maxVals.conv1);
+
+
+    //     //select layers
+    //     const l1 = d3.select(`g#layerNum_1`);
+    //     const l2 = d3.select(`g#layerNum_2`);
+    //     const l3 = d3.select(`g#layerNum_3`);
+
+    //     const schemeOffset = 250;
+
+    //     const infoTable = {
+    //         valueTable:[
+    //             [0,1],
+    //             [maxVals.conv1],
+    //             [maxVals.conv2],
+    //             [result[0], result[1]]
+    //         ],
+    //         nameTable:[
+    //             "Features Color Scheme",
+    //             "GCNConv1 Color Scheme",
+    //             "GCNConv2 Color Scheme",
+    //             "Result Color Scheme",
+    //         ],
+    //         xLocationTable:[
+    //             schemeLocations[0][0],
+    //             schemeLocations[1][0],
+    //             schemeLocations[1][0] + 400,
+    //             schemeLocations[1][0] + 400*2,
+    //         ],
+    //         yLocationTable:[
+    //             schemeLocations[0][1] + schemeOffset,
+    //             schemeLocations[1][1] + schemeOffset,
+    //             schemeLocations[1][1] + schemeOffset,
+    //             schemeLocations[1][1] + schemeOffset,
+    //         ],
+    //         layerTable:[firstLayer, l1, l2, l3],
+    //         schemeTypeTable:["binary", "", "", "binary"]
+    //     };
+
+    //     colorSchemesTable = drawColorSchremeSequence(infoTable, myColor);
+
+    }
+
+    return {
+        locations: locations,
+        frames: frames,
+        schemeLocations: schemeLocations,
+        featureVisTable: featureVisTable,
+        colorSchemesTable: colorSchemesTable,
+        firstLayer: firstLayer,
+        maxVals: maxVals,
+        paths: paths
+    };
+}
+
 //draw pooling visualizer
 export function drawPoolingVis(
     locations: any,
