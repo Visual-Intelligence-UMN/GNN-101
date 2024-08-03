@@ -12,6 +12,7 @@ import * as d3 from "d3";
 import { roundToTwo } from "../components/WebUtils";
 import { deprecate } from "util";
 import { injectSVG } from "./svgUtils";
+import { sigmoid } from "./linkPredictionUtils";
 
 //draw cross connections between feature visualizers for computational graph
 export function drawCrossConnectionForSubgraph(
@@ -938,6 +939,12 @@ export function drawGCNConvLinkModel(
 
         } else {
             //visualize the result layer
+            console.log("check last locations", locations, featureKeysEachLayer);
+            //extract last two feature visualizers' locations
+            const location1:[number, number] = [locations[0][0], locations[0][1]];
+            const location2:[number, number] = [locations[1][0], locations[1][1]];
+            
+            drawResultVisForLinkModel(location1, location2, 0.333, myColor);
         }
 
         //drawPoints(".mats", "red", schemeLocations);
@@ -1591,5 +1598,87 @@ export function drawResultLayer(
         resultLabelsList:resultLabelsList
     };
 }
+
+
+
+
+//we need the locations for previous two feature visualizers
+//also need the final probability results
+export function drawResultVisForLinkModel(
+    location1:[number, number], 
+    location2:[number, number], 
+    prob:number,
+    myColor:any
+){
+    //compute the mid point
+    const midY = (location1[1] + location2[1])/2;
+    const featureX = location1[0] + 64 * 5 + 100;
+    const midYForFeature = midY + 15;
+
+    const startingPoint1:[number, number] = [location1[0]+64*5, location1[1]+15/2];
+    const startingPoint2:[number, number] = [location2[0]+64*5, location2[1]+15/2];
+    const endingPoint:[number, number] = [featureX, midYForFeature];
+
+    //draw the result layer
+    const g = d3
+        .select(".mats")
+        .append("g")
+        .attr("class", "layerVis")
+        .attr("id", `layerNum_3`);
+    
+    //getting the probability result
+    const trueProb = sigmoid(prob);
+    const falseProb = 1 - trueProb;
+    const probs = [trueProb, falseProb];
+    
+    for(let i=0; i<2; i++){
+        g.append("rect")
+            .attr("x", featureX + i * 15)
+            .attr("y", midYForFeature-15/2)
+            .attr("width", 15)
+            .attr("height", 15)
+            .attr("fill", myColor(probs[i]))
+            .attr("stroke", "black")
+            .attr("stroke-width", 0.1)
+            .attr("class", "resultRect")
+            .attr("id", `resultRect`);
+    }
+    //draw the connection between two layers
+    const res1 = computeMids(startingPoint1, endingPoint);
+    const hpoint1:[number, number] = res1[0];
+    const lpoint1:[number, number] = res1[1];
+
+    const res2 = computeMids(startingPoint2, endingPoint);
+    const hpoint2:[number, number] = res2[0];
+    const lpoint2:[number, number] = res2[1];
+
+    const curve = d3.line().curve(d3.curveBasis);
+
+    d3.select(".mats")
+        .append("path")
+        .attr(
+            "d",
+            curve([startingPoint1, hpoint1, lpoint1, endingPoint])
+        )
+        .attr("stroke", "black")
+        .attr("opacity", 0.25)
+        .attr("fill", "none")
+        .attr("layerID", 3)
+        .attr("class", "crossConnection");
+
+    d3.select(".mats")
+        .append("path")
+        .attr(
+            "d",
+            curve([startingPoint2, hpoint2, lpoint2, endingPoint])
+        )
+        .attr("stroke", "black")
+        .attr("opacity", 0.25)
+        .attr("fill", "none")
+        .attr("layerID", 3)
+        .attr("class", "crossConnection");
+
+}
+
 
 
