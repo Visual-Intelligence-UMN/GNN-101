@@ -914,6 +914,9 @@ export function drawGCNConvLinkModel(
                 );
                 schemeLocations = sgfPack.schemeLocations;
                 featureVisTable = sgfPack.featureVisTable;
+            }else{
+                if (k == 0) frames["GCNConv1"].push(null);
+                if (k == 1) frames["GCNConv2"].push(null);
             }
         }
 

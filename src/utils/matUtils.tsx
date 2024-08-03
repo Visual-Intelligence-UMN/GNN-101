@@ -1207,6 +1207,8 @@ export function visualizeLinkClassifierFeatures(
     maxVals = GCNConvPackage.maxVals;
     let paths = GCNConvPackage.paths;
 
+    console.log("frames", frames);
+
     //-----------------------------------INTERACTIONS EVENTS MANAGEMENT-----------------------------------------------
     //added interactions
     //add mouse event
