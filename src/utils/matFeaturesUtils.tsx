@@ -917,6 +917,8 @@ export function drawGCNConvLinkModel(
             }else{
                 if (k == 0) frames["GCNConv1"].push(null);
                 if (k == 1) frames["GCNConv2"].push(null);
+
+                featureVisTable[k+1].push(null);
             }
         }
 
@@ -979,6 +981,8 @@ export function drawGCNConvLinkModel(
         colorSchemesTable = drawColorSchremeSequence(infoTable, myColor);
 
     }
+
+    console.log("featureVisTable", featureVisTable);
 
     return {
         locations: locations,
