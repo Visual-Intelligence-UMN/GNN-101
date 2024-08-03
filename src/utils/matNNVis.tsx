@@ -450,7 +450,10 @@ async function initLinkClassifier(
 
 
 
-    const featuresManager = visualizeLinkClassifierFeatures(locations, featuresArray, myColor, conv1, conv2, graph, [], keys, keysForEach);
+    const featuresManager = visualizeLinkClassifierFeatures(
+        locations, featuresArray, myColor, 
+        conv1, conv2, graph, adjList, [], keys, 
+        keysForEach);
     
 
     // const intervalID = featuresManager.getIntervalID();

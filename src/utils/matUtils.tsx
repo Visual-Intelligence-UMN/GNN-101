@@ -1101,7 +1101,7 @@ export function visualizeLinkClassifierFeatures(
     conv2: any,
     // probAdj: any,
     graph: any,
-    // adjList: any,
+    adjList: any,
     maxVals: any,
     featureKeys: number[],
     featureKeysEachLayer: number[][]
@@ -1199,15 +1199,13 @@ export function visualizeLinkClassifierFeatures(
         featureKeys,
         featureKeysEachLayer
     );
-    // locations = GCNConvPackage.locations;
-    // frames = GCNConvPackage.frames;
-    // schemeLocations = GCNConvPackage.schemeLocations;
-    // featureVisTable = GCNConvPackage.featureVisTable;
-    // colorSchemesTable = GCNConvPackage.colorSchemesTable;
-    // maxVals = GCNConvPackage.maxVals;
-    // let resultLabelsList = GCNConvPackage.resultLabelsList;
-    // let paths = GCNConvPackage.paths;
-    // let resultPaths = GCNConvPackage.resultPaths;
+    locations = GCNConvPackage.locations;
+    frames = GCNConvPackage.frames;
+    schemeLocations = GCNConvPackage.schemeLocations;
+    featureVisTable = GCNConvPackage.featureVisTable;
+    colorSchemesTable = GCNConvPackage.colorSchemesTable;
+    maxVals = GCNConvPackage.maxVals;
+    let paths = GCNConvPackage.paths;
 
     //-----------------------------------INTERACTIONS EVENTS MANAGEMENT-----------------------------------------------
     //added interactions
@@ -1232,46 +1230,46 @@ export function visualizeLinkClassifierFeatures(
         matFrames = pack.matFrames;
     });
 
-    // d3.selectAll(".featureVis").on("mouseover", function (event, d) {
-    //     //if not in the state of lock
-    //     if (!lock) {
-    //         //paths interactions
-    //         const layerID = Number(d3.select(this).attr("layerID")) - 1;
-    //         const node = Number(d3.select(this).attr("node"));
-    //         const featureOverPack = featureVisMouseOver(
-    //             layerID,
-    //             node,
-    //             paths,
-    //             frames,
-    //             adjList,
-    //             matFrames,
-    //             colFrames,
-    //             featureChannels
-    //         );
-    //         paths = featureOverPack.paths;
-    //         frames = featureOverPack.frames;
-    //         matFrames = featureOverPack.matFrames;
-    //         colFrames = featureOverPack.colFrames;
-    //     }
-    // });
-    // d3.selectAll(".featureVis").on("mouseout", function (event, d) {
-    //     if (!lock) {
-    //         const layerID = Number(d3.select(this).attr("layerID")) - 1;
-    //         const node = Number(d3.select(this).attr("node"));
-    //         const featureOverPack = featureVisMouseOut(
-    //             layerID,
-    //             node,
-    //             paths,
-    //             frames,
-    //             adjList,
-    //             matFrames,
-    //             colFrames
-    //         );
-    //         paths = featureOverPack.paths;
-    //         frames = featureOverPack.frames;
-    //         matFrames = featureOverPack.matFrames;
-    //         colFrames = featureOverPack.colFrames;
-    //     }
-    // });
+    d3.selectAll(".featureVis").on("mouseover", function (event, d) {
+        //if not in the state of lock
+        if (!lock) {
+            //paths interactions
+            const layerID = Number(d3.select(this).attr("layerID")) - 1;
+            const node = Number(d3.select(this).attr("node"));
+            const featureOverPack = featureVisMouseOver(
+                layerID,
+                node,
+                paths,
+                frames,
+                adjList,
+                matFrames,
+                colFrames,
+                featureChannels
+            );
+            paths = featureOverPack.paths;
+            frames = featureOverPack.frames;
+            matFrames = featureOverPack.matFrames;
+            colFrames = featureOverPack.colFrames;
+        }
+    });
+    d3.selectAll(".featureVis").on("mouseout", function (event, d) {
+        if (!lock) {
+            const layerID = Number(d3.select(this).attr("layerID")) - 1;
+            const node = Number(d3.select(this).attr("node"));
+            const featureOverPack = featureVisMouseOut(
+                layerID,
+                node,
+                paths,
+                frames,
+                adjList,
+                matFrames,
+                colFrames
+            );
+            paths = featureOverPack.paths;
+            frames = featureOverPack.frames;
+            matFrames = featureOverPack.matFrames;
+            colFrames = featureOverPack.colFrames;
+        }
+    });
 }
 
