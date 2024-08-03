@@ -14,6 +14,7 @@ import {
     prepMatrices,
     get_features_origin,
     loadNodesLocation,
+    graphToMatrix,
 } from "@/utils/utils";
 import {
     HeatmapData,
@@ -38,6 +39,35 @@ export function chunkArray<T>(inputArray: T[], chunkSize: number): T[][] {
         result.push(chunk);
     }
     return result;
+}
+
+
+//node selector in link prediction
+
+export const NodeSelector:React.FC<{
+    nodeList: number[], selectedNode: number, dependNode:number, setSelectedNode: Function,
+    handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+}> = ({nodeList, selectedNode, dependNode, setSelectedNode, handleChange}) => {
+    return (
+        <select
+            className="text-2xl rounded-md px-3 shadow-none border-solid border-gray-200 border-2 min-w-80 bg-white text-gray-600"
+            value={selectedNode}
+            onChange={(e) => {
+                if(Number(e.target.value)!=dependNode){
+                    setSelectedNode(Number(e.target.value));
+                    handleChange(e);
+                }else{
+                    window.alert("Can't select the same node for link prediction");
+                }
+            }}
+        >
+            {nodeList.map((item, index) => (
+                <option key={index} value={item}>
+                    {item}
+                </option>
+            ))}
+        </select>
+    );
 }
 
 interface GraphAnalysisViewerProps {
@@ -649,6 +679,8 @@ export const PredictionVisualizer: React.FC<PredictionVisualizerProps> = ({
 
 import React from "react";
 import { i } from "mathjs";
+import { convertToAdjacencyMatrix, getNodeSet } from "@/utils/linkPredictionUtils";
+import { extractSubgraph } from "@/utils/graphDataUtils";
 
 interface ViewSwitchProps {
     handleChange: () => void;
@@ -977,6 +1009,7 @@ export function visualizeGraph(
 //helper to get the matrix body visualize
 export function visualizeMatrixBody(gridSize: number, graph: any, width: number, height: number, margin: any) {
 
+    console.log("graph", graph);
 
     d3.select("#matvis").selectAll("svg").remove();
     const svg = d3
@@ -1052,13 +1085,12 @@ export function visualizeMatrix(
     isAttribute: boolean,
     gridSize: number
 ) {
-    const init = async (graph: any, features: any, nodeAttrs: any) => {
+    const init = async (graph: any, nodeAttrs: any) => {
         const margin = { top: 10, right: 80, bottom: 30, left: 80 };
         const width = gridSize + margin.left + margin.right;
         const height = (gridSize + margin.top + margin.bottom) * 2;
         //visualize matrix body part
         visualizeMatrixBody(gridSize, graph, width, height, margin);
-
         if (isAttribute) drawNodeAttributes(nodeAttrs, graph, 150);
     };
 
@@ -1066,17 +1098,12 @@ export function visualizeMatrix(
         //const features = await get_features_origin(data);
 
         try {
-
             const data = await load_json(path);
             const nodeAttrs = getNodeAttributes(data);
             const features = await get_features_origin(data);
-
             const processedData = await graph_to_matrix(data);
-
-            //const graphsData = await prepMatrices(1, processedData);
-
             // Initialize and run D3 visualization with processe  d data
-            await init(processedData, features, nodeAttrs);
+            await init(processedData, nodeAttrs);
         } catch (error) {
 
         }
@@ -1084,3 +1111,64 @@ export function visualizeMatrix(
 
     visualizeMat(path);
 }
+
+export function visualizePartialGraphMatrix(
+    path: string,
+    isAttribute: boolean,
+    gridSize: number,
+    hubNodeA: number,
+    hubNodeB: number
+) {
+    const init = async (graph: any) => {
+        console.log("enter! 2", graph);
+        const margin = { top: 10, right: 80, bottom: 30, left: 80 };
+        const width = gridSize + margin.left + margin.right;
+        const height = (gridSize + margin.top + margin.bottom) * 2;
+        //get the nodes
+        let nodesA:number[] = getNodeSet(graph, hubNodeA)[0];
+        let nodesB:number[] = getNodeSet(graph, hubNodeB)[0];
+
+        console.log("nodesA", nodesA);
+        console.log("nodesB", nodesB);
+
+        const mergedNodes = [...nodesA, ...nodesB];
+
+        console.log("mergedNodes", mergedNodes);
+
+        //compute the structure of the subgraph
+        const subGraph = extractSubgraph(graph, mergedNodes);
+
+        console.log("subGraph", subGraph);
+
+        //get node attribute
+        const keys = Object.keys(subGraph).map(Number);
+
+        //transform the subgraph to adjacent matrix
+        const subMatrix = convertToAdjacencyMatrix(subGraph);
+
+        console.log("subMatrix", subMatrix);
+
+        //visualize matrix body part
+        visualizeMatrixBody(gridSize, subMatrix, width, height, margin);
+
+        drawNodeAttributes(keys, subMatrix, 150);
+    };
+
+    const visualizeMat = async (path: string) => {
+        console.log("enter! 1", path);
+        try {
+            const data = await load_json(path);
+            const processedData = await graph_to_matrix(data);
+
+            // Initialize and run D3 visualization with processe  d data
+            await init(processedData);
+        } catch (error) {
+
+        }
+    };
+    console.log("enter!", path);
+    visualizeMat(path);
+}
+
+
+

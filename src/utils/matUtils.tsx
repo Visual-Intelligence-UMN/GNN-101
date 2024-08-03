@@ -5,6 +5,8 @@ import {
     drawGCNConvGraphModel,
     drawGCNConvNodeModel,
     computeMids,
+    drawGCNConvLinkModel,
+    drawCrossConnectionForSubgraph,
 } from "./matFeaturesUtils";
 import * as d3 from "d3";
 import {
@@ -1087,15 +1089,122 @@ export function visualizeNodeClassifierFeatures(
         }
 
     });
-
-
-
-
-
-
     return null;
 }
 
 
+export function visualizeLinkClassifierFeatures(
+    locations: any,
+    features: any,
+    myColor: any,
+    conv1: any,
+    conv2: any,
+    // probAdj: any,
+    graph: any,
+    // adjList: any,
+    maxVals: any,
+    featureKeys: number[],
+    featureKeysEachLayer: number[][]
+    // trainingNodes: number[]
+) {
+    //--------------------------------DATA PREP MANAGEMENT--------------------------------
+    let intervalID: any = null; // to manage animation controls
 
+    let poolingVis = null; //to manage pooling visualizer
+    let outputVis = null; //to manage model output
+    let resultVis: any = null; //tp manage result visualizer
+    //load weights and bias
+    const dataPackage = loadNodeWeights();
+
+    const weights = dataPackage["weights"];
+    const bias = dataPackage["bias"];
+
+    //table that manage all feature visualizers for GCNConv
+    let featureVisTable: SVGElement[][] = [[], [], [], [], []];
+    //table that manage color schemes
+    let colorSchemesTable: SVGElement[] = [];
+    //control detail view
+    let dview = false;
+    //control lock and unlock
+    let lock = false;
+    //a data structure to store all feature vis frames information
+    interface FrameDS {
+        features: any[];
+        GCNConv1: any[];
+        GCNConv2: any[];
+        GCNConv3: any[];
+        results: any[];
+    }
+    var frames: FrameDS = {
+        features: [],
+        GCNConv1: [],
+        GCNConv2: [],
+        GCNConv3: [],
+        results: []
+    };
+    var schemeLocations: any = [];
+
+    //--------------------------------DRAW FRAMES--------------------------------
+    const framePackage = drawMatrixPreparation(graph, locations, 600);
+    let colFrames: SVGElement[] = framePackage.colFrames; //a
+    let matFrames: SVGElement[] = framePackage.matFrames; //a
+
+    //-----------------------------------FIRST LAYER-----------------------------------------------
+    const firstLayerPackage = drawNodeFeatures(
+        locations,
+        graph,
+        myColor,
+        features,
+        frames,
+        schemeLocations,
+        featureVisTable,
+        128,
+        2.5,
+        15,
+        150,
+        false
+    );
+    //updated variables
+    locations = firstLayerPackage.locations;
+    frames = firstLayerPackage.frames;
+    schemeLocations = firstLayerPackage.schemeLocations;
+    featureVisTable = firstLayerPackage.featureVisTable;
+    const firstLayer = firstLayerPackage.firstLayer;
+
+    //drawPoints(".mats", "red", locations);
+
+    //draw paths
+    drawCrossConnectionForSubgraph(graph, locations, 2.5*128, 100, 0, featureKeys, featureKeys, featureKeysEachLayer[1]);
+
+    //-----------------------------------GCNConv LAYERS-----------------------------------------------
+    const featureChannels = 64;
+    
+    // we need have the locations and indices of the nodes involved during the computation
+
+    const GCNConvPackage = drawGCNConvLinkModel(
+        conv1,
+        conv2,
+        locations,
+        myColor,
+        frames,
+        schemeLocations,
+        featureVisTable,
+        graph,
+        colorSchemesTable,
+        firstLayer,
+        maxVals,
+        featureChannels,
+        featureKeys,
+        featureKeysEachLayer
+    );
+    // locations = GCNConvPackage.locations;
+    // frames = GCNConvPackage.frames;
+    // schemeLocations = GCNConvPackage.schemeLocations;
+    // featureVisTable = GCNConvPackage.featureVisTable;
+    // colorSchemesTable = GCNConvPackage.colorSchemesTable;
+    // maxVals = GCNConvPackage.maxVals;
+    // let resultLabelsList = GCNConvPackage.resultLabelsList;
+    // let paths = GCNConvPackage.paths;
+    // let resultPaths = GCNConvPackage.resultPaths;
+}
 

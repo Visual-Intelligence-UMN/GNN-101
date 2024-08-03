@@ -5,7 +5,7 @@ import ClassifyGraph from "./ClassifyGraph";
 // import { CSSTransition } from 'react-transition-group';
 import MatricesVisualizer from "./MatricesVisualizer";
 import { IntmData, IntmDataNode } from "../types";
-import { graphList, linkList, modelList, nodeList, DatasetInfo } from "../utils/const";
+import { graphList, linkList, modelList, nodeList, DatasetInfo, nodeSelectionList } from "../utils/const";
 import Sidebar from "./Sidebar";
 import styles from "./index.module.css";
 import * as d3 from "d3";
@@ -18,12 +18,14 @@ import {
     GraphAnalysisViewer,
     NodeClassifierButtonChain,
     LinkClassifierButtonChain,
+    NodeSelector,
 } from "../components/WebUtils";
 import { Footer, NavBar } from "../components/Surfaces";
 import { Inter } from "@next/font/google";
 import NodeMatricesVisualizer from "./node_classifier/NodeMatrixVisualizer";
 import NodeGraphVisualizer from "./node_classifier/NodeGraphVisualizer";
 import { mod } from "mathjs";
+import LinkMatricesVisualizer from "./link_classifier/LinkMatrixVisualizer";
 
 export const inter = Inter({
     variable: "--font-inter",
@@ -56,6 +58,9 @@ export default function Home() {
     const [predicted, setPredicted] = useState(false);
     const [simulationLoading, setSimulation] = useState(false);
 
+    const [hubNodeA, setHubNodeA] = useState(241);
+    const [hubNodeB, setHubNodeB] = useState(109);
+
     //intermediate output
     const [intmData, setIntmData] = useState<IntmData | IntmDataNode | null>(
         null
@@ -76,6 +81,15 @@ export default function Home() {
     function handleGraphSelection(e: React.ChangeEvent<HTMLSelectElement>): void {
 
         setSelectedGraph(e.target.value);
+        setChangedG(true);
+        setProbabilities([]);
+        setPredicted(false);
+        setSimulation(false);
+    }
+
+    function handleNodeSelection(e: React.ChangeEvent<HTMLSelectElement>): void {
+
+        //setSelectedGraph(e.target.value);
         setChangedG(true);
         setProbabilities([]);
         setPredicted(false);
@@ -138,7 +152,6 @@ export default function Home() {
                                         } else {
                                             setSelectedGraph("twitch_EN");
                                         }
-
                                     }}
                                     OptionList={Object.keys(modelList)}
                                 />
@@ -194,7 +207,6 @@ export default function Home() {
                                             />
                                         )}
                                     </div>
-
                                 </div>
                                 <div className="relative"
                                     style={{
@@ -224,6 +236,24 @@ export default function Home() {
                                         <p>{DatasetInfo[model]}</p>
                                     </div>
                                 </div>
+                                {model == "link classification" ?<>
+                                    Predict a link from node 
+                                    <NodeSelector
+                                        nodeList={nodeSelectionList}
+                                        selectedNode={hubNodeA}
+                                        dependNode={hubNodeB}
+                                        setSelectedNode={setHubNodeA} 
+                                        handleChange={handleNodeSelection}
+                                    />
+                                     to node 
+                                    <NodeSelector
+                                        nodeList={nodeSelectionList}
+                                        selectedNode={hubNodeB}
+                                        dependNode={hubNodeA}
+                                        setSelectedNode={setHubNodeB}
+                                        handleChange={handleNodeSelection}
+                                    />
+                                </>:<></>}
                                 {selectedGraph &&
                                     (graphList[selectedGraph] || nodeList[selectedGraph]) ? (
                                     model == "graph classification" ? (
@@ -319,7 +349,15 @@ export default function Home() {
                                 ) : isGraphView ? (
                                     <>Graph View</>
                                 ) : (
-                                    <>Matrix View</>
+                                    <LinkMatricesVisualizer
+                                        graph_path={linkList[selectedGraph]}
+                                        intmData={intmData}
+                                        changed={changedG}
+                                        predicted={predicted}
+                                        selectedButtons={selectedButtons}
+                                        hubNodeA={hubNodeA}
+                                        hubNodeB={hubNodeB}
+                                    />
                                 )}
 
                                 {/* overlay text on visualizer when not predicted */}

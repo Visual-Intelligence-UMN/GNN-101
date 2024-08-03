@@ -1,5 +1,6 @@
 import {
     deepClone,
+    drawPoints,
     get_cood_from_parent,
     get_coordination,
     myColor
@@ -76,21 +77,27 @@ export function drawNodeAttributes(nodeAttrs: any, graph: any, offset: number) {
     //for x-axis
     const rectCood = get_cood_from_parent(".mats", "rect");
 
+    console.log("rectCoord", rectCood);
+
     const step = graph.length;
     let xTextCood = [];
     for (let i = step - 1; i < graph.length * graph.length; i += step) {
         xTextCood.push(rectCood[i]);
     }
 
-    //drawPoints(".mats", "red", xTextCood);
+    console.log("xTextCood", xTextCood);
+
+    // drawPoints(".mats", "red", xTextCood);
     for (let i = 0; i < xTextCood.length; i++) {
         d3.select(".mats")
             .append("text")
             .attr("x", xTextCood[i][0] - 2.5)
-            .attr("y", xTextCood[i][1] + 60)
+            .attr("y", xTextCood[i][1] + 75)
             .attr("font-size", "10px")
             .text(nodeAttrs[i]);
     }
+    //drawPoints(".mats", "red", rectCood);
+    console.log("rectCoord", rectCood);
 }
 
 export interface HeatmapData {
@@ -331,6 +338,27 @@ export function loadNodeWeights(){
         weightsJSON["conv2.bias"],
         weightsJSON["conv3.bias"],
         weightsJSON["classifier.bias"],
+    ];
+
+    return { weights: weights, bias: bias };
+}
+
+export function loadLinkWeights(){
+    // weights data preparation
+    let weights: any = []; // DS to manage weights for each layer
+    let bias: any = []; // DS to manage bias for each layer
+
+    const weightsJSON: any = require("../../public/link_weights.json");
+
+
+
+    weights = [
+        weightsJSON["onnx::MatMul_196"],
+        weightsJSON["onnx::MatMul_199"]
+    ];
+    bias = [
+        weightsJSON["conv1.bias"],
+        weightsJSON["conv2.bias"]
     ];
 
     return { weights: weights, bias: bias };
