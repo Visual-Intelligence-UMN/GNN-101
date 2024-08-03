@@ -1716,15 +1716,15 @@ export function drawResultVisForLinkModel(
         .attr("class", "pathsToResult");
     
     featureVisualizer.on("mouseover", function (event) {
-        d3.selectAll(".pathsToResult").attr("opacity", 1);
-        d3.select(".resultFrame").attr("opacity", 1);
-        d3.selectAll(".frame[layerID='2']").attr("opacity", 1);
+        d3.selectAll(".pathsToResult").style("opacity", 1);
+        d3.select(".resultFrame").style("opacity", 1);
+        d3.selectAll(".frame[layerID='2']").style("opacity", 1);
         
     });
     featureVisualizer.on("mouseout", function (event) {
-        d3.selectAll(".pathsToResult").attr("opacity", 0.25);
-        d3.select(".resultFrame").attr("opacity", 0.25);
-        d3.selectAll(".frame[layerID='2']").attr("opacity", 0.25);
+        d3.selectAll(".pathsToResult").style("opacity", 0.25);
+        d3.select(".resultFrame").style("opacity", 0.25);
+        d3.selectAll(".frame[layerID='2']").style("opacity", 0.25);
     });
     featureVisualizer.on("click", function (event) {
 
