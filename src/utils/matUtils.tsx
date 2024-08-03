@@ -1145,7 +1145,7 @@ export function visualizeLinkClassifierFeatures(
     var schemeLocations: any = [];
 
     //--------------------------------DRAW FRAMES--------------------------------
-    const framePackage = drawMatrixPreparation(graph, locations, 600, -25);
+    const framePackage = drawMatrixPreparation(graph, locations, 400, -25);
     let colFrames: SVGElement[] = framePackage.colFrames; //a
     let matFrames: SVGElement[] = framePackage.matFrames; //a
 
@@ -1210,6 +1210,14 @@ export function visualizeLinkClassifierFeatures(
     console.log("frames", frames);
 
     //-----------------------------------INTERACTIONS EVENTS MANAGEMENT-----------------------------------------------
+
+    let recordLayerID: number = -1;
+    // a state to controls the recover event
+    let transState = "GCNConv";
+    //save events for poolingVis
+    let poolingOverEvent: any = null;
+    let poolingOutEvent: any = null;
+
     //added interactions
     //add mouse event
     d3.selectAll(".oFeature").on("mouseover", function (event, d) {
@@ -1271,6 +1279,108 @@ export function visualizeLinkClassifierFeatures(
             frames = featureOverPack.frames;
             matFrames = featureOverPack.matFrames;
             colFrames = featureOverPack.colFrames;
+        }
+    });
+    d3.selectAll(".mats, .switchBtn").on("click", function (event, d) {
+        if (event.target && event.target.id === "btn") {
+            return;
+        }
+        if (lock) {
+            d3.selectAll(".resultVis")
+                .style("pointer-events", "auto")
+                .style("opacity", 1);
+            const recoverPackage = detailedViewRecovery(
+                event,
+                dview,
+                lock,
+                transState,
+                recordLayerID,
+                poolingOutEvent,
+                poolingOverEvent,
+                poolingVis,
+                colorSchemesTable,
+                featureChannels,
+                90,
+                []
+            );
+            //update variables
+            dview = recoverPackage.dview;
+            lock = recoverPackage.lock;
+            transState = recoverPackage.transState;
+            recordLayerID = recoverPackage.recordLayerID;
+            poolingOutEvent = recoverPackage.poolingOutEvent;
+            poolingOverEvent = recoverPackage.poolingOverEvent;
+            colorSchemesTable = recoverPackage.colorSchemesTable;
+
+            clearInterval(intervalID);
+        }
+    });
+
+    function setIntervalID(id: any) {
+        intervalID = id;
+
+    }
+
+    d3.selectAll(".featureVis").on("click", function (event, d) {
+        if (lock != true) {
+            //state
+            transState = "GCNConv";
+            lock = true;
+            event.stopPropagation();
+            dview = true;
+
+            //lock all feature visualizers and transparent paths
+            d3.selectAll(".resultVis")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".oFeature")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.select(".pooling")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".twoLayer")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".crossConnection").style("opacity", 0);
+            //transparent other feature visualizers
+            d3.selectAll(".featureVis").style("opacity", 0.2);
+            d3.selectAll(".oFeature").style("opacity", 0.2);
+            //translate each layer
+            const layerID = Number(d3.select(this).attr("layerID")) - 1;
+            const node = Number(d3.select(this).attr("node"));
+            const featureVisPack = featureVisClick(
+                layerID,
+                node,
+                recordLayerID,
+                colorSchemesTable,
+                adjList,
+                featureVisTable,
+                features,
+                conv1,
+                conv2,
+                bias,
+                myColor,
+                weights,
+                lock,
+                setIntervalID,
+                featureChannels,
+                15,
+                10,
+                90,
+                34,
+                5,
+                "relu"
+            );
+            // update variables
+            recordLayerID = featureVisPack.recordLayerID;
+            colorSchemesTable = featureVisPack.colorSchemesTable;
+            featureVisTable = featureVisPack.featureVisTable;
+            features = featureVisPack.features;
+            intervalID = featureVisPack.getIntervalID();
+
+            //path connect - connect intermediate feature vis to current feature vis
+
         }
     });
 }

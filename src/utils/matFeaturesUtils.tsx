@@ -237,7 +237,7 @@ export function drawMatrixPreparation(graph: any, locations: any, gridSize:numbe
     const ratio = locations[0][1] / 61.875365257263184;
     const startY = locations[0][1] / ratio;
     const rowHeight = gridSize / graph.length;
-    drawPoints(".mats", "red", colLocations);
+    // drawPoints(".mats", "red", colLocations);
     let colFrames: SVGElement[] = []; //a
   //  drawPoints(".mats", "red", colLocations)
     for (let i = 0; i < colLocations.length; i++) {
@@ -942,43 +942,41 @@ export function drawGCNConvLinkModel(
         //let max1 = findAbsMax(maxVals.conv1);
 
 
-    //     //select layers
-    //     const l1 = d3.select(`g#layerNum_1`);
-    //     const l2 = d3.select(`g#layerNum_2`);
-    //     const l3 = d3.select(`g#layerNum_3`);
+        //select layers
+        const l1 = d3.select(`g#layerNum_1`);
+        const l2 = d3.select(`g#layerNum_2`);
+        const l3 = d3.select(`g#layerNum_3`);
 
-    //     const schemeOffset = 250;
+        const schemeOffset = 250;
+        console.log("schemeLocations", schemeLocations);
+        const loc2 = [schemeLocations[0][0] + 64*5+50, schemeLocations[0][1]];
+        schemeLocations.push(loc2);
+        const infoTable = {
+            valueTable:[
+                [1],
+                [1],
+                [1]
+            ],
+            nameTable:[
+                "Features Color Scheme",
+                "GCNConv1 Color Scheme",
+                "GCNConv2 Color Scheme"
+            ],
+            xLocationTable:[
+                schemeLocations[0][0],
+                schemeLocations[1][0],
+                schemeLocations[1][0] + 400
+            ],
+            yLocationTable:[
+                schemeLocations[0][1] + schemeOffset,
+                schemeLocations[1][1] + schemeOffset,
+                schemeLocations[1][1] + schemeOffset
+            ],
+            layerTable:[firstLayer, l1, l2],
+            schemeTypeTable:["", "", ""]
+        };
 
-    //     const infoTable = {
-    //         valueTable:[
-    //             [0,1],
-    //             [maxVals.conv1],
-    //             [maxVals.conv2],
-    //             [result[0], result[1]]
-    //         ],
-    //         nameTable:[
-    //             "Features Color Scheme",
-    //             "GCNConv1 Color Scheme",
-    //             "GCNConv2 Color Scheme",
-    //             "Result Color Scheme",
-    //         ],
-    //         xLocationTable:[
-    //             schemeLocations[0][0],
-    //             schemeLocations[1][0],
-    //             schemeLocations[1][0] + 400,
-    //             schemeLocations[1][0] + 400*2,
-    //         ],
-    //         yLocationTable:[
-    //             schemeLocations[0][1] + schemeOffset,
-    //             schemeLocations[1][1] + schemeOffset,
-    //             schemeLocations[1][1] + schemeOffset,
-    //             schemeLocations[1][1] + schemeOffset,
-    //         ],
-    //         layerTable:[firstLayer, l1, l2, l3],
-    //         schemeTypeTable:["binary", "", "", "binary"]
-    //     };
-
-    //     colorSchemesTable = drawColorSchremeSequence(infoTable, myColor);
+        colorSchemesTable = drawColorSchremeSequence(infoTable, myColor);
 
     }
 
