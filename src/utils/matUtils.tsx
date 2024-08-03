@@ -6,6 +6,7 @@ import {
     drawGCNConvNodeModel,
     computeMids,
     drawGCNConvLinkModel,
+    drawCrossConnectionForSubgraph,
 } from "./matFeaturesUtils";
 import * as d3 from "d3";
 import {
@@ -1160,7 +1161,8 @@ export function visualizeLinkClassifierFeatures(
         128,
         2.5,
         15,
-        150
+        150,
+        false
     );
     //updated variables
     locations = firstLayerPackage.locations;
@@ -1168,6 +1170,11 @@ export function visualizeLinkClassifierFeatures(
     schemeLocations = firstLayerPackage.schemeLocations;
     featureVisTable = firstLayerPackage.featureVisTable;
     const firstLayer = firstLayerPackage.firstLayer;
+
+    //drawPoints(".mats", "red", locations);
+
+    //draw paths
+    drawCrossConnectionForSubgraph(graph, locations, 2.5*128, 100, 0, featureKeys, featureKeys, featureKeysEachLayer[1]);
 
     //-----------------------------------GCNConv LAYERS-----------------------------------------------
     const featureChannels = 64;

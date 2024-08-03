@@ -13,6 +13,79 @@ import { roundToTwo } from "../components/WebUtils";
 import { deprecate } from "util";
 import { injectSVG } from "./svgUtils";
 
+//draw cross connections between feature visualizers for computational graph
+export function drawCrossConnectionForSubgraph(
+    graph: any,
+    locations: any,
+    firstVisSize: number,
+    gapSize: number, //the gap between two layers
+    layerID: number,
+    totalKeys: number[], //where we store all nodes incolced in the computation
+    startKeys: number[], //where we store all the starting nodes
+    endKeys: number[] //where we store all the ending nodes
+) {
+    const rectH = 15;
+
+    let alocations = deepClone(locations);
+    for (let i = 0; i < alocations.length; i++) {
+        alocations[i][0] += firstVisSize;
+        alocations[i][1] += rectH / 2;
+    }
+
+    let blocations = deepClone(alocations);
+    for (let i = 0; i < blocations.length; i++) {
+        blocations[i][0] += gapSize;
+    }
+    // drawPoints(".mats", "red", blocations);
+
+    //draw one-one paths
+    for (let i = 0; i < alocations.length; i++) {
+        if(startKeys.includes(totalKeys[i]) && endKeys.includes(totalKeys[i])){
+            d3.select(".mats")
+                .append("path")
+                .attr("d", d3.line()([alocations[i], blocations[i]]))
+                .attr("stroke", "black")
+                .attr("opacity", 0.05)
+                .attr("fill", "none")
+                .attr("endingNode", i)
+                .attr("layerID", layerID).attr("class", "crossConnection");
+        }
+    }
+    //draw one-multiple paths - three
+    let pts: number[][] = [];
+    const curve = d3.line().curve(d3.curveBasis);
+    for (let i = 0; i < graph.length; i++) {
+        for (let j = 0; j < graph[0].length; j++) {
+            if (graph[i][j] == 1 && startKeys.includes(totalKeys[i]) && endKeys.includes(totalKeys[j])) {
+                const res = computeMids(alocations[i], blocations[j]);
+                const hpoint = res[0];
+                const lpoint = res[1];
+
+                d3.select(".mats")
+                    .append("path")
+                    .attr(
+                        "d",
+                        curve([alocations[i], hpoint, lpoint, blocations[j]])
+                    )
+                    .attr("stroke", "black")
+                    .attr("opacity", 0.05)
+                    .attr("fill", "none")
+                    .attr("endingNode", j)
+                    .attr("layerID", layerID)
+                    .attr("class", "crossConnection");
+                pts.push(hpoint);
+                pts.push(lpoint);
+
+            }
+        }
+    }
+
+    //TODO: paths data structure management
+
+}
+
+
+
 //draw cross connections between feature visualizers
 export function drawCrossConnection(
     graph: any,
@@ -828,13 +901,16 @@ export function drawGCNConvLinkModel(
         if (k != 1) {
             // visualize cross connections btw 1st, 2nd GCNConv
             // we need have another special cross connection for this one
-            // paths = drawCrossConnection(
-            //     graph,
-            //     locations,
-            //     (featureChannels-2) * rectW,
-            //     102,
-            //     k + 1
-            // );
+            paths = drawCrossConnectionForSubgraph(
+                graph,
+                locations,
+                64*5,
+                100,
+                1,
+                featureKeys,
+                featureKeysEachLayer[1],
+                featureKeysEachLayer[2]
+            );
 
         } else {
             //visualize the result layer
