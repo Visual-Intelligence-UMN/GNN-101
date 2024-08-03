@@ -943,8 +943,13 @@ export function drawGCNConvLinkModel(
             //extract last two feature visualizers' locations
             const location1:[number, number] = [locations[0][0], locations[0][1]];
             const location2:[number, number] = [locations[1][0], locations[1][1]];
-            
-            drawResultVisForLinkModel(location1, location2, 0.333, myColor);
+
+            let layerLocations = deepClone(locations);
+            for(let i=0; i<layerLocations.length; i++){
+                layerLocations[i][0] += rectW*2+200;
+            }
+
+            drawResultVisForLinkModel(location1, location2, 0.333, myColor, layerLocations);
         }
 
         //drawPoints(".mats", "red", schemeLocations);
@@ -964,25 +969,29 @@ export function drawGCNConvLinkModel(
             valueTable:[
                 [1],
                 [1],
-                [1]
+                [1],
+                [0.3, 0.7]
             ],
             nameTable:[
                 "Features Color Scheme",
                 "GCNConv1 Color Scheme",
-                "GCNConv2 Color Scheme"
+                "GCNConv2 Color Scheme",
+                "Result Color Scheme"
             ],
             xLocationTable:[
                 schemeLocations[0][0],
                 schemeLocations[1][0],
-                schemeLocations[1][0] + 400
+                schemeLocations[1][0] + 400,
+                schemeLocations[1][0] + 400*2
             ],
             yLocationTable:[
                 schemeLocations[0][1] + schemeOffset,
                 schemeLocations[1][1] + schemeOffset,
+                schemeLocations[1][1] + schemeOffset,
                 schemeLocations[1][1] + schemeOffset
             ],
-            layerTable:[firstLayer, l1, l2],
-            schemeTypeTable:["", "", ""]
+            layerTable:[firstLayer, l1, l2, l3],
+            schemeTypeTable:["", "", "", "binary"]
         };
 
         colorSchemesTable = drawColorSchremeSequence(infoTable, myColor);
@@ -1608,8 +1617,9 @@ export function drawResultVisForLinkModel(
     location1:[number, number], 
     location2:[number, number], 
     prob:number,
-    myColor:any
-){
+    myColor:any,
+    layerLocations: any
+){  
     //compute the mid point
     const midY = (location1[1] + location2[1])/2;
     const featureX = location1[0] + 64 * 5 + 100;
@@ -1625,6 +1635,15 @@ export function drawResultVisForLinkModel(
         .append("g")
         .attr("class", "layerVis")
         .attr("id", `layerNum_3`);
+
+    //add label
+    addLayerName(
+        layerLocations,
+        "Prediction Result",
+        0,
+        30,
+        d3.select(`g#layerNum_3`)
+    );
     
     //getting the probability result
     const trueProb = sigmoid(prob);
