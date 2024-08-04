@@ -1,3 +1,6 @@
+import { sigmoid } from "./linkPredictionUtils";
+import { splitIntoMatrices } from "./utils";
+
 type NodeID = number;
 type HopLevel = number;
 type GraphIndex = string;
@@ -110,5 +113,18 @@ export function removeDuplicatesFromSubarrays(arr: number[][]): number[][] {
     });
 }
 
-
+//get the probabilities result from the model, using in the prediction result visualizer
+export function getProbabilities(prob: any, hubNodeA: number, hubNodeB: number): number[]{
+    console.log("input prob check", prob);
+    // split to matrix
+    const probAdj = splitIntoMatrices(prob, Math.sqrt(prob.length));
+    console.log("probAdj check", probAdj);
+    //find the right prediction result
+    const probResult = probAdj[hubNodeA][hubNodeB];
+    //sigmoid 
+    const trueResult = sigmoid(probResult);
+    const falseResult = 1 - trueResult;
+    //return the result
+    return [falseResult, trueResult];
+}
 

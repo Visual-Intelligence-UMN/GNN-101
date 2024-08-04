@@ -52,6 +52,8 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
     setChangedG(false);
     setIntmData(intmData);
 
+    console.log("prob in prediction check", prob);
+
     if (Array.isArray(prob[0])) {
       setProbabilities(prob as number[][]);
     } else {

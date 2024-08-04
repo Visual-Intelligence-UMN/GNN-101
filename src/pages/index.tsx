@@ -19,6 +19,7 @@ import {
     NodeClassifierButtonChain,
     LinkClassifierButtonChain,
     NodeSelector,
+    PredictionVisualizer,
 } from "../components/WebUtils";
 import { Footer, NavBar } from "../components/Surfaces";
 import { Inter } from "@next/font/google";
@@ -26,6 +27,7 @@ import NodeMatricesVisualizer from "./node_classifier/NodeMatrixVisualizer";
 import NodeGraphVisualizer from "./node_classifier/NodeGraphVisualizer";
 import { mod } from "mathjs";
 import LinkMatricesVisualizer from "./link_classifier/LinkMatrixVisualizer";
+import { getProbabilities } from "@/utils/graphDataUtils";
 
 export const inter = Inter({
     variable: "--font-inter",
@@ -253,13 +255,18 @@ export default function Home() {
                                         setSelectedNode={setHubNodeB}
                                         handleChange={handleNodeSelection}
                                     />
-                                </>:<></>}
+                                </>
+                                
+                                :
+                                <></>}
                                 {selectedGraph &&
-                                    (graphList[selectedGraph] || nodeList[selectedGraph]) ? (
+                                    (linkList[selectedGraph] || graphList[selectedGraph] || nodeList[selectedGraph]) ? (
                                     model == "graph classification" ? (
                                         <GraphAnalysisViewer path={graphList[selectedGraph]} />
                                     ) : (
-                                        <GraphAnalysisViewer path={nodeList[selectedGraph]} />
+                                        model == "node classification" ? 
+                                        <GraphAnalysisViewer path={nodeList[selectedGraph]} />:
+                                        <GraphAnalysisViewer path={linkList[selectedGraph]} />
                                     )
                                 ) : null}
                             </div>
@@ -267,16 +274,16 @@ export default function Home() {
                             <hr className="border-t border-gray-300 my-4"></hr>
 
                             {/* <ClassifyGraph
-                graphPath={graphList[selectedGraph]}
-                modelPath={modelList[model]}
-                setChangedG={setChangedG}
-                setIntmData={setIntmData}
-                setPredicted={setPredicted}
-                predicted={predicted}
-                probabilities={probabilities}
-                setProbabilities={setProbabilities}
-                simulationLoading={simulationLoading}
-              /> */}
+                                graphPath={graphList[selectedGraph]}
+                                modelPath={modelList[model]}
+                                setChangedG={setChangedG}
+                                setIntmData={setIntmData}
+                                setPredicted={setPredicted}
+                                predicted={predicted}
+                                probabilities={probabilities}
+                                setProbabilities={setProbabilities}
+                                simulationLoading={simulationLoading}
+                            /> */}
 
                             {/* model visualization */}
 
