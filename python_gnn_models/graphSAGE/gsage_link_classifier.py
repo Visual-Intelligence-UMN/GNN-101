@@ -245,8 +245,8 @@ print(prediction['decode_all_final'])
 
 #%%
 
-print(f'conv1 shape: {list(prediction['conv1'].shape)}')
-print(f'conv2 shape: {list(prediction['conv2'].shape)}')
+print(f'conv1 shape: {list(prediction['sage1'].shape)}')
+print(f'conv2 shape: {list(prediction['sage2'].shape)}')
 print(f'conv3 shape: {list(prediction['decode_mul'].shape)}')
 print(f'final shape: {list(prediction['prob_adj'].shape)}')
 print(f'final shape: {list(prediction['decode_all_final'].shape)}')
@@ -267,7 +267,7 @@ print(prediction)
 # python model to ONNX model
 torch.onnx.export(model,               # model being run
                   dummy_input,         # model input 
-                  "gnn_link_model.onnx",    # where to save the model
+                  "sage_link_model.onnx",    # where to save the model
                   export_params=True,  # store the trained parameter weights inside the model file
                   opset_version=17,    # the ONNX version to export the model to
                 #   do_constant_folding=True,  # whether to execute constant folding for optimization
@@ -278,40 +278,12 @@ torch.onnx.export(model,               # model being run
                                 'output': {0: 'batch_size'}})  # which axes should be considered dynamic)
 
 #%%
-# export data from dataset
-import json, torch
-def data_to_json(data):
-    json_data = {}
-    
-    # Convert node features to a list of lists
-    if data.x is not None:
-        json_data['x'] = data.x.tolist()  # Assuming x is a tensor of node features
-    
-    # Convert edge index to a list of pairs/lists
-    if data.edge_index is not None:
-        edge_index_list = data.edge_index.tolist()  # Convert to [2] and then to list
-        json_data['edge_index'] = edge_index_list 
-    
-    # Convert labels to a list
-    if data.y is not None:
-        json_data['y'] = data.y.tolist()  
-    num_nodes = data.x.size(0)
-    batch = torch.zeros(num_nodes, dtype=torch.int32)
-    json_data['batch'] = batch.tolist()
-    
-    return json_data
-
-json_data = data_to_json(dataset)
-with open(f'twitch.json', 'w') as f:
-    json.dump(json_data, f, indent=4)
-
-#%%
 # export weights of the model
 import onnx
 import numpy as np
 import json
 
-model = onnx.load('gnn_link_model.onnx')
+model = onnx.load('sage_link_model.onnx')
 
 weights = {}
 
@@ -319,7 +291,7 @@ for tensor in model.graph.initializer:
     np_array = onnx.numpy_helper.to_array(tensor)
     weights[tensor.name] = np_array.tolist()
 
-with open('link_weights.json', 'w') as f:
+with open('sage_link_weights.json', 'w') as f:
     json.dump(weights, f)
 
 #%%
@@ -342,7 +314,7 @@ def extract_keys(data, keys_set=None):
     
     return keys_set
 
-with open("link_weights.json", "r") as file:
+with open("sage_link_weights.json", "r") as file:
     data = json.load(file)
 
 print(data)

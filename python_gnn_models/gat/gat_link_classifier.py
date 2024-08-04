@@ -311,7 +311,7 @@ import onnx
 import numpy as np
 import json
 
-model = onnx.load('gnn_link_model.onnx')
+model = onnx.load('gat_link_model.onnx')
 
 weights = {}
 
@@ -342,7 +342,7 @@ def extract_keys(data, keys_set=None):
     
     return keys_set
 
-with open("link_weights.json", "r") as file:
+with open("gat_link_weights.json", "r") as file:
     data = json.load(file)
 
 print(data)

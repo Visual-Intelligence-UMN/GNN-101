@@ -122,3 +122,6 @@ torch.onnx.export(model,               # model being run
                   dynamic_axes={'x': {0: 'num_nodes'},
                                 'edge_index': {1: 'num_edges'},
                                 'output': {0: 'batch_size'}})  # which axes should be considered dynamic)
+
+
+

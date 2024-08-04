@@ -227,7 +227,7 @@ x = data.x.numpy().astype('float32')
 edge_index = data.edge_index.numpy().astype('int64')
 
 edge_attr = torch.ones(edge_index.shape[1], 1).numpy().astype('float32')
-onnx_model_path = "gnn_node_model.onnx"
+onnx_model_path = "sage_node_model.onnx"
 onnx_model = onnx.load(onnx_model_path)
 onnx.checker.check_model(onnx_model)
 
@@ -255,7 +255,7 @@ import onnx
 import numpy as np
 import json
 
-model = onnx.load('gnn_node_model.onnx')
+model = onnx.load('sage_node_model.onnx')
 
 weights = {}
 
@@ -263,7 +263,7 @@ for tensor in model.graph.initializer:
     np_array = onnx.numpy_helper.to_array(tensor)
     weights[tensor.name] = np_array.tolist()
 
-with open('node_weights.json', 'w') as f:
+with open('sage_node_weights.json', 'w') as f:
     json.dump(weights, f)
 
 
@@ -286,7 +286,7 @@ def extract_keys(data, keys_set=None):
     
     return keys_set
 
-with open("node_weights.json", "r") as file:
+with open("sage_node_weights.json", "r") as file:
     data = json.load(file)
 
 print(data)
@@ -301,21 +301,6 @@ for k in keys:
     print(k,d.shape)
 
 # weights data file analysis
-# All keys: {'conv3.bias', 'onnx::MatMul_277', 'onnx::MatMul_271', 'conv2.bias', 'classifier.weight', 'onnx::MatMul_274', 'classifier.bias', 'conv1.bias'}
-# conv3.bias (2,)
-# onnx::MatMul_277 (4, 2)
-# onnx::MatMul_271 (34, 4)
-# conv2.bias (4,)
-# classifier.weight (4, 2)
-# onnx::MatMul_274 (4, 4)
-# classifier.bias (4,)
-# conv1.bias (4,)
-
-# intermediate data shape for each layer
-# conv1 shape: [34, 4]
-# conv2 shape: [34, 4]
-# conv3 shape: [34, 2]
-# final shape: [34, 4]
 
 
 

@@ -194,5 +194,57 @@ torch.onnx.export(model,               # model being run
                                 'output': {0: 'batch_size'}})  # which axes should be considered dynamic)
 
 
+#%%
+# export weights of the model
+import onnx
+import numpy as np
+import json
+
+model = onnx.load('sage_graph_model.onnx')
+
+weights = {}
+
+for tensor in model.graph.initializer:
+    np_array = onnx.numpy_helper.to_array(tensor)
+    weights[tensor.name] = np_array.tolist()
+
+with open('sage_graph_weights.json', 'w') as f:
+    json.dump(weights, f)
+
+
+#%%
+# weights analysis
+import json
+import numpy as np
+
+def extract_keys(data, keys_set=None):
+    if keys_set is None:
+        keys_set = set()
+    
+    if isinstance(data, dict):
+        for key, value in data.items():
+            keys_set.add(key)
+            extract_keys(value, keys_set)
+    elif isinstance(data, list):
+        for item in data:
+            extract_keys(item, keys_set)
+    
+    return keys_set
+
+with open("sage_graph_weights.json", "r") as file:
+    data = json.load(file)
+
+print(data)
+
+keys = extract_keys(data)
+
+# print all keys in json
+print("All keys:", keys)
+
+for k in keys:
+    d = np.array(data[k])
+    print(k,d.shape)
+
+# weights data file analysis
 
 
