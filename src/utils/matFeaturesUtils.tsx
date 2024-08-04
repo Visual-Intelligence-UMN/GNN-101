@@ -1703,7 +1703,7 @@ export function drawResultVisForLinkModel(
             curve([startingPoint1, hpoint1, lpoint1, endingPoint])
         )
         .attr("stroke", "black")
-        .attr("opacity", 0.25)
+        .attr("opacity", 0.05)
         .attr("fill", "none")
         .attr("layerID", 3)
         .attr("class", "pathsToResult crossConnection");
@@ -1715,7 +1715,7 @@ export function drawResultVisForLinkModel(
             curve([startingPoint2, hpoint2, lpoint2, endingPoint])
         )
         .attr("stroke", "black")
-        .attr("opacity", 0.25)
+        .attr("opacity", 0.05)
         .attr("fill", "none")
         .attr("layerID", 3)
         .attr("class", "pathsToResult crossConnection");

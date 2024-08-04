@@ -1397,7 +1397,7 @@ export function visualizeLinkClassifierFeatures(
     });
     d3.selectAll(".resultVis").on("mouseout", function (event) {
         if(!lock){
-            d3.selectAll(".pathsToResult").style("opacity", 0.25);
+            d3.selectAll(".pathsToResult").style("opacity", 0.05);
             d3.select(".resultFrame").style("opacity", 0.25);
             d3.selectAll(".frame[layerID='2']").style("opacity", 0.25);
         }
