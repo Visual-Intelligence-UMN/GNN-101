@@ -452,7 +452,7 @@ async function initLinkClassifier(
 
     const featuresManager = visualizeLinkClassifierFeatures(
         locations, featuresArray, myColor, 
-        conv1, conv2, graph, adjList, [], keys, 
+        conv1, conv2, prob_adj[hubNodeA][hubNodeB], graph, adjList, [], keys, 
         keysForEach);
     
 

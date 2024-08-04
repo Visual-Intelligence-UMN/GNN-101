@@ -853,6 +853,7 @@ export function drawGCNConvNodeModel(
 export function drawGCNConvLinkModel(
     conv1: any,
     conv2: any,
+    probResult: number, 
     locations: any,
     myColor: any,
     frames: any,
@@ -951,7 +952,7 @@ export function drawGCNConvLinkModel(
                 layerLocations[i][0] += rectW*2+200;
             }
 
-            drawResultVisForLinkModel(location1, location2, 0.333, myColor, layerLocations);
+            drawResultVisForLinkModel(location1, location2, probResult, myColor, layerLocations);
         }
 
         //drawPoints(".mats", "red", schemeLocations);
@@ -1651,6 +1652,8 @@ export function drawResultVisForLinkModel(
     const trueProb = sigmoid(prob);
     const falseProb = 1 - trueProb;
     const probs = [trueProb, falseProb];
+
+    console.log("prob check", probs);
 
     //add a featureVisualizer
     const featureVisualizer = g.append("g").attr("class", "resultVis");
