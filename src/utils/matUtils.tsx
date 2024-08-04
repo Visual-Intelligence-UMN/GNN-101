@@ -1,4 +1,4 @@
-import { calculatePrevFeatureVisPos, loadNodeWeights, loadWeights, translateLayers } from "./matHelperUtils";
+import { calculatePrevFeatureVisPos, loadLinkWeights, loadNodeWeights, loadWeights, translateLayers } from "./matHelperUtils";
 import {
     drawMatrixPreparation,
     drawNodeFeatures,
@@ -1099,9 +1099,9 @@ export function visualizeLinkClassifierFeatures(
     myColor: any,
     conv1: any,
     conv2: any,
-    // probAdj: any,
+    probResult: number,
     graph: any,
-    // adjList: any,
+    adjList: any,
     maxVals: any,
     featureKeys: number[],
     featureKeysEachLayer: number[][]
@@ -1114,7 +1114,7 @@ export function visualizeLinkClassifierFeatures(
     let outputVis = null; //to manage model output
     let resultVis: any = null; //tp manage result visualizer
     //load weights and bias
-    const dataPackage = loadNodeWeights();
+    const dataPackage = loadLinkWeights();
 
     const weights = dataPackage["weights"];
     const bias = dataPackage["bias"];
@@ -1145,7 +1145,7 @@ export function visualizeLinkClassifierFeatures(
     var schemeLocations: any = [];
 
     //--------------------------------DRAW FRAMES--------------------------------
-    const framePackage = drawMatrixPreparation(graph, locations, 600);
+    const framePackage = drawMatrixPreparation(graph, locations, 400, -25);
     let colFrames: SVGElement[] = framePackage.colFrames; //a
     let matFrames: SVGElement[] = framePackage.matFrames; //a
 
@@ -1174,7 +1174,9 @@ export function visualizeLinkClassifierFeatures(
     //drawPoints(".mats", "red", locations);
 
     //draw paths
-    drawCrossConnectionForSubgraph(graph, locations, 2.5*128, 100, 0, featureKeys, featureKeys, featureKeysEachLayer[1]);
+    const pathsForFisrtLayer = drawCrossConnectionForSubgraph(graph, locations, 2.5*128, 100, 0, featureKeys, featureKeys, featureKeysEachLayer[1]);
+
+    console.log("paths for first layer", pathsForFisrtLayer);
 
     //-----------------------------------GCNConv LAYERS-----------------------------------------------
     const featureChannels = 64;
@@ -1184,6 +1186,7 @@ export function visualizeLinkClassifierFeatures(
     const GCNConvPackage = drawGCNConvLinkModel(
         conv1,
         conv2,
+        probResult, 
         locations,
         myColor,
         frames,
@@ -1197,14 +1200,248 @@ export function visualizeLinkClassifierFeatures(
         featureKeys,
         featureKeysEachLayer
     );
-    // locations = GCNConvPackage.locations;
-    // frames = GCNConvPackage.frames;
-    // schemeLocations = GCNConvPackage.schemeLocations;
-    // featureVisTable = GCNConvPackage.featureVisTable;
-    // colorSchemesTable = GCNConvPackage.colorSchemesTable;
-    // maxVals = GCNConvPackage.maxVals;
-    // let resultLabelsList = GCNConvPackage.resultLabelsList;
-    // let paths = GCNConvPackage.paths;
-    // let resultPaths = GCNConvPackage.resultPaths;
+    locations = GCNConvPackage.locations;
+    frames = GCNConvPackage.frames;
+    schemeLocations = GCNConvPackage.schemeLocations;
+    featureVisTable = GCNConvPackage.featureVisTable;
+    colorSchemesTable = GCNConvPackage.colorSchemesTable;
+    maxVals = GCNConvPackage.maxVals;
+    let paths = GCNConvPackage.paths;
+
+    console.log("frames", frames);
+
+    //-----------------------------------INTERACTIONS EVENTS MANAGEMENT-----------------------------------------------
+
+    let recordLayerID: number = -1;
+    // a state to controls the recover event
+    let transState = "GCNConv";
+    //save events for poolingVis
+    let poolingOverEvent: any = null;
+    let poolingOutEvent: any = null;
+
+    //added interactions
+    //add mouse event
+    d3.selectAll(".oFeature").on("mouseover", function (event, d) {
+        //if not in the state of lock
+        if (!lock) {
+            const layerID = d3.select(this).attr("layerID");
+            const node = d3.select(this).attr("node");
+            const pack = oFeatureMouseOver(layerID, node, frames, matFrames);
+            //update variables
+            frames = pack.frames;
+            matFrames = pack.matFrames;
+        }
+    });
+    d3.selectAll(".oFeature").on("mouseout", function (event, d) {
+        const layerID = d3.select(this).attr("layerID");
+        const node = d3.select(this).attr("node");
+        const pack = oFeatureMouseOut(layerID, node, frames, matFrames);
+        //update variables
+        frames = pack.frames;
+        matFrames = pack.matFrames;
+    });
+
+    d3.selectAll(".featureVis").on("mouseover", function (event, d) {
+        //if not in the state of lock
+        if (!lock) {
+            //paths interactions
+            const layerID = Number(d3.select(this).attr("layerID")) - 1;
+            const node = Number(d3.select(this).attr("node"));
+            const featureOverPack = featureVisMouseOver(
+                layerID,
+                node,
+                paths,
+                frames,
+                adjList,
+                matFrames,
+                colFrames,
+                featureChannels
+            );
+            paths = featureOverPack.paths;
+            frames = featureOverPack.frames;
+            matFrames = featureOverPack.matFrames;
+            colFrames = featureOverPack.colFrames;
+        }
+    });
+    d3.selectAll(".featureVis").on("mouseout", function (event, d) {
+        if (!lock) {
+            const layerID = Number(d3.select(this).attr("layerID")) - 1;
+            const node = Number(d3.select(this).attr("node"));
+            const featureOverPack = featureVisMouseOut(
+                layerID,
+                node,
+                paths,
+                frames,
+                adjList,
+                matFrames,
+                colFrames
+            );
+            paths = featureOverPack.paths;
+            frames = featureOverPack.frames;
+            matFrames = featureOverPack.matFrames;
+            colFrames = featureOverPack.colFrames;
+        }
+    });
+    d3.selectAll(".mats, .switchBtn").on("click", function (event, d) {
+        if (event.target && event.target.id === "btn") {
+            return;
+        }
+        if (lock) {
+            d3.selectAll(".resultVis")
+                .style("pointer-events", "auto")
+                .style("opacity", 1);
+            const recoverPackage = detailedViewRecovery(
+                event,
+                dview,
+                lock,
+                transState,
+                recordLayerID,
+                poolingOutEvent,
+                poolingOverEvent,
+                poolingVis,
+                colorSchemesTable,
+                featureChannels,
+                90,
+                []
+            );
+            //update variables
+            dview = recoverPackage.dview;
+            lock = recoverPackage.lock;
+            transState = recoverPackage.transState;
+            recordLayerID = recoverPackage.recordLayerID;
+            poolingOutEvent = recoverPackage.poolingOutEvent;
+            poolingOverEvent = recoverPackage.poolingOverEvent;
+            colorSchemesTable = recoverPackage.colorSchemesTable;
+
+            clearInterval(intervalID);
+        }
+    });
+
+    function setIntervalID(id: any) {
+        intervalID = id;
+
+    }
+
+    d3.selectAll(".featureVis").on("click", function (event, d) {
+        if (lock != true) {
+            //state
+            transState = "GCNConv";
+            lock = true;
+            event.stopPropagation();
+            dview = true;
+
+            //lock all feature visualizers and transparent paths
+            d3.selectAll(".resultVis")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".oFeature")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.select(".pooling")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".twoLayer")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".crossConnection").style("opacity", 0);
+            //transparent other feature visualizers
+            d3.selectAll(".featureVis").style("opacity", 0.2);
+            d3.selectAll(".oFeature").style("opacity", 0.2);
+            //translate each layer
+            const layerID = Number(d3.select(this).attr("layerID")) - 1;
+            const node = Number(d3.select(this).attr("node"));
+            const featureVisPack = featureVisClick(
+                layerID,
+                node,
+                recordLayerID,
+                colorSchemesTable,
+                adjList,
+                featureVisTable,
+                features,
+                conv1,
+                conv2,
+                bias,
+                myColor,
+                weights,
+                lock,
+                setIntervalID,
+                featureChannels,
+                15,
+                5,
+                90,
+                128,
+                2.5,
+            );
+            // update variables
+            recordLayerID = featureVisPack.recordLayerID;
+            colorSchemesTable = featureVisPack.colorSchemesTable;
+            featureVisTable = featureVisPack.featureVisTable;
+            features = featureVisPack.features;
+            intervalID = featureVisPack.getIntervalID();
+
+            //path connect - connect intermediate feature vis to current feature vis
+
+        }
+    });
+
+
+    //result visualizer interactions
+    d3.selectAll(".resultVis").on("mouseover", function (event) {
+        if(!lock){
+            d3.selectAll(".pathsToResult").style("opacity", 1);
+            d3.select(".resultFrame").style("opacity", 1);
+            d3.selectAll(".frame[layerID='2']").style("opacity", 1);
+        }
+    });
+    d3.selectAll(".resultVis").on("mouseout", function (event) {
+        if(!lock){
+            d3.selectAll(".pathsToResult").style("opacity", 0.25);
+            d3.select(".resultFrame").style("opacity", 0.25);
+            d3.selectAll(".frame[layerID='2']").style("opacity", 0.25);
+        }
+    });
+    d3.selectAll(".resultVis").on("click", function (event) {
+        console.log("click result visualizer!");
+        if (lock != true) {
+            //state
+            transState = "linkResult";
+            lock = true;
+            event.stopPropagation();
+            dview = true;
+
+            //lock all feature visualizers and transparent paths
+            d3.selectAll(".resultVis")
+                .style("pointer-events", "none");
+            d3.selectAll(".oFeature")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.select(".pooling")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".twoLayer")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".crossConnection").style("opacity", 0);
+            d3.selectAll(".pathsToResult").attr("opacity", 0);
+
+            console.log("selection check", d3.selectAll(".pathsToResult"));
+
+            d3.selectAll(".frame[layerID='2']").style("opacity", 1);
+
+            //transparent other feature visualizers
+            d3.selectAll(".featureVis").style("opacity", 0.2);
+            d3.selectAll(".oFeature").style("opacity", 0.2);
+            //translate each layer
+            const layerID = Number(d3.select(this).attr("layerID")) - 1;
+            const node = Number(d3.select(this).attr("node"));
+            translateLayers(2, 250);
+
+
+            //recover necesary components
+            d3.selectAll("#layerNum_2").style("opacity", 1);
+            d3.selectAll(".featureVis[layerID='2']").style("opacity", 1);
+            
+        }
+    });
 }
 

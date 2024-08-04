@@ -31,7 +31,7 @@ const LinkMatricesVisualizer: React.FC<LinkMatricesVisualizerProps> = ({
     useEffect(() => {
         if ((intmData == null || changed) && !predicted) {
             console.log("visualize partial graph");
-            visualizePartialGraphMatrix(graph_path, false, 600, hubNodeA, hubNodeB);
+            visualizePartialGraphMatrix(graph_path, false, 400, hubNodeA, hubNodeB);
         } else {
             console.log("visualize link classifier", hubNodeA, hubNodeB);
            visualizeLinkClassifier(setIsLoading, graph_path, intmData, hubNodeA, hubNodeB);
