@@ -4,6 +4,7 @@ import { Hint, PredictionVisualizer } from "../components/WebUtils";
 import { on } from "events";
 import { useEffect } from "react";
 import { IntmData, IntmDataLink, IntmDataNode } from "@/types";
+import { only } from "node:test";
 
 interface ClassifyGraphProps {
   graphPath: string;
@@ -31,12 +32,13 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
   onlyShownButton = false,
   simulationLoading,
 }) => {
+  let prob: number[] | number[][] = [];
   const classifyGraph = async () => {
     setPredicted(true);
 
     //	const { prob, intmData } = await graphPrediction(modelPath, graphPath);
 
-    let prob: number[] | number[][];
+    
     let intmData: IntmData | IntmDataNode | IntmDataLink;
 
     if (modelPath == "./gnn_node_model.onnx")
@@ -52,13 +54,16 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
     setChangedG(false);
     setIntmData(intmData);
 
-    console.log("prob in prediction check", prob);
+    
 
     if (Array.isArray(prob[0])) {
       setProbabilities(prob as number[][]);
+      console.log("prob 1", probabilities);
     } else {
       setProbabilities(prob as number[]);
+      console.log("prob 2", probabilities);
     }
+    console.log("check in prediction", prob, probabilities);
   };
 
   const prediction = !predicted ? (
@@ -85,7 +90,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
   ) : modelPath == "./gnn_node_model.onnx" ? (
     <></>
   ) : Array.isArray(probabilities[0]) ? (
-    <div>{/* the prediction visualization for the node classifier */}</div>
+    <div></div>
   ) : probabilities.length > 0 && typeof probabilities[0] === "number" ? (
     <PredictionVisualizer
       result={{
@@ -99,19 +104,23 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
   const content =
     modelPath == "./gnn_node_model.onnx" ? (
       <>{prediction}</>
-    ) : onlyShownButton ? (
-      prediction
     ) : (
-      <div className="flex gap-x-4 items-center mb-2">
-        {!predicted && (
-          <div className="flex gap-x-4 items-center">
-            <h1 className="text-3xl font-black">Predictions</h1>
-            <p className="mt-1 	mx-3">No data available yet!</p>
-            <Hint text='Press the "Click to Predict!" to predict' />
-          </div>
-        )}
-        {prediction}
-      </div>
+      onlyShownButton ? (
+        prediction
+      ) 
+      : 
+      (
+        <div className="flex gap-x-4 items-center mb-2">
+          {!predicted && (
+            <div className="flex gap-x-4 items-center">
+              <h1 className="text-3xl font-black">Predictions</h1>
+              <p className="mt-1 	mx-3">No data available yet!</p>
+              <Hint text='Press the "Click to Predict!" to predict' />
+            </div>
+          )}
+          {prediction}
+        </div>
+      )
     );
 
   return content;
