@@ -1347,6 +1347,8 @@ export function visualizeLinkClassifierFeatures(
             //transparent other feature visualizers
             d3.selectAll(".featureVis").style("opacity", 0.2);
             d3.selectAll(".oFeature").style("opacity", 0.2);
+            d3.selectAll(".legend").style("opacity", 0.25);
+            d3.selectAll(".binary-legend").style("opacity", 0.25);
             //translate each layer
             const layerID = Number(d3.select(this).attr("layerID")) - 1;
             const node = Number(d3.select(this).attr("node"));
@@ -1423,6 +1425,12 @@ export function visualizeLinkClassifierFeatures(
                 .style("opacity", 0.2);
             d3.selectAll(".crossConnection").style("opacity", 0);
             d3.selectAll(".pathsToResult").attr("opacity", 0);
+
+            d3.selectAll(".legend").style("opacity", 0.25);
+            d3.selectAll(".binary-legend").style("opacity", 0.25);
+
+            colorSchemesTable[2].style.opacity = "1";
+            colorSchemesTable[3].style.opacity = "1";
 
             console.log("selection check", d3.selectAll(".pathsToResult"));
 

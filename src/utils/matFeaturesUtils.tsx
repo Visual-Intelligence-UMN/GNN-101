@@ -1001,7 +1001,7 @@ export function drawGCNConvLinkModel(
 
     }
 
-    console.log("featureVisTable", featureVisTable);
+    console.log("cst", colorSchemesTable);
 
     return {
         locations: locations,
