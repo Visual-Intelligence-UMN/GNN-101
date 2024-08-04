@@ -1651,7 +1651,7 @@ export function drawResultVisForLinkModel(
     const probs = [trueProb, falseProb];
 
     //add a featureVisualizer
-    const featureVisualizer = g.append("g").attr("class", "resultVisualizer");
+    const featureVisualizer = g.append("g").attr("class", "resultVis");
     
     for(let i=0; i<2; i++){
         featureVisualizer.append("rect")
