@@ -267,7 +267,7 @@ print(prediction)
 # python model to ONNX model
 torch.onnx.export(model,               # model being run
                   dummy_input,         # model input 
-                  "gnn_link_model.onnx",    # where to save the model
+                  "gat_link_model.onnx",    # where to save the model
                   export_params=True,  # store the trained parameter weights inside the model file
                   opset_version=17,    # the ONNX version to export the model to
                 #   do_constant_folding=True,  # whether to execute constant folding for optimization
