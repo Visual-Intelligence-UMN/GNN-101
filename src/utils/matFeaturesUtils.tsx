@@ -1680,7 +1680,7 @@ export function drawResultVisForLinkModel(
         .attr("stroke", "black")
         .attr("opacity", 0.25)
         .attr("stroke-width", 1)
-        .attr("class", "resultFrame")
+        .attr("class", "resultFrame frame")
         .raise();
         // .attr("class", "resultRect")
         // .attr("id", `resultRect`);
