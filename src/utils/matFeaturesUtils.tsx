@@ -1651,7 +1651,7 @@ export function drawResultVisForLinkModel(
     const probs = [trueProb, falseProb];
 
     //add a featureVisualizer
-    const featureVisualizer = g.append("g");
+    const featureVisualizer = g.append("g").attr("class", "resultVisualizer");
     
     for(let i=0; i<2; i++){
         featureVisualizer.append("rect")
@@ -1714,21 +1714,6 @@ export function drawResultVisForLinkModel(
         .attr("fill", "none")
         .attr("layerID", 3)
         .attr("class", "pathsToResult");
-    
-    featureVisualizer.on("mouseover", function (event) {
-        d3.selectAll(".pathsToResult").style("opacity", 1);
-        d3.select(".resultFrame").style("opacity", 1);
-        d3.selectAll(".frame[layerID='2']").style("opacity", 1);
-        
-    });
-    featureVisualizer.on("mouseout", function (event) {
-        d3.selectAll(".pathsToResult").style("opacity", 0.25);
-        d3.select(".resultFrame").style("opacity", 0.25);
-        d3.selectAll(".frame[layerID='2']").style("opacity", 0.25);
-    });
-    featureVisualizer.on("click", function (event) {
-
-    });
 }
 
 
