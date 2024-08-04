@@ -38,6 +38,47 @@ const LinkMatricesVisualizer: React.FC<LinkMatricesVisualizerProps> = ({
         }
     }, [graph_path, intmData, changed, hubNodeA, hubNodeB]);
 
+
+    const updateTextElements = (svg: SVGSVGElement, selectedButtons: boolean[]) => {
+        console.log("selected buttons", selectedButtons);
+
+        d3.select(svg)
+          .selectAll(".layerVis")
+          .each(function (d, i) {
+            const g1 = d3.select(this);
+    
+            g1.selectAll("text.layerName")
+              .transition()
+              .duration(140)
+              .style("opacity", () => {
+                if ((i <= 1 && selectedButtons[i]) ||
+                  (i === 2 && selectedButtons[2]) ||
+                  (i === 3 && selectedButtons[6])) {
+                  return 1;
+                }
+                return 0.5;
+              })
+              .attr("font-size", () => {
+                if ((i <= 1 && selectedButtons[i]) ||
+                  (i === 2 && selectedButtons[2]) ||
+                  (i === 3 && selectedButtons[6])) {
+                  return "18px";
+                }
+                return "15px";
+              });
+          });
+      };
+      useEffect(() => {
+        const svg = d3
+            .select("#matvis")
+            .select("svg.mats")
+            .node() as SVGSVGElement;
+        if (svg && !isLoading) {
+          updateTextElements(svg, selectedButtons);
+        }
+
+      }, [selectedButtons, isLoading]);
+
     return (
         <div
             id="matvis"
