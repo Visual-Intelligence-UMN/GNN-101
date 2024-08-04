@@ -941,8 +941,10 @@ export function drawGCNConvLinkModel(
             //visualize the result layer
             console.log("check last locations", locations, featureKeysEachLayer);
             //extract last two feature visualizers' locations
-            const location1:[number, number] = [locations[0][0], locations[0][1]];
-            const location2:[number, number] = [locations[1][0], locations[1][1]];
+            const hubNodeA = featureKeysEachLayer[0].indexOf(featureKeysEachLayer[2][0]);
+            const hubNodeB = featureKeysEachLayer[0].indexOf(featureKeysEachLayer[2][1]);
+            const location1:[number, number] = [locations[hubNodeA][0], locations[hubNodeA][1]];
+            const location2:[number, number] = [locations[hubNodeB][0], locations[hubNodeB][1]];
 
             let layerLocations = deepClone(locations);
             for(let i=0; i<layerLocations.length; i++){
