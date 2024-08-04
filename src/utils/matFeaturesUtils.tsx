@@ -1656,7 +1656,7 @@ export function drawResultVisForLinkModel(
     console.log("prob check", probs);
 
     //add a featureVisualizer
-    const featureVisualizer = g.append("g").attr("class", "resultVis");
+    const featureVisualizer = g.append("g");
     
     for(let i=0; i<2; i++){
         featureVisualizer.append("rect")
@@ -1667,8 +1667,8 @@ export function drawResultVisForLinkModel(
             .attr("fill", myColor(probs[i]))
             .attr("stroke", "black")
             .attr("stroke-width", 0.1)
-            .attr("class", "resultRect")
-            .attr("id", `resultRect`);
+            .attr("class", "resultVis")
+            .attr("id", `resultRect${i}`);
     }
 
     g.append("rect")
@@ -1706,7 +1706,7 @@ export function drawResultVisForLinkModel(
         .attr("opacity", 0.25)
         .attr("fill", "none")
         .attr("layerID", 3)
-        .attr("class", "pathsToResult");
+        .attr("class", "pathsToResult crossConnection");
 
     d3.select(".mats")
         .append("path")
@@ -1718,7 +1718,7 @@ export function drawResultVisForLinkModel(
         .attr("opacity", 0.25)
         .attr("fill", "none")
         .attr("layerID", 3)
-        .attr("class", "pathsToResult");
+        .attr("class", "pathsToResult crossConnection");
 }
 
 
