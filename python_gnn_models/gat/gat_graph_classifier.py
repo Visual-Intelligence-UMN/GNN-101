@@ -137,7 +137,17 @@ batch_dummy = torch.zeros(num_nodes, dtype=torch.int32)  # Assuming a single gra
 
 dummy_input = (x_dummy, edge_index_dummy, batch_dummy)
 
-
-
-
 # %%
+torch.onnx.export(model,               # model being run
+                  dummy_input,         # model input 
+                  "gat_graph_model.onnx",    # where to save the model
+                  export_params=True,  # store the trained parameter weights inside the model file
+                  opset_version=17,    # the ONNX version to export the model to
+                #   do_constant_folding=True,  # whether to execute constant folding for optimization
+                  input_names = ['x', 'edge_index', 'batch'],   # the model's input names
+                  output_names=['gat1', 'gat2', 'gat3', 'pooling','dropout','final'],
+                  dynamic_axes={'x': {0: 'num_nodes'},
+                                'edge_index': {1: 'num_edges'},
+                                'batch': {0: 'num_nodes'},
+                                'output': {0: 'batch_size'}})  # which axes should be considered dynamic)
+
