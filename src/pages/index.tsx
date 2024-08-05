@@ -26,6 +26,7 @@ import NodeMatricesVisualizer from "./node_classifier/NodeMatrixVisualizer";
 import NodeGraphVisualizer from "./node_classifier/NodeGraphVisualizer";
 import { mod } from "mathjs";
 import LinkMatricesVisualizer from "./link_classifier/LinkMatrixVisualizer";
+import LinkGraphVisualizer from "./link_classifier/LinkGraphVisualizer";
 
 export const inter = Inter({
     variable: "--font-inter",
@@ -347,7 +348,17 @@ export default function Home() {
                                         />
                                     )
                                 ) : isGraphView ? (
-                                    <>Graph View</>
+                                    <LinkGraphVisualizer
+                                        graph_path={linkList[selectedGraph]}
+                                        intmData={intmData}
+                                        changed={changedG}
+                                        predicted={predicted}
+                                        selectedButtons={selectedButtons}
+                                        simulationLoading={simulationLoading}
+                                        setSimulation={setSimulation}
+                                        hubNodeA={hubNodeA}
+                                        hubNodeB={hubNodeB}
+                                        />
                                 ) : (
                                     <LinkMatricesVisualizer
                                         graph_path={linkList[selectedGraph]}
@@ -358,6 +369,7 @@ export default function Home() {
                                         hubNodeA={hubNodeA}
                                         hubNodeB={hubNodeB}
                                     />
+                                    
                                 )}
 
                                 {/* overlay text on visualizer when not predicted */}
