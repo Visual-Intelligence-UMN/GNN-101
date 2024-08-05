@@ -403,16 +403,12 @@ export async function data_prep(o_data: any) {
         } else {
           node_train = "?"
         }
-
-
-        
       }
       if (aromatic_node_index_set.has(i)) {
         is_aromatic = true;
       } else {
         is_aromatic = false;
       }
-      
 
 
       if (is_train.length != 0) {

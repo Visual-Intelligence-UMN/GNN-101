@@ -8,6 +8,8 @@ GNN101 is a web-based tool that provides visual learning experience for the grap
 
 GiHub Page Version: https://Visual-Intelligence-UMN.github.io/GNN-101
 
+Demo Video: https://youtu.be/_0jXy4Zoh-o 
+
 ## Getting Started
 
 First, install all dependencies by using: 

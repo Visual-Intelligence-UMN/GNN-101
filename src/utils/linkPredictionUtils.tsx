@@ -105,13 +105,12 @@ export function getNodeSet(
     hubNode: number
 ){
     // Convert graph to adjacency matrix and adjacency list
-    //const mat = graphToMatrix(graph);
+    // const mat = graphToMatrix(graph);
     let adjList:number[][] = graphToAdjList(graph);
     adjList = removeDuplicatesFromSubarrays(adjList);
 
     let addedFeatureNodes: Set<number> = new Set();
     let addedConv1Nodes: Set<number> = new Set();
-
     for(let i = 0; i < adjList[hubNode].length; i++){
         const neighborNode = adjList[hubNode][i];
         console.log("add edge", hubNode, neighborNode);
@@ -129,7 +128,7 @@ export function getNodeSet(
             console.log("neighborNode hop 2", neighborNode);
             console.log("add edge hop 2", node, neighborNode);
             if (!addedFeatureNodes.has(neighborNode)) {
-                addedFeatureNodes.add(neighborNode);            
+                addedFeatureNodes.add(neighborNode);        
             }
         }
     }
@@ -139,7 +138,7 @@ export function getNodeSet(
     const mergedNodes = [nodesNeedConstruct, nodesNeedConstruct1];
     //const subgraph = extractSubgraph(mat, nodesNeedConstruct);
 
-    //basically, we generate a computational graph based on the input graph and the features - computeGraph
+    //basically, we generate a computational graph based on the input graph an-0d the features - computeGraph
     //then we have a set of nodes that we have added to the computeGraph - sets
     //we also need to construct a subgraph based on the nodes that we have added to the computeGraph - subgraph
     return mergedNodes;
@@ -163,7 +162,5 @@ export function convertToAdjacencyMatrix(adjDict: AdjacencyDict): number[][] {
     return adjMatrix;
 }
 
-export function sigmoid(x: number) {
-    return 1 / (1 + Math.exp(-x));
-}
+
 
