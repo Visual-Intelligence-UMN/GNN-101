@@ -1057,6 +1057,7 @@ export function visualizeMatrixBody(gridSize: number, graph: any, width: number,
         .attr("y", (d: HeatmapData) => y(d.variable)! + 150)
         .attr("width", x.bandwidth())
         .attr("height", y.bandwidth())
+        .attr("id", (d:any)=>`gridCell-${d.group}-${d.variable}`)
         .style("fill", (d: HeatmapData) => myColor(d.value))
         .style("stroke-width", 1)
         .style("stroke", "grey")

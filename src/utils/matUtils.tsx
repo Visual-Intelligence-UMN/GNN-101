@@ -1448,6 +1448,9 @@ export function visualizeLinkClassifierFeatures(
             //recover necesary components
             d3.selectAll("#layerNum_2").style("opacity", 1);
             d3.selectAll(".featureVis[layerID='2']").style("opacity", 1);
+
+            //visualize the inner computation process
+            
             
         }
     });

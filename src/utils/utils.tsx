@@ -176,6 +176,26 @@ export function findMaxIndex(arr: number[]): number {
   return arr.indexOf(maxValue);
 }
 
+export function splitAnyIntoMatrices<T>(
+  array: T[],
+  matrixSize: number = 64
+): T[][] {
+  // 创建一个空的二维数组
+  let result: T[][] = [];
+  // 计算每个子数组的长度
+  let n = Math.ceil(array.length / matrixSize);
+
+  // 遍历 n 次来创建子数组
+  for (let i = 0; i < n; i++) {
+      // 截取从 i * matrixSize 开始的 matrixSize 长度的部分
+      let subArray = array.slice(i * matrixSize, (i + 1) * matrixSize);
+      // 将截取的子数组添加到结果数组中
+      result.push(subArray);
+  }
+
+  // 返回生成的二维数组
+  return result;
+}
 
 //Split a large 1d array into a 1d array with multiple 8*8 matrices
 

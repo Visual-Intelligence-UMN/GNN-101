@@ -7,7 +7,9 @@ import {
     matrix_to_hmap,
     get_axis_gdata,
     graphToAdjList,
-    drawPoints
+    drawPoints,
+    get_cood_from_parent,
+    splitAnyIntoMatrices
 } from "../utils/utils";
 import {
     visualizeGraphClassifierFeatures,
@@ -370,10 +372,26 @@ async function initLinkClassifier(
     visualizeMatrixBody(gridSize, graph, width, height, margin);
     drawNodeAttributes(keys, graph, 150);
 
+    //draw target edge - "?"
+    
+    //get the subgraph indexes for the target edge - hubNodeA and hubNodeB
+
+    //indexing the location
+    const rectLocations = get_cood_from_parent(".mats", "rect");
+
+    //add a question mark to the target edge
+
+
+
     const data = matrix_to_hmap(graph);
 
     locations = get_cood_locations(data, locations);
 
+    const locationMatrix = splitAnyIntoMatrices(locations, Math.sqrt(locations.length));
+
+    //drawPoints(".mats", "red", locationMatrix);
+
+    
     //shift the locations
     for(let i = 0; i < locations.length; i++){
         locations[i][0] += 25;
@@ -448,7 +466,21 @@ async function initLinkClassifier(
     // });
     //crossConnectionMatrices(graphs, locations, offsetMat, pathMatrix);
 
+    const subGraphNodeA = featuresIndicesLayerOne.indexOf(hubNodeA);
+    const subGraphNodeB = featuresIndicesLayerOne.indexOf(hubNodeB);
 
+    const questionMark = d3.select("#matvis").append("text").text("?").attr("x", locationMatrix[subGraphNodeA][subGraphNodeB][0]).attr("y", locationMatrix[subGraphNodeA][subGraphNodeB][1]).raise();
+
+
+    console.log(
+        "grid cell", 
+        `#gridCell-${subGraphNodeA}-${subGraphNodeB}`, `#gridCell-${subGraphNodeB}-${subGraphNodeA}`,
+        d3.select("#matvis").selectAll("rect").select(`#gridCell-${subGraphNodeA}-${subGraphNodeB}`)
+        ,locationMatrix[subGraphNodeA][subGraphNodeB][0], locationMatrix[subGraphNodeA][subGraphNodeB][1],questionMark
+    );
+
+    d3.select("#matvis").select(`#gridCell-${subGraphNodeA}-${subGraphNodeB}`).attr("fill", "red");
+    d3.select("#matvis").select(`#gridCell-${subGraphNodeB}-${subGraphNodeA}`).attr("fill", "red");
 
     const featuresManager = visualizeLinkClassifierFeatures(
         locations, featuresArray, myColor, 
