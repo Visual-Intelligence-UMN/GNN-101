@@ -99,7 +99,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
       }}
     />
   ) : (
-    <span>Predicting...</span>
+    <span>Predicting...Estimated waiting time is 10 seconds...</span>
   );
   const content =
     modelPath == "./gnn_node_model.onnx" ? (
