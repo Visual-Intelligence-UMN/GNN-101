@@ -28,7 +28,6 @@ export function graphVisDrawMatrixWeight(
 
     
     if(Xt[0].length!=Xt.length){
-        //weightMatrixPostions = transposeAnyMatrix(weightMatrixPostions);
         flag = false;
 
         const math = create(all, {});
@@ -399,7 +398,7 @@ export function hoverOverHandler(node: any, aggregatedData: any, state: State, g
     for (let i = 0; i < node.features.length; i++) {
         d3.select(`.calculatedFeatures${i}`)
             .on("mouseover", function () {
-                if (!state.isClicked) {
+                if (!state.isClicked || state.isPlaying) {
                     return;
                 }
                 graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg)
@@ -416,7 +415,7 @@ export function hoverOverHandler(node: any, aggregatedData: any, state: State, g
 
     })
             .on("mouseout", function () {
-                if (!state.isClicked) {
+                if (!state.isClicked || state.isPlaying) {
                     return;
                 }
                 d3.selectAll(".math-displayer").remove();

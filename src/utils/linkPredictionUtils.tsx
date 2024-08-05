@@ -133,8 +133,8 @@ export function getNodeSet(
         }
     }
 
-    const nodesNeedConstruct:number[] = Array.from(addedFeatureNodes);
-    const nodesNeedConstruct1:number[] = Array.from(addedConv1Nodes);
+    const nodesNeedConstruct:number[] = Array.from(addedFeatureNodes); //feature nodes
+    const nodesNeedConstruct1:number[] = Array.from(addedConv1Nodes); //first conv
     const mergedNodes = [nodesNeedConstruct, nodesNeedConstruct1];
     //const subgraph = extractSubgraph(mat, nodesNeedConstruct);
 

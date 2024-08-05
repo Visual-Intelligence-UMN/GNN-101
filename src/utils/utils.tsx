@@ -533,6 +533,7 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
 
   if (movedNode && (!event.target.classList.contains("vis-component"))) {
     svg.selectAll(".vis-component").style("opacity", 0);
+    d3.selectAll(".hintLabel").attr("opacity", 1);
     let currMoveOffset = moveOffset;
 
     for (let i = 0; i < colorSchemes.length; i++) {
@@ -828,6 +829,7 @@ export function featureVisualizer(
               return;
             }
             state.isClicked = true;
+            d3.selectAll(".hintLabel").attr("opacity", 0);
 
                     //  // prevent clicking on other nodes and move the layers to the right again
                     //  if (movedNode === node) {
@@ -998,6 +1000,7 @@ export function featureVisualizer(
             return;
           }
           state.isClicked = true;
+          d3.selectAll(".hintLabel").attr("opacity", 0);
 
 
 

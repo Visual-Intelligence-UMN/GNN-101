@@ -928,7 +928,6 @@ export function calculationVisualizer(
 
 
 
-
     const math = create(all, {});
     let Xt = math.transpose(currentWeights);
     if (node.graphIndex === 1) {
@@ -1557,7 +1556,7 @@ function weightAnimation(
             return;
         }
 
-        d3.selectAll(".weightUnit").style("opacity", 0.3).lower();
+        d3.selectAll(".weightUnit").attr("opacity", 0.3).lower();
         if (i >= endNumber) {
             i = 0; // Reset the index to replay the animation
         }
@@ -1588,6 +1587,7 @@ function weightAnimation(
                 //     state
                 // );
                 if (mode === 0 && node.graphIndex === 5) {
+                    d3.select(`#columnUnit-${i - 1}`).style("opacity", 0).lower();
                     const math = create(all, {});
                     const wMat = math.transpose(allWeights[3]);
 
@@ -1601,7 +1601,7 @@ function weightAnimation(
                 graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg)
 
                 d3.selectAll(`#weightUnit-${i - 1}`).style("opacity", 0.3).lower();
-                d3.select(`#columnUnit-${i - 1}`).style("opacity", 0).lower();
+                d3.selectAll(`#columnUnit-${i - 1}`).style("opacity", 0).lower();
                 d3.selectAll(`#weightUnit-${i}`).style("opacity", 1).raise();
                 d3.select(`#columnUnit-${i}`).style("opacity", 1).raise();
 
