@@ -20,7 +20,8 @@ import {
 } from "@/utils/graphUtils"
 import { stat } from "fs";
 import { Yomogi } from "@next/font/google";
-import { dataPreparationLinkPred, indexingFeatures } from "./linkPredictionUtils";
+import { dataPreparationLinkPred, constructComputationalGraph } from "./linkPredictionUtils";
+import { extractSubgraph } from "./graphDataUtils";
 
 env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
@@ -402,16 +403,12 @@ export async function data_prep(o_data: any) {
         } else {
           node_train = "?"
         }
-
-
-        
       }
       if (aromatic_node_index_set.has(i)) {
         is_aromatic = true;
       } else {
         is_aromatic = false;
       }
-      
 
 
       if (is_train.length != 0) {
@@ -1449,20 +1446,26 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
 
   const prob = outputMap.prob_adj.cpuData;
 
-
+  console.log("predicted!",intmData);
 
   const data = dataPreparationLinkPred(intmData);
 
   const features = graphData.x;
 
 
+  console.log("data!", data);
 
+    const mat = graphToMatrix(graphData);
 
-    const indexedFeaturesI = indexingFeatures(
+    const computationalGraph = constructComputationalGraph(
       graphData, features, data.conv1Data, data.conv2Data, 241
     );
+    const nodesNeedConstruct = computationalGraph.getNodesAtHopLevel(2);
+    const subgraph = extractSubgraph(mat, nodesNeedConstruct)
 
-
+    console.log("subgraph", subgraph);
+    console.log("computationalGraph", computationalGraph);
+  
   return {prob, intmData};
 
 }
@@ -1588,4 +1591,8 @@ export function loadNodesLocation(mode: number, path: string) {
 
   return data;
 }
+
+
+
+
 

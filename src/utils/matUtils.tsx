@@ -1,10 +1,12 @@
-import { calculatePrevFeatureVisPos, loadNodeWeights, loadWeights, translateLayers } from "./matHelperUtils";
+import { calculatePrevFeatureVisPos, loadLinkWeights, loadNodeWeights, loadWeights, translateLayers } from "./matHelperUtils";
 import {
     drawMatrixPreparation,
     drawNodeFeatures,
     drawGCNConvGraphModel,
     drawGCNConvNodeModel,
     computeMids,
+    drawGCNConvLinkModel,
+    drawCrossConnectionForSubgraph,
 } from "./matFeaturesUtils";
 import * as d3 from "d3";
 import {
@@ -1087,15 +1089,367 @@ export function visualizeNodeClassifierFeatures(
         }
 
     });
-
-
-
-
-
-
     return null;
 }
 
 
+export function visualizeLinkClassifierFeatures(
+    locations: any,
+    features: any,
+    myColor: any,
+    conv1: any,
+    conv2: any,
+    probResult: number,
+    graph: any,
+    adjList: any,
+    maxVals: any,
+    featureKeys: number[],
+    featureKeysEachLayer: number[][]
+    // trainingNodes: number[]
+) {
+    //--------------------------------DATA PREP MANAGEMENT--------------------------------
+    let intervalID: any = null; // to manage animation controls
 
+    let poolingVis = null; //to manage pooling visualizer
+    let outputVis = null; //to manage model output
+    let resultVis: any = null; //tp manage result visualizer
+    //load weights and bias
+    const dataPackage = loadLinkWeights();
+
+    const weights = dataPackage["weights"];
+    const bias = dataPackage["bias"];
+
+    //table that manage all feature visualizers for GCNConv
+    let featureVisTable: SVGElement[][] = [[], [], [], [], []];
+    //table that manage color schemes
+    let colorSchemesTable: SVGElement[] = [];
+    //control detail view
+    let dview = false;
+    //control lock and unlock
+    let lock = false;
+    //a data structure to store all feature vis frames information
+    interface FrameDS {
+        features: any[];
+        GCNConv1: any[];
+        GCNConv2: any[];
+        GCNConv3: any[];
+        results: any[];
+    }
+    var frames: FrameDS = {
+        features: [],
+        GCNConv1: [],
+        GCNConv2: [],
+        GCNConv3: [],
+        results: []
+    };
+    var schemeLocations: any = [];
+
+    //--------------------------------DRAW FRAMES--------------------------------
+    const framePackage = drawMatrixPreparation(graph, locations, 400, -25);
+    let colFrames: SVGElement[] = framePackage.colFrames; //a
+    let matFrames: SVGElement[] = framePackage.matFrames; //a
+
+    //-----------------------------------FIRST LAYER-----------------------------------------------
+    const firstLayerPackage = drawNodeFeatures(
+        locations,
+        graph,
+        myColor,
+        features,
+        frames,
+        schemeLocations,
+        featureVisTable,
+        128,
+        2.5,
+        15,
+        150,
+        false
+    );
+    //updated variables
+    locations = firstLayerPackage.locations;
+    frames = firstLayerPackage.frames;
+    schemeLocations = firstLayerPackage.schemeLocations;
+    featureVisTable = firstLayerPackage.featureVisTable;
+    const firstLayer = firstLayerPackage.firstLayer;
+
+    //drawPoints(".mats", "red", locations);
+
+    //draw paths
+    const pathsForFisrtLayer = drawCrossConnectionForSubgraph(graph, locations, 2.5*128, 100, 0, featureKeys, featureKeys, featureKeysEachLayer[1]);
+
+    console.log("paths for first layer", pathsForFisrtLayer);
+
+    //-----------------------------------GCNConv LAYERS-----------------------------------------------
+    const featureChannels = 64;
+    
+    // we need have the locations and indices of the nodes involved during the computation
+
+    const GCNConvPackage = drawGCNConvLinkModel(
+        conv1,
+        conv2,
+        probResult, 
+        locations,
+        myColor,
+        frames,
+        schemeLocations,
+        featureVisTable,
+        graph,
+        colorSchemesTable,
+        firstLayer,
+        maxVals,
+        featureChannels,
+        featureKeys,
+        featureKeysEachLayer
+    );
+    locations = GCNConvPackage.locations;
+    frames = GCNConvPackage.frames;
+    schemeLocations = GCNConvPackage.schemeLocations;
+    featureVisTable = GCNConvPackage.featureVisTable;
+    colorSchemesTable = GCNConvPackage.colorSchemesTable;
+    maxVals = GCNConvPackage.maxVals;
+    let paths = GCNConvPackage.paths;
+
+    console.log("frames", frames);
+
+    //-----------------------------------INTERACTIONS EVENTS MANAGEMENT-----------------------------------------------
+
+    let recordLayerID: number = -1;
+    // a state to controls the recover event
+    let transState = "GCNConv";
+    //save events for poolingVis
+    let poolingOverEvent: any = null;
+    let poolingOutEvent: any = null;
+
+    //added interactions
+    //add mouse event
+    d3.selectAll(".oFeature").on("mouseover", function (event, d) {
+        //if not in the state of lock
+        if (!lock) {
+            const layerID = d3.select(this).attr("layerID");
+            const node = d3.select(this).attr("node");
+            const pack = oFeatureMouseOver(layerID, node, frames, matFrames);
+            //update variables
+            frames = pack.frames;
+            matFrames = pack.matFrames;
+        }
+    });
+    d3.selectAll(".oFeature").on("mouseout", function (event, d) {
+        const layerID = d3.select(this).attr("layerID");
+        const node = d3.select(this).attr("node");
+        const pack = oFeatureMouseOut(layerID, node, frames, matFrames);
+        //update variables
+        frames = pack.frames;
+        matFrames = pack.matFrames;
+    });
+
+    d3.selectAll(".featureVis").on("mouseover", function (event, d) {
+        //if not in the state of lock
+        if (!lock) {
+            //paths interactions
+            const layerID = Number(d3.select(this).attr("layerID")) - 1;
+            const node = Number(d3.select(this).attr("node"));
+            const featureOverPack = featureVisMouseOver(
+                layerID,
+                node,
+                paths,
+                frames,
+                adjList,
+                matFrames,
+                colFrames,
+                featureChannels
+            );
+            paths = featureOverPack.paths;
+            frames = featureOverPack.frames;
+            matFrames = featureOverPack.matFrames;
+            colFrames = featureOverPack.colFrames;
+        }
+    });
+    d3.selectAll(".featureVis").on("mouseout", function (event, d) {
+        if (!lock) {
+            const layerID = Number(d3.select(this).attr("layerID")) - 1;
+            const node = Number(d3.select(this).attr("node"));
+            const featureOverPack = featureVisMouseOut(
+                layerID,
+                node,
+                paths,
+                frames,
+                adjList,
+                matFrames,
+                colFrames
+            );
+            paths = featureOverPack.paths;
+            frames = featureOverPack.frames;
+            matFrames = featureOverPack.matFrames;
+            colFrames = featureOverPack.colFrames;
+        }
+    });
+    d3.selectAll(".mats, .switchBtn").on("click", function (event, d) {
+        if (event.target && event.target.id === "btn") {
+            return;
+        }
+        if (lock) {
+            d3.selectAll(".resultVis")
+                .style("pointer-events", "auto")
+                .style("opacity", 1);
+            const recoverPackage = detailedViewRecovery(
+                event,
+                dview,
+                lock,
+                transState,
+                recordLayerID,
+                poolingOutEvent,
+                poolingOverEvent,
+                poolingVis,
+                colorSchemesTable,
+                featureChannels,
+                90,
+                []
+            );
+            //update variables
+            dview = recoverPackage.dview;
+            lock = recoverPackage.lock;
+            transState = recoverPackage.transState;
+            recordLayerID = recoverPackage.recordLayerID;
+            poolingOutEvent = recoverPackage.poolingOutEvent;
+            poolingOverEvent = recoverPackage.poolingOverEvent;
+            colorSchemesTable = recoverPackage.colorSchemesTable;
+
+            clearInterval(intervalID);
+        }
+    });
+
+    function setIntervalID(id: any) {
+        intervalID = id;
+
+    }
+
+    d3.selectAll(".featureVis").on("click", function (event, d) {
+        if (lock != true) {
+            //state
+            transState = "GCNConv";
+            lock = true;
+            event.stopPropagation();
+            dview = true;
+
+            //lock all feature visualizers and transparent paths
+            d3.selectAll(".resultVis")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".oFeature")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.select(".pooling")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".twoLayer")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".crossConnection").style("opacity", 0);
+            //transparent other feature visualizers
+            d3.selectAll(".featureVis").style("opacity", 0.2);
+            d3.selectAll(".oFeature").style("opacity", 0.2);
+            d3.selectAll(".legend").style("opacity", 0.25);
+            d3.selectAll(".binary-legend").style("opacity", 0.25);
+            //translate each layer
+            const layerID = Number(d3.select(this).attr("layerID")) - 1;
+            const node = Number(d3.select(this).attr("node"));
+            const featureVisPack = featureVisClick(
+                layerID,
+                node,
+                recordLayerID,
+                colorSchemesTable,
+                adjList,
+                featureVisTable,
+                features,
+                conv1,
+                conv2,
+                bias,
+                myColor,
+                weights,
+                lock,
+                setIntervalID,
+                featureChannels,
+                15,
+                5,
+                90,
+                128,
+                2.5,
+            );
+            // update variables
+            recordLayerID = featureVisPack.recordLayerID;
+            colorSchemesTable = featureVisPack.colorSchemesTable;
+            featureVisTable = featureVisPack.featureVisTable;
+            features = featureVisPack.features;
+            intervalID = featureVisPack.getIntervalID();
+
+            //path connect - connect intermediate feature vis to current feature vis
+
+        }
+    });
+
+
+    //result visualizer interactions
+    d3.selectAll(".resultVis").on("mouseover", function (event) {
+        if(!lock){
+            d3.selectAll(".pathsToResult").style("opacity", 1);
+            d3.select(".resultFrame").style("opacity", 1);
+            d3.selectAll(".frame[layerID='2']").style("opacity", 1);
+        }
+    });
+    d3.selectAll(".resultVis").on("mouseout", function (event) {
+        if(!lock){
+            d3.selectAll(".pathsToResult").style("opacity", 0.05);
+            d3.select(".resultFrame").style("opacity", 0.25);
+            d3.selectAll(".frame[layerID='2']").style("opacity", 0.25);
+        }
+    });
+    d3.selectAll(".resultVis").on("click", function (event) {
+        console.log("click result visualizer!");
+        if (lock != true) {
+            //state
+            transState = "linkResult";
+            lock = true;
+            event.stopPropagation();
+            dview = true;
+
+            //lock all feature visualizers and transparent paths
+            d3.selectAll(".resultVis")
+                .style("pointer-events", "none");
+            d3.selectAll(".oFeature")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.select(".pooling")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".twoLayer")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".crossConnection").style("opacity", 0);
+            d3.selectAll(".pathsToResult").attr("opacity", 0);
+
+            d3.selectAll(".legend").style("opacity", 0.25);
+            d3.selectAll(".binary-legend").style("opacity", 0.25);
+
+            colorSchemesTable[2].style.opacity = "1";
+            colorSchemesTable[3].style.opacity = "1";
+
+            console.log("selection check", d3.selectAll(".pathsToResult"));
+
+            d3.selectAll(".frame[layerID='2']").style("opacity", 1);
+
+            //transparent other feature visualizers
+            d3.selectAll(".featureVis").style("opacity", 0.2);
+            d3.selectAll(".oFeature").style("opacity", 0.2);
+            //translate each layer
+            const layerID = Number(d3.select(this).attr("layerID")) - 1;
+            const node = Number(d3.select(this).attr("node"));
+            translateLayers(2, 250);
+
+
+            //recover necesary components
+            d3.selectAll("#layerNum_2").style("opacity", 1);
+            d3.selectAll(".featureVis[layerID='2']").style("opacity", 1);
+            
+        }
+    });
+}
 

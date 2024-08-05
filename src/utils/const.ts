@@ -11,8 +11,12 @@ export const linkList: { [k: string]: string } = {
 export const modelList: { [k: string]: string } = {
   "graph classification": "./gnn_model2.onnx",
   "node classification": "./gnn_node_model.onnx",
-  //  "link classification": "./gnn_link_model.onnx",
+  "link classification": "./gnn_link_model.onnx",
 };
+
+export const nodeSelectionList = [
+  148, 407, 79, 116, 994, 632, 71, 110, 420, 772, 394, 109, 241, 471
+];
 
 function graph_list_generate(num: number) {
   let res: { [k: string]: string } = {};

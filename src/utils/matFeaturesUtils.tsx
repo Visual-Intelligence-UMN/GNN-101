@@ -12,6 +12,99 @@ import * as d3 from "d3";
 import { roundToTwo } from "../components/WebUtils";
 import { deprecate } from "util";
 import { injectSVG } from "./svgUtils";
+import { sigmoid } from "./linkPredictionUtils";
+
+//draw cross connections between feature visualizers for computational graph
+export function drawCrossConnectionForSubgraph(
+    graph: any,
+    locations: any,
+    firstVisSize: number,
+    gapSize: number, //the gap between two layers
+    layerID: number,
+    totalKeys: number[], //where we store all nodes incolced in the computation
+    startKeys: number[], //where we store all the starting nodes
+    endKeys: number[] //where we store all the ending nodes
+) {
+    const rectH = 15;
+
+    let alocations = deepClone(locations);
+    for (let i = 0; i < alocations.length; i++) {
+        alocations[i][0] += firstVisSize;
+        alocations[i][1] += rectH / 2;
+    }
+
+    let blocations = deepClone(alocations);
+    for (let i = 0; i < blocations.length; i++) {
+        blocations[i][0] += gapSize;
+    }
+    // drawPoints(".mats", "red", blocations);
+    //draw one-multiple & one-one paths - three
+    let pts: number[][] = [];
+    const curve = d3.line().curve(d3.curveBasis);
+    for (let i = 0; i < graph.length; i++) {
+        for (let j = 0; j < graph[0].length; j++) {
+            if (graph[i][j] == 1 && startKeys.includes(totalKeys[i]) && endKeys.includes(totalKeys[j])) {
+                const res = computeMids(alocations[i], blocations[j]);
+                const hpoint = res[0];
+                const lpoint = res[1];
+
+                d3.select(".mats")
+                    .append("path")
+                    .attr(
+                        "d",
+                        curve([alocations[i], hpoint, lpoint, blocations[j]])
+                    )
+                    .attr("stroke", "black")
+                    .attr("opacity", 0.05)
+                    .attr("fill", "none")
+                    .attr("endingNode", j)
+                    .attr("layerID", layerID)
+                    .attr("class", "crossConnection");
+                pts.push(hpoint);
+                pts.push(lpoint);
+
+            }
+        }
+    }
+
+    //TODO: paths data structure management
+
+    d3.selectAll("path").lower();
+
+    //group all path elements by LayerID and Ending Node
+    interface GroupedPaths {
+        [layerID: string]: {
+            [endingNode: string]: SVGPathElement[];
+        };
+    }
+    const paths = d3.selectAll<SVGPathElement, any>("path");
+
+    const groupedPaths: GroupedPaths = paths
+        .nodes()
+        .reduce((acc: GroupedPaths, path: SVGPathElement) => {
+            const layerID: string = path.getAttribute("layerID") || ""; // 确保 layerID 和 endingNode 不是 null
+            const endingNode: string = path.getAttribute("endingNode") || "";
+
+            if (!acc[layerID]) {
+                acc[layerID] = {};
+            }
+
+            if (!acc[layerID][endingNode]) {
+                acc[layerID][endingNode] = [];
+            }
+
+            acc[layerID][endingNode].push(path);
+
+            return acc;
+        }, {});
+
+    console.log("groupedPaths", groupedPaths); 
+
+    return groupedPaths;
+
+}
+
+
 
 //draw cross connections between feature visualizers
 export function drawCrossConnection(
@@ -133,7 +226,7 @@ export function computeMidsVertical(point1: any, point2: any) :[[number, number]
 }
 
 //draw aid utils for matrix visualization(column and row frames)
-export function drawMatrixPreparation(graph: any, locations: any, gridSize:number) {
+export function drawMatrixPreparation(graph: any, locations: any, gridSize:number, xOffset:number=0) {
     const offset = 100;
     let colLocations = [];
     for (let i = 0; i < graph.length; i++) {
@@ -145,14 +238,14 @@ export function drawMatrixPreparation(graph: any, locations: any, gridSize:numbe
     const ratio = locations[0][1] / 61.875365257263184;
     const startY = locations[0][1] / ratio;
     const rowHeight = gridSize / graph.length;
-    //drawPoints(".mats", "red", colLocations);
+    // drawPoints(".mats", "red", colLocations);
     let colFrames: SVGElement[] = []; //a
   //  drawPoints(".mats", "red", colLocations)
     for (let i = 0; i < colLocations.length; i++) {
         const r = d3
             .select(".mats")
             .append("rect")
-            .attr("x", colLocations[i][0])
+            .attr("x", colLocations[i][0] + xOffset)
             .attr("y", colLocations[i][1] / ratio + offset)
             .attr("height", gridSize)
             .attr("width", gridSize / graph.length)
@@ -173,7 +266,7 @@ export function drawMatrixPreparation(graph: any, locations: any, gridSize:numbe
         const r = d3
             .select(".mats")
             .append("rect")
-            .attr("x", locations[i][0] - gridSize + rowHeight / 2)
+            .attr("x", locations[i][0] - gridSize + rowHeight / 2 + xOffset)
             .attr("y", startY + i * rowHeight + offset)
             .attr("height", rowHeight)
             .attr("width", gridSize)
@@ -751,6 +844,174 @@ export function drawGCNConvNodeModel(
         thirdGCN: thirdGCN,
         resultPaths: resultPaths,
         resultLabelsList:resultLabelsList
+    };
+}
+
+
+
+//draw intermediate features from GCNConv process
+export function drawGCNConvLinkModel(
+    conv1: any,
+    conv2: any,
+    probResult: number, 
+    locations: any,
+    myColor: any,
+    frames: any,
+    schemeLocations: any,
+    featureVisTable: any,
+    graph: any,
+    colorSchemesTable: any,
+    firstLayer: any,
+    maxVals: any,
+    featureChannels: number,
+    featureKeys:number[], //an number array that record all node indexes involved in the computation
+    featureKeysEachLayer: number[][], //an 2d array that record all node indexes involved in the computation for each layer
+) {
+    //GCNCov Visualizer
+    let paths: any;
+    const gcnFeatures = [conv1, conv2];
+
+    for (let k = 0; k < 2; k++) {
+        const rectH = 15;
+        const rectW = 5;
+        const layer = d3
+            .select(".mats")
+            .append("g")
+            .attr("class", "layerVis")
+            .attr("id", `layerNum_${k + 1}`);
+        for (let i = 0; i < locations.length; i++) {
+            if (k != 0) {
+                locations[i][0] += rectW * featureChannels + 100;
+            } else {
+                locations[i][0] += 128 * 2.5 + 100;
+            }
+        }
+
+       // drawPoints(".mats", "red", [[locations[0][0], locations[0][1]]])
+
+        //draw hint label
+        if(k==0){
+            const hintLabelPos = [locations[0][0] - 120 - 64, locations[0][1] - 120 - 64];
+            const gLabel = d3.select(".mats").append("g");
+            injectSVG(gLabel, hintLabelPos[0], hintLabelPos[1], "./assets/SVGs/interactionHint.svg", "hintLabel")
+        }
+        addLayerName(
+            locations,
+            "GCNConv" + (k + 1),
+            0,
+            30,
+            d3.select(`g#layerNum_${k + 1}`)
+        );
+
+        //drawPoints(".mats","red",locations);
+        const gcnFeature = gcnFeatures[k];
+
+        for (let i = 0; i < locations.length; i++) {
+            // a special checking here - to see if this node involved in the computation or not
+            if(featureKeysEachLayer[k+1].includes(featureKeys[i])){
+                const sgfPack = drawSingleGCNConvFeature(
+                    layer, i, k, gcnFeature, featureChannels, locations, 
+                    rectW, rectH, myColor, [], frames,
+                    schemeLocations, featureVisTable
+                );
+                schemeLocations = sgfPack.schemeLocations;
+                featureVisTable = sgfPack.featureVisTable;
+            }else{
+                if (k == 0) frames["GCNConv1"].push(null);
+                if (k == 1) frames["GCNConv2"].push(null);
+
+                featureVisTable[k+1].push(null);
+            }
+        }
+
+        if (k != 1) {
+            // visualize cross connections btw 1st, 2nd GCNConv
+            // we need have another special cross connection for this one
+            paths = drawCrossConnectionForSubgraph(
+                graph,
+                locations,
+                64*5,
+                100,
+                1,
+                featureKeys,
+                featureKeysEachLayer[1],
+                featureKeysEachLayer[2]
+            );
+
+        } else {
+            //visualize the result layer
+            console.log("check last locations", locations, featureKeysEachLayer);
+            //extract last two feature visualizers' locations
+            const hubNodeA = featureKeysEachLayer[0].indexOf(featureKeysEachLayer[2][0]);
+            const hubNodeB = featureKeysEachLayer[0].indexOf(featureKeysEachLayer[2][1]);
+            const location1:[number, number] = [locations[hubNodeA][0], locations[hubNodeA][1]];
+            const location2:[number, number] = [locations[hubNodeB][0], locations[hubNodeB][1]];
+
+            let layerLocations = deepClone(locations);
+            for(let i=0; i<layerLocations.length; i++){
+                layerLocations[i][0] += rectW*2+200;
+            }
+
+            drawResultVisForLinkModel(location1, location2, probResult, myColor, layerLocations);
+        }
+
+        //drawPoints(".mats", "red", schemeLocations);
+        //let max1 = findAbsMax(maxVals.conv1);
+
+
+        //select layers
+        const l1 = d3.select(`g#layerNum_1`);
+        const l2 = d3.select(`g#layerNum_2`);
+        const l3 = d3.select(`g#layerNum_3`);
+
+        const schemeOffset = 250;
+        console.log("schemeLocations", schemeLocations);
+        const loc2 = [schemeLocations[0][0] + 64*5+50, schemeLocations[0][1]];
+        schemeLocations.push(loc2);
+        const infoTable = {
+            valueTable:[
+                [1],
+                [1],
+                [1],
+                [0.3, 0.7]
+            ],
+            nameTable:[
+                "Features Color Scheme",
+                "GCNConv1 Color Scheme",
+                "GCNConv2 Color Scheme",
+                "Result Color Scheme"
+            ],
+            xLocationTable:[
+                schemeLocations[0][0],
+                schemeLocations[1][0],
+                schemeLocations[1][0] + 400,
+                schemeLocations[1][0] + 400*2
+            ],
+            yLocationTable:[
+                schemeLocations[0][1] + schemeOffset,
+                schemeLocations[1][1] + schemeOffset,
+                schemeLocations[1][1] + schemeOffset,
+                schemeLocations[1][1] + schemeOffset
+            ],
+            layerTable:[firstLayer, l1, l2, l3],
+            schemeTypeTable:["", "", "", "binary"]
+        };
+
+        colorSchemesTable = drawColorSchremeSequence(infoTable, myColor);
+
+    }
+
+    console.log("cst", colorSchemesTable);
+
+    return {
+        locations: locations,
+        frames: frames,
+        schemeLocations: schemeLocations,
+        featureVisTable: featureVisTable,
+        colorSchemesTable: colorSchemesTable,
+        firstLayer: firstLayer,
+        maxVals: maxVals,
+        paths: paths
     };
 }
 
@@ -1349,5 +1610,116 @@ export function drawResultLayer(
         resultLabelsList:resultLabelsList
     };
 }
+
+
+
+
+//we need the locations for previous two feature visualizers
+//also need the final probability results
+export function drawResultVisForLinkModel(
+    location1:[number, number], 
+    location2:[number, number], 
+    prob:number,
+    myColor:any,
+    layerLocations: any
+){  
+    //compute the mid point
+    const midY = (location1[1] + location2[1])/2;
+    const featureX = location1[0] + 64 * 5 + 100;
+    const midYForFeature = midY + 15;
+
+    const startingPoint1:[number, number] = [location1[0]+64*5, location1[1]+15/2];
+    const startingPoint2:[number, number] = [location2[0]+64*5, location2[1]+15/2];
+    const endingPoint:[number, number] = [featureX, midYForFeature];
+
+    //draw the result layer
+    const g = d3
+        .select(".mats")
+        .append("g")
+        .attr("class", "layerVis")
+        .attr("id", `layerNum_3`);
+
+    //add label
+    addLayerName(
+        layerLocations,
+        "Prediction Result",
+        0,
+        30,
+        d3.select(`g#layerNum_3`)
+    );
+    
+    //getting the probability result
+    const trueProb = sigmoid(prob);
+    const falseProb = 1 - trueProb;
+    const probs = [trueProb, falseProb];
+
+    console.log("prob check", probs);
+
+    //add a featureVisualizer
+    const featureVisualizer = g.append("g");
+    
+    for(let i=0; i<2; i++){
+        featureVisualizer.append("rect")
+            .attr("x", featureX + i * 15)
+            .attr("y", midYForFeature-15/2)
+            .attr("width", 15)
+            .attr("height", 15)
+            .attr("fill", myColor(probs[i]))
+            .attr("stroke", "black")
+            .attr("stroke-width", 0.1)
+            .attr("class", "resultVis")
+            .attr("id", `resultRect${i}`);
+    }
+
+    g.append("rect")
+        .attr("x", featureX)
+        .attr("y", midYForFeature-15/2)
+        .attr("width", 30)
+        .attr("height", 15)
+        .attr("fill", "none")
+        .attr("stroke", "black")
+        .attr("opacity", 0.25)
+        .attr("stroke-width", 1)
+        .attr("class", "resultFrame frame")
+        .raise();
+        // .attr("class", "resultRect")
+        // .attr("id", `resultRect`);
+
+    //draw the connection between two layers
+    const res1 = computeMids(startingPoint1, endingPoint);
+    const hpoint1:[number, number] = res1[0];
+    const lpoint1:[number, number] = res1[1];
+
+    const res2 = computeMids(startingPoint2, endingPoint);
+    const hpoint2:[number, number] = res2[0];
+    const lpoint2:[number, number] = res2[1];
+
+    const curve = d3.line().curve(d3.curveBasis);
+
+    d3.select(".mats")
+        .append("path")
+        .attr(
+            "d",
+            curve([startingPoint1, hpoint1, lpoint1, endingPoint])
+        )
+        .attr("stroke", "black")
+        .attr("opacity", 0.05)
+        .attr("fill", "none")
+        .attr("layerID", 3)
+        .attr("class", "pathsToResult crossConnection");
+
+    d3.select(".mats")
+        .append("path")
+        .attr(
+            "d",
+            curve([startingPoint2, hpoint2, lpoint2, endingPoint])
+        )
+        .attr("stroke", "black")
+        .attr("opacity", 0.05)
+        .attr("fill", "none")
+        .attr("layerID", 3)
+        .attr("class", "pathsToResult crossConnection");
+}
+
 
 

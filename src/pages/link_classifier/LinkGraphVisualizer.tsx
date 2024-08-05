@@ -9,18 +9,19 @@ import {
   softmax,
   myColor,
   loadNodesLocation
-} from "../utils/utils";
+} from "@/utils/utils";
 
-import { visualizeGraph } from "../components/WebUtils";
+import { visualizeGraph, visualizePartialGraph } from "@/components/WebUtils";
 import { aggregationCalculator } from "@/utils/graphUtils";
 import { sources } from "next/dist/compiled/webpack/webpack";
 import { buildBinaryLegend, buildLegend } from "@/utils/matHelperUtils";
 import { findAbsMax } from "@/utils/matNNVis";
 import { injectSVG } from "@/utils/svgUtils";
+import { dataProccessGraphVisLinkPrediction } from "@/utils/GraphvislinkPredUtil";
 
 
 
-interface GraphVisualizerProps {
+interface LinkVisualizerProps {
   graph_path: string;
   intmData: null | any;
   changed: boolean;
@@ -28,9 +29,11 @@ interface GraphVisualizerProps {
   selectedButtons: boolean[];
   simulationLoading: boolean;
   setSimulation: Function;
+  hubNodeA: number;
+  hubNodeB: number;
 }
 
-const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
+const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
   graph_path,
   intmData,
   changed,
@@ -38,6 +41,8 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
   selectedButtons,
   simulationLoading,
   setSimulation,
+  hubNodeA,
+  hubNodeB,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -59,6 +64,8 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
     const visualizationId = ++currentVisualizationId.current;
 
     const init = async (graphs: any[]) => {
+      
+      
       if (intmData != null) {
 
       }
@@ -432,7 +439,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
     const runVisualization = async () => {
       if ((intmData == null || changed) && !predicted) {
-        await visualizeGraph(graph_path,() => handleSimulationComplete(visualizationId), true, 0);
+        await visualizePartialGraph(graph_path,() => handleSimulationComplete(visualizationId), true, 2, hubNodeA, hubNodeB);
       } else {
         await visualizeGNN(4);
         handleSimulationComplete(visualizationId);
@@ -444,11 +451,10 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
       try {
         setIsLoading(true);
 
-        const processedData = await data_prep(graph_path);
+        const processedData = await dataProccessGraphVisLinkPrediction(graph_path, hubNodeA, hubNodeB);
 
-        const graphsData = await prep_graphs(num, processedData);
         // Initialize and run D3 visualization with processe  d data
-        await init(graphsData);
+        await init(processedData);
       } catch (error) {
         console.error("Error in visualizeGNN:", error);
       } finally {
@@ -461,7 +467,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
     
   
     
-  }, [graph_path, intmData]);
+  }, [graph_path, intmData, hubNodeA, hubNodeB]);
   const updateTextElements = (svg: SVGSVGElement, selectedButtons: boolean[]) => {
     d3.select(svg)
       .selectAll(".layerVis")
@@ -517,4 +523,4 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
   );
 };
 
-export default GraphVisualizer;
+export default LinkGraphVisualizer;

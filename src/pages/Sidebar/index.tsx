@@ -59,7 +59,7 @@ export default function Sidebar(props: Props) {
                 <div className="p-4">
                     <h1 className="text-3xl font-semibold text-3xl">Input Data of a GNN:</h1>
                     <p>
-                        To start, let’s establish what a graph is. A graph represents the
+                        To start, let's establish what a graph is. A graph represents the
                         relations (edges) between a collection of entities (nodes). For
                         example, the right panel shows a graph of a chemical compound, from
                         the{" "}
@@ -94,7 +94,7 @@ export default function Sidebar(props: Props) {
                         <br />
                         A graph can be represented as either a node-link diagram or an
                         adjacency matrix. A node-link diagram is an intuitive visual
-                        representation of the graph where nodes are depcited as circles and
+                        representation of the graph where nodes are depicted as circles and
                         edges are lines connecting the circles. It is easy to understand and
                         informative, especially for small graphs.
                         <br />
