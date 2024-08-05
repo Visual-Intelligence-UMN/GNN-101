@@ -1,6 +1,6 @@
 // UTILS FILE BECAUSE WE HAVE SO MANY HELPER FUNCTIONS
 import * as d3 from "d3";
-
+import * as fs from 'fs'
 import { loadNodeWeights, loadWeights } from "./matHelperUtils";
 import * as ort from "onnxruntime-web";
 import { env } from "onnxruntime-web";
@@ -1588,9 +1588,30 @@ export function loadNodesLocation(mode: number, path: string) {
     data = require("../../public/json_data/node_location/nodes_data_karate.json");
 
   }
+  if (mode === 2) {
+    data = require("../../public/json_data/node_location/nodes_data_twitch.json");
+  }
 
   return data;
 }
+
+export const pushDataToJSON = async (filePath: string, newData: any) => {
+  try {
+    const response = await fetch('/api/pushData', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ filePath, newData }),
+    });
+
+    const result = await response.json();
+    console.log(result.message);
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
+
 
 
 

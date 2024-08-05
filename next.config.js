@@ -13,7 +13,10 @@ module.exports = {
   //output:"export",
   webpack: (config, {}) => {
     config.resolve.extensions.push(".ts", ".tsx");
-    config.resolve.fallback = { fs: false };
+    config.resolve.fallback = {
+      ...config.resolve.fallback,  
+      fs: false,
+    };
     config.optimization.minimizer = [
       new TerserPlugin({
         terserOptions: {

@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 //import "./webUtils.css";
 import * as d3 from "d3";
+
 import {
     analyzeGraph,
     data_prep,
@@ -15,6 +16,7 @@ import {
     get_features_origin,
     loadNodesLocation,
     graphToMatrix,
+    pushDataToJSON,
 } from "@/utils/utils";
 import {
     HeatmapData,
@@ -765,7 +767,6 @@ export const Hint: React.FC<HintProps> = ({ text }) => {
 
 //-------------------------------------------------------------
 //single graph visualizer
-let initialCoordinates: { [id: string]: { x: number; y: number } } = {};
 
 export function visualizeGraph(
     path: string,
@@ -774,6 +775,7 @@ export function visualizeGraph(
     mode: number
 ): Promise<void> {
     return new Promise<void>((resolve) => {
+        let initialCoordinates: { [id: string]: { x: number; y: number } } = {};
         const init = async (data: any) => {
             const parse = path.match(/(\d+)\.json$/);
             const select = parse ? parse[1] : '';
@@ -1107,8 +1109,9 @@ export function visualizePartialGraphMatrix(
     hubNodeA: number,
     hubNodeB: number
 ) {
+    let initialCoordinates: { [id: string]: { x: number; y: number } } = {};
     const init = async (graph: any) => {
-        console.log("enter! 2", graph);
+        // console.log("enter! 2", graph);
         const margin = { top: 10, right: 80, bottom: 30, left: 80 };
         const width = gridSize + margin.left + margin.right;
         const height = (gridSize + margin.top + margin.bottom) * 2;
@@ -1116,17 +1119,17 @@ export function visualizePartialGraphMatrix(
         let nodesA:number[] = getNodeSet(graph, hubNodeA)[0];
         let nodesB:number[] = getNodeSet(graph, hubNodeB)[0];
 
-        console.log("nodesA", nodesA);
-        console.log("nodesB", nodesB);
+        // console.log("nodesA", nodesA);
+        // console.log("nodesB", nodesB);
 
         const mergedNodes = [...nodesA, ...nodesB];
 
-        console.log("mergedNodes", mergedNodes);
+        // console.log("mergedNodes", mergedNodes);
 
         //compute the structure of the subgraph
         const subGraph = extractSubgraph(graph, mergedNodes);
 
-        console.log("subGraph", subGraph);
+        // console.log("subGraph", subGraph);
 
         //get node attribute
         const keys = Object.keys(subGraph).map(Number);
@@ -1134,7 +1137,7 @@ export function visualizePartialGraphMatrix(
         //transform the subgraph to adjacent matrix
         const subMatrix = convertToAdjacencyMatrix(subGraph);
 
-        console.log("subMatrix", subMatrix);
+        // console.log("subMatrix", subMatrix);
 
         //visualize matrix body part
         visualizeMatrixBody(gridSize, subMatrix, width, height, margin);
@@ -1143,7 +1146,7 @@ export function visualizePartialGraphMatrix(
     };
 
     const visualizeMat = async (path: string) => {
-        console.log("enter! 1", path);
+        // console.log("enter! 1", path);
         try {
             const data = await load_json(path);
             const processedData = await graph_to_matrix(data);
@@ -1167,14 +1170,19 @@ export function visualizePartialGraph(
     hubNodeA: number,
     hubNodeB: number
 ): Promise<void> {
+
     return new Promise<void>((resolve) => {
         const init = async (data: any) => {
+            // const parse = path.match(/(\d+)\.json$/);
+            // const select = parse ? parse[1] : '';
+            // const location = (loadNodesLocation(mode, select))[(hubNodeA + hubNodeB).toString()];
+
             const offset = 600;
             const margin = { top: 10, right: 30, bottom: 30, left: 40 };
             const width = 6 * offset - margin.left - margin.right;
             const height = 1000 - margin.top - margin.bottom;
 
-            console.log(data);
+            console.log('data', data);
 
             // Append the SVG object to the body of the page
             d3.select("#my_dataviz").selectAll("svg").remove();
@@ -1202,7 +1210,7 @@ export function visualizePartialGraph(
                 .selectAll("circle")
                 .data(data.nodes)
                 .join("circle")
-                .attr("r", 6)
+                .attr("r", 12)
                 .style("fill", "white")
                 .style("stroke", "#69b3a2")
                 .style("stroke-width", 1)
@@ -1218,7 +1226,17 @@ export function visualizePartialGraph(
                 .attr("text-anchor", "middle")
                 .attr("dominant-baseline", "central");
 
-
+                // data.nodes.forEach((node: any, i: number) => {
+  
+                //     if (location[i.toString()]) {
+                //       node.x = location[i.toString()].x;
+                //       node.y = location[i.toString()].y;
+                //     } else {
+                //         node.x = Math.random() * width;
+                //         node.y = Math.random() * height;
+                //       }
+                //   });
+                
 
                 const simulation = d3
                 .forceSimulation(data.nodes)
@@ -1227,10 +1245,10 @@ export function visualizePartialGraph(
                     d3
                         .forceLink(data.links)
                         .id((d: any) => d.id)
-                        .distance(10)
+                        .distance(30)
                 )
                 .force("charge", d3.forceManyBody().strength(-50))
-                .force("center", d3.forceCenter(width / 2, height / 3.5))
+                .force("center", d3.forceCenter(width / 2, height / 2.7 ))
                 .on("tick", function ticked() {
                     link.attr("x1", (d: any) => d.source.x)
                         .attr("y1", (d: any) => d.source.y)
@@ -1265,6 +1283,16 @@ export function visualizePartialGraph(
                       }
                 });
             });
+            // let subArr: {[key: string]: any} = {}
+            // data.nodes.forEach((node: any, i: number) => {
+            //     subArr[i.toString()] = {x: node.x, y: node.y }; 
+            // })
+            // console.log('subArry', subArr);    
+            // let fullArr: {[key: string]: any} = {}
+            // fullArr[(hubNodeA + hubNodeB).toString()] = subArr
+            // console.log(fullArr)
+            // pushDataToJSON('public/json_data/node_location/nodes_data_twitch.json', fullArr)
+
             const graphWidth = maxXDistance + 20
             const graphHeight = maxYDistance + 20;
             const point1 = { x: 0, y: height / 8 };
@@ -1299,6 +1327,7 @@ export function visualizePartialGraph(
         const visualizeG = async () => {
             try {
                 const pData = await dataProccessGraphVisLinkPrediction(path, hubNodeA, hubNodeB);
+                console.log('pdata', pData);
                 await init(pData[0]);
             } catch (error) {
                 console.error(error); // Log the error
