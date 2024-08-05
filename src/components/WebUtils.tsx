@@ -475,19 +475,6 @@ export const LinkClassifierButtonChain = ({
                     </button>
                     <button
                         disabled={!predicted}
-                        className={`bg-red-200  ${predicted
-                            ? "hover:border-black hover:bg-red-300"
-                            : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[3]
-                                ? "outline outline-2 outline-black bg-red-300"
-                                : ""
-                            }`}
-                        onClick={() => handleButtonClick(3)}
-                    >
-                        Decode
-                    </button>
-                    <button
-                        disabled={!predicted}
                         className={`bg-gray-200  ${predicted
                             ? "hover:border-black hover:bg-gray-300"
                             : ""

@@ -1001,7 +1001,7 @@ export function drawGCNConvLinkModel(
 
     }
 
-    console.log("featureVisTable", featureVisTable);
+    console.log("cst", colorSchemesTable);
 
     return {
         locations: locations,
@@ -1680,7 +1680,7 @@ export function drawResultVisForLinkModel(
         .attr("stroke", "black")
         .attr("opacity", 0.25)
         .attr("stroke-width", 1)
-        .attr("class", "resultFrame")
+        .attr("class", "resultFrame frame")
         .raise();
         // .attr("class", "resultRect")
         // .attr("id", `resultRect`);
@@ -1703,7 +1703,7 @@ export function drawResultVisForLinkModel(
             curve([startingPoint1, hpoint1, lpoint1, endingPoint])
         )
         .attr("stroke", "black")
-        .attr("opacity", 0.25)
+        .attr("opacity", 0.05)
         .attr("fill", "none")
         .attr("layerID", 3)
         .attr("class", "pathsToResult crossConnection");
@@ -1715,7 +1715,7 @@ export function drawResultVisForLinkModel(
             curve([startingPoint2, hpoint2, lpoint2, endingPoint])
         )
         .attr("stroke", "black")
-        .attr("opacity", 0.25)
+        .attr("opacity", 0.05)
         .attr("fill", "none")
         .attr("layerID", 3)
         .attr("class", "pathsToResult crossConnection");
