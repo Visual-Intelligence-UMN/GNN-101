@@ -469,7 +469,9 @@ async function initLinkClassifier(
     const subGraphNodeA = featuresIndicesLayerOne.indexOf(hubNodeA);
     const subGraphNodeB = featuresIndicesLayerOne.indexOf(hubNodeB);
 
-    const questionMark = d3.select("#matvis").append("text").text("?").attr("x", locationMatrix[subGraphNodeA][subGraphNodeB][0]).attr("y", locationMatrix[subGraphNodeA][subGraphNodeB][1]).raise();
+    // drawPoints(".mats", "red", locationMatrix[subGraphNodeA]);
+
+    const questionMark = d3.select(".mats").append("text").text("?").attr("x", locationMatrix[subGraphNodeA][subGraphNodeB][0]+10).attr("y", locationMatrix[subGraphNodeA][subGraphNodeB][1]+50).raise();
 
 
     console.log(
@@ -479,8 +481,8 @@ async function initLinkClassifier(
         ,locationMatrix[subGraphNodeA][subGraphNodeB][0], locationMatrix[subGraphNodeA][subGraphNodeB][1],questionMark
     );
 
-    d3.select("#matvis").select(`#gridCell-${subGraphNodeA}-${subGraphNodeB}`).attr("fill", "red");
-    d3.select("#matvis").select(`#gridCell-${subGraphNodeB}-${subGraphNodeA}`).attr("fill", "red");
+    d3.select(".mats").select(`#gridCell-${subGraphNodeA}-${subGraphNodeB}`).attr("fill", "red");
+    d3.select(".mats").select(`#gridCell-${subGraphNodeB}-${subGraphNodeA}`).attr("fill", "red");
 
     const featuresManager = visualizeLinkClassifierFeatures(
         locations, featuresArray, myColor, 
