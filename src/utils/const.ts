@@ -8,10 +8,24 @@ export const linkList: { [k: string]: string } = {
   twitch_EN: "./json_data/links/twitch.json",
 };
 
-export const modelList: { [k: string]: string } = {
+export const modelGCNList: { [k: string]: string } = {
   "graph classification": "./gnn_model2.onnx",
   "node classification": "./gnn_node_model.onnx",
-  "link classification": "./gnn_link_model.onnx",
+  "link classification": "./gnn_link_model.onnx"
+};
+
+export const modelGATList: { [k: string]: string } = {
+  "GAT link classification": "./gat_link_model.onnx"
+};
+
+export const modelGraphSAGEList: { [k: string]: string } = {
+  "GraphSAGE link classification": "./sage_link_model.onnx"
+};
+
+export const modelTypeList:{ [k: string]: string } = {
+  "GCN":"GCN",
+  "GAT":"GAT",
+  "GraphSAGE":"GraphSAGE"
 };
 
 export const nodeSelectionList = [

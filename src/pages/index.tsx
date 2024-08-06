@@ -5,7 +5,7 @@ import ClassifyGraph from "./ClassifyGraph";
 // import { CSSTransition } from 'react-transition-group';
 import MatricesVisualizer from "./MatricesVisualizer";
 import { IntmData, IntmDataNode } from "../types";
-import { graphList, linkList, modelList, nodeList, DatasetInfo, nodeSelectionList } from "../utils/const";
+import { graphList, linkList, modelGCNList, nodeList, DatasetInfo, nodeSelectionList, modelTypeList, modelGATList, modelGraphSAGEList } from "../utils/const";
 import Sidebar from "./Sidebar";
 import styles from "./index.module.css";
 import * as d3 from "d3";
@@ -64,6 +64,10 @@ export default function Home() {
 
     const [hubNodeA, setHubNodeA] = useState(241);
     const [hubNodeB, setHubNodeB] = useState(109);
+
+    const [modelType, setModelType] = useState("GCN");
+
+    const [modelList, setModelList] = useState<{[k:string]:string}>(modelType === "GCN" ? modelGCNList : (modelType === "GAT" ? modelGATList : modelGraphSAGEList));
 
     //intermediate output
     const [intmData, setIntmData] = useState<IntmData | IntmDataNode | null>(
@@ -141,6 +145,32 @@ export default function Home() {
                             >
                                 <h1 className="text-3xl min-w-48 font-black">GNN Model</h1>
                                 <Selector
+                                    selectedOption={modelType}
+                                    handleChange={(e) => {
+                                        const newModelType = e.target.value;
+                                        setModelType(newModelType);
+                                        setPredicted(false);
+                                        setSimulation(false);
+                                        setProbabilities([]);
+                                        setIntmData(null);
+
+                                        if (newModelType === "GCN") {
+                                            setModel("graph classification");
+                                            setSelectedGraph("graph_2");
+                                            setModelList(modelGCNList);
+                                        } else if (newModelType === "GAT") {
+                                            setSelectedGraph("twitch_EN");
+                                            setModel("GAT link classification");
+                                            setModelList(modelGATList);
+                                        } else {
+                                            setModel("GraphSAGE link classification");
+                                            setSelectedGraph("twitch_EN");
+                                            setModelList(modelGraphSAGEList);
+                                        }
+                                    }}
+                                    OptionList={Object.keys(modelTypeList)}
+                                />
+                                <Selector
                                     selectedOption={model}
                                     handleChange={(e) => {
                                         const newModel = e.target.value;
@@ -149,10 +179,16 @@ export default function Home() {
                                         setSimulation(false);
                                         setProbabilities([]);
                                         setIntmData(null);
-                                        if (newModel === "node classification") {
-                                            setSelectedGraph("karate");
-                                        } else if (newModel === "graph classification") {
-                                            setSelectedGraph("graph_2");
+                                        if (modelType === "GCN") {
+                                            if (newModel === "node classification") {
+                                                setSelectedGraph("karate");
+                                            } else if (newModel === "graph classification") {
+                                                setSelectedGraph("graph_2");
+                                            } else {
+                                                setSelectedGraph("twitch_EN");
+                                            }
+                                        } else if (modelType === "GAT") {
+                                            setSelectedGraph("twitch_EN");
                                         } else {
                                             setSelectedGraph("twitch_EN");
                                         }
@@ -275,18 +311,6 @@ export default function Home() {
 
                             <hr className="border-t border-gray-300 my-4"></hr>
 
-                            {/* <ClassifyGraph
-                                graphPath={graphList[selectedGraph]}
-                                modelPath={modelList[model]}
-                                setChangedG={setChangedG}
-                                setIntmData={setIntmData}
-                                setPredicted={setPredicted}
-                                predicted={predicted}
-                                probabilities={probabilities}
-                                setProbabilities={setProbabilities}
-                                simulationLoading={simulationLoading}
-                            /> */}
-
                             {/* model visualization */}
 
                             <div className="flex gap-x-4 items-center">
@@ -388,6 +412,19 @@ export default function Home() {
                                             Model Visualization will show after prediction
                                         </h1>
 
+                                        <ClassifyGraph
+                                                graphPath={nodeList[selectedGraph]}
+                                                modelPath={modelList[model]}
+                                                setChangedG={setChangedG}
+                                                setIntmData={setIntmData}
+                                                setPredicted={setPredicted}
+                                                predicted={predicted}
+                                                probabilities={probabilities}
+                                                setProbabilities={setProbabilities}
+                                                onlyShownButton={true}
+                                                simulationLoading={simulationLoading}
+                                        />
+{/* 
                                         {model == "graph classification" ? (
                                             <ClassifyGraph
                                                 graphPath={graphList[selectedGraph]}
@@ -414,7 +451,7 @@ export default function Home() {
                                                 onlyShownButton={true}
                                                 simulationLoading={simulationLoading}
                                             />
-                                        )}
+                                        )} */}
                                     </div>
                                 )}
                                 {/* </Panel> */}

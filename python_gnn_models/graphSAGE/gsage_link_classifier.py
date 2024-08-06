@@ -283,7 +283,7 @@ import onnx
 import numpy as np
 import json
 
-model = onnx.load('sage_link_model.onnx')
+model = onnx.load('../public/sage_link_model.onnx')
 
 weights = {}
 
@@ -328,10 +328,14 @@ for k in keys:
     d = np.array(data[k])
     print(k,d.shape)
 
-# All keys: {'conv1.bias', 'onnx::MatMul_196', 'onnx::MatMul_199', 'conv2.bias'}
-# conv1.bias (64,)
-# onnx::MatMul_196 (128, 64)
-# onnx::MatMul_199 (64, 64)
-# conv2.bias (64,)
+# All keys: {'conv1.lin_l.weight', 'conv2.lin_l.weight', 'onnx::MatMul_132', 'conv2.lin_l.bias', 'onnx::MatMul_135', 'conv1.lin_l.bias'}
+# conv1.lin_l.weight (64, 128)
+# conv2.lin_l.weight (64, 64)
+# onnx::MatMul_132 (128, 64)
+# conv2.lin_l.bias (64,)
+# onnx::MatMul_135 (64, 64)
+# conv1.lin_l.bias (64,)
 
 
+
+# %%
