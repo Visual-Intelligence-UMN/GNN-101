@@ -242,15 +242,12 @@ export default function Home() {
 
                                             <span className="text-2xl">Zachary&apos;s Karate Club </span>
                                         ) : (
-                                            <Selector
-                                                selectedOption={selectedGraph}
-                                                handleChange={handleGraphSelection}
-                                                OptionList={Object.keys(linkList)}
-                                            />
+                                            <span className="text-2xl">Twitch Users </span>
                                         )}
+                                    <p>{DatasetInfo[model]}</p>
                                     </div>
                                 </div>
-                                <div className="relative"
+                                {/* <div className="relative"
                                     style={{
                                         zIndex: 50
                                     }}>
@@ -277,7 +274,7 @@ export default function Home() {
                                     >
                                         <p>{DatasetInfo[model]}</p>
                                     </div>
-                                </div>
+                                </div> */}
                                 {model == "link classification"|| modelType=="GAT"||modelType=="GraphSAGE" ?<>
                                     Predict a link from node 
                                     <NodeSelector

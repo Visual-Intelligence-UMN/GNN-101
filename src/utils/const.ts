@@ -60,5 +60,7 @@ The task is to predict whether two users are friends or not. The graph has 77774
 export const DatasetInfo: { [k: string]: string } = {
   "node classification": KARATE_INFO,
   "graph classification": MUTAG_INFO,
-  "edge classification": TWITCH_INFO,
+  "link classification": TWITCH_INFO,
+  "GAT link classification": TWITCH_INFO,
+  "GraphSAGE link classification": TWITCH_INFO,
 };
