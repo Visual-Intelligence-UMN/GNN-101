@@ -1104,7 +1104,8 @@ export function visualizeLinkClassifierFeatures(
     adjList: any,
     maxVals: any,
     featureKeys: number[],
-    featureKeysEachLayer: number[][]
+    featureKeysEachLayer: number[][],
+    innerComputationMode: string = "GCN"
     // trainingNodes: number[]
 ) {
     //--------------------------------DATA PREP MANAGEMENT--------------------------------
@@ -1352,34 +1353,41 @@ export function visualizeLinkClassifierFeatures(
             //translate each layer
             const layerID = Number(d3.select(this).attr("layerID")) - 1;
             const node = Number(d3.select(this).attr("node"));
-            const featureVisPack = featureVisClick(
-                layerID,
-                node,
-                recordLayerID,
-                colorSchemesTable,
-                adjList,
-                featureVisTable,
-                features,
-                conv1,
-                conv2,
-                bias,
-                myColor,
-                weights,
-                lock,
-                setIntervalID,
-                featureChannels,
-                15,
-                5,
-                90,
-                128,
-                2.5,
-            );
-            // update variables
-            recordLayerID = featureVisPack.recordLayerID;
-            colorSchemesTable = featureVisPack.colorSchemesTable;
-            featureVisTable = featureVisPack.featureVisTable;
-            features = featureVisPack.features;
-            intervalID = featureVisPack.getIntervalID();
+            if(innerComputationMode == "GCN"){
+                const featureVisPack = featureVisClick(
+                    layerID,
+                    node,
+                    recordLayerID,
+                    colorSchemesTable,
+                    adjList,
+                    featureVisTable,
+                    features,
+                    conv1,
+                    conv2,
+                    bias,
+                    myColor,
+                    weights,
+                    lock,
+                    setIntervalID,
+                    featureChannels,
+                    15,
+                    5,
+                    90,
+                    128,
+                    2.5,
+                );
+                // update variables
+                recordLayerID = featureVisPack.recordLayerID;
+                colorSchemesTable = featureVisPack.colorSchemesTable;
+                featureVisTable = featureVisPack.featureVisTable;
+                features = featureVisPack.features;
+                intervalID = featureVisPack.getIntervalID();
+            } else if(innerComputationMode == "GAT"){
+
+            } else if(innerComputationMode == "SAGE"){
+
+            }
+            
 
             //path connect - connect intermediate feature vis to current feature vis
 

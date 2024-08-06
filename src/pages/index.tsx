@@ -400,6 +400,7 @@ export default function Home() {
                                         selectedButtons={selectedButtons}
                                         hubNodeA={hubNodeA}
                                         hubNodeB={hubNodeB}
+                                        innerComputationMode={modelType}
                                     />
                                     
                                 )}

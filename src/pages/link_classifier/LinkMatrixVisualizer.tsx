@@ -11,6 +11,7 @@ interface LinkMatricesVisualizerProps {
     selectedButtons: boolean[];
     hubNodeA: number;
     hubNodeB: number;
+    innerComputationMode: string;
 }
 
 const LinkMatricesVisualizer: React.FC<LinkMatricesVisualizerProps> = ({
@@ -20,7 +21,8 @@ const LinkMatricesVisualizer: React.FC<LinkMatricesVisualizerProps> = ({
     predicted,
     selectedButtons,
     hubNodeA,
-    hubNodeB
+    hubNodeB,
+    innerComputationMode,
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -34,7 +36,7 @@ const LinkMatricesVisualizer: React.FC<LinkMatricesVisualizerProps> = ({
             visualizePartialGraphMatrix(graph_path, false, 400, hubNodeA, hubNodeB);
         } else {
             console.log("visualize link classifier", hubNodeA, hubNodeB);
-           visualizeLinkClassifier(setIsLoading, graph_path, intmData, hubNodeA, hubNodeB);
+           visualizeLinkClassifier(setIsLoading, graph_path, intmData, hubNodeA, hubNodeB, innerComputationMode);
         }
     }, [graph_path, intmData, changed, hubNodeA, hubNodeB]);
 
