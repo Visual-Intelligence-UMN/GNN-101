@@ -1211,5 +1211,20 @@ export function outputVisClick(
     };
 }
 
+export function featureGATClick(
+    layerID: number,
+    gap: number,
+    featureChannels: number
+){
+    translateLayers(layerID, (gap+2) * 3 + 5 * featureChannels * 2);
+}
+
+export function featureSAGEClick(
+    layerID: number,
+    gap: number,
+    featureChannels: number
+){
+    translateLayers(layerID, (gap+2) * 3 + 5 * featureChannels * 2);
+}
 
 

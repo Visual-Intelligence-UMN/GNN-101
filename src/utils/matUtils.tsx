@@ -19,7 +19,9 @@ import {
     outputVisClick,
     resultRectMouseover,
     resultRectMouseout,
-    resultVisMouseEvent
+    resultVisMouseEvent,
+    featureGATClick,
+    featureSAGEClick
 } from "./matEventsUtils";
 import { drawPoints } from "./utils";
 import { AnimationController, computeMatrixLocations, drawAniPath, drawBiasPath, drawBiasVector, drawPathBtwOuputResult, drawPathInteractiveComponents, drawWeightMatrix, drawWeightsVector } from "./matAnimateUtils";
@@ -1384,9 +1386,10 @@ export function visualizeLinkClassifierFeatures(
                 features = featureVisPack.features;
                 intervalID = featureVisPack.getIntervalID();
             } else if(innerComputationMode == "GAT"){
-
+                const featureVisPack = featureGATClick(layerID, 90, featureChannels);
+                
             } else if(innerComputationMode == "SAGE"){
-
+                const featureVisPack = featureSAGEClick(layerID, 90, featureChannels);
             }
             
 

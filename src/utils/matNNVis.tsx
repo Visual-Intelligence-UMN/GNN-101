@@ -472,15 +472,15 @@ async function initLinkClassifier(
 
     // drawPoints(".mats", "red", locationMatrix[subGraphNodeA]);
 
-    const questionMark = d3.select(".mats").append("text").text("?").attr("x", locationMatrix[subGraphNodeA][subGraphNodeB][0]+10).attr("y", locationMatrix[subGraphNodeA][subGraphNodeB][1]+50).raise();
+    //const questionMark = d3.select(".mats").append("text").text("?").attr("x", locationMatrix[subGraphNodeA][subGraphNodeB][0]+10).attr("y", locationMatrix[subGraphNodeA][subGraphNodeB][1]+50).raise();
 
 
-    console.log(
-        "grid cell", 
-        `#gridCell-${subGraphNodeA}-${subGraphNodeB}`, `#gridCell-${subGraphNodeB}-${subGraphNodeA}`,
-        d3.select("#matvis").selectAll("rect").select(`#gridCell-${subGraphNodeA}-${subGraphNodeB}`)
-        ,locationMatrix[subGraphNodeA][subGraphNodeB][0], locationMatrix[subGraphNodeA][subGraphNodeB][1],questionMark
-    );
+    // console.log(
+    //     "grid cell", 
+    //     `#gridCell-${subGraphNodeA}-${subGraphNodeB}`, `#gridCell-${subGraphNodeB}-${subGraphNodeA}`,
+    //     d3.select("#matvis").selectAll("rect").select(`#gridCell-${subGraphNodeA}-${subGraphNodeB}`)
+    //     ,locationMatrix[subGraphNodeA][subGraphNodeB][0], locationMatrix[subGraphNodeA][subGraphNodeB][1],questionMark
+    // );
 
     d3.select(".mats").select(`#gridCell-${subGraphNodeA}-${subGraphNodeB}`).attr("fill", "red");
     d3.select(".mats").select(`#gridCell-${subGraphNodeB}-${subGraphNodeA}`).attr("fill", "red");
