@@ -140,7 +140,7 @@ export function drawAniPath(
         d3.selectAll(".matmul-displayer").remove();
     });
 
-    
+    d3.selectAll(".interactRect").style("pointer-events", "none");    
 }
 
 export function drawMatrixWeight(
