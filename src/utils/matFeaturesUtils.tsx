@@ -866,6 +866,7 @@ export function drawGCNConvLinkModel(
     featureChannels: number,
     featureKeys:number[], //an number array that record all node indexes involved in the computation
     featureKeysEachLayer: number[][], //an 2d array that record all node indexes involved in the computation for each layer
+    innerComputationMode: string
 ) {
     //GCNCov Visualizer
     let paths: any;
@@ -895,9 +896,17 @@ export function drawGCNConvLinkModel(
             const gLabel = d3.select(".mats").append("g");
             injectSVG(gLabel, hintLabelPos[0], hintLabelPos[1], "./assets/SVGs/interactionHint.svg", "hintLabel")
         }
+
+        //conditional statement for layer name adjustments
+        let layerName = "GCNConv";
+        if(innerComputationMode=="GAT"){
+            layerName = "GATConv";
+        }else if (innerComputationMode=="GraphSAGE"){
+            layerName = "SAGEConv";
+        }
         addLayerName(
             locations,
-            "GCNConv" + (k + 1),
+            layerName + (k + 1),
             0,
             30,
             d3.select(`g#layerNum_${k + 1}`)
@@ -958,6 +967,29 @@ export function drawGCNConvLinkModel(
         //drawPoints(".mats", "red", schemeLocations);
         //let max1 = findAbsMax(maxVals.conv1);
 
+        //conditional statement for color schemes name adjustments
+        let nameTable = [
+            "Features Color Scheme",
+            "GCNConv1 Color Scheme",
+            "GCNConv2 Color Scheme",
+            "Result Color Scheme"
+        ];
+
+        if(innerComputationMode=="GAT"){
+            nameTable = [
+                "Features Color Scheme",
+                "GATConv1 Color Scheme",
+                "GATConv2 Color Scheme",
+                "Result Color Scheme"
+            ];
+        }else if(innerComputationMode=="GraphSAGE"){
+            nameTable = [
+                "Features Color Scheme",
+                "SAGEConv1 Color Scheme",
+                "SAGEConv2 Color Scheme",
+                "Result Color Scheme"
+            ];
+        }
 
         //select layers
         const l1 = d3.select(`g#layerNum_1`);
@@ -975,12 +1007,7 @@ export function drawGCNConvLinkModel(
                 [1],
                 [0.3, 0.7]
             ],
-            nameTable:[
-                "Features Color Scheme",
-                "GCNConv1 Color Scheme",
-                "GCNConv2 Color Scheme",
-                "Result Color Scheme"
-            ],
+            nameTable:nameTable,
             xLocationTable:[
                 schemeLocations[0][0],
                 schemeLocations[1][0],

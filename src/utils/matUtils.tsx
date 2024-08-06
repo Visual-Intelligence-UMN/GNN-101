@@ -1199,7 +1199,8 @@ export function visualizeLinkClassifierFeatures(
         maxVals,
         featureChannels,
         featureKeys,
-        featureKeysEachLayer
+        featureKeysEachLayer,
+        innerComputationMode
     );
     locations = GCNConvPackage.locations;
     frames = GCNConvPackage.frames;
