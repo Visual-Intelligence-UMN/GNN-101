@@ -80,7 +80,9 @@ export class Graph {
 
 }
 
-type AdjacencyListForSearch = { [key: number]: number[] };
+type AdjacencyListForSearch = {
+    [x: string]: any; [key: number]: number[] 
+};
 
 
 //return a extracted subgraph from the larger graph

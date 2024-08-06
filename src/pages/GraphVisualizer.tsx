@@ -59,8 +59,6 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
     const visualizationId = ++currentVisualizationId.current;
 
     const init = async (graphs: any[]) => {
-      
-      
       if (intmData != null) {
 
       }
