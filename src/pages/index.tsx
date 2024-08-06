@@ -207,12 +207,14 @@ export default function Home() {
                                         selectedButtons={selectedButtons}
                                         setSelectedButtons={setSelectedButtons}
                                         predicted={predicted}
+
                                     />
                                 ) : (
                                     <LinkClassifierButtonChain
                                         selectedButtons={selectedButtons}
                                         setSelectedButtons={setSelectedButtons}
                                         predicted={predicted}
+                                        innerComputationMode={modelType}
                                     />
                                 )}
                             </div>

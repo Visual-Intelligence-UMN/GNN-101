@@ -406,10 +406,12 @@ export const LinkClassifierButtonChain = ({
     selectedButtons,
     setSelectedButtons,
     predicted,
+    innerComputationMode,
 }: {
     selectedButtons: any[];
     setSelectedButtons: Function;
     predicted: boolean;
+    innerComputationMode: string;
 }) => {
     const handleButtonClick = (index: number) => {
         setSelectedButtons((prevSelectedLayers: any[]) => {
@@ -419,6 +421,19 @@ export const LinkClassifierButtonChain = ({
             return updatedLayers;
         });
     };
+
+    const [archList, setArchList] = useState<string[]>(["GCNConv1", "GCNConv2"]);
+
+    useEffect(() => {
+        if(innerComputationMode === "GCN"){
+            setArchList(["GCNConv1", "GCNConv2"]);
+        }else if (innerComputationMode === "GAT"){
+            setArchList(["GATConv1", "GATConv2"]);
+        }else {
+            setArchList(["SAGEConv1", "SAGEConv2"]);
+        }
+    }, [innerComputationMode]);
+
     return (
         <div className="flex gap-x-4 items-center">
             <div className="flex">
@@ -458,7 +473,7 @@ export const LinkClassifierButtonChain = ({
                             }`}
                         onClick={() => handleButtonClick(1)}
                     >
-                        GNNConv1
+                        {archList[0]}
                     </button>
                     <button
                         disabled={!predicted}
@@ -471,7 +486,7 @@ export const LinkClassifierButtonChain = ({
                             }`}
                         onClick={() => handleButtonClick(2)}
                     >
-                        GNNConv2
+                        {archList[1]}
                     </button>
                     <button
                         disabled={!predicted}
