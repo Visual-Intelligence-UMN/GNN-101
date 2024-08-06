@@ -245,8 +245,8 @@ print(prediction['decode_all_final'])
 
 #%%
 
-print(f'conv1 shape: {list(prediction['conv1'].shape)}')
-print(f'conv2 shape: {list(prediction['conv2'].shape)}')
+print(f'conv1 shape: {list(prediction['gat1'].shape)}')
+print(f'conv2 shape: {list(prediction['gat2'].shape)}')
 print(f'conv3 shape: {list(prediction['decode_mul'].shape)}')
 print(f'final shape: {list(prediction['prob_adj'].shape)}')
 print(f'final shape: {list(prediction['decode_all_final'].shape)}')
@@ -269,13 +269,19 @@ torch.onnx.export(model,               # model being run
                   dummy_input,         # model input 
                   "gat_link_model.onnx",    # where to save the model
                   export_params=True,  # store the trained parameter weights inside the model file
-                  opset_version=17,    # the ONNX version to export the model to
+                  opset_version=18,    # the ONNX version to export the model to
                 #   do_constant_folding=True,  # whether to execute constant folding for optimization
                   input_names = ['x', 'edge_index', 'edge_label_index'],   # the model's input names
                   output_names=['gat1', 'gat2', 'decode_mul', 'decode_sum', 'prob_adj', 'decode_all_final'],
                   dynamic_axes={'x': {0: 'num_nodes'},
                                 'edge_index': {1: 'num_edges'},
                                 'output': {0: 'batch_size'}})  # which axes should be considered dynamic)
+
+
+#%%
+
+onnxProgram = torch.onnx.dynamo_export(GAT, dummy_input)
+
 
 #%%
 # export data from dataset
