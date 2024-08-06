@@ -138,7 +138,7 @@ def test(pos_edge_index, neg_edge_index):
 
 #%%
 
-for epoch in range(1, 101):
+for epoch in range(1, 50):
     loss = train()
     val_loss, val_acc = test(data.val_pos_edge_index, data.val_neg_edge_index)
     test_loss, test_acc = test(data.test_pos_edge_index, data.test_neg_edge_index)
@@ -283,7 +283,7 @@ import onnx
 import numpy as np
 import json
 
-model = onnx.load('../public/sage_link_model.onnx')
+model = onnx.load('./sage_link_model.onnx')
 
 weights = {}
 
@@ -335,7 +335,6 @@ for k in keys:
 # conv2.lin_l.bias (64,)
 # onnx::MatMul_135 (64, 64)
 # conv1.lin_l.bias (64,)
-
 
 
 # %%

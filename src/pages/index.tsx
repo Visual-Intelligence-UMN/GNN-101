@@ -276,7 +276,7 @@ export default function Home() {
                                         <p>{DatasetInfo[model]}</p>
                                     </div>
                                 </div>
-                                {model == "link classification" ?<>
+                                {model == "link classification"|| modelType=="GAT"||modelType=="GraphSAGE" ?<>
                                     Predict a link from node 
                                     <NodeSelector
                                         nodeList={nodeSelectionList}

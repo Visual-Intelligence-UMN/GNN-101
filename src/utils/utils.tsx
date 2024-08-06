@@ -1461,9 +1461,11 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
   if(modelPath === "./gat_link_model.onnx"){
     conv1 = outputMap.gat1.cpuData;
     conv2 = outputMap.gat2.cpuData;
+    console.log("gat model", conv1, conv2);
   }else if(modelPath === "./sage_link_model.onnx"){
     conv1 = outputMap.sage1.cpuData;
     conv2 = outputMap.sage2.cpuData;
+    console.log("sage model", conv1, conv2);
   }else{
     conv1 = outputMap.conv1.cpuData;
     conv2 = outputMap.conv2.cpuData;
