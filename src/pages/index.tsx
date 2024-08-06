@@ -415,19 +415,6 @@ export default function Home() {
                                             Model Visualization will show after prediction
                                         </h1>
 
-                                        <ClassifyGraph
-                                                graphPath={nodeList[selectedGraph]}
-                                                modelPath={modelList[model]}
-                                                setChangedG={setChangedG}
-                                                setIntmData={setIntmData}
-                                                setPredicted={setPredicted}
-                                                predicted={predicted}
-                                                probabilities={probabilities}
-                                                setProbabilities={setProbabilities}
-                                                onlyShownButton={true}
-                                                simulationLoading={simulationLoading}
-                                        />
-{/* 
                                         {model == "graph classification" ? (
                                             <ClassifyGraph
                                                 graphPath={graphList[selectedGraph]}
@@ -454,7 +441,7 @@ export default function Home() {
                                                 onlyShownButton={true}
                                                 simulationLoading={simulationLoading}
                                             />
-                                        )} */}
+                                        )}
                                     </div>
                                 )}
                                 {/* </Panel> */}
