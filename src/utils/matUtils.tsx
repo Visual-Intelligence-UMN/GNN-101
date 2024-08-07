@@ -1386,7 +1386,34 @@ export function visualizeLinkClassifierFeatures(
                 features = featureVisPack.features;
                 intervalID = featureVisPack.getIntervalID();
             } else if(innerComputationMode == "GAT"){
-                const featureVisPack = featureGATClick(layerID, 90, featureChannels);
+                const featureVisPack = featureGATClick(
+                    layerID,
+                    node,
+                    recordLayerID,
+                    colorSchemesTable,
+                    adjList,
+                    featureVisTable,
+                    features,
+                    conv1,
+                    conv2,
+                    bias,
+                    myColor,
+                    weights,
+                    lock,
+                    setIntervalID,
+                    featureChannels,
+                    15,
+                    5,
+                    90,
+                    128,
+                    2.5,
+                );
+                // update variables
+                recordLayerID = featureVisPack.recordLayerID;
+                colorSchemesTable = featureVisPack.colorSchemesTable;
+                featureVisTable = featureVisPack.featureVisTable;
+                features = featureVisPack.features;
+                intervalID = featureVisPack.getIntervalID();
                 
             } else if(innerComputationMode == "SAGE"){
                 const featureVisPack = featureSAGEClick(layerID, 90, featureChannels);

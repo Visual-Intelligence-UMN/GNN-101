@@ -368,4 +368,68 @@ for k in keys:
 # onnx::MatMul_199 (64, 64)
 # conv2.bias (64,)
 
+#%%
+import torch.nn as nn
+class GAT(nn.Module):
+    def __init__(self, in_channels, out_channels, heads=1):
+        super(GAT, self).__init__()
+        self.gat_conv = GATConv(in_channels, out_channels, heads=heads, concat=True)
 
+    def forward(self, x, edge_index):
+        x, (edge_index, attn_coefficients) = self.gat_conv(x, edge_index, return_attention_weights=True)
+        return x, attn_coefficients
+
+# 假设输入特征和边索引如下：
+in_channels = 16
+out_channels = 32
+heads = 4
+
+x = torch.randn((10, in_channels))  # 10个节点，每个节点有16维特征
+edge_index = torch.tensor([[0, 1, 2, 3], [1, 2, 3, 4]], dtype=torch.long)  # 边的索引
+
+# 创建模型并进行前向传播
+model = GAT(in_channels, out_channels, heads=heads)
+output, attention_coefficients = model(x, edge_index)
+
+print("Output:", output)
+print("Attention Coefficients:", attention_coefficients)
+
+# %%
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch_geometric.nn import GATConv
+
+class GAT(nn.Module):
+    def __init__(self, in_channels, out_channels, heads=1):
+        super(GAT, self).__init__()
+        self.gat_conv = GATConv(in_channels, out_channels, heads=heads, concat=True)
+
+    def forward(self, x, edge_index):
+        x, (edge_index, attn_coefficients) = self.gat_conv(x, edge_index, return_attention_weights=True)
+        return x, attn_coefficients
+
+# 假设输入特征和边索引如下：
+in_channels = 16
+out_channels = 32
+heads = 4
+
+x = torch.randn((10, in_channels))  # 10个节点，每个节点有16维特征
+edge_index = torch.tensor([[0, 1, 2, 3], [1, 2, 3, 4]], dtype=torch.long)  # 边的索引
+
+# 创建模型并进行前向传播
+model = GAT(in_channels, out_channels, heads=heads)
+output, attention_coefficients = model(x, edge_index)
+
+# 打印可学习参数
+parm = []
+print("Model's learnable parameters:")
+for name, param in model.named_parameters():
+    if param.requires_grad:
+        parm.append(f"{name}: {param.data}")
+        print(f"{name}: {param.data}")
+
+# 打印注意力系数
+print("Attention Coefficients:", attention_coefficients)
+
+# %%
