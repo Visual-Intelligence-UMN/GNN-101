@@ -100,6 +100,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
 
       graphs.forEach((data, i) => {
+        
 
 
 
@@ -288,6 +289,12 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             }
             allNodes.push(node);
           });
+
+          data.nodes.forEach((node: any) => {
+            console.log("i",i)
+            console.log(node.x)
+  
+          })
 
           
           let maxXDistance = 0;

@@ -570,6 +570,11 @@ export function featureVisualizer(
 ) {
   state.isClicked = false;
 
+  console.log("fwad", allNodes)
+
+
+
+
 
   
   // 1. visualize feature
@@ -629,12 +634,18 @@ export function featureVisualizer(
 
 
 
-
+    
 
     let xOffset = (graphIndex - 2.5) * offset;
     if (graphIndex >= 4 && mode === 0) {
       xOffset = (graphIndex - 2.5) * offset - 25 * (graphIndex * 1.5);
     }
+    if (mode === 2) {
+      xOffset = (graphIndex - 3.5) * offset;
+
+    }
+
+
 
     const g2 = svg.append("g")
       .attr("layerNum", graphIndex)
@@ -1069,7 +1080,6 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
 
 
   nodesByIndex.forEach((nodes, graphIndex) => {
-
     nodes.forEach((node: any, i) => {
 
       if (!node.links) {
@@ -1087,6 +1097,9 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
       //   conv = 4;
         
       // }
+      if (mode === 2) {
+        conv = 2
+      }
       if (graphIndex < conv) { 
         
         let drawnLinks = new Set();
@@ -1176,11 +1189,12 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
             }
           })
         }
+     
       
         
       } else {  
-        if (mode === 1) {
-          if (graphIndex === 3) {
+        if (mode === 1 || mode === 2) {
+          if (graphIndex === 2) {
             const nextLayerNodes = nodesByIndex.get(graphIndex + 1);
           if (nextLayerNodes) {
             nextLayerNodes.forEach((nextNode: any) => {
@@ -1256,6 +1270,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
       
     });
   });
+
 
  }
 

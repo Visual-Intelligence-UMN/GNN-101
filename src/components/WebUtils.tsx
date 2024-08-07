@@ -974,8 +974,6 @@ export function visualizeGraph(
                             .attr("transform", transform);
                             onComplete();
                             resolve();
-                        
-                        
                     }
                     updatePositions();
         };
@@ -1202,7 +1200,7 @@ export function visualizePartialGraph(
                 .selectAll("circle")
                 .data(data.nodes)
                 .join("circle")
-                .attr("r", 6)
+                .attr("r", 17)
                 .style("fill", "white")
                 .style("stroke", "#69b3a2")
                 .style("stroke-width", 1)
@@ -1213,7 +1211,7 @@ export function visualizePartialGraph(
                 .selectAll("text")
                 .data(data.nodes)
                 .join("text")
-                .text(" ")
+                .text((d: any) => d.id)
                 .attr("font-size", `12px`)
                 .attr("text-anchor", "middle")
                 .attr("dominant-baseline", "central");
@@ -1229,8 +1227,8 @@ export function visualizePartialGraph(
                         .id((d: any) => d.id)
                         .distance(10)
                 )
-                .force("charge", d3.forceManyBody().strength(-50))
-                .force("center", d3.forceCenter(width / 2, height / 3.5))
+                .force("charge", d3.forceManyBody().strength(-500))
+                .force("center", d3.forceCenter(width / 2, height / 3))
                 .on("tick", function ticked() {
                     link.attr("x1", (d: any) => d.source.x)
                         .attr("y1", (d: any) => d.source.y)
@@ -1243,8 +1241,6 @@ export function visualizePartialGraph(
 
                     labels.attr("x", (d: any) => d.x)
                           .attr("y", (d: any) => d.y);
-                    labels.attr("x", (d: any) => d.x - 6)
-                          .attr("y", (d: any) => d.y + 6);
                 })
                 .on("end", function ended() {
                     let maxXDistance = 0;
@@ -1265,31 +1261,49 @@ export function visualizePartialGraph(
                       }
                 });
             });
-            const graphWidth = maxXDistance + 20
+            const graphWidth = maxXDistance + 20;
             const graphHeight = maxYDistance + 20;
-            const point1 = { x: 0, y: height / 8 };
-            const point2 = { x: 0.9 * offset, y: height / 20 };
-            const point3 = { x: 0.9 * offset, y: height / 1.7 };
-            const point4 = { x: 0, y: height / 1.5 };
+            const point1 = { x: 0.9 * offset - 260, y: height / 8 };
+            const point2 = {
+                x: 0.8 * offset - 260,
+                y: height / 20,
+            };
+            const point3 = {
+                x: 0.8 * offset - 260,
+                y: height / 1.7,
+            };
+            const point4 = {
+                x: 0.9 * offset - 260,
+                y: height / 1.5,
+            };
+            const tolerance = 100;
+
             const x_dist = Math.abs(point1.x - point2.x);
-            const y_dist = Math.abs(point1.y - point4.y)
+            const y_dist = Math.abs(point1.y - point4.y);
+
             const centerX = (point1.x + point3.x) / 2;
             const centerY = (point1.y + point3.y) / 2;
-            let scaleX = (graphWidth / (538.12));
-            let scaleY = (graphHeight / (512.63));
+            let scaleX = (graphWidth + tolerance) / x_dist;
+            let scaleY = (graphHeight + tolerance) / y_dist;
             let transform = `translate(${centerX}, ${centerY}) scale(${scaleX}, ${scaleY}) translate(${-centerX}, ${-centerY})`;
-            if (graphWidth < x_dist && graphHeight < y_dist) {
-                scaleX = 1
-                scaleY = 1
-                transform = `scale(${scaleX}, ${scaleY})`;
+            if (
+                graphWidth + tolerance < x_dist &&
+                graphHeight + tolerance < y_dist
+            ) {
+                transform = `scale(1, 1)`;
             }
             const parallelogram = svg
-                .append("polygon")  
-                .attr("points", `${point1.x},${point1.y} ${point2.x},${point2.y} ${point3.x},${point3.y} ${point4.x},${point4.y}`)
+                .append("polygon")
+                .attr(
+                    "points",
+                    `${point1.x},${point1.y} ${point2.x},${point2.y} ${point3.x},${point3.y} ${point4.x},${point4.y}`
+                )
                 .attr("stroke", "black")
                 .attr("fill", "none")
-                .attr('transform',transform);
-                });
+                .attr("transform", transform);
+                onComplete();
+                resolve();
+        })
           
             
     
