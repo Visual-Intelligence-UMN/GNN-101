@@ -402,6 +402,9 @@ export function featureVisClick(
     oRectW:number,
     activation: string = "relu"
 ) {
+
+    console.log("feature vis click", layerID, featureVisTable);
+
     let biasCoord: [number, number];
     let res10: [number, number];
     let res11: [number, number];
@@ -672,9 +675,12 @@ export function featureVisClick(
         {func: () => {
             drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels)
             drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels)
-            if(activation=="tanh"){
+            if(featureVisTable.length==4&&layerID==2){
+                //if it's the last layer, don't show the relu icon
+            }
+            else if(activation=="tanh"){
                 drawTanh(midX1, wmCoord, biasCoord, nextCoord);
-            }else{
+            }else if(activation=="relu"){
                 drawReLU(midX1, wmCoord, biasCoord, nextCoord)
             }
             curNode.style.opacity = "1";
