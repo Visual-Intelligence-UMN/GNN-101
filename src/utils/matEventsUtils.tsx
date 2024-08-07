@@ -641,7 +641,7 @@ export function featureVisClick(
         btnX += 100;
     }
 
-
+    console.log("feature vis click", layerID, featureVisTable, oFeatureChannels)
 
     let weightMatrixPostions:any = computeMatrixLocations(btnX+15, btnY, curveDir, rectW, featureChannels, weights, layerID);
 
@@ -680,7 +680,11 @@ export function featureVisClick(
         {func: () => {
             drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels)
             drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels)
-            if(activation=="tanh"){
+            if((featureVisTable.length==4&&layerID==2)||
+                (oFeatureChannels==128&&layerID==1)){
+                //if it's the last layer, don't show the relu icon
+            }
+            else if(activation=="tanh"){
                 drawTanh(midX1, wmCoord, biasCoord, nextCoord);
             }else{
                 drawReLU(midX1, wmCoord, biasCoord, nextCoord)
@@ -1452,7 +1456,7 @@ export function featureGATClick(
     //drawPoints(".mats", "red", endCoordList);
     //draw paths
 
-
+    console.log("feature vis click", layerID, featureVisTable)
 
     //aniamtion sequence
     const initSec = 1000;
@@ -1507,7 +1511,11 @@ export function featureGATClick(
         {func: () => {
             drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels)
             drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels)
-            if(activation=="tanh"){
+            if((featureVisTable.length==4&&layerID==2)||
+                (oFeatureChannels==128&&layerID==1)){
+                //if it's the last layer, don't show the relu icon
+            }
+            else if(activation=="tanh"){
                 drawTanh(midX1, wmCoord, biasCoord, nextCoord);
             }else{
                 drawReLU(midX1, wmCoord, biasCoord, nextCoord)
