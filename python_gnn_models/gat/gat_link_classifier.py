@@ -47,7 +47,7 @@ print('Test edges (negative):', data.test_neg_edge_index.size(1))
 print(data)
 
 #%%
-
+# x, (edge_index, attn_coefficients) = self.gat_conv(x, edge_index, return_attention_weights=True)
 class GAT(torch.nn.Module):
     def __init__(self, in_channels, hidden_channels, out_channels):
         super().__init__()
@@ -70,10 +70,13 @@ class GAT(torch.nn.Module):
 
     def forward(self, x, edge_index, edge_label_index):
         outputs = {}
-        x = self.conv1(x, edge_index).relu()
+        x, (edge_index, attn1_coefficients) = self.conv1(x, edge_index, return_attention_weights=True)
+        x = x.relu()
         outputs["gat1"] = x
-        z = self.conv2(x, edge_index)
+        z, (edge_index, attn2_coefficients) = self.conv2(x, edge_index, return_attention_weights=True)
         outputs["gat2"] = z
+        outputs["attn1"] = attn1_coefficients
+        outputs["attn2"] = attn2_coefficients
 
         x = (z[edge_label_index[0]] * z[edge_label_index[1]])
         outputs["decode_mul"] = x
@@ -149,6 +152,9 @@ for epoch in range(1, 101):
 gData = dataset[0]
 print(gData)
 
+#%%
+
+print(gData.edge_index.size())
 
 #%%
 def get_neighbor_count(data, node_index):
@@ -250,6 +256,10 @@ print(f'conv2 shape: {list(prediction['gat2'].shape)}')
 print(f'conv3 shape: {list(prediction['decode_mul'].shape)}')
 print(f'final shape: {list(prediction['prob_adj'].shape)}')
 print(f'final shape: {list(prediction['decode_all_final'].shape)}')
+print(f'attn1 shape: {list(prediction['attn1'].shape)}')
+print(f'attn2 shape: {list(prediction['attn2'].shape)}')
+
+
 
 #%%
 
@@ -262,6 +272,18 @@ prediction = model.forward(x, edge_index, edge_index)
 #%%
 
 print(prediction)
+
+
+#%%
+
+# 打印可学习参数
+parm = []
+print("Model's learnable parameters:")
+for name, param in model.named_parameters():
+    if param.requires_grad:
+        parm.append(f"{name}: {param.data}")
+        print(f"{name}: {param.data.size()}")
+
 
 #%%
 # python model to ONNX model
@@ -394,20 +416,6 @@ output, attention_coefficients = model(x, edge_index)
 print("Output:", output)
 print("Attention Coefficients:", attention_coefficients)
 
-# %%
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torch_geometric.nn import GATConv
-
-class GAT(nn.Module):
-    def __init__(self, in_channels, out_channels, heads=1):
-        super(GAT, self).__init__()
-        self.gat_conv = GATConv(in_channels, out_channels, heads=heads, concat=True)
-
-    def forward(self, x, edge_index):
-        x, (edge_index, attn_coefficients) = self.gat_conv(x, edge_index, return_attention_weights=True)
-        return x, attn_coefficients
 
 # 假设输入特征和边索引如下：
 in_channels = 16

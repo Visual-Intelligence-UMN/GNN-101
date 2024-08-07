@@ -7,7 +7,8 @@ from sklearn.metrics import roc_auc_score
 
 import torch_geometric.transforms as T
 from torch_geometric.datasets import Planetoid
-from torch_geometric.nn import SAGEConv
+# from graphSAGE import ConvSAGE
+from graphSAGE.CustomizedLayer import ConvSAGE
 from torch_geometric.utils import negative_sampling
 
 #%%
@@ -51,8 +52,8 @@ print(data)
 class SAGE(torch.nn.Module):
     def __init__(self, in_channels, hidden_channels, out_channels):
         super().__init__()
-        self.conv1 = SAGEConv(in_channels, hidden_channels)
-        self.conv2 = SAGEConv(hidden_channels, out_channels)
+        self.conv1 = ConvSAGE(in_channels, hidden_channels)
+        self.conv2 = ConvSAGE(hidden_channels, out_channels)
 
     def encode(self, x, edge_index):
         x = self.conv1(x, edge_index).relu()
