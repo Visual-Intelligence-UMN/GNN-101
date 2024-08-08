@@ -47,7 +47,7 @@ print('Test edges (negative):', data.test_neg_edge_index.size(1))
 print(data)
 
 #%%
-
+# x, (edge_index, attn_coefficients) = self.gat_conv(x, edge_index, return_attention_weights=True)
 class GAT(torch.nn.Module):
     def __init__(self, in_channels, hidden_channels, out_channels):
         super().__init__()
@@ -70,10 +70,13 @@ class GAT(torch.nn.Module):
 
     def forward(self, x, edge_index, edge_label_index):
         outputs = {}
-        x = self.conv1(x, edge_index).relu()
+        x, (edge_index, attn1_coefficients) = self.conv1(x, edge_index, return_attention_weights=True)
+        x = x.relu()
         outputs["gat1"] = x
-        z = self.conv2(x, edge_index)
+        z, (edge_index, attn2_coefficients) = self.conv2(x, edge_index, return_attention_weights=True)
         outputs["gat2"] = z
+        outputs["attn1"] = attn1_coefficients
+        outputs["attn2"] = attn2_coefficients
 
         x = (z[edge_label_index[0]] * z[edge_label_index[1]])
         outputs["decode_mul"] = x
@@ -149,6 +152,9 @@ for epoch in range(1, 101):
 gData = dataset[0]
 print(gData)
 
+#%%
+
+print(gData.edge_index.size())
 
 #%%
 def get_neighbor_count(data, node_index):
@@ -245,11 +251,15 @@ print(prediction['decode_all_final'])
 
 #%%
 
-print(f'conv1 shape: {list(prediction['conv1'].shape)}')
-print(f'conv2 shape: {list(prediction['conv2'].shape)}')
+print(f'conv1 shape: {list(prediction['gat1'].shape)}')
+print(f'conv2 shape: {list(prediction['gat2'].shape)}')
 print(f'conv3 shape: {list(prediction['decode_mul'].shape)}')
 print(f'final shape: {list(prediction['prob_adj'].shape)}')
 print(f'final shape: {list(prediction['decode_all_final'].shape)}')
+print(f'attn1 shape: {list(prediction['attn1'].shape)}')
+print(f'attn2 shape: {list(prediction['attn2'].shape)}')
+
+
 
 #%%
 
@@ -263,19 +273,37 @@ prediction = model.forward(x, edge_index, edge_index)
 
 print(prediction)
 
+
+#%%
+
+# 打印可学习参数
+parm = []
+print("Model's learnable parameters:")
+for name, param in model.named_parameters():
+    if param.requires_grad:
+        parm.append(f"{name}: {param.data}")
+        print(f"{name}: {param.data.size()}")
+
+
 #%%
 # python model to ONNX model
 torch.onnx.export(model,               # model being run
                   dummy_input,         # model input 
                   "gat_link_model.onnx",    # where to save the model
                   export_params=True,  # store the trained parameter weights inside the model file
-                  opset_version=17,    # the ONNX version to export the model to
+                  opset_version=18,    # the ONNX version to export the model to
                 #   do_constant_folding=True,  # whether to execute constant folding for optimization
                   input_names = ['x', 'edge_index', 'edge_label_index'],   # the model's input names
                   output_names=['gat1', 'gat2', 'decode_mul', 'decode_sum', 'prob_adj', 'decode_all_final'],
                   dynamic_axes={'x': {0: 'num_nodes'},
                                 'edge_index': {1: 'num_edges'},
                                 'output': {0: 'batch_size'}})  # which axes should be considered dynamic)
+
+
+#%%
+
+onnxProgram = torch.onnx.dynamo_export(GAT, dummy_input)
+
 
 #%%
 # export data from dataset
@@ -311,7 +339,7 @@ import onnx
 import numpy as np
 import json
 
-model = onnx.load('gat_link_model.onnx')
+model = onnx.load('../public/gat_link_model.onnx')
 
 weights = {}
 
@@ -319,7 +347,7 @@ for tensor in model.graph.initializer:
     np_array = onnx.numpy_helper.to_array(tensor)
     weights[tensor.name] = np_array.tolist()
 
-with open('link_weights.json', 'w') as f:
+with open('gat_link_weights.json', 'w') as f:
     json.dump(weights, f)
 
 #%%
@@ -362,4 +390,54 @@ for k in keys:
 # onnx::MatMul_199 (64, 64)
 # conv2.bias (64,)
 
+#%%
+import torch.nn as nn
+class GAT(nn.Module):
+    def __init__(self, in_channels, out_channels, heads=1):
+        super(GAT, self).__init__()
+        self.gat_conv = GATConv(in_channels, out_channels, heads=heads, concat=True)
 
+    def forward(self, x, edge_index):
+        x, (edge_index, attn_coefficients) = self.gat_conv(x, edge_index, return_attention_weights=True)
+        return x, attn_coefficients
+
+# 假设输入特征和边索引如下：
+in_channels = 16
+out_channels = 32
+heads = 4
+
+x = torch.randn((10, in_channels))  # 10个节点，每个节点有16维特征
+edge_index = torch.tensor([[0, 1, 2, 3], [1, 2, 3, 4]], dtype=torch.long)  # 边的索引
+
+# 创建模型并进行前向传播
+model = GAT(in_channels, out_channels, heads=heads)
+output, attention_coefficients = model(x, edge_index)
+
+print("Output:", output)
+print("Attention Coefficients:", attention_coefficients)
+
+
+# 假设输入特征和边索引如下：
+in_channels = 16
+out_channels = 32
+heads = 4
+
+x = torch.randn((10, in_channels))  # 10个节点，每个节点有16维特征
+edge_index = torch.tensor([[0, 1, 2, 3], [1, 2, 3, 4]], dtype=torch.long)  # 边的索引
+
+# 创建模型并进行前向传播
+model = GAT(in_channels, out_channels, heads=heads)
+output, attention_coefficients = model(x, edge_index)
+
+# 打印可学习参数
+parm = []
+print("Model's learnable parameters:")
+for name, param in model.named_parameters():
+    if param.requires_grad:
+        parm.append(f"{name}: {param.data}")
+        print(f"{name}: {param.data}")
+
+# 打印注意力系数
+print("Attention Coefficients:", attention_coefficients)
+
+# %%

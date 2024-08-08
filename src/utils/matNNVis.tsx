@@ -7,7 +7,9 @@ import {
     matrix_to_hmap,
     get_axis_gdata,
     graphToAdjList,
-    drawPoints
+    drawPoints,
+    get_cood_from_parent,
+    splitAnyIntoMatrices
 } from "../utils/utils";
 import {
     visualizeGraphClassifierFeatures,
@@ -263,7 +265,7 @@ export async function visualizeNodeClassifier(setIsLoading:any, graph_path:strin
 };
 
 //Visualization Pipeline for Link Classifier
-export async function visualizeLinkClassifier(setIsLoading:any, graph_path:string, intmData:any, hubNodeA:number, hubNodeB:number) {
+export async function visualizeLinkClassifier(setIsLoading:any, graph_path:string, intmData:any, hubNodeA:number, hubNodeB:number, innerComputationMode:string) {
     try {
         console.log("start visualizing...", graph_path, intmData, hubNodeA, hubNodeB);
         setIsLoading(true);
@@ -302,7 +304,7 @@ export async function visualizeLinkClassifier(setIsLoading:any, graph_path:strin
         console.log("subMatrix", subMatrix);
 
         // Initialize and run D3 visualization with processe  d data
-        await initLinkClassifier(subMatrix, features, intmData, graph_path, hubNodeA, hubNodeB, keys);
+        await initLinkClassifier(subMatrix, features, intmData, graph_path, hubNodeA, hubNodeB, keys, innerComputationMode);
     } catch (error) {
         console.error("Error in visualizeGNN:", error);
     } finally {
@@ -320,7 +322,8 @@ async function initLinkClassifier(
     graph_path:string,
     hubNodeA:number,
     hubNodeB:number,
-    keys: number[]
+    keys: number[],
+    innerComputationMode:string
 )  {
 
     //process the origin data
@@ -370,10 +373,26 @@ async function initLinkClassifier(
     visualizeMatrixBody(gridSize, graph, width, height, margin);
     drawNodeAttributes(keys, graph, 150);
 
+    //draw target edge - "?"
+    
+    //get the subgraph indexes for the target edge - hubNodeA and hubNodeB
+
+    //indexing the location
+    const rectLocations = get_cood_from_parent(".mats", "rect");
+
+    //add a question mark to the target edge
+
+
+
     const data = matrix_to_hmap(graph);
 
     locations = get_cood_locations(data, locations);
 
+    const locationMatrix = splitAnyIntoMatrices(locations, Math.sqrt(locations.length));
+
+    //drawPoints(".mats", "red", locationMatrix);
+
+    
     //shift the locations
     for(let i = 0; i < locations.length; i++){
         locations[i][0] += 25;
@@ -448,12 +467,28 @@ async function initLinkClassifier(
     // });
     //crossConnectionMatrices(graphs, locations, offsetMat, pathMatrix);
 
+    const subGraphNodeA = featuresIndicesLayerOne.indexOf(hubNodeA);
+    const subGraphNodeB = featuresIndicesLayerOne.indexOf(hubNodeB);
 
+    // drawPoints(".mats", "red", locationMatrix[subGraphNodeA]);
+
+    //const questionMark = d3.select(".mats").append("text").text("?").attr("x", locationMatrix[subGraphNodeA][subGraphNodeB][0]+10).attr("y", locationMatrix[subGraphNodeA][subGraphNodeB][1]+50).raise();
+
+
+    // console.log(
+    //     "grid cell", 
+    //     `#gridCell-${subGraphNodeA}-${subGraphNodeB}`, `#gridCell-${subGraphNodeB}-${subGraphNodeA}`,
+    //     d3.select("#matvis").selectAll("rect").select(`#gridCell-${subGraphNodeA}-${subGraphNodeB}`)
+    //     ,locationMatrix[subGraphNodeA][subGraphNodeB][0], locationMatrix[subGraphNodeA][subGraphNodeB][1],questionMark
+    // );
+
+    d3.select(".mats").select(`#gridCell-${subGraphNodeA}-${subGraphNodeB}`).attr("fill", "red");
+    d3.select(".mats").select(`#gridCell-${subGraphNodeB}-${subGraphNodeA}`).attr("fill", "red");
 
     const featuresManager = visualizeLinkClassifierFeatures(
         locations, featuresArray, myColor, 
         conv1, conv2, prob_adj[hubNodeA][hubNodeB], graph, adjList, [], keys, 
-        keysForEach);
+        keysForEach, innerComputationMode);
     
 
     // const intervalID = featuresManager.getIntervalID();

@@ -176,6 +176,26 @@ export function findMaxIndex(arr: number[]): number {
   return arr.indexOf(maxValue);
 }
 
+export function splitAnyIntoMatrices<T>(
+  array: T[],
+  matrixSize: number = 64
+): T[][] {
+  // 创建一个空的二维数组
+  let result: T[][] = [];
+  // 计算每个子数组的长度
+  let n = Math.ceil(array.length / matrixSize);
+
+  // 遍历 n 次来创建子数组
+  for (let i = 0; i < n; i++) {
+      // 截取从 i * matrixSize 开始的 matrixSize 长度的部分
+      let subArray = array.slice(i * matrixSize, (i + 1) * matrixSize);
+      // 将截取的子数组添加到结果数组中
+      result.push(subArray);
+  }
+
+  // 返回生成的二维数组
+  return result;
+}
 
 //Split a large 1d array into a 1d array with multiple 8*8 matrices
 
@@ -1468,9 +1488,24 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
     edge_label_index: edgeIndexTensor,
   });
 
+  let conv1 = [];
+  let conv2 = [];
+
+  if(modelPath === "./gat_link_model.onnx"){
+    conv1 = outputMap.gat1.cpuData;
+    conv2 = outputMap.gat2.cpuData;
+    console.log("gat model", conv1, conv2);
+  }else if(modelPath === "./sage_link_model.onnx"){
+    conv1 = outputMap.sage1.cpuData;
+    conv2 = outputMap.sage2.cpuData;
+    console.log("sage model", conv1, conv2);
+  }else{
+    conv1 = outputMap.conv1.cpuData;
+    conv2 = outputMap.conv2.cpuData;
+  }
   const intmData: IntmDataLink = {
-    conv1: outputMap.conv1.cpuData,
-    conv2: outputMap.conv2.cpuData,
+    conv1: conv1,
+    conv2: conv2,
     decode_mul: outputMap.decode_mul.cpuData,
     decode_sum: outputMap.decode_sum.cpuData,
     prob_adj: outputMap.prob_adj.cpuData,
@@ -1479,7 +1514,7 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
 
   const prob = outputMap.prob_adj.cpuData;
 
-  console.log("predicted!",intmData);
+  console.log("predicted!",intmData, modelPath);
 
   const data = dataPreparationLinkPred(intmData);
 

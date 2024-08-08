@@ -601,20 +601,20 @@ myColor:any
         const operators = ["x", "+", "x", "... = "];
 
         //matmul-displayer interaction
-        let displayerOffset = -125;
-        if(curveDir==1)displayerOffset = 75;
+        let displayerOffset = -150;
+        if(curveDir==1)displayerOffset = 100;
         let displayerX = coordFeatureVis[0];
         let displayerY = coordFeatureVis[1] + displayerOffset;
 
-        const displayW = 150;
-        const displayH = 50;
+        const displayW = 300;
+        const displayH = 100;
 
         //drawPoints(".mats", "red", [[displayerX, displayerY]])
 
         d3.select(".mats")
             .append("rect")
             .attr("x", displayerX)
-            .attr("y", displayerY)
+            .attr("y", displayerY - 10)
             .attr("width", displayW)
             .attr("height", displayH)
             .attr("rx", 10)
@@ -633,7 +633,7 @@ myColor:any
             .attr("y", displayerY + titleYOffset)
             .text("Matmul Visualization")
             .attr("class", "matmul-displayer procVis")
-            .attr("font-size", titleYOffset)
+            .attr("font-size", titleYOffset*2)
             .attr("fill", "black");
         
         const vectorLength = displayH - titleYOffset;
@@ -655,7 +655,7 @@ myColor:any
             .attr("y", displayerY + vectorLength/2 + 3)
             .text("dot(")
             .attr("class", "matmul-displayer procVis")
-            .attr("font-size", titleYOffset)
+            .attr("font-size", titleYOffset*2)
             .attr("fill", "black");
 
         d3.select(".mats")
@@ -664,7 +664,7 @@ myColor:any
             .attr("y", displayerY + vectorLength/2 + 3)
             .text(",")
             .attr("class", "matmul-displayer procVis")
-            .attr("font-size", titleYOffset)
+            .attr("font-size", titleYOffset*2)
             .attr("fill", "black");
         
         d3.select(".mats")
@@ -673,7 +673,7 @@ myColor:any
             .attr("y", displayerY + vectorLength/2 + 3)
             .text(")")
             .attr("class", "matmul-displayer procVis")
-            .attr("font-size", titleYOffset)
+            .attr("font-size", titleYOffset*2)
             .attr("fill", "black");
 
         d3.select(".mats")
@@ -682,16 +682,16 @@ myColor:any
             .attr("y", displayerY + vectorLength/2 + 20)
             .text("=")
             .attr("class", "matmul-displayer procVis")
-            .attr("font-size", titleYOffset)
+            .attr("font-size", titleYOffset*2)
             .attr("fill", "black");
 
         for(let i=0; i<dataSamples.length; i++){
             d3.select(".mats")
                 .append("rect")
-                .attr("x", displayerX + 3 + unitSize*(i+1)+15*i)
-                .attr("y", displayerY + vectorLength/2 + 20 - unitSize/2)
-                .attr("width", unitSize)
-                .attr("height", unitSize)
+                .attr("x", displayerX + 3 + unitSize*(i+1)+30*i)
+                .attr("y", displayerY + vectorLength/2 + 20 - unitSize)
+                .attr("width", unitSize*2)
+                .attr("height", unitSize*2)
                 .style("stroke", "black")
                 .attr("fill", myColor(dataSamples[i]))
                 .attr("class", "matmul-displayer procVis")
@@ -700,11 +700,11 @@ myColor:any
             if(dataSamples[i]<0.5){color = "black"}
             d3.select(".mats")
                 .append("text")
-                .attr("x", displayerX + 3 + unitSize*(i+1)+15*i)
+                .attr("x", displayerX + 3 + unitSize*(i+1)+30*i)
                 .attr("y", displayerY + vectorLength/2 + 20)
                 .text(roundToTwo(dataSamples[i]))
                 .attr("class", "matmul-displayer procVis")
-                .attr("font-size", unitSize / 2)
+                .attr("font-size", unitSize)
                 .attr("fill", color);
         }
 
@@ -713,7 +713,7 @@ myColor:any
         for(let i=0; i<operators.length; i++){
             d3.select(".mats")
             .append("text")
-            .attr("x", displayerX + 3 + unitSize*(i+1) + 13*(i+1))
+            .attr("x", displayerX + 3 + unitSize*(i+1) + 30*(i+1))
             .attr("y", displayerY + vectorLength/2 + 20)
             .text(operators[i])
             .attr("font-size", unitSize)
@@ -724,9 +724,9 @@ myColor:any
         d3.select(".mats")
             .append("rect")
             .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength + vectorLength/1.5)
-            .attr("y", displayerY + vectorLength/2 + 20 - unitSize/2)
-            .attr("width", unitSize)
-            .attr("height", unitSize)
+            .attr("y", displayerY + vectorLength/2 + 20 - unitSize)
+            .attr("width", unitSize*2)
+            .attr("height", unitSize*2)
             .style("stroke", "black")
             .attr("fill", myColor(currentVal))
             .attr("class", "matmul-displayer procVis")
@@ -740,7 +740,7 @@ myColor:any
                 .attr("y", displayerY + vectorLength/2 + 20)
                 .text(roundToTwo(currentVal))
                 .attr("class", "matmul-displayer procVis")
-                .attr("font-size", unitSize / 2)
+                .attr("font-size", unitSize)
                 .attr("fill", color);
         
         
@@ -760,7 +760,7 @@ myColor:any
         for(let i=0; i<weightVector.length; i++){
             d3.select(".mats")
                 .append("rect")
-                .attr("x", displayerX + eqXOffset * 3)
+                .attr("x", displayerX + eqXOffset * 5)
                 .attr("y", displayerY + eqYOffset + i*h2/2)
                 .attr("width", w/2)
                 .attr("height", h2/2)
@@ -782,7 +782,7 @@ myColor:any
 
         d3.select(".mats")
             .append("rect")
-            .attr("x", displayerX + eqXOffset * 3)
+            .attr("x", displayerX + eqXOffset * 5)
             .attr("y", displayerY + eqYOffset)
             .attr("width", w/2)
             .attr("height", h2/2 * weightVector.length)

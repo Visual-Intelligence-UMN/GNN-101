@@ -7,7 +7,8 @@ from sklearn.metrics import roc_auc_score
 
 import torch_geometric.transforms as T
 from torch_geometric.datasets import Planetoid
-from torch_geometric.nn import SAGEConv
+# from graphSAGE import ConvSAGE
+from graphSAGE.CustomizedLayer import ConvSAGE
 from torch_geometric.utils import negative_sampling
 
 #%%
@@ -51,8 +52,8 @@ print(data)
 class SAGE(torch.nn.Module):
     def __init__(self, in_channels, hidden_channels, out_channels):
         super().__init__()
-        self.conv1 = SAGEConv(in_channels, hidden_channels)
-        self.conv2 = SAGEConv(hidden_channels, out_channels)
+        self.conv1 = ConvSAGE(in_channels, hidden_channels)
+        self.conv2 = ConvSAGE(hidden_channels, out_channels)
 
     def encode(self, x, edge_index):
         x = self.conv1(x, edge_index).relu()
@@ -138,7 +139,7 @@ def test(pos_edge_index, neg_edge_index):
 
 #%%
 
-for epoch in range(1, 101):
+for epoch in range(1, 50):
     loss = train()
     val_loss, val_acc = test(data.val_pos_edge_index, data.val_neg_edge_index)
     test_loss, test_acc = test(data.test_pos_edge_index, data.test_neg_edge_index)
@@ -283,7 +284,7 @@ import onnx
 import numpy as np
 import json
 
-model = onnx.load('sage_link_model.onnx')
+model = onnx.load('./sage_link_model.onnx')
 
 weights = {}
 
@@ -328,10 +329,13 @@ for k in keys:
     d = np.array(data[k])
     print(k,d.shape)
 
-# All keys: {'conv1.bias', 'onnx::MatMul_196', 'onnx::MatMul_199', 'conv2.bias'}
-# conv1.bias (64,)
-# onnx::MatMul_196 (128, 64)
-# onnx::MatMul_199 (64, 64)
-# conv2.bias (64,)
+# All keys: {'conv1.lin_l.weight', 'conv2.lin_l.weight', 'onnx::MatMul_132', 'conv2.lin_l.bias', 'onnx::MatMul_135', 'conv1.lin_l.bias'}
+# conv1.lin_l.weight (64, 128)
+# conv2.lin_l.weight (64, 64)
+# onnx::MatMul_132 (128, 64)
+# conv2.lin_l.bias (64,)
+# onnx::MatMul_135 (64, 64)
+# conv1.lin_l.bias (64,)
 
 
+# %%

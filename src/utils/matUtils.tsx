@@ -19,7 +19,9 @@ import {
     outputVisClick,
     resultRectMouseover,
     resultRectMouseout,
-    resultVisMouseEvent
+    resultVisMouseEvent,
+    featureGATClick,
+    featureSAGEClick
 } from "./matEventsUtils";
 import { drawPoints } from "./utils";
 import { AnimationController, computeMatrixLocations, drawAniPath, drawBiasPath, drawBiasVector, drawPathBtwOuputResult, drawPathInteractiveComponents, drawWeightMatrix, drawWeightsVector } from "./matAnimateUtils";
@@ -1104,7 +1106,8 @@ export function visualizeLinkClassifierFeatures(
     adjList: any,
     maxVals: any,
     featureKeys: number[],
-    featureKeysEachLayer: number[][]
+    featureKeysEachLayer: number[][],
+    innerComputationMode: string = "GCN"
     // trainingNodes: number[]
 ) {
     //--------------------------------DATA PREP MANAGEMENT--------------------------------
@@ -1198,7 +1201,8 @@ export function visualizeLinkClassifierFeatures(
         maxVals,
         featureChannels,
         featureKeys,
-        featureKeysEachLayer
+        featureKeysEachLayer,
+        innerComputationMode
     );
     locations = GCNConvPackage.locations;
     frames = GCNConvPackage.frames;
@@ -1352,34 +1356,69 @@ export function visualizeLinkClassifierFeatures(
             //translate each layer
             const layerID = Number(d3.select(this).attr("layerID")) - 1;
             const node = Number(d3.select(this).attr("node"));
-            const featureVisPack = featureVisClick(
-                layerID,
-                node,
-                recordLayerID,
-                colorSchemesTable,
-                adjList,
-                featureVisTable,
-                features,
-                conv1,
-                conv2,
-                bias,
-                myColor,
-                weights,
-                lock,
-                setIntervalID,
-                featureChannels,
-                15,
-                5,
-                90,
-                128,
-                2.5,
-            );
-            // update variables
-            recordLayerID = featureVisPack.recordLayerID;
-            colorSchemesTable = featureVisPack.colorSchemesTable;
-            featureVisTable = featureVisPack.featureVisTable;
-            features = featureVisPack.features;
-            intervalID = featureVisPack.getIntervalID();
+            if(innerComputationMode == "GCN"){
+                const featureVisPack = featureVisClick(
+                    layerID,
+                    node,
+                    recordLayerID,
+                    colorSchemesTable,
+                    adjList,
+                    featureVisTable,
+                    features,
+                    conv1,
+                    conv2,
+                    bias,
+                    myColor,
+                    weights,
+                    lock,
+                    setIntervalID,
+                    featureChannels,
+                    15,
+                    5,
+                    90,
+                    128,
+                    2.5,
+                );
+                // update variables
+                recordLayerID = featureVisPack.recordLayerID;
+                colorSchemesTable = featureVisPack.colorSchemesTable;
+                featureVisTable = featureVisPack.featureVisTable;
+                features = featureVisPack.features;
+                intervalID = featureVisPack.getIntervalID();
+            } else if(innerComputationMode == "GAT"){
+                const featureVisPack = featureGATClick(
+                    layerID,
+                    node,
+                    recordLayerID,
+                    colorSchemesTable,
+                    adjList,
+                    featureVisTable,
+                    features,
+                    conv1,
+                    conv2,
+                    bias,
+                    myColor,
+                    weights,
+                    lock,
+                    setIntervalID,
+                    featureChannels,
+                    15,
+                    5,
+                    90,
+                    128,
+                    2.5,
+                );
+                // update variables
+                recordLayerID = featureVisPack.recordLayerID;
+                colorSchemesTable = featureVisPack.colorSchemesTable;
+                featureVisTable = featureVisPack.featureVisTable;
+                features = featureVisPack.features;
+                intervalID = featureVisPack.getIntervalID();
+                
+            } else if(innerComputationMode == "SAGE"){
+                const featureVisPack = featureSAGEClick(layerID, 90, featureChannels);
+            }
+            
 
             //path connect - connect intermediate feature vis to current feature vis
 
@@ -1448,6 +1487,9 @@ export function visualizeLinkClassifierFeatures(
             //recover necesary components
             d3.selectAll("#layerNum_2").style("opacity", 1);
             d3.selectAll(".featureVis[layerID='2']").style("opacity", 1);
+
+            //visualize the inner computation process
+            
             
         }
     });
