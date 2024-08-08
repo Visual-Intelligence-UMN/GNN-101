@@ -1422,6 +1422,7 @@ export function visualizeLinkClassifierFeatures(
             
 
             //path connect - connect intermediate feature vis to current feature vis
+            
 
         }
     });

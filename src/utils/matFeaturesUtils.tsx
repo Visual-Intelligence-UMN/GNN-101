@@ -1685,23 +1685,34 @@ export function drawResultVisForLinkModel(
     //add a featureVisualizer
     const featureVisualizer = g.append("g");
     
-    for(let i=0; i<2; i++){
-        featureVisualizer.append("rect")
-            .attr("x", featureX + i * 15)
-            .attr("y", midYForFeature-15/2)
-            .attr("width", 15)
-            .attr("height", 15)
-            .attr("fill", myColor(probs[i]))
-            .attr("stroke", "black")
-            .attr("stroke-width", 0.1)
-            .attr("class", "resultVis")
-            .attr("id", `resultRect${i}`);
-    }
+  //  for(let i=0; i<2; i++){
+    featureVisualizer.append("rect")
+        .attr("x", featureX)
+        .attr("y", midYForFeature-15/2)
+        .attr("width", 15)
+        .attr("height", 15)
+        .attr("fill", myColor(trueProb))
+        .attr("stroke", "black")
+        .attr("stroke-width", 0.1)
+        .attr("class", "resultVis")
+        .attr("id", `resultRect`);
+//    }
+
+    //add result label
+    let result = "True";
+    if(trueProb<0.5)result = "False";
+    const resultLabel = g.append("text")
+                        .attr("x", featureX+20)
+                        .attr("y", midYForFeature+5)
+                        .text(result)
+                        .style("fill", "gray")
+                        .style("font-size", "12px");
+
 
     g.append("rect")
         .attr("x", featureX)
         .attr("y", midYForFeature-15/2)
-        .attr("width", 30)
+        .attr("width", 15)
         .attr("height", 15)
         .attr("fill", "none")
         .attr("stroke", "black")
