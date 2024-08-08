@@ -184,7 +184,7 @@ export function drawGraphVisWeightVector(weightMatrixPositions: number[][][], re
                             .attr("id", `columnUnit-${j}`);
 
 }
-export function displayerHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], i: number, mode: number, isOutput: boolean) {
+export function displayerHandler(node: any, aggregatedData: any, calculatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], i: number, mode: number, isOutput: boolean) {
 
                 if (!g.selectAll) {
                     g = d3.selectAll(g)
@@ -376,7 +376,7 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
                 .attr("width", 7)
                 .attr("height", 7)
                 .attr("class", `math-displayer`)
-                .style("fill", myColor(node.features[i]))
+                .style("fill", myColor(calculatedData[i]))
                 .style("stroke-width", 0.1)
                 .style("stroke", "grey")
                 .style("opacity", 1);
@@ -384,7 +384,7 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
                 g.append("text")
                 .attr("x", 70 - 30 + 80)
                 .attr("y", displayHeight - 10 - 5)
-                .text(roundToTwo(node.features[i]))
+                .text(roundToTwo(calculatedData[i]))
                 .attr("class", "math-displayer")
                 .attr("font-size", "3");
 
@@ -397,7 +397,7 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
     }
 
 
-export function hoverOverHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], Xt: any, startCoordList: any, endCoordList: any, svg: any, mode: number, isOutput: boolean) {
+export function hoverOverHandler(node: any, aggregatedData: any, calculatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], Xt: any, startCoordList: any, endCoordList: any, svg: any, mode: number, isOutput: boolean) {
 
     
 
@@ -412,7 +412,7 @@ export function hoverOverHandler(node: any, aggregatedData: any, state: State, g
                 d3.selectAll(".calculatedRect").style("opacity", 0.2)
                 d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1)
                 d3.selectAll(`#tempath${i}`).style("opacity", 1);
-                displayerHandler(node, aggregatedData, state, g, displayHeight, rectL, wmRectL, myColor, weights, index, weightsLocation, i, mode, isOutput)
+                displayerHandler(node, aggregatedData, calculatedData, state, g, displayHeight, rectL, wmRectL, myColor, weights, index, weightsLocation, i, mode, isOutput)
 
 
 
