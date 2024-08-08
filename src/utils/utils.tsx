@@ -326,6 +326,7 @@ export type NodeType = {
   name: string;
   features: number[];
   is_aromatic: boolean;
+  original_id: string
 };
 
 export type LinkType = {
@@ -422,7 +423,8 @@ export async function data_prep(o_data: any) {
         id: i,
         name: node_name,
         features: nodes[i],
-        is_aromatic: is_aromatic
+        is_aromatic: is_aromatic,
+        original_id: "Unknown"
       }
       final_data.nodes.push(new_node);
     }
@@ -467,7 +469,8 @@ export async function prep_graphs(g_num: number, data: any) {
       id: 0,
       name: " ",
       features: [0],
-      is_aromatic: false
+      is_aromatic: false,
+      original_id: "Unknown"
     } 
 
     var node_array = [];
@@ -1092,12 +1095,15 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
         let xOffset1 = (graphIndex - 2.5) * offset;
         let xOffset2 = (graphIndex - 1.5) * offset;
 
+
       let conv = 3;
       // if (mode === 1) {
       //   conv = 4;
         
       // }
       if (mode === 2) {
+        xOffset1 = (graphIndex - 3.5) * offset;
+        xOffset2 = (graphIndex - 2.5) * offset;
         conv = 2
       }
       if (graphIndex < conv) { 
@@ -1125,6 +1131,8 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
               const controlX2 = node.x + xOffset1 + (neighborNode.x + xOffset2 - node.x - xOffset1) * 0.2;
               const controlY2 = neighborNode.y + 10;
               const avg = calculateAverage(node.features)
+              let neighborOffset = (neighborNode.graphIndex - 2.5) * offset
+              if (mode === 2) {neighborOffset -= offset}
 
               const path = svg.append("path")
                 .attr("d", 
@@ -1136,7 +1144,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
                   ${controlY1}, 
                   ${controlX2} 
                   ${controlY2}, 
-                  ${neighborNode.x + (neighborNode.graphIndex - 2.5) * offset - 16} 
+                  ${neighborNode.x + neighborOffset - 16} 
                   ${neighborNode.y + 10}
                 `)
                 .style("stroke", linkStrength(avg))
@@ -1156,7 +1164,9 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
           if (nextNode) {
           nextNode.forEach((nextNode: any) => {
             if (node.id === nextNode.id) {
-              const xOffsetNext = (graphIndex + 1 - 2.5) * offset;
+              let xOffsetNext = (graphIndex + 1 - 2.5) * offset;
+              if (mode === 2) {xOffsetNext -= offset}
+
 
               const controlX1 = node.x + xOffset1 + (nextNode.x + xOffsetNext - node.x - xOffset1) * 0.3;
               const controlY1 = node.y + 10;
@@ -1193,7 +1203,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
       
         
       } else {  
-        if (mode === 1 || mode === 2) {
+        if (mode === 1) {
           if (graphIndex === 2) {
             const nextLayerNodes = nodesByIndex.get(graphIndex + 1);
           if (nextLayerNodes) {
@@ -1235,6 +1245,11 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
           if (graphIndex === 3) {
             xOffset1 = (graphIndex - 2.5) * offset;
             
+          }
+          if (mode === 2) {
+            xOffset1 = xOffset1 - offset + 150
+            xOffset2 = xOffset2 - offset + 100
+
           }
           
           

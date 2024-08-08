@@ -18,6 +18,7 @@ import { buildBinaryLegend, buildLegend } from "@/utils/matHelperUtils";
 import { findAbsMax } from "@/utils/matNNVis";
 import { injectSVG } from "@/utils/svgUtils";
 import { dataProccessGraphVisLinkPrediction } from "@/utils/GraphvislinkPredUtil";
+import { linkPredFeatureVisualizer } from "@/utils/linkPredGraphVisUtil";
 
 
 
@@ -86,7 +87,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
 
       graphs.forEach((data, i) => {
 
-        let xOffset = (i - 2.5) * offset;
+        let xOffset = (i - 3.5) * offset;
         const g1 = svg
           .append("g")
           .attr("class", "layerVis")
@@ -117,7 +118,8 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
           .text((d: any) => d.id)
           .attr("font-size", `12px`)
           .attr("text-anchor", "middle")
-          .attr("dominant-baseline", "central");
+          .attr("dominant-baseline", "central")
+          .attr("opacity", 0)
 
 
 
@@ -155,14 +157,29 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
         function updatePositions() {
 
 
+          let value:number[] = [];
+          if (intmData != null) {
+            if (i === 1) {
+              value = intmData.conv1;
+            }
+            if (i === 2) {
+              value = intmData.conv2;
+            }
+            if (i === 3) {
+              value = intmData.prob_adj;
+            }
+          }
+
+
           data.nodes.forEach((node: any) => {
             node.graphIndex = i;
-            // if (value != null && i <= 4 && value instanceof Float32Array) {
-            //   node.features = value.subarray(
-            //     64 * node.id,
-            //     64 * (node.id + 1)
-            //   );
-            // }
+            if (value != null && i <= 3 && value instanceof Float32Array) {
+               node.features = value.subarray(
+                64 * node.id,
+                64 * (node.id + 1)
+              );
+            }
+
             allNodes.push(node);
           })
 
@@ -185,6 +202,70 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
   point3 = { x: 3.9 * offset + widthPadding, y: height / 1.7 + heightPadding};
   point4 = { x: 4.0 * offset - widthPadding, y: height / 1.5 + heightPadding};
   }
+
+
+  let x_dist = Math.abs(point1.x - point2.x);
+  let y_dist = Math.abs(point1.y - point4.y)
+  let centerX = (point1.x + point3.x) / 2;
+  let centerY = (point1.y + point3.y) / 2;
+  const text_x = point1.x
+  let text_y = point4.y;
+
+
+  let featureCoords = [{ x: 0, y: 0 }, { x: 0, y: 0 }];
+          if (i == 4) {
+            featureCoords[0] = { x: centerX, y: centerY };
+          }
+          if (i == 5) {
+            featureCoords[1] = {x: centerX, y: centerY};
+          }
+
+
+          let text = " ";
+          if (i == 0) {
+            text = "Input"
+          }
+          if (i <= 2 && i != 0) {
+            text = `GCNConv${i}`
+          }
+          if (i === 3) {
+            text = "Prediction Result"
+          }
+
+
+          if (graph_path === "./json_data/graphs/input_graph0.json") {
+            text_y += 80;
+          }
+          const textElement = g1.append("text")
+            .attr("class", "layer-label")
+            .attr("x", text_x)
+            .attr("y", text_y)
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "central")
+            .attr("fill", "black")
+            .attr("font-size", "15px")
+            .text(text)
+            .attr("font-weight", "normal")
+            .attr('opacity', 0.5);
+
+            const absMax = findAbsMax(allNodes[0].features);
+
+
+           let cst:any = null;
+          let cstOffset = 25;
+ 
+
+          if(i==0){
+            cst = buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x, text_y + cstOffset, g1)
+          }
+          else if(i==5){
+            cst = buildBinaryLegend(myColor, value[0], value[1], text+" Color Scheme", text_x, text_y + cstOffset, g1)
+          }
+          else {
+            cst = buildLegend(myColor, absMax, text+" Color Scheme", text_x - 50, text_y + cstOffset, g1);
+          }
+
+          colorSchemes.push(cst);
 
 
 
@@ -210,7 +291,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
               .attr("opacity", 0);
   
               if (intmData) {
-                featureVisualizer(svg, allNodes, offset, height, graphs, 900, 600, 15, 10, 3, 20, colorSchemes, 0);
+                linkPredFeatureVisualizer(svg, allNodes, offset, height, graphs, 900, 600, 15, 10, 3, 20, colorSchemes, 2);
               }
             }
         }

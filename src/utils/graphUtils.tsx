@@ -842,7 +842,7 @@ export function calculationVisualizer(
         .delay(3500)
         .style("opacity", 1);
 
-    for (let i = 0; i < 64; i++) {
+    for (let i = 0; i < node.relatedNodes[0].features.length; i++) {
         let s: [number, number] = [
             node.graphIndex * offset +
             i * prevRectHeight +
@@ -909,7 +909,8 @@ export function calculationVisualizer(
         .style("stroke-width", 1)
         .style("opacity", 0);
 
-    for (let i = 0; i < 64; i++) {
+        
+    for (let i = 0; i < node.features.length; i++) {
         let s: [number, number] = [
             node.graphIndex * offset +
             i * rectHeight +
@@ -1211,8 +1212,7 @@ export function calculationVisualizer(
                         d3.selectAll(".softmaxLabel").attr("opacity", 1);
                         d3.selectAll(".intermediate-path").attr("opacity", 0);
                         d3.selectAll(".aniRect").style("opacity", 1);
-             
-
+            
         // relu
         const relu = g3.append("g");
         let svgPath = "./assets/SVGs/ReLU.svg";
@@ -1492,7 +1492,8 @@ function weightAnimation(
 
         }
     }
-
+    console.log("start:", startCoordList)
+    console.log("end:", endCoordList)
 
 
 
@@ -1598,7 +1599,7 @@ function weightAnimation(
 
 
                 
-                graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg)
+                graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode)
 
                 d3.selectAll(`#weightUnit-${i - 1}`).style("opacity", 0.3).lower();
                 d3.selectAll(`#columnUnit-${i - 1}`).style("opacity", 0).lower();
@@ -1793,7 +1794,7 @@ export function matrixMultiplication(matrix_a: any[], matrix_b: any[]) {
     const colsB = matrix_b[0].length;
 
     if (colsA !== rowsB) {
-
+console.log("not match")
 
 
         return [];

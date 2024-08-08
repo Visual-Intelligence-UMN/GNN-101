@@ -14,9 +14,8 @@ export function graphVisDrawMatrixWeight(
     weightMatrixPostions:any,
     featureChannels: number,
     g: any,
-    id:string = "tempath",
-    mode:string = "normal"
-
+    mode: number,
+    id:string = "tempath"
 ){
     if (!g.selectAll) {
         g = d3.select(g)
@@ -215,9 +214,9 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
                 }
 
 
-                console.log('weights matrix is', weightMat, 'at index', index, 'and i is', i, 'which means the column selected is', weightMat[i])
+
                 for (let j = 0; j < weightMat[i].length; j++) {
-                    console.log(j)
+             
                     g.append("rect")
                     .attr("x", 130)
                     .attr("y", 20 + wmRectL * j)
@@ -407,8 +406,12 @@ export function hoverOverHandler(node: any, aggregatedData: any, state: State, g
                 if (!state.isClicked || state.isPlaying) {
                     return;
                 }
-                console.log('Xt', Xt)
-                graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg)
+               
+                if (mode === 2 && node.graphIndex === 1) {
+                    graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, 1, i, myColor, weightsLocation, node.features.length, svg, mode)
+                } else {
+                    graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode)
+                }
                 d3.selectAll(".calculatedRect").style("opacity", 0.2)
                 d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1)
                 d3.selectAll(`#tempath${i}`).style("opacity", 1);

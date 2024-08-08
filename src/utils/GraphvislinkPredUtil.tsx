@@ -2,6 +2,7 @@ import { deepClone, get_features_origin, graph_to_matrix, linkPrediction, LinkTy
 import { getNodeSet } from "@/utils/linkPredictionUtils";
 import { error } from "console";
 import { extractSubgraph } from "./graphDataUtils";
+import { sources } from "next/dist/compiled/webpack/webpack";
 
 
 // this function transfrom the raw graph
@@ -80,11 +81,13 @@ export async function dataProccessGraphVisLinkPrediction(graph_path: any, hubNod
         };
         for (const key in subGraph) {
             let node_name = "Unknown";
+            const features: number[] = data.x[key];
             var new_node = {
               id: nodeMapping[Number(key)],
               name: node_name,
-              features: subGraph[key],
-              is_aromatic: false
+              features: features,
+              is_aromatic: false,
+              original_id: key,
             }
             final_data.nodes.push(new_node);
         }
@@ -96,17 +99,37 @@ export async function dataProccessGraphVisLinkPrediction(graph_path: any, hubNod
 
 
 
+        var new_node = {
+            id: 0,
+            name: "Unknown",
+            features: [0],
+            is_aromatic: false,
+            original_id: "0",
+          }
+        var new_relation = {
+            source: 0,
+            target: 0,
+            type: "single"
+        }
 
+        let final_data3 = {
+            nodes: [] as NodeType[],
+            links: [] as LinkType[],
+        };
+        final_data3.nodes.push(new_node)
+        final_data3.links.push(new_relation)
 
 
         result.push(final_data)
         result.push(final_data1)
         result.push(final_data2)
+        result.push(final_data3)
+
+
 
 
 
 // to-do: add the last layer
-
 
 
         return result;
