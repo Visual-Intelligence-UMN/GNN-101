@@ -82,8 +82,14 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
         .attr("class", "gvis");
 
         //TODO: put the hint label position into the injection function, using class attr for the interactions
-     const gLabel = d3.select(".gvis").append("g");
-     injectSVG(gLabel, location[0].x-1650-64, location[0].y-120-64, "./assets/SVGs/interactionHint.svg", "hintLabel");
+        const gLabel = d3.select(".gvis").append("g").attr("class", "hintLabel");
+
+        if (graph_path === "./json_data/graphs/input_graph0.json") {
+         injectSVG(gLabel, location[3].x-1650-64 + offset, location[3].y-120-64, "./assets/SVGs/interactionHint.svg", "hintLabel");
+       } else {
+         injectSVG(gLabel, location[0].x-1650-64 + offset, location[0].y-120-64, "./assets/SVGs/interactionHint.svg", "hintLabel");
+       }
+   
      
 
 
@@ -326,7 +332,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             transform = `scale(1, 1)`;
           } 
           const text_x = point1.x
-          const text_y = point4.y;
+          let text_y = point4.y;
           if (i >= 4) {
             point1.y -= 130;
             point2.y -= 130;
@@ -350,6 +356,10 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           }
           if (i == 5) {
             featureCoords[1] = {x: centerX, y: centerY};
+          }
+
+          if (graph_path === "./json_data/graphs/input_graph0.json") {
+            text_y += 80;
           }
 
 
@@ -413,7 +423,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
             if (intmData) {
 
-              featureVisualizer(svg, allNodes, offset, height, graphs, 900, 600, 15, 10, 3, 20, colorSchemes, 0); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
+              featureVisualizer(svg, allNodes, offset, height, graphs, 700, 900, 600, 15, 10, 3, 20, colorSchemes, 0); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
               //function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, graphs: any[], moveOffset: number, fcLayerMoveOffset: number, rectWidth: number, firstLayerRectHeight: number, rectHeight: number, outputLayerRectHeight: number)
             }
 
