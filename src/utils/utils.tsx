@@ -561,6 +561,7 @@ export function featureVisualizer(
   offset: number, 
   height: number, 
   graphs: any[], 
+  firstLayerMoveOffset: number,
   moveOffset: number, 
   fcLayerMoveOffset: number, 
   rectWidth: number, 
@@ -787,15 +788,22 @@ export function featureVisualizer(
 
         let prevRectHeight;
  
-
+        let currMoveOffset = moveOffset;
         if (graphIndex === 1) {
           prevRectHeight = firstLayerRectHeight;
+          currMoveOffset = firstLayerMoveOffset
         } else {
           prevRectHeight = rectHeight;
         }
+
+        if (mode === 1 && graphIndex === 4) {
+          currMoveOffset = fcLayerMoveOffset;
+
+        } 
  
 
-        let currMoveOffset = moveOffset;
+    
+        
 
 
       //the bottom of the featureGroup 
@@ -887,6 +895,7 @@ export function featureVisualizer(
           
         
         let currMoveOffset = fcLayerMoveOffset;
+
 
 
 

@@ -385,7 +385,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
 
 
             if (intmData && intmData.final) {
-              featureVisualizer(svg, allNodes, offset, height, graphs, 900, 600, 15, 10, 20, 20, colorSchemes, 1); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
+              featureVisualizer(svg, allNodes, offset, height, graphs, 1100, 600, 800, 15, 10, 20, 20, colorSchemes, 1); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
             }
 
           }
