@@ -1407,6 +1407,7 @@ export function visualizeLinkClassifierFeatures(
                     90,
                     128,
                     2.5,
+                    featureKeysEachLayer
                 );
                 // update variables
                 recordLayerID = featureVisPack.recordLayerID;
