@@ -1549,7 +1549,7 @@ export function visualizeLinkClassifierFeatures(
             let resultVisPos = deepClone(endingPoint);
             resultVisPos[0] += 150;
             
-            drawPoints(".mats", "red", [resultVisPos]);
+            // drawPoints(".mats", "red", [resultVisPos]);
 
             g.append("line")
                 .attr("x1", endingPoint[0])
@@ -1561,13 +1561,23 @@ export function visualizeLinkClassifierFeatures(
                 .attr("class", "procVis");
 
             //TODO: add data fetching for dot product result
+            const hubNodeA = featureKeysEachLayer[2][0];
+            const hubNodeB = featureKeysEachLayer[2][1];
+
+            const featureInvolvedCOmputingA = Array.prototype.slice.call(conv2[hubNodeA]);
+            const featureInvolvedCOmputingB = Array.prototype.slice.call(conv2[hubNodeB]);
+
+            console.log("result vis comp", hubNodeA, hubNodeB, featureInvolvedCOmputingA, featureInvolvedCOmputingB);
+            
+            const math = create(all, {});
+            const resultVal = math.dot(featureInvolvedCOmputingA, featureInvolvedCOmputingB);
 
             g.append("rect")
                 .attr("x", resultVisPos[0])
                 .attr("y", resultVisPos[1]-7.5)
                 .attr("width", 15)
                 .attr("height", 15)
-                .attr("fill", "red")
+                .attr("fill", myColor(resultVal))
                 .attr("stroke", "black")
                 .attr("class", "dotResult procVis");
 
@@ -1576,7 +1586,7 @@ export function visualizeLinkClassifierFeatures(
                 .attr("y1", resultVisPos[1])
                 .attr("x2", resultVisPos[0]+100)
                 .attr("y2", resultVisPos[1])
-                .attr("stroke", "black")
+                .attr("stroke", myColor(resultVal))
                 .attr("stroke-width", 1)
                 .attr("class", "procVis")
                 .lower();
