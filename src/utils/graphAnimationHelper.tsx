@@ -14,9 +14,9 @@ export function graphVisDrawMatrixWeight(
     weightMatrixPostions:any,
     featureChannels: number,
     g: any,
-    id:string = "tempath",
-    mode:string = "normal"
-
+    mode: number,
+    node: any,
+    id:string = "tempath"
 ){
     if (!g.selectAll) {
         g = d3.select(g)
@@ -28,7 +28,6 @@ export function graphVisDrawMatrixWeight(
 
     
     if(Xt[0].length!=Xt.length){
-        //weightMatrixPostions = transposeAnyMatrix(weightMatrixPostions);
         flag = false;
 
         const math = create(all, {});
@@ -52,22 +51,24 @@ export function graphVisDrawMatrixWeight(
 
         if(curveDir==1){
             s1 = startCoordList[startCoordList.length - j - 1];
-         e1 = endCoordList[currentStep];
+            e1 = endCoordList[currentStep];
         }
+        
+
 
         let m1 = [0,0];
-        // if(flag){
-        //     m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+        if(flag){
+             m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
 
-        // }else{
-        //     m1 = weightMatrixPostions[currentStep][weightMatrixPostions[0].length-1-j];
-        // }
+        }else{
+             m1 = weightMatrixPostions[currentStep][weightMatrixPostions[0].length-1-j];
+        }
 
-        // if(Xt[0].length==64 && Xt.length==2){
-        //     m1 = weightMatrixPostions[currentStep][j];
-        // }else{
-        //     m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
-        // }
+        if(Xt[0].length==64 && Xt.length==2){
+            m1 = weightMatrixPostions[currentStep][j];
+        }else{
+            m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+        }
         
         
 
@@ -93,7 +94,6 @@ export function graphVisDrawMatrixWeight(
 
         if(Xt.length==Xt[0].length || (Xt.length==64 && Xt[0].length==7)){
             m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
-                
 
             changed = true;
         }
@@ -101,8 +101,7 @@ export function graphVisDrawMatrixWeight(
         if(Xt.length==Xt[0].length && Xt.length==4){
             if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
             else m1 = weightMatrixPostions[j][currentStep]
-                
-
+   
             changed = true;
         }
 
@@ -110,18 +109,26 @@ export function graphVisDrawMatrixWeight(
             if((Xt[0].length<Xt.length && Xt.length!=64)||(Xt[0].length==64&&Xt.length==2)
             ||(Xt[0].length==34&&Xt.length==4)
             ||(Xt.length==34&&Xt[0].length==4)){
+       
                 if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
                 else m1 = weightMatrixPostions[j][currentStep]
                 
 
             }
             else{
-                if(curveDir==-1)m1 = weightMatrixPostions[j][currentStep]
+    
+                if(curveDir==-1) { 
+                    m1 = weightMatrixPostions[j][currentStep] 
+                    if (mode === 2 && node.graphIndex === 1) {
+                        m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+                    } 
+                }
                 else m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
 
 
             }
         }
+        
 
         let controlPoint1 = [s1[0], m1[1]];
         let controlPoint2 = [e1[0], m1[1]];
@@ -185,13 +192,14 @@ export function drawGraphVisWeightVector(weightMatrixPositions: number[][][], re
                             .attr("id", `columnUnit-${j}`);
 
 }
-export function displayerHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], i: number) {
+export function displayerHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], i: number, mode: number, isOutput: boolean) {
 
                 if (!g.selectAll) {
                     g = d3.selectAll(g)
                 }
 
                 d3.select(".graph-displayer").attr("opacity", 1);
+                console.log('weight before transformations', weights)
 
 
                 d3.selectAll(".weightUnit").style("opacity", 0.3);
@@ -201,31 +209,36 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
                 
 
         
-            
                 let weightMat = weights[index]
-            
-                if (index === 0) {
-                    const math = create(all, {});
-                    weightMat = math.transpose(weightMat);
+                const math = create(all, {});   
+                weightMat = math.transpose(weightMat);
+                if (mode === 1) {
+                    if (index !== 1 && !isOutput) {
+                        weightMat = weightMat.map((row: any) => row.reverse());
+                    } else {
+                        weightMat = weightMat.slice().reverse()
+                    }
+                } else if (mode === 0) {
+                    weightMat = weightMat.slice().reverse()
                 }
 
 
 
-            
-                for (let j = 0; j < weightMat[i].length; j++)
-                g.append("rect")
-                                        .attr("x", 130)
-                                        .attr("y", 20 + wmRectL * j)
-                                        .attr("width", 7)
-                                        .attr("height", wmRectL)
-                                        .attr("fill", myColor(weightMat[i][j]))
-                                        .attr("stroke", "gray")
-                                        .attr("stroke-width", 0.1)
-                                        .attr("opacity", 1)
-                                        .attr("class", "columnUnit math-displayer")
-                                        .attr("id", `columnUnit-${j}`)
-                                        .style("opacity", 1)
-
+                for (let j = 0; j < weightMat[i].length; j++) {
+             
+                    g.append("rect")
+                    .attr("x", 130)
+                    .attr("y", 20 + wmRectL * j)
+                    .attr("width", 7)
+                    .attr("height", wmRectL)
+                    .attr("fill", myColor(weightMat[i][j]))
+                    .attr("stroke", "gray")
+                    .attr("stroke-width", 0.1)
+                    .attr("opacity", 1)
+                    .attr("class", "columnUnit math-displayer")
+                    .attr("id", `columnUnit-${j}`)
+                    .style("opacity", 1)
+                }
                 const featureGroup = g.append("g")
                 .attr("transform", `translate(${70}, ${displayHeight - 40})`);
 
@@ -392,21 +405,26 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
     }
 
 
-export function hoverOverHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], Xt: any, startCoordList: any, endCoordList: any, svg: any) {
+export function hoverOverHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], Xt: any, startCoordList: any, endCoordList: any, svg: any, mode: number, isOutput: boolean) {
 
     
 
     for (let i = 0; i < node.features.length; i++) {
         d3.select(`.calculatedFeatures${i}`)
             .on("mouseover", function () {
-                if (!state.isClicked) {
+                if (!state.isClicked || state.isPlaying) {
                     return;
                 }
-                graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg)
+               
+                if (mode === 2 && node.graphIndex === 1) {
+                    graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode, node)
+                } else {
+                    graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode, node)
+                }
                 d3.selectAll(".calculatedRect").style("opacity", 0.2)
                 d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1)
                 d3.selectAll(`#tempath${i}`).style("opacity", 1);
-                displayerHandler(node, aggregatedData, state, g, displayHeight, rectL, wmRectL, myColor, weights, index, weightsLocation, i)
+                displayerHandler(node, aggregatedData, state, g, displayHeight, rectL, wmRectL, myColor, weights, index, weightsLocation, i, mode, isOutput)
 
 
 
@@ -416,7 +434,7 @@ export function hoverOverHandler(node: any, aggregatedData: any, state: State, g
 
     })
             .on("mouseout", function () {
-                if (!state.isClicked) {
+                if (!state.isClicked || state.isPlaying) {
                     return;
                 }
                 d3.selectAll(".math-displayer").remove();

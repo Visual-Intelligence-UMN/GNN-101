@@ -80,8 +80,17 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
         .attr("class", "gvis");
 
         //TODO: put the hint label position into the injection function, using class attr for the interactions
-     const gLabel = d3.select(".gvis").append("g");
-     injectSVG(gLabel, location[0].x-1650-64, location[0].y-120-64, "./assets/SVGs/interactionHint.svg", "hintLabel");
+     const gLabel = d3.select(".gvis").append("g").attr("class", "hintLabel");
+
+     if (graph_path === "./json_data/graphs/input_graph0.json") {
+      injectSVG(gLabel, location[3].x-1650-64 + offset, location[3].y-120-64, "./assets/SVGs/interactionHint.svg", "hintLabel");
+    } else {
+      injectSVG(gLabel, location[0].x-1650-64 + offset, location[0].y-120-64, "./assets/SVGs/interactionHint.svg", "hintLabel");
+    }
+
+
+     
+
      
 
 
@@ -91,6 +100,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
 
       graphs.forEach((data, i) => {
+        
 
 
 
@@ -280,6 +290,12 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             allNodes.push(node);
           });
 
+          data.nodes.forEach((node: any) => {
+            console.log("i",i)
+            console.log(node.x)
+  
+          })
+
           
           let maxXDistance = 0;
           let maxYDistance = 0;
@@ -324,7 +340,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             transform = `scale(1, 1)`;
           } 
           const text_x = point1.x
-          const text_y = point4.y;
+          let text_y = point4.y;
           if (i >= 4) {
             point1.y -= 130;
             point2.y -= 130;
@@ -364,6 +380,11 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           if (i === 5) {
             text = "Prediction Result"
           }
+
+
+          if (graph_path === "./json_data/graphs/input_graph0.json") {
+            text_y += 80;
+          }
           const textElement = g1.append("text")
             .attr("class", "layer-label")
             .attr("x", text_x)
@@ -380,7 +401,9 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
 
            let cst:any = null;
-          const cstOffset = 25;
+          let cstOffset = 25;
+ 
+
           if(i==0){
             cst = buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x, text_y + cstOffset, g1)
           }
