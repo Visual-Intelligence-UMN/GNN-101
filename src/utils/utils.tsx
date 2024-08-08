@@ -533,6 +533,7 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
   if (!movedNode || !state.isClicked) {
     return;
   }
+  d3.selectAll(".hintLabel").attr("opacity", 1);
 
   if (movedNode && (!event.target.classList.contains("vis-component"))) {
     svg.selectAll(".vis-component").style("opacity", 0);
@@ -839,6 +840,7 @@ export function featureVisualizer(
               return;
             }
             state.isClicked = true;
+            d3.selectAll(".hintLabel").attr("opacity", 0);
 
                     //  // prevent clicking on other nodes and move the layers to the right again
                     //  if (movedNode === node) {
@@ -1001,6 +1003,7 @@ export function featureVisualizer(
                 link.style("opacity", 0);
               });
             }
+       
           }
         });
         node.featureGroup.on("click", function(event: any) {
@@ -1010,6 +1013,7 @@ export function featureVisualizer(
             return;
           }
           state.isClicked = true;
+          d3.selectAll(".hintLabel").attr("opacity", 0);
 
 
 
@@ -1203,7 +1207,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
                   .attr("y2", nextNode.y + 10)
                   .style("stroke", linkStrength(avg))
                   .style("stroke-width", 1)
-                  .style("opacity", 0.1)
+                  .style("opacity", 0)
                   .style("fill", "none");
 
                 if (!nextNode.links) {
@@ -1246,7 +1250,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
             const path = svg.append("path")
               .attr("d", `M ${node.x + xOffset1} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 20} ${nextNode.y + 10}`)
               .style("stroke", linkStrength(avg))
-              .style("opacity", 0.1)
+              .style("opacity", 0)
               .style('stroke-width', 1)
               .style("fill", "none");
            
