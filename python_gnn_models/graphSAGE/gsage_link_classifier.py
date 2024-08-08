@@ -329,13 +329,11 @@ for k in keys:
     d = np.array(data[k])
     print(k,d.shape)
 
-# All keys: {'conv1.lin_l.weight', 'conv2.lin_l.weight', 'onnx::MatMul_132', 'conv2.lin_l.bias', 'onnx::MatMul_135', 'conv1.lin_l.bias'}
-# conv1.lin_l.weight (64, 128)
-# conv2.lin_l.weight (64, 64)
-# onnx::MatMul_132 (128, 64)
-# conv2.lin_l.bias (64,)
-# onnx::MatMul_135 (64, 64)
-# conv1.lin_l.bias (64,)
+# All keys: {'conv1.weight', 'conv2.bias', 'conv2.weight', 'conv1.bias'}
+# conv1.weight (256, 64)
+# conv2.bias (64,)
+# conv2.weight (128, 64)
+# conv1.bias (64,)
 
 
 # %%

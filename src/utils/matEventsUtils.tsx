@@ -31,6 +31,7 @@ import {
 import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import { drawMatmulExplanation, drawSoftmaxDisplayer } from "./matInteractionUtils";
 import path from "node:path/win32";
+import { computeAttentionCoefficient, testCompute } from "./computationUtils";
 
 //graph feature events interactions - mouseover
 export function oFeatureMouseOver(
@@ -1238,6 +1239,7 @@ export function featureGATClick(
     oRectW:number,
     activation: string = "relu"
 ){
+    testCompute();
     let biasCoord: [number, number];
     let res10: [number, number];
     let res11: [number, number];
