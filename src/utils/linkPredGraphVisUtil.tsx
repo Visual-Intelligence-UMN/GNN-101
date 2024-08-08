@@ -320,8 +320,8 @@ export function linkPredFeatureVisualizer(
             for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
 
 
-            colorSchemes[node.graphIndex].style.opacity = "1";
-            colorSchemes[node.graphIndex - 1].style.opacity = "1";
+            // colorSchemes[node.graphIndex].style.opacity = "1";
+            // colorSchemes[node.graphIndex - 1].style.opacity = "1";
 
             hideAllLinks(allNodes);
 
@@ -368,7 +368,7 @@ export function linkPredFeatureVisualizer(
 
         let currRectHeight = rectHeight;
         let rectName = "pooling"
-        if (node.graphIndex >= 5) {
+        if (node.graphIndex >= 3) {
           currRectHeight = outputLayerRectHeight;
           rectName = "output";
         }
@@ -464,7 +464,6 @@ export function linkPredFeatureVisualizer(
           if (!state.isClicked) {
             if (node.links) {
               node.links.forEach((link: any) => {
-              
                 link.style("opacity", 0);
               });
             }
@@ -478,7 +477,7 @@ export function linkPredFeatureVisualizer(
           }
           state.isClicked = true;
           d3.selectAll(".hintLabel").attr("opacity", 0);
-
+       
 
 
           highlightNodes(node);
@@ -489,11 +488,8 @@ export function linkPredFeatureVisualizer(
               relatedNodes = node.relatedNodes;
             } // to make sure relatedNodes is not null
             showFeature(node);
-            if (node.graphIndex === 3) {
-              fcLayerCalculationVisualizer(node, allNodes, relatedNodes, offset, height, currMoveOffset, node.graphIndex, g2, state, currRectHeight, colorSchemes, convNum, svg, mode);
-            }
-            if (node.graphIndex === 4) {
 
+            if (node.graphIndex === 3) {
               outputVisualizer(node, allNodes, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, convNum, svg, mode)
             }
             
@@ -516,8 +512,6 @@ export function linkPredFeatureVisualizer(
             
             moveNextLayer(svg, node, currMoveOffset, 1);
             movedNode = node; // Update the moved node
-           
-
         });
       }
     

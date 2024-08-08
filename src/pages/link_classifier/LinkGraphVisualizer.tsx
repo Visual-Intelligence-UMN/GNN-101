@@ -173,10 +173,16 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
 
           data.nodes.forEach((node: any) => {
             node.graphIndex = i;
-            if (value != null && i <= 3 && value instanceof Float32Array) {
+            if (value != null && i <= 2 && value instanceof Float32Array) {
                node.features = value.subarray(
                 64 * node.id,
                 64 * (node.id + 1)
+              );
+            }
+            if (value != null && i === 3 && value instanceof Float32Array) {
+              node.features = value.subarray(
+                2 * node.id,
+                2 * (node.id + 1)
               );
             }
 
@@ -291,11 +297,10 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
               .attr("opacity", 0);
   
               if (intmData) {
-                linkPredFeatureVisualizer(svg, allNodes, offset, height, graphs, 900, 600, 15, 10, 3, 20, colorSchemes, 2);
+                linkPredFeatureVisualizer(svg, allNodes, offset, height, graphs, 1200, 900, 15, 2, 3, 20, colorSchemes, 2);
               }
             }
         }
-
         
 
         setIsLoading(false);

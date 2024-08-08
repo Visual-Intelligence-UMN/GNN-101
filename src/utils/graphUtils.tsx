@@ -182,6 +182,7 @@ export function outputVisualizer(
     mode: number
 
 ) {
+    console.log("AWFAWF", allWeights)
 
     let weights = allWeights[3];
     if (!svg.selectAll) {
@@ -765,8 +766,11 @@ export function calculationVisualizer(
     let end_x = 0;
     let end_y = 0;
 
-
+    
     let moveToX = 3.5 * offset - 100;
+    if (mode === 2) {
+        moveToX += offset
+    }
     let moveToY = height / 20;
     if (node.relatedNodes.length <= 8) {
         moveToY = height / 5;
@@ -1599,7 +1603,7 @@ function weightAnimation(
 
 
                 
-                graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode)
+                graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode, node)
 
                 d3.selectAll(`#weightUnit-${i - 1}`).style("opacity", 0.3).lower();
                 d3.selectAll(`#columnUnit-${i - 1}`).style("opacity", 0).lower();

@@ -15,6 +15,7 @@ export function graphVisDrawMatrixWeight(
     featureChannels: number,
     g: any,
     mode: number,
+    node: any,
     id:string = "tempath"
 ){
     if (!g.selectAll) {
@@ -50,22 +51,24 @@ export function graphVisDrawMatrixWeight(
 
         if(curveDir==1){
             s1 = startCoordList[startCoordList.length - j - 1];
-         e1 = endCoordList[currentStep];
+            e1 = endCoordList[currentStep];
         }
+        
+
 
         let m1 = [0,0];
-        // if(flag){
-        //     m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+        if(flag){
+             m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
 
-        // }else{
-        //     m1 = weightMatrixPostions[currentStep][weightMatrixPostions[0].length-1-j];
-        // }
+        }else{
+             m1 = weightMatrixPostions[currentStep][weightMatrixPostions[0].length-1-j];
+        }
 
-        // if(Xt[0].length==64 && Xt.length==2){
-        //     m1 = weightMatrixPostions[currentStep][j];
-        // }else{
-        //     m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
-        // }
+        if(Xt[0].length==64 && Xt.length==2){
+            m1 = weightMatrixPostions[currentStep][j];
+        }else{
+            m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+        }
         
         
 
@@ -91,7 +94,6 @@ export function graphVisDrawMatrixWeight(
 
         if(Xt.length==Xt[0].length || (Xt.length==64 && Xt[0].length==7)){
             m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
-                
 
             changed = true;
         }
@@ -99,8 +101,7 @@ export function graphVisDrawMatrixWeight(
         if(Xt.length==Xt[0].length && Xt.length==4){
             if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
             else m1 = weightMatrixPostions[j][currentStep]
-                
-
+   
             changed = true;
         }
 
@@ -108,18 +109,26 @@ export function graphVisDrawMatrixWeight(
             if((Xt[0].length<Xt.length && Xt.length!=64)||(Xt[0].length==64&&Xt.length==2)
             ||(Xt[0].length==34&&Xt.length==4)
             ||(Xt.length==34&&Xt[0].length==4)){
+       
                 if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
                 else m1 = weightMatrixPostions[j][currentStep]
                 
 
             }
             else{
-                if(curveDir==-1)m1 = weightMatrixPostions[j][currentStep]
+    
+                if(curveDir==-1) { 
+                    m1 = weightMatrixPostions[j][currentStep] 
+                    if (mode === 2 && node.graphIndex === 1) {
+                        m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+                    } 
+                }
                 else m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
 
 
             }
         }
+        
 
         let controlPoint1 = [s1[0], m1[1]];
         let controlPoint2 = [e1[0], m1[1]];
@@ -408,9 +417,9 @@ export function hoverOverHandler(node: any, aggregatedData: any, state: State, g
                 }
                
                 if (mode === 2 && node.graphIndex === 1) {
-                    graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, 1, i, myColor, weightsLocation, node.features.length, svg, mode)
+                    graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode, node)
                 } else {
-                    graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode)
+                    graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode, node)
                 }
                 d3.selectAll(".calculatedRect").style("opacity", 0.2)
                 d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1)
