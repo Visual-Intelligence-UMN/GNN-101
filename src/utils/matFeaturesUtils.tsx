@@ -872,6 +872,10 @@ export function drawGCNConvLinkModel(
     let paths: any;
     const gcnFeatures = [conv1, conv2];
 
+
+    let location1:[number, number] = [0, 0];
+            let location2:[number, number] = [0, 0];
+
     for (let k = 0; k < 2; k++) {
         const rectH = 15;
         const rectW = 5;
@@ -953,8 +957,8 @@ export function drawGCNConvLinkModel(
             //extract last two feature visualizers' locations
             const hubNodeA = featureKeysEachLayer[0].indexOf(featureKeysEachLayer[2][0]);
             const hubNodeB = featureKeysEachLayer[0].indexOf(featureKeysEachLayer[2][1]);
-            const location1:[number, number] = [locations[hubNodeA][0], locations[hubNodeA][1]];
-            const location2:[number, number] = [locations[hubNodeB][0], locations[hubNodeB][1]];
+            location1 = [locations[hubNodeA][0], locations[hubNodeA][1]];
+            location2 = [locations[hubNodeB][0], locations[hubNodeB][1]];
 
             let layerLocations = deepClone(locations);
             for(let i=0; i<layerLocations.length; i++){
@@ -1038,7 +1042,8 @@ export function drawGCNConvLinkModel(
         colorSchemesTable: colorSchemesTable,
         firstLayer: firstLayer,
         maxVals: maxVals,
-        paths: paths
+        paths: paths,
+        locationsForLastLayer: [location1, location2]
     };
 }
 

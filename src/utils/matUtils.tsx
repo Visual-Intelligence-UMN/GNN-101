@@ -23,7 +23,7 @@ import {
     featureGATClick,
     featureSAGEClick
 } from "./matEventsUtils";
-import { drawPoints } from "./utils";
+import { deepClone, drawPoints } from "./utils";
 import { AnimationController, computeMatrixLocations, drawAniPath, drawBiasPath, drawBiasVector, drawPathBtwOuputResult, drawPathInteractiveComponents, drawWeightMatrix, drawWeightsVector } from "./matAnimateUtils";
 import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import { roundToTwo } from "../components/WebUtils";
@@ -1211,6 +1211,7 @@ export function visualizeLinkClassifierFeatures(
     colorSchemesTable = GCNConvPackage.colorSchemesTable;
     maxVals = GCNConvPackage.maxVals;
     let paths = GCNConvPackage.paths;
+    let locationsForLastLayer = GCNConvPackage.locationsForLastLayer;
 
     console.log("frames", frames);
 
@@ -1422,7 +1423,7 @@ export function visualizeLinkClassifierFeatures(
             
 
             //path connect - connect intermediate feature vis to current feature vis
-            
+
 
         }
     });
@@ -1492,7 +1493,94 @@ export function visualizeLinkClassifierFeatures(
 
             //visualize the inner computation process
             
+            //compute locationing
+            // let prevFeatureCoord:any = [];
+
+            const location1: [number, number] = locationsForLastLayer[0];
+            const location2: [number, number] = locationsForLastLayer[1];
+
+            const midY = (location1[1] + location2[1])/2;
+            const featureX = location1[0] + 64 * 5 + 100;
+            const midYForFeature = midY + 15;
+
+            const startingPoint1:[number, number] = [location1[0]+64*5, location1[1]+15/2];
+            const startingPoint2:[number, number] = [location2[0]+64*5, location2[1]+15/2];
+            const endingPoint:[number, number] = [featureX, midYForFeature];
+
+            //draw the connection between two layers
+            const res1 = computeMids(startingPoint1, endingPoint);
+            const hpoint1:[number, number] = res1[0];
+            const lpoint1:[number, number] = res1[1];
+
+            const res2 = computeMids(startingPoint2, endingPoint);
+            const hpoint2:[number, number] = res2[0];
+            const lpoint2:[number, number] = res2[1];
+
+            const curve = d3.line().curve(d3.curveBasis);
+
+            d3.select(".mats")
+                .append("path")
+                .attr(
+                    "d",
+                    curve([startingPoint1, hpoint1, lpoint1, endingPoint])
+                )
+                .attr("stroke", "black")
+                .attr("opacity", 1)
+                .attr("fill", "none")
+                .attr("layerID", 3)
+                .attr("class", "procVis");
+
+            d3.select(".mats")
+                .append("path")
+                .attr(
+                    "d",
+                    curve([startingPoint2, hpoint2, lpoint2, endingPoint])
+                )
+                .attr("stroke", "black")
+                .attr("opacity", 1)
+                .attr("fill", "none")
+                .attr("layerID", 3)
+                .attr("class", "procVis");
+
+            const g = d3.select(".mats").append("g");
+
+            injectSVG(g, endingPoint[0], endingPoint[1]-12, "./assets/SVGs/matmul.svg", "procVis dotProduct");
             
+            let resultVisPos = deepClone(endingPoint);
+            resultVisPos[0] += 150;
+            
+            drawPoints(".mats", "red", [resultVisPos]);
+
+            g.append("line")
+                .attr("x1", endingPoint[0])
+                .attr("y1", endingPoint[1])
+                .attr("x2", resultVisPos[0])
+                .attr("y2", resultVisPos[1])
+                .attr("stroke", "black")
+                .attr("stroke-width", 1)
+                .attr("class", "procVis");
+
+            //TODO: add data fetching for dot product result
+
+            g.append("rect")
+                .attr("x", resultVisPos[0])
+                .attr("y", resultVisPos[1]-7.5)
+                .attr("width", 15)
+                .attr("height", 15)
+                .attr("fill", "red")
+                .attr("stroke", "black")
+                .attr("class", "dotResult procVis");
+
+            g.append("line")
+                .attr("x1", resultVisPos[0]+15)
+                .attr("y1", resultVisPos[1])
+                .attr("x2", resultVisPos[0]+100)
+                .attr("y2", resultVisPos[1])
+                .attr("stroke", "black")
+                .attr("stroke-width", 1)
+                .attr("class", "procVis")
+                .lower();
+
         }
     });
 }
