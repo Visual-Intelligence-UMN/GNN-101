@@ -204,12 +204,12 @@ export default function Home() {
                                         onClick={() => setShowDatasetInfo(!showDatasetInfo)}
                                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-center flex justify-center items-center"
                                         style={{
-                                            width: '45px',
+                                            width: '120px',
                                             height: '40px',
 
                                         }}
                                     >
-                                        {'?'}
+                                        {!showDatasetInfo ? 'Show More' : 'Show Less'}
                                     </button>
                                     <div
                                         className={`absolute left-0 mt-2 p-4 bg-white border border-gray-300 rounded shadow-lg transition-all duration-300 ease-in-out overflow-hidden ${showDatasetInfo ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'

@@ -402,6 +402,9 @@ export function featureVisClick(
     oRectW:number,
     activation: string = "relu"
 ) {
+
+    console.log("feature vis click", layerID, featureVisTable);
+
     let biasCoord: [number, number];
     let res10: [number, number];
     let res11: [number, number];
@@ -672,9 +675,12 @@ export function featureVisClick(
         {func: () => {
             drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels)
             drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels)
-            if(activation=="tanh"){
+            if(featureVisTable.length==4&&layerID==2){
+                //if it's the last layer, don't show the relu icon
+            }
+            else if(activation=="tanh"){
                 drawTanh(midX1, wmCoord, biasCoord, nextCoord);
-            }else{
+            }else if(activation=="relu"){
                 drawReLU(midX1, wmCoord, biasCoord, nextCoord)
             }
             curNode.style.opacity = "1";
@@ -722,6 +728,9 @@ export function featureVisClick(
     });
 
     btn.on("click", function (event: any, d: any) {
+
+        d3.selectAll(".interactRect").style("pointer-events", "none");
+
         allowExpl = false;
 
 
@@ -750,6 +759,7 @@ export function featureVisClick(
                 //   d3.select(".mats").selectAll(".pauseRemove").remove();
                 d3.selectAll("#tempath").remove();
                 d3.select(".wMatLink").style("opacity", 1);
+                d3.selectAll(".interactRect").style("pointer-events", "auto");
               //  d3.select(".mats").selectAll(".").remove();
               d3.selectAll(".matmul-displayer").remove();
                 currentStep = 0; // 重置步骤
@@ -792,6 +802,7 @@ export function featureVisClick(
                 if(featureChannels==4&&layerID==2&&currentStep >= 2){
                     d3.selectAll("#tempath").remove();
                     d3.select(".wMatLink").style("opacity", 1);
+                    d3.selectAll(".interactRect").style("pointer-events", "auto");
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".weightUnit").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
@@ -820,6 +831,7 @@ export function featureVisClick(
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".weightUnit").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
+                    d3.selectAll(".interactRect").style("pointer-events", "auto");
                     injectPlayButtonSVG(
                         btn,
                         btnX,
@@ -845,6 +857,7 @@ export function featureVisClick(
                 "./assets/SVGs/playBtn_play.svg"
             );
             isPlaying = false;
+            d3.selectAll(".interactRect").style("pointer-events", "none");
         }
         d3.selectAll("#tempath").lower();
     });
@@ -1153,6 +1166,7 @@ export function outputVisClick(
         if (!isPlaying || currentStep >= 2 || currentStep == 0) {
             d3.selectAll("#tempath").remove();
             d3.select(".wMatLink").style("opacity", 1);
+            d3.selectAll(".interactRect").style("pointer-events", "auto");
             d3.selectAll(".matmul-displayer").remove();
             injectPlayButtonSVG(
                 btn,
@@ -1163,6 +1177,7 @@ export function outputVisClick(
             if (currentStep >= 2) {
                 d3.selectAll(".matmul-displayer").remove();
                 d3.select(".wMatLink").style("opacity", 1);
+                d3.selectAll(".interactRect").style("pointer-events", "auto");
                 d3.selectAll("#tempath").remove();
                 d3.select(".mats").selectAll(".removeRect").remove();
                 currentStep = 0; // 重置步骤
