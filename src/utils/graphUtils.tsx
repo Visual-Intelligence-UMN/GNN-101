@@ -331,7 +331,7 @@ export function outputVisualizer(
 
         const Xt = weights;
 
-    hoverOverHandler(node, node.relatedNodes[0].features, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true)
+    hoverOverHandler(node, node.relatedNodes[0].features, calculatedData, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true)
 
     let outputData = [];
     for (let i = 0; i < calculatedData.length; i++) {
@@ -413,6 +413,7 @@ export function outputVisualizer(
             endCoordList,
             Xt,
             node.relatedNodes[0].features,
+            calculatedData,
             offset,
             height,
             moveOffset,
@@ -771,11 +772,16 @@ export function calculationVisualizer(
     if (node.relatedNodes.length <= 8) {
         moveToY = height / 5;
     }
+    let temp = 0;
+    if (mode === 1) {
+        temp = 50
+    }
     let originalCoordinates = moveFeatures(
         node.relatedNodes,
-        moveToX,
+        moveToX + temp,
         moveToY
     ); //record the original cooridinates for restoring
+
 
   
 
@@ -788,7 +794,7 @@ export function calculationVisualizer(
         .append("g")
         .attr(
             "transform",
-            `translate(${3.5 * offset + node.relatedNodes[0].features.length * prevRectHeight
+            `translate(${3.5 * offset + node.relatedNodes[0].features.length * prevRectHeight + temp
             }, ${height / 5 + 150})`
         );
     
@@ -842,11 +848,12 @@ export function calculationVisualizer(
         .delay(3500)
         .style("opacity", 1);
 
+
     for (let i = 0; i < 64; i++) {
         let s: [number, number] = [
             node.graphIndex * offset +
             i * prevRectHeight +
-            node.relatedNodes[0].features.length * prevRectHeight + prevRectHeight / 2,
+            node.relatedNodes[0].features.length * prevRectHeight + prevRectHeight / 2 + temp, 
             height / 5 + 150 + 25,
         ];
         startCoordList.push(s);
@@ -862,7 +869,7 @@ export function calculationVisualizer(
             "transform",
             `translate(${3.5 * offset +
             node.relatedNodes[0].features.length * 2 * prevRectHeight +
-            100
+            100 + temp
             }, ${height / 5 + 150})`
         );
 
@@ -914,7 +921,7 @@ export function calculationVisualizer(
             node.graphIndex * offset +
             i * rectHeight +
             node.relatedNodes[0].features.length * 2 * prevRectHeight +
-            100,
+            100 + temp,
             height / 5 + 150 + 25,
         ];
         endCoordList.push(s);
@@ -957,7 +964,7 @@ export function calculationVisualizer(
 
     const g4 = g3
         .append("g")
-        .attr("transform", `translate(${3.5 * offset +
+        .attr("transform", `translate(${3.5 * offset + temp +
             node.relatedNodes[0].features.length * 2 * prevRectHeight +
             100}, ${height / 5 + 10})`);
 
@@ -999,7 +1006,7 @@ export function calculationVisualizer(
             "transform",
             `translate(${3.5 * offset +
             node.relatedNodes[0].features.length * 2 * prevRectHeight +
-            100
+            100 + temp
             }, ${height / 5 + 100})`
         );
 
@@ -1040,7 +1047,7 @@ export function calculationVisualizer(
     intermediateFeatureGroups.push(BiasGroup);
     node.intermediateFeatureGroups = intermediateFeatureGroups;
 
-    end_x = 3.5 * offset + node.relatedNodes[0].features.length * prevRectHeight;
+    end_x = 3.5 * offset + node.relatedNodes[0].features.length * prevRectHeight + temp;
     end_y = height / 5 + 150 + 7.5;
 
     let adjMatrixSlice: number[] = [];
@@ -1064,6 +1071,7 @@ export function calculationVisualizer(
             endCoordList,
             currentWeights,
             aggregatedData,
+            calculatedData,
             offset,
             height,
             moveOffset,
@@ -1077,7 +1085,7 @@ export function calculationVisualizer(
             displayHeight,
             mode
         );
-        hoverOverHandler(node, aggregatedData, state, g4, displayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, weights, node.graphIndex - 1, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, false)
+        hoverOverHandler(node, aggregatedData, calculatedData, state, g4, displayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, weights, node.graphIndex - 1, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, false)
 
 
 
@@ -1085,8 +1093,8 @@ export function calculationVisualizer(
             node.relatedNodes.forEach((n: any, i: number) => {
                 if (n.featureGroupLocation) {
                     start_x =
-                        3.5 * offset - 70 + n.features.length * prevRectHeight;
-                    start_y = height / 20 + 90 + 45 * i;
+                        3.5 * offset - 70 + n.features.length * prevRectHeight + temp;
+                    start_y = height / 20 + 90 + 45 * i
                     if (node.relatedNodes.length <= 8) {
                         start_y = height / 5 + 90 + 45 * i
                     }
@@ -1126,12 +1134,12 @@ export function calculationVisualizer(
             let color;
             start_x =
                 3.5 * offset +
-                node.relatedNodes[0].features.length * prevRectHeight * 2;
+                node.relatedNodes[0].features.length * prevRectHeight * 2 + temp;
             start_y = height / 5 + 150 + 7.5;
             end_x =
                 3.5 * offset +
                 node.relatedNodes[0].features.length * prevRectHeight * 2 +
-                100; // the horizontal distance is offset(600) + moveoffset(300)
+                100 + temp; // the horizontal distance is offset(600) + moveoffset(300)
             end_y = height / 5 + 150 + 7.5;
 
             color = calculateAverage(node.features); // to be determined
@@ -1152,12 +1160,12 @@ export function calculationVisualizer(
                 3.5 * offset +
                 node.relatedNodes[0].features.length * prevRectHeight * 2 +
                 node.features.length * rectHeight +
-                100;
+                100 + temp;
             start_y = height / 5 + 150 + 7.5;
             end_x =
                 3.5 * offset +
                 node.relatedNodes[0].features.length * prevRectHeight * 2 +
-                node.features.length * rectHeight +
+                node.features.length * rectHeight + temp +
                 175; // the horizontal distance is offset(600) + moveoffset(300)
             end_y = height / 5 + 150 + 7.5;
 
@@ -1177,7 +1185,7 @@ export function calculationVisualizer(
             start_x =
                 3.5 * offset +
                 node.relatedNodes[0].features.length * 2 * prevRectHeight +
-                node.features.length * 3 +
+                node.features.length * 3 + temp + 
                 100;
             start_y = height / 5 + 100 + 7.5;
 
@@ -1215,6 +1223,7 @@ export function calculationVisualizer(
              
 
         // relu
+        if (!(mode === 0 && node.graphIndex === 3)) {
         const relu = g3.append("g");
         let svgPath = "./assets/SVGs/ReLU.svg";
         let labelText = "ReLU Non-linear Function";
@@ -1256,6 +1265,8 @@ export function calculationVisualizer(
 
         });
 
+    
+
         relu.on("mouseout", function () {
             d3.selectAll(".math-displayer").remove();
         });
@@ -1279,7 +1290,8 @@ export function calculationVisualizer(
             d3.selectAll(".output-path").attr("opacity", 1);
             d3.selectAll(".softmaxLabel").attr("opacity", 1);
             d3.selectAll(".intermediate-path").attr("opacity", 0)     
-            clearInterval(intervalID)   
+            clearInterval(intervalID)  
+    } 
             
     }, 3500);
 
@@ -1290,7 +1302,7 @@ export function calculationVisualizer(
         .attr(
             "transform",
             `translate(${3.5 * offset +
-            node.relatedNodes[0].features.length * 2 * prevRectHeight +
+            node.relatedNodes[0].features.length * 2 * prevRectHeight + temp +
             node.features.length * rectHeight +
             175
             }, ${height / 5 + 150})`
@@ -1340,7 +1352,7 @@ export function calculationVisualizer(
         .attr(
             "transform",
             `translate(${3.5 * offset +
-            node.relatedNodes[0].features.length * 2 * prevRectHeight +
+            node.relatedNodes[0].features.length * 2 * prevRectHeight + temp +
             node.features.length * rectHeight +
             175
             }, ${height / 5 + 150})`
@@ -1460,6 +1472,7 @@ function weightAnimation(
     endCoordList: number[][],
     weights: any,
     aggregatedData: any,
+    calculatedData: any,
     offset: number,
     height: number,
     moveOffset: number,
@@ -1492,6 +1505,10 @@ function weightAnimation(
             endNumber = 2
 
         }
+    }
+    let temp = 0;
+    if (mode === 1) {
+        temp = 50
     }
 
 
@@ -1591,9 +1608,9 @@ function weightAnimation(
                     const math = create(all, {});
                     const wMat = math.transpose(allWeights[3]);
 
-                    displayerHandler(node, aggregatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, i, mode, true)
+                    displayerHandler(node, aggregatedData, calculatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, i, mode, true)
                 } else {
-                displayerHandler(node, aggregatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, allWeights, node.graphIndex - 1, weightsLocation, i, mode, false)
+                displayerHandler(node, aggregatedData, calculatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, allWeights, node.graphIndex - 1, weightsLocation, i, mode, false)
                 }
 
 
@@ -1601,7 +1618,7 @@ function weightAnimation(
                 graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg)
 
                 d3.selectAll(`#weightUnit-${i - 1}`).style("opacity", 0.3).lower();
-                d3.select(`#columnUnit-${i - 1}`).style("opacity", 0).lower();
+                d3.selectAll(`#columnUnit-${i - 1}`).style("opacity", 0).lower();
                 d3.selectAll(`#weightUnit-${i}`).style("opacity", 1).raise();
                 d3.select(`#columnUnit-${i}`).style("opacity", 1).raise();
 
@@ -1634,19 +1651,19 @@ function weightAnimation(
 
                         d3.selectAll(".output")
                             .transition()
-                            .delay(2000)
+                            .delay(500)
                             .duration(1000)
                             .attr("opacity", 1)
                             .attr(
                                 "transform",
                                 `translate(${node.featureGroupLocation.xPos - 2.5 * offset + (moveOffset - node.features.length * rectHeight - node.relatedNodes[0].features.length *
-                                    2 * prevRectHeight) - 180 + 12.5
+                                    2 * prevRectHeight) - 180 + 12.5 - temp
                                 }, ${node.featureGroupLocation.yPos -
                                 height / 5 -
                                 150
                                 }) rotate(90)`
                             );
-                    }, 2000);
+                    }, 500);
                 }
             }
         }, 250);
@@ -2316,7 +2333,7 @@ export function nodeOutputVisualizer(
         .lower();
 
         const Xt = math.transpose(weights);
-    hoverOverHandler(node, calculatedData, state, g5, DisplayHeight, (20 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true)
+    hoverOverHandler(node, calculatedData, calculatedData, state, g5, DisplayHeight, (20 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true)
 
 
 
@@ -2394,6 +2411,7 @@ export function nodeOutputVisualizer(
             startCoordList,
             endCoordList,
             Xt,
+            calculatedData,
             calculatedData,
             offset,
             height,
@@ -2721,14 +2739,14 @@ export function nodeOutputVisualizer(
                     .attr("height", rectL)
                     .style("stroke", "black")
                     .attr("fill", myColor(node.features[i]))
-                    .attr("class", "math-displayer").style("fill", "white")
+                    .attr("class", "math-displayer")
                     .lower();
                 g5.append("text")
                     .attr("x", displayerWidth - 50)
                     .attr("y", 25 + rectL / 2)
                     .text(roundToTwo(node.features[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5").style("fill", "white");
+                    .attr("font-size", "5")
             })
             .on("mouseout", function () {
                 if (!state.isClicked) {
