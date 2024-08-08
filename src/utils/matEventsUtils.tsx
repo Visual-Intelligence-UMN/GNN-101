@@ -27,6 +27,7 @@ import {
     drawTanh,
     drawWeightMatrix,
     computeMatrixLocations,
+    drawAttentions,
 } from "./matAnimateUtils";
 import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import { drawMatmulExplanation, drawSoftmaxDisplayer } from "./matInteractionUtils";
@@ -1517,7 +1518,7 @@ export function featureGATClick(
 
     let animateSeqAfterPath: any = [
         {func: () => {
-            drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir)
+            drawAttentions(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir)
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
         }, 
