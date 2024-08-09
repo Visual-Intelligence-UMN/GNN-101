@@ -346,7 +346,7 @@ export type NodeType = {
   name: string;
   features: number[];
   is_aromatic: boolean;
-  original_id: string
+  original_id: number;
 };
 
 export type LinkType = {
@@ -444,7 +444,7 @@ export async function data_prep(o_data: any) {
         name: node_name,
         features: nodes[i],
         is_aromatic: is_aromatic,
-        original_id: "Unknown"
+        original_id: 0
       }
       final_data.nodes.push(new_node);
     }
@@ -490,7 +490,7 @@ export async function prep_graphs(g_num: number, data: any) {
       name: " ",
       features: [0],
       is_aromatic: false,
-      original_id: "Unknown"
+      original_id: 0
     } 
 
     var node_array = [];

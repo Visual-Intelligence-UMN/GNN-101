@@ -58,7 +58,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
     setSimulation(false);
     const visualizationId = ++currentVisualizationId.current;
 
-    const init = async (graphs: any[]) => {
+    const init = async (graphs: any[], subgraph: any[], nodeMapping: any) => {
       if (intmData != null) {}
 
       let allNodes: any[] = [];
@@ -85,6 +85,13 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
 
       let colorSchemes: any = [];
 
+      const transformedSubgraph = Object.fromEntries(
+        Object.entries(subgraph).map(([key, value]) => {
+          const mappedKey = nodeMapping[key];
+          return [mappedKey, value];
+        })
+      );
+
       graphs.forEach((data, i) => {
 
         let xOffset = (i - 3.5) * offset;
@@ -98,7 +105,49 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
           .selectAll("line")
           .data(data.links)
           .join("line")
-          .style("stroke", "#aaa");
+          .style("stroke", "#aaa")
+          .style("opacity", (d: any) => {
+            if (i < 3) {
+   
+              let is_source = false;
+              let is_target = false;
+              for (let key in subgraph[i]) {
+                console.log("AWDAWD", nodeMapping[key])
+                if (nodeMapping[key] === d.source) {
+    
+                  is_source = true
+                  break;
+                }
+              }
+              for (let key in subgraph[i]) {
+                if (nodeMapping[key] === d.target) {
+                  is_target = true
+                  break;
+                }
+              }
+
+              if (is_source && is_target){ 
+                return 1
+
+            } else {
+              return 0.2
+            } } else {
+              return 0;
+            }
+          
+
+
+          } )
+
+          if (i < 3) {
+            console.log("CBUAWC", subgraph)
+            console.log("AW", Object.keys(subgraph[i]))
+            
+            console.log("AddW", data.links)
+            console.log(['109', '241'].includes(String(109)))
+
+          }
+
 
         const node = g1
           .selectAll("circle")
@@ -181,8 +230,8 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
             }
             if (value != null && i === 3 && value instanceof Float32Array) {
               node.features = value.subarray(
-                2 * node.id,
-                2 * (node.id + 1)
+                node.id,
+                (node.id + 1)
               );
             }
 
@@ -297,7 +346,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
               .attr("opacity", 0);
   
               if (intmData) {
-                linkPredFeatureVisualizer(svg, allNodes, offset, height, graphs, 1200, 900, 15, 2, 3, 20, colorSchemes, 2);
+                linkPredFeatureVisualizer(svg, allNodes, offset, height, graphs, 1200, 900, 15, 2, 3, 20, colorSchemes, 2, subgraph);
               }
             }
         }
@@ -326,7 +375,13 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
       try {
         setIsLoading(true);
         const processedData = await dataProccessGraphVisLinkPrediction(graph_path, hubNodeA, hubNodeB);
-        await init(processedData);
+        if (processedData) {
+          let graphs = processedData[0];
+          let subgraph = processedData[1];
+          let nodeMapping = processedData[2]
+          await init(graphs, subgraph, nodeMapping);
+        }
+
       } catch (error) {
         console.error("Error in visualizeGNN:", error);
       } finally {

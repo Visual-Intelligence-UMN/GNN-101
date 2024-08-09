@@ -23,6 +23,8 @@ import { stat } from "fs";
 import { Yomogi } from "@next/font/google";
 import { dataPreparationLinkPred, constructComputationalGraph } from "./linkPredictionUtils";
 import { extractSubgraph } from "./graphDataUtils";
+import { isValidElement } from "react";
+import { isValidNode } from "./GraphvislinkPredUtil";
 
 
 export function linkPredFeatureVisualizer(
@@ -39,22 +41,16 @@ export function linkPredFeatureVisualizer(
   outputLayerRectHeight: number,
   colorSchemes:any,
   mode: number,
+  subgraph: any
 ) {
   state.isClicked = false;
 
- 
 
-
-
-
-
-  
   // 1. visualize feature
   // 2. handle interaction event
   // 3. do the calculation for animation
   let convNum = 3;
   let {weights, bias} = loadLinkWeights();
-
 
 
   const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex); //somehow doesn't include the node in the last layer
@@ -66,7 +62,7 @@ export function linkPredFeatureVisualizer(
   }
   let movedNode: any = null; // to prevent the same node is clicked twice
 
-
+  
 
 
 
@@ -98,13 +94,7 @@ export function linkPredFeatureVisualizer(
        aggregatedDataMap = matrixMultiplication(normalizedAdjMatrix, featureMap)
        calculatedDataMap = matrixMultiplication(aggregatedDataMap, currentWeights)
  
- 
-
       }
-
-
-      
-
 
 
     
@@ -142,10 +132,22 @@ export function linkPredFeatureVisualizer(
 
         // add svgElement to each node simplify the interaction process (maybe)
 
+        let className = "node_group";
+        let opacity = 1;
+        if (!isValidNode(subgraph, node)) {
+          className = "invalid"
+          opacity = 0.2;
+        }
         const nodeGroup = g2.append("g")
-          .attr("class", "node-group")
+          .attr("class", className)
           .attr("transform", `translate(${node.x},${node.y})`);
+
+
+
+
         node.svgElement = nodeGroup.append("circle")
+        .attr("class", className)
+
           .attr("cx", 0)
           .attr("cy", 0)
           .attr("r", 17)
@@ -153,71 +155,27 @@ export function linkPredFeatureVisualizer(
           .attr("stroke", "#69b3a2")
           .attr("stroke-width", 1)
           .attr("stroke-opacity", 1)
-          .attr("opacity", 1)
+          .attr("opacity", opacity)
           .node(); // make the svgElement a DOM element (the original on method somehow doesn't work)
-        if (mode === 1 && graphIndex === 4) {
-          let name = "unknown";
-          if (node.features[0] > 0.5) {
-            name = "A"
-          }
-          if (node.features[1] > 0.5) {
-            name = "B"
-          }
-          if (node.features[2] > 0.5) {
-            name = "C"
-          }
-          if (node.features[3] > 0.5) {
-            name = "D"
-          }
 
 
-          node.text = nodeGroup.append("text")
-          .attr("x", 0)
-          .attr("y", 0)
-          .join("text")
-          .text(name)
-          .attr("text-anchor", "middle")
-          .attr("dominant-baseline", "central")
-          .attr("font-size", `17px`)
-          .attr("opacity", 1);
-
-        }
-        else {
         node.text = nodeGroup.append("text")
           .attr("x", 0)
           .attr("y", 0)
           .join("text")
           .attr("text-anchor", "middle")
           .attr("dominant-baseline", "central")
-          .text(node.id)
+          .text(node.original_id)
           .attr("font-size", `17px`)
-          .attr("opacity", 1);
-        }
+          .attr("opacity", opacity - 0.05);
+          
+
+        
 
         const featureGroup = g2.append("g")
           .attr("transform", `translate(${xPos - 7.5}, ${yPos})`);
 
-        if (mode === 1 && graphIndex === 4) {
 
-          featureGroup.selectAll("rect")
-          .data(features)
-          .enter()
-          .append("rect")
-          .attr("x", 0)
-          .attr("y", (d: any, i: number) => i * currRectHeight)
-          .attr("width", rectWidth)
-          .attr("height", currRectHeight)
-          .attr("class", `node-features node-features-${node.graphIndex}-${node.id}`)
-          .attr("id", (d: any, i: number) => "output-layer-rect-" + i) 
-          .style("fill", (d: number) => myColor(d))
-          .style("stroke-width", 0.1)
-          .style("stroke", "grey")
-          .style("opacity", 1);
-
-
-
-
-        } else {
         featureGroup.selectAll("rect")
           .data(features)
           .enter()
@@ -232,7 +190,7 @@ export function linkPredFeatureVisualizer(
           .style("stroke-width", 0.1)
           .style("stroke", "grey")
           .style("opacity", 1);
-        }
+        
 
         const frame = featureGroup.append("rect")
         .attr("class", `node-features-${node.graphIndex}-${node.id}`)
@@ -250,7 +208,7 @@ export function linkPredFeatureVisualizer(
           .attr("y", node.features.length * currRectHeight + 12)
           .attr("class", `node-features-${node.graphIndex}-${node.id}`)
           .attr("dy", ".35em")
-          .text(node.id)
+          .text(node.original_id)
           .style("font-size", "12px")
           .style("fill", "black")
           .style("text-anchor", "middle");
@@ -282,8 +240,9 @@ export function linkPredFeatureVisualizer(
         scaleFeatureGroup(node, 0.5);
 
         // add interaction 
+        
         nodeGroup.on("mouseenter", function(this: any) {
-          if (!state.isClicked) {
+          if (!state.isClicked && isValidNode(subgraph, node)) {
             highlightNodes(node);
             if (node.relatedNodes) {
               reduceNodeOpacity(allNodes, node.relatedNodes, node);
@@ -292,7 +251,7 @@ export function linkPredFeatureVisualizer(
         });
 
         nodeGroup.on("mouseleave", function() {
-          if (!state.isClicked) {
+          if (!state.isClicked && isValidNode(subgraph, node)) {
             resetNodes(allNodes, convNum);
           }
         });
@@ -303,7 +262,7 @@ export function linkPredFeatureVisualizer(
           nodeGroup.on("click", function(event:any) {
             event.stopPropagation();
             event.preventDefault();
-            if (state.isClicked) {
+            if (state.isClicked && !isValidNode(subgraph, node)) {
               return;
             }
             state.isClicked = true;

@@ -22,6 +22,7 @@ import { stat, truncateSync } from "fs";
 import { drawActivationExplanation } from "./matInteractionUtils";
 import { computeMatrixLocations, drawMatrixWeight, drawWeightMatrix } from "./matAnimateUtils";
 import { graphVisDrawActivationExplanation, graphVisDrawMatrixWeight, displayerHandler, hoverOverHandler} from "./graphAnimationHelper";
+import { isValidNode } from "./GraphvislinkPredUtil";
 
 export const pathColor = d3
     .scaleLinear<string>()
@@ -59,8 +60,10 @@ export function reduceNodeOpacity(
                 !(relatedNodes.length != 0 && relatedNodes.includes(node)) &&
                 node != selfNode
             ) {
+                if (!d3.select(node.svgElement).classed("invalid")) {
                 d3.select(node.svgElement).attr("stroke-opacity", 0.2);
                 node.text.attr("opacity", 0.2);
+                }
             }
         }
     });
@@ -68,8 +71,6 @@ export function reduceNodeOpacity(
 
 export function scaleFeatureGroup(node: any, scale: number) {
     d3.selectAll(`.node-features-${node.graphIndex}-${node.id}`).attr('transform', `scale(${scale})`);
-
-
 }
 
 export function showFeature(node: any) {
@@ -118,6 +119,7 @@ export function highlightNodes(node: any) {
 
 export function resetNodes(allNodes: any[], convNum: number) {
     allNodes.forEach((node) => {
+        if (node.svgElement && !d3.select(node.svgElement).classed("invalid")) {
         scaleFeatureGroup(node, 0.5)
         if (node.graphIndex < convNum) {
             if (node.featureGroup) {
@@ -156,10 +158,16 @@ export function resetNodes(allNodes: any[], convNum: number) {
                 });
             }
             if (node.svgElement && node.text) {
-                d3.select(node.svgElement).attr("stroke-opacity", 1);
-                node.text.attr("opacity", 1);
+                if (d3.select(node.svgElement).classed("invalid")) {
+                    console.log("AWD")
+                }
+                if (!d3.select(node.svgElement).classed("invalid")) {
+                    d3.select(node.svgElement).attr("stroke-opacity", 1);
+                    node.text.attr("opacity", 1);
+                }
             }
         }
+    }
     });
 }
 
@@ -1616,11 +1624,6 @@ function weightAnimation(
 
 
                 if (i >= endNumber) {
-        
-
- 
-
-    
                     clearInterval(intervalID);
                     state.isPlaying = false;
                     d3.selectAll(".math-displayer").remove();
