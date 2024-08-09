@@ -29,6 +29,7 @@ import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import { roundToTwo } from "../components/WebUtils";
 import { drawMatmulExplanation, drawSoftmaxDisplayerNodeClassifier } from "./matInteractionUtils";
 import { create, all } from "mathjs";
+import { sigmoid } from "./linkPredictionUtils";
 
 //Graph Classifier： features visualization pipeline: draw all feature visualizers for original features and GCNConv
 export function visualizeGraphClassifierFeatures(
@@ -1602,7 +1603,7 @@ export function visualizeLinkClassifierFeatures(
                 .attr("x", sigmoidTextPos[0])
                 .attr("y", sigmoidTextPos[1])
                 .attr("fill", "gray")
-                .attr("class", "procVis")
+                .attr("class", "procVis sigmoid")
                 .text("Sigmoid")
                 .style("font-size", "12px");
 
@@ -1701,6 +1702,97 @@ export function visualizeLinkClassifierFeatures(
             d3.select(".mats").selectAll(".dotProduct").on("mouseout", function(event){
                 d3.selectAll(".math-displayer").remove();
             });
+
+            //add sigmoid explanation
+            d3.select(".sigmoid").on("mouseover", function(event){
+                const [x, y] = d3.pointer(event);
+                const displayW = 250;
+                const displayH = 100;
+
+                //find coordination for the math displayer first
+                const displayX = x + 10;
+                const displayY = y - 10;
+
+                //add displayer
+                d3.select(".mats")
+                    .append("rect")
+                    .attr("x", displayX)
+                    .attr("y", displayY)
+                    .attr("width", displayW)
+                    .attr("height", displayH)
+                    .attr("rx", 10)
+                    .attr("ry", 10)
+                    .style("fill", "white")
+                    .style("stroke", "black")
+                    .style("stroke-width", 2)
+                    .attr("class", "math-displayer procVis")
+                    .raise();
+
+                console.log("in!!!!");
+
+                d3.select(".mats")
+                    .append("text")
+                    .attr("x", displayX + 75)
+                    .attr("y", displayY + 20)
+                    .text("Sigmoid")
+                    .style("font-size", "16px")
+                    .attr("class", "math-displayer procVis")
+                    .raise();
+
+
+                d3.select(".mats")
+                    .append("text")
+                    .attr("x", displayX + 50)
+                    .attr("y", displayY + 40)
+                    .attr("xml:space", "preserve")
+                    .text("1")
+                    .attr("class", "math-displayer procVis")
+
+                d3.select(".mats").append("line")
+                    .attr("x1", displayX + 5)
+                    .attr("y1", displayY + 50)
+                    .attr("x2", displayX + 105)
+                    .attr("y2", displayY + 50)
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 1)
+                    .attr("class", "math-displayer procVis");
+
+                d3.select(".mats")
+                    .append("text")
+                    .attr("x", displayX + 110)
+                    .attr("y", displayY + 50)
+                    .attr("xml:space", "preserve")
+                    .text("=")
+                    .attr("class", "math-displayer procVis")
+                
+                d3.select(".mats")
+                    .append("rect")
+                    .attr("x", displayX + 125)
+                    .attr("y", displayY + 35)
+                    .attr("width", 15)
+                    .attr("height", 15)
+                    .attr("fill", myColor(sigmoid(resultVal)))
+                
+                d3.select(".mats")
+                    .append("text")
+                    .attr("x", displayX + 5)
+                    .attr("y", displayY + 75)
+                    .attr("xml:space", "preserve")
+                    .text("1 + expr( -       )")
+                    .attr("class", "math-displayer procVis")
+
+                d3.select(".mats")
+                    .append("rect")
+                    .attr("x", displayX + 90)
+                    .attr("y", displayY + 65)
+                    .attr("width", 15)
+                    .attr("height", 15)
+                    .attr("fill", myColor(resultVal))
+            });
+
+            d3.select(".sigmoid").on("mouseout", function(event){
+                d3.selectAll(".math-displayer").remove();
+            })
 
         }
     });
