@@ -166,7 +166,7 @@ export function linkPredFeatureVisualizer(
           .attr("text-anchor", "middle")
           .attr("dominant-baseline", "central")
           .text(node.original_id)
-          .attr("font-size", `17px`)
+          .attr("font-size", `10px`)
           .attr("opacity", opacity - 0.05);
           
 
@@ -209,7 +209,7 @@ export function linkPredFeatureVisualizer(
           .attr("class", `node-features-${node.graphIndex}-${node.id}`)
           .attr("dy", ".35em")
           .text(node.original_id)
-          .style("font-size", "12px")
+          .style("font-size", "10px")
           .style("fill", "black")
           .style("text-anchor", "middle");
         
@@ -262,7 +262,7 @@ export function linkPredFeatureVisualizer(
           nodeGroup.on("click", function(event:any) {
             event.stopPropagation();
             event.preventDefault();
-            if (state.isClicked && !isValidNode(subgraph, node)) {
+            if (state.isClicked || !isValidNode(subgraph, node)) {
               return;
             }
             state.isClicked = true;

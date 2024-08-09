@@ -22,6 +22,7 @@ import { stat } from "fs";
 import { Yomogi } from "@next/font/google";
 import { dataPreparationLinkPred, constructComputationalGraph } from "./linkPredictionUtils";
 import { extractSubgraph } from "./graphDataUtils";
+import { isValidNode } from "./GraphvislinkPredUtil";
 
 env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
@@ -1096,7 +1097,7 @@ export function calculateAverage(arr: number[]): number {
   return average * 10;
 }
 
-export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset: number, mode: number) {
+export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset: number, subgraph: any, mode: number) {
   const nodesByIndex = d3.group(nodes, (d: any) => d.graphIndex);
 
 
@@ -1257,6 +1258,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
           }
           return;
         }
+        else if (mode === 0) {
           const avg = calculateAverage(node.features)
 
           xOffset1 = (graphIndex - 2.5) * offset - 150;
@@ -1266,11 +1268,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
             xOffset1 = (graphIndex - 2.5) * offset;
             
           }
-          if (mode === 2) {
-            xOffset1 = xOffset1 - offset + 150
-            xOffset2 = xOffset2 - offset + 100
-
-          }
+        
           
           
           const nextLayer = graphs[graphIndex + 1];
@@ -1299,11 +1297,53 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
           }
           nextNode.links.push(path);
           nextNode.relatedNodes.push(node);
+        
+        }
+      } else {
+        const avg = calculateAverage(node.features)
+        
+
+   
+        xOffset1 = (graphIndex - 3.5) * offset;
+        xOffset2 = (graphIndex - 2.5) * offset - 30 * (graphIndex * 1.5) + 100;
+
           
+          
+          const nextLayer = graphs[graphIndex + 1];
+          if (nextLayer) {
+            let nextNode = nextLayer.nodes[0];
+
+            const controlX1 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.3;
+            const controlY1 = node.y + 10;
+            const controlX2 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.7;
+            const controlY2 = nextNode.y + 10;
+            if (isValidNode(subgraph, node)) {
+            
+            const path = svg.append("path")
+              .attr("d", `M ${node.x + xOffset1} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 20} ${nextNode.y + 10}`)
+              .style("stroke", linkStrength(avg))
+              .style("opacity", 0)
+              .style('stroke-width', 1)
+              .style("fill", "none");
+           
+  
+          if (!nextNode.links) {
+            nextNode.links = [];
+          }
+          if (!nextNode.relatedNodes) {
+            nextNode.relatedNodes = [];
+          }
+          nextNode.links.push(path);
+          nextNode.relatedNodes.push(node);
+        }
+        
         }
       }
+    }
+    
       
     });
+    
   });
 
 

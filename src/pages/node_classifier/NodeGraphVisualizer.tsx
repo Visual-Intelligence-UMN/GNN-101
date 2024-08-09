@@ -377,6 +377,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
               svg,
               graphs,
               offset,
+              [],
               1
             );
 

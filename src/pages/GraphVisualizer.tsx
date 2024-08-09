@@ -425,6 +425,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
               svg,
               graphs,
               offset,
+              [],
               0
             );
 

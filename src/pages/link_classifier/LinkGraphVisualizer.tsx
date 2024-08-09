@@ -106,13 +106,40 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
           .data(data.links)
           .join("line")
           .style("stroke", "#aaa")
+          .style("stroke-dasharray", (d: any) => {
+
+   
+              let is_source = false;
+              let is_target = false;
+                if (nodeMapping[hubNodeA] === d.source || nodeMapping[hubNodeA] == d.target) {
+    
+                  is_source = true
+     
+                }
+              
+                if (nodeMapping[hubNodeB] === d.target || nodeMapping[hubNodeB] == d.source) {
+                  is_target = true
+   
+                }
+              
+
+              if (is_source && is_target){ 
+                return "20";
+              }
+
+    
+        
+            return "none"
+          
+        })
+          
           .style("opacity", (d: any) => {
             if (i < 3) {
    
               let is_source = false;
               let is_target = false;
               for (let key in subgraph[i]) {
-                console.log("AWDAWD", nodeMapping[key])
+     
                 if (nodeMapping[key] === d.source) {
     
                   is_source = true
@@ -139,15 +166,6 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
 
           } )
 
-          if (i < 3) {
-            console.log("CBUAWC", subgraph)
-            console.log("AW", Object.keys(subgraph[i]))
-            
-            console.log("AddW", data.links)
-            console.log(['109', '241'].includes(String(109)))
-
-          }
-
 
         const node = g1
           .selectAll("circle")
@@ -169,11 +187,6 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
           .attr("text-anchor", "middle")
           .attr("dominant-baseline", "central")
           .attr("opacity", 0)
-
-
-
-
-    
 
 
         d3.forceSimulation(data.nodes)
@@ -199,8 +212,6 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
           node.attr("cx", (d: any) => d.x).attr("cy", (d: any) => d.y);
           labels.attr("x", (d: any) => d.x).attr("y", (d: any) => d.y);
         }
-
-
 
 
         function updatePositions() {
@@ -239,7 +250,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
           })
 
 
-    
+  
   const extentX = d3.extent(data.nodes, (d: any) => d.x) as [number | undefined, number | undefined];
   const extentY = d3.extent(data.nodes, (d: any) => d.y) as [number | undefined, number | undefined];
 
@@ -340,6 +351,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
                 svg,
                 graphs,
                 offset,
+                subgraph,
                 2
               );
               svg.selectAll("circle")
