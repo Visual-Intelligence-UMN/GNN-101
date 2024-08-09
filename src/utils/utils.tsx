@@ -346,6 +346,7 @@ export type NodeType = {
   name: string;
   features: number[];
   is_aromatic: boolean;
+  original_id: string
 };
 
 export type LinkType = {
@@ -442,7 +443,8 @@ export async function data_prep(o_data: any) {
         id: i,
         name: node_name,
         features: nodes[i],
-        is_aromatic: is_aromatic
+        is_aromatic: is_aromatic,
+        original_id: "Unknown"
       }
       final_data.nodes.push(new_node);
     }
@@ -487,7 +489,8 @@ export async function prep_graphs(g_num: number, data: any) {
       id: 0,
       name: " ",
       features: [0],
-      is_aromatic: false
+      is_aromatic: false,
+      original_id: "Unknown"
     } 
 
     var node_array = [];
@@ -553,6 +556,7 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
 
   if (movedNode && (!event.target.classList.contains("vis-component"))) {
     svg.selectAll(".vis-component").style("opacity", 0);
+    d3.selectAll(".hintLabel").attr("opacity", 1);
     let currMoveOffset = moveOffset;
 
     for (let i = 0; i < colorSchemes.length; i++) {
@@ -588,6 +592,11 @@ export function featureVisualizer(
   mode: number,
 ) {
   state.isClicked = false;
+
+  console.log("fwad", allNodes)
+
+
+
 
 
   
@@ -648,12 +657,18 @@ export function featureVisualizer(
 
 
 
-
+    
 
     let xOffset = (graphIndex - 2.5) * offset;
     if (graphIndex >= 4 && mode === 0) {
       xOffset = (graphIndex - 2.5) * offset - 25 * (graphIndex * 1.5);
     }
+    if (mode === 2) {
+      xOffset = (graphIndex - 3.5) * offset;
+
+    }
+
+
 
     const g2 = svg.append("g")
       .attr("layerNum", graphIndex)
@@ -848,6 +863,7 @@ export function featureVisualizer(
               return;
             }
             state.isClicked = true;
+            d3.selectAll(".hintLabel").attr("opacity", 0);
 
                     //  // prevent clicking on other nodes and move the layers to the right again
                     //  if (movedNode === node) {
@@ -1018,6 +1034,7 @@ export function featureVisualizer(
             return;
           }
           state.isClicked = true;
+          d3.selectAll(".hintLabel").attr("opacity", 0);
 
 
 
@@ -1086,7 +1103,6 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
 
 
   nodesByIndex.forEach((nodes, graphIndex) => {
-
     nodes.forEach((node: any, i) => {
 
       if (!node.links) {
@@ -1099,11 +1115,17 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
         let xOffset1 = (graphIndex - 2.5) * offset;
         let xOffset2 = (graphIndex - 1.5) * offset;
 
+
       let conv = 3;
       // if (mode === 1) {
       //   conv = 4;
         
       // }
+      if (mode === 2) {
+        xOffset1 = (graphIndex - 3.5) * offset;
+        xOffset2 = (graphIndex - 2.5) * offset;
+        conv = 2
+      }
       if (graphIndex < conv) { 
         
         let drawnLinks = new Set();
@@ -1129,6 +1151,8 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
               const controlX2 = node.x + xOffset1 + (neighborNode.x + xOffset2 - node.x - xOffset1) * 0.2;
               const controlY2 = neighborNode.y + 10;
               const avg = calculateAverage(node.features)
+              let neighborOffset = (neighborNode.graphIndex - 2.5) * offset
+              if (mode === 2) {neighborOffset -= offset}
 
               const path = svg.append("path")
                 .attr("d", 
@@ -1140,7 +1164,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
                   ${controlY1}, 
                   ${controlX2} 
                   ${controlY2}, 
-                  ${neighborNode.x + (neighborNode.graphIndex - 2.5) * offset - 16} 
+                  ${neighborNode.x + neighborOffset - 16} 
                   ${neighborNode.y + 10}
                 `)
                 .style("stroke", linkStrength(avg))
@@ -1160,7 +1184,9 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
           if (nextNode) {
           nextNode.forEach((nextNode: any) => {
             if (node.id === nextNode.id) {
-              const xOffsetNext = (graphIndex + 1 - 2.5) * offset;
+              let xOffsetNext = (graphIndex + 1 - 2.5) * offset;
+              if (mode === 2) {xOffsetNext -= offset}
+
 
               const controlX1 = node.x + xOffset1 + (nextNode.x + xOffsetNext - node.x - xOffset1) * 0.3;
               const controlY1 = node.y + 10;
@@ -1193,11 +1219,12 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
             }
           })
         }
+     
       
         
       } else {  
         if (mode === 1) {
-          if (graphIndex === 3) {
+          if (graphIndex === 2) {
             const nextLayerNodes = nodesByIndex.get(graphIndex + 1);
           if (nextLayerNodes) {
             nextLayerNodes.forEach((nextNode: any) => {
@@ -1239,6 +1266,11 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
             xOffset1 = (graphIndex - 2.5) * offset;
             
           }
+          if (mode === 2) {
+            xOffset1 = xOffset1 - offset + 150
+            xOffset2 = xOffset2 - offset + 100
+
+          }
           
           
           const nextLayer = graphs[graphIndex + 1];
@@ -1273,6 +1305,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
       
     });
   });
+
 
  }
 

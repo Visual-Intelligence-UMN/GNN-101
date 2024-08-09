@@ -182,6 +182,7 @@ export function outputVisualizer(
     mode: number
 
 ) {
+    console.log("AWFAWF", allWeights)
 
     let weights = allWeights[3];
     if (!svg.selectAll) {
@@ -329,9 +330,9 @@ export function outputVisualizer(
         .attr("opacity", 0)
         .lower();
 
-        const Xt = weights;;
+        const Xt = weights;
 
-    hoverOverHandler(node, node.relatedNodes[0].features, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg)
+    hoverOverHandler(node, node.relatedNodes[0].features, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true)
 
     let outputData = [];
     for (let i = 0; i < calculatedData.length; i++) {
@@ -765,8 +766,11 @@ export function calculationVisualizer(
     let end_x = 0;
     let end_y = 0;
 
-
+    
     let moveToX = 3.5 * offset - 100;
+    if (mode === 2) {
+        moveToX += offset
+    }
     let moveToY = height / 20;
     if (node.relatedNodes.length <= 8) {
         moveToY = height / 5;
@@ -842,7 +846,7 @@ export function calculationVisualizer(
         .delay(3500)
         .style("opacity", 1);
 
-    for (let i = 0; i < 64; i++) {
+    for (let i = 0; i < node.relatedNodes[0].features.length; i++) {
         let s: [number, number] = [
             node.graphIndex * offset +
             i * prevRectHeight +
@@ -909,7 +913,8 @@ export function calculationVisualizer(
         .style("stroke-width", 1)
         .style("opacity", 0);
 
-    for (let i = 0; i < 64; i++) {
+        
+    for (let i = 0; i < node.features.length; i++) {
         let s: [number, number] = [
             node.graphIndex * offset +
             i * rectHeight +
@@ -925,7 +930,6 @@ export function calculationVisualizer(
         matrixRectSize /= 2
     }
     let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, matrixRectSize, node.features.length, weights, node.graphIndex - 1);
-
 
 
 
@@ -1077,7 +1081,7 @@ export function calculationVisualizer(
             displayHeight,
             mode
         );
-        hoverOverHandler(node, aggregatedData, state, g4, displayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, weights, node.graphIndex - 1, weightsLocation, Xt, startCoordList, endCoordList, svg)
+        hoverOverHandler(node, aggregatedData, state, g4, displayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, weights, node.graphIndex - 1, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, false)
 
 
 
@@ -1212,8 +1216,7 @@ export function calculationVisualizer(
                         d3.selectAll(".softmaxLabel").attr("opacity", 1);
                         d3.selectAll(".intermediate-path").attr("opacity", 0);
                         d3.selectAll(".aniRect").style("opacity", 1);
-             
-
+            
         // relu
         const relu = g3.append("g");
         let svgPath = "./assets/SVGs/ReLU.svg";
@@ -1493,7 +1496,8 @@ function weightAnimation(
 
         }
     }
-
+    console.log("start:", startCoordList)
+    console.log("end:", endCoordList)
 
 
 
@@ -1557,7 +1561,7 @@ function weightAnimation(
             return;
         }
 
-        d3.selectAll(".weightUnit").style("opacity", 0.3).lower();
+        d3.selectAll(".weightUnit").attr("opacity", 0.3).lower();
         if (i >= endNumber) {
             i = 0; // Reset the index to replay the animation
         }
@@ -1588,20 +1592,21 @@ function weightAnimation(
                 //     state
                 // );
                 if (mode === 0 && node.graphIndex === 5) {
+                    d3.select(`#columnUnit-${i - 1}`).style("opacity", 0).lower();
                     const math = create(all, {});
                     const wMat = math.transpose(allWeights[3]);
 
-                    displayerHandler(node, aggregatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, i)
+                    displayerHandler(node, aggregatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, i, mode, true)
                 } else {
-                displayerHandler(node, aggregatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, allWeights, node.graphIndex - 1, weightsLocation, i)
+                displayerHandler(node, aggregatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, allWeights, node.graphIndex - 1, weightsLocation, i, mode, false)
                 }
 
 
                 
-                graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg)
+                graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode, node)
 
                 d3.selectAll(`#weightUnit-${i - 1}`).style("opacity", 0.3).lower();
-                d3.select(`#columnUnit-${i - 1}`).style("opacity", 0).lower();
+                d3.selectAll(`#columnUnit-${i - 1}`).style("opacity", 0).lower();
                 d3.selectAll(`#weightUnit-${i}`).style("opacity", 1).raise();
                 d3.select(`#columnUnit-${i}`).style("opacity", 1).raise();
 
@@ -1793,7 +1798,7 @@ export function matrixMultiplication(matrix_a: any[], matrix_b: any[]) {
     const colsB = matrix_b[0].length;
 
     if (colsA !== rowsB) {
-
+console.log("not match")
 
 
         return [];
@@ -2316,7 +2321,7 @@ export function nodeOutputVisualizer(
         .lower();
 
         const Xt = math.transpose(weights);
-    hoverOverHandler(node, calculatedData, state, g5, DisplayHeight, (20 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg)
+    hoverOverHandler(node, calculatedData, state, g5, DisplayHeight, (20 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true)
 
 
 

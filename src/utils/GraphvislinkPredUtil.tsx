@@ -1,7 +1,8 @@
-import { get_features_origin, graph_to_matrix, linkPrediction, LinkType, load_json, NodeType } from "@/utils/utils";
+import { deepClone, get_features_origin, graph_to_matrix, linkPrediction, LinkType, load_json, NodeType } from "@/utils/utils";
 import { getNodeSet } from "@/utils/linkPredictionUtils";
 import { error } from "console";
 import { extractSubgraph } from "./graphDataUtils";
+import { sources } from "next/dist/compiled/webpack/webpack";
 
 
 // this function transfrom the raw graph
@@ -39,151 +40,97 @@ export async function dataProccessGraphVisLinkPrediction(graph_path: any, hubNod
         let newGraph: Graph = { x: [], new_relation: []};
 
 
+        const nodeMapping: { [key: number]: number } = {};
+        let newId = 0;
+
+        for (const originalId of mergedNodes) {
+            nodeMapping[originalId] = newId++;
+        }
+
+
 
         for (const key in subGraph) {
             if (subGraph.hasOwnProperty(key)) {
                 const value = subGraph[key];
-                //console.log(`Key: ${key}, Value: ${JSON.stringify(value)}`);
+
                 newGraph.x.push(data.x[key])
                 for (let j = 0; j < value.length; j++) {
                     if (key != value[j]) {
                         var new_relation = {
-                            source: Number(key),
-                            target: Number(value[j]),
+                            source: nodeMapping[Number(key)],
+                            target: nodeMapping[(value[j])],
                             type: "single"
-                        } 
+                        }
                         newGraph.new_relation.push(new_relation)
                     }
-
-                    
                 }
                 }
             }
-        
 
+
+            var new_relation: LinkType = {
+                source: nodeMapping[hubNodeB],
+                target: nodeMapping[hubNodeA],
+                type: "single"               
+            }
+            newGraph.new_relation.push(new_relation)
+        
         let final_data = {
             nodes: [] as NodeType[],
             links: [] as LinkType[],
         };
-        var nodes = newGraph.x;
         for (const key in subGraph) {
             let node_name = "Unknown";
+            const features: number[] = data.x[key];
             var new_node = {
-              id: Number(key),
+              id: nodeMapping[Number(key)],
               name: node_name,
-              features: subGraph[key],
-              is_aromatic: false
+              features: features,
+              is_aromatic: false,
+              original_id: key,
             }
             final_data.nodes.push(new_node);
         }
 
         final_data.links = newGraph.new_relation;
 
-        let nodes1A:number[] = getNodeSet(graph, hubNodeA)[1];
-        let nodes1B:number[] = getNodeSet(graph, hubNodeB)[1];
-
-        //console.log("nodesA", nodesA);
-        //console.log("nodesB", nodesB);
-
-        const mergedNodes1 = [...nodes1A, ...nodes1B];
-
-        const subGraph1 = extractSubgraph(graph, mergedNodes1);
-
-        //console.log("subGraph", subGraph1);
-
-
-        let newGraph1: Graph = { x: [], new_relation: []};
+        const final_data1 = deepClone(final_data);
+        const final_data2 = deepClone(final_data);
 
 
 
-        for (const key in subGraph1) {
-            if (subGraph1.hasOwnProperty(key)) {
-                const value = subGraph1[key];
-                //console.log(`Key: ${key}, Value: ${JSON.stringify(value)}`);
-                newGraph1.x.push(data.x[key])
-                for (let j = 0; j < value.length; j++) {
-                    if (key != value[j]) {
-                        var new_relation = {
-                            source: Number(key),
-                            target: Number(value[j]),
-                            type: "single"
-                        } 
-                        newGraph1.new_relation.push(new_relation)
-                    }
+        var new_node = {
+            id: 0,
+            name: "Unknown",
+            features: [0],
+            is_aromatic: false,
+            original_id: "0",
+          }
+        var new_relation = {
+            source: 0,
+            target: 0,
+            type: "single"
+        }
 
-                    
-                }
-                }
-            }
-        
-            let final_data1 = {
-                nodes: [] as NodeType[],
-                links: [] as LinkType[],
-            };
-            var nodes1 = newGraph1.x;
-            for (const key in subGraph) {
-                let node_name = "Unknown";
-                var new_node1 = {
-                  id: Number(key),
-                  name: node_name,
-                  features: subGraph1[key],
-                  is_aromatic: false
-                }
-                final_data1.nodes.push(new_node1);
-            }
-    
-            final_data1.links = newGraph1.new_relation;    
-      
-          
-
-
-            var final_data2 = {
-                nodes: [] as NodeType[],
-                links: [] as LinkType[],
-            }
-            var NodeA= {
-                id: hubNodeA,
-                name: "Unknown",
-                features: data.x[hubNodeA],
-                is_aromatic: false
-              }
-
-            var NodeB= {
-                id: hubNodeB,
-                name: "Unknown",
-                features: data.x[hubNodeB],
-                is_aromatic: false
-            }
-            var new_relation_A: LinkType = {
-                source: hubNodeA,
-                target: hubNodeB,
-                type: "single"
-            }
-            var new_relation_B: LinkType = {
-                source: hubNodeB,
-                target: hubNodeA,
-                type: "single"               
-            }
-            final_data2.nodes.push(NodeA)
-            final_data2.nodes.push(NodeB);
-            final_data2.links.push(new_relation_A)
-            final_data2.links.push(new_relation_B)
+        let final_data3 = {
+            nodes: [] as NodeType[],
+            links: [] as LinkType[],
+        };
+        final_data3.nodes.push(new_node)
+        final_data3.links.push(new_relation)
 
 
         result.push(final_data)
         result.push(final_data1)
         result.push(final_data2)
+        result.push(final_data3)
+
+
 
 
 
 // to-do: add the last layer
 
-
-
-
-
-        
-    
 
         return result;
 
