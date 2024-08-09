@@ -281,9 +281,33 @@ parm = []
 print("Model's learnable parameters:")
 for name, param in model.named_parameters():
     if param.requires_grad:
-        parm.append(f"{name}: {param.data}")
+        parm.append(param.data.tolist())
         print(f"{name}: {param.data.size()}")
 
+
+#%%
+
+# data extraction
+
+param = {
+    "conv1_att_src": parm[0][0][0],
+    "conv1_att_dst": parm[1][0][0],
+    "conv2_att_src": parm[4][0][0],
+    "conv2_att_dst": parm[5][0][0]
+}
+
+print(param)
+
+# 打印字典中的每个键和值的形状
+# for key, value in param.items():
+#     print(f"Key: {key}")
+#     print(f"Shape: {value.shape}")
+
+#%%
+
+
+with open('learnableVectorsGAT.json', 'w') as f:
+    json.dump(param, f, indent=4)
 
 #%%
 # python model to ONNX model
@@ -439,5 +463,24 @@ for name, param in model.named_parameters():
 
 # 打印注意力系数
 print("Attention Coefficients:", attention_coefficients)
+
+# %%
+# store all learnable parameters
+import onnx
+
+model = onnx.load('gat_link_model.onnx')
+
+
+# 获取模型图
+graph = model.graph
+
+# 遍历节点并打印节点名称及其初始值（即参数）
+for initializer in graph.initializer:
+    name = initializer.name
+    dims = initializer.dims
+    vals = initializer.float_data
+    print(f"Name: {name}")
+    print(f"Dimensions: {dims}")
+    print(f"Values: {vals[:10]}...")  # 只打印前10个值以示例
 
 # %%

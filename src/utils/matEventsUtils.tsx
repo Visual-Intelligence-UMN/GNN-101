@@ -27,10 +27,12 @@ import {
     drawTanh,
     drawWeightMatrix,
     computeMatrixLocations,
+    drawAttentions,
 } from "./matAnimateUtils";
 import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import { drawMatmulExplanation, drawSoftmaxDisplayer } from "./matInteractionUtils";
 import path from "node:path/win32";
+import { computeAttentionCoefficient, testCompute } from "./computationUtils";
 
 //graph feature events interactions - mouseover
 export function oFeatureMouseOver(
@@ -1236,8 +1238,12 @@ export function featureGATClick(
     gap:number,
     oFeatureChannels:number,
     oRectW:number,
-    activation: string = "relu"
+    featureKeysEachLayer: number[][],
+    activation: string = "relu",
 ){
+    console.log("convs", conv1, conv2, featureKeysEachLayer);
+    const largeGraphIndexes = featureKeysEachLayer[0];
+    //testCompute();
     let biasCoord: [number, number];
     let res10: [number, number];
     let res11: [number, number];
@@ -1317,7 +1323,39 @@ export function featureGATClick(
         //find multipliers
         let node_i = node;
         let node_j = adjList[node_i][i];
-        let mulV = 1 / Math.sqrt(dList[node_i] * dList[node_j]);
+        
+        //find a way to compute the attn coef - mulV
+
+        //get all neigbor features
+        let neighborsFeatures = [];
+        for(let j=0; j<adjList[node_i].length; j++){
+            if(i!=j){
+                //index mapping: (i -> itself index; j-> neighbor index)
+                let jthIndex = largeGraphIndexes[j];
+                if(layerID==0){jthIndex = j;}
+                console.log("attn inner loop", featuresTable[layerID][jthIndex], jthIndex, layerID, featuresTable);
+                neighborsFeatures.push(
+                    Array.prototype.slice.call(featuresTable[layerID][jthIndex]));
+            }
+        }
+
+        let lgI = largeGraphIndexes[node_i];
+        let lgJ = largeGraphIndexes[node_j];
+
+        if(layerID==0){
+            lgI = node_i;
+            lgJ = node_j;
+        }
+
+        let selfFeature = Array.prototype.slice.call(featuresTable[layerID][lgI]);
+
+        let targetFeature = Array.prototype.slice.call(featuresTable[layerID][lgJ]);
+
+        //get the feature of node_i
+
+        console.log("attn features", layerID, selfFeature, targetFeature, neighborsFeatures, largeGraphIndexes[node_i], largeGraphIndexes[node_j]);
+
+        const mulV = computeAttentionCoefficient(layerID+1, selfFeature, targetFeature, neighborsFeatures);
         mulValues.push(mulV);
         //compute x'
 
@@ -1480,7 +1518,7 @@ export function featureGATClick(
 
     let animateSeqAfterPath: any = [
         {func: () => {
-            drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir)
+            drawAttentions(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir)
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
         }, 
