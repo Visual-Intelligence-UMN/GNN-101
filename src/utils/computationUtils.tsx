@@ -14,16 +14,6 @@ export function concatAggregation(x: number[][]): number[] {
     return x.reduce((a, b) => a.concat(b), []);
 }
 
-export function dotProduct(arr1: number[], arr2: number[]): number {
-    if (arr1.length !== arr2.length) {
-        throw new Error("Arrays must have the same length");
-    }
-    let result = 0;
-    for (let i = 0; i < arr1.length; i++) {
-        result += arr1[i] * arr2[i];
-    }
-    return result;
-}
 
 export function computeAttnStep(
     learnableVectorsSrc: number[],
