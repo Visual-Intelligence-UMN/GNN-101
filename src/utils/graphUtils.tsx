@@ -1545,6 +1545,7 @@ function weightAnimation(
 
         event.stopPropagation();
         state.isPlaying = !state.isPlaying;
+        state.isAnimating = true;
 
         if(state.isPlaying)injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_pause.svg");
         else injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_play.svg")
@@ -1635,8 +1636,9 @@ function weightAnimation(
     
                     clearInterval(intervalID);
                     state.isPlaying = false;
+                    state.isAnimating = false;
                     d3.selectAll(".math-displayer").remove();
-                    d3.selectAll(".graph-displayer").remove();
+                    d3.selectAll(".graph-displayer").attr("opacity", 0);
 
                     injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_play.svg")
                     d3.selectAll(".aniRect").style("opacity", 1);

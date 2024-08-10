@@ -405,7 +405,7 @@ export function hoverOverHandler(node: any, aggregatedData: any, calculatedData:
     for (let i = 0; i < node.features.length; i++) {
         d3.select(`.calculatedFeatures${i}`)
             .on("mouseover", function () {
-                if (!state.isClicked) {
+                if (!state.isClicked || state.isPlaying || state.isAnimating) {
                     return;
                 }
                 console.log('Xt', Xt)
@@ -423,7 +423,7 @@ export function hoverOverHandler(node: any, aggregatedData: any, calculatedData:
 
     })
             .on("mouseout", function () {
-                if (!state.isClicked) {
+                if (!state.isClicked || state.isPlaying || state.isAnimating) {
                     return;
                 }
                 d3.selectAll(".math-displayer").remove();
