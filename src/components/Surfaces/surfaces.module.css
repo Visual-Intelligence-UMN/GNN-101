@@ -4,4 +4,5 @@
     color: white;
     height: var(--header-height);
     line-height: var(--header-height);
+    font-size: 20px;
 }
