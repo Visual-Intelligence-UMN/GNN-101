@@ -516,11 +516,13 @@ export function transposeAnyMatrix(matrix:any){
 export interface State {
   isClicked: boolean;
   isPlaying: boolean;
+  isAnimating: boolean;
 }
 
 export const state: State = {
   isClicked: false, // if isClicked is true, all mouseover/out operation would be banned and some certain functions would be called
   isPlaying: false,
+  isAnimating: false,
 };
 
 
