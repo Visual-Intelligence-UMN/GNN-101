@@ -1357,7 +1357,7 @@ export function softmax(logits: number[]) {
 export function analyzeGraph(graphData: any) {
     const nodeCount = graphData.x.length;
     const edgePairs = graphData.edge_index;
-    const edges = edgePairs[0].length;
+    let edges = edgePairs[0].length;
     const degreeMap = new Array(nodeCount).fill(0);
     const hasLoop = new Set();
     let isDirected = false;
@@ -1388,7 +1388,9 @@ export function analyzeGraph(graphData: any) {
 
 
 
-
+  if(isDirected){
+    edges *= 2;
+  }
 
 
 

@@ -123,12 +123,12 @@ export const GraphAnalysisViewer: React.FC<GraphAnalysisViewerProps> = ({
                 {data.has_isolated_node ? "Yes" : "No"}
             </div>
             <div className="mr-4">
-                <span>Has Loop</span>: {data.has_loop ? "Yes" : "No"}
+                <span>Has Self-Loop</span>: {data.has_loop ? "Yes" : "No"}
             </div>
-            {/* <div className="mr-4">
+            <div className="mr-4">
                 <span>Is Directed</span>:{" "}
                 {data.is_directed ? "Yes" : "No"}
-            </div> */}
+            </div>
         </div>
     ) : (
         <div className="flex flex-row flex-wrap items-center text-lg font-thin">
