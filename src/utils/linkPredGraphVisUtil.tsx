@@ -4,7 +4,7 @@ import * as d3 from "d3";
 import { loadLinkWeights, loadNodeWeights, loadWeights } from "./matHelperUtils";
 import * as ort from "onnxruntime-web";
 import { env } from "onnxruntime-web";
-import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature, outputVisualizer, scaleFeatureGroup, nodeOutputVisualizer } from "@/utils/graphUtils";
+import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature, scaleFeatureGroup, nodeOutputVisualizer, pathColor, weightAnimation, moveFeatures, moveFeaturesBack } from "@/utils/graphUtils";
 import { features, off } from 'process';
 
 import { IGraphData, IntmData, IntmDataLink, IntmDataNode } from "../types";
@@ -18,13 +18,17 @@ import {
   highlightNodes,
   moveNextLayer,
 } from "@/utils/graphUtils"
-import { FeatureGroupLocation, myColor, state } from "@/utils/utils"
+import { calculateAverage, FeatureGroupLocation, handleClickEvent, myColor, State, state } from "@/utils/utils"
 import { stat } from "fs";
 import { Yomogi } from "@next/font/google";
 import { dataPreparationLinkPred, constructComputationalGraph } from "./linkPredictionUtils";
 import { extractSubgraph } from "./graphDataUtils";
 import { isValidElement } from "react";
 import { isValidNode } from "./GraphvislinkPredUtil";
+import { roundToTwo } from "@/components/WebUtils";
+import { hoverOverHandler } from "./graphAnimationHelper";
+import { computeMatrixLocations, drawWeightMatrix } from "./matAnimateUtils";
+import { all, create } from "mathjs";
 
 
 export function linkPredFeatureVisualizer(
@@ -449,7 +453,7 @@ export function linkPredFeatureVisualizer(
             showFeature(node);
 
             if (node.graphIndex === 3) {
-              outputVisualizer(node, allNodes, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, convNum, svg, mode)
+              linkPredOutputVisualizer(node, allNodes, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, convNum, svg, mode)
             }
             
             reduceNodeOpacity(allNodes, relatedNodes, node);
@@ -483,3 +487,193 @@ export function linkPredFeatureVisualizer(
 
 
 }
+
+
+
+
+
+
+
+export function linkPredOutputVisualizer(
+  node: any,
+  allNodes: any[],
+  bias: any[],
+  svg: any,
+  offset: number,
+  isClicked: boolean,
+  moveOffset: number,
+  height: number,
+  prevRectHeight: number,
+  rectHeight: number,
+  rectWidth: number,
+  colorSchemes: any,
+  convNum: number,
+  originalSvg: any,
+  mode: number
+
+) {
+  if (!svg.selectAll) {
+    svg = d3.selectAll(svg)
+  }
+
+
+
+  let intervalID = 0;
+  state.isClicked = true;
+
+  d3.selectAll(".to-be-removed").remove();
+  d3.selectAll(".node-features-Copy").style("visibility", "visible").lower();
+
+  //color schemes interaction
+  for (let i = 0; i < 4; i++) colorSchemes[i].style.opacity = "0.5";
+
+
+
+  let originalCoordinates: any[] = [];
+  let coordinate
+  let index = 0;
+
+    node.relatedNodes.forEach((n: any, i: number) => {
+        
+        if (n.featureGroup) {
+            n.featureGroup
+                .transition()
+                .delay(1000)
+                .duration(1500)
+                .attr(
+                    "transform", (d: any) => {
+                      if (index === 0) {
+                      return `translate(${ (node.graphIndex + 1) * offset + 250 + 27.5}, ${height / 5 + 15 + i * 45 + 100}) rotate(-90)`
+                    }
+                    else {
+                      return `translate(${ (node.graphIndex + 1) * offset + 500 + 27.5}, ${height / 5 + 15 + i * 45 - 75}) rotate(0)`
+                    }
+                  });
+        }
+        index ++;
+        if (n.featureGroupLocation) {
+
+            coordinate = { xPos: n.featureGroupLocation.xPos, yPos: n.featureGroupLocation.yPos };
+            originalCoordinates.push(coordinate);
+        }
+    });
+
+
+    
+    svg.append("text")
+    .attr("x", (node.graphIndex - 1) * offset - 100)
+    .attr("class", "to-be-removed")
+    .attr("y", height / 3 - 15)
+    .attr("xml:space", "preserve")
+    .text("dot (                                                                 )  = ")
+    .attr("font-size", "20")
+    .attr("fill", "black")
+    .style("opacity", 1)
+
+
+    svg.append("rect")
+    .attr("x",  (node.graphIndex - 1) * offset + 330)
+    .attr("class", "to-be-removed")
+    .attr("y", height / 3 - 30)
+    .attr("width", rectHeight)
+    .attr("height", rectHeight)
+    .style("stroke", "black")
+    .attr("fill", myColor(node.features[0]))
+    .lower();
+
+    svg.append("text")
+    .attr("x",  (node.graphIndex - 1) * offset + 330)
+    .attr("class", "to-be-removed")
+    .attr("y", height / 3 - 15)
+    .text(roundToTwo(node.features[0]))
+    .attr("fill", "white")
+    .attr("font-size", "12")
+    .style("opacity", 1)
+
+
+  const g5 = svg
+      .append("g")
+      .attr("transform", `translate(${node.x - 90}, ${node.y - 180})`);
+
+
+  let DisplayerWidth = 300; // Width of the graph-displayer
+  let DisplayHeight = 75;
+
+  const graphDisplayer = g5
+      .append("rect")
+      .attr("x", (node.graphIndex - 2) * 1)
+      .attr("y", 0)
+      .attr("width", DisplayerWidth)
+      .attr("height", DisplayHeight)
+      .attr("rx", 10)
+      .attr("ry", 10)
+      .style("fill", "transparent")
+      .style("stroke", "black")
+      .style("stroke-width", 2)
+      .attr("class", "graph-displayer")
+      .attr("opacity", 0)
+      .lower();
+
+
+
+
+
+
+
+
+
+
+
+
+
+  for (let i = 0; i < node.features.length; i++) {
+      d3.select(`#output-layer-rect-${i}`)
+          .on("mouseover", function () {
+              if (!state.isClicked) {
+                  return;
+              }
+              
+
+
+
+          })
+          .on("mouseout", function () {
+              if (!state.isClicked) {
+                  return;
+              }
+              d3.selectAll(".math-displayer").remove();
+              d3.selectAll(".graph-displayer").attr("opacity", 0);
+              d3.selectAll(".softmax").attr("opacity", 0.07);
+              d3.selectAll(`.softmax${i}`).attr("opacity", 0.07);
+          });
+  }
+
+  d3.select("#my_dataviz").on("click", function(event: any) {
+    d3.selectAll(".math-displayer").remove();
+    d3.selectAll(".graph-displayer").remove();
+ 
+        d3.selectAll(".node-features-Copy").style("visibility", "hidden")
+        d3.selectAll(".weightUnit").remove();
+        d3.selectAll(".columnUnit").remove();
+        d3.selectAll(".procVis").remove();
+        d3.selectAll(".to-be-removed").remove();
+
+        d3.selectAll(".graph-displayer").remove();
+        for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "1";
+        moveFeaturesBack(node.relatedNodes, originalCoordinates);
+        node.featureGroup
+            .transition()
+            .duration(1000)
+            .attr(
+                "transform",
+                `translate(${node.x - 7.5}, ${node.y + 170 + 5}) rotate(0)`
+            );
+
+            handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state)
+
+
+})
+
+}
+
+

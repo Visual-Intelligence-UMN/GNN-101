@@ -1465,7 +1465,7 @@ export function moveNextLayer(
 
 }
 
-function weightAnimation(
+export function weightAnimation(
     svg: any,
     node: any, startCoordList: number[][],
     endCoordList: number[][],
@@ -1822,7 +1822,7 @@ console.log("not match")
     return result;
 }
 
-function moveFeatures(relatedNodes: any, xPos: number, yPos: number) {
+export function moveFeatures(relatedNodes: any, xPos: number, yPos: number) {
     let originalCoordinates: any[] = [];
     let coordinate: FeatureGroupLocation;
     let x;
@@ -1850,7 +1850,7 @@ function moveFeatures(relatedNodes: any, xPos: number, yPos: number) {
     return originalCoordinates;
 }
 
-function moveFeaturesBack(
+export function moveFeaturesBack(
     relatedNodes: any,
     originalCoordinates: FeatureGroupLocation[]
 ) {
