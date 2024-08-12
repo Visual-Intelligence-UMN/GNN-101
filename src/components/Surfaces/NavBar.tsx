@@ -7,7 +7,8 @@ export default function Navbar() {
             <div className="flex flex-wrap items-center justify-between mx-20">
                 <a href="#" className="flex items-center space-x-3 rtl:space-x-reverse">
                     <div className="self-center text-2xl font-semibold whitespace-nowrap text-white">
-                        <Image src='/assets/PNGs/logo/GNNLogo.png' alt="Logo" width={220} height={75} style={{ width: 'auto' }} />
+                        {/* <Image src='/assets/PNGs/logo/GNNLogo.png' alt="Logo" width={220} height={75} style={{ width: 'auto' }} /> */}
+                        <img src='/assets/PNGs/logo/GNNLogo.png' alt="Logo" width={220} height={75} />
                     </div>
                 </a>
                 <div id="navbar-default">
