@@ -539,6 +539,7 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
 
   if (movedNode && (!event.target.classList.contains("vis-component"))) {
     svg.selectAll(".vis-component").style("opacity", 0);
+    svg.selectAll(".button-group").remove()
     let currMoveOffset = moveOffset;
 
     for (let i = 0; i < colorSchemes.length; i++) {

@@ -632,8 +632,17 @@ export function featureVisClick(
     let btnX = playBtnCoord[0];
     const btnY = playBtnCoord[1]+rectH;
 
+    let coordPathStartingPt:[number, number] = [
+        wmCoord[0],
+        wmCoord[1]
+    ]
+
     if(layerID==0 && oFeatureChannels==34){
-        btnX += 100;
+        btnX += 105;
+
+        coordPathStartingPt[0] += 35;
+
+        
     }
 
 
@@ -674,7 +683,7 @@ export function featureVisClick(
         // {func: () => , delay: aniSec},
         {func: () => {
             drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels)
-            drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels)
+            drawFinalPath(coordPathStartingPt, res00, res01, nextCoord, layerID, featureChannels)
             if(featureVisTable.length==4&&layerID==2){
                 //if it's the last layer, don't show the relu icon
             }
@@ -755,13 +764,13 @@ export function featureVisClick(
             }
 
             if(featureChannels==4&&layerID==2&&currentStep >= 2){
-                d3.select(".mats").selectAll(".removeRect").remove();
+                d3.select(".mats").transition().delay(200).selectAll(".removeRect").remove();
                 //   d3.select(".mats").selectAll(".pauseRemove").remove();
-                d3.selectAll("#tempath").remove();
-                d3.select(".wMatLink").style("opacity", 1);
-                d3.selectAll(".interactRect").style("pointer-events", "auto");
+                d3.selectAll("#tempath").transition().delay(200).remove();
+                d3.select(".wMatLink").transition().delay(200).style("opacity", 1);
+                d3.selectAll(".interactRect").transition().delay(200).style("pointer-events", "auto");
               //  d3.select(".mats").selectAll(".").remove();
-              d3.selectAll(".matmul-displayer").remove();
+              d3.selectAll(".matmul-displayer").transition().delay(200).remove();
                 currentStep = 0; // 重置步骤
             }
             if (currentStep >= featureChannels) {
@@ -800,12 +809,12 @@ export function featureVisClick(
 
 
                 if(featureChannels==4&&layerID==2&&currentStep >= 2){
-                    d3.selectAll("#tempath").remove();
-                    d3.select(".wMatLink").style("opacity", 1);
-                    d3.selectAll(".interactRect").style("pointer-events", "auto");
-                    d3.selectAll(".matmul-displayer").remove();
-                    d3.selectAll(".weightUnit").style("opacity", 1);
-                    d3.selectAll(".columnUnit").style("opacity", 0);
+                    d3.selectAll("#tempath").transition().delay(200).remove();
+                    d3.select(".wMatLink").transition().delay(200).style("opacity", 1);
+                    d3.selectAll(".interactRect").transition().delay(200).style("pointer-events", "auto");
+                    d3.selectAll(".matmul-displayer").transition().delay(200).remove();
+                    d3.selectAll(".weightUnit").transition().delay(200).style("opacity", 1);
+                    d3.selectAll(".columnUnit").transition().delay(200).style("opacity", 0);
                     injectPlayButtonSVG(
                         btn,
                         btnX,
@@ -826,12 +835,12 @@ export function featureVisClick(
                 }
 
                 if (currentStep >= featureChannels || !lock) {
-                    d3.selectAll("#tempath").remove();
-                    d3.select(".wMatLink").style("opacity", 1);
-                    d3.selectAll(".matmul-displayer").remove();
-                    d3.selectAll(".weightUnit").style("opacity", 1);
-                    d3.selectAll(".columnUnit").style("opacity", 0);
-                    d3.selectAll(".interactRect").style("pointer-events", "auto");
+                    d3.selectAll("#tempath").transition().delay(200).remove();
+                    d3.select(".wMatLink").transition().delay(200).style("opacity", 1);
+                    d3.selectAll(".matmul-displayer").transition().delay(200).remove();
+                    d3.selectAll(".weightUnit").transition().delay(200).style("opacity", 1);
+                    d3.selectAll(".columnUnit").transition().delay(200).style("opacity", 0);
+                    d3.selectAll(".interactRect").transition().delay(200).style("pointer-events", "auto");
                     injectPlayButtonSVG(
                         btn,
                         btnX,
@@ -1164,10 +1173,10 @@ export function outputVisClick(
         }
         //replay controls
         if (!isPlaying || currentStep >= 2 || currentStep == 0) {
-            d3.selectAll("#tempath").remove();
-            d3.select(".wMatLink").style("opacity", 1);
-            d3.selectAll(".interactRect").style("pointer-events", "auto");
-            d3.selectAll(".matmul-displayer").remove();
+            d3.selectAll("#tempath").transition().delay(200).remove();
+            d3.select(".wMatLink").transition().delay(200).style("opacity", 1);
+            d3.selectAll(".interactRect").transition().delay(200).style("pointer-events", "auto");
+            d3.selectAll(".matmul-displayer").transition().delay(200).remove();
             injectPlayButtonSVG(
                 btn,
                 btnX,
@@ -1175,11 +1184,11 @@ export function outputVisClick(
                 "./assets/SVGs/matmul.svg"
             );
             if (currentStep >= 2) {
-                d3.selectAll(".matmul-displayer").remove();
-                d3.select(".wMatLink").style("opacity", 1);
-                d3.selectAll(".interactRect").style("pointer-events", "auto");
-                d3.selectAll("#tempath").remove();
-                d3.select(".mats").selectAll(".removeRect").remove();
+                d3.selectAll(".matmul-displayer").transition().delay(200).remove();
+                d3.select(".wMatLink").transition().delay(200).style("opacity", 1);
+                d3.selectAll(".interactRect").transition().delay(200).style("pointer-events", "auto");
+                d3.selectAll("#tempath").transition().delay(200).remove();
+                d3.select(".mats").transition().delay(200).selectAll(".removeRect").remove();
                 currentStep = 0; // 重置步骤
             }
             animateSeq[0].delay = 1;

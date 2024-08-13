@@ -147,7 +147,7 @@ export function drawSoftmaxDisplayer(
         .text(roundToTwo(result[0]))
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
-        .attr("fill", "white");
+        .attr("fill", determineColor(result[0]));
     d3.select(".mats")
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 4)
@@ -173,7 +173,7 @@ export function drawSoftmaxDisplayer(
         .text(roundToTwo(result[1]))
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
-        .attr("fill", "white");
+        .attr("fill", determineColor(result[1]));
     d3.select(".mats")
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 9)
@@ -215,6 +215,16 @@ export function drawSoftmaxDisplayer(
         .attr("font-size", unitSize / 2)
         .attr("fill", textColor);
 }
+
+
+function determineColor(val: number) {
+    if (Math.abs(val) > 0.5) {
+        return "white";
+    }
+
+    return "black";
+}
+
 
 export function drawSoftmaxDisplayerNodeClassifier(
     displayerPos: number[],
@@ -285,7 +295,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .text(roundToTwo(nthOutputVals[Number(rectID)]))
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
-        .attr("fill", "white");
+        .attr("fill", determineColor(nthOutputVals[Number(rectID)]));
     d3.select(".mats")
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 8 + upperOffset)
@@ -343,7 +353,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .text(roundToTwo(nthOutputVals[0]))
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
-        .attr("fill", "white");
+        .attr("fill", determineColor(nthOutputVals[0]));
     d3.select(".mats")
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 4)
@@ -369,7 +379,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .text(roundToTwo(nthOutputVals[1]))
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
-        .attr("fill", "white");
+        .attr("fill", determineColor(nthOutputVals[1]));
 
     d3.select(".mats")
         .append("text")
@@ -396,7 +406,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .text(roundToTwo(nthOutputVals[2]))
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
-        .attr("fill", "white");
+        .attr("fill", determineColor(nthOutputVals[2]));    
 
     d3.select(".mats")
         .append("text")
@@ -423,7 +433,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .text(roundToTwo(nthOutputVals[3]))
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
-        .attr("fill", "white");
+        .attr("fill", determineColor(nthOutputVals[3]));
     d3.select(".mats")
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 19)

@@ -897,7 +897,7 @@ export function visualizeNodeClassifierFeatures(
                         drawWeightsVector(g, nthOutputVals, finalOutputCoord,
                             15, 10, myColor, wMat, startPathCoords,
                             endPathCoords, curveDir, weightMatrixPostions,
-                            featureChannels, prevCon3Val, "procVis wRect");
+                            featureChannels, prevCon3Val, "procVis wRect", "");
                         drawPathBtwOuputResult([vectorAfterMatMulPath], finalOutputCoord);
                     }, delay: aniSec
                 },
@@ -946,8 +946,8 @@ export function visualizeNodeClassifierFeatures(
                                     btnY,
                                     "./assets/SVGs/matmul.svg"
                                 );
-                                d3.selectAll("#tempath").remove();
-                                d3.selectAll(".matmul-displayer").remove();
+                                d3.selectAll("#tempath").transition().delay(200).remove();
+                                d3.selectAll(".matmul-displayer").transition().delay(200).remove();
                                 clearInterval(intervalID);
                             }
                         }, 250);
@@ -1004,8 +1004,8 @@ export function visualizeNodeClassifierFeatures(
                 }
                 //replay controls
                 if (!isPlaying || currentStep >= 4 || currentStep == 0) {
-                    d3.selectAll("#tempath").remove();
-                    d3.selectAll(".matmul-displayer").remove();
+                    d3.selectAll("#tempath").transition().delay(200).remove();
+                    d3.selectAll(".matmul-displayer").transition().delay(200).remove();
                     btn.selectAll("*").remove();
                     injectPlayButtonSVG(
                         btn,
@@ -1014,10 +1014,10 @@ export function visualizeNodeClassifierFeatures(
                         "./assets/SVGs/playBtn_pause.svg"
                     );
                     if (currentStep >= 4) {
-                        d3.selectAll("#tempath").remove();
-                        d3.selectAll(".matmul-displayer").remove();
-                        d3.select(".mats").selectAll(".removeRect").remove();
-                        d3.select(".mats").selectAll(".pauseRemove").remove();
+                        d3.selectAll("#tempath").transition().delay(200).remove();
+                        d3.selectAll(".matmul-displayer").transition().delay(200).remove();
+                        d3.select(".mats").selectAll(".removeRect").transition().delay(200).remove();
+                        d3.select(".mats").selectAll(".pauseRemove").transition().delay(200).remove();
                         currentStep = 0; // 重置步骤
                         featureVisTable[4][node].style.opacity = "0.25";
                         resultLabelsList[node].style.fill = "gray";
