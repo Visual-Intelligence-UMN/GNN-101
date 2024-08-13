@@ -574,7 +574,9 @@ export function outputVisualizer(
                     .attr("y", displayHeight - 40 + rectL / 2)
                     .text(roundToTwo(calculatedData[0]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "5")
+                    .attr("fill", Math.abs(calculatedData[0]) > 0.7 ? "white" : "black");
+                    
 
                 g5.append("rect")
                     .attr("x", displayerWidth - 130)
@@ -590,7 +592,8 @@ export function outputVisualizer(
                     .attr("y", displayHeight - 40 + rectL / 2)
                     .text(roundToTwo(calculatedData[1]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "5")
+                    .attr("fill", Math.abs(calculatedData[1]) > 0.7 ? "white" : "black");
 
                 g5.append("rect")
                     .attr("x", 100)
@@ -606,7 +609,8 @@ export function outputVisualizer(
                     .attr("y", 10 + rectL / 2)
                     .text(roundToTwo(calculatedData[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "5")
+                    .attr("fill", Math.abs(calculatedData[i]) > 0.7 ? "white" : "black");
 
                 g5.append("text")
                     .attr("x", displayerWidth / 2 - 50)
@@ -669,7 +673,8 @@ export function outputVisualizer(
                     .attr("y", 25 + rectL / 2)
                     .text(roundToTwo(node.features[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "5")
+                    .attr("fill", Math.abs(node.features[i]) > 0.7 ? "white" : "black");
             })
             .on("mouseout", function () {
                 if (!state.isClicked) {
@@ -2117,7 +2122,8 @@ function poolingLayerInteraction(
                         .attr("y", numRect[j][1] + rectL / 2)
                         .text(roundToTwo(node.relatedNodes[j].features[i]))
                         .attr("class", "math-displayer")
-                        .attr("font-size", "5");
+                        .attr("font-size", "5")
+                        .attr("fill", Math.abs(node.relatedNodes[j].features[i]) > 0.7 ? "white" : "black");
                 }
                 // append text
 
@@ -2158,7 +2164,9 @@ function poolingLayerInteraction(
                     .attr("y", 30 - rectL / 2)
                     .text(roundToTwo(node.features[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "5")
+                    .attr("fill", Math.abs(node.features[i]) > 0.7 ? "white" : "black");
+                    
             })
             .on("mouseout", function () {
                 if (!state.isClicked) {
@@ -2572,7 +2580,8 @@ export function nodeOutputVisualizer(
                     .attr("y", displayHeight - 40 + rectL / 2)
                     .text(roundToTwo(calculatedData[0]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "5")
+                    .attr("fill", Math.abs(calculatedData[0]) > 0.7 ? "white" : "black");
 
                 g5.append("rect")
                     .attr("x", 100)
@@ -2588,7 +2597,8 @@ export function nodeOutputVisualizer(
                     .attr("y", displayHeight - 40 + rectL / 2)
                     .text(roundToTwo(calculatedData[1]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "5")
+                    .attr("fill", Math.abs(calculatedData[1]) > 0.7 ? "white" : "black");
 
 
 
@@ -2606,7 +2616,8 @@ export function nodeOutputVisualizer(
                     .attr("y", displayHeight - 40 + rectL / 2)
                     .text(roundToTwo(calculatedData[2]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "5")
+                    .attr("fill", Math.abs(calculatedData[2]) > 0.7 ? "white" : "black");
 
 
                     g5.append("rect")
@@ -2623,7 +2634,8 @@ export function nodeOutputVisualizer(
                     .attr("y", displayHeight - 40 + rectL / 2)
                     .text(roundToTwo(calculatedData[3]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "5")
+                    .attr("fill", Math.abs(calculatedData[3]) > 0.7 ? "white" : "black");
 
 
 
@@ -2653,7 +2665,8 @@ export function nodeOutputVisualizer(
                     .attr("y", 10 + rectL / 2)
                     .text(roundToTwo(calculatedData[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5").style("fill", "black");
+                    .attr("font-size", "5")
+                    .attr("fill", Math.abs(calculatedData[i]) > 0.7 ? "white" : "black");
 
                 g5.append("text")
                     .attr("x", 100 - 27)
@@ -2751,6 +2764,7 @@ export function nodeOutputVisualizer(
                     .text(roundToTwo(node.features[i]))
                     .attr("class", "math-displayer")
                     .attr("font-size", "5")
+                    .attr("fill", Math.abs(node.features[i]) > 0.7 ? "white" : "black");
             })
             .on("mouseout", function () {
                 if (!state.isClicked) {

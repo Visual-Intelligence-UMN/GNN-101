@@ -304,7 +304,8 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 .attr("y", displayHeight - 10 - 5)
                 .text(roundToTwo(aggregatedData[0]))
                 .attr("class", "math-displayer")
-                .attr("font-size", "3");
+                .attr("font-size", "3")
+                .attr("fill", Math.abs(aggregatedData[0]) > 0.7 ? "white" : "black");
 
 
 
@@ -325,7 +326,8 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 .attr("y", displayHeight - 10 - 5)
                 .text(roundToTwo(weights[index][0][i]))
                 .attr("class", "math-displayer")
-                .attr("font-size", "3");
+                .attr("font-size", "3")
+                .attr("fill", Math.abs(weights[index][0][1]) > 0.7 ? "white" : "black");
 
 
 
@@ -347,7 +349,8 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 .attr("y", displayHeight - 10 - 5)
                 .text(roundToTwo(aggregatedData[1]))
                 .attr("class", "math-displayer")
-                .attr("font-size", "3");
+                .attr("font-size", "3")
+                .attr("fill", Math.abs(aggregatedData[1]) > 0.7 ? "white" : "black");
 
 
 
@@ -368,7 +371,8 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 .attr("y", displayHeight - 10 - 5)
                 .text(roundToTwo(weights[index][1][i]))
                 .attr("class", "math-displayer")
-                .attr("font-size", "3");
+                .attr("font-size", "3")
+                .attr("fill", Math.abs(weights[index][1][i]) > 0.7 ? "white" : "black");
 
 
 
@@ -391,7 +395,8 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 .attr("y", displayHeight - 10 - 5)
                 .text(roundToTwo(calculatedData[i]))
                 .attr("class", "math-displayer")
-                .attr("font-size", "3");
+                .attr("font-size", "3")
+                .attr("fill", Math.abs(calculatedData[i]) > 0.7 ? "white" : "black");
 
 
 
