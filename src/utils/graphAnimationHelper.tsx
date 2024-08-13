@@ -190,6 +190,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 if (!g.selectAll) {
                     g = d3.selectAll(g)
                 }
+                
 
                 d3.select(".graph-displayer").attr("opacity", 1);
                 console.log('weight before transformations', weights)
@@ -216,9 +217,12 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 }
 
 
+
                 console.log('weights matrix is', weightMat, 'at index', index, 'and i is', i, 'which means the column selected is', weightMat[i])
                 for (let j = 0; j < weightMat[i].length; j++) {
+
                     console.log(j)
+                    
                     g.append("rect")
                     .attr("x", 130)
                     .attr("y", 20 + wmRectL * j)
@@ -229,7 +233,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                     .attr("stroke-width", 0.1)
                     .attr("opacity", 1)
                     .attr("class", "columnUnit math-displayer")
-                    .attr("id", `columnUnit-${j}`)
+           
                     .style("opacity", 1)
                 }
                 const featureGroup = g.append("g")
