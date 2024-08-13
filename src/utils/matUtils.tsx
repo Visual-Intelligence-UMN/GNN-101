@@ -897,7 +897,7 @@ export function visualizeNodeClassifierFeatures(
                         drawWeightsVector(g, nthOutputVals, finalOutputCoord,
                             15, 10, myColor, wMat, startPathCoords,
                             endPathCoords, curveDir, weightMatrixPostions,
-                            featureChannels, prevCon3Val, "procVis wRect");
+                            featureChannels, prevCon3Val, "procVis wRect", "");
                         drawPathBtwOuputResult([vectorAfterMatMulPath], finalOutputCoord);
                     }, delay: aniSec
                 },
