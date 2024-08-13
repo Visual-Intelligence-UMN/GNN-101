@@ -632,8 +632,17 @@ export function featureVisClick(
     let btnX = playBtnCoord[0];
     const btnY = playBtnCoord[1]+rectH;
 
+    let coordPathStartingPt:[number, number] = [
+        wmCoord[0],
+        wmCoord[1]
+    ]
+
     if(layerID==0 && oFeatureChannels==34){
-        btnX += 100;
+        btnX += 105;
+
+        coordPathStartingPt[0] += 35;
+
+        
     }
 
 
@@ -674,7 +683,7 @@ export function featureVisClick(
         // {func: () => , delay: aniSec},
         {func: () => {
             drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels)
-            drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels)
+            drawFinalPath(coordPathStartingPt, res00, res01, nextCoord, layerID, featureChannels)
             if(featureVisTable.length==4&&layerID==2){
                 //if it's the last layer, don't show the relu icon
             }
