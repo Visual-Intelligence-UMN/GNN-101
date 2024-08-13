@@ -190,6 +190,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 if (!g.selectAll) {
                     g = d3.selectAll(g)
                 }
+                
 
                 d3.select(".graph-displayer").attr("opacity", 1);
                 console.log('weight before transformations', weights)
@@ -216,9 +217,12 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 }
 
 
+
                 console.log('weights matrix is', weightMat, 'at index', index, 'and i is', i, 'which means the column selected is', weightMat[i])
                 for (let j = 0; j < weightMat[i].length; j++) {
+
                     console.log(j)
+                    
                     g.append("rect")
                     .attr("x", 130)
                     .attr("y", 20 + wmRectL * j)
@@ -229,7 +233,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                     .attr("stroke-width", 0.1)
                     .attr("opacity", 1)
                     .attr("class", "columnUnit math-displayer")
-                    .attr("id", `columnUnit-${j}`)
+           
                     .style("opacity", 1)
                 }
                 const featureGroup = g.append("g")
@@ -300,7 +304,8 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 .attr("y", displayHeight - 10 - 5)
                 .text(roundToTwo(aggregatedData[0]))
                 .attr("class", "math-displayer")
-                .attr("font-size", "3");
+                .attr("font-size", "3")
+                .attr("fill", Math.abs(aggregatedData[0]) > 0.7 ? "white" : "black");
 
 
 
@@ -321,7 +326,8 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 .attr("y", displayHeight - 10 - 5)
                 .text(roundToTwo(weights[index][0][i]))
                 .attr("class", "math-displayer")
-                .attr("font-size", "3");
+                .attr("font-size", "3")
+                .attr("fill", Math.abs(weights[index][0][1]) > 0.7 ? "white" : "black");
 
 
 
@@ -343,7 +349,8 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 .attr("y", displayHeight - 10 - 5)
                 .text(roundToTwo(aggregatedData[1]))
                 .attr("class", "math-displayer")
-                .attr("font-size", "3");
+                .attr("font-size", "3")
+                .attr("fill", Math.abs(aggregatedData[1]) > 0.7 ? "white" : "black");
 
 
 
@@ -364,7 +371,8 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 .attr("y", displayHeight - 10 - 5)
                 .text(roundToTwo(weights[index][1][i]))
                 .attr("class", "math-displayer")
-                .attr("font-size", "3");
+                .attr("font-size", "3")
+                .attr("fill", Math.abs(weights[index][1][i]) > 0.7 ? "white" : "black");
 
 
 
@@ -387,7 +395,8 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 .attr("y", displayHeight - 10 - 5)
                 .text(roundToTwo(calculatedData[i]))
                 .attr("class", "math-displayer")
-                .attr("font-size", "3");
+                .attr("font-size", "3")
+                .attr("fill", Math.abs(calculatedData[i]) > 0.7 ? "white" : "black");
 
 
 
