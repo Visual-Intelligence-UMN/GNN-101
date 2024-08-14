@@ -273,10 +273,10 @@ export function outputVisualizer(
     calculatedFeatureGroup.append("text")
         .attr("x", 5)
         .attr("y", -43)
-        .text("Matrix Multiplication")
+        .text("Matmul Result")
         .style("fill", "gray")
 
-        .style("font-size", "12px")
+        .style("font-size", "17px")
         .attr("class", "bias to-be-removed")
         .style("opacity", 0);
 
@@ -358,16 +358,7 @@ export function outputVisualizer(
         .style("stroke", "grey")
         .style("opacity", 0);
 
-    outputGroup.append("text")
-        .attr("x", 5 - moveOffset)
-        .attr("y", 28)
-        .text("Matmul")
-        .style("fill", "gray")
 
-        .style("font-size", "12px")
-        .attr("class", "bias to-be-removed")
-
-        .style("opacity", 0);
 
 
 
@@ -396,7 +387,7 @@ export function outputVisualizer(
         .text("Bias Vector")
         .style("fill", "gray")
 
-        .style("font-size", "12px")
+        .style("font-size", "17px")
         .attr("class", "bias to-be-removed")
 
         .style("opacity", 0);
@@ -462,7 +453,7 @@ export function outputVisualizer(
             .attr("y", end_y + 55)
             .text("Softmax")
             .style("fill", "gray")
-            .style("font-size", "12px")
+            .style("font-size", "17px")
             .attr("class", "to-be-removed softmaxLabel")
             .style("opacity", 1);
 
@@ -832,7 +823,7 @@ export function calculationVisualizer(
         .attr("y", -5)
         .text("Vectors Summation")
         .style("fill", "gray")
-        .style("font-size", "12px")
+        .style("font-size", "17px")
         .attr("class", "aggregatedFeatureGroup to-be-removed")
         .style("opacity", 0);
 
@@ -901,9 +892,9 @@ export function calculationVisualizer(
     calculatedFeatureGroup.append("text")
         .attr("x", 0)
         .attr("y", -5)
-        .text("Matrix Multiplication")
+        .text("Matmul")
         .style("fill", "gray")
-        .style("font-size", "12px")
+        .style("font-size", "17px")
         .attr("class", "calFrame to-be-removed")
         .style("opacity", 0);
 
@@ -1035,7 +1026,7 @@ export function calculationVisualizer(
         .attr("y", -5)
         .text("Bias Vector")
         .style("fill", "gray")
-        .style("font-size", "12px")
+        .style("font-size", "17px")
         .attr("class", "bias to-be-removed").style("opacity", 0);
 
     const BiasFrame = BiasGroup.append("rect")
@@ -1283,7 +1274,7 @@ export function calculationVisualizer(
             .attr("y", end_y - 20)
             .text(labelText)
             .style("fill", "gray")
-            .style("font-size", "12px")
+            .style("font-size", "17px")
             .attr("class", "relu to-be-removed").attr("opacity", 0);
 
 
@@ -1321,7 +1312,7 @@ export function calculationVisualizer(
         .text("Final Output Vector")
         .style("fill", "gray")
 
-        .style("font-size", "12px")
+        .style("font-size", "17px")
         .attr("class", "relu output to-be-removed").style("opacity", 0);
 
 
@@ -1398,7 +1389,7 @@ export function calculationVisualizer(
         .text("Final Output Vector")
         .style("fill", "gray")
 
-        .style("font-size", "12px")
+        .style("font-size", "17px")
         .attr("class", "relu to-be-removed").style("opacity", 0);
 
 
@@ -1623,7 +1614,7 @@ function weightAnimation(
 
 
                 
-                graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg)
+                graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode = mode)
 
                 d3.selectAll(`#weightUnit-${i - 1}`).style("opacity", 0.3).lower();
                 d3.selectAll(`#columnUnit-${i - 1}`).style("opacity", 0).lower();
@@ -2285,7 +2276,7 @@ export function nodeOutputVisualizer(
         .text("Matrix Multiplication")
         .style("fill", "gray")
 
-        .style("font-size", "12px")
+        .style("font-size", "17px")
         .attr("class", "bias to-be-removed")
 
         .style("opacity", 0);
@@ -2372,16 +2363,7 @@ export function nodeOutputVisualizer(
         .style("stroke", "grey")
         .style("opacity", 0);
 
-    outputGroup.append("text")
-        .attr("x", 5)
-        .attr("y", 28)
-        .text("Matmul Result")
-        .style("fill", "gray")
 
-        .style("font-size", "12px")
-        .attr("class", "bias to-be-removed")
-
-        .style("opacity", 0);
 
     const BiasGroup = svg
         .append("g")
@@ -2407,7 +2389,7 @@ export function nodeOutputVisualizer(
         .text("Bias Vector")
         .style("fill", "gray")
 
-        .style("font-size", "12px")
+        .style("font-size", "17px")
         .attr("class", "bias to-be-removed")
 
         .style("opacity", 0);
@@ -2473,7 +2455,7 @@ export function nodeOutputVisualizer(
             .attr("y", end_y + 55)
             .text("Softmax")
             .style("fill", "gray")
-            .style("font-size", "12px")
+            .style("font-size", "17px")
             .attr("class", "to-be-removed softmaxLabel")
             .style("opacity", 1);
 
