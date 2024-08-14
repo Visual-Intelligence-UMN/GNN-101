@@ -5,6 +5,7 @@ import { roundToTwo } from "@/components/WebUtils";
 
 
 export function graphVisDrawMatrixWeight(
+    node: any,
     Xt: any,
     startCoordList:any,
     endCoordList:any,
@@ -14,15 +15,13 @@ export function graphVisDrawMatrixWeight(
     weightMatrixPostions:any,
     featureChannels: number,
     g: any,
-    id:string = "tempath",
-    mode:string = "normal"
-
+    mode: number,
+    id:string = "tempath"
 ){
     if (!g.selectAll) {
         g = d3.select(g)
     }
 
-    
     let flag = true;
 
 
@@ -30,21 +29,29 @@ export function graphVisDrawMatrixWeight(
     if(Xt[0].length!=Xt.length){
         //weightMatrixPostions = transposeAnyMatrix(weightMatrixPostions);
         flag = false;
-
         const math = create(all, {});
         Xt = math.transpose(Xt);
     }
+
     if((Xt[0].length==2 && Xt.length==64)
         ||(Xt[0].length==4 && Xt.length==2)
     ){
         const math = create(all, {});
         Xt = math.transpose(Xt);
     }
+
     if((weightMatrixPostions.length==4&&weightMatrixPostions[0].length==2)){
         const math = create(all, {});
         Xt = math.transpose(Xt);
     }
-    const Xv = Xt[currentStep];
+    if (mode === 1 && node.graphIndex === 4) {
+        Xt = Xt.reverse();
+        Xt = Xt.map((row: any) => row.reverse());
+    }
+
+    let Xv = Xt[currentStep];
+
+    
 
     for (let j = 0; j < Xv.length; j++) {
         let s1 = startCoordList[j];
@@ -52,8 +59,12 @@ export function graphVisDrawMatrixWeight(
 
         if(curveDir==1){
             s1 = startCoordList[startCoordList.length - j - 1];
-         e1 = endCoordList[currentStep];
+            e1 = endCoordList[currentStep];
         }
+        if (mode === 1 && node.graphIndex === 4) {
+            s1 = startCoordList[j]
+        }
+     
 
         let m1 = [0,0];
         // if(flag){
@@ -62,7 +73,6 @@ export function graphVisDrawMatrixWeight(
         // }else{
         //     m1 = weightMatrixPostions[currentStep][weightMatrixPostions[0].length-1-j];
         // }
-
         // if(Xt[0].length==64 && Xt.length==2){
         //     m1 = weightMatrixPostions[currentStep][j];
         // }else{
@@ -78,8 +88,7 @@ export function graphVisDrawMatrixWeight(
         if(weightMatrixPostions.length==4&&weightMatrixPostions[0].length==2){
             if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
             else m1 = weightMatrixPostions[j][currentStep]
-            
-
+        
             changed = true;
         }
 
@@ -93,8 +102,6 @@ export function graphVisDrawMatrixWeight(
 
         if(Xt.length==Xt[0].length || (Xt.length==64 && Xt[0].length==7)){
             m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
-                
-
             changed = true;
         }
 
@@ -112,16 +119,15 @@ export function graphVisDrawMatrixWeight(
             ||(Xt.length==34&&Xt[0].length==4)){
                 if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
                 else m1 = weightMatrixPostions[j][currentStep]
-                
-
             }
             else{
                 if(curveDir==-1)m1 = weightMatrixPostions[j][currentStep]
                 else m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
 
-
             }
         }
+
+
 
         let controlPoint1 = [s1[0], m1[1]];
         let controlPoint2 = [e1[0], m1[1]];
@@ -159,32 +165,7 @@ export function graphVisDrawMatrixWeight(
 }
 
 
-export function drawGraphVisWeightVector(weightMatrixPositions: number[][][], rectW: number, weights: number[][][], index: number, g: any, currentStep: number) {
-    if (!g.selectAll) {
-        g = d3.selectAll(g)
-    }
-    let weightMat = weights[index]
 
-    if (index === 0) {
-        const math = create(all, {});
-        weightMat = math.transpose(weightMat);
-    }
-
-
-    for (let j = 0; j < weightMat[currentStep].length; j++)
-    g.append("rect")
-                            .attr("x", 130)
-                            .attr("y", 20 + rectW * j)
-                            .attr("width", 7)
-                            .attr("height", rectW)
-                            .attr("fill", myColor(weightMat[currentStep][j]))
-                            .attr("stroke", "gray")
-                            .attr("stroke-width", 0.1)
-                            .attr("opacity", 1)
-                            .attr("class", "columnUnit math-displayer")
-                            .attr("id", `columnUnit-${j}`);
-
-}
 export function displayerHandler(node: any, aggregatedData: any, calculatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], i: number, mode: number, isOutput: boolean) {
 
                 if (!g.selectAll) {
@@ -274,7 +255,15 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                     .attr("class", "math-displayer")
                     .attr("font-size", "10");
 
-
+                if (mode === 1 && node.graphIndex === 4) {
+                    g.append("text")
+                    .attr("x", 70 - 30)
+                    .attr("y", displayHeight - 10)
+                    .attr("xml:space", "preserve")
+                    .text("=       x         +         x                  =     ")
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "5");
+                } else  {
                 g.append("text")
                     .attr("x", 70 - 30)
                     .attr("y", displayHeight - 10)
@@ -282,6 +271,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                     .text("=       x         +         x          ...     =     ")
                     .attr("class", "math-displayer")
                     .attr("font-size", "5");
+                }
 
 
 
@@ -418,14 +408,16 @@ export function hoverOverHandler(node: any, aggregatedData: any, calculatedData:
                     return;
                 }
                 console.log('Xt', Xt)
-                graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg)
+                if (mode === 1 && node.graphIndex === 4) {
+                    graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, 1, i, myColor, weightsLocation, node.features.length, svg, mode)
+                }
+                else {
+                graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode)
+                }
                 d3.selectAll(".calculatedRect").style("opacity", 0.2)
                 d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1)
                 d3.selectAll(`#tempath${i}`).style("opacity", 1);
                 displayerHandler(node, aggregatedData, calculatedData, state, g, displayHeight, rectL, wmRectL, myColor, weights, index, weightsLocation, i, mode, isOutput)
-
-
-
 
 
 
