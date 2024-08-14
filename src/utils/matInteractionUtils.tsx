@@ -608,7 +608,11 @@ myColor:any
             aggregatedVector[1],
             weightVector[1]
         ];
-        const operators = ["x", "+", "x", "... = "];
+        let operators = ["x", "+", "x", "... = "];
+
+        if(weightVector.length==2&&aggregatedVector.length==2){
+            operators[3] = "=";
+        }
 
         //matmul-displayer interaction
         let displayerOffset = -150;
