@@ -206,7 +206,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                     
                     g.append("rect")
                     .attr("x", 130)
-                    .attr("y", 20 + wmRectL * j)
+                    .attr("y", 40 + wmRectL * j)
                     .attr("width", 7)
                     .attr("height", wmRectL)
                     .attr("fill", myColor(weightMat[i][j]))
@@ -218,7 +218,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                     .style("opacity", 1)
                 }
                 const featureGroup = g.append("g")
-                .attr("transform", `translate(${70}, ${displayHeight - 40})`);
+                .attr("transform", `translate(${70}, ${displayHeight - 50})`);
 
 
 
@@ -227,7 +227,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 .attr("y", displayHeight - 65)
                 .text("Matmul Visualization")
                 .attr("class", "math-displayer")
-                .attr("font-size", "10");
+                .attr("font-size", "15");
 
 
                 featureGroup.selectAll("rect")
@@ -248,29 +248,29 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
 
 
                 g.append("text")
-                    .attr("x", 70 - 25)
-                    .attr("y", displayHeight - 30)
+                    .attr("x", 70 - 35)
+                    .attr("y", displayHeight - 40)
                     .attr("xml:space", "preserve")
-                    .text("dot(                   ,                 )")
+                    .text("dot(           ,         )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "10");
+                    .attr("font-size", "15");
 
                 if (mode === 1 && node.graphIndex === 4) {
                     g.append("text")
-                    .attr("x", 70 - 30)
+                    .attr("x", 70 - 40)
                     .attr("y", displayHeight - 10)
                     .attr("xml:space", "preserve")
-                    .text("=       x         +         x                  =     ")
+                    .text("=       x      +     x      ...  =     ")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "10");
                 } else  {
                 g.append("text")
-                    .attr("x", 70 - 30)
+                    .attr("x", 70 - 40)
                     .attr("y", displayHeight - 10)
                     .attr("xml:space", "preserve")
-                    .text("=       x         +         x          ...     =     ")
+                    .text("=       x      +     x      ...  =     ")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "10");
                 }
 
 
@@ -280,9 +280,9 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 g.append("rect")    
       
                 .attr("x", 70 - 30 + 5)
-                .attr("y", displayHeight - 10 - 7)
-                .attr("width", 7)
-                .attr("height", 7)
+                .attr("y", displayHeight - 10 - 9)
+                .attr("width", 9)
+                .attr("height", 9)
                 .attr("class", `math-displayer`)
                 .style("fill", myColor(aggregatedData[0]))
                 .style("stroke-width", 0.1)
@@ -294,17 +294,17 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 .attr("y", displayHeight - 10 - 5)
                 .text(roundToTwo(aggregatedData[0]))
                 .attr("class", "math-displayer")
-                .attr("font-size", "3")
+                .attr("font-size", "4")
                 .attr("fill", Math.abs(aggregatedData[0]) > 0.7 ? "white" : "black");
 
 
 
 
                 g.append("rect")    
-                .attr("x", 70 - 30 + 20)
-                .attr("y", displayHeight - 10 - 7)
-                .attr("width", 7)
-                .attr("height", 7)
+                .attr("x", 70 - 30 + 25)
+                .attr("y", displayHeight - 10 - 9)
+                .attr("width", 9)
+                .attr("height", 9)
                 .attr("class", `math-displayer`)
                 .style("fill", myColor(weights[index][0][i]))
                 .style("stroke-width", 0.1)
@@ -312,11 +312,11 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 .style("opacity", 1);
 
                 g.append("text")
-                .attr("x", 70 - 30 + 20)
+                .attr("x", 70 - 30 + 25)
                 .attr("y", displayHeight - 10 - 5)
                 .text(roundToTwo(weights[index][0][i]))
                 .attr("class", "math-displayer")
-                .attr("font-size", "3")
+                .attr("font-size", "4")
                 .attr("fill", Math.abs(weights[index][0][1]) > 0.7 ? "white" : "black");
 
 
@@ -324,10 +324,10 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 // second component
                 g.append("rect")    
 
-                .attr("x", 70 - 30 + 35)
-                .attr("y", displayHeight - 10 - 7)
-                .attr("width", 7)
-                .attr("height", 7)
+                .attr("x", 70 - 30 + 45)
+                .attr("y", displayHeight - 10 - 9)
+                .attr("width", 9)
+                .attr("height", 9)
                 .attr("class", `math-displayer`)
                 .style("fill", myColor(aggregatedData[1]))
                 .style("stroke-width", 0.1)
@@ -335,21 +335,21 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 .style("opacity", 1);
 
                 g.append("text")
-                .attr("x", 70 - 30 + 35)
+                .attr("x", 70 - 30 + 45)
                 .attr("y", displayHeight - 10 - 5)
                 .text(roundToTwo(aggregatedData[1]))
                 .attr("class", "math-displayer")
-                .attr("font-size", "3")
+                .attr("font-size", "4")
                 .attr("fill", Math.abs(aggregatedData[1]) > 0.7 ? "white" : "black");
 
 
 
                 g.append("rect")    
 
-                .attr("x", 70 - 30 + 50)
-                .attr("y", displayHeight - 10 - 7)
-                .attr("width", 7)
-                .attr("height", 7)
+                .attr("x", 70 - 30 + 65)
+                .attr("y", displayHeight - 10 - 9)
+                .attr("width", 9)
+                .attr("height", 9)
                 .attr("class", `math-displayer`)
                 .style("fill", myColor(weights[index][1][i]))
                 .style("stroke-width", 0.1)
@@ -357,11 +357,11 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 .style("opacity", 1);
 
                 g.append("text")
-                .attr("x", 70 - 30 + 50)
+                .attr("x", 70 - 30 + 65)
                 .attr("y", displayHeight - 10 - 5)
                 .text(roundToTwo(weights[index][1][i]))
                 .attr("class", "math-displayer")
-                .attr("font-size", "3")
+                .attr("font-size", "4")
                 .attr("fill", Math.abs(weights[index][1][i]) > 0.7 ? "white" : "black");
 
 
@@ -370,10 +370,10 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 // output
                 g.append("rect")    
 
-                .attr("x", 70 - 30 + 80)
-                .attr("y", displayHeight - 10 - 7)
-                .attr("width", 7)
-                .attr("height", 7)
+                .attr("x", 70 - 30 + 100)
+                .attr("y", displayHeight - 10 - 9)
+                .attr("width", 9)
+                .attr("height", 9)
                 .attr("class", `math-displayer`)
                 .style("fill", myColor(calculatedData[i]))
                 .style("stroke-width", 0.1)
@@ -381,15 +381,12 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 .style("opacity", 1);
 
                 g.append("text")
-                .attr("x", 70 - 30 + 80)
+                .attr("x", 70 - 30 + 100)
                 .attr("y", displayHeight - 10 - 5)
                 .text(roundToTwo(calculatedData[i]))
                 .attr("class", "math-displayer")
-                .attr("font-size", "3")
+                .attr("font-size", "4")
                 .attr("fill", Math.abs(calculatedData[i]) > 0.7 ? "white" : "black");
-
-
-
 
 
 

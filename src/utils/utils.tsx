@@ -539,7 +539,6 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
 
   if (movedNode && (!event.target.classList.contains("vis-component"))) {
     svg.selectAll(".vis-component").style("opacity", 0);
-    svg.selectAll(".button-group").remove()
     let currMoveOffset = moveOffset;
 
     for (let i = 0; i < colorSchemes.length; i++) {
@@ -1134,11 +1133,10 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
                   `M 
                   ${node.x + xOffset1 + 16}
                   ${node.y + 10}
-                  C 
-                  ${controlX1} 
-                  ${controlY1}, 
+                  Q
                   ${controlX2} 
                   ${controlY2}, 
+
                   ${neighborNode.x + (neighborNode.graphIndex - 2.5) * offset - 16} 
                   ${neighborNode.y + 10}
                 `)
@@ -1171,7 +1169,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
               const path = svg.append("path")
                 .attr("d", 
                   `M ${node.x + xOffset1 + 16} ${node.y + 10} 
-                   C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, 
+                   Q ${controlX2} ${controlY2}, 
                    ${nextNode.x + xOffsetNext - 16} ${nextNode.y + 10}`
                 )
                 .style("stroke-width", 1)
@@ -1244,14 +1242,14 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
           if (nextLayer) {
             let nextNode = nextLayer.nodes[0];
 
-            const controlX1 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.3;
+            const controlX1 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.5;
             const controlY1 = node.y + 10;
             const controlX2 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.7;
             const controlY2 = nextNode.y + 10;
 
             
             const path = svg.append("path")
-              .attr("d", `M ${node.x + xOffset1} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 20} ${nextNode.y + 10}`)
+              .attr("d", `M ${node.x + xOffset1} ${node.y + 10} C ${controlX2} ${controlY2}, ${controlX2} ${controlY2} ${nextNode.x + xOffset2 - 20} ${nextNode.y + 10}`)
               .style("stroke", linkStrength(avg))
               .style("opacity", 0)
               .style('stroke-width', 1)
