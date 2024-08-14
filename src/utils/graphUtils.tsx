@@ -574,7 +574,9 @@ export function outputVisualizer(
                     .attr("y", displayHeight - 40 + rectL / 2)
                     .text(roundToTwo(calculatedData[0]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "5")
+                    .attr("fill", Math.abs(calculatedData[0]) > 0.7 ? "white" : "black");
+                    
 
                 g5.append("rect")
                     .attr("x", displayerWidth - 130)
@@ -590,7 +592,8 @@ export function outputVisualizer(
                     .attr("y", displayHeight - 40 + rectL / 2)
                     .text(roundToTwo(calculatedData[1]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "5")
+                    .attr("fill", Math.abs(calculatedData[1]) > 0.7 ? "white" : "black");
 
                 g5.append("rect")
                     .attr("x", 100)
@@ -606,7 +609,8 @@ export function outputVisualizer(
                     .attr("y", 10 + rectL / 2)
                     .text(roundToTwo(calculatedData[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "5")
+                    .attr("fill", Math.abs(calculatedData[i]) > 0.7 ? "white" : "black");
 
                 g5.append("text")
                     .attr("x", displayerWidth / 2 - 50)
@@ -669,7 +673,8 @@ export function outputVisualizer(
                     .attr("y", 25 + rectL / 2)
                     .text(roundToTwo(node.features[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "5")
+                    .attr("fill", Math.abs(node.features[i]) > 0.7 ? "white" : "black");
             })
             .on("mouseout", function () {
                 if (!state.isClicked) {
@@ -1605,11 +1610,13 @@ function weightAnimation(
                 //     prevLayerFeatureLength,
                 //     state
                 // );
-                if (mode === 0 && node.graphIndex === 5) {
+                if (mode === 0 && node.graphIndex === 5 || mode === 1 && node.graphIndex === 4) {
                     const math = create(all, {});
                     const wMat = math.transpose(allWeights[3]);
-
-                    displayerHandler(node, aggregatedData, calculatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, i, mode, true)
+         
+             
+                        displayerHandler(node, aggregatedData, calculatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, i, mode, true)
+      
                 } else {
                 displayerHandler(node, aggregatedData, calculatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, allWeights, node.graphIndex - 1, weightsLocation, i, mode, false)
                 }
@@ -2115,7 +2122,8 @@ function poolingLayerInteraction(
                         .attr("y", numRect[j][1] + rectL / 2)
                         .text(roundToTwo(node.relatedNodes[j].features[i]))
                         .attr("class", "math-displayer")
-                        .attr("font-size", "5");
+                        .attr("font-size", "5")
+                        .attr("fill", Math.abs(node.relatedNodes[j].features[i]) > 0.7 ? "white" : "black");
                 }
                 // append text
 
@@ -2156,7 +2164,9 @@ function poolingLayerInteraction(
                     .attr("y", 30 - rectL / 2)
                     .text(roundToTwo(node.features[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "5")
+                    .attr("fill", Math.abs(node.features[i]) > 0.7 ? "white" : "black");
+                    
             })
             .on("mouseout", function () {
                 if (!state.isClicked) {
@@ -2335,7 +2345,7 @@ export function nodeOutputVisualizer(
         .lower();
 
         const Xt = math.transpose(weights);
-    hoverOverHandler(node, calculatedData, calculatedData, state, g5, DisplayHeight, (20 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true)
+    hoverOverHandler(node, node.relatedNodes[0].features, calculatedData, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true)
 
 
 
@@ -2413,7 +2423,7 @@ export function nodeOutputVisualizer(
             startCoordList,
             endCoordList,
             Xt,
-            calculatedData,
+            node.relatedNodes[0].features,
             calculatedData,
             offset,
             height,
@@ -2501,7 +2511,7 @@ export function nodeOutputVisualizer(
             .append("path")
             .attr(
                 "d",
-                `M${start_x - 270},${start_y - 65} L${end_x - 195},${end_y}`
+                `M${start_x - 267},${start_y - 65} L${end_x - 195},${end_y}`
             )
             .style("stroke", pathColor(color))
             .style("stroke-width", 1)
@@ -2514,7 +2524,7 @@ export function nodeOutputVisualizer(
             .append("path")
             .attr(
                 "d",
-                `M${end_x - 130},${start_y - 65} L${end_x},${end_y}`
+                `M${end_x - 117},${start_y - 63} L${end_x},${end_y}`
             )
             .style("stroke", pathColor(color))
             .style("stroke-width", 1)
@@ -2527,7 +2537,7 @@ export function nodeOutputVisualizer(
             .append("path")
             .attr(
                 "d",
-                `M${end_x + 45},${start_y - 65} L${end_x + 200},${end_y}`
+                `M${end_x + 30},${start_y - 65} L${end_x + 200},${end_y}`
             )
             .style("stroke", pathColor(color))
             .style("stroke-width", 1)
@@ -2570,7 +2580,8 @@ export function nodeOutputVisualizer(
                     .attr("y", displayHeight - 40 + rectL / 2)
                     .text(roundToTwo(calculatedData[0]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "5")
+                    .attr("fill", Math.abs(calculatedData[0]) > 0.7 ? "white" : "black");
 
                 g5.append("rect")
                     .attr("x", 100)
@@ -2586,7 +2597,8 @@ export function nodeOutputVisualizer(
                     .attr("y", displayHeight - 40 + rectL / 2)
                     .text(roundToTwo(calculatedData[1]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "5")
+                    .attr("fill", Math.abs(calculatedData[1]) > 0.7 ? "white" : "black");
 
 
 
@@ -2604,7 +2616,8 @@ export function nodeOutputVisualizer(
                     .attr("y", displayHeight - 40 + rectL / 2)
                     .text(roundToTwo(calculatedData[2]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "5")
+                    .attr("fill", Math.abs(calculatedData[2]) > 0.7 ? "white" : "black");
 
 
                     g5.append("rect")
@@ -2621,7 +2634,8 @@ export function nodeOutputVisualizer(
                     .attr("y", displayHeight - 40 + rectL / 2)
                     .text(roundToTwo(calculatedData[3]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "5")
+                    .attr("fill", Math.abs(calculatedData[3]) > 0.7 ? "white" : "black");
 
 
 
@@ -2651,7 +2665,8 @@ export function nodeOutputVisualizer(
                     .attr("y", 10 + rectL / 2)
                     .text(roundToTwo(calculatedData[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5").style("fill", "black");
+                    .attr("font-size", "5")
+                    .attr("fill", Math.abs(calculatedData[i]) > 0.7 ? "white" : "black");
 
                 g5.append("text")
                     .attr("x", 100 - 27)
@@ -2732,7 +2747,7 @@ export function nodeOutputVisualizer(
                     .attr("y", 35)
                     .text("=")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "15").style("fill", "white");
+                    .attr("font-size", "15")
 
                 g5.append("rect")
                     .attr("x", displayerWidth - 50)
@@ -2749,6 +2764,7 @@ export function nodeOutputVisualizer(
                     .text(roundToTwo(node.features[i]))
                     .attr("class", "math-displayer")
                     .attr("font-size", "5")
+                    .attr("fill", Math.abs(node.features[i]) > 0.7 ? "white" : "black");
             })
             .on("mouseout", function () {
                 if (!state.isClicked) {
