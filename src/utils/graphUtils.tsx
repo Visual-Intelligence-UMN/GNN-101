@@ -312,7 +312,7 @@ export function outputVisualizer(
 
 
     let DisplayerWidth = 300; // Width of the graph-displayer
-    let DisplayHeight = 75;
+    let DisplayHeight = 100;
 
     const graphDisplayer = g5
         .append("rect")
@@ -537,7 +537,7 @@ export function outputVisualizer(
 
     let rectL = 15;
     let displayerWidth = 300; // Width of the graph-displayer
-    let displayHeight = 75;
+    let displayHeight = 100;
 
 
 
@@ -962,7 +962,7 @@ export function calculationVisualizer(
         .append("g")
         .attr("transform", `translate(${3.5 * offset + temp +
             node.relatedNodes[0].features.length * 2 * prevRectHeight +
-            100}, ${height / 5 + 10})`);
+            100}, ${height / 5 - 50})`);
 
     let rectL = 0.5;
     if (mode === 1) {
@@ -972,7 +972,7 @@ export function calculationVisualizer(
         }
     }
     let displayerWidth = 300; // Width of the graph-displayer
-    let displayHeight = 75;
+    let displayHeight = 100;
 
     const displayer = g4
         .append("rect")
@@ -1910,14 +1910,14 @@ export function fcLayerCalculationVisualizer(
 
     const g4 = svg
         .append("g")
-        .attr("transform", `translate(${moveToX - 700}, ${moveToY})`);
+        .attr("transform", `translate(${moveToX - 700}, ${moveToY - 50})`);
 
     const displayer = g4
         .append("rect")
         .attr("x", 0)
         .attr("y", 0)
         .attr("width", 300)
-        .attr("height", 75)
+        .attr("height", 100)
         .attr("rx", 10)
         .attr("ry", 10)
         .style("fill", "transparent")
@@ -2310,7 +2310,7 @@ export function nodeOutputVisualizer(
 
     const g5 = svg
         .append("g")
-        .attr("transform", `translate(${endCoordList[0][0]}, ${endCoordList[0][1] - 150})`);
+        .attr("transform", `translate(${endCoordList[0][0]}, ${endCoordList[0][1] - 200})`);
 
     let RectL = 0.5;
     if (mode === 1) {
@@ -2318,7 +2318,7 @@ export function nodeOutputVisualizer(
 
     }
     let DisplayerWidth = 300; // Width of the graph-displayer
-    let DisplayHeight = 75;
+    let DisplayHeight = 100;
 
     const graphDisplayer = g5
         .append("rect")
