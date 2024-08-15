@@ -36,7 +36,6 @@ print(f'Number of classes: {dataset.num_classes}')
 
 from torch_geometric.utils import train_test_split_edges
 
-
 data = train_test_split_edges(dataset[0])
 
 print('Train edges:', data.train_pos_edge_index.size(1))
@@ -52,8 +51,8 @@ print(data)
 class SAGE(torch.nn.Module):
     def __init__(self, in_channels, hidden_channels, out_channels):
         super().__init__()
-        self.conv1 = SAGEConv(in_channels, hidden_channels, root_weight=False)
-        self.conv2 = SAGEConv(hidden_channels, out_channels, root_weight=False)
+        self.conv1 = SAGEConv(in_channels, hidden_channels, root_weight=False, aggr='max')
+        self.conv2 = SAGEConv(hidden_channels, out_channels, root_weight=False, aggr='max')
 
     def encode(self, x, edge_index):
         x = self.conv1(x, edge_index).relu()
