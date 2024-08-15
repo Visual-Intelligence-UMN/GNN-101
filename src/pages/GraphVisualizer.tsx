@@ -390,7 +390,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             .text(text)
             .attr("font-weight", "normal")
             .attr('opacity', 0.5);
-
+            console.log("value", value)
             const absMax = findAbsMax(value);
 
 

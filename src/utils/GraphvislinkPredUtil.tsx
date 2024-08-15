@@ -51,7 +51,7 @@ export async function dataProccessGraphVisLinkPrediction(graph_path: any, hubNod
         subGraphSet.push(subGraph)
         subGraphSet.push(subGraph2)
         subGraphSet.push(subGraph3)
-        console.log("sub", subGraphSet)
+
 
 
         //console.log("subGraph", subGraph);

@@ -730,7 +730,7 @@ export function calculationVisualizer(
     mode: number,
     innerComputationMode: string
 ) {
-    console.log("INEER", innerComputationMode)
+
 
 
 
@@ -1135,9 +1135,9 @@ export function calculationVisualizer(
                     else {
                         
 
-                        console.log("AWDAWD,",neighborFeatures)
+                       
                         const multiplier = computeAttentionCoefficient(node.graphIndex, n.features, lastLayerNodefeature, neighborFeatures);
-                        console.log("mul",multiplier)
+                        
 
                         g3.append("text")
                         .attr("x", start_x + 20)

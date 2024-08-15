@@ -1149,9 +1149,8 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
              if (!neighborNode.relatedNodes) {
               neighborNode.relatedNodes = [];
              }
-             console.log("hubNode", hubNodeA, hubNodeB)
-             console.log("node", node.original_id)
-             console.log("neighbor", neighborNode.original_id)
+
+
              if (!(node.original_id === hubNodeA && neighborNode.original_id === hubNodeB) && !(node.original_id === hubNodeB && neighborNode.original_id === hubNodeA)) {
             
               const controlX1 = node.x + xOffset1 + (neighborNode.x + xOffset2 - node.x - xOffset1) * 0.8;

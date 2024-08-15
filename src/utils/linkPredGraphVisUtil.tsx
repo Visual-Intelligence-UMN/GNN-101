@@ -291,7 +291,7 @@ export function linkPredFeatureVisualizer(
             hideAllLinks(allNodes);
 
 
-            console.log("ADCWA", innerComputationMode)
+          
             calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
           
 
