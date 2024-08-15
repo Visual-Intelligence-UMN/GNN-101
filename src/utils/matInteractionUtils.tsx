@@ -620,7 +620,7 @@ myColor:any
         let displayerX = coordFeatureVis[0];
         let displayerY = coordFeatureVis[1] + displayerOffset + 20;
 
-        const displayW = 250;
+        const displayW = 300;
         const displayH = 100;
 
         //drawPoints(".mats", "red", [[displayerX, displayerY]])
@@ -630,6 +630,7 @@ myColor:any
         tooltip
             .append("rect")
             .attr("x", displayerX)
+            .attr("y", displayerY - 10)
             .attr("y", displayerY - 10)
             .attr("width", displayW)
             .attr("height", displayH)
@@ -649,6 +650,7 @@ myColor:any
             .attr("y", displayerY + titleYOffset)
             .text("Matmul Visualization")
             .attr("class", "matmul-displayer procVis")
+            .attr("font-size", titleYOffset*2)
             .attr("font-size", titleYOffset*2)
             .attr("fill", "black");
         
@@ -672,6 +674,7 @@ myColor:any
             .text("dot(")
             .attr("class", "matmul-displayer procVis")
             .attr("font-size", titleYOffset*2)
+            .attr("font-size", titleYOffset*2)
             .attr("fill", "black");
 
         tooltip
@@ -680,6 +683,7 @@ myColor:any
             .attr("y", displayerY + vectorLength/2 + 3)
             .text(",")
             .attr("class", "matmul-displayer procVis")
+            .attr("font-size", titleYOffset*2)
             .attr("font-size", titleYOffset*2)
             .attr("fill", "black");
         
@@ -690,6 +694,7 @@ myColor:any
             .text(")")
             .attr("class", "matmul-displayer procVis")
             .attr("font-size", titleYOffset*2)
+            .attr("font-size", titleYOffset*2)
             .attr("fill", "black");
 
         tooltip
@@ -698,6 +703,7 @@ myColor:any
             .attr("y", displayerY + vectorLength/2 + 20)
             .text("=")
             .attr("class", "matmul-displayer procVis")
+            .attr("font-size", titleYOffset*2)
             .attr("font-size", titleYOffset*2)
             .attr("fill", "black");
 
@@ -720,6 +726,7 @@ myColor:any
                 .attr("y", displayerY + vectorLength/2 + 20 + unitSize/2)
                 .text(roundToTwo(dataSamples[i]))
                 .attr("class", "matmul-displayer procVis")
+                .attr("font-size", unitSize)
                 .attr("font-size", unitSize)
                 .attr("fill", color);
         }
@@ -757,6 +764,7 @@ myColor:any
                 .text(roundToTwo(currentVal))
                 .attr("class", "matmul-displayer procVis")
                 .attr("font-size", unitSize)
+                .attr("font-size", unitSize)
                 .attr("fill", color);
         
         
@@ -776,6 +784,7 @@ myColor:any
         for(let i=0; i<weightVector.length; i++){
             tooltip
                 .append("rect")
+                .attr("x", displayerX + eqXOffset * 5)
                 .attr("x", displayerX + eqXOffset * 5)
                 .attr("y", displayerY + eqYOffset + i*h2/2)
                 .attr("width", w/2)
@@ -798,6 +807,7 @@ myColor:any
 
             tooltip
             .append("rect")
+            .attr("x", displayerX + eqXOffset * 5)
             .attr("x", displayerX + eqXOffset * 5)
             .attr("y", displayerY + eqYOffset)
             .attr("width", w/2)

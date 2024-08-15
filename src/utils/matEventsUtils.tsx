@@ -128,6 +128,8 @@ export function detailedViewRecovery(
     d3.selectAll(".oFeature")
         .style("opacity", 1)
         .style("pointer-events", "auto");
+
+    d3.selectAll(".resultVisualizer").style("pointer-events", "auto");
     
     setTimeout(()=>{
     //recover layers positions
@@ -148,7 +150,10 @@ export function detailedViewRecovery(
         d3.select(".poolingFrame").style("opacity", 0.25);
     } else if (transState == "result") {
         translateLayers(5, -300);
-    } else if(transState=="resultLayer"){
+    } else if(transState=="linkResult"){
+        translateLayers(2, -250);
+
+    }else if(transState=="resultLayer"){
         d3.select(".mats")
                 .selectAll(".resultRect")
                 .style("pointer-events", "none");
@@ -506,6 +511,9 @@ export function featureVisClick(
 
     } else if(Xt[0].length<10){
         w = 10;
+    }
+    if(oFeatureChannels==128 && Xt[0].length==128){
+        w = 2.5;
     }
     let intervalID: any;
     let curveDir = 1;
@@ -1215,3 +1223,6 @@ export function outputVisClick(
         colorSchemesTable: colorSchemesTable,
     };
 }
+
+
+

@@ -20,7 +20,8 @@ import {
 } from "@/utils/graphUtils"
 import { stat } from "fs";
 import { Yomogi } from "@next/font/google";
-import { dataPreparationLinkPred, indexingFeatures } from "./linkPredictionUtils";
+import { dataPreparationLinkPred, constructComputationalGraph } from "./linkPredictionUtils";
+import { extractSubgraph } from "./graphDataUtils";
 
 env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
@@ -175,6 +176,26 @@ export function findMaxIndex(arr: number[]): number {
   return arr.indexOf(maxValue);
 }
 
+export function splitAnyIntoMatrices<T>(
+  array: T[],
+  matrixSize: number = 64
+): T[][] {
+  // 创建一个空的二维数组
+  let result: T[][] = [];
+  // 计算每个子数组的长度
+  let n = Math.ceil(array.length / matrixSize);
+
+  // 遍历 n 次来创建子数组
+  for (let i = 0; i < n; i++) {
+      // 截取从 i * matrixSize 开始的 matrixSize 长度的部分
+      let subArray = array.slice(i * matrixSize, (i + 1) * matrixSize);
+      // 将截取的子数组添加到结果数组中
+      result.push(subArray);
+  }
+
+  // 返回生成的二维数组
+  return result;
+}
 
 //Split a large 1d array into a 1d array with multiple 8*8 matrices
 
@@ -1463,20 +1484,26 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
 
   const prob = outputMap.prob_adj.cpuData;
 
-
+  console.log("predicted!",intmData);
 
   const data = dataPreparationLinkPred(intmData);
 
   const features = graphData.x;
 
 
+  console.log("data!", data);
 
+    const mat = graphToMatrix(graphData);
 
-    const indexedFeaturesI = indexingFeatures(
+    const computationalGraph = constructComputationalGraph(
       graphData, features, data.conv1Data, data.conv2Data, 241
     );
+    const nodesNeedConstruct = computationalGraph.getNodesAtHopLevel(2);
+    const subgraph = extractSubgraph(mat, nodesNeedConstruct)
 
-
+    console.log("subgraph", subgraph);
+    console.log("computationalGraph", computationalGraph);
+  
   return {prob, intmData};
 
 }
@@ -1602,4 +1629,8 @@ export function loadNodesLocation(mode: number, path: string) {
 
   return data;
 }
+
+
+
+
 

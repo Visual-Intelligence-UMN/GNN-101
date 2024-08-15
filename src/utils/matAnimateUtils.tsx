@@ -276,18 +276,28 @@ export function drawMatrixWeight(
             changed = true;
         }
 
+        if(Xt.length>80 || Xt[0].length>80){
+            //if(curveDir==-1){
+                m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+            //}
+           // else{ m1 = weightMatrixPostions[j][currentStep]}
+                
+            console.log("signal 3", curveDir)
+            changed = true;
+        }
+
         if(!changed){
             if((Xt[0].length<Xt.length && Xt.length!=64)||(Xt[0].length==64&&Xt.length==2)){
                 if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
                 else m1 = weightMatrixPostions[j][currentStep]
                 
-
+                console.log("signal 1")
             }
             else{
                 if(curveDir==-1)m1 = weightMatrixPostions[j][currentStep]
                 else m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
 
-
+                console.log("signal 2");
             }
         }
 

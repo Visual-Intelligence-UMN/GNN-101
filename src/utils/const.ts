@@ -8,11 +8,29 @@ export const linkList: { [k: string]: string } = {
   twitch_EN: "./json_data/links/twitch.json",
 };
 
-export const modelList: { [k: string]: string } = {
+export const modelGCNList: { [k: string]: string } = {
   "graph classification": "./gnn_model2.onnx",
   "node classification": "./gnn_node_model.onnx",
-  //  "link classification": "./gnn_link_model.onnx",
+  "link classification": "./gnn_link_model.onnx"
 };
+
+export const modelGATList: { [k: string]: string } = {
+  "GAT link classification": "./gat_link_model.onnx"
+};
+
+export const modelGraphSAGEList: { [k: string]: string } = {
+  "GraphSAGE link classification": "./sage_link_model.onnx"
+};
+
+export const modelTypeList:{ [k: string]: string } = {
+  "GCN":"GCN",
+  "GAT":"GAT",
+  "GraphSAGE":"GraphSAGE"
+};
+
+export const nodeSelectionList = [
+  148, 407, 79, 116, 994, 632, 71, 110, 420, 772, 394, 109, 241, 471
+];
 
 function graph_list_generate(num: number) {
   let res: { [k: string]: string } = {};
@@ -42,5 +60,7 @@ The task is to predict whether two users are friends or not. The graph has 77774
 export const DatasetInfo: { [k: string]: string } = {
   "node classification": KARATE_INFO,
   "graph classification": MUTAG_INFO,
-  "edge classification": TWITCH_INFO,
+  "link classification": TWITCH_INFO,
+  "GAT link classification": TWITCH_INFO,
+  "GraphSAGE link classification": TWITCH_INFO,
 };
