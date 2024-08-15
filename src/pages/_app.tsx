@@ -87,7 +87,6 @@ export default function App({ Component, pageProps }: AppProps) {
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
         />
-
         <Head>
             <link rel="icon" href='./assets/PNGs/logo/logo.png' />
             <title>GNN 101</title>
