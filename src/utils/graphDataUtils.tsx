@@ -80,7 +80,7 @@ export class Graph {
 
 }
 
-type AdjacencyListForSearch = {
+export type AdjacencyListForSearch = {
     [x: string]: any; [key: number]: number[] 
 };
 

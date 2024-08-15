@@ -58,7 +58,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
     setSimulation(false);
     const visualizationId = ++currentVisualizationId.current;
 
-    const init = async (graphs: any[]) => {
+    const init = async (graphs: any[], subgraph: any[], nodeMapping: any) => {
       if (intmData != null) {}
 
       let allNodes: any[] = [];
@@ -85,6 +85,13 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
 
       let colorSchemes: any = [];
 
+      const transformedSubgraph = Object.fromEntries(
+        Object.entries(subgraph).map(([key, value]) => {
+          const mappedKey = nodeMapping[key];
+          return [mappedKey, value];
+        })
+      );
+
       graphs.forEach((data, i) => {
 
         let xOffset = (i - 3.5) * offset;
@@ -98,7 +105,67 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
           .selectAll("line")
           .data(data.links)
           .join("line")
-          .style("stroke", "#aaa");
+          .style("stroke", "#aaa")
+          .style("stroke-dasharray", (d: any) => {
+
+   
+              let is_source = false;
+              let is_target = false;
+                if (nodeMapping[hubNodeA] === d.source || nodeMapping[hubNodeA] == d.target) {
+    
+                  is_source = true
+     
+                }
+              
+                if (nodeMapping[hubNodeB] === d.target || nodeMapping[hubNodeB] == d.source) {
+                  is_target = true
+   
+                }
+              
+
+              if (is_source && is_target){ 
+                return "20";
+              }
+
+    
+        
+            return "none"
+          
+        })
+          
+          .style("opacity", (d: any) => {
+            if (i < 3) {
+   
+              let is_source = false;
+              let is_target = false;
+              for (let key in subgraph[i]) {
+     
+                if (nodeMapping[key] === d.source) {
+    
+                  is_source = true
+                  break;
+                }
+              }
+              for (let key in subgraph[i]) {
+                if (nodeMapping[key] === d.target) {
+                  is_target = true
+                  break;
+                }
+              }
+
+              if (is_source && is_target){ 
+                return 1
+
+            } else {
+              return 0.2
+            } } else {
+              return 0;
+            }
+          
+
+
+          } )
+
 
         const node = g1
           .selectAll("circle")
@@ -120,11 +187,6 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
           .attr("text-anchor", "middle")
           .attr("dominant-baseline", "central")
           .attr("opacity", 0)
-
-
-
-
-    
 
 
         d3.forceSimulation(data.nodes)
@@ -150,8 +212,6 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
           node.attr("cx", (d: any) => d.x).attr("cy", (d: any) => d.y);
           labels.attr("x", (d: any) => d.x).attr("y", (d: any) => d.y);
         }
-
-
 
 
         function updatePositions() {
@@ -181,8 +241,8 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
             }
             if (value != null && i === 3 && value instanceof Float32Array) {
               node.features = value.subarray(
-                2 * node.id,
-                2 * (node.id + 1)
+                node.id,
+                (node.id + 1)
               );
             }
 
@@ -190,7 +250,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
           })
 
 
-    
+  
   const extentX = d3.extent(data.nodes, (d: any) => d.x) as [number | undefined, number | undefined];
   const extentY = d3.extent(data.nodes, (d: any) => d.y) as [number | undefined, number | undefined];
 
@@ -291,13 +351,14 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
                 svg,
                 graphs,
                 offset,
+                subgraph,
                 2
               );
               svg.selectAll("circle")
               .attr("opacity", 0);
   
               if (intmData) {
-                linkPredFeatureVisualizer(svg, allNodes, offset, height, graphs, 1200, 900, 15, 2, 3, 20, colorSchemes, 2);
+                linkPredFeatureVisualizer(svg, allNodes, offset, height, graphs, 1200, 900, 15, 2, 3, 20, colorSchemes, 2, subgraph);
               }
             }
         }
@@ -326,7 +387,13 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
       try {
         setIsLoading(true);
         const processedData = await dataProccessGraphVisLinkPrediction(graph_path, hubNodeA, hubNodeB);
-        await init(processedData);
+        if (processedData) {
+          let graphs = processedData[0];
+          let subgraph = processedData[1];
+          let nodeMapping = processedData[2]
+          await init(graphs, subgraph, nodeMapping);
+        }
+
       } catch (error) {
         console.error("Error in visualizeGNN:", error);
       } finally {

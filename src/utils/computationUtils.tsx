@@ -38,9 +38,9 @@ export function computeAttnStep(
 
 export function computeAttentionCoefficient(
     layerIndex: number, //if 1 then its first gatconv layer, if 2 then second gatconv layer
-    feature: number[],
-    targetFeature: number[],
-    neighborFeatures: number[][]
+    feature: number[],//ith feature
+    targetFeature: number[],//jth feature
+    neighborFeatures: number[][] //neughbor's features, exclude itself
 ){
     //fetch the learnable vectors
     const learnableData = require("../../public/learnableVectorsGAT.json");

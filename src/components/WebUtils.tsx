@@ -1328,8 +1328,14 @@ export function visualizePartialGraph(
 
         const visualizeG = async () => {
             try {
-                const pData = await dataProccessGraphVisLinkPrediction(path, hubNodeA, hubNodeB);
-                await init(pData[0]);
+                const processedData = await dataProccessGraphVisLinkPrediction(path, hubNodeA, hubNodeB);
+                if (processedData) {
+                    const graphs = processedData[0][0]
+
+                    await init(graphs);
+
+                }
+
             } catch (error) {
                 console.error(error); // Log the error
             }

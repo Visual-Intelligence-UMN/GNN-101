@@ -59,6 +59,8 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
     const visualizationId = ++currentVisualizationId.current;
 
     const init = async (graphs: any[]) => {
+      
+      
       if (intmData != null) {
 
       }
@@ -80,17 +82,14 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
         .attr("class", "gvis");
 
         //TODO: put the hint label position into the injection function, using class attr for the interactions
-     const gLabel = d3.select(".gvis").append("g").attr("class", "hintLabel");
+        const gLabel = d3.select(".gvis").append("g").attr("class", "hintLabel");
 
-     if (graph_path === "./json_data/graphs/input_graph0.json") {
-      injectSVG(gLabel, location[3].x-1650-64 + offset, location[3].y-120-64, "./assets/SVGs/interactionHint.svg", "hintLabel");
-    } else {
-      injectSVG(gLabel, location[0].x-1650-64 + offset, location[0].y-120-64, "./assets/SVGs/interactionHint.svg", "hintLabel");
-    }
-
-
-     
-
+        if (graph_path === "./json_data/graphs/input_graph0.json") {
+         injectSVG(gLabel, location[3].x-1650-64 + offset, location[3].y-120-64, "./assets/SVGs/interactionHint.svg", "hintLabel");
+       } else {
+         injectSVG(gLabel, location[0].x-1650-64 + offset, location[0].y-120-64, "./assets/SVGs/interactionHint.svg", "hintLabel");
+       }
+   
      
 
 
@@ -100,7 +99,6 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
 
       graphs.forEach((data, i) => {
-        
 
 
 
@@ -290,12 +288,6 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             allNodes.push(node);
           });
 
-          data.nodes.forEach((node: any) => {
-            console.log("i",i)
-            console.log(node.x)
-  
-          })
-
           
           let maxXDistance = 0;
           let maxYDistance = 0;
@@ -366,6 +358,10 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             featureCoords[1] = {x: centerX, y: centerY};
           }
 
+          if (graph_path === "./json_data/graphs/input_graph0.json") {
+            text_y += 80;
+          }
+
 
           let text = " ";
           if (i == 0) {
@@ -379,11 +375,6 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           }
           if (i === 5) {
             text = "Prediction Result"
-          }
-
-
-          if (graph_path === "./json_data/graphs/input_graph0.json") {
-            text_y += 80;
           }
           const textElement = g1.append("text")
             .attr("class", "layer-label")
@@ -401,9 +392,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
 
            let cst:any = null;
-          let cstOffset = 25;
- 
-
+          const cstOffset = 25;
           if(i==0){
             cst = buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x, text_y + cstOffset, g1)
           }
@@ -434,7 +423,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
             if (intmData) {
 
-              featureVisualizer(svg, allNodes, offset, height, graphs, 900, 600, 15, 10, 3, 20, colorSchemes, 0); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
+              featureVisualizer(svg, allNodes, offset, height, graphs, 700, 900, 600, 15, 10, 3, 20, colorSchemes, 0); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
               //function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, graphs: any[], moveOffset: number, fcLayerMoveOffset: number, rectWidth: number, firstLayerRectHeight: number, rectHeight: number, outputLayerRectHeight: number)
             }
 

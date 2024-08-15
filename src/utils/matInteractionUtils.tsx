@@ -147,7 +147,7 @@ export function drawSoftmaxDisplayer(
         .text(roundToTwo(result[0]))
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
-        .attr("fill", "white");
+        .attr("fill", determineColor(result[0]));
     d3.select(".mats")
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 4)
@@ -173,7 +173,7 @@ export function drawSoftmaxDisplayer(
         .text(roundToTwo(result[1]))
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
-        .attr("fill", "white");
+        .attr("fill", determineColor(result[1]));
     d3.select(".mats")
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 9)
@@ -215,6 +215,16 @@ export function drawSoftmaxDisplayer(
         .attr("font-size", unitSize / 2)
         .attr("fill", textColor);
 }
+
+
+function determineColor(val: number) {
+    if (Math.abs(val) > 0.5) {
+        return "white";
+    }
+
+    return "black";
+}
+
 
 export function drawSoftmaxDisplayerNodeClassifier(
     displayerPos: number[],
@@ -285,7 +295,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .text(roundToTwo(nthOutputVals[Number(rectID)]))
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
-        .attr("fill", "white");
+        .attr("fill", determineColor(nthOutputVals[Number(rectID)]));
     d3.select(".mats")
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 8 + upperOffset)
@@ -343,7 +353,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .text(roundToTwo(nthOutputVals[0]))
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
-        .attr("fill", "white");
+        .attr("fill", determineColor(nthOutputVals[0]));
     d3.select(".mats")
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 4)
@@ -369,7 +379,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .text(roundToTwo(nthOutputVals[1]))
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
-        .attr("fill", "white");
+        .attr("fill", determineColor(nthOutputVals[1]));
 
     d3.select(".mats")
         .append("text")
@@ -396,7 +406,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .text(roundToTwo(nthOutputVals[2]))
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
-        .attr("fill", "white");
+        .attr("fill", determineColor(nthOutputVals[2]));    
 
     d3.select(".mats")
         .append("text")
@@ -423,7 +433,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .text(roundToTwo(nthOutputVals[3]))
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
-        .attr("fill", "white");
+        .attr("fill", determineColor(nthOutputVals[3]));
     d3.select(".mats")
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 19)
@@ -598,22 +608,29 @@ myColor:any
             aggregatedVector[1],
             weightVector[1]
         ];
-        const operators = ["x", "+", "x", "... = "];
+        let operators = ["x", "+", "  x", "          ......    = "];
+
+        if(weightVector.length==2&&aggregatedVector.length==2){
+            operators[3] = "           =";
+        }
 
         //matmul-displayer interaction
         let displayerOffset = -150;
         if(curveDir==1)displayerOffset = 100;
         let displayerX = coordFeatureVis[0];
-        let displayerY = coordFeatureVis[1] + displayerOffset;
+        let displayerY = coordFeatureVis[1] + displayerOffset + 20;
 
         const displayW = 300;
         const displayH = 100;
 
         //drawPoints(".mats", "red", [[displayerX, displayerY]])
 
-        d3.select(".mats")
+        const tooltip = d3.select(".mats").append("g");
+
+        tooltip
             .append("rect")
             .attr("x", displayerX)
+            .attr("y", displayerY - 10)
             .attr("y", displayerY - 10)
             .attr("width", displayW)
             .attr("height", displayH)
@@ -627,12 +644,13 @@ myColor:any
         
         const titleYOffset = 5;
         const titleXOffset = 50;
-        d3.select(".mats")
+        tooltip
             .append("text")
             .attr("x", displayerX + titleXOffset)
             .attr("y", displayerY + titleYOffset)
             .text("Matmul Visualization")
             .attr("class", "matmul-displayer procVis")
+            .attr("font-size", titleYOffset*2)
             .attr("font-size", titleYOffset*2)
             .attr("fill", "black");
         
@@ -649,61 +667,66 @@ myColor:any
         const eqYOffset = titleYOffset * 2.5;
         const unitSize = (eqXOffset / 3 + 3)/2;
         const upperOffset = unitSize * 2;
-        d3.select(".mats")
+        tooltip
             .append("text")
             .attr("x", displayerX + 3)
             .attr("y", displayerY + vectorLength/2 + 3)
             .text("dot(")
             .attr("class", "matmul-displayer procVis")
             .attr("font-size", titleYOffset*2)
+            .attr("font-size", titleYOffset*2)
             .attr("fill", "black");
 
-        d3.select(".mats")
+        tooltip
             .append("text")
             .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength)
             .attr("y", displayerY + vectorLength/2 + 3)
             .text(",")
             .attr("class", "matmul-displayer procVis")
             .attr("font-size", titleYOffset*2)
+            .attr("font-size", titleYOffset*2)
             .attr("fill", "black");
         
-        d3.select(".mats")
+        tooltip
             .append("text")
             .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength + vectorLength/1.5)
             .attr("y", displayerY + vectorLength/2 + 3)
             .text(")")
             .attr("class", "matmul-displayer procVis")
             .attr("font-size", titleYOffset*2)
+            .attr("font-size", titleYOffset*2)
             .attr("fill", "black");
 
-        d3.select(".mats")
+        tooltip
             .append("text")
             .attr("x", displayerX + 3)
             .attr("y", displayerY + vectorLength/2 + 20)
             .text("=")
             .attr("class", "matmul-displayer procVis")
             .attr("font-size", titleYOffset*2)
+            .attr("font-size", titleYOffset*2)
             .attr("fill", "black");
 
         for(let i=0; i<dataSamples.length; i++){
-            d3.select(".mats")
+            tooltip
                 .append("rect")
                 .attr("x", displayerX + 3 + unitSize*(i+1)+30*i)
                 .attr("y", displayerY + vectorLength/2 + 20 - unitSize)
-                .attr("width", unitSize*2)
-                .attr("height", unitSize*2)
+                .attr("width", unitSize*2.5)
+                .attr("height", unitSize*2.5)
                 .style("stroke", "black")
                 .attr("fill", myColor(dataSamples[i]))
                 .attr("class", "matmul-displayer procVis")
                 .raise();
             let color = "white";
             if(dataSamples[i]<0.5){color = "black"}
-            d3.select(".mats")
+            tooltip
                 .append("text")
-                .attr("x", displayerX + 3 + unitSize*(i+1)+30*i)
-                .attr("y", displayerY + vectorLength/2 + 20)
+                .attr("x", displayerX + 3 + unitSize*(i+1)+30*i + unitSize/2)
+                .attr("y", displayerY + vectorLength/2 + 20 + unitSize/2)
                 .text(roundToTwo(dataSamples[i]))
                 .attr("class", "matmul-displayer procVis")
+                .attr("font-size", unitSize)
                 .attr("font-size", unitSize)
                 .attr("fill", color);
         }
@@ -711,22 +734,22 @@ myColor:any
         
 
         for(let i=0; i<operators.length; i++){
-            d3.select(".mats")
-            .append("text")
-            .attr("x", displayerX + 3 + unitSize*(i+1) + 30*(i+1))
-            .attr("y", displayerY + vectorLength/2 + 20)
+            tooltip
+            .append("text").attr("xml:space", "preserve")
+            .attr("x", displayerX + 3 + unitSize*(i+1) + 25*(i+1))
+            .attr("y", displayerY + vectorLength/2 + 20 )
             .text(operators[i])
-            .attr("font-size", unitSize)
+            .attr("font-size", unitSize*1.25)
             .attr("class", "matmul-displayer procVis")
             .raise();
         }
 
-        d3.select(".mats")
+        tooltip
             .append("rect")
             .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength + vectorLength/1.5)
             .attr("y", displayerY + vectorLength/2 + 20 - unitSize)
-            .attr("width", unitSize*2)
-            .attr("height", unitSize*2)
+            .attr("width", unitSize*2.5)
+            .attr("height", unitSize*2.5)
             .style("stroke", "black")
             .attr("fill", myColor(currentVal))
             .attr("class", "matmul-displayer procVis")
@@ -734,19 +757,20 @@ myColor:any
         
             let color = "white";
             if(currentVal<0.5){color = "black"}
-            d3.select(".mats")
+            tooltip
                 .append("text")
-                .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength + vectorLength/1.5)
-                .attr("y", displayerY + vectorLength/2 + 20)
+                .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength + vectorLength/1.5 + unitSize/2)
+                .attr("y", displayerY + vectorLength/2 + 20 + unitSize/2)
                 .text(roundToTwo(currentVal))
                 .attr("class", "matmul-displayer procVis")
+                .attr("font-size", unitSize)
                 .attr("font-size", unitSize)
                 .attr("fill", color);
         
         
         //draw the aggregated vector
         for(let i=0; i<aggregatedVector.length; i++){
-            d3.select(".mats")
+            tooltip
                 .append("rect")
                 .attr("x", displayerX + eqXOffset+i*h/2)
                 .attr("y", displayerY + vectorLength/2)
@@ -758,8 +782,9 @@ myColor:any
 
         //draw the weight vector
         for(let i=0; i<weightVector.length; i++){
-            d3.select(".mats")
+            tooltip
                 .append("rect")
+                .attr("x", displayerX + eqXOffset * 5)
                 .attr("x", displayerX + eqXOffset * 5)
                 .attr("y", displayerY + eqYOffset + i*h2/2)
                 .attr("width", w/2)
@@ -769,7 +794,7 @@ myColor:any
         }
 
         //draw franes
-        d3.select(".mats")
+        tooltip
             .append("rect")
             .attr("x", displayerX + eqXOffset)
             .attr("y", displayerY + vectorLength/2)
@@ -780,8 +805,9 @@ myColor:any
             .attr("stroke", "black")
             .raise();
 
-        d3.select(".mats")
+            tooltip
             .append("rect")
+            .attr("x", displayerX + eqXOffset * 5)
             .attr("x", displayerX + eqXOffset * 5)
             .attr("y", displayerY + eqYOffset)
             .attr("width", w/2)
@@ -790,5 +816,21 @@ myColor:any
             .attr("class", "procVis matmul-displayer")
             .attr("stroke", "black")
             .raise();
+
+           // 定义缩放比例
+const scaleFactor = 1.5;
+
+// 获取 tooltip 元素的边界框
+const bbox = tooltip.node()?.getBBox();
+
+// 计算中心点
+if(bbox!=undefined){
+const centerX = bbox.x + bbox.width / 2;
+const centerY = bbox.y + bbox.height / 2;
+
+// 将缩放中心设置为元素的中心点
+tooltip.attr('transform', `translate(${centerX}, ${centerY}) scale(${scaleFactor}) translate(${-centerX}, ${-centerY})`);
+
+}
 
 }
