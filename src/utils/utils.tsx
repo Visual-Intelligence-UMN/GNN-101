@@ -22,6 +22,7 @@ import { stat } from "fs";
 import { Yomogi } from "@next/font/google";
 import { dataPreparationLinkPred, constructComputationalGraph } from "./linkPredictionUtils";
 import { extractSubgraph } from "./graphDataUtils";
+import { isValidNode } from "./GraphvislinkPredUtil";
 
 env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
@@ -1098,14 +1099,13 @@ export function calculateAverage(arr: number[]): number {
   return average * 10;
 }
 
-export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset: number, mode: number) {
+export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset: number, subgraph: any, mode: number) {
   const nodesByIndex = d3.group(nodes, (d: any) => d.graphIndex);
 
 
 
 
   nodesByIndex.forEach((nodes, graphIndex) => {
-
     nodes.forEach((node: any, i) => {
 
       if (!node.links) {
@@ -1118,11 +1118,17 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
         let xOffset1 = (graphIndex - 2.5) * offset;
         let xOffset2 = (graphIndex - 1.5) * offset;
 
+
       let conv = 3;
       // if (mode === 1) {
       //   conv = 4;
         
       // }
+      if (mode === 2) {
+        xOffset1 = (graphIndex - 3.5) * offset;
+        xOffset2 = (graphIndex - 2.5) * offset;
+        conv = 2
+      }
       if (graphIndex < conv) { 
         
         let drawnLinks = new Set();
@@ -1148,17 +1154,18 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
               const controlX2 = node.x + xOffset1 + (neighborNode.x + xOffset2 - node.x - xOffset1) * 0.2;
               const controlY2 = neighborNode.y + 10;
               const avg = calculateAverage(node.features)
+              let neighborOffset = (neighborNode.graphIndex - 2.5) * offset
+              if (mode === 2) {neighborOffset -= offset}
 
               const path = svg.append("path")
                 .attr("d", 
                   `M 
                   ${node.x + xOffset1 + 16}
                   ${node.y + 10}
-                  Q
+                  Q 
                   ${controlX2} 
                   ${controlY2}, 
-
-                  ${neighborNode.x + (neighborNode.graphIndex - 2.5) * offset - 16} 
+                  ${neighborNode.x + neighborOffset - 16} 
                   ${neighborNode.y + 10}
                 `)
                 .style("stroke", linkStrength(avg))
@@ -1178,7 +1185,9 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
           if (nextNode) {
           nextNode.forEach((nextNode: any) => {
             if (node.id === nextNode.id) {
-              const xOffsetNext = (graphIndex + 1 - 2.5) * offset;
+              let xOffsetNext = (graphIndex + 1 - 2.5) * offset;
+              if (mode === 2) {xOffsetNext -= offset}
+
 
               const controlX1 = node.x + xOffset1 + (nextNode.x + xOffsetNext - node.x - xOffset1) * 0.3;
               const controlY1 = node.y + 10;
@@ -1211,11 +1220,12 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
             }
           })
         }
+     
       
         
       } else {  
         if (mode === 1) {
-          if (graphIndex === 3) {
+          if (graphIndex === 2) {
             const nextLayerNodes = nodesByIndex.get(graphIndex + 1);
           if (nextLayerNodes) {
             nextLayerNodes.forEach((nextNode: any) => {
@@ -1229,7 +1239,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
                   .attr("y2", nextNode.y + 10)
                   .style("stroke", linkStrength(avg))
                   .style("stroke-width", 1)
-                  .style("opacity", 0)
+                  .style("opacity", 0.1)
                   .style("fill", "none");
 
                 if (!nextNode.links) {
@@ -1248,6 +1258,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
           }
           return;
         }
+        else if (mode === 0) {
           const avg = calculateAverage(node.features)
 
           xOffset1 = (graphIndex - 2.5) * offset - 150;
@@ -1257,20 +1268,59 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
             xOffset1 = (graphIndex - 2.5) * offset;
             
           }
+        
           
           
           const nextLayer = graphs[graphIndex + 1];
           if (nextLayer) {
             let nextNode = nextLayer.nodes[0];
 
-            const controlX1 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.5;
+            const controlX1 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.3;
             const controlY1 = node.y + 10;
             const controlX2 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.7;
             const controlY2 = nextNode.y + 10;
 
             
             const path = svg.append("path")
-              .attr("d", `M ${node.x + xOffset1} ${node.y + 10} C ${controlX2} ${controlY2}, ${controlX2} ${controlY2} ${nextNode.x + xOffset2 - 20} ${nextNode.y + 10}`)
+              .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 20} ${nextNode.y + 10}`)
+              .style("stroke", linkStrength(avg))
+              .style("opacity", 0.1)
+              .style('stroke-width', 1)
+              .style("fill", "none");
+           
+  
+          if (!nextNode.links) {
+            nextNode.links = [];
+          }
+          if (!nextNode.relatedNodes) {
+            nextNode.relatedNodes = [];
+          }
+          nextNode.links.push(path);
+          nextNode.relatedNodes.push(node);
+        
+        }
+      } else {
+        const avg = calculateAverage(node.features)
+        
+
+   
+        xOffset1 = (graphIndex - 3.5) * offset;
+        xOffset2 = (graphIndex - 2.5) * offset - 30 * (graphIndex * 1.5) + 100;
+
+          
+          
+          const nextLayer = graphs[graphIndex + 1];
+          if (nextLayer) {
+            let nextNode = nextLayer.nodes[0];
+
+            const controlX1 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.3;
+            const controlY1 = node.y + 10;
+            const controlX2 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.7;
+            const controlY2 = nextNode.y + 10;
+            if (isValidNode(subgraph, node)) {
+            
+            const path = svg.append("path")
+              .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 20} ${nextNode.y + 10}`)
               .style("stroke", linkStrength(avg))
               .style("opacity", 0)
               .style('stroke-width', 1)
@@ -1285,12 +1335,17 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
           }
           nextNode.links.push(path);
           nextNode.relatedNodes.push(node);
-          
+        }
+        
         }
       }
+    }
+    
       
     });
+    
   });
+
 
  }
 
@@ -1434,6 +1489,7 @@ export const graphPrediction = async (modelPath: string, graphPath: string) => {
 }
 
 
+
 export const linkPrediction = async (modelPath: string, graphPath: string) => {
  
 
@@ -1473,9 +1529,24 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
     edge_label_index: edgeIndexTensor,
   });
 
+  let conv1 = [];
+  let conv2 = [];
+
+  if(modelPath === "./gat_link_model.onnx"){
+    conv1 = outputMap.gat1.cpuData;
+    conv2 = outputMap.gat2.cpuData;
+    console.log("gat model", conv1, conv2);
+  }else if(modelPath === "./sage_link_model.onnx"){
+    conv1 = outputMap.sage1.cpuData;
+    conv2 = outputMap.sage2.cpuData;
+    console.log("sage model", conv1, conv2);
+  }else{
+    conv1 = outputMap.conv1.cpuData;
+    conv2 = outputMap.conv2.cpuData;
+  }
   const intmData: IntmDataLink = {
-    conv1: outputMap.conv1.cpuData,
-    conv2: outputMap.conv2.cpuData,
+    conv1: conv1,
+    conv2: conv2,
     decode_mul: outputMap.decode_mul.cpuData,
     decode_sum: outputMap.decode_sum.cpuData,
     prob_adj: outputMap.prob_adj.cpuData,
@@ -1484,7 +1555,7 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
 
   const prob = outputMap.prob_adj.cpuData;
 
-  console.log("predicted!",intmData);
+  console.log("predicted!",intmData, modelPath);
 
   const data = dataPreparationLinkPred(intmData);
 
@@ -1507,7 +1578,6 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
   return {prob, intmData};
 
 }
-
 
 function splitArray(arr: number[], chunkSize: number): number[][] {
   const chunks: number[][] = [];

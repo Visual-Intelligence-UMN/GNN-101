@@ -123,15 +123,26 @@ export function graphVisDrawMatrixWeight(
             if((Xt[0].length<Xt.length && Xt.length!=64)||(Xt[0].length==64&&Xt.length==2)
             ||(Xt[0].length==34&&Xt.length==4)
             ||(Xt.length==34&&Xt[0].length==4)){
+       
                 if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
                 else m1 = weightMatrixPostions[j][currentStep]
+                
+
             }
             else{
-                if(curveDir==-1)m1 = weightMatrixPostions[j][currentStep]
+    
+                if(curveDir==-1) { 
+                    m1 = weightMatrixPostions[j][currentStep] 
+                    if (mode === 2 && node.graphIndex === 1) {
+                        m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+                    } 
+                }
                 else m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+
 
             }
         }
+        
 
 
 
