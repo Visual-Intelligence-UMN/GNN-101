@@ -1,4 +1,4 @@
-import { calculatePrevFeatureVisPos, loadLinkWeights, loadNodeWeights, loadWeights, translateLayers } from "./matHelperUtils";
+import { calculatePrevFeatureVisPos, loadLinkGATWeights, loadLinkWeights, loadNodeWeights, loadWeights, translateLayers } from "./matHelperUtils";
 import {
     drawMatrixPreparation,
     drawNodeFeatures,
@@ -1118,7 +1118,13 @@ export function visualizeLinkClassifierFeatures(
     let outputVis = null; //to manage model output
     let resultVis: any = null; //tp manage result visualizer
     //load weights and bias
-    const dataPackage = loadLinkWeights();
+    let dataPackage = loadLinkWeights();
+
+    //conditional loading
+    if(innerComputationMode == "GCN"){
+        dataPackage = loadLinkGATWeights();
+    }
+
 
     const weights = dataPackage["weights"];
     const bias = dataPackage["bias"];
