@@ -23,7 +23,6 @@ import { Footer, NavBar } from "../components/Surfaces";
 import { Inter } from "@next/font/google";
 import NodeMatricesVisualizer from "./node_classifier/NodeMatrixVisualizer";
 import NodeGraphVisualizer from "./node_classifier/NodeGraphVisualizer";
-import { mod } from "mathjs";
 
 export const inter = Inter({
     variable: "--font-inter",
@@ -82,11 +81,8 @@ export default function Home() {
         setSimulation(false);
     }
 
-    useEffect(() => {
-        (document.body.style as any).zoom = "70%";
-    }, []);
-
     return (
+        <div >
         <main className={inter.className}>
             <div className={inter2.className}>
                 {step === 0 && (
@@ -103,17 +99,20 @@ export default function Home() {
             </div>
             {step === 1 && (
                 <div className="bg-white text-black">
+                    <div id="gnn101">
                     <NavBar />
+                    </div>
                     {/* <PanelGroup direction="horizontal"> */}
 
-                    <div className={` ${styles.body}  grid grid-cols-4 `}>
+                    <div className={` ${styles.body}  grid grid-cols-4 `} >
+                        <div id="text-panel">
                         <Sidebar
                             isGraphView={isGraphView}
                             setIsGraphView={setIsGraphView}
                             predicted={predicted}
                             modelMode={model}
                         />
-
+                        </div>
                         {/* <Panel className="ml-4"> */}
                         {/* GNN model */}
                         <div className={`${styles.rightContainer} col-span-3 ml-4`}>
@@ -123,6 +122,7 @@ export default function Home() {
                             >
                                 <h1 className="text-3xl min-w-48 font-black">GNN Model</h1>
                                 <Selector
+
                                     selectedOption={model}
                                     handleChange={(e) => {
                                         const newModel = e.target.value;
@@ -141,27 +141,30 @@ export default function Home() {
 
                                     }}
                                     OptionList={Object.keys(modelList)}
+                                    id="task-selector"
                                 />
 
-                                {model == "graph classification" ? (
-                                    <ButtonChain
-                                        selectedButtons={selectedButtons}
-                                        setSelectedButtons={setSelectedButtons}
-                                        predicted={predicted}
-                                    />
-                                ) : model == "node classification" ? (
-                                    <NodeClassifierButtonChain
-                                        selectedButtons={selectedButtons}
-                                        setSelectedButtons={setSelectedButtons}
-                                        predicted={predicted}
-                                    />
-                                ) : (
-                                    <LinkClassifierButtonChain
-                                        selectedButtons={selectedButtons}
-                                        setSelectedButtons={setSelectedButtons}
-                                        predicted={predicted}
-                                    />
-                                )}
+                                <div id="model-architecture">
+                                    {model == "graph classification" ? (
+                                        <ButtonChain
+                                            selectedButtons={selectedButtons}
+                                            setSelectedButtons={setSelectedButtons}
+                                            predicted={predicted}
+                                        />
+                                    ) : model == "node classification" ? (
+                                        <NodeClassifierButtonChain
+                                            selectedButtons={selectedButtons}
+                                            setSelectedButtons={setSelectedButtons}
+                                            predicted={predicted}
+                                        />
+                                    ) : (
+                                        <LinkClassifierButtonChain
+                                            selectedButtons={selectedButtons}
+                                            setSelectedButtons={setSelectedButtons}
+                                            predicted={predicted}
+                                        />
+                                    )}
+                                </div>
                             </div>
 
                             <hr className="border-t border-gray-300 my-4"></hr>
@@ -177,6 +180,7 @@ export default function Home() {
                                                 selectedOption={selectedGraph}
                                                 handleChange={handleGraphSelection}
                                                 OptionList={Object.keys(graphList)}
+                                                id="dataset-selector"
                                             />
                                         ) : model == "node classification" ? (
                                             //   <Selector
@@ -191,9 +195,10 @@ export default function Home() {
                                                 selectedOption={selectedGraph}
                                                 handleChange={handleGraphSelection}
                                                 OptionList={Object.keys(linkList)}
+                                                id="dataset-selector"
                                             />
                                         )}
-                                        <p>{DatasetInfo[model]}</p>
+                                        <p id="dataset-description">{DatasetInfo[model]}</p>
                                     </div>
 
                                 </div>
@@ -360,5 +365,6 @@ export default function Home() {
                 </div>
             )}
         </main>
+        </div>
     );
 }
