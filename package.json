@@ -14,10 +14,13 @@
   "dependencies": {
     "@fontsource/inter": "^5.0.18",
     "@next/font": "^14.2.3",
+    "@reactour/tour": "^3.7.0",
     "colorsys": "^1.0.22",
     "copy-webpack-plugin": "^12.0.2",
     "d3": "^7.9.0",
     "fs": "^0.0.1-security",
+    "intro.js": "^7.0.1",
+    "intro.js-react": "^1.0.0",
     "lodash": "^4.17.21",
     "mathjs": "^13.0.0",
     "next": "^14.2.4",
@@ -25,6 +28,7 @@
     "onnxruntime-web": "^1.17.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-joyride": "^2.8.2",
     "react-resizable-panels": "^2.0.19",
     "react-scrollbars-custom": "^4.1.1",
     "react-tooltip": "^5.27.0",
@@ -39,9 +43,9 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "gh-pages": "^6.1.1",
+    "jest": "^27.0.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.3",
-    "typescript": "5.4.5",
-    "jest": "^27.0.0"
+    "typescript": "5.4.5"
   }
 }

@@ -28,6 +28,7 @@ import {
     drawWeightMatrix,
     computeMatrixLocations,
     drawAttentions,
+    drawMathFormula,
 } from "./matAnimateUtils";
 import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import { drawMatmulExplanation, drawSoftmaxDisplayer } from "./matInteractionUtils";
@@ -649,6 +650,8 @@ export function featureVisClick(
 
     d3.select(".mats").style("pointer-events", "none");
 
+    const formula:any = d3.select(".mats").append("g").attr("class", "math-formula");
+
     let animateSeqAfterPath: any = [
         {func: () => {
             drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir)
@@ -697,10 +700,16 @@ export function featureVisClick(
         // {func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels), delay: 1,},
         // {func: () => drawReLU(midX1, wmCoord, biasCoord, nextCoord), delay: aniSec,},
         // {func: () => {curNode.style.opacity = "1";},delay: aniSec,},
+        {
+            func:()=>{
+                drawMathFormula(formula, coordFeatureVis[0], coordFeatureVis[1]-80, "./assets/SVGs/GCNFormula_test.svg");
+            }
+        },
         {func: () => {
             d3.select(".ctrlBtn").style("pointer-events", "auto");
             d3.select(".mats").style("pointer-events", "auto");
         },delay: 1,},
+
     ];
 
     // if(activation=="tanh"){

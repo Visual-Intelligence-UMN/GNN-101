@@ -1,8 +1,8 @@
 import * as d3 from "d3";
 import { computeMids, computeMidsVertical } from "./matFeaturesUtils";
-import { injectPlayButtonSVG } from "./svgUtils";
+import { flattenSVG, injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import { drawActivationExplanation, drawDotProduct } from "./matInteractionUtils";
-import { create, all, transposeDependencies } from "mathjs";
+import { create, all, transposeDependencies, flatten } from "mathjs";
 import { drawPoints, flipHorizontally, flipVertically, rotateMatrixCounterClockwise, transposeAnyMatrix } from "./utils";
 import { drawHintLabel, drawMatrixValid, rotateMatrix } from "./matHelperUtils";
 
@@ -65,6 +65,24 @@ export function runAnimations(index:number, animations:any) {
     } else {
 
     }
+}
+
+export function drawMathFormula(
+    g:any,
+    x: number, 
+    y:number,
+    formula:string
+){
+    injectSVG(
+        g,
+        x,
+        y,
+        formula,
+        "procVis math-formula-pos"
+    );
+
+    flattenSVG(".mats");
+
 }
 
 export function drawAniPath(
@@ -912,17 +930,28 @@ export function drawReLU(
 
         relu.on("mouseover", function(event, d){
             const [x, y] = d3.pointer(event);
-
-            //set-up the paramtere for the math displayer
-           drawActivationExplanation(
-            x, y, "ReLU Non-Linear Function",
-            "f(x) = max(0, x)", "Range: [ 0 to infinity)"
+        
+            // 设置数学公式展示的参数
+            drawActivationExplanation(
+                x, y, "ReLU Non-Linear Function",
+                "f(x) = max(0, x)", "Range: [0 to infinity)"
             );
-            
+        
+            //d3.select("#activation").attr("stroke", "red"); // 使用 d3.select 而不是 d3.selectAll
         });
-
+        
         relu.on("mouseout", function(){
             d3.selectAll(".math-displayer").remove();
+            // d3.select("#activation").attr("stroke", "black"); // 同样使用 d3.select
+        
+            // const x = parseFloat(d3.select(".math-formula-pos").attr("x")) || 0; // 使用 parseFloat
+            // const y = parseFloat(d3.select(".math-formula-pos").attr("y")) || 0;
+        
+            // // 先删除旧的公式元素
+            // d3.selectAll(".math-formula").remove();
+        
+            // const formula = d3.select(".mats").append("g").attr("class", "math-formula");
+            // drawMathFormula(formula, x, y, "./assets/SVGs/GCNFormula_test.svg");
         });
 }
 
