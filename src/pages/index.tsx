@@ -73,7 +73,6 @@ export default function Home() {
 
 
     function handleGraphSelection(e: React.ChangeEvent<HTMLSelectElement>): void {
-
         setSelectedGraph(e.target.value);
         setChangedG(true);
         setProbabilities([]);

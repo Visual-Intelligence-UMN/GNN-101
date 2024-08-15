@@ -48,14 +48,41 @@ export default function App({ Component, pageProps }: AppProps) {
 
     const [isClient, setIsClient] = useState(false);
 
+    const [currentStepIndex, setCurrentStepIndex] = useState(0);
+
+
     useEffect(() => {
-      //  (document.body.style as any).zoom = "70%";
+     // (document.body.style as any).zoom = "70%";
         setIsClient(true);
 
     }, []);
 
+    useEffect(() => {
+        if(currentStepIndex==8){
+            (document.body.style as any).zoom = "70%";
+        }
+    },[currentStepIndex])
+
+    const handleJoyrideCallback = (data:any) => {
+        const { action, index, type } = data;
+
+        console.log("event",  { action, index, type })
+    
+        if (type === 'step:before' || type === 'step:after') {
+            
+          setCurrentStepIndex(index);
+          console.log("idx", index)
+        }
+        
+        if (type === 'tour:end' || action === 'close') {
+          // 当 Joyride 结束时的处理逻辑
+            setCurrentStepIndex(8);
+            console.log("idx finished")
+        }
+      };
+
     return <>
-   {isClient && ( <Joyride steps={steps} continuous={true} showProgress={true} showSkipButton={true} />)}
+   {isClient && ( <Joyride steps={steps} continuous={true} showProgress={true} showSkipButton={true} callback={handleJoyrideCallback}/>)}
         <Link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
