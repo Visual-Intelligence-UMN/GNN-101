@@ -652,7 +652,7 @@ export function featureVisClick(
 
     d3.select(".mats").style("pointer-events", "none");
 
-    const formula:any = d3.select(".mats").append("g");
+    const formula:any = d3.select(".mats").append("g").attr("class", "math-formula");
 
     let animateSeqAfterPath: any = [
         {func: () => {
@@ -703,7 +703,7 @@ export function featureVisClick(
         // {func: () => {curNode.style.opacity = "1";},delay: aniSec,},
         {
             func:()=>{
-                drawMathFormula(formula, coordFeatureVis[0], coordFeatureVis[1]-80, "./assets/SVGs/output_flattened.svg");
+                drawMathFormula(formula, coordFeatureVis[0], coordFeatureVis[1]-80, "./assets/SVGs/GCNFormula_test.svg");
             }
         },
         {func: () => {
