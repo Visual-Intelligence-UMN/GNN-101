@@ -27,6 +27,7 @@ interface NodeGraphVisualizerProps {
   selectedButtons: boolean[];
   simulationLoading: boolean;
   setSimulation: Function;
+  innerComputationMode: string
 }
 
 const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
@@ -37,6 +38,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
   selectedButtons,
   simulationLoading,
   setSimulation,
+  innerComputationMode
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -378,7 +380,9 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
               graphs,
               offset,
               [],
-              1
+              1,
+              0,
+              0
             );
 
 
@@ -386,7 +390,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
 
 
             if (intmData && intmData.final) {
-              featureVisualizer(svg, allNodes, offset, height, graphs, 1100, 600, 800, 15, 10, 20, 20, colorSchemes, 1); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
+              featureVisualizer(svg, allNodes, offset, height, graphs, 1100, 600, 800, 15, 10, 20, 20, colorSchemes, 1, innerComputationMode); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
             }
 
           }

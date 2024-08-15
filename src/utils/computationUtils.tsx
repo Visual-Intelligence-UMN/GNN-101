@@ -42,6 +42,10 @@ export function computeAttentionCoefficient(
     targetFeature: number[],//jth feature
     neighborFeatures: number[][] //neughbor's features, exclude itself
 ){
+    console.log("layerindex", layerIndex)
+    console.log("feature", feature)
+    console.log("targetfeat", targetFeature)
+    console.log("nei", neighborFeatures)
     //fetch the learnable vectors
     const learnableData = require("../../public/learnableVectorsGAT.json");
     const learnableVectors = [

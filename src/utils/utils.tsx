@@ -595,6 +595,7 @@ export function featureVisualizer(
   outputLayerRectHeight: number,
   colorSchemes:any,
   mode: number,
+  innerComputationMode: string,
 ) {
   state.isClicked = false;
 
@@ -886,7 +887,7 @@ export function featureVisualizer(
            if (mode === 1 && graphIndex === 4) {
             nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, svg, mode)
            } else {
-            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
+            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
            };
 
 
@@ -1099,7 +1100,7 @@ export function calculateAverage(arr: number[]): number {
   return average * 10;
 }
 
-export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset: number, subgraph: any, mode: number) {
+export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset: number, subgraph: any, mode: number, hubNodeA: number, hubNodeB: number) {
   const nodesByIndex = d3.group(nodes, (d: any) => d.graphIndex);
 
 
@@ -1138,7 +1139,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
          nextGraphLinks.forEach((link: any) => {
            const sortedIds = [link.source.id, link.target.id].sort();
            const linkId = sortedIds.join("-");
-           if ((link.source.id === node.id || link.target.id === node.id) && !drawnLinks.has(linkId)) {
+           if (((link.source.id === node.id || link.target.id === node.id) && !drawnLinks.has(linkId))) {
              drawnLinks.add(linkId);
 
              const neighborNode = link.source.id === node.id ? link.target : link.source;
@@ -1148,6 +1149,10 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
              if (!neighborNode.relatedNodes) {
               neighborNode.relatedNodes = [];
              }
+             console.log("hubNode", hubNodeA, hubNodeB)
+             console.log("node", node.original_id)
+             console.log("neighbor", neighborNode.original_id)
+             if (!(node.original_id === hubNodeA && neighborNode.original_id === hubNodeB) && !(node.original_id === hubNodeB && neighborNode.original_id === hubNodeA)) {
             
               const controlX1 = node.x + xOffset1 + (neighborNode.x + xOffset2 - node.x - xOffset1) * 0.8;
               const controlY1 = node.y + 10;
@@ -1177,6 +1182,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
 
               neighborNode.links.push(path);
               neighborNode.relatedNodes.push(node);
+                }
         
            }
           })

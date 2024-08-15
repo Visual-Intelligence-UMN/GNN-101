@@ -458,6 +458,7 @@ export default function Home() {
                                                     simulationLoading
                                                 }
                                                 setSimulation={setSimulation}
+                                                innerComputationMode={modelType}
                                             />
                                         </>
                                     ) : (
@@ -487,6 +488,7 @@ export default function Home() {
                                                 simulationLoading
                                             }
                                             setSimulation={setSimulation}
+                                            innerComputationMode={modelType}
                                         />
                                     ) : (
                                         <NodeMatricesVisualizer
@@ -508,6 +510,7 @@ export default function Home() {
                                         setSimulation={setSimulation}
                                         hubNodeA={hubNodeA}
                                         hubNodeB={hubNodeB}
+                                        innerComputationMode = {modelType}
                                     />
                                 ) : (
                                     <LinkMatricesVisualizer

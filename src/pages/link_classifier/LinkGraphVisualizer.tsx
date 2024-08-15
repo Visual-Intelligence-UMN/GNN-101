@@ -32,6 +32,7 @@ interface LinkVisualizerProps {
   setSimulation: Function;
   hubNodeA: number;
   hubNodeB: number;
+  innerComputationMode: string;
 }
 
 
@@ -45,6 +46,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
   setSimulation,
   hubNodeA,
   hubNodeB,
+  innerComputationMode
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -92,6 +94,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
         })
       );
 
+      console.log("BAD", innerComputationMode)
       graphs.forEach((data, i) => {
 
         let xOffset = (i - 3.5) * offset;
@@ -234,21 +237,23 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
           data.nodes.forEach((node: any) => {
             node.graphIndex = i;
             if (value != null && i <= 2 && value instanceof Float32Array) {
-               node.features = value.subarray(
+               node.features = Array.from(value.subarray(
                 64 * node.id,
                 64 * (node.id + 1)
-              );
+              ));
             }
             if (value != null && i === 3 && value instanceof Float32Array) {
-              node.features = value.subarray(
+              node.features = Array.from(value.subarray(
                 node.id,
                 (node.id + 1)
-              );
+              ));
             }
 
             allNodes.push(node);
           })
+          
 
+          console.log("VAWAD", allNodes)
 
   
   const extentX = d3.extent(data.nodes, (d: any) => d.x) as [number | undefined, number | undefined];
@@ -352,13 +357,15 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
                 graphs,
                 offset,
                 subgraph,
-                2
+                2,
+                hubNodeA,
+                hubNodeB
               );
               svg.selectAll("circle")
               .attr("opacity", 0);
   
               if (intmData) {
-                linkPredFeatureVisualizer(svg, allNodes, offset, height, graphs, 1200, 900, 15, 2, 3, 20, colorSchemes, 2, subgraph);
+                linkPredFeatureVisualizer(svg, allNodes, offset, height, graphs, 1200, 900, 15, 2, 3, 20, colorSchemes, 2, subgraph, innerComputationMode);
               }
             }
         }
