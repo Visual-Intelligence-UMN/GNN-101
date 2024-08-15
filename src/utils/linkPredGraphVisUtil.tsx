@@ -4,7 +4,7 @@ import * as d3 from "d3";
 import { loadLinkWeights, loadNodeWeights, loadWeights } from "./matHelperUtils";
 import * as ort from "onnxruntime-web";
 import { env } from "onnxruntime-web";
-import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature, scaleFeatureGroup, nodeOutputVisualizer, pathColor, weightAnimation, moveFeatures, moveFeaturesBack } from "@/utils/graphUtils";
+import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature, scaleFeatureGroup, nodeOutputVisualizer, pathColor, moveFeatures, moveFeaturesBack } from "@/utils/graphUtils";
 import { features, off } from 'process';
 
 import { IGraphData, IntmData, IntmDataLink, IntmDataNode } from "../types";
@@ -659,8 +659,12 @@ export function linkPredOutputVisualizer(
         d3.selectAll(".to-be-removed").remove();
 
         d3.selectAll(".graph-displayer").remove();
-        for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "1";
+        for (let i = 0; i < 4; i++) {colorSchemes[i].style.opacity = "1";}
+
+        console.log("noderelatedNodes", node.relatedNodes)
+
         moveFeaturesBack(node.relatedNodes, originalCoordinates);
+
         node.featureGroup
             .transition()
             .duration(1000)

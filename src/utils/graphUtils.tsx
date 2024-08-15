@@ -768,6 +768,11 @@ export function calculationVisualizer(
     if (node.relatedNodes.length <= 8) {
         moveToY = height / 5;
     }
+
+    if (mode === 2) {
+        moveToX += offset
+    }
+
     let temp = 0;
     if (mode === 1) {
         temp = 50
@@ -845,7 +850,7 @@ export function calculationVisualizer(
         .style("opacity", 1);
 
 
-    for (let i = 0; i < 64; i++) {
+    for (let i = 0; i < node.relatedNodes[0].features.length; i++) {
         let s: [number, number] = [
             node.graphIndex * offset +
             i * prevRectHeight +
@@ -912,7 +917,7 @@ export function calculationVisualizer(
         .style("stroke-width", 1)
         .style("opacity", 0);
 
-    for (let i = 0; i < 64; i++) {
+        for (let i = 0; i < node.features.length; i++) {
         let s: [number, number] = [
             node.graphIndex * offset +
             i * rectHeight +
@@ -1831,7 +1836,7 @@ export function matrixMultiplication(matrix_a: any[], matrix_b: any[]) {
     return result;
 }
 
-function moveFeatures(relatedNodes: any, xPos: number, yPos: number) {
+export function moveFeatures(relatedNodes: any, xPos: number, yPos: number) {
     let originalCoordinates: any[] = [];
     let coordinate: FeatureGroupLocation;
     let x;
@@ -1859,10 +1864,12 @@ function moveFeatures(relatedNodes: any, xPos: number, yPos: number) {
     return originalCoordinates;
 }
 
-function moveFeaturesBack(
+export function moveFeaturesBack(
     relatedNodes: any,
     originalCoordinates: FeatureGroupLocation[]
 ) {
+
+
     relatedNodes.forEach((n: any, i: number) => {
         let xPos = originalCoordinates[i].xPos;
         let yPos = originalCoordinates[i].yPos;
