@@ -1,8 +1,8 @@
 import * as d3 from "d3";
 import { computeMids, computeMidsVertical } from "./matFeaturesUtils";
-import { injectPlayButtonSVG } from "./svgUtils";
+import { flattenSVG, injectPlayButtonSVG } from "./svgUtils";
 import { drawActivationExplanation, drawDotProduct } from "./matInteractionUtils";
-import { create, all, transposeDependencies } from "mathjs";
+import { create, all, transposeDependencies, flatten } from "mathjs";
 import { drawPoints, flipHorizontally, flipVertically, rotateMatrixCounterClockwise, transposeAnyMatrix } from "./utils";
 import { drawHintLabel, drawMatrixValid, rotateMatrix } from "./matHelperUtils";
 
@@ -65,6 +65,23 @@ export function runAnimations(index:number, animations:any) {
     } else {
 
     }
+}
+
+export function drawMathFormula(
+    g:any,
+    x: number, 
+    y:number,
+    formula:string
+){
+    injectPlayButtonSVG(
+        g,
+        x,
+        y,
+        formula
+    );
+
+    flattenSVG(".mats");
+
 }
 
 export function drawAniPath(
@@ -803,11 +820,14 @@ export function drawReLU(
             x, y, "ReLU Non-Linear Function",
             "f(x) = max(0, x)", "Range: [ 0 to infinity)"
             );
+
+          //  d3.selectAll(".activation").attr("stroke", "red").attr("shape-rendering", "geometricPrecision");
             
         });
 
         relu.on("mouseout", function(){
             d3.selectAll(".math-displayer").remove();
+           // d3.selectAll(".activation").attr("stroke", "black").attr("shape-rendering", "geometricPrecision");
         });
 }
 
