@@ -130,7 +130,7 @@ export default function Sidebar(props: Props) {
                     </p>
 
                     {!props.predicted &&
-                        `Click the "click to predict" button on the right side and show inner layers`}
+                        `Click the "predict" button on the right side and show inner layers`}
 
                     <p>
                         Message-passing forms the backbone of many GNN architectures,
