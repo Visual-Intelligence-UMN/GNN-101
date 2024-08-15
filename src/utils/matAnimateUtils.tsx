@@ -73,15 +73,55 @@ export function drawMathFormula(
     y:number,
     formula:string
 ){
-    injectSVG(
-        g,
-        x,
-        y,
-        formula,
-        "procVis math-formula-pos"
-    );
+ 
+// injectSVG(
+//         g,
+//         x,
+//         y,
+//         formula,
+//         "procVis math-formula-pos"
+//     );
 
-    flattenSVG(".mats");
+const defs = g.append("defs");
+const filter = defs.append("filter")
+    .attr("id", "redFilter");
+
+// 使用 feColorMatrix 改变图像的颜色
+filter.append("feColorMatrix")
+    .attr("type", "matrix")
+    .attr("values", "1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0");
+
+    g.append("image")
+    .attr("x", x)
+    .attr("y", y)
+    .attr("width", 150)
+    .attr("height", 60)
+    .attr("href", "./test2.png")
+    .attr("class", "procVis math-formula-pos").attr("filter", "url(#redFilter)");
+
+    g.append("rect")
+    .attr("x", x-5)
+    .attr("y", y-25)
+    .attr("width", 175)
+    .attr("height", 75)
+    .attr("fill", "white")
+    .attr("opacity", 1)
+    .attr("stroke", "black")
+    .attr("stroke-width", 1)
+    .attr("class", "procVis")
+    .attr("rx", 5)
+    .attr("ry", 5)
+    .lower();
+   
+    g.append("text")
+    .text("GCNConv")
+    .attr("class", "procVis")
+    .attr("font-size", 12)
+    .attr("x", x + 40)
+    .attr("y", y - 25 + 12)
+
+
+   // flattenSVG(".mats");
 
 }
 

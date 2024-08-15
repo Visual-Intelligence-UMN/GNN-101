@@ -701,11 +701,11 @@ export function featureVisClick(
         // {func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels), delay: 1,},
         // {func: () => drawReLU(midX1, wmCoord, biasCoord, nextCoord), delay: aniSec,},
         // {func: () => {curNode.style.opacity = "1";},delay: aniSec,},
-        // {
-        //     func:()=>{
-        //         drawMathFormula(formula, coordFeatureVis[0], coordFeatureVis[1]-80, "./assets/SVGs/GCNFormula_test.svg");
-        //     }
-        // },
+        {
+            func:()=>{
+                drawMathFormula(formula, coordFeatureVis[0], coordFeatureVis[1]-80, "./assets/SVGs/GCNFormula_test.svg");
+            }
+        },
         {func: () => {
             d3.select(".ctrlBtn").style("pointer-events", "auto");
             d3.select(".mats").style("pointer-events", "auto");
