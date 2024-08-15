@@ -73,7 +73,7 @@ export const GraphAnalysisViewer: React.FC<GraphAnalysisViewerProps> = ({
     }, [path]);
 
     const graphStat = data ? (
-        <div className="flex flex-row flex-wrap items-center text-lg font-thin">
+        <div className="flex flex-row flex-wrap items-center text-lg font-thin" id="graph-statistics">
             {/* <div className="mr-4">
                 <span>Graph Information</span>{" "}
             </div> */}
@@ -495,7 +495,7 @@ const inter = Inter({
 });
 export const Sidebar = () => {
     return (
-        <div className="sidebar" style={{ height: "100%" }}>
+        <div className="sidebar" style={{ height: "100%" }} id="text-panel">
             <main className={inter.className} style={{ paddingRight: "60px" }}>
                 <h1 className="text-2xl font-black text-center text-3xl">
                     WHAT is an GNN model?
@@ -550,18 +550,21 @@ interface SelectorProps {
     selectedOption: string;
     handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
     OptionList: string[];
+    id:string
 }
 
 export const Selector: React.FC<SelectorProps> = ({
     selectedOption,
     handleChange,
     OptionList,
+    id
 }) => {
     return (
         <select
             className="text-2xl rounded-md px-3 shadow-none border-solid border-gray-200 border-2 min-w-80 bg-white text-gray-600"
             value={selectedOption}
             onChange={handleChange}
+            id={id}
         >
             {OptionList.map((item, index) => (
                 <option key={index} value={item}>
