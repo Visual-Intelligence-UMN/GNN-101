@@ -1,8 +1,8 @@
 import * as d3 from "d3";
 import { computeMids, computeMidsVertical } from "./matFeaturesUtils";
-import { injectPlayButtonSVG } from "./svgUtils";
+import { flattenSVG, injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import { drawActivationExplanation, drawDotProduct } from "./matInteractionUtils";
-import { create, all, transposeDependencies } from "mathjs";
+import { create, all, transposeDependencies, flatten } from "mathjs";
 import { drawPoints, flipHorizontally, flipVertically, rotateMatrixCounterClockwise, transposeAnyMatrix } from "./utils";
 import { drawHintLabel, drawMatrixValid, rotateMatrix } from "./matHelperUtils";
 
@@ -65,6 +65,24 @@ export function runAnimations(index:number, animations:any) {
     } else {
 
     }
+}
+
+export function drawMathFormula(
+    g:any,
+    x: number, 
+    y:number,
+    formula:string
+){
+    injectSVG(
+        g,
+        x,
+        y,
+        formula,
+        "procVis math-formula-pos"
+    );
+
+    flattenSVG(".mats");
+
 }
 
 export function drawAniPath(
@@ -140,7 +158,7 @@ export function drawAniPath(
         d3.selectAll(".matmul-displayer").remove();
     });
 
-    d3.selectAll(".interactRect").style("pointer-events", "none");    
+    d3.selectAll(".interactRect").style("pointer-events", "none");
 }
 
 export function drawMatrixWeight(
@@ -331,6 +349,111 @@ export function drawMatrixWeight(
             .attr("stroke", "black").attr("id", id)
             .attr("stroke-width", 2).attr("stroke", myColor(Xv[j])).lower();
     }
+}
+
+
+export function drawAttentions(
+    g1: any,
+    X: any,
+    coordFeatureVis: any,
+    w: number,
+    rectH: number,
+    myColor: any,
+    posList: any,
+    mulValues: any,
+    curveDir: number
+) {
+    const g = g1.append("g").attr("class", "procVis aggregate")
+    for (let m = 0; m < X.length; m++) {
+        g.append("rect")
+            .attr("x", coordFeatureVis[0] + w * m)
+            .attr("y", coordFeatureVis[1] - rectH / 2)
+            .attr("width", w)
+            .attr("height", rectH)
+            .attr("fill", myColor(X[m]))
+            .attr("opacity", 0)
+            .attr("stroke", "gray")
+            .attr("stroke-width", 0.1)
+            .attr("class", "procVis summation");
+    }
+
+    //draw frame
+    g1.append("rect")
+        .attr("x", coordFeatureVis[0])
+        .attr("y", coordFeatureVis[1] - rectH / 2)
+        .attr("width", w * X.length)
+        .attr("height", rectH)
+        .attr("fill", "none")
+        .attr("opacity", 0)
+        .attr("stroke", "black")
+        .attr("stroke-width", 1)
+        .attr("class", "procVis summation");
+
+    //draw label
+    drawHintLabel(g1, coordFeatureVis[0], coordFeatureVis[1] + rectH * curveDir * 1.1, "Vector Summation", "procVis");
+
+    //path connect - connect prev layer feature vis to intermediate feature vis
+    const curve = d3.line().curve(d3.curveBasis);
+    for (let i = 0; i < posList.length; i++) {
+        const res = computeMids(posList[i], coordFeatureVis);
+        const hpoint = res[0];
+        const lpoint = res[1];
+
+        d3.select(".mats")
+            .append("path")
+            .attr("d", curve([posList[i], hpoint, lpoint, coordFeatureVis]))
+            .attr("stroke", myColor(mulValues[i]))
+            .attr("opacity", 0)
+            .attr("fill", "none")
+            .attr("class", "procVis summation")
+            .attr("id", "procPath");
+
+        //draw multipliers
+        let x = (coordFeatureVis[0] - posList[i][0]) / 2 + posList[i][0];
+        let y = (coordFeatureVis[1] - posList[i][1]) / 2 + posList[i][1];
+
+
+        const gradient = g1.append("defs")
+            .append("linearGradient")
+            .attr("id", "text-gradient")
+            .attr("x1", "0%")
+            .attr("y1", "0%")
+            .attr("x2", "100%")
+            .attr("y2", "0%");
+
+        // 设置渐变的颜色
+        gradient.append("stop")
+            .attr("offset", "0%")
+            .attr("stop-color", "pink");
+
+        gradient.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", "blue");
+
+
+        d3.select(".mats")
+            .append("text")
+            .text(mulValues[i].toFixed(2))
+            .attr("x", x - 2)
+            .attr("y", y - 2)
+            .attr("text-anchor", "middle")
+            .attr("fill", "url(#text-gradient)")
+            .attr("font-size", 15)
+            .attr("class", "procVis attention")
+            .attr("opacity", 1).attr("font-weight", "bold");
+    
+    }
+    d3.selectAll(".summation").transition().duration(100).attr("opacity", 1);
+
+    d3.selectAll(".attention").on("mouseover", function(){
+        d3.select(this)
+            .style("stroke", "black")
+            .attr("stroke-width", 0.02)
+            .attr("font-size", 30);
+    });
+    d3.selectAll(".attention").on("mouseout", function(){
+        d3.select(this).style("stroke", "none").attr("font-size", 15);
+    });
 }
 
 
@@ -807,17 +930,28 @@ export function drawReLU(
 
         relu.on("mouseover", function(event, d){
             const [x, y] = d3.pointer(event);
-
-            //set-up the paramtere for the math displayer
-           drawActivationExplanation(
-            x, y, "ReLU Non-Linear Function",
-            "f(x) = max(0, x)", "Range: [ 0 to infinity)"
+        
+            // 设置数学公式展示的参数
+            drawActivationExplanation(
+                x, y, "ReLU Non-Linear Function",
+                "f(x) = max(0, x)", "Range: [0 to infinity)"
             );
-            
+        
+            //d3.select("#activation").attr("stroke", "red"); // 使用 d3.select 而不是 d3.selectAll
         });
-
+        
         relu.on("mouseout", function(){
             d3.selectAll(".math-displayer").remove();
+            // d3.select("#activation").attr("stroke", "black"); // 同样使用 d3.select
+        
+            // const x = parseFloat(d3.select(".math-formula-pos").attr("x")) || 0; // 使用 parseFloat
+            // const y = parseFloat(d3.select(".math-formula-pos").attr("y")) || 0;
+        
+            // // 先删除旧的公式元素
+            // d3.selectAll(".math-formula").remove();
+        
+            // const formula = d3.select(".mats").append("g").attr("class", "math-formula");
+            // drawMathFormula(formula, x, y, "./assets/SVGs/GCNFormula_test.svg");
         });
 }
 
@@ -977,5 +1111,3 @@ export function drawBiasPathOutputVis(
                         .duration(1000)
                         .attr("opacity", 1);
 }
-
-

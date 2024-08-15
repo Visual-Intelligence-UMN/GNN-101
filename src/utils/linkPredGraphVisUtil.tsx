@@ -45,7 +45,8 @@ export function linkPredFeatureVisualizer(
   outputLayerRectHeight: number,
   colorSchemes:any,
   mode: number,
-  subgraph: any
+  subgraph: any,
+  innerComputationMode: string
 ) {
   state.isClicked = false;
 
@@ -55,6 +56,7 @@ export function linkPredFeatureVisualizer(
   // 3. do the calculation for animation
   let convNum = 3;
   let {weights, bias} = loadLinkWeights();
+
 
 
   const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex); //somehow doesn't include the node in the last layer
@@ -289,11 +291,9 @@ export function linkPredFeatureVisualizer(
             hideAllLinks(allNodes);
 
 
-           if (mode === 1 && graphIndex === 3) {
-            nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, svg, mode)
-           } else {
-            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
-           };
+            console.log("ADCWA", innerComputationMode)
+            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
+          
 
 
             
@@ -661,7 +661,7 @@ export function linkPredOutputVisualizer(
         d3.selectAll(".graph-displayer").remove();
         for (let i = 0; i < 4; i++) {colorSchemes[i].style.opacity = "1";}
 
-        console.log("noderelatedNodes", node.relatedNodes)
+
 
         moveFeaturesBack(node.relatedNodes, originalCoordinates);
 

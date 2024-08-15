@@ -22,6 +22,7 @@ import { stat, truncateSync } from "fs";
 import { drawActivationExplanation } from "./matInteractionUtils";
 import { computeMatrixLocations, drawMatrixWeight, drawWeightMatrix } from "./matAnimateUtils";
 import { graphVisDrawActivationExplanation, graphVisDrawMatrixWeight, displayerHandler, hoverOverHandler} from "./graphAnimationHelper";
+import { computeAttentionCoefficient } from "./computationUtils";
 
 export const pathColor = d3
     .scaleLinear<string>()
@@ -726,8 +727,10 @@ export function calculationVisualizer(
     rectHeight: number,
     rectWidth: number,
     state: State,
-    mode: number
+    mode: number,
+    innerComputationMode: string
 ) {
+    console.log("INEER", innerComputationMode)
 
 
 
@@ -1088,6 +1091,20 @@ export function calculationVisualizer(
         );
         hoverOverHandler(node, aggregatedData, calculatedData, state, g4, displayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, weights, node.graphIndex - 1, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, false)
 
+        let neighborFeatures: number[][] = []
+        let lastLayerNodefeature: number[]
+        if (node.relatedNodes) {
+            node.relatedNodes.forEach((n: any, i: number) => {
+                if (n.id != node.id) {
+                neighborFeatures.push(n.features)
+                }
+                else {
+                    lastLayerNodefeature = n.features
+
+                }
+            }
+        )}
+
 
 
         if (node.relatedNodes) {
@@ -1103,9 +1120,10 @@ export function calculationVisualizer(
                     const control1_y = start_y;
                     const control2_x = start_x + (end_x - start_x) * 0.7;
                     const control2_y = end_y;
+                    
 
                     let color = calculateAverage(n.features);
-
+                    if (innerComputationMode === "GCN") {
                     g3.append("text")
                         .attr("x", start_x + 20)
                         .attr("y", start_y - 10)
@@ -1113,6 +1131,23 @@ export function calculationVisualizer(
                         .attr("font-size", 7.5)
                         .attr("class", "parameter")
                         .attr("opacity", 0).raise();
+                    }
+                    else {
+                        
+
+                        console.log("AWDAWD,",neighborFeatures)
+                        const multiplier = computeAttentionCoefficient(node.graphIndex, n.features, lastLayerNodefeature, neighborFeatures);
+                        console.log("mul",multiplier)
+
+                        g3.append("text")
+                        .attr("x", start_x + 20)
+                        .attr("y", start_y - 10)
+                        .text(multiplier)
+                        .attr("font-size", 7.5)
+                        .attr("class", "parameter")
+                        .attr("opacity", 0).raise();
+
+                    }
 
                     const originToAggregated = g3
                         .append("path")
