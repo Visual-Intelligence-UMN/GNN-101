@@ -44,3 +44,39 @@ export const DatasetInfo: { [k: string]: string } = {
   "graph classification": MUTAG_INFO,
   "edge classification": TWITCH_INFO,
 };
+
+
+export const INTRO_STEPS = [
+    {
+        // element: "#gnn101",
+        intro: "Welcome to GNN 101!",
+    },
+    {
+        element: '#task-selector',
+        intro: 'Click here to select the task for GNN!',
+    },
+    {
+        element: '#model-architecture',
+        intro: 'The model architecture menu is here!',
+    },
+    {
+        element: '#dataset-selector',
+        intro: 'Click here to switch the input data!',
+    },
+    {
+        element: '#dataset-description',
+        intro: 'The dataset description is here!',
+    },
+    {
+        element: '#graph-statistics',
+        intro: 'Here is the graph statistic!',
+    },
+    {
+        element: '#text-panel',
+        intro: 'More details about GNN on text panel!',
+    },
+    {
+        element: '#click-to-predict',
+        intro: 'Click predict to start!',
+    }
+];
