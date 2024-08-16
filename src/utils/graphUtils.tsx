@@ -19,7 +19,7 @@ import { injectPlayButtonSVGForGraphView, injectSVG} from "./svgUtils";
 import { stat, truncateSync } from "fs";
 
 
-import { drawActivationExplanation } from "./matInteractionUtils";
+import { drawActivationExplanation, drawMatmulExplanation, graphVisDrawMatmulExplanation } from "./matInteractionUtils";
 import { computeMatrixLocations, drawMathFormula, drawMatrixWeight, drawWeightMatrix } from "./matAnimateUtils";
 import { graphVisDrawActivationExplanation, graphVisDrawMatrixWeight, displayerHandler, hoverOverHandler} from "./graphAnimationHelper";
 import { computeAttentionCoefficient } from "./computationUtils";
@@ -804,10 +804,12 @@ export function calculationVisualizer(
     
     aggregatedFeatureGroup.on("mouseover", function(event:any, d:any){
         d3.selectAll(".parameter").style("opacity", 1);
+        d3.selectAll(".formula_neighbor_aggregate").style("fill", "red")
     });
 
     aggregatedFeatureGroup.on("mouseout", function(event:any, d:any){
         d3.selectAll(".parameter").style("opacity", 0);
+        d3.selectAll(".formula_neighbor_aggregate").style("fill", "black")
     });
 
     aggregatedFeatureGroup
@@ -851,6 +853,9 @@ export function calculationVisualizer(
         .transition()
         .delay(3500)
         .style("opacity", 1);
+
+
+
 
 
     for (let i = 0; i < node.relatedNodes[0].features.length; i++) {
@@ -957,7 +962,11 @@ export function calculationVisualizer(
             return;
         }
         drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, matrixRectSize, matrixRectSize, node.features.length, weights, node.graphIndex - 1, myColor, svg, weightsLocation)
-        drawMathFormula(formula, endCoordList[0][0] - 90, endCoordList[0][1] - 30 + 100, "./assets/SVGs/GCNFormula_bitmap.svg");
+        if (innerComputationMode === "GCN") {
+        drawMathFormula(formula, endCoordList[0][0] - 290, endCoordList[0][1] - 30 + 100, "./assets/SVGs/GCNFormula.svg");
+        } else if (innerComputationMode === "GAT") {
+            drawMathFormula(formula, endCoordList[0][0] - 390, endCoordList[0][1] - 30 + 100, "./assets/SVGs/GATFormula.svg");
+        } 
 
 
 
@@ -1049,6 +1058,13 @@ export function calculationVisualizer(
         .style("stroke", "black")
         .style("stroke-width", 1)
         .style("opacity", 0);
+
+        BiasGroup.on("mouseover", function() {
+            d3.selectAll(".formula_bias").style("fill", "red")
+        }).on("mouseout", function() {
+            d3.selectAll(".formula_bias").style("fill", "black")
+
+        })
 
     intermediateFeatureGroups.push(BiasGroup);
     node.intermediateFeatureGroups = intermediateFeatureGroups;
@@ -1282,6 +1298,7 @@ export function calculationVisualizer(
             }
         });
         relu.on("mouseover", function (event: any, d: any) {
+            d3.selectAll(".formula_activation").style("fill", "red")
             const [x, y] = d3.pointer(event);
 
             //set-up the paramtere for the math displayer
@@ -1306,6 +1323,7 @@ export function calculationVisualizer(
     
 
         relu.on("mouseout", function () {
+            d3.selectAll(".formula_activation").style("fill", "black")
             d3.selectAll(".math-displayer").remove();
         });
 
@@ -1335,56 +1353,7 @@ export function calculationVisualizer(
 
 
 
-    const outputGroup = g3
-        .append("g")
-        .attr(
-            "transform",
-            `translate(${3.5 * offset +
-            node.relatedNodes[0].features.length * 2 * prevRectHeight + temp +
-            node.features.length * rectHeight +
-            175
-            }, ${height / 5 + 150})`
-        );
-
-
-    //draw label
-    outputGroup.append("text")
-        .attr("x", 0)
-        .attr("y", 28)
-        .text("Final Output Vector")
-        .style("fill", "gray")
-
-        .style("font-size", "17px")
-        .attr("class", "relu output to-be-removed").style("opacity", 0);
-
-
-    outputGroup
-        .selectAll("rect")
-        .data(node.features)
-        .enter()
-        .append("rect")
-        .attr("class", "relu output to-be-removed")
-        .attr("x", (d: any, i: number) => i * rectHeight)
-        .attr("y", 0)
-        .attr("width", rectHeight)
-        .attr("height", rectWidth)
-        .style("fill", (d: number) => myColor(d))
-        .style("stroke-width", 0.1)
-        .style("stroke", "grey")
-        .attr("opacity", 0);
-
-
-    const outputFrame = outputGroup.append("rect")
-        .attr("x", 0)
-        .attr("y", 0)
-        .attr("class", "relu output to-be-removed")
-        .attr("width", rectHeight * node.features.length)
-        .attr("height", rectWidth)
-        .style("fill", "none")
-        .style("stroke", "black")
-        .style("stroke-width", 1)
-        .style("opacity", 0);
-
+    
     const outputGroupCopy = g3
         .append("g")
         .attr(
@@ -1433,6 +1402,61 @@ export function calculationVisualizer(
 
         .style("font-size", "17px")
         .attr("class", "relu to-be-removed").style("opacity", 0);
+
+
+        const outputGroup = g3
+        .append("g")
+        .attr(
+            "transform",
+            `translate(${3.5 * offset +
+            node.relatedNodes[0].features.length * 2 * prevRectHeight + temp +
+            node.features.length * rectHeight +
+            175
+            }, ${height / 5 + 150})`
+        );
+
+
+    //draw label
+
+
+        outputGroup.on("mouseover", function() {
+            d3.selectAll(".formula_x").style("fill", "red")
+        }).on("mouseout", function() {
+            d3.selectAll(".formula_x").style("fill", "black")
+
+        })
+
+
+    outputGroup
+        .selectAll("rect")
+        .data(node.features)
+        .enter()
+        .append("rect")
+        .attr("class", "relu output to-be-removed")
+        .attr("x", (d: any, i: number) => i * rectHeight)
+        .attr("y", 0)
+        .attr("width", rectHeight)
+        .attr("height", rectWidth)
+        .style("fill", (d: number) => myColor(d))
+        .style("stroke-width", 0.1)
+        .style("stroke", "grey")
+        .attr("opacity", 0);
+
+
+    const outputFrame = outputGroup.append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("class", "relu output to-be-removed")
+        .attr("width", rectHeight * node.features.length)
+        .attr("height", rectWidth)
+        .style("fill", "none")
+        .style("stroke", "black")
+        .style("stroke-width", 1)
+        .style("opacity", 0);
+    
+
+
+ 
 
 
     intermediateFeatureGroups.push(outputGroup);
@@ -1525,6 +1549,7 @@ function weightAnimation(
     mode: number
 ) {
 
+
     if (!state.isClicked) {
         d3.selectAll(".to-be-removed").remove();
         return
@@ -1574,12 +1599,34 @@ function weightAnimation(
     const gLabel = svg.append("g");
     injectSVG(gLabel, endCoordList[0][0] - 80-120-64, endCoordList[0][1] - 22.5-120-64, "./assets/SVGs/interactionHint.svg", "to-be-removed");
 
+    btn.on("mouseover", function() {
+        if (!state.isAnimating) {
+        graphVisDrawMatmulExplanation(
+            svg, endCoordList[0][0]- 80, endCoordList[0][1] - 80, "Matrix Multiplication", "Click the icon to show the matrix multiplication process!"
+        );
+        d3.selectAll(".formula_weights").style("fill", "red")
+        d3.selectAll(".formula_neighbor_aggregate").style("fill", "red")
+        d3.selectAll(".formula_summation").style("fill", "red")
+    }
+    }).on("mouseout", function() {
+        if (!state.isAnimating) {
+        d3.selectAll(".math-displayer").remove();
+        }
+        d3.selectAll(".formula_weights").style("fill", "black")
+        d3.selectAll(".formula_neighbor_aggregate").style("fill", "black")
+        d3.selectAll(".formula_summation").style("fill", "black")
+    })
+
     btn.on("click", function (event: any) {
         if (isSwitched === 0) {
+            
             
             d3.selectAll(".aniRect").style("opacity", 0);
         }
         isSwitched ++;
+        d3.selectAll(".formula_weights").style("fill", "red")
+        d3.selectAll(".formula_neighbor_aggregate").style("fill", "red")
+        d3.selectAll(".formula_summation").style("fill", "red")
 
         event.stopPropagation();
         state.isPlaying = !state.isPlaying;
@@ -1679,6 +1726,9 @@ function weightAnimation(
                     state.isAnimating = false;
                     d3.selectAll(".math-displayer").remove();
                     d3.selectAll(".graph-displayer").attr("opacity", 0);
+                    d3.selectAll(".formula_weights").style("fill", "black")
+                    d3.selectAll(".formula_neighbor_aggregate").style("fill", "black")
+                    d3.selectAll(".formula_summation").style("fill", "black")
 
                     injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_play.svg")
                     d3.selectAll(".aniRect").style("opacity", 1);
