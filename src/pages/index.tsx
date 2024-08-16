@@ -83,6 +83,11 @@ export default function Home() {
         setSimulation(false);
     }
 
+    const startIntro = () => {
+        if (introRef.current) {
+            introRef.current.introJs.start();
+        }
+    }
 
 
     useEffect(() => {
@@ -124,7 +129,7 @@ export default function Home() {
                 {step === 1 && (
                     <div className="bg-white text-black">
                         <div id="gnn101">
-                            <NavBar />
+                            <NavBar startIntro={startIntro} />
                         </div>
                         {/* <PanelGroup direction="horizontal"> */}
 
