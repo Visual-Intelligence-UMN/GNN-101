@@ -188,6 +188,10 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 if (!g.selectAll) {
                     g = d3.selectAll(g)
                 }
+
+ 
+       
+ 
                 
 
                 d3.select(".graph-displayer").attr("opacity", 1);
@@ -430,6 +434,7 @@ export function hoverOverHandler(node: any, aggregatedData: any, calculatedData:
                 }
                 d3.selectAll(".calculatedRect").style("opacity", 0.2)
                 d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1)
+                d3.selectAll("#GCN5").style("fill", "red")
                 d3.selectAll(`#tempath${i}`).style("opacity", 1);
                 displayerHandler(node, aggregatedData, calculatedData, state, g, displayHeight, rectL, wmRectL, myColor, weights, index, weightsLocation, i, mode, isOutput)
 
@@ -448,6 +453,7 @@ export function hoverOverHandler(node: any, aggregatedData: any, calculatedData:
                 d3.selectAll(`#tempath${i}`).style("opacity", 0).raise();
                 d3.selectAll(".weightUnit").style("opacity", 1);
                 d3.selectAll(".calculatedRect").style("opacity", 1)
+                d3.selectAll("#GCN5").style("fill", "black")
                 
 
             });

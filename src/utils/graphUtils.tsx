@@ -20,7 +20,7 @@ import { stat, truncateSync } from "fs";
 
 
 import { drawActivationExplanation } from "./matInteractionUtils";
-import { computeMatrixLocations, drawMatrixWeight, drawWeightMatrix } from "./matAnimateUtils";
+import { computeMatrixLocations, drawMathFormula, drawMatrixWeight, drawWeightMatrix } from "./matAnimateUtils";
 import { graphVisDrawActivationExplanation, graphVisDrawMatrixWeight, displayerHandler, hoverOverHandler} from "./graphAnimationHelper";
 import { computeAttentionCoefficient } from "./computationUtils";
 
@@ -950,13 +950,14 @@ export function calculationVisualizer(
 
 
 
-    
+    const formula:any = svg.append("g").attr("class", "math-formula");
 
     setTimeout(()=> {
         if (!state.isClicked) {
             return;
         }
         drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, matrixRectSize, matrixRectSize, node.features.length, weights, node.graphIndex - 1, myColor, svg, weightsLocation)
+        drawMathFormula(formula, endCoordList[0][0] - 90, endCoordList[0][1] - 30 + 100, "./assets/SVGs/GCNFormula_bitmap.svg");
 
 
 
@@ -1027,6 +1028,7 @@ export function calculationVisualizer(
         .style("stroke-width", 0.1)
         .style("stroke", "grey")
         .style("opacity", 0);
+    
 
     //draw label
     BiasGroup.append("text")
