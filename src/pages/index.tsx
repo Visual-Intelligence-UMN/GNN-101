@@ -148,6 +148,7 @@ export default function Home() {
                                 <div
                                     className="flex gap-x-2 items-center"
                                     style={{ paddingTop: "40px" }}
+                                    id="model-selector"
                                 >
                                     <h1 className="text-3xl min-w-48 font-black">GNN Model</h1>
                                     <Selector
@@ -199,7 +200,7 @@ export default function Home() {
                                 <hr className="border-t border-gray-300 my-4"></hr>
 
                                 {/* graph data */}
-                                <div className="flex gap-x-4 items-center  mb-3 ">
+                                <div className="flex gap-x-4 items-center  mb-3 " id="graph-selector">
                                     <h1 className="text-3xl font-black min-w-48">Input Graph </h1>
 
                                     <div className="flex items-center gap-x-4 ">

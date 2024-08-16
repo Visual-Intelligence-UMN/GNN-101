@@ -1,3 +1,5 @@
+import { electricConstantDependencies } from "mathjs";
+
 export const graphList = graph_list_generate(3);
 
 export const nodeList: { [k: string]: string } = {
@@ -49,34 +51,42 @@ export const DatasetInfo: { [k: string]: string } = {
 export const INTRO_STEPS = [
     {
         // element: "#gnn101",
-        intro: "Welcome to GNN 101!",
+        intro: "🎉 Welcome to GNN 101! Ready to dive into the world of Graph Neural Networks?",
     },
     {
-        element: '#task-selector',
-        intro: 'Click here to select the task for GNN!',
+        element: "#model-selector",
+        intro: "🔍 GNN models of different tasks and architectures!",
     },
     {
-        element: '#model-architecture',
-        intro: 'The model architecture menu is here!',
+        element: "#graph-selector",
+        intro: "🔍 Explore different graphs used in GNN. ",
     },
-    {
-        element: '#dataset-selector',
-        intro: 'Click here to switch the input data!',
-    },
-    {
-        element: '#dataset-description',
-        intro: 'The dataset description is here!',
-    },
-    {
-        element: '#graph-statistics',
-        intro: 'Here is the graph statistic!',
-    },
+    // {
+    //     element: '#task-selector',
+    //     intro: 'Click here to select the task for GNN!',
+    // },
+    // {
+    //     element: '#model-architecture',
+    //     intro: 'The model architecture menu is here!',
+    // },
+    // {
+    //     element: '#dataset-selector',
+    //     intro: 'Click here to switch the input data!',
+    // },
+    // {
+    //     element: '#dataset-description',
+    //     intro: 'The dataset description is here!',
+    // },
+    // {
+    //     element: '#graph-statistics',
+    //     intro: 'Here is the graph statistic!',
+    // },
     {
         element: '#text-panel',
-        intro: 'More details about GNN on text panel!',
+        intro: '📖  Dive deeper into GNNs with the text panel! Scroll down to see more!',
     },
     {
         element: '#click-to-predict',
-        intro: 'Click predict to start!',
+        intro: '🚀 Ready to start? Click "Start Prediction" ',
     }
 ];
