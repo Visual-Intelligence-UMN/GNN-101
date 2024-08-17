@@ -763,12 +763,11 @@ export function featureVisualizer(
         }
 
         const frame = featureGroup.append("rect")
-        .attr("class", `node-features-${node.graphIndex}-${node.id}`)
+        .attr("class", `node-features-${node.graphIndex}-${node.id} nodeFeatureFrame`)
         .attr("x", 0)  
         .attr("y", 0)
         .attr("width", rectWidth)
         .attr("height", currRectHeight * (node.features.length) )
-        .attr("class", `node-features-${node.graphIndex}-${node.id}`)
         .style("fill", "none")
         .style("stroke", "black")
         .style("stroke-width", 1);

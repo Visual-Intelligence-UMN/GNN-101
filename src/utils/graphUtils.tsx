@@ -289,14 +289,14 @@ export function outputVisualizer(
     }
     const math = create(all, {});
     const wMat = math.transpose(allWeights[3]);
-    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, rectHeight / 3, node.features.length, [wMat], 0);
+    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1], -1, rectHeight / 3, node.features.length, [wMat], 0);
 
 
     setTimeout(() => {
         if (!state.isClicked) {
             return;
         }
-        drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, 1, rectHeight / 3, rectHeight / 3, node.features.length, [wMat], 0, myColor, svg, weightsLocation);
+        drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1], 1, rectHeight / 3, rectHeight / 3, node.features.length, [wMat], 0, myColor, svg, weightsLocation);
 
         d3.selectAll(".bias").style("opacity", 1);
         d3.selectAll(".softmax").attr("opacity", 0.07);
@@ -830,7 +830,7 @@ export function calculationVisualizer(
 
 
     const aggFrame = aggregatedFeatureGroup.append("rect")
-        .attr("class", "aggregatedFeatureGroup to-be-removed")
+        .attr("class", "aggregatedFeatureGroup to-be-removed aggFrame")
         .attr("x", 0)
         .attr("y", 0)
         .attr("width", prevRectHeight * aggregatedData.length)
@@ -928,7 +928,7 @@ export function calculationVisualizer(
     if (mode === 1 && node.graphIndex === 1) {
         matrixRectSize /= 2
     }
-    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, matrixRectSize, node.features.length, weights, node.graphIndex - 1);
+    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1], -1, matrixRectSize, node.features.length, weights, node.graphIndex - 1);
 
 
 
@@ -949,9 +949,9 @@ export function calculationVisualizer(
         if (!state.isClicked) {
             return;
         }
-        drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, matrixRectSize, matrixRectSize, node.features.length, weights, node.graphIndex - 1, myColor, svg, weightsLocation)
+        drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1], -1, matrixRectSize, matrixRectSize, node.features.length, weights, node.graphIndex - 1, myColor, svg, weightsLocation)
     
-        drawMathFormula(formula, endCoordList[0][0] - 290, endCoordList[0][1] - 30 + 100, "./assets/SVGs/GCNFormula.svg");
+        drawMathFormula(formula, endCoordList[0][0] + 200, endCoordList[0][1] - 250, "./assets/SVGs/GCNFormula.svg");
 
         
 
@@ -1037,7 +1037,7 @@ export function calculationVisualizer(
         .attr("class", "bias to-be-removed").style("opacity", 0);
 
     const BiasFrame = BiasGroup.append("rect")
-        .attr("class", "bias to-be-removed")
+        .attr("class", "bias biasFrame to-be-removed")
         .attr("x", 0)
         .attr("y", 0)
         .attr("width", rectHeight * biasData.length)
@@ -1241,7 +1241,7 @@ export function calculationVisualizer(
                 d3.select(ReLU)
                     .attr("x", end_x - 45)
                     .attr("y", end_y - 15)
-                    .attr("class", "relu to-be-removed mats procVis")
+                    .attr("class", "relu relu-icon to-be-removed mats procVis")
                     .attr("opacity", 1)
                     .raise();
             }
@@ -1404,12 +1404,6 @@ export function calculationVisualizer(
     node.intermediateFeatureGroups = intermediateFeatureGroups;
 
 
-    setTimeout(() => {
-    
-            d3.selectAll(".formula_bias").style("fill", "red")
-
-
-    }, 2000)
 
 
 
@@ -2306,13 +2300,13 @@ export function nodeOutputVisualizer(
     const math = create(all, {});
     const wMat = math.transpose(allWeights[3]);
 
-    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] - 30, -1, 10, node.features.length, [wMat], 0);
+    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1], -1, 10, node.features.length, [wMat], 0);
 
     setTimeout(() => {
         if (!state.isClicked) {
             return;
         }
-        drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, 1, 10, 10, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
+        drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1], 1, 10, 10, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
 
 
         d3.selectAll(".bias").style("opacity", 1);
