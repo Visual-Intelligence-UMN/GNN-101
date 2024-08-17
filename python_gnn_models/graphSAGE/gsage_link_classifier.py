@@ -49,6 +49,39 @@ print(data)
 
 #%%
 
+from torch_geometric.data import Data
+from torch_geometric.loader import NeighborLoader
+
+gData = Data(x=data.x, edge_index=data.train_pos_edge_index)
+
+train_loader = NeighborLoader(
+    gData,
+    num_neighbors=[15, 10],
+    batch_size=32,
+    input_nodes=None,
+    shuffle=True
+)
+
+val_loader = NeighborLoader(
+    Data(x=data.x, edge_index=data.val_pos_edge_index),
+    num_neighbors=[15, 10],
+    batch_size=32,
+    input_nodes=None,
+    shuffle=False
+)
+
+test_loader = NeighborLoader(
+    Data(x=data.x, edge_index=data.test_pos_edge_index),
+    num_neighbors=[15, 10],
+    batch_size=32,
+    input_nodes=None,
+    shuffle=False
+)
+
+print(train_loader)
+
+#%%
+
 class SAGE(torch.nn.Module):
     def __init__(self, in_channels, hidden_channels, out_channels):
         super().__init__()
@@ -61,6 +94,7 @@ class SAGE(torch.nn.Module):
         return x
 
     def decode(self, z, edge_label_index):
+        # edge_label_index = edge_label_index.to(torch.int)
         x = (z[edge_label_index[0]] * z[edge_label_index[1]])
         x = x.sum(dim=-1)
         return x
@@ -89,60 +123,92 @@ class SAGE(torch.nn.Module):
 
 
 model = SAGE(dataset.num_features, 64, 64).to(device)
-optimizer = torch.optim.Adam(params=model.parameters(), lr=0.01)
+optimizer = torch.optim.Adam(params=model.parameters(), lr=0.05)
 criterion = torch.nn.BCEWithLogitsLoss()
 print(device)
 
 #%%
 def train():
     model.train()
-    optimizer.zero_grad()
-    z = model.encode(data.x.to(device), data.train_pos_edge_index.to(device))
+    total_loss = 0
+    for batch in train_loader:
+        optimizer.zero_grad()
+        z = model.encode(batch.x.to(device), batch.edge_index.to(device))
 
-    pos_edge_index = data.train_pos_edge_index.to(device)
-    pos_out = model.decode(z, pos_edge_index)
-    pos_loss = criterion(pos_out, torch.ones(pos_out.size(0), device=device))
+        pos_edge_index = batch.edge_index.to(device)
+        pos_out = model.decode(z, pos_edge_index)
+        pos_loss = criterion(pos_out, torch.ones(pos_out.size(0), device=device))
 
-    neg_edge_index = negative_sampling(
-        edge_index=data.train_pos_edge_index, 
-        num_nodes=data.num_nodes,
-        num_neg_samples=pos_edge_index.size(1)
-    ).to(device)
-    neg_out = model.decode(z, neg_edge_index)
-    neg_loss = criterion(neg_out, torch.zeros(neg_out.size(0), device=device))
+        neg_edge_index = negative_sampling(
+            edge_index=batch.edge_index,
+            num_nodes=batch.num_nodes,
+            num_neg_samples=pos_edge_index.size(1)
+        ).to(device)
+        neg_out = model.decode(z, neg_edge_index)
+        neg_loss = criterion(neg_out, torch.zeros(neg_out.size(0), device=device))
 
-    loss = pos_loss + neg_loss
-    loss.backward()
-    optimizer.step()
-    return loss.item()
+        loss = pos_loss + neg_loss
+        loss.backward()
+        optimizer.step()
+        total_loss += loss.item()
+    
+    return total_loss / len(train_loader)
+
 
 #%%
 
-def test(pos_edge_index, neg_edge_index):
+def test(loader):
     model.eval()
-    with torch.no_grad():
-        z = model.encode(data.x.to(device), data.train_pos_edge_index.to(device))
+    total_loss = 0
+    correct = 0
+    count = 0
     
-    pos_out = model.decode(z, pos_edge_index.to(device))
-    neg_out = model.decode(z, neg_edge_index.to(device))
+    for batch in loader:
+        with torch.no_grad():
+            z = model.encode(batch.x.to(device), batch.edge_index.to(device))
+        
+        # 正样本边的预测
+        pos_edge_index = batch.edge_index.to(device)
+        pos_out = model.decode(z, pos_edge_index)
+        pos_y = torch.ones(pos_out.size(0), device=device)
 
-    pos_y = torch.ones(pos_out.size(0), device=device)
-    neg_y = torch.zeros(neg_out.size(0), device=device)
-    y = torch.cat([pos_y, neg_y])
-    pred = torch.cat([pos_out, neg_out])
+        # 负样本边的预测
+        neg_edge_index = negative_sampling(
+            edge_index=batch.edge_index,
+            num_nodes=batch.num_nodes,
+            num_neg_samples=pos_edge_index.size(1)
+        ).to(device)
+        neg_edge_index = neg_edge_index.to(torch.int)
 
-    loss = criterion(pred, y).item()
-    pred = torch.sigmoid(pred)  
-    pred = pred > 0.5
-    acc = pred.eq(y).sum().item() / y.size(0)
-    return loss, acc
+        neg_out = model.decode(z, neg_edge_index)
+        neg_y = torch.zeros(neg_out.size(0), device=device)
+
+        # 合并正负样本
+        y = torch.cat([pos_y, neg_y])
+        pred = torch.cat([pos_out, neg_out])
+
+        # 计算损失
+        loss = criterion(pred, y).item()
+        total_loss += loss
+
+        # 计算准确率
+        pred = torch.sigmoid(pred)
+        pred = pred > 0.5
+        correct += pred.eq(y).sum().item()
+        count += y.size(0)
+    
+    # 返回平均损失和准确率
+    avg_loss = total_loss / len(loader)
+    accuracy = correct / count
+    return avg_loss, accuracy
+
 
 #%%
 
 for epoch in range(1, 50):
     loss = train()
-    val_loss, val_acc = test(data.val_pos_edge_index, data.val_neg_edge_index)
-    test_loss, test_acc = test(data.test_pos_edge_index, data.test_neg_edge_index)
+    val_loss, val_acc = test(val_loader)
+    test_loss, test_acc = test(test_loader)
     print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}, Test Loss: {test_loss:.4f}, Test Acc: {test_acc:.4f}')
 
 #%%
@@ -329,13 +395,11 @@ for k in keys:
     d = np.array(data[k])
     print(k,d.shape)
 
-# All keys: {'conv1.lin_l.weight', 'conv2.lin_l.weight', 'onnx::MatMul_132', 'conv2.lin_l.bias', 'onnx::MatMul_135', 'conv1.lin_l.bias'}
-# conv1.lin_l.weight (64, 128)
-# conv2.lin_l.weight (64, 64)
-# onnx::MatMul_132 (128, 64)
-# conv2.lin_l.bias (64,)
-# onnx::MatMul_135 (64, 64)
-# conv1.lin_l.bias (64,)
+# All keys: {'conv1.weight', 'conv2.bias', 'conv2.weight', 'conv1.bias'}
+# conv1.weight (256, 64)
+# conv2.bias (64,)
+# conv2.weight (128, 64)
+# conv1.bias (64,)
 
 
 # %%

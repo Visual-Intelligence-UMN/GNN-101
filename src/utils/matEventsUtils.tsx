@@ -1518,7 +1518,7 @@ export function featureGATClick(
 
     let animateSeqAfterPath: any = [
         {func: () => {
-            drawAttentions(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir)
+            drawAttentions(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir, layerID)
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
         }, 
@@ -2049,7 +2049,7 @@ export function featureSAGEClick(
 
     let animateSeqAfterPath: any = [
         {func: () => {
-            drawAttentions(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir)
+            //drawAttentions(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir)
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
         }, 

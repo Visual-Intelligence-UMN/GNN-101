@@ -1,10 +1,10 @@
 import torch
 import torch.nn.functional as F
 from torch.nn import Parameter
-from graphSAGE.CustomizedMessgPassing import CustomizedMessagePassing
+# from graphSAGE.CustomizedMessgPassing import CustomizedMessagePassing
 from torch_geometric.utils import add_remaining_self_loops
-
-from graphSAGE.inits import uniform
+from torch_geometric.nn.conv import MessagePassing
+from inits import uniform
 
 
 class testClass():
