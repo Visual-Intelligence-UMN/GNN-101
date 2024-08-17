@@ -20,7 +20,7 @@ import { stat, truncateSync } from "fs";
 
 
 import { drawActivationExplanation } from "./matInteractionUtils";
-import { computeMatrixLocations, drawMatrixWeight, drawWeightMatrix } from "./matAnimateUtils";
+import { computeMatrixLocations, drawMathFormula, drawMatrixWeight, drawWeightMatrix } from "./matAnimateUtils";
 import { graphVisDrawActivationExplanation, graphVisDrawMatrixWeight, displayerHandler, hoverOverHandler} from "./graphAnimationHelper";
 
 export const pathColor = d3
@@ -708,6 +708,7 @@ export function outputVisualizer(
 
 }
 
+
 export function calculationVisualizer(
     node: any,
     allNodes: any[],
@@ -940,7 +941,7 @@ export function calculationVisualizer(
 
     
 
-
+    const formula:any = svg.append("g").attr("class", "math-formula");
 
     
 
@@ -949,10 +950,16 @@ export function calculationVisualizer(
             return;
         }
         drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, matrixRectSize, matrixRectSize, node.features.length, weights, node.graphIndex - 1, myColor, svg, weightsLocation)
+    
+        drawMathFormula(formula, endCoordList[0][0] - 290, endCoordList[0][1] - 30 + 100, "./assets/SVGs/GCNFormula.svg");
+
+        
+
 
 
 
     }, 2000)
+    
    
 
 
@@ -1335,7 +1342,7 @@ export function calculationVisualizer(
     const outputFrame = outputGroup.append("rect")
         .attr("x", 0)
         .attr("y", 0)
-        .attr("class", "relu output to-be-removed")
+        .attr("class", "relu output outputFrame to-be-removed")
         .attr("width", rectHeight * node.features.length)
         .attr("height", rectWidth)
         .style("fill", "none")
@@ -1374,7 +1381,7 @@ export function calculationVisualizer(
     const outputFrameCopy = outputGroupCopy.append("rect")
         .attr("x", 0)
         .attr("y", 0)
-        .attr("class", "relu to-be-removed")
+        .attr("class", "outputFrame relu to-be-removed")
         .attr("width", rectHeight * node.features.length)
         .attr("height", rectWidth)
         .style("fill", "none")
@@ -1390,11 +1397,20 @@ export function calculationVisualizer(
         .style("fill", "gray")
 
         .style("font-size", "17px")
-        .attr("class", "relu to-be-removed").style("opacity", 0);
+        .attr("class", "after-relu to-be-removed").style("opacity", 0);
 
 
     intermediateFeatureGroups.push(outputGroup);
     node.intermediateFeatureGroups = intermediateFeatureGroups;
+
+
+    setTimeout(() => {
+    
+            d3.selectAll(".formula_bias").style("fill", "red")
+
+
+    }, 2000)
+
 
 
     d3.select("#my_dataviz").on("click", function(event: any) {
