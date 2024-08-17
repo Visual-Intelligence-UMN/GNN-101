@@ -15,6 +15,7 @@ import {
 } from "./utils";
 import { drawHintLabel, drawMatrixValid, rotateMatrix } from "./matHelperUtils";
 import { off } from "node:process";
+import { computeAttnStep } from "./computationUtils";
 
 interface Animation {
     func: () => void;
@@ -414,7 +415,9 @@ export function drawAttentions(
     posList: any,
     mulValues: any,
     curveDir: number,
-    layerID: number //layer index 0->layer 1, 1-> layer 2
+    layerID: number, //layer index 0->layer 1, 1-> layer 2
+    featuresTable:any,
+    lgIndices: number[][]
 ) {
     //learnable vectors
     const learnableData = require("../../public/learnableVectorsGAT.json");
@@ -424,7 +427,7 @@ export function drawAttentions(
     ];
 
 
-    console.log("draw attention", layerID);
+    console.log("draw attention", layerID, featuresTable, lgIndices);
     const g = g1.append("g").attr("class", "procVis aggregate");
     for (let m = 0; m < X.length; m++) {
         g.append("rect")
@@ -531,7 +534,21 @@ export function drawAttentions(
         const srcVector = learnableVectors[layerID][1];
 
         const dummyInput = Array.from({ length: 64 }, () => Math.random());
-        const eij = Array.from({ length: 3 }, () => Math.random());
+
+        const weightMatrix = require("../../public/gat_link_weights.json");
+        const weightMatrices = [
+            weightMatrix["conv1.lin_l.weight"],
+            weightMatrix["conv2.lin_l.weight"]
+        ]
+        //const eij = Array.from({ length: 3 }, () => Math.random());
+        let eij:any = [];
+        for(let i=1; i<lgIndices.length; i++){
+            eij.push(computeAttnStep(srcVector, dstVector, weightMatrices[layerID],
+                featuresTable[layerID][0],
+                featuresTable[layerID][lgIndices[i][1]]));
+        }
+
+        
         const targetE = eij[0];
 
         attnDisplayer
@@ -540,7 +557,7 @@ export function drawAttentions(
             .attr("y", dY + 10)
             .attr("rx", 5)
             .attr("ry", 5)
-            .attr("width", 350)
+            .attr("width", 375)
             .attr("height", 150)
             .attr("fill", "white")
             .attr("stroke", "black")
@@ -576,7 +593,7 @@ export function drawAttentions(
                 .attr("fill", myColor(eij[i]))
                 .attr("stroke", "black")
                 .attr("class", "procVis attn-displayer attnE")
-                .attr("id", `e-${i}`);
+                .attr("id", `e-${i}`).attr("index", i);
 
             if (i != 0) {
                 attnDisplayer
@@ -618,7 +635,7 @@ export function drawAttentions(
                 .attr("y", dY + 75 + 12.5)
                 .attr("text-anchor", "middle")
                 .attr("font-size", 10)
-                .attr("class", "procVis attn-displayer attnE");
+                .attr("class", "procVis attn-displayer attnE").attr("index", i);
         }
 
         attnDisplayer
@@ -629,7 +646,7 @@ export function drawAttentions(
             .attr("height", 15)
             .attr("fill", myColor(targetE))
             .attr("class", "procVis attn-displayer attnTargetE attnE")
-            .attr("stroke", "black");
+            .attr("stroke", "black").attr("index", 0);
 
         attnDisplayer
             .append("text")
@@ -638,7 +655,7 @@ export function drawAttentions(
             .attr("y", dY + 50)
             .attr("text-anchor", "middle")
             .attr("font-size", 10)
-            .attr("class", "procVis attn-displayer attnE");
+            .attr("class", "procVis attn-displayer attnE").attr("index", 0);
 
         d3.selectAll(".attnE").on("mouseover", function () {
             d3.selectAll(".attnHint").remove();
@@ -676,28 +693,30 @@ export function drawAttentions(
                     .raise();
             }
 
-            for (let i = 0; i < dummyInput.length; i++) {
+            const inputVector = featuresTable[layerID][Number(d3.select(this).attr("index"))];
+
+            for (let i = 0; i < inputVector.length; i++) {
                 eDisplayer
                     .append("rect")
                     .attr(
                         "x",
-                        dX + 140 - 10 + 50 + i * (25 / dummyInput.length)
+                        dX + 140 - 10 + 50 + i * (25 / inputVector.length)
                     )
                     .attr("y", dY + 112.5 + 12.5)
-                    .attr("width", 25 / dummyInput.length)
+                    .attr("width", 25 / inputVector.length)
                     .attr("height", 2.5)
-                    .attr("fill", myColor(dummyInput[i]));
+                    .attr("fill", myColor(inputVector[i]));
 
                 eDisplayer
                     .append("rect")
                     .attr(
                         "x",
-                        dX + 200 + 20 + 50 + i * (25 / dummyInput.length)
+                        dX + 200 + 20 + 50 + i * (25 / inputVector.length)
                     )
                     .attr("y", dY + 112.5 + 12.5)
-                    .attr("width", 25 / dummyInput.length)
+                    .attr("width", 25 / inputVector.length)
                     .attr("height", 2.5)
-                    .attr("fill", myColor(dummyInput[i]));
+                    .attr("fill", myColor(inputVector[i]));
             }
 
             let imageMat = "./assets/PNGs/GATConvMat1.png";

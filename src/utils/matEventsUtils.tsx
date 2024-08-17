@@ -1319,10 +1319,13 @@ export function featureGATClick(
     let featuresTable = [features, conv1, conv2];
     let X = new Array(featuresTable[layerID][node].length).fill(0);
     let mulValues = []; //an array to store all multiplier values
+    let lgIndices = [];
     for (let i = 0; i < adjList[node].length; i++) {
         //find multipliers
         let node_i = node;
         let node_j = adjList[node_i][i];
+
+        console.log("draw attention 2", adjList[node].length)
         
         //find a way to compute the attn coef - mulV
 
@@ -1346,6 +1349,8 @@ export function featureGATClick(
             lgI = node_i;
             lgJ = node_j;
         }
+
+        lgIndices.push([lgI, lgJ]);
 
         let selfFeature = Array.prototype.slice.call(featuresTable[layerID][lgI]);
 
@@ -1518,7 +1523,10 @@ export function featureGATClick(
 
     let animateSeqAfterPath: any = [
         {func: () => {
-            drawAttentions(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir, layerID)
+            drawAttentions(
+                g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir, layerID,
+                featuresTable, lgIndices
+            )
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
         }, 

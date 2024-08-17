@@ -33,7 +33,7 @@ export function computeAttnStep(
     if (typeof val1 !== 'number') {
         throw new Error(`Expected val1 to be a number, but got ${typeof val1}`);
     }
-    return Math.exp(leakyRelu(val +val1));
+    return leakyRelu(val +val1);
 }
 
 export function computeAttentionCoefficient(
@@ -58,13 +58,13 @@ export function computeAttentionCoefficient(
     const usingWeightMatrix = weightMatrices[layerIndex - 1];
     console.log("attn data", usingVectors, usingWeightMatrix);
     //compute numerator
-    let numerator = computeAttnStep(usingVectors[1], usingVectors[0], usingWeightMatrix, feature, targetFeature);
+    let numerator = Math.exp(computeAttnStep(usingVectors[1], usingVectors[0], usingWeightMatrix, feature, targetFeature));
     console.log("attn numerator", numerator);
     //compute denominator
     neighborFeatures.push(feature);
     let denominator = 0;
     for(let i=0; i<neighborFeatures.length; i++){
-        denominator += computeAttnStep(usingVectors[1], usingVectors[0], usingWeightMatrix, feature, neighborFeatures[i]); 
+        denominator += Math.exp(computeAttnStep(usingVectors[1], usingVectors[0], usingWeightMatrix, feature, neighborFeatures[i])); 
         console.log("attn denominator",i,  denominator);
     }
     //return the attention coefficient
