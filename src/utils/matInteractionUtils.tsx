@@ -4,6 +4,123 @@ import { flipVertically, softmax } from "./utils";
 import { create, all, transposeDependencies } from "mathjs";
 
 //---------------------------functions for the softmax interaction in the graph classifier------------------------------
+export function drawAttnDisplayer(
+    attnDisplayer: any,
+    dX: number,
+    dY: number,
+    eij: number[],
+    targetE: number,
+    myColor: any
+){
+    attnDisplayer
+            .append("rect")
+            .attr("x", dX + 10)
+            .attr("y", dY + 10)
+            .attr("rx", 5)
+            .attr("ry", 5)
+            .attr("width", 375)
+            .attr("height", 150)
+            .attr("fill", "white")
+            .attr("stroke", "black")
+            .attr("stroke-width", 1)
+            .attr("class", "procVis attn-displayer");
+
+        //draw the equation
+        attnDisplayer
+            .append("text")
+            .text("Attention Coefficient")
+            .attr("x", dX + 150)
+            .attr("y", dY + 25)
+            .attr("text-anchor", "middle")
+            .attr("font-size", 15)
+            .attr("class", "procVis attn-displayer");
+
+        attnDisplayer
+            .append("text")
+            .text("a_i_j  =  ")
+            .attr("x", dX + 15)
+            .attr("y", dY + 75)
+            .attr("xml:space", "preserve")
+            .attr("font-size", 15)
+            .attr("class", "procVis attn-displayer");
+
+        for (let i = 0; i < eij.length; i++) {
+            attnDisplayer
+                .append("rect")
+                .attr("x", dX + 100 + 65 * i)
+                .attr("y", dY + 75)
+                .attr("width", 15)
+                .attr("height", 15)
+                .attr("fill", myColor(eij[i]))
+                .attr("stroke", "black")
+                .attr("class", "procVis attn-displayer attnE")
+                .attr("id", `e-${i}`).attr("index", i);
+
+            if (i != 0) {
+                attnDisplayer
+                    .append("text")
+                    .text("+")
+                    .attr("x", dX + 100 + 65 * i - 30)
+                    .attr("y", dY + 75 + 12.5)
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", 15)
+                    .attr("class", "procVis attn-displayer");
+            }
+
+            type Point = { x: number; y: number };
+            const points: Point[] = [
+                { x: dX + 100, y: dY + 65 },
+                { x: dX + 100 + 65 * (eij.length - 1), y: dY + 65 },
+            ];
+
+            const lineGenerator = d3
+                .line<Point>() // 使用泛型指定类型
+                .x((d: Point) => d.x) // 设置x坐标
+                .y((d: Point) => d.y); // 设置y坐标
+
+            const pathData = lineGenerator(points);
+
+            // 5. 将路径添加到SVG中
+            attnDisplayer
+                .append("path")
+                .attr("d", pathData)
+                .attr("stroke", "black")
+                .attr("stroke-width", 1)
+                .attr("fill", "none")
+                .attr("id", "targetE"); // 确保路径不被填充
+
+            attnDisplayer
+                .append("text")
+                .text("exp(" + eij[i].toFixed(2) + ")")
+                .attr("x", dX + 100 + 65 * i)
+                .attr("y", dY + 75 + 12.5)
+                .attr("text-anchor", "middle")
+                .attr("font-size", 10)
+                .attr("class", "procVis attn-displayer attnE").attr("index", i);
+        }
+
+        attnDisplayer
+            .append("rect")
+            .attr("x", dX + 100 + 50)
+            .attr("y", dY + 50 - 7.5)
+            .attr("width", 15)
+            .attr("height", 15)
+            .attr("fill", myColor(targetE))
+            .attr("class", "procVis attn-displayer attnTargetE attnE")
+            .attr("stroke", "black").attr("index", 0);
+
+        attnDisplayer
+            .append("text")
+            .text("exp(" + targetE.toFixed(2) + ")")
+            .attr("x", dX + 100 + 50)
+            .attr("y", dY + 50)
+            .attr("text-anchor", "middle")
+            .attr("font-size", 10)
+            .attr("class", "procVis attn-displayer attnE").attr("index", 0);
+}
+
+
+
 export function drawSoftmaxDisplayer(
     pathMap: any,
     endCoord: any,
