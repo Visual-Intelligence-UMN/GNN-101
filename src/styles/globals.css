@@ -11,6 +11,13 @@
   --zoom-ratio: 0.7;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
 
 body {
   color: rgb(var(--foreground-rgb));
@@ -34,13 +41,6 @@ rect {
 .frame {
   transition: all;
   transition-duration: 1.5s;
-}
-
-.introjs-tooltiptext {
-    text-align: center;
-    padding-top: 5px !important;
-    padding-bottom: 5px !important;
-    font-size: 20px;
 }
 
 .colFrame {

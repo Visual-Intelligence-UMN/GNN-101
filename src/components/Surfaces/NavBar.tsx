@@ -1,9 +1,6 @@
 import styles from './surfaces.module.css';
-
-type Props = {
-    startIntro: () => void;
-}
-export default function Navbar(props: Props) {
+import Image from 'next/image';
+export default function Navbar() {
     return <>
 
         <nav className={styles.header}>
@@ -16,9 +13,9 @@ export default function Navbar(props: Props) {
                 </a>
                 <div id="navbar-default">
                     <ul className="font-medium flex flex-row md:space-x-8 rtl:space-x-reverse">
-                        <li>
-                            <a onClick={props.startIntro} className="text-gray-900 md:hover:text-blue-300 md:p-0 text-white " style={{ cursor: "pointer" }}>Intro</a>
-                        </li>
+                        {/* <li>
+                            <a href="#" className="text-gray-900 md:hover:text-blue-300 md:p-0 text-white" >About</a>
+                        </li> */}
                         <li>
                             <a href="https://github.com/Visual-Intelligence-UMN/web-gnn-vis" target='_blank' className="text-gray-900 md:hover:text-blue-300 md:p-0 text-white ">Github</a>
                         </li>

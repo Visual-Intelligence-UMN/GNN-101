@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import { create, all, matrix, i } from "mathjs";
-import { State, flipHorizontally, flipVertically, myColor } from "./utils";
+import { State, myColor } from "./utils";
 import { roundToTwo } from "@/components/WebUtils";
 
 
@@ -44,16 +44,10 @@ export function graphVisDrawMatrixWeight(
         const math = create(all, {});
         Xt = math.transpose(Xt);
     }
-    if (mode === 1 && node.graphIndex === 1 || mode === 1 && node.graphIndex === 3) {
-
-    } else {
-
-
-        Xt = flipVertically(Xt)
-        Xt = flipHorizontally(Xt);
+    if (mode === 1 && node.graphIndex === 4) {
+        Xt = Xt.reverse();
+        Xt = Xt.map((row: any) => row.reverse());
     }
-    
-    
 
     let Xv = Xt[currentStep];
 

@@ -64,7 +64,6 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
       <button
         onClick={classifyGraph}
         className=" border border-4 opacity-60 hover:opacity-90 hover:border-4 py-1 px-2 rounded-lg text-4xl"
-        id="click-to-predict"
         style={{ color: "rgb(25, 118, 210)", borderColor: "rgb(25, 118, 210)" }}
       >
         Click to Predict!
