@@ -825,7 +825,7 @@ export function calculationVisualizer(
         .text("Vectors Summation")
         .style("fill", "gray")
         .style("font-size", "17px")
-        .attr("class", "aggregatedFeatureGroup to-be-removed")
+        .attr("class", "aggregatedFeatureGroup to-be-removed aggText")
         .style("opacity", 0);
 
 
@@ -951,7 +951,7 @@ export function calculationVisualizer(
         }
         drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1], -1, matrixRectSize, matrixRectSize, node.features.length, weights, node.graphIndex - 1, myColor, svg, weightsLocation)
     
-        drawMathFormula(formula, endCoordList[0][0] + 200, endCoordList[0][1] - 250, "./assets/SVGs/GCNFormula.svg");
+        drawMathFormula(formula, endCoordList[0][0] + 150, endCoordList[0][1] - 250, "./assets/SVGs/GCNFormula.svg");
 
         
 
@@ -1034,7 +1034,7 @@ export function calculationVisualizer(
         .text("Bias Vector")
         .style("fill", "gray")
         .style("font-size", "17px")
-        .attr("class", "bias to-be-removed").style("opacity", 0);
+        .attr("class", "bias to-be-removed biasText").style("opacity", 0);
 
     const BiasFrame = BiasGroup.append("rect")
         .attr("class", "bias biasFrame to-be-removed")
@@ -1282,7 +1282,7 @@ export function calculationVisualizer(
             .text(labelText)
             .style("fill", "gray")
             .style("font-size", "17px")
-            .attr("class", "relu to-be-removed").attr("opacity", 0);
+            .attr("class", "relu to-be-removed reluText").attr("opacity", 0);
 
 
 
@@ -1320,7 +1320,7 @@ export function calculationVisualizer(
         .style("fill", "gray")
 
         .style("font-size", "17px")
-        .attr("class", "relu output to-be-removed").style("opacity", 0);
+        .attr("class", "relu output outputText to-be-removed").style("opacity", 0);
 
 
     outputGroup
@@ -1846,6 +1846,7 @@ function moveFeatures(relatedNodes: any, xPos: number, yPos: number) {
     let coordinate: FeatureGroupLocation;
     let x;
     let y;
+
 
     relatedNodes.forEach((n: any, i: number) => {
         if (n.featureGroup) {

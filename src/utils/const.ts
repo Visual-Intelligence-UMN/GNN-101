@@ -24,6 +24,15 @@ export const formulaClass: { [k: string]: string[]} = {
   "formula_activation": ["relu-frame"]
 }
 
+export const formulaTextClass: { [k: string]: string[]} = {
+  "formula_weights": ["weightMatrixText"],
+  "formula_bias": ["biasText"],
+  "formula_x": ["outputText"],
+  "formula_summation": ["aggText"],
+  "formula_neighbor_aggregate": [],
+  "formula_activation": ["reluText"]
+}
+
 function graph_list_generate(num: number) {
   let res: { [k: string]: string } = {};
   res["graph_0"] = "./input_graph.json";

@@ -775,7 +775,7 @@ export function featureVisualizer(
         featureGroup.append("text")
           .attr("x", rectWidth / 2)
           .attr("y", node.features.length * currRectHeight + 12)
-          .attr("class", `node-features-${node.graphIndex}-${node.id}`)
+          .attr("class", `node-features-${node.graphIndex}-${node.id} feature-id`)
           .attr("dy", ".35em")
           .text(node.id)
           .style("font-size", "12px")
@@ -841,6 +841,7 @@ export function featureVisualizer(
               return;
             }
             state.isClicked = true;
+            node.featureGroup.style("opacity", 0)
             d3.selectAll(".hintLabel").attr("opacity", 0);
 
                     //  // prevent clicking on other nodes and move the layers to the right again

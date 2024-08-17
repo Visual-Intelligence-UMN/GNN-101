@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import { gcd } from "mathjs";
-import { formulaClass } from "./const";
+import { formulaClass, formulaTextClass } from "./const";
 
 //a specific function for SVG injection for play-pause button
 export function injectPlayButtonSVG(btn:any, btnX: number, btnY: number, SVGPath:string){
@@ -55,10 +55,19 @@ function formularInteractionHandler(x: number, y: number, g: any, class_name: st
             d3.selectAll(`.${formulaClass[class_name][i]}`).style("stroke_width", 1).style("stroke", "red");
         }
 
+        for (let i = 0; i < formulaTextClass[class_name].length; i ++) {
+            d3.selectAll(`.${formulaTextClass[class_name][i]}`).style("fill", "red")
+        }
+
+
     }).on("mouseout", function(this: any) {
         d3.select((`.${class_name}`)).style("fill", "black")
         for (let i = 0; i < formulaClass[class_name].length; i ++) {
-            d3.selectAll(`.${formulaClass[class_name][i]}`).style("stroke_width", 1).style("stroke", "black");
+            d3.selectAll(`.${formulaClass[class_name][i]}`).style("stroke_width", 1).style("stroke", "gray");
+        }
+
+        for (let i = 0; i < formulaTextClass[class_name].length; i ++) {
+            d3.selectAll(`.${formulaTextClass[class_name][i]}`).style("fill", "gray")
         }
 
 
@@ -66,23 +75,40 @@ function formularInteractionHandler(x: number, y: number, g: any, class_name: st
     }
 }
 
-export function injectSVG(g:any, x: number, y: number, SVGPath:string, svgClass:string, ){
+export function injectSVG(g:any, x: number, y: number, SVGPath:string, svgClass:string){
     g.selectAll("*").remove();
     d3.xml(SVGPath).then(function(data) {
 
         const play = g!.node()!.appendChild(data.documentElement)
         d3.select(play).attr("x", x).attr("y", y).attr("class", svgClass)
        
-        formularInteractionHandler(x, y, g, "formula_x")
-        formularInteractionHandler(x, y, g, "formula_bias")
-        formularInteractionHandler(x, y, g, "formula_weights")
-        formularInteractionHandler(x, y, g, "formula_summation")
-        formularInteractionHandler(x, y, g, "formula_neighbor_aggregate")
-        formularInteractionHandler(x, y, g, "formula_activation")
+        if (SVGPath === "./assets/SVGs/GCNFormula.svg") {
+            g.append("rect")
+            .attr("class", "to-be-removed")
+            .attr("x", x - 50)
+            .attr("y", y)
+            .attr("width", 400)
+            .attr("height", 100)
+            .style("fill", "none")
+            .style("stroke", "black")
 
 
-
-
+            g.append("text")
+            .attr("class", "to-be-removed")
+            .attr("x", x)
+            .attr("y", y + 90)
+            .style("fill", "gray")
+            .text("hover on to see the corresponding part")
+            
+        
+ 
+            formularInteractionHandler(x, y, g, "formula_x")
+            formularInteractionHandler(x, y, g, "formula_bias")
+            formularInteractionHandler(x, y, g, "formula_weights")
+            formularInteractionHandler(x, y, g, "formula_summation")
+            formularInteractionHandler(x, y, g, "formula_neighbor_aggregate")
+            formularInteractionHandler(x, y, g, "formula_activation")
+        }
         
     });
 }

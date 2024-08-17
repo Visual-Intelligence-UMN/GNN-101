@@ -615,7 +615,7 @@ weightMatrixPostions:any
             //draw label hint
             drawHintLabel(g, weightMatrixPostions[0][0][0], 
                 weightMatrixPostions[0][0][1] - 12, "Weight Matrix", 
-                "procVis");
+                "procVis weightMatrixText");
 
             //flip
           //  weightMat = flipVertically(weightMat);
