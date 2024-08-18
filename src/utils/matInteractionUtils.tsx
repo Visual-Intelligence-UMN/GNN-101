@@ -124,7 +124,104 @@ export function drawAttnDisplayer(
             .attr("class", "procVis attn-displayer attnTargetE attnE").attr("index", 0);
 }
 
+export function drawEScoreEquation(
+    lgIndices: number[][],
+    eDisplayer: any,
+    jthIndexElement: number,
+    dX: number,
+    dY: number,
+    dstVector: number[],
+    srcVector: number[],
+    myColor: any,
+    inputVector: number[],
+    layerID: number
+){
+            eDisplayer
+                .append("text")
+                .text(
+                    `e_${lgIndices[0][0]}_${jthIndexElement} = LeakyReLU(                            +                        )`
+                )
+                .attr("x", dX + 15)
+                .attr("y", dY + 125)
+                .attr("xml:space", "preserve")
+                .attr("font-size", 12)
+                .attr("class", "procVis attn-displayer")
+                .attr("id", "leakyRelu");
 
+            for (let i = 0; i < dstVector.length; i++) {
+                eDisplayer
+                    .append("rect")
+                    .attr("x", dX + 140 - 10 + 12.5)
+                    .attr("y", dY + 112.5 + i * (25 / srcVector.length))
+                    .attr("width", 2.5)
+                    .attr("height", 25 / srcVector.length)
+                    .attr("fill", myColor(srcVector[i]));
+
+                eDisplayer
+                    .append("rect")
+                    .attr("x", dX + 200 + 12.5 + 20)
+                    .attr("y", dY + 112.5 + i * (25 / dstVector.length))
+                    .attr("width", 2.5)
+                    .attr("height", 25 / dstVector.length)
+                    .attr("fill", myColor(dstVector[i]))
+                    .raise();
+            }
+
+            
+
+            for (let i = 0; i < inputVector.length; i++) {
+                eDisplayer
+                    .append("rect")
+                    .attr(
+                        "x",
+                        dX + 140 - 10 + 50 + i * (25 / inputVector.length)
+                    )
+                    .attr("y", dY + 112.5 + 12.5)
+                    .attr("width", 25 / inputVector.length)
+                    .attr("height", 2.5)
+                    .attr("fill", myColor(inputVector[i]));
+
+                eDisplayer
+                    .append("rect")
+                    .attr(
+                        "x",
+                        dX + 200 + 20 + 50 + i * (25 / inputVector.length)
+                    )
+                    .attr("y", dY + 112.5 + 12.5)
+                    .attr("width", 25 / inputVector.length)
+                    .attr("height", 2.5)
+                    .attr("fill", myColor(inputVector[i]));
+            }
+
+            let imageMat = "./assets/PNGs/GATConvMat1.png";
+            let imgW = 50;
+            let imgH = 50;
+
+            let offset = 0;
+
+            if(layerID==1){
+                imageMat = "./assets/PNGs/GATConvMat2.png";
+                imgW = 25;
+                imgH = 25;
+                offset = 10;
+            }
+
+            eDisplayer
+                .append("image")
+                .attr("xlink:href", imageMat)
+                .attr("x", dX + 75 + 75 - 10 + offset)
+                .attr("y", dY + 75 + 25 + offset)
+                .attr("width", imgW)
+                .attr("height", imgH);
+
+            eDisplayer
+                .append("image")
+                .attr("xlink:href", imageMat)
+                .attr("x", dX + 75 + 75 + 60 + 20 + offset)
+                .attr("y", dY + 75 + 25 + offset)
+                .attr("width", imgW)
+                .attr("height", imgH);
+}
 
 export function drawSoftmaxDisplayer(
     pathMap: any,
