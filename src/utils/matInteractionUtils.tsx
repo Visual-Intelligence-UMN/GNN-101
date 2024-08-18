@@ -30,7 +30,10 @@ export function drawAttnDisplayer(
         //draw the equation
         attnDisplayer
             .append("text")
-            .text("Attention Coefficient")
+            .text(
+                "Attention Coefficient for " + 
+                `a_${lgIndices[0][0]}_${lgIndices[ithIdx][1]}`
+            )
             .attr("x", dX + 150)
             .attr("y", dY + 25)
             .attr("text-anchor", "middle")
@@ -39,7 +42,7 @@ export function drawAttnDisplayer(
 
         attnDisplayer
             .append("text")
-            .text("a_i_j  =  ")
+            .text(`a_${lgIndices[0][0]}_${lgIndices[ithIdx][1]}`+"  =  ")
             .attr("x", dX + 15)
             .attr("y", dY + 75)
             .attr("xml:space", "preserve")
