@@ -16,12 +16,12 @@ export const modelList: { [k: string]: string } = {
   //  "link classification": "./gnn_link_model.onnx",
 };
 export const formulaClass: { [k: string]: string[]} = {
-  "formula_weights": ["weight-matrix-frame"],
-  "formula_bias": ["biasFrame"],
-  "formula_x": ["outputFrame"],
-  "formula_summation": ["nodeFeatureFrame", "aggFrame"],
-  "formula_neighbor_aggregate": ["nodeFeatureFrame"],
-  "formula_activation": ["relu-frame"]
+  "formula_weights": ["weight-matrix-frame", "weightUnit"],
+  "formula_bias": ["biasFrame", "bias"],
+  "formula_x": ["output"],
+  "formula_summation": ["aggregatedFeatureGroup", "origin-to-aggregated"],
+  "formula_neighbor_aggregate": ["original-features"],
+  "formula_activation": ["relu-icon"]
 }
 
 export const formulaTextClass: { [k: string]: string[]} = {

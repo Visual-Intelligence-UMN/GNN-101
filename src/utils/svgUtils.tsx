@@ -24,7 +24,7 @@ export function injectPlayButtonSVGForGraphView(btn:any, btnX: number, btnY: num
     d3.xml(SVGPath).then(function(data) {
 
         const play = btn!.node()!.appendChild(data.documentElement)
-        d3.select(play).attr("x", btnX).attr("y", btnY).attr("class", "vis-component")
+        d3.select(play).attr("x", btnX).attr("y", btnY).attr("class", "vis-component procVis")
         .on("mouseover", function(event){
             d3.select(play).select("circle").style("fill", "rgb(218, 218, 218)");
         })
@@ -50,25 +50,28 @@ function formularInteractionHandler(x: number, y: number, g: any, class_name: st
     .attr("stroke", "none") 
     .attr("class", "to-be-removed")
     .on("mouseover", function(this: any) {
+        d3.selectAll(".procVis").style("opacity", 0.2) 
+        d3.select((`.${class_name}`)).style("fill", "red")
 
         for (let i = 0; i < formulaClass[class_name].length; i ++) {
-            d3.selectAll(`.${formulaClass[class_name][i]}`).style("stroke_width", 1).style("stroke", "red");
+            d3.selectAll(`.${formulaClass[class_name][i]}`).style("opacity", 1)
         }
 
         for (let i = 0; i < formulaTextClass[class_name].length; i ++) {
-            d3.selectAll(`.${formulaTextClass[class_name][i]}`).style("fill", "red")
+            d3.selectAll(`.${formulaTextClass[class_name][i]}`).style("opacity", 1)
         }
 
 
     }).on("mouseout", function(this: any) {
+        d3.selectAll(".procVis").style("opacity", 1) 
         d3.select((`.${class_name}`)).style("fill", "black")
-        for (let i = 0; i < formulaClass[class_name].length; i ++) {
-            d3.selectAll(`.${formulaClass[class_name][i]}`).style("stroke_width", 1).style("stroke", "gray");
-        }
+        // for (let i = 0; i < formulaClass[class_name].length; i ++) {
+        //     d3.selectAll(`.${formulaClass[class_name][i]}`).style("stroke_width", 1).style("stroke", "gray");
+        // }
 
-        for (let i = 0; i < formulaTextClass[class_name].length; i ++) {
-            d3.selectAll(`.${formulaTextClass[class_name][i]}`).style("fill", "gray")
-        }
+        // for (let i = 0; i < formulaTextClass[class_name].length; i ++) {
+        //     d3.selectAll(`.${formulaTextClass[class_name][i]}`).style("fill", "gray")
+        // }
 
     })
     }

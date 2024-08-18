@@ -695,7 +695,6 @@ export function outputVisualizer(
             d3.selectAll(".node-features-Copy").style("visibility", "hidden")
             d3.selectAll(".weightUnit").remove();
             d3.selectAll(".columnUnit").remove();
-            d3.selectAll(".procVis").remove();
             d3.selectAll(".to-be-removed").remove();
     
             d3.selectAll(".graph-displayer").remove();
@@ -751,6 +750,7 @@ export function calculationVisualizer(
 
     node.relatedNodes.forEach((n: any) => {
         n.featureId.style("visibility", "hidden")
+        n.featureGroup.attr("class", "procVis original-features")
     })
     
 
@@ -827,7 +827,7 @@ export function calculationVisualizer(
         .attr("height", rectWidth)
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 0.1)
-        .attr("class", "aggregatedFeatureGroup to-be-removed")
+        .attr("class", "aggregatedFeatureGroup to-be-removed procVis")
         .style("stroke", "grey")
         .style("opacity", 0);
 
@@ -838,12 +838,12 @@ export function calculationVisualizer(
         .text("Vectors Summation")
         .style("fill", "gray")
         .style("font-size", "17px")
-        .attr("class", "aggregatedFeatureGroup to-be-removed aggText")
+        .attr("class", "aggregatedFeatureGroup to-be-removed aggText procVis")
         .style("opacity", 0);
 
 
     const aggFrame = aggregatedFeatureGroup.append("rect")
-        .attr("class", "aggregatedFeatureGroup to-be-removed aggFrame")
+        .attr("class", "aggregatedFeatureGroup to-be-removed aggFrame procVis")
         .attr("x", 0)
         .attr("y", 0)
         .attr("width", prevRectHeight * aggregatedData.length)
@@ -895,7 +895,7 @@ export function calculationVisualizer(
         .attr("height", rectWidth)
         .attr(
             "class",
-            (d: number, i: number) => `calculatedFeatures${i} to-be-removed aniRect calculatedRect`
+            (d: number, i: number) => `calculatedFeatures${i} to-be-removed aniRect calculatedRect procVis`
         )
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 0.1)
@@ -909,14 +909,14 @@ export function calculationVisualizer(
         .text("Matmul")
         .style("fill", "gray")
         .style("font-size", "17px")
-        .attr("class", "calFrame to-be-removed")
+        .attr("class", "calFrame to-be-removed procVis")
         .style("opacity", 0);
 
 
 
 
     const calFrame = calculatedFeatureGroup.append("rect")
-        .attr("class", "calFrame to-be-removed")
+        .attr("class", "calFrame to-be-removed procVis")
         .attr("x", 0)
         .attr("y", 0)
         .attr("width", (rectHeight * calculatedData.length))
@@ -964,14 +964,14 @@ export function calculationVisualizer(
         }
         drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1], -1, matrixRectSize, matrixRectSize, node.features.length, weights, node.graphIndex - 1, myColor, svg, weightsLocation)
     
-        drawMathFormula(formula, endCoordList[0][0] + 150, endCoordList[0][1] - 250, "./assets/SVGs/GCNFormula.svg");
+        drawMathFormula(formula, endCoordList[0][0] - 50, endCoordList[0][1] - 350, "./assets/SVGs/GCNFormula.svg");
 
         
 
 
 
 
-    }, 2000)
+    }, 3500)
     
    
 
@@ -1030,7 +1030,7 @@ export function calculationVisualizer(
         .data(biasData)
         .enter()
         .append("rect")
-        .attr("class", "bias")
+        .attr("class", "bias procVis")
         .attr("x", (d: any, i: number) => i * rectHeight)
         .attr("y", 0)
         .attr("width", rectHeight)
@@ -1047,10 +1047,10 @@ export function calculationVisualizer(
         .text("Bias Vector")
         .style("fill", "gray")
         .style("font-size", "17px")
-        .attr("class", "bias to-be-removed biasText").style("opacity", 0);
+        .attr("class", "bias to-be-removed biasText procVis").style("opacity", 0);
 
     const BiasFrame = BiasGroup.append("rect")
-        .attr("class", "bias biasFrame to-be-removed")
+        .attr("class", "bias biasFrame to-be-removed procVis")
         .attr("x", 0)
         .attr("y", 0)
         .attr("width", rectHeight * biasData.length)
@@ -1138,7 +1138,7 @@ export function calculationVisualizer(
                         .style("stroke", myColor(adjMatrixSlice[i]))
                         .style("stroke-width", 1)
                         .style("fill", "none")
-                        .attr("class", "to-be-removed origin-to-aggregated")
+                        .attr("class", "to-be-removed origin-to-aggregated procVis")
                         .style("opacity", 0).lower();
 
                     d3.selectAll(".origin-to-aggregated").style("opacity", 1);
@@ -1167,7 +1167,7 @@ export function calculationVisualizer(
                 .style("stroke", "black")
                 .style("stroke-width", 1)
                 .style("fill", "none")
-                .attr("class", "relu to-be-removed output-path")
+                .attr("class", "relu to-be-removed output-path procVis")
                 .attr("opacity", 0).lower();
 
             paths.push(aggregatedToCalculated);
@@ -1193,7 +1193,7 @@ export function calculationVisualizer(
                 .style("stroke", "black")
                 .style("stroke-width", 1)
                 .style("fill", "none")
-                .attr("class", "relu to-be-removed")
+                .attr("class", "relu to-be-removed procVis")
                 .attr("opacity", 0).lower();
 
             paths.push(calculatedToFinal);
@@ -1222,7 +1222,7 @@ export function calculationVisualizer(
                 .style("opacity", 0.7)
                 .style("stroke-width", 1)
                 .style("fill", "none")
-                .attr("class", "bias to-be-removed")
+                .attr("class", "relu to-be-removed procVis")
                 .style("opacity", 0).lower();
 
             paths.push(biasToFinal);
@@ -1255,7 +1255,7 @@ export function calculationVisualizer(
                     .attr("x", end_x - 45)
                     .attr("y", end_y - 15)
                     .attr("class", "relu relu-icon to-be-removed mats procVis")
-                    .attr("opacity", 1)
+                    .style("opacity", 1)
                     .raise();
             }
         });
@@ -1295,7 +1295,7 @@ export function calculationVisualizer(
             .text(labelText)
             .style("fill", "gray")
             .style("font-size", "17px")
-            .attr("class", "relu to-be-removed reluText").attr("opacity", 0);
+            .attr("class", "relu to-be-removed reluText procVis").attr("opacity", 0);
 
 
 
@@ -1333,7 +1333,7 @@ export function calculationVisualizer(
         .style("fill", "gray")
 
         .style("font-size", "17px")
-        .attr("class", "relu output outputText to-be-removed").style("opacity", 0);
+        .attr("class", "relu output outputText to-be-removed procVis").style("opacity", 0);
 
 
     outputGroup
@@ -1341,7 +1341,7 @@ export function calculationVisualizer(
         .data(node.features)
         .enter()
         .append("rect")
-        .attr("class", "relu output to-be-removed")
+        .attr("class", "relu output to-be-removed procVis")
         .attr("x", (d: any, i: number) => i * rectHeight)
         .attr("y", 0)
         .attr("width", rectHeight)
@@ -1355,7 +1355,7 @@ export function calculationVisualizer(
     const outputFrame = outputGroup.append("rect")
         .attr("x", 0)
         .attr("y", 0)
-        .attr("class", "relu output outputFrame to-be-removed")
+        .attr("class", "relu output outputFrame to-be-removed procVis")
         .attr("width", rectHeight * node.features.length)
         .attr("height", rectWidth)
         .style("fill", "none")
@@ -1379,7 +1379,7 @@ export function calculationVisualizer(
         .data(node.features)
         .enter()
         .append("rect")
-        .attr("class", "relu to-be-removed")
+        .attr("class", "relu to-be-removed procVis")
         .attr("x", (d: any, i: number) => i * rectHeight)
         .attr("y", 0)
         .attr("width", rectHeight)
@@ -1394,7 +1394,7 @@ export function calculationVisualizer(
     const outputFrameCopy = outputGroupCopy.append("rect")
         .attr("x", 0)
         .attr("y", 0)
-        .attr("class", "outputFrame relu to-be-removed")
+        .attr("class", "outputFrame relu to-be-removed procVis")
         .attr("width", rectHeight * node.features.length)
         .attr("height", rectWidth)
         .style("fill", "none")
@@ -1410,7 +1410,7 @@ export function calculationVisualizer(
         .style("fill", "gray")
 
         .style("font-size", "17px")
-        .attr("class", "after-relu to-be-removed").style("opacity", 0);
+        .attr("class", "after-relu to-be-removed procVis").style("opacity", 0);
 
 
     intermediateFeatureGroups.push(outputGroup);
@@ -1430,7 +1430,6 @@ export function calculationVisualizer(
         d3.selectAll(".to-be-removed").remove();
         d3.selectAll(".weightUnit").remove();
         d3.selectAll(".columnUnit").remove();
-        d3.selectAll(".procVis").remove();
 
 
         state.isPlaying = false;
@@ -1553,7 +1552,7 @@ function weightAnimation(
 
 
     const gLabel = svg.append("g");
-    injectSVG(gLabel, endCoordList[0][0] - 80-120-64, endCoordList[0][1] - 22.5-120-64, "./assets/SVGs/interactionHint.svg", "to-be-removed");
+    injectSVG(gLabel, endCoordList[0][0] - 80-120-64, endCoordList[0][1] - 22.5-120-64, "./assets/SVGs/interactionHint.svg", "to-be-removed procVis");
 
     btn.on("click", function (event: any) {
         if (isSwitched === 0) {
@@ -2794,7 +2793,7 @@ export function nodeOutputVisualizer(
         d3.selectAll(".math-displayer").remove();
         d3.selectAll(".graph-displayer").remove();
                 d3.selectAll(".node-features-Copy").style("opacity", "hidden");
-                d3.selectAll(".procVis").remove();
+    
                 d3.selectAll(".to-be-removed").remove();
                 handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
     

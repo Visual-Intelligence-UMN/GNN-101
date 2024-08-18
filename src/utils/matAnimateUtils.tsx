@@ -78,7 +78,7 @@ export function drawMathFormula(
         x,
         y,
         formula,
-        "procVis math-formula-pos"
+        "math-formula-pos to-be-removed"
     );
 
     flattenSVG(".mats");
@@ -615,7 +615,7 @@ weightMatrixPostions:any
             //draw label hint
             drawHintLabel(g, weightMatrixPostions[0][0][0], 
                 weightMatrixPostions[0][0][1] - 12, "Weight Matrix", 
-                "procVis weightMatrixText");
+                "procVis weightMatrixText to-be-removed");
 
             //flip
           //  weightMat = flipVertically(weightMat);
@@ -645,7 +645,7 @@ weightMatrixPostions:any
         }
 
         g.append("rect")
-        .attr("class", "weight-matrix-frame to-be-removed")
+        .attr("class", "weight-matrix-frame to-be-removed procVis")
         .attr("x", weightMatrixPostions[0][0][0])
         .attr("y", weightMatrixPostions[0][0][1])
         .attr("width", rectW*weightMatrixPostions[0].length)
@@ -690,7 +690,7 @@ weightMatrixPostions:any
                         .attr("width", rectW/coefficient)
                         .attr("height", rectW/coefficient)
                         .attr("fill", myColor(colorVal))
-                        .attr("class", "weightUnit")
+                        .attr("class", "weightUnit procVis")
                         .attr("id", `weightUnit-${j}`);
 
                     tempArr.push([matX+j*rectW/coefficient+rectW/(coefficient*2), matY+i*rectW/coefficient+rectW/(coefficient*2)]);
