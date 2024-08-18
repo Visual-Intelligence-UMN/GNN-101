@@ -559,7 +559,7 @@ export function drawAttentions(
             .append("g")
             .attr("class", "procVis attn-displayer");
 
-        drawAttnDisplayer(attnDisplayer, dX, dY, eij, targetE, myColor);
+        drawAttnDisplayer(attnDisplayer, dX, dY, eij, lgIndices, targetE, myColor, ithIdx);
 
         d3.selectAll(".attnE").on("mouseover", function () {
             const targetIdx = Number(d3.select(this).attr("index"));

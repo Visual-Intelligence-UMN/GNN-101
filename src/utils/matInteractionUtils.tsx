@@ -9,8 +9,10 @@ export function drawAttnDisplayer(
     dX: number,
     dY: number,
     eij: number[],
+    lgIndices: number[][],
     targetE: number,
-    myColor: any
+    myColor: any,
+    ithIdx: number
 ){
     attnDisplayer
             .append("rect")
@@ -91,7 +93,7 @@ export function drawAttnDisplayer(
 
             attnDisplayer
                 .append("text")
-                .text("exp(" + eij[i].toFixed(2) + ")")
+                .text("exp(" + `e_${lgIndices[i][0]}_${lgIndices[i][1]}` + ")")
                 .attr("x", dX + 100 + 65 * i)
                 .attr("y", dY + 75 + 12.5)
                 .attr("text-anchor", "middle")
@@ -111,7 +113,7 @@ export function drawAttnDisplayer(
 
         attnDisplayer
             .append("text")
-            .text("exp(" + targetE.toFixed(2) + ")")
+            .text("exp(" + `e_${lgIndices[0][0]}_${lgIndices[ithIdx][1]}` + ")")
             .attr("x", dX + 100 + 50)
             .attr("y", dY + 50)
             .attr("text-anchor", "middle")
