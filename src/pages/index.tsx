@@ -357,18 +357,33 @@ export default function Home() {
                                             </h1>
 
 
-                                            <ClassifyGraph
-                                                graphPath={"graph classification" ? graphList[selectedGraph] : nodeList[selectedGraph]}
-                                                modelPath={modelList[model]}
-                                                setChangedG={setChangedG}
-                                                setIntmData={setIntmData}
-                                                setPredicted={setPredicted}
-                                                predicted={predicted}
-                                                probabilities={probabilities}
-                                                setProbabilities={setProbabilities}
-                                                onlyShownButton={true}
-                                                simulationLoading={simulationLoading}
-                                            />
+                                            {model == "graph classification" ? (
+                                                <ClassifyGraph
+                                                    graphPath={graphList[selectedGraph]}
+                                                    modelPath={modelList[model]}
+                                                    setChangedG={setChangedG}
+                                                    setIntmData={setIntmData}
+                                                    setPredicted={setPredicted}
+                                                    predicted={predicted}
+                                                    probabilities={probabilities}
+                                                    setProbabilities={setProbabilities}
+                                                    onlyShownButton={true}
+                                                    simulationLoading={simulationLoading}
+                                                />
+                                            ) : (
+                                                <ClassifyGraph
+                                                    graphPath={nodeList[selectedGraph]}
+                                                    modelPath={modelList[model]}
+                                                    setChangedG={setChangedG}
+                                                    setIntmData={setIntmData}
+                                                    setPredicted={setPredicted}
+                                                    predicted={predicted}
+                                                    probabilities={probabilities}
+                                                    setProbabilities={setProbabilities}
+                                                    onlyShownButton={true}
+                                                    simulationLoading={simulationLoading}
+                                                />
+                                            )}
                                         </div>
                                     )}
                                     {/* </Panel> */}
