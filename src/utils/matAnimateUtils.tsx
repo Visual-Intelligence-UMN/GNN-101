@@ -564,7 +564,7 @@ export function drawAttentions(
 
         d3.selectAll(".attnE").on("mouseover", function () {
             const targetIdx = Number(d3.select(this).attr("index"));
-            d3.selectAll(".attnHint").remove();
+            d3.selectAll(".e-displayer").remove();
             const eDisplayer = attnDisplayer
                 .append("g")
                 .attr("class", "procVis e-displayer attn-displayer");
@@ -579,32 +579,24 @@ export function drawAttentions(
             }
             drawEScoreEquation(lgIndices, eDisplayer, jthIndexElement, dX, dY, dstVector, srcVector, myColor, inputVector, layerID);
         });
-        d3.selectAll(".attnE").on("mouseout", function () {
-            d3.selectAll(".e-displayer").remove();
-            if (d3.selectAll(".attnHint").empty()) {
-            attnDisplayer
-                .append("text")
-                .text(
-                    "Hover-on the attention to see the detailed computation"
-                )
-                .attr("x", dX + 15)
-                .attr("y", dY + 125)
-                .attr("xml:space", "preserve")
-                .attr("font-size", 12)
-                .attr("class", "procVis attn-displayer attnHint");
-            }
-        });
-        //add detail equation:
-        attnDisplayer
-                .append("text")
-                .text(
-                    "Hover-on the attention to see the detailed computation"
-                )
-                .attr("x", dX + 15)
-                .attr("y", dY + 125)
-                .attr("xml:space", "preserve")
-                .attr("font-size", 12)
-                .attr("class", "procVis attn-displayer attnHint");
+        // d3.selectAll(".attnE").on("mouseout", function () {
+        //     d3.selectAll(".e-displayer").remove();
+        //     if (d3.selectAll(".e-displayer").empty()) {
+        //         const eDisplayer = attnDisplayer
+        //             .append("g")
+        //             .attr("class", "procVis e-displayer attn-displayer");
+        //         const inputVector = featuresTable[layerID][Number(d3.select(this).attr("index"))];
+        //         let jthIndexElement = lgIndices[ithIdx][1];
+        //         drawEScoreEquation(lgIndices, eDisplayer, jthIndexElement, dX, dY, dstVector, srcVector, myColor, inputVector, layerID);
+        //     }
+        // });
+        //add initial e-score equation:
+        const eDisplayer = attnDisplayer
+            .append("g")
+            .attr("class", "procVis e-displayer attn-displayer");
+        const inputVector = featuresTable[layerID][Number(d3.select(this).attr("index"))];
+        let jthIndexElement = lgIndices[ithIdx][1];
+        drawEScoreEquation(lgIndices, eDisplayer, jthIndexElement, dX, dY, dstVector, srcVector, myColor, inputVector, layerID);
 
         //recover the .mats event
         let recoverEvent: any = d3.select(".mats").on("click");
