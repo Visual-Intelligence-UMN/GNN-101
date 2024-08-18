@@ -17,6 +17,7 @@ import {
 import { drawHintLabel, drawMatrixValid, rotateMatrix } from "./matHelperUtils";
 import { off } from "node:process";
 import { computeAttnStep } from "./computationUtils";
+import { removeDuplicatesFromSubarrays, removeDuplicateSubarrays } from "./graphDataUtils";
 
 interface Animation {
     func: () => void;
@@ -416,7 +417,7 @@ export function drawAttentions(
     posList: any,
     mulValues: any,
     curveDir: number,
-    layerID: number, //layer index 0->layer 1, 1-> layer 2
+    layerID: number, //layer index_0->layer_1, index_1-> layer_2
     featuresTable:any,
     lgIndices: number[][]
 ) {
@@ -428,7 +429,7 @@ export function drawAttentions(
     ];
 
 
-    console.log("draw attention", layerID, featuresTable, lgIndices);
+    
     const g = g1.append("g").attr("class", "procVis aggregate");
     for (let m = 0; m < X.length; m++) {
         g.append("rect")
@@ -465,20 +466,24 @@ export function drawAttentions(
     );
 
     //path connect - connect prev layer feature vis to intermediate feature vis
+    
     const curve = d3.line().curve(d3.curveBasis);
+    posList = removeDuplicateSubarrays(posList);
+    console.log("poslist", posList, mulValues);
     for (let i = 0; i < posList.length; i++) {
         const res = computeMids(posList[i], coordFeatureVis);
         const hpoint = res[0];
         const lpoint = res[1];
 
-        d3.select(".mats")
+        const attnPath = d3.select(".mats")
             .append("path")
             .attr("d", curve([posList[i], hpoint, lpoint, coordFeatureVis]))
             .attr("stroke", myColor(mulValues[i]))
-            .attr("opacity", 0)
+            .attr("opacity", 1)
             .attr("fill", "none")
-            .attr("class", "procVis summation")
-            .attr("id", "procPath");
+            .attr("class", "procVis summation");
+
+        console.log("eij attnPath", attnPath)
 
         //draw multipliers
         let x = (coordFeatureVis[0] - posList[i][0]) / 2 + posList[i][0];
@@ -511,7 +516,7 @@ export function drawAttentions(
             .attr("font-size", 15)
             .attr("class", "procVis attention")
             .attr("opacity", 1)
-            .attr("font-weight", "bold").attr("index", i);
+            .attr("font-weight", "bold").attr("attn-index", i);
     }
     d3.selectAll(".summation").transition().duration(100).attr("opacity", 1);
 
@@ -536,14 +541,18 @@ export function drawAttentions(
         ]
         //const eij = Array.from({ length: 3 }, () => Math.random());
         let eij:any = [];
-        for(let i=1; i<lgIndices.length; i++){
+        console.log("push eij before", lgIndices)
+        for(let i=0; i<lgIndices.length; i++){
             eij.push(computeAttnStep(srcVector, dstVector, weightMatrices[layerID],
                 featuresTable[layerID][0],
                 featuresTable[layerID][lgIndices[i][1]]));
+            console.log("push eij", i, eij);
         }
 
-        
-        const targetE = eij[Number(d3.select(this).attr("index"))-1];
+        const ithIdx = Number(d3.select(this).attr("attn-index"));        
+        const targetE = eij[ithIdx];
+
+        console.log("eij",ithIdx, eij, targetE);
 
         const attnDisplayer = d3
             .select(".mats")
@@ -553,21 +562,31 @@ export function drawAttentions(
         drawAttnDisplayer(attnDisplayer, dX, dY, eij, targetE, myColor);
 
         d3.selectAll(".attnE").on("mouseover", function () {
+            const targetIdx = Number(d3.select(this).attr("index"));
             d3.selectAll(".attnHint").remove();
             const eDisplayer = attnDisplayer
                 .append("g")
                 .attr("class", "procVis e-displayer attn-displayer");
+            
+            console.log( `e_${targetIdx}_${lgIndices[targetIdx][1]} = LeakyReLU(                            +                        )`, lgIndices)
+
+            let jthIndexElement = lgIndices[targetIdx][1];
+            if(d3.select(this).classed("attnTargetE")){
+                jthIndexElement = lgIndices[ithIdx][1];
+                console.log("jthIndexElement", jthIndexElement, ithIdx, lgIndices);
+            }
 
             eDisplayer
                 .append("text")
                 .text(
-                    "e_i_j = LeakyReLU(                            +                        )"
+                    `e_${lgIndices[0][0]}_${jthIndexElement} = LeakyReLU(                            +                        )`
                 )
                 .attr("x", dX + 15)
                 .attr("y", dY + 125)
                 .attr("xml:space", "preserve")
                 .attr("font-size", 12)
-                .attr("class", "procVis attn-displayer");
+                .attr("class", "procVis attn-displayer")
+                .attr("id", "leakyRelu");
 
             for (let i = 0; i < dstVector.length; i++) {
                 eDisplayer

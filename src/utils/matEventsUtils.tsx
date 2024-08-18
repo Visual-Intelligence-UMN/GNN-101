@@ -1241,7 +1241,7 @@ export function featureGATClick(
     featureKeysEachLayer: number[][],
     activation: string = "relu",
 ){
-    console.log("convs", conv1, conv2, featureKeysEachLayer);
+    console.log("convs", conv1, conv2, featureKeysEachLayer, adjList[node]);
     const largeGraphIndexes = featureKeysEachLayer[0];
     //testCompute();
     let biasCoord: [number, number];
@@ -1320,12 +1320,13 @@ export function featureGATClick(
     let X = new Array(featuresTable[layerID][node].length).fill(0);
     let mulValues = []; //an array to store all multiplier values
     let lgIndices = [];
+    //adjList[node] = Array.from(new Set(adjList[node]));
     for (let i = 0; i < adjList[node].length; i++) {
         //find multipliers
         let node_i = node;
         let node_j = adjList[node_i][i];
 
-        console.log("draw attention 2", adjList[node].length)
+        console.log("draw attention 2", adjList[node].length, adjList[node])
         
         //find a way to compute the attn coef - mulV
 

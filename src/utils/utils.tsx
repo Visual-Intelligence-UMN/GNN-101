@@ -1615,11 +1615,11 @@ export const nodePrediction = async (modelPath: string, graphPath: string): Prom
 	
 }
 
-export function graphToAdjList(graph:any){
+export function graphToAdjList(graph:any, addingSelfLoop=true){
   let adjList: number[][] = Array.from({ length: graph.length }, () => []);
     for (let i = 0; i < graph.length; i++) {
         //push itself to the linkMap
-        adjList[i].push(i);
+        if(addingSelfLoop)adjList[i].push(i);
         for (let j = 0; j < graph[0].length; j++) {
             if (graph[i][j] == 1) {
                 //push its neighbors to linkMap

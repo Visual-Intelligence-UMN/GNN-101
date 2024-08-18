@@ -333,7 +333,7 @@ async function initLinkClassifier(
     let colorSchemeTable: any = null;
     //a data structure to record the link relationship
     //fill up the linkMap
-    let adjList = graphToAdjList(graph);
+    let adjList = graphToAdjList(graph, false);
 
     let conv1: number[][] = [],
         conv2: number[][] = [],

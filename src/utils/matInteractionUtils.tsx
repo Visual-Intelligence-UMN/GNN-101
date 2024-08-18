@@ -116,7 +116,7 @@ export function drawAttnDisplayer(
             .attr("y", dY + 50)
             .attr("text-anchor", "middle")
             .attr("font-size", 10)
-            .attr("class", "procVis attn-displayer attnE").attr("index", 0);
+            .attr("class", "procVis attn-displayer attnTargetE attnE").attr("index", 0);
 }
 
 

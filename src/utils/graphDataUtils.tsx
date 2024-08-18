@@ -115,6 +115,26 @@ export function removeDuplicatesFromSubarrays(arr: number[][]): number[][] {
     });
 }
 
+export function removeDuplicateSubarrays(arr: number[][]): number[][] {
+    // 使用一个Set来存储已经见过的子数组
+    const uniqueSubarrays = new Set();
+    
+    return arr.filter(subarray => {
+        // 将子数组转换为字符串，以便在Set中存储和比较
+        const subarrayKey = JSON.stringify(subarray);
+        
+        // 如果Set中没有这个子数组的键，则添加并保留该子数组
+        if (!uniqueSubarrays.has(subarrayKey)) {
+            uniqueSubarrays.add(subarrayKey);
+            return true;
+        }
+        
+        // 如果Set中已有这个子数组的键，则过滤掉该子数组
+        return false;
+    });
+}
+
+
 //get the probabilities result from the model, using in the prediction result visualizer
 export function getProbabilities(prob: any, hubNodeA: number, hubNodeB: number): number[]{
     console.log("input prob check", prob);
