@@ -50,7 +50,7 @@ function formularInteractionHandler(x: number, y: number, g: any, class_name: st
     .attr("stroke", "none") 
     .attr("class", "to-be-removed")
     .on("mouseover", function(this: any) {
-        d3.select((`.${class_name}`)).style("fill", "red")
+
         for (let i = 0; i < formulaClass[class_name].length; i ++) {
             d3.selectAll(`.${formulaClass[class_name][i]}`).style("stroke_width", 1).style("stroke", "red");
         }
@@ -69,7 +69,6 @@ function formularInteractionHandler(x: number, y: number, g: any, class_name: st
         for (let i = 0; i < formulaTextClass[class_name].length; i ++) {
             d3.selectAll(`.${formulaTextClass[class_name][i]}`).style("fill", "gray")
         }
-
 
     })
     }
@@ -100,8 +99,6 @@ export function injectSVG(g:any, x: number, y: number, SVGPath:string, svgClass:
             .style("fill", "gray")
             .text("hover on to see the corresponding part")
             
-        
- 
             formularInteractionHandler(x, y, g, "formula_x")
             formularInteractionHandler(x, y, g, "formula_bias")
             formularInteractionHandler(x, y, g, "formula_weights")

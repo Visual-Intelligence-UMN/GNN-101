@@ -726,7 +726,6 @@ export function featureVisualizer(
           .attr("transform", `translate(${xPos - 7.5}, ${yPos})`);
 
         if (mode === 1 && graphIndex === 4) {
-
           featureGroup.selectAll("rect")
           .data(features)
           .enter()
@@ -772,7 +771,7 @@ export function featureVisualizer(
         .style("stroke", "black")
         .style("stroke-width", 1);
 
-        featureGroup.append("text")
+        const featureId = featureGroup.append("text")
           .attr("x", rectWidth / 2)
           .attr("y", node.features.length * currRectHeight + 12)
           .attr("class", `node-features-${node.graphIndex}-${node.id} feature-id`)
@@ -781,8 +780,6 @@ export function featureVisualizer(
           .style("font-size", "12px")
           .style("fill", "black")
           .style("text-anchor", "middle");
-        
-
 
 
 
@@ -812,6 +809,7 @@ export function featureVisualizer(
         let featureGroupLocation: FeatureGroupLocation = {xPos, yPos}; 
 
         node.featureGroup = featureGroup;
+        node.featureId = featureId;
         node.featureGroupLocation = featureGroupLocation; // this will be used in calculationvisualizer
         scaleFeatureGroup(node, 0.5);
 

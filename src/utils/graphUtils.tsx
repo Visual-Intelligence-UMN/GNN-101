@@ -74,10 +74,12 @@ export function scaleFeatureGroup(node: any, scale: number) {
 
 export function showFeature(node: any) {
     const scale = 1;
-    if (node.featureGroup) {
+    if (node.featureGroup && node.featureId) {
+
         scaleFeatureGroup(node, scale);
     }
-    if (node.relatedNodes) {
+    if (node.relatedNodes && node.featureId) {
+
         node.relatedNodes.forEach((n: any) => {
             if (n.featureGroup) {
                 scaleFeatureGroup(n, scale);
@@ -89,6 +91,7 @@ export function showFeature(node: any) {
 export function highlightNodes(node: any) {
     if (node.featureGroup && node.svgElement) {
         d3.select(node.svgElement).attr("stroke-width", 3);
+        node.featureId.style("visibility", "visible")
         node.featureGroup.style("transition", "none")
             .style("opacity", 1)
             .style("visibility", "visible")
@@ -98,7 +101,9 @@ export function highlightNodes(node: any) {
 
     if (node.relatedNodes) {
         node.relatedNodes.forEach((n: any) => {
+            n.featureId.style("visibility", "visible")
             d3.select(n.svgElement).attr("stroke-width", 3);
+            node.featureId.style("visibility", "visible")
             n.featureGroup.style("transition", "none")
                 .style("opacity", 1)
                 .style("visibility", "visible")
@@ -158,6 +163,9 @@ export function resetNodes(allNodes: any[], convNum: number) {
             if (node.svgElement && node.text) {
                 d3.select(node.svgElement).attr("stroke-opacity", 1);
                 node.text.attr("opacity", 1);
+            }
+            if (node.featureId) {
+                node.featureId.style("visibility", "hidden")
             }
         }
     });
@@ -739,6 +747,11 @@ export function calculationVisualizer(
     let currentWeights = weights[node.graphIndex - 1]
 
 
+
+
+    node.relatedNodes.forEach((n: any) => {
+        n.featureId.style("visibility", "hidden")
+    })
     
 
 
