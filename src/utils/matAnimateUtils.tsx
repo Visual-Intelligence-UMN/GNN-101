@@ -526,6 +526,9 @@ export function drawAttentions(
     d3.selectAll(".attention").on("click", function (event: any, d: any) {
         event.stopPropagation();
         d3.select(this).attr("font-size", 30);
+
+        const attnScore = Number(d3.select(this).text());
+
         extendAttnView = true;
 
         //extend the math-displayer
@@ -560,7 +563,7 @@ export function drawAttentions(
             .append("g")
             .attr("class", "procVis attn-displayer");
 
-        drawAttnDisplayer(attnDisplayer, dX, dY, eij, lgIndices, targetE, myColor, ithIdx);
+        drawAttnDisplayer(attnDisplayer, dX, dY, eij, lgIndices, targetE, myColor, ithIdx, attnScore);
 
         d3.selectAll(".attnE").on("mouseover", function () {
             const targetIdx = Number(d3.select(this).attr("index"));
@@ -579,17 +582,7 @@ export function drawAttentions(
             }
             drawEScoreEquation(lgIndices, eDisplayer, jthIndexElement, dX, dY, dstVector, srcVector, myColor, inputVector, layerID);
         });
-        // d3.selectAll(".attnE").on("mouseout", function () {
-        //     d3.selectAll(".e-displayer").remove();
-        //     if (d3.selectAll(".e-displayer").empty()) {
-        //         const eDisplayer = attnDisplayer
-        //             .append("g")
-        //             .attr("class", "procVis e-displayer attn-displayer");
-        //         const inputVector = featuresTable[layerID][Number(d3.select(this).attr("index"))];
-        //         let jthIndexElement = lgIndices[ithIdx][1];
-        //         drawEScoreEquation(lgIndices, eDisplayer, jthIndexElement, dX, dY, dstVector, srcVector, myColor, inputVector, layerID);
-        //     }
-        // });
+
         //add initial e-score equation:
         const eDisplayer = attnDisplayer
             .append("g")

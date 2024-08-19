@@ -12,116 +12,121 @@ export function drawAttnDisplayer(
     lgIndices: number[][],
     targetE: number,
     myColor: any,
-    ithIdx: number
-){
+    ithIdx: number,
+    attnScore: number
+) {
     attnDisplayer
+        .append("rect")
+        .attr("x", dX + 10)
+        .attr("y", dY + 10)
+        .attr("rx", 5)
+        .attr("ry", 5)
+        .attr("width", 375)
+        .attr("height", 150)
+        .attr("fill", "white")
+        .attr("stroke", "black")
+        .attr("stroke-width", 1)
+        .attr("class", "procVis attn-displayer");
+
+    //draw the equation
+    attnDisplayer
+        .append("text")
+        .text(
+            "Attention Coefficient for " +
+                `a_${lgIndices[0][0]}_${lgIndices[ithIdx][1]} = ${attnScore}`
+        )
+        .attr("x", dX + 200)
+        .attr("y", dY + 25)
+        .attr("text-anchor", "middle")
+        .attr("font-size", 15)
+        .attr("class", "procVis attn-displayer");
+
+    attnDisplayer
+        .append("text")
+        .text(`a_${lgIndices[0][0]}_${lgIndices[ithIdx][1]}` + "  =  ")
+        .attr("x", dX + 15)
+        .attr("y", dY + 75)
+        .attr("xml:space", "preserve")
+        .attr("font-size", 15)
+        .attr("class", "procVis attn-displayer");
+
+    for (let i = 0; i < eij.length; i++) {
+        attnDisplayer
             .append("rect")
-            .attr("x", dX + 10)
-            .attr("y", dY + 10)
-            .attr("rx", 5)
-            .attr("ry", 5)
-            .attr("width", 375)
-            .attr("height", 150)
-            .attr("fill", "white")
-            .attr("stroke", "black")
-            .attr("stroke-width", 1)
-            .attr("class", "procVis attn-displayer");
-
-        //draw the equation
-        attnDisplayer
-            .append("text")
-            .text(
-                "Attention Coefficient for " + 
-                `a_${lgIndices[0][0]}_${lgIndices[ithIdx][1]}`
-            )
-            .attr("x", dX + 150)
-            .attr("y", dY + 25)
-            .attr("text-anchor", "middle")
-            .attr("font-size", 15)
-            .attr("class", "procVis attn-displayer");
-
-        attnDisplayer
-            .append("text")
-            .text(`a_${lgIndices[0][0]}_${lgIndices[ithIdx][1]}`+"  =  ")
-            .attr("x", dX + 15)
+            .attr("x", dX + 100 + 65 * i)
             .attr("y", dY + 75)
-            .attr("xml:space", "preserve")
-            .attr("font-size", 15)
-            .attr("class", "procVis attn-displayer");
-
-        for (let i = 0; i < eij.length; i++) {
-            attnDisplayer
-                .append("rect")
-                .attr("x", dX + 100 + 65 * i)
-                .attr("y", dY + 75)
-                .attr("width", 15)
-                .attr("height", 15)
-                .attr("fill", myColor(eij[i]))
-                .attr("stroke", "black")
-                .attr("class", "procVis attn-displayer attnE")
-                .attr("id", `e-${i}`).attr("index", i);
-
-            if (i != 0) {
-                attnDisplayer
-                    .append("text")
-                    .text("+")
-                    .attr("x", dX + 100 + 65 * i - 30)
-                    .attr("y", dY + 75 + 12.5)
-                    .attr("text-anchor", "middle")
-                    .attr("font-size", 15)
-                    .attr("class", "procVis attn-displayer");
-            }
-
-            type Point = { x: number; y: number };
-            const points: Point[] = [
-                { x: dX + 100, y: dY + 65 },
-                { x: dX + 100 + 65 * (eij.length - 1), y: dY + 65 },
-            ];
-
-            const lineGenerator = d3
-                .line<Point>() // 使用泛型指定类型
-                .x((d: Point) => d.x) // 设置x坐标
-                .y((d: Point) => d.y); // 设置y坐标
-
-            const pathData = lineGenerator(points);
-
-            // 5. 将路径添加到SVG中
-            attnDisplayer
-                .append("path")
-                .attr("d", pathData)
-                .attr("stroke", "black")
-                .attr("stroke-width", 1)
-                .attr("fill", "none")
-                .attr("id", "targetE"); // 确保路径不被填充
-
-            attnDisplayer
-                .append("text")
-                .text("exp(" + `e_${lgIndices[i][0]}_${lgIndices[i][1]}` + ")")
-                .attr("x", dX + 100 + 65 * i)
-                .attr("y", dY + 75 + 12.5)
-                .attr("text-anchor", "middle")
-                .attr("font-size", 10)
-                .attr("class", "procVis attn-displayer attnE").attr("index", i);
-        }
-
-        attnDisplayer
-            .append("rect")
-            .attr("x", dX + 100 + 50)
-            .attr("y", dY + 50 - 7.5)
             .attr("width", 15)
             .attr("height", 15)
-            .attr("fill", myColor(targetE))
-            .attr("class", "procVis attn-displayer attnTargetE attnE")
-            .attr("stroke", "black").attr("index", 0);
+            .attr("fill", myColor(eij[i]))
+            .attr("stroke", "black")
+            .attr("class", "procVis attn-displayer attnE")
+            .attr("id", `e-${i}`)
+            .attr("index", i);
+
+        if (i != 0) {
+            attnDisplayer
+                .append("text")
+                .text("+")
+                .attr("x", dX + 100 + 65 * i - 30)
+                .attr("y", dY + 75 + 12.5)
+                .attr("text-anchor", "middle")
+                .attr("font-size", 15)
+                .attr("class", "procVis attn-displayer");
+        }
+
+        type Point = { x: number; y: number };
+        const points: Point[] = [
+            { x: dX + 100, y: dY + 65 },
+            { x: dX + 100 + 65 * (eij.length - 1), y: dY + 65 },
+        ];
+
+        const lineGenerator = d3
+            .line<Point>() // 使用泛型指定类型
+            .x((d: Point) => d.x) // 设置x坐标
+            .y((d: Point) => d.y); // 设置y坐标
+
+        const pathData = lineGenerator(points);
+
+        // 5. 将路径添加到SVG中
+        attnDisplayer
+            .append("path")
+            .attr("d", pathData)
+            .attr("stroke", "black")
+            .attr("stroke-width", 1)
+            .attr("fill", "none")
+            .attr("id", "targetE"); // 确保路径不被填充
 
         attnDisplayer
             .append("text")
-            .text("exp(" + `e_${lgIndices[0][0]}_${lgIndices[ithIdx][1]}` + ")")
-            .attr("x", dX + 100 + 50)
-            .attr("y", dY + 50)
+            .text("exp(" + `e_${lgIndices[i][0]}_${lgIndices[i][1]}` + ")")
+            .attr("x", dX + 100 + 65 * i)
+            .attr("y", dY + 75 + 12.5)
             .attr("text-anchor", "middle")
             .attr("font-size", 10)
-            .attr("class", "procVis attn-displayer attnTargetE attnE").attr("index", 0);
+            .attr("class", "procVis attn-displayer attnE")
+            .attr("index", i);
+    }
+
+    attnDisplayer
+        .append("rect")
+        .attr("x", dX + 100 + 50)
+        .attr("y", dY + 50 - 7.5)
+        .attr("width", 15)
+        .attr("height", 15)
+        .attr("fill", myColor(targetE))
+        .attr("class", "procVis attn-displayer attnTargetE attnE")
+        .attr("stroke", "black")
+        .attr("index", 0);
+
+    attnDisplayer
+        .append("text")
+        .text("exp(" + `e_${lgIndices[0][0]}_${lgIndices[ithIdx][1]}` + ")")
+        .attr("x", dX + 100 + 50)
+        .attr("y", dY + 50)
+        .attr("text-anchor", "middle")
+        .attr("font-size", 10)
+        .attr("class", "procVis attn-displayer attnTargetE attnE")
+        .attr("index", 0);
 }
 
 export function drawEScoreEquation(
@@ -135,19 +140,32 @@ export function drawEScoreEquation(
     myColor: any,
     inputVector: number[],
     layerID: number
-){
-            eDisplayer
-                .append("text")
-                .text(
-                    `e_${lgIndices[0][0]}_${jthIndexElement} = LeakyReLU(                            +                        )`
-                )
-                .attr("x", dX + 15)
-                .attr("y", dY + 125)
-                .attr("xml:space", "preserve")
-                .attr("font-size", 12)
-                .attr("class", "procVis attn-displayer")
-                .attr("id", "leakyRelu");
+) {
+    eDisplayer
+        .append("text")
+        .text(
+            `e_${lgIndices[0][0]}_${jthIndexElement} = LeakyReLU(                      +                               )`
+        )
+        .attr("x", dX + 15)
+        .attr("y", dY + 125)
+        .attr("xml:space", "preserve")
+        .attr("font-size", 12)
+        .attr("class", "procVis attn-displayer")
+        .attr("id", "leakyRelu");
 
+    const fontSize = 12;
+    const textH = dY + 125;
+
+    eDisplayer
+        .append("text")
+        .text("a^T_s")
+        .attr("id", "ats").attr("class", "mathjax-latex")
+        .attr("x", dX + 130)
+        .attr("y", textH)
+        .attr("font-size", fontSize)
+        .on("mouseenter", function () {
+            d3.select("#ats").style("opacity", 0);
+            d3.selectAll(".temp").style("pointer-events", "none");
             for (let i = 0; i < dstVector.length; i++) {
                 eDisplayer
                     .append("rect")
@@ -155,20 +173,50 @@ export function drawEScoreEquation(
                     .attr("y", dY + 112.5 + i * (25 / srcVector.length))
                     .attr("width", 2.5)
                     .attr("height", 25 / srcVector.length)
-                    .attr("fill", myColor(srcVector[i]));
+                    .attr("fill", myColor(srcVector[i])).attr("class", "temp");
+            }
+        })
+        .on("mouseout", function () {
+            d3.select("#ats").style("opacity", 1);
+            d3.selectAll(".temp").remove();
+        });
 
+    eDisplayer
+        .append("text")
+        .text("a^T_d")
+        .attr("id", "atd").attr("class", "mathjax-latex")
+        .attr("x", dX + 200 + 20)
+        .attr("y", textH)
+        .attr("font-size", fontSize)
+        .on("mouseenter", function () {
+            d3.select("#atd").style("opacity", 0);
+            d3.selectAll(".temp").style("pointer-events", "none");
+            for (let i = 0; i < dstVector.length; i++) {
                 eDisplayer
                     .append("rect")
                     .attr("x", dX + 200 + 12.5 + 20)
                     .attr("y", dY + 112.5 + i * (25 / dstVector.length))
                     .attr("width", 2.5)
-                    .attr("height", 25 / dstVector.length)
+                    .attr("height", 25 / dstVector.length).attr("class", "temp")
                     .attr("fill", myColor(dstVector[i]))
                     .raise();
             }
+        })
+        .on("mouseout", function () {
+            d3.select("#atd").style("opacity", 1);
+            d3.selectAll(".temp").remove();
+        });
 
-            
-
+    eDisplayer
+        .append("text")
+        .text(`x_${lgIndices[0][0]}`)
+        .attr("id", "xi").attr("class", "mathjax-latex")
+        .attr("x", dX + 140 - 10 + 50)
+        .attr("y", textH)
+        .attr("font-size", fontSize)
+        .on("mouseenter", function () {
+            d3.select("#xi").style("opacity", 0);
+            d3.selectAll(".temp").style("pointer-events", "none");
             for (let i = 0; i < inputVector.length; i++) {
                 eDisplayer
                     .append("rect")
@@ -178,11 +226,28 @@ export function drawEScoreEquation(
                     )
                     .attr("y", dY + 112.5 + 12.5)
                     .attr("width", 25 / inputVector.length)
-                    .attr("height", 2.5)
+                    .attr("height", 2.5).attr("class", "temp")
                     .attr("fill", myColor(inputVector[i]));
+            }
+        })
+        .on("mouseout", function () {
+            d3.select("#xi").style("opacity", 1);
+            d3.selectAll(".temp").remove();
+        });
 
+    eDisplayer
+        .append("text")
+        .text(`x_${jthIndexElement}`)
+        .attr("id", "xj").attr("class", "mathjax-latex")
+        .attr("x", dX + 200 + 70)
+        .attr("y", textH)
+        .attr("font-size", fontSize)
+        .on("mouseenter", function () {
+            d3.select("#xj").style("opacity", 0);
+            d3.selectAll(".temp").style("pointer-events", "none");
+            for (let i = 0; i < inputVector.length; i++) {
                 eDisplayer
-                    .append("rect")
+                    .append("rect").attr("class", "temp")
                     .attr(
                         "x",
                         dX + 200 + 20 + 50 + i * (25 / inputVector.length)
@@ -192,35 +257,87 @@ export function drawEScoreEquation(
                     .attr("height", 2.5)
                     .attr("fill", myColor(inputVector[i]));
             }
+        })
+        .on("mouseout", function () {
+            d3.select("#xj").style("opacity", 1);
+            d3.selectAll(".temp").remove();
+        });
 
-            let imageMat = "./assets/PNGs/GATConvMat1.png";
-            let imgW = 50;
-            let imgH = 50;
+    let imageMat = "./assets/PNGs/GATConvMat1.png";
+    let imgW = 50;
+    let imgH = 50;
 
-            let offset = 0;
+    let offset = 0;
 
-            if(layerID==1){
-                imageMat = "./assets/PNGs/GATConvMat2.png";
-                imgW = 25;
-                imgH = 25;
-                offset = 10;
-            }
+    if (layerID == 1) {
+        imageMat = "./assets/PNGs/GATConvMat2.png";
+        imgW = 25;
+        imgH = 25;
+        offset = 10;
+    }
 
-            eDisplayer
-                .append("image")
-                .attr("xlink:href", imageMat)
-                .attr("x", dX + 75 + 75 - 10 + offset)
-                .attr("y", dY + 75 + 25 + offset)
-                .attr("width", imgW)
-                .attr("height", imgH);
+    eDisplayer
+        .append("image")
+        .attr("xlink:href", imageMat).attr("id", "w1png")
+        .attr("x", dX + 75 + 75 - 10 + offset)
+        .attr("y", dY + 75 + 25 + offset)
+        .attr("width", imgW)
+        .attr("height", imgH).attr("opacity", 0);
 
-            eDisplayer
-                .append("image")
-                .attr("xlink:href", imageMat)
-                .attr("x", dX + 75 + 75 + 60 + 20 + offset)
-                .attr("y", dY + 75 + 25 + offset)
-                .attr("width", imgW)
-                .attr("height", imgH);
+eDisplayer
+.append("image")
+.attr("xlink:href", imageMat)
+.attr("id", "w2png")
+.attr("x", dX + 75 + 75 + 60 + 20 + offset)
+.attr("y", dY + 75 + 25 + offset)
+.attr("width", imgW)
+.attr("height", imgH).attr("opacity", 0);
+
+    eDisplayer
+        .append("text")
+        .text("W")
+        .attr("id", "w1").attr("class", "mathjax-latex")
+        .attr("x", dX + 75 + 75 + 15)
+        .attr("y", textH)
+        .attr("font-size", fontSize)
+        .on("mouseenter", function () {
+            d3.selectAll(".temp").style("pointer-events", "none");
+            d3.select("#w1").style("opacity", 0);
+            d3.select("#w1png").attr("opacity", 1); 
+        })
+        .on("mouseout", function () {
+            d3.selectAll(".temp").style("pointer-events", "none");
+            d3.select("#w1").style("opacity", 1);
+            d3.select("#w1png").attr("opacity", 0); 
+            d3.selectAll(".temp").remove();
+        });
+
+        
+
+    eDisplayer
+        .append("text")
+        .text("W")
+        .attr("id", "w2").attr("class", "mathjax-latex")
+        .attr("x", dX + 75 + 75 + 60 + 40+5)
+        .attr("y", textH)
+        .attr("font-size", fontSize)
+        .on("mouseenter", function () {
+            d3.selectAll(".temp").style("pointer-events", "none");
+            d3.select("#w2").style("opacity", 0);
+            d3.select("#w2png").attr("opacity", 1); 
+        })
+        .on("mouseout", function () {
+            d3.selectAll(".temp").style("pointer-events", "none");
+            d3.select("#w2").style("opacity", 1);
+            d3.select("#w2png").attr("opacity", 0);
+            d3.selectAll(".temp").remove();
+        });
+
+        
+
+    
+    //renderMath(document.body);
+
 }
 
 export function drawSoftmaxDisplayer(
@@ -266,7 +383,6 @@ export function drawSoftmaxDisplayer(
     if (id == 0) {
         title = "Softmax Score for 'Non-Mutagenic'";
     }
-
 
     //add contents into the math displayer
     //add title
@@ -686,8 +802,13 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .attr("fill", textColor);
 }
 
-
-export function drawActivationExplanation(x:number, y:number, title:string, formula:string, description:string){
+export function drawActivationExplanation(
+    x: number,
+    y: number,
+    title: string,
+    formula: string,
+    description: string
+) {
     const displayW = 250;
     const displayH = 75;
 
@@ -742,7 +863,12 @@ export function drawActivationExplanation(x:number, y:number, title:string, form
         .attr("fill", "black");
 }
 
-export function drawMatmulExplanation(x:number, y:number, title:string, description:string){
+export function drawMatmulExplanation(
+    x: number,
+    y: number,
+    title: string,
+    description: string
+) {
     const displayW = 350;
     const displayH = 50;
 
@@ -774,7 +900,8 @@ export function drawMatmulExplanation(x:number, y:number, title:string, descript
         .text(title)
         .attr("class", "math-displayer procVis")
         .attr("font-size", titleYOffset)
-        .attr("fill", "black").raise();
+        .attr("fill", "black")
+        .raise();
     const eqXOffset = titleXOffset / 2;
     const eqYOffset = titleYOffset * 2.5;
     const unitSize = eqXOffset / 3 + 3;
@@ -786,228 +913,236 @@ export function drawMatmulExplanation(x:number, y:number, title:string, descript
         .text(description)
         .attr("class", "math-displayer procVis")
         .attr("font-size", unitSize)
-        .attr("fill", "black").raise();
+        .attr("fill", "black")
+        .raise();
 }
 
 export function drawDotProduct(
-dummy:any,
-rectID:any,
-X:number[],
-Xv:any,
-curveDir:any,
-coordFeatureVis:any,
-myColor:any
-){
+    dummy: any,
+    rectID: any,
+    X: number[],
+    Xv: any,
+    curveDir: any,
+    coordFeatureVis: any,
+    myColor: any
+) {
+    //data fetching - get the current value, aggregated vector, and weight vector
 
-        //data fetching - get the current value, aggregated vector, and weight vector
+    const math = create(all, {});
+    let currentVal = dummy[Number(rectID)];
+    let aggregatedVector: number[] = X;
+    let transposedXv = math.transpose(Xv);
+    transposedXv = flipVertically(transposedXv);
+    let weightVector: number[] = transposedXv[Number(rectID)];
 
-        const math = create(all, {})
-        let currentVal = dummy[Number(rectID)];
-        let aggregatedVector:number[] = X;
-        let transposedXv = math.transpose(Xv);
-        transposedXv = flipVertically(transposedXv);
-        let weightVector:number[] = transposedXv[Number(rectID)];
+    //first few data points for example
+    const dataSamples = [
+        aggregatedVector[0],
+        weightVector[0],
+        aggregatedVector[1],
+        weightVector[1],
+    ];
+    const operators = ["x", "+", "x", "... = "];
 
+    //matmul-displayer interaction
+    let displayerOffset = -150;
+    if (curveDir == 1) displayerOffset = 100;
+    let displayerX = coordFeatureVis[0];
+    let displayerY = coordFeatureVis[1] + displayerOffset;
 
+    const displayW = 300;
+    const displayH = 100;
 
-        //first few data points for example
-        const dataSamples = [
-            aggregatedVector[0],
-            weightVector[0],
-            aggregatedVector[1],
-            weightVector[1]
-        ];
-        const operators = ["x", "+", "x", "... = "];
+    //drawPoints(".mats", "red", [[displayerX, displayerY]])
 
-        //matmul-displayer interaction
-        let displayerOffset = -150;
-        if(curveDir==1)displayerOffset = 100;
-        let displayerX = coordFeatureVis[0];
-        let displayerY = coordFeatureVis[1] + displayerOffset;
+    d3.select(".mats")
+        .append("rect")
+        .attr("x", displayerX)
+        .attr("y", displayerY - 10)
+        .attr("width", displayW)
+        .attr("height", displayH)
+        .attr("rx", 10)
+        .attr("ry", 10)
+        .style("fill", "white")
+        .style("stroke", "black")
+        .style("stroke-width", 2)
+        .attr("class", "matmul-displayer procVis")
+        .lower();
 
-        const displayW = 300;
-        const displayH = 100;
+    const titleYOffset = 5;
+    const titleXOffset = 50;
+    d3.select(".mats")
+        .append("text")
+        .attr("x", displayerX + titleXOffset)
+        .attr("y", displayerY + titleYOffset)
+        .text("Matmul Visualization")
+        .attr("class", "matmul-displayer procVis")
+        .attr("font-size", titleYOffset * 2)
+        .attr("fill", "black");
 
-        //drawPoints(".mats", "red", [[displayerX, displayerY]])
+    const vectorLength = displayH - titleYOffset;
 
+    let h = vectorLength / aggregatedVector.length;
+    let h2 = vectorLength / weightVector.length;
+    let w = 11.25;
+    if (h > vectorLength / weightVector.length)
+        h = vectorLength / weightVector.length;
+
+    const eqXOffset = titleXOffset / 2;
+    const eqYOffset = titleYOffset * 2.5;
+    const unitSize = (eqXOffset / 3 + 3) / 2;
+    const upperOffset = unitSize * 2;
+    d3.select(".mats")
+        .append("text")
+        .attr("x", displayerX + 3)
+        .attr("y", displayerY + vectorLength / 2 + 3)
+        .text("dot(")
+        .attr("class", "matmul-displayer procVis")
+        .attr("font-size", titleYOffset * 2)
+        .attr("fill", "black");
+
+    d3.select(".mats")
+        .append("text")
+        .attr("x", displayerX + 3 + eqXOffset / 2 + vectorLength)
+        .attr("y", displayerY + vectorLength / 2 + 3)
+        .text(",")
+        .attr("class", "matmul-displayer procVis")
+        .attr("font-size", titleYOffset * 2)
+        .attr("fill", "black");
+
+    d3.select(".mats")
+        .append("text")
+        .attr(
+            "x",
+            displayerX + 3 + eqXOffset / 2 + vectorLength + vectorLength / 1.5
+        )
+        .attr("y", displayerY + vectorLength / 2 + 3)
+        .text(")")
+        .attr("class", "matmul-displayer procVis")
+        .attr("font-size", titleYOffset * 2)
+        .attr("fill", "black");
+
+    d3.select(".mats")
+        .append("text")
+        .attr("x", displayerX + 3)
+        .attr("y", displayerY + vectorLength / 2 + 20)
+        .text("=")
+        .attr("class", "matmul-displayer procVis")
+        .attr("font-size", titleYOffset * 2)
+        .attr("fill", "black");
+
+    for (let i = 0; i < dataSamples.length; i++) {
         d3.select(".mats")
             .append("rect")
-            .attr("x", displayerX)
-            .attr("y", displayerY - 10)
-            .attr("width", displayW)
-            .attr("height", displayH)
-            .attr("rx", 10)
-            .attr("ry", 10)
-            .style("fill", "white")
+            .attr("x", displayerX + 3 + unitSize * (i + 1) + 30 * i)
+            .attr("y", displayerY + vectorLength / 2 + 20 - unitSize)
+            .attr("width", unitSize * 2)
+            .attr("height", unitSize * 2)
             .style("stroke", "black")
-            .style("stroke-width", 2)
+            .attr("fill", myColor(dataSamples[i]))
             .attr("class", "matmul-displayer procVis")
-            .lower();
-        
-        const titleYOffset = 5;
-        const titleXOffset = 50;
-        d3.select(".mats")
-            .append("text")
-            .attr("x", displayerX + titleXOffset)
-            .attr("y", displayerY + titleYOffset)
-            .text("Matmul Visualization")
-            .attr("class", "matmul-displayer procVis")
-            .attr("font-size", titleYOffset*2)
-            .attr("fill", "black");
-        
-        const vectorLength = displayH - titleYOffset;
-        
-        let h = vectorLength / aggregatedVector.length;
-        let h2 = vectorLength / weightVector.length;
-        let w = 11.25;
-        if(h>vectorLength / weightVector.length)h = vectorLength / weightVector.length;
-
-
-
-        const eqXOffset = titleXOffset / 2;
-        const eqYOffset = titleYOffset * 2.5;
-        const unitSize = (eqXOffset / 3 + 3)/2;
-        const upperOffset = unitSize * 2;
-        d3.select(".mats")
-            .append("text")
-            .attr("x", displayerX + 3)
-            .attr("y", displayerY + vectorLength/2 + 3)
-            .text("dot(")
-            .attr("class", "matmul-displayer procVis")
-            .attr("font-size", titleYOffset*2)
-            .attr("fill", "black");
-
-        d3.select(".mats")
-            .append("text")
-            .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength)
-            .attr("y", displayerY + vectorLength/2 + 3)
-            .text(",")
-            .attr("class", "matmul-displayer procVis")
-            .attr("font-size", titleYOffset*2)
-            .attr("fill", "black");
-        
-        d3.select(".mats")
-            .append("text")
-            .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength + vectorLength/1.5)
-            .attr("y", displayerY + vectorLength/2 + 3)
-            .text(")")
-            .attr("class", "matmul-displayer procVis")
-            .attr("font-size", titleYOffset*2)
-            .attr("fill", "black");
-
-        d3.select(".mats")
-            .append("text")
-            .attr("x", displayerX + 3)
-            .attr("y", displayerY + vectorLength/2 + 20)
-            .text("=")
-            .attr("class", "matmul-displayer procVis")
-            .attr("font-size", titleYOffset*2)
-            .attr("fill", "black");
-
-        for(let i=0; i<dataSamples.length; i++){
-            d3.select(".mats")
-                .append("rect")
-                .attr("x", displayerX + 3 + unitSize*(i+1)+30*i)
-                .attr("y", displayerY + vectorLength/2 + 20 - unitSize)
-                .attr("width", unitSize*2)
-                .attr("height", unitSize*2)
-                .style("stroke", "black")
-                .attr("fill", myColor(dataSamples[i]))
-                .attr("class", "matmul-displayer procVis")
-                .raise();
-            let color = "white";
-            if(dataSamples[i]<0.5){color = "black"}
-            d3.select(".mats")
-                .append("text")
-                .attr("x", displayerX + 3 + unitSize*(i+1)+30*i)
-                .attr("y", displayerY + vectorLength/2 + 20)
-                .text(roundToTwo(dataSamples[i]))
-                .attr("class", "matmul-displayer procVis")
-                .attr("font-size", unitSize)
-                .attr("fill", color);
+            .raise();
+        let color = "white";
+        if (dataSamples[i] < 0.5) {
+            color = "black";
         }
-
-        
-
-        for(let i=0; i<operators.length; i++){
-            d3.select(".mats")
+        d3.select(".mats")
             .append("text")
-            .attr("x", displayerX + 3 + unitSize*(i+1) + 30*(i+1))
-            .attr("y", displayerY + vectorLength/2 + 20)
+            .attr("x", displayerX + 3 + unitSize * (i + 1) + 30 * i)
+            .attr("y", displayerY + vectorLength / 2 + 20)
+            .text(roundToTwo(dataSamples[i]))
+            .attr("class", "matmul-displayer procVis")
+            .attr("font-size", unitSize)
+            .attr("fill", color);
+    }
+
+    for (let i = 0; i < operators.length; i++) {
+        d3.select(".mats")
+            .append("text")
+            .attr("x", displayerX + 3 + unitSize * (i + 1) + 30 * (i + 1))
+            .attr("y", displayerY + vectorLength / 2 + 20)
             .text(operators[i])
             .attr("font-size", unitSize)
             .attr("class", "matmul-displayer procVis")
             .raise();
-        }
+    }
 
+    d3.select(".mats")
+        .append("rect")
+        .attr(
+            "x",
+            displayerX + 3 + eqXOffset / 2 + vectorLength + vectorLength / 1.5
+        )
+        .attr("y", displayerY + vectorLength / 2 + 20 - unitSize)
+        .attr("width", unitSize * 2)
+        .attr("height", unitSize * 2)
+        .style("stroke", "black")
+        .attr("fill", myColor(currentVal))
+        .attr("class", "matmul-displayer procVis")
+        .raise();
+
+    let color = "white";
+    if (currentVal < 0.5) {
+        color = "black";
+    }
+    d3.select(".mats")
+        .append("text")
+        .attr(
+            "x",
+            displayerX + 3 + eqXOffset / 2 + vectorLength + vectorLength / 1.5
+        )
+        .attr("y", displayerY + vectorLength / 2 + 20)
+        .text(roundToTwo(currentVal))
+        .attr("class", "matmul-displayer procVis")
+        .attr("font-size", unitSize)
+        .attr("fill", color);
+
+    //draw the aggregated vector
+    for (let i = 0; i < aggregatedVector.length; i++) {
         d3.select(".mats")
             .append("rect")
-            .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength + vectorLength/1.5)
-            .attr("y", displayerY + vectorLength/2 + 20 - unitSize)
-            .attr("width", unitSize*2)
-            .attr("height", unitSize*2)
-            .style("stroke", "black")
-            .attr("fill", myColor(currentVal))
-            .attr("class", "matmul-displayer procVis")
-            .raise();
-        
-            let color = "white";
-            if(currentVal<0.5){color = "black"}
-            d3.select(".mats")
-                .append("text")
-                .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength + vectorLength/1.5)
-                .attr("y", displayerY + vectorLength/2 + 20)
-                .text(roundToTwo(currentVal))
-                .attr("class", "matmul-displayer procVis")
-                .attr("font-size", unitSize)
-                .attr("fill", color);
-        
-        
-        //draw the aggregated vector
-        for(let i=0; i<aggregatedVector.length; i++){
-            d3.select(".mats")
-                .append("rect")
-                .attr("x", displayerX + eqXOffset+i*h/2)
-                .attr("y", displayerY + vectorLength/2)
-                .attr("width", h/2)
-                .attr("height", w/2)
-                .attr("fill", myColor(aggregatedVector[i]))
-                .attr("class", "procVis matmul-displayer").raise();
-        }
-
-        //draw the weight vector
-        for(let i=0; i<weightVector.length; i++){
-            d3.select(".mats")
-                .append("rect")
-                .attr("x", displayerX + eqXOffset * 5)
-                .attr("y", displayerY + eqYOffset + i*h2/2)
-                .attr("width", w/2)
-                .attr("height", h2/2)
-                .attr("fill", myColor(weightVector[i]))
-                .attr("class", "procVis matmul-displayer").raise();
-        }
-
-        //draw franes
-        d3.select(".mats")
-            .append("rect")
-            .attr("x", displayerX + eqXOffset)
-            .attr("y", displayerY + vectorLength/2)
-            .attr("width", h/2 * aggregatedVector.length)
-            .attr("height", w/2)
-            .attr("fill", "none")
+            .attr("x", displayerX + eqXOffset + (i * h) / 2)
+            .attr("y", displayerY + vectorLength / 2)
+            .attr("width", h / 2)
+            .attr("height", w / 2)
+            .attr("fill", myColor(aggregatedVector[i]))
             .attr("class", "procVis matmul-displayer")
-            .attr("stroke", "black")
             .raise();
+    }
 
+    //draw the weight vector
+    for (let i = 0; i < weightVector.length; i++) {
         d3.select(".mats")
             .append("rect")
             .attr("x", displayerX + eqXOffset * 5)
-            .attr("y", displayerY + eqYOffset)
-            .attr("width", w/2)
-            .attr("height", h2/2 * weightVector.length)
-            .attr("fill", "none")
+            .attr("y", displayerY + eqYOffset + (i * h2) / 2)
+            .attr("width", w / 2)
+            .attr("height", h2 / 2)
+            .attr("fill", myColor(weightVector[i]))
             .attr("class", "procVis matmul-displayer")
-            .attr("stroke", "black")
             .raise();
+    }
 
+    //draw franes
+    d3.select(".mats")
+        .append("rect")
+        .attr("x", displayerX + eqXOffset)
+        .attr("y", displayerY + vectorLength / 2)
+        .attr("width", (h / 2) * aggregatedVector.length)
+        .attr("height", w / 2)
+        .attr("fill", "none")
+        .attr("class", "procVis matmul-displayer")
+        .attr("stroke", "black")
+        .raise();
+
+    d3.select(".mats")
+        .append("rect")
+        .attr("x", displayerX + eqXOffset * 5)
+        .attr("y", displayerY + eqYOffset)
+        .attr("width", w / 2)
+        .attr("height", (h2 / 2) * weightVector.length)
+        .attr("fill", "none")
+        .attr("class", "procVis matmul-displayer")
+        .attr("stroke", "black")
+        .raise();
 }
