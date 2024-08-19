@@ -547,12 +547,15 @@ export function drawAttentions(
         let eij:any = [];
         console.log("push eij before", lgIndices)
         for(let i=0; i<lgIndices.length; i++){
-            eij.push(computeAttnStep(srcVector, dstVector, weightMatrices[layerID],
-                featuresTable[layerID][0],
-                featuresTable[layerID][lgIndices[i][1]]));
+            eij.push(computeAttnStep(
+                Array.prototype.slice.call(srcVector), 
+                Array.prototype.slice.call(dstVector), 
+                weightMatrices[layerID],
+                Array.prototype.slice.call(featuresTable[layerID][0]),
+                Array.prototype.slice.call(featuresTable[layerID][lgIndices[i][1]])));
             console.log("push eij", i, eij);
         }
-
+        
         const ithIdx = Number(d3.select(this).attr("attn-index"));        
         const targetE = eij[ithIdx];
 
