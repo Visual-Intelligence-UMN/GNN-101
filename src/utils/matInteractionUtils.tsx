@@ -2,11 +2,6 @@ import * as d3 from "d3";
 import { roundToTwo } from "../components/WebUtils";
 import { flipVertically, softmax } from "./utils";
 import { create, all, transposeDependencies } from "mathjs";
-import { mathjax } from 'mathjax-full/js/mathjax.js';
-import { TeX } from 'mathjax-full/js/input/tex.js';
-import { SVG } from 'mathjax-full/js/output/svg.js'; // 或者 CHTML 作为输出方式
-import { liteAdaptor } from 'mathjax-full/js/adaptors/liteAdaptor.js';
-import { RegisterHTMLHandler } from 'mathjax-full/js/handlers/html.js';
 import { injectMathSymbol, injectSVG } from "./svgUtils";
 
 
@@ -48,9 +43,19 @@ export function drawAttnDisplayer(
         .attr("font-size", 15)
         .attr("class", "procVis attn-displayer");
 
+    
+    const eqEScore = attnDisplayer.append("g").attr("class", "procVis attn-displayer");
+    
+    injectMathSymbol(
+        eqEScore, dX + 15, dY + 50, 
+        "./assets/SVGs/attn.svg", 
+        "procVis attn-displayer", "input",
+        `${lgIndices[0][0]},${lgIndices[ithIdx][1]}`
+    );
+    
     attnDisplayer
         .append("text")
-        .text(`a_${lgIndices[0][0]}_${lgIndices[ithIdx][1]}` + "  =  ")
+        .text("          =  ")
         .attr("x", dX + 15)
         .attr("y", dY + 75)
         .attr("xml:space", "preserve")
@@ -154,10 +159,18 @@ export function drawEScoreEquation(
     inputVector: number[],
     layerID: number
 ) {
+    const eqEScore = eDisplayer.append("g").attr("class", "procVis attn-displayer");
+    
+    injectMathSymbol(
+        eqEScore, dX + 15, dY + 100, 
+        "./assets/SVGs/escore.svg", 
+        "procVis attn-displayer", "input",
+        `${lgIndices[0][0]}, ${jthIndexElement}`
+    );
     eDisplayer
         .append("text")
         .text(
-            `e_${lgIndices[0][0]}_${jthIndexElement} = LeakyReLU(                      +                               )`
+            `          = LeakyReLU(                      +                               )`
         )
         .attr("x", dX + 15)
         .attr("y", dY + 125)

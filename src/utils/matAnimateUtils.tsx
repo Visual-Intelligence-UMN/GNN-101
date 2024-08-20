@@ -19,7 +19,6 @@ import { drawHintLabel, drawMatrixValid, rotateMatrix } from "./matHelperUtils";
 import { off } from "node:process";
 import { computeAttnStep } from "./computationUtils";
 import { removeDuplicatesFromSubarrays, removeDuplicateSubarrays } from "./graphDataUtils";
-import { mathjax } from 'mathjax-full/js/mathjax.js';
 
 interface Animation {
     func: () => void;
