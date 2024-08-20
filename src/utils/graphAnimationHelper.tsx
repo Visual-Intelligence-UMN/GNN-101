@@ -179,7 +179,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 }
                 
 
-                d3.select(".graph-displayer").attr("opacity", 1).raise();
+                d3.select(".graph-displayer").attr("opacity", 1);
                 
                 console.log('weight before transformations', weights)
 

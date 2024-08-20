@@ -770,6 +770,7 @@ export function featureVisualizer(
         .style("fill", "none")
         .style("stroke", "black")
         .style("stroke-width", 1);
+    
 
         const featureId = featureGroup.append("text")
           .attr("x", rectWidth / 2)
