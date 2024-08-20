@@ -25,6 +25,23 @@ export function drawHintLabel(
     return label;
 }
 
+
+export function drawEqComponentLabel(
+    eDisplayer:any,
+    x: number,
+    y: number,
+    text: string
+){
+    eDisplayer.append("text")
+            .text(text)
+            .attr("x", x)
+            .attr("y", y)
+            .attr("class", "temp")
+            .style("fill", "gray")
+            .style("font-size", 5);
+}
+
+
 //get node attributes from graph data
 export function getNodeAttributes(data: any) {
     let nodeAttrs = [];

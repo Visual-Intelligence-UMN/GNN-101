@@ -3,6 +3,7 @@ import { roundToTwo } from "../components/WebUtils";
 import { flipVertically, softmax } from "./utils";
 import { create, all, transposeDependencies } from "mathjs";
 import { injectMathSymbol, injectSVG } from "./svgUtils";
+import { drawEqComponentLabel } from "./matHelperUtils";
 
 
 //---------------------------functions for the softmax interaction in the graph classifier------------------------------
@@ -30,16 +31,27 @@ export function drawAttnDisplayer(
         .attr("stroke-width", 1)
         .attr("class", "procVis attn-displayer");
 
+     //   a_${lgIndices[0][0]}_${lgIndices[ithIdx][1]}
+
+     const attnEqScore = attnDisplayer.append("g").attr("class", "procVis attn-displayer");
+    
+     injectMathSymbol(
+        attnEqScore, dX + 250, dY + 10, 
+         "./assets/SVGs/attn.svg", 
+         "procVis attn-displayer", "input",
+         `${lgIndices[0][0]},${lgIndices[ithIdx][1]}`
+     );
+
     //draw the equation
     attnDisplayer
         .append("text")
         .text(
             "Attention Coefficient for " +
-                `a_${lgIndices[0][0]}_${lgIndices[ithIdx][1]} = ${attnScore}`
+                `       = ${attnScore}`
         )
         .attr("x", dX + 200)
         .attr("y", dY + 25)
-        .attr("text-anchor", "middle")
+        .attr("text-anchor", "middle").attr("xml:space", "preserve")
         .attr("font-size", 15)
         .attr("class", "procVis attn-displayer");
 
@@ -47,7 +59,7 @@ export function drawAttnDisplayer(
     const eqEScore = attnDisplayer.append("g").attr("class", "procVis attn-displayer");
     
     injectMathSymbol(
-        eqEScore, dX + 15, dY + 50, 
+        eqEScore, dX + 15, dY + 50 + 7.5, 
         "./assets/SVGs/attn.svg", 
         "procVis attn-displayer", "input",
         `${lgIndices[0][0]},${lgIndices[ithIdx][1]}`
@@ -162,7 +174,7 @@ export function drawEScoreEquation(
     const eqEScore = eDisplayer.append("g").attr("class", "procVis attn-displayer");
     
     injectMathSymbol(
-        eqEScore, dX + 15, dY + 100, 
+        eqEScore, dX + 15, dY + 100 + 7.5, 
         "./assets/SVGs/escore.svg", 
         "procVis attn-displayer", "input",
         `${lgIndices[0][0]}, ${jthIndexElement}`
@@ -186,9 +198,22 @@ export function drawEScoreEquation(
     const aTs = eDisplayer.append("g").attr("id", "ats").attr("class", "math-latex");
     injectSVG(aTs, dX + 130, textH, "./assets/SVGs/a_t_s.svg", "math-latex");
     
+    
+
     aTs.on("mouseenter", function () {
+        d3.select("#ats-text").style("opacity", 1);
         d3.select("#ats").style("opacity", 0);
+        
         d3.selectAll(".temp").style("pointer-events", "none");
+
+        eDisplayer.append("text")
+            .text("Learnable Vector for Source")
+            .attr("x", dX + 140 - 10 + 12.5 + 5)
+            .attr("y", dY + 112.5 + srcVector.length * (25 / srcVector.length) + 5)
+            .attr("class", "temp")
+            .style("fill", "gray")
+            .style("font-size", 5);
+
         for (let i = 0; i < dstVector.length; i++) {
             eDisplayer
                 .append("rect")
@@ -202,16 +227,36 @@ export function drawEScoreEquation(
         })
         .on("mouseout", function () {
             d3.select("#ats").style("opacity", 1);
+            d3.select("#ats-text").style("opacity", 0);
             d3.selectAll(".temp").remove();
         });
 
 
-    const aTd = eDisplayer.append("g").attr("id", "atd").attr("class", "math-latex");
+    const aTd = eDisplayer
+    .append("g")
+    .attr("id", "atd")
+    .attr("class", "math-latex");
+
+    aTd.append("text")
+    .text("Learnable Vector for Destination")
+    .attr("x", dX + 200 + 12.5 + 20)
+    .attr("y", dY + 112.5 + dstVector.length * (25 / dstVector.length))
+
+
     injectSVG(aTd, dX + 220, textH, "./assets/SVGs/a_t_d.svg", "math-latex");
         
     aTd.on("mouseenter", function () {
             d3.select("#atd").style("opacity", 0);
             d3.selectAll(".temp").style("pointer-events", "none");
+
+            eDisplayer.append("text")
+            .text("Learnable Vector for Destination")
+            .attr("x", dX + 200 + 12.5 + 20)
+            .attr("y", dY + 112.5 + dstVector.length * (25 / dstVector.length) + 5)
+            .attr("class", "temp")
+            .style("fill", "gray")
+            .style("font-size", 5);
+
             for (let i = 0; i < dstVector.length; i++) {
                 eDisplayer
                     .append("rect")
@@ -234,6 +279,9 @@ export function drawEScoreEquation(
         x1.on("mouseenter", function () {
             d3.select("#xi").style("opacity", 0);
             d3.selectAll(".temp").style("pointer-events", "none");
+
+            drawEqComponentLabel(eDisplayer, dX + 140 - 10 + 50 + inputVector.length * (25 / inputVector.length), dY + 112.5 + 12.5 + 5, "Input Vector")
+            
             for (let i = 0; i < inputVector.length; i++) {
                 eDisplayer
                     .append("rect")
@@ -259,6 +307,9 @@ export function drawEScoreEquation(
         .on("mouseenter", function () {
             d3.select("#xj").style("opacity", 0);
             d3.selectAll(".temp").style("pointer-events", "none");
+
+            drawEqComponentLabel(eDisplayer, dX + 200 + 20 + 50 + inputVector.length * (25 / inputVector.length), dY + 112.5 + 12.5 + 5, "Input Vector")
+
             for (let i = 0; i < inputVector.length; i++) {
                 eDisplayer
                     .append("rect").attr("class", "temp")
@@ -298,14 +349,14 @@ export function drawEScoreEquation(
         .attr("width", imgW)
         .attr("height", imgH).attr("opacity", 0);
 
-eDisplayer
-.append("image")
-.attr("xlink:href", imageMat)
-.attr("id", "w2png")
-.attr("x", dX + 75 + 75 + 60 + 20 + offset)
-.attr("y", dY + 75 + 25 + offset)
-.attr("width", imgW)
-.attr("height", imgH).attr("opacity", 0);
+    eDisplayer
+        .append("image")
+        .attr("xlink:href", imageMat)
+        .attr("id", "w2png")
+        .attr("x", dX + 75 + 75 + 60 + 20 + offset)
+        .attr("y", dY + 75 + 25 + offset)
+        .attr("width", imgW)
+        .attr("height", imgH).attr("opacity", 0);
 
     eDisplayer
         .append("text")
@@ -315,11 +366,14 @@ eDisplayer
         .attr("y", textH + 15)
         .attr("font-size", fontSize).style("font-weight", "bold")
         .on("mouseenter", function () {
+            drawEqComponentLabel(eDisplayer, dX + 75 + 75 - 10 + offset, dY + 75 + 25 + offset + imgH + 5, "Weight Matrix")
+
             d3.selectAll(".temp").style("pointer-events", "none");
             d3.select("#w1").style("opacity", 0);
             d3.select("#w1png").attr("opacity", 1); 
         })
         .on("mouseout", function () {
+            
             d3.selectAll(".temp").style("pointer-events", "none");
             d3.select("#w1").style("opacity", 1);
             d3.select("#w1png").attr("opacity", 0); 
@@ -336,6 +390,8 @@ eDisplayer
         .attr("y", textH + 15)
         .attr("font-size", fontSize).style("font-weight", "bold")
         .on("mouseenter", function () {
+            drawEqComponentLabel(eDisplayer, dX + 75 + 75 + 60 + 20 + offset, dY + 75 + 25 + offset + imgH + 5, "Weight Matrix")
+
             d3.selectAll(".temp").style("pointer-events", "none");
             d3.select("#w2").style("opacity", 0);
             d3.select("#w2png").attr("opacity", 1); 
