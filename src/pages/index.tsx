@@ -194,6 +194,7 @@ export default function Home() {
                             <div
                                 className="flex gap-x-2 items-center"
                                 style={{ paddingTop: "40px" }}
+                                id="model-selector"
                             >
                                 <h1 className="text-3xl min-w-48 font-black">
                                     GNN Model
@@ -241,7 +242,7 @@ export default function Home() {
                                                 } }
                                                 OptionList={Object.keys(
                                                     modelTypeList
-                                                )} id={""}                                        />
+                                                )} id="task-selector"                                        />
                                         <h2 className="text-xl m-auto">Task</h2>
                                         <Selector
                                                 selectedOption={model}
@@ -314,6 +315,7 @@ export default function Home() {
                             <hr className="border-t border-gray-300 my-4"></hr>
 
                             {/* graph data */}
+                            {/* graph data */}
                             <div>
                                 <div className="flex gap-x-4 items-center  mb-3 ">
                                     <h1 className="text-3xl font-black min-w-48">
@@ -336,7 +338,7 @@ export default function Home() {
                                                                 graphList
                                                             )}
                                                             id="dataset-selector"
-                                            />
+                                                        />
                                                     </>
                                                 ) : model ==
                                                   "node classification" ? (
@@ -346,25 +348,15 @@ export default function Home() {
                                                     //     OptionList={Object.keys(nodeList)}
                                                     //   />
 
-                                            <span className="text-2xl">Zachary&apos;s Karate Club </span>
-                                        ) : (
-                                            <Selector
-                                                selectedOption={selectedGraph}
-                                                handleChange={handleGraphSelection}
-                                                OptionList={Object.keys(linkList)}
-                                                id="dataset-selector"
-                                            />
-                                        )}
-                                        <p id="dataset-description">{DatasetInfo[model]}</p>
                                                     <span className="text-2xl">
                                                         Zachary&apos;s Karate
                                                         Club{" "}
                                                     </span>
-                                                 : (
+                                                ) : (
                                                     <span className="text-2xl">
                                                         Twitch Users{" "}
                                                     </span>
-                                                )
+                                                )}
                                             </div>
                                         </div>
                                         <div>
@@ -434,21 +426,9 @@ export default function Home() {
                                         <></>
                                     )}
                                 </div>
-                                <p>{DatasetInfo[model]}</p>
+                                <p id="dataset-description">{DatasetInfo[model]}</p>
 
                                 <hr className="border-t border-gray-300 my-4"></hr>
-
-                            {/* <ClassifyGraph
-                graphPath={graphList[selectedGraph]}
-                modelPath={modelList[model]}
-                setChangedG={setChangedG}
-                setIntmData={setIntmData}
-                setPredicted={setPredicted}
-                predicted={predicted}
-                probabilities={probabilities}
-                setProbabilities={setProbabilities}
-                simulationLoading={simulationLoading}
-              /> */}
 
                                 {/* model visualization */}
 
@@ -556,7 +536,7 @@ export default function Home() {
                                         setSimulation={setSimulation}
                                         hubNodeA={hubNodeA}
                                         hubNodeB={hubNodeB}
-                                        innerComputationMode = {modelType}
+                                        innerComputationMode={modelType}
                                     />
                                 ) : (
                                     <LinkMatricesVisualizer
@@ -573,37 +553,52 @@ export default function Home() {
 
                                 {/* overlay text on visualizer when not predicted */}
                                 {probabilities.length == 0 && (
-                                    <div className="absolute top-1/2"
-                                        style={{ right: '300px' }}>
+                                    <div
+                                        className="absolute top-1/2"
+                                        style={{ right: "300px" }}
+                                    >
                                         <h1 className="text-4xl text-gray-300">
-                                            Model Visualization will show after prediction
+                                            Model Visualization will show after
+                                            prediction
                                         </h1>
 
                                         {model == "graph classification" ? (
                                             <ClassifyGraph
-                                                graphPath={graphList[selectedGraph]}
+                                                graphPath={
+                                                    graphList[selectedGraph]
+                                                }
                                                 modelPath={modelList[model]}
                                                 setChangedG={setChangedG}
                                                 setIntmData={setIntmData}
                                                 setPredicted={setPredicted}
                                                 predicted={predicted}
                                                 probabilities={probabilities}
-                                                setProbabilities={setProbabilities}
+                                                setProbabilities={
+                                                    setProbabilities
+                                                }
                                                 onlyShownButton={true}
-                                                simulationLoading={simulationLoading}
+                                                simulationLoading={
+                                                    simulationLoading
+                                                }
                                             />
                                         ) : (
                                             <ClassifyGraph
-                                                graphPath={nodeList[selectedGraph]}
+                                                graphPath={
+                                                    nodeList[selectedGraph]
+                                                }
                                                 modelPath={modelList[model]}
                                                 setChangedG={setChangedG}
                                                 setIntmData={setIntmData}
                                                 setPredicted={setPredicted}
                                                 predicted={predicted}
                                                 probabilities={probabilities}
-                                                setProbabilities={setProbabilities}
+                                                setProbabilities={
+                                                    setProbabilities
+                                                }
                                                 onlyShownButton={true}
-                                                simulationLoading={simulationLoading}
+                                                simulationLoading={
+                                                    simulationLoading
+                                                }
                                             />
                                         )}
                                     </div>
@@ -614,10 +609,10 @@ export default function Home() {
                         </div>
                     </div>
 
-                        <Footer />
-                    </div>
-                )}
-            </main>
+                    <Footer />
+                </div>
+            )}
+        </main>
         </div>
     );
 }
