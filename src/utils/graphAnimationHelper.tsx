@@ -240,8 +240,8 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 .data(aggregatedData)
                 .enter()
                 .append("rect")
-                .attr("x", (d: any, i: number) => i * rectL)
-                .attr("y", 0)
+                .attr("x", (d: any, i: number) => (i * rectL) + 15)
+                .attr('y', 15)
                 .attr("width", rectL)
                 .attr("height", 7)
                 .attr("class", `math-displayer`)
@@ -394,7 +394,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 .attr("font-size", "4")
                 .attr("fill", Math.abs(calculatedData[i]) > 0.7 ? "white" : "black");
 
-
+                d3.selectAll('.math-displayer').style('transform', 'scale(1.3)')
 
 
     }

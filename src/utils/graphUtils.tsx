@@ -322,12 +322,12 @@ export function outputVisualizer(
         .attr("height", DisplayHeight)
         .attr("rx", 10)
         .attr("ry", 10)
-        .style("fill", "transparent")
+        .style("fill", "white")
         .style("stroke", "black")
         .style("stroke-width", 2)
         .attr("class", "graph-displayer")
         .attr("opacity", 0)
-        .lower();
+        .raise();
 
         const Xt = weights;
 
@@ -391,7 +391,7 @@ export function outputVisualizer(
         .attr("class", "bias to-be-removed")
 
         .style("opacity", 0);
-
+    BiasGroup.lower();
     setTimeout(() => {
         if (!state.isClicked) {
             return;
@@ -666,6 +666,8 @@ export function outputVisualizer(
                     .attr("class", "math-displayer")
                     .attr("font-size", "5")
                     .attr("fill", Math.abs(node.features[i]) > 0.7 ? "white" : "black");
+                
+                
             })
             .on("mouseout", function () {
                 if (!state.isClicked) {
@@ -978,16 +980,16 @@ export function calculationVisualizer(
         .append("rect")
         .attr("x", (node.graphIndex - 2) * 1)
         .attr("y", 0)
-        .attr("width", displayerWidth)
-        .attr("height", displayHeight)
+        .attr("width", displayerWidth )
+        .attr("height", displayHeight )
         .attr("rx", 10)
         .attr("ry", 10)
-        .style("fill", "transparent")
+        .style("fill", "white")
         .style("stroke", "black")
         .style("stroke-width", 2)
         .attr("class", "graph-displayer")
         .attr("opacity", 0)
-        .lower();
+        .raise();
 
     
 
@@ -1028,7 +1030,7 @@ export function calculationVisualizer(
         .style("fill", "gray")
         .style("font-size", "17px")
         .attr("class", "bias to-be-removed").style("opacity", 0);
-
+        BiasGroup.lower();
     const BiasFrame = BiasGroup.append("rect")
         .attr("class", "bias to-be-removed")
         .attr("x", 0)
@@ -1262,7 +1264,6 @@ export function calculationVisualizer(
         });
 
     
-
         relu.on("mouseout", function () {
             d3.selectAll(".math-displayer").remove();
         });
@@ -1287,6 +1288,7 @@ export function calculationVisualizer(
             d3.selectAll(".softmaxLabel").attr("opacity", 1);
             d3.selectAll(".intermediate-path").attr("opacity", 0)     
             clearInterval(intervalID)  
+        relu.lower();
     } 
             
     }, 3500);
@@ -1308,7 +1310,7 @@ export function calculationVisualizer(
     //draw label
     outputGroup.append("text")
         .attr("x", 0)
-        .attr("y", 28)
+        .attr("y", 32)
         .text("Final Output Vector")
         .style("fill", "gray")
 
@@ -1385,7 +1387,7 @@ export function calculationVisualizer(
     //draw label
     outputGroupCopy.append("text")
         .attr("x", 0)
-        .attr("y", 28)
+        .attr("y", 32)
         .text("Final Output Vector")
         .style("fill", "gray")
 
@@ -1395,6 +1397,7 @@ export function calculationVisualizer(
 
     intermediateFeatureGroups.push(outputGroup);
     node.intermediateFeatureGroups = intermediateFeatureGroups;
+    d3.selectAll('.graph-displayer').style("transform", 'scale(1.6)')
 
 
     d3.select("#my_dataviz").on("click", function(event: any) {
@@ -1920,12 +1923,12 @@ export function fcLayerCalculationVisualizer(
         .attr("height", 100)
         .attr("rx", 10)
         .attr("ry", 10)
-        .style("fill", "transparent")
+        .style("fill", "white")
         .style("stroke", "black")
         .style("stroke-width", 2)
         .attr("class", "graph-displayer")
         .attr("opacity", 0)
-        .lower();
+        .raise();
 
     let xPos = node.featureGroupLocation.xPos + (graphIndex - 3.5) * offset;
     let yPos = node.featureGroupLocation.yPos;
@@ -2328,7 +2331,7 @@ export function nodeOutputVisualizer(
         .attr("height", DisplayHeight)
         .attr("rx", 10)
         .attr("ry", 10)
-        .style("fill", "transparent")
+        .style("fill", "white")
         .style("stroke", "black")
         .style("stroke-width", 2)
         .attr("class", "graph-displayer to-be-removed")
@@ -2393,7 +2396,7 @@ export function nodeOutputVisualizer(
         .attr("class", "bias to-be-removed")
 
         .style("opacity", 0);
-
+        BiasGroup.lower();
     setTimeout(() => {
         if (!state.isClicked) {
             return;

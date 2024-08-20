@@ -676,7 +676,7 @@ myColor:any
 
         tooltip
             .append("text")
-            .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength)
+            .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength - 10)
             .attr("y", displayerY + vectorLength/2 + 3)
             .text(",")
             .attr("class", "matmul-displayer procVis")
@@ -685,7 +685,7 @@ myColor:any
         
         tooltip
             .append("text")
-            .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength + vectorLength/1.5)
+            .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength + 33)
             .attr("y", displayerY + vectorLength/2 + 3)
             .text(")")
             .attr("class", "matmul-displayer procVis")
@@ -706,22 +706,28 @@ myColor:any
                 .append("rect")
                 .attr("x", displayerX + 3 + unitSize*(i+1)+30*i)
                 .attr("y", displayerY + vectorLength/2 + 20 - unitSize)
-                .attr("width", unitSize*2.5)
-                .attr("height", unitSize*2.5)
+                .attr("width", unitSize*2.8)
+                .attr("height", unitSize*2.8)
                 .style("stroke", "black")
                 .attr("fill", myColor(dataSamples[i]))
                 .attr("class", "matmul-displayer procVis")
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "central")   
                 .raise();
             let color = "white";
             if(dataSamples[i]<0.5){color = "black"}
             tooltip
                 .append("text")
-                .attr("x", displayerX + 3 + unitSize*(i+1)+30*i + unitSize/2)
+                .attr("x", displayerX + 8 + unitSize*(i+1)+30*i + unitSize/2)
                 .attr("y", displayerY + vectorLength/2 + 20 + unitSize/2)
                 .text(roundToTwo(dataSamples[i]))
                 .attr("class", "matmul-displayer procVis")
-                .attr("font-size", unitSize)
-                .attr("fill", color);
+                .attr("font-size", unitSize - 1)
+                .attr("fill", color)
+                .attr("text-anchor", "middle")
+                .attr("alignment-baseline", "middle");
+
+
         }
 
         
@@ -741,8 +747,8 @@ myColor:any
             .append("rect")
             .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength + vectorLength/1.5)
             .attr("y", displayerY + vectorLength/2 + 20 - unitSize)
-            .attr("width", unitSize*2.5)
-            .attr("height", unitSize*2.5)
+            .attr("width", unitSize*2.8)
+            .attr("height", unitSize*2.8)
             .style("stroke", "black")
             .attr("fill", myColor(currentVal))
             .attr("class", "matmul-displayer procVis")
@@ -752,24 +758,26 @@ myColor:any
             if(currentVal<0.5){color = "black"}
             tooltip
                 .append("text")
-                .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength + vectorLength/1.5 + unitSize/2)
+                .attr("x", displayerX + 8 + eqXOffset/2 + vectorLength + vectorLength/1.5 + unitSize/2)
                 .attr("y", displayerY + vectorLength/2 + 20 + unitSize/2)
                 .text(roundToTwo(currentVal))
                 .attr("class", "matmul-displayer procVis")
-                .attr("font-size", unitSize)
-                .attr("fill", color);
-        
-        
+                .attr("font-size", unitSize - 1)
+                .attr("fill", color)
+                .attr("text-anchor", "middle")
+                .attr("alignment-baseline", "middle");
+
         //draw the aggregated vector
         for(let i=0; i<aggregatedVector.length; i++){
             tooltip
                 .append("rect")
-                .attr("x", displayerX + eqXOffset+i*h/2)
-                .attr("y", displayerY + vectorLength/2)
+                .attr("x", displayerX + eqXOffset+i*h/2 + 6) 
+                .attr("y", displayerY + vectorLength/2 -3 )
                 .attr("width", h/2)
                 .attr("height", w/2)
                 .attr("fill", myColor(aggregatedVector[i]))
-                .attr("class", "procVis matmul-displayer").raise();
+                .attr('id', 'aggregatedVector')
+                .attr("class", "procVis matmul-displayer ").raise();
         }
 
         //draw the weight vector
@@ -777,7 +785,7 @@ myColor:any
             tooltip
                 .append("rect")
                 .attr("x", displayerX + eqXOffset * 5)
-                .attr("y", displayerY + eqYOffset + i*h2/2)
+                .attr("y", displayerY + eqYOffset + i*h2/2 )
                 .attr("width", w/2)
                 .attr("height", h2/2)
                 .attr("fill", myColor(weightVector[i]))
@@ -787,8 +795,8 @@ myColor:any
         //draw franes
         tooltip
             .append("rect")
-            .attr("x", displayerX + eqXOffset)
-            .attr("y", displayerY + vectorLength/2)
+            .attr("x", displayerX + eqXOffset + 6)
+            .attr("y", displayerY + vectorLength/2 - 3)
             .attr("width", h/2 * aggregatedVector.length)
             .attr("height", w/2)
             .attr("fill", "none")

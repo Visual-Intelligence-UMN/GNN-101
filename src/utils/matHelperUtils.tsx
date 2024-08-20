@@ -16,7 +16,7 @@ export function drawHintLabel(
 ){
     const label = g.append("text")
         .attr("x", x)
-        .attr("y", y)
+        .attr("y", y + 5)
         .text(text)
         .style("fill", "gray")
         .style("font-size", textSize)
