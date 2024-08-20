@@ -580,6 +580,54 @@ export function drawMatmulExplanation(x:number, y:number, title:string, descript
         .attr("fill", "black").raise();
 }
 
+export function graphVisDrawMatmulExplanation(svg: any, x:number, y:number, title:string, description:string){
+    const displayW = 350;
+    const displayH = 50;
+
+    //find coordination for the math displayer first
+    const displayX = x + 10;
+    const displayY = y - 10;
+
+    //add displayer
+    svg
+        .append("rect")
+        .attr("x", displayX)
+        .attr("y", displayY)
+        .attr("width", displayW)
+        .attr("height", displayH)
+        .attr("rx", 10)
+        .attr("ry", 10)
+        .style("fill", "white")
+        .style("stroke", "black")
+        .style("stroke-width", 2)
+        .attr("class", "math-displayer procVis")
+        .raise();
+
+    const titleYOffset = 10;
+    const titleXOffset = 50;
+    svg
+        .append("text")
+        .attr("x", displayX + 100)
+        .attr("y", displayY + titleYOffset)
+        .text(title)
+        .attr("class", "math-displayer procVis")
+        .attr("font-size", titleYOffset)
+        .attr("fill", "black").raise();
+    const eqXOffset = titleXOffset / 2;
+    const eqYOffset = titleYOffset * 2.5;
+    const unitSize = eqXOffset / 3 + 3;
+    const upperOffset = unitSize * 2;
+    svg
+        .append("text")
+        .attr("x", displayX + eqXOffset)
+        .attr("y", displayY + eqYOffset)
+        .text(description)
+        .attr("class", "math-displayer procVis")
+        .attr("font-size", unitSize)
+        .attr("fill", "black").raise();
+}
+
+
 export function drawDotProduct(
 dummy:any,
 rectID:any,

@@ -188,10 +188,14 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 if (!g.selectAll) {
                     g = d3.selectAll(g)
                 }
+
+ 
+       
+ 
                 
 
                 d3.select(".graph-displayer").attr("opacity", 1);
-                console.log('weight before transformations', weights)
+
 
 
                 d3.selectAll(".weightUnit").style("opacity", 0.3);
@@ -216,10 +220,10 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
 
 
 
-                console.log('weights matrix is', weightMat, 'at index', index, 'and i is', i, 'which means the column selected is', weightMat[i])
+        
                 for (let j = 0; j < weightMat[i].length; j++) {
 
-                    console.log(j)
+               
                     
                     g.append("rect")
                     .attr("x", 130)
@@ -421,7 +425,7 @@ export function hoverOverHandler(node: any, aggregatedData: any, calculatedData:
                 if (!state.isClicked || state.isPlaying || state.isAnimating) {
                     return;
                 }
-                console.log('Xt', Xt)
+               
                 if (mode === 1 && node.graphIndex === 4) {
                     graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, 1, i, myColor, weightsLocation, node.features.length, svg, mode)
                 }
@@ -430,6 +434,9 @@ export function hoverOverHandler(node: any, aggregatedData: any, calculatedData:
                 }
                 d3.selectAll(".calculatedRect").style("opacity", 0.2)
                 d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1)
+                d3.selectAll(".formula_weights").style("fill", "red")
+                d3.selectAll(".formula_neighbor_aggregate").style("fill", "red")
+                d3.selectAll(".formula_summation").style("fill", "red")
                 d3.selectAll(`#tempath${i}`).style("opacity", 1);
                 displayerHandler(node, aggregatedData, calculatedData, state, g, displayHeight, rectL, wmRectL, myColor, weights, index, weightsLocation, i, mode, isOutput)
 
@@ -448,6 +455,9 @@ export function hoverOverHandler(node: any, aggregatedData: any, calculatedData:
                 d3.selectAll(`#tempath${i}`).style("opacity", 0).raise();
                 d3.selectAll(".weightUnit").style("opacity", 1);
                 d3.selectAll(".calculatedRect").style("opacity", 1)
+                d3.selectAll(".formula_weights").style("fill", "black")
+                d3.selectAll(".formula_summation").style("fill", "black")
+                d3.selectAll(".formula_neighbor_aggregate").style("fill", "black")
                 
 
             });

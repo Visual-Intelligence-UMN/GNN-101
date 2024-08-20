@@ -702,7 +702,7 @@ export function featureVisClick(
         // {func: () => {curNode.style.opacity = "1";},delay: aniSec,},
         {
             func:()=>{
-                drawMathFormula(formula, coordFeatureVis[0], coordFeatureVis[1]-80, "./assets/SVGs/GCNFormula_test.svg");
+                drawMathFormula(formula, coordFeatureVis[0], coordFeatureVis[1]-80, "./assets/SVGs/GCNFormula.svg");
             }
         },
         {func: () => {

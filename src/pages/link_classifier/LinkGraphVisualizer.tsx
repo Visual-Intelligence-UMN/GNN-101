@@ -94,7 +94,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
         })
       );
 
-      console.log("BAD", innerComputationMode)
+
       graphs.forEach((data, i) => {
 
         let xOffset = (i - 3.5) * offset;
@@ -233,7 +233,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
             }
           }
 
-
+          let allValues: any[] = []
           data.nodes.forEach((node: any) => {
             node.graphIndex = i;
             if (value != null && i <= 2 && value instanceof Float32Array) {
@@ -241,19 +241,23 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
                 64 * node.id,
                 64 * (node.id + 1)
               ));
+              allValues = allValues.concat(node.features)
             }
             if (value != null && i === 3 && value instanceof Float32Array) {
               node.features = Array.from(value.subarray(
                 node.id,
                 (node.id + 1)
               ));
+              allValues = allValues.concat(node.features)
             }
 
             allNodes.push(node);
           })
+
+          
           
 
-          console.log("VAWAD", allNodes)
+
 
   
   const extentX = d3.extent(data.nodes, (d: any) => d.x) as [number | undefined, number | undefined];
@@ -319,7 +323,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
             .attr("font-weight", "normal")
             .attr('opacity', 0.5);
 
-            const absMax = findAbsMax(allNodes[0].features);
+
 
 
            let cst:any = null;
@@ -329,10 +333,10 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
           if(i==0){
             cst = buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x, text_y + cstOffset, g1)
           }
-          else if(i==5){
-            cst = buildBinaryLegend(myColor, value[0], value[1], text+" Color Scheme", text_x, text_y + cstOffset, g1)
-          }
+
           else {
+            const absMax = findAbsMax(allValues);
+            console.log("value", allValues)
             cst = buildLegend(myColor, absMax, text+" Color Scheme", text_x - 50, text_y + cstOffset, g1);
           }
 
