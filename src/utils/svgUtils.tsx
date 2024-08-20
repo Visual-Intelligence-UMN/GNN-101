@@ -41,3 +41,15 @@ export function injectSVG(g:any, x: number, y: number, SVGPath:string, svgClass:
         d3.select(play).attr("x", x).attr("y", y).attr("class", svgClass)
     });
 }
+
+export function injectMathSymbol(g:any, x: number, y: number, SVGPath:string, svgClass:string, mode:string, lowerIndex:number|string){
+    g.selectAll("*").remove();
+    d3.xml(SVGPath).then(function(data) {
+
+        const play = g!.node()!.appendChild(data.documentElement)
+        d3.select(play).attr("x", x).attr("y", y).attr("class", svgClass)
+        if(mode=="input"){
+            d3.select(play).select("#lowerIndex_a").text(lowerIndex);
+        }
+    });
+}

@@ -2,6 +2,13 @@ import * as d3 from "d3";
 import { roundToTwo } from "../components/WebUtils";
 import { flipVertically, softmax } from "./utils";
 import { create, all, transposeDependencies } from "mathjs";
+import { mathjax } from 'mathjax-full/js/mathjax.js';
+import { TeX } from 'mathjax-full/js/input/tex.js';
+import { SVG } from 'mathjax-full/js/output/svg.js'; // 或者 CHTML 作为输出方式
+import { liteAdaptor } from 'mathjax-full/js/adaptors/liteAdaptor.js';
+import { RegisterHTMLHandler } from 'mathjax-full/js/handlers/html.js';
+import { injectMathSymbol, injectSVG } from "./svgUtils";
+
 
 //---------------------------functions for the softmax interaction in the graph classifier------------------------------
 export function drawAttnDisplayer(
@@ -51,7 +58,11 @@ export function drawAttnDisplayer(
         .attr("class", "procVis attn-displayer");
 
     for (let i = 0; i < eij.length; i++) {
-        attnDisplayer
+        const escoreComponent = attnDisplayer.append("g").attr("class", "procVis attn-displayer attnE")
+        .attr("id", `e-${i}`)
+        .attr("index", i);
+
+        escoreComponent
             .append("rect")
             .attr("x", dX + 100 + 65 * i)
             .attr("y", dY + 75)
@@ -59,12 +70,10 @@ export function drawAttnDisplayer(
             .attr("height", 15)
             .attr("fill", myColor(eij[i]))
             .attr("stroke", "black")
-            .attr("class", "procVis attn-displayer attnE")
-            .attr("id", `e-${i}`)
-            .attr("index", i);
+            
 
         if (i != 0) {
-            attnDisplayer
+            escoreComponent
                 .append("text")
                 .text("+")
                 .attr("x", dX + 100 + 65 * i - 30)
@@ -88,7 +97,7 @@ export function drawAttnDisplayer(
         const pathData = lineGenerator(points);
 
         // 5. 将路径添加到SVG中
-        attnDisplayer
+        escoreComponent
             .append("path")
             .attr("d", pathData)
             .attr("stroke", "black")
@@ -96,15 +105,12 @@ export function drawAttnDisplayer(
             .attr("fill", "none")
             .attr("id", "targetE"); // 确保路径不被填充
 
-        attnDisplayer
-            .append("text")
-            .text("exp(" + `e_${lgIndices[i][0]}_${lgIndices[i][1]}` + ")")
-            .attr("x", dX + 100 + 65 * i)
-            .attr("y", dY + 75 + 12.5)
-            .attr("text-anchor", "middle")
-            .attr("font-size", 10)
-            .attr("class", "procVis attn-displayer attnE")
-            .attr("index", i);
+        const escore = escoreComponent.append("g");
+        injectMathSymbol(
+            escore, dX + 100 + 65 * i-7.5, dY + 75-7.5, 
+            "./assets/SVGs/escore.svg", 
+            "procVis attn-displayer", "input",
+            `${lgIndices[i][0]},${lgIndices[i][1]}`);
     }
 
     attnDisplayer
@@ -118,15 +124,22 @@ export function drawAttnDisplayer(
         .attr("stroke", "black")
         .attr("index", 0);
 
-    attnDisplayer
-        .append("text")
-        .text("exp(" + `e_${lgIndices[0][0]}_${lgIndices[ithIdx][1]}` + ")")
-        .attr("x", dX + 100 + 50)
-        .attr("y", dY + 50)
-        .attr("text-anchor", "middle")
-        .attr("font-size", 10)
-        .attr("class", "procVis attn-displayer attnTargetE attnE")
-        .attr("index", 0);
+    const escore = attnDisplayer.append("g").attr("id", 0).attr("class", "math-latex");
+    injectMathSymbol(
+        escore, dX + 100 + 50-7.5, dY + 50-15, 
+        "./assets/SVGs/escore.svg", 
+        "procVis attn-displayer attnTargetE attnE", "input",
+        `${lgIndices[0][0]},${lgIndices[ithIdx][1]}`);
+
+    // attnDisplayer
+    //     .append("text")
+    //     .text("exp(" + `e_${lgIndices[0][0]}_${lgIndices[ithIdx][1]}` + ")")
+    //     .attr("x", dX + 100 + 50)
+    //     .attr("y", dY + 50)
+    //     .attr("text-anchor", "middle")
+    //     .attr("font-size", 10)
+    //     .attr("class", "procVis attn-displayer attnTargetE attnE")
+    //     .attr("index", 0);
 }
 
 export function drawEScoreEquation(
@@ -154,41 +167,36 @@ export function drawEScoreEquation(
         .attr("id", "leakyRelu");
 
     const fontSize = 12;
-    const textH = dY + 125;
+    const textH = dY + 110;
 
-    eDisplayer
-        .append("text")
-        .text("a^T_s")
-        .attr("id", "ats").attr("class", "mathjax-latex")
-        .attr("x", dX + 130)
-        .attr("y", textH)
-        .attr("font-size", fontSize)
-        .on("mouseenter", function () {
-            d3.select("#ats").style("opacity", 0);
-            d3.selectAll(".temp").style("pointer-events", "none");
-            for (let i = 0; i < dstVector.length; i++) {
-                eDisplayer
-                    .append("rect")
-                    .attr("x", dX + 140 - 10 + 12.5)
-                    .attr("y", dY + 112.5 + i * (25 / srcVector.length))
-                    .attr("width", 2.5)
-                    .attr("height", 25 / srcVector.length)
-                    .attr("fill", myColor(srcVector[i])).attr("class", "temp");
+
+    const aTs = eDisplayer.append("g").attr("id", "ats").attr("class", "math-latex");
+    injectSVG(aTs, dX + 130, textH, "./assets/SVGs/a_t_s.svg", "math-latex");
+    
+    aTs.on("mouseenter", function () {
+        d3.select("#ats").style("opacity", 0);
+        d3.selectAll(".temp").style("pointer-events", "none");
+        for (let i = 0; i < dstVector.length; i++) {
+            eDisplayer
+                .append("rect")
+                .attr("x", dX + 140 - 10 + 12.5)
+                .attr("y", dY + 112.5 + i * (25 / srcVector.length))
+                .attr("width", 2.5)
+                .attr("height", 25 / srcVector.length)
+                .attr("fill", myColor(srcVector[i])).attr("class", "temp");
             }
+        
         })
         .on("mouseout", function () {
             d3.select("#ats").style("opacity", 1);
             d3.selectAll(".temp").remove();
         });
 
-    eDisplayer
-        .append("text")
-        .text("a^T_d")
-        .attr("id", "atd").attr("class", "mathjax-latex")
-        .attr("x", dX + 200 + 20)
-        .attr("y", textH)
-        .attr("font-size", fontSize)
-        .on("mouseenter", function () {
+
+    const aTd = eDisplayer.append("g").attr("id", "atd").attr("class", "math-latex");
+    injectSVG(aTd, dX + 220, textH, "./assets/SVGs/a_t_d.svg", "math-latex");
+        
+    aTd.on("mouseenter", function () {
             d3.select("#atd").style("opacity", 0);
             d3.selectAll(".temp").style("pointer-events", "none");
             for (let i = 0; i < dstVector.length; i++) {
@@ -207,14 +215,10 @@ export function drawEScoreEquation(
             d3.selectAll(".temp").remove();
         });
 
-    eDisplayer
-        .append("text")
-        .text(`x_${lgIndices[0][0]}`)
-        .attr("id", "xi").attr("class", "mathjax-latex")
-        .attr("x", dX + 140 - 10 + 50)
-        .attr("y", textH)
-        .attr("font-size", fontSize)
-        .on("mouseenter", function () {
+    const x1 = eDisplayer.append("g").attr("id", "xi").attr("class", "math-latex");
+    injectMathSymbol(x1, dX + 140 - 10 + 50, textH, "./assets/SVGs/vector_x.svg", "math-latex", "input", lgIndices[0][0]);
+
+        x1.on("mouseenter", function () {
             d3.select("#xi").style("opacity", 0);
             d3.selectAll(".temp").style("pointer-events", "none");
             for (let i = 0; i < inputVector.length; i++) {
@@ -235,13 +239,10 @@ export function drawEScoreEquation(
             d3.selectAll(".temp").remove();
         });
 
-    eDisplayer
-        .append("text")
-        .text(`x_${jthIndexElement}`)
-        .attr("id", "xj").attr("class", "mathjax-latex")
-        .attr("x", dX + 200 + 70)
-        .attr("y", textH)
-        .attr("font-size", fontSize)
+        const x2 = eDisplayer.append("g").attr("id", "xj").attr("class", "math-latex");
+        injectMathSymbol(x2, dX + 220+ 50, textH, "./assets/SVGs/vector_x.svg", "math-latex", "input", jthIndexElement);
+    
+    x2
         .on("mouseenter", function () {
             d3.select("#xj").style("opacity", 0);
             d3.selectAll(".temp").style("pointer-events", "none");
@@ -297,9 +298,9 @@ eDisplayer
         .append("text")
         .text("W")
         .attr("id", "w1").attr("class", "mathjax-latex")
-        .attr("x", dX + 75 + 75 + 15)
-        .attr("y", textH)
-        .attr("font-size", fontSize)
+        .attr("x", dX + 75 + 75 + 15 )
+        .attr("y", textH + 15)
+        .attr("font-size", fontSize).style("font-weight", "bold")
         .on("mouseenter", function () {
             d3.selectAll(".temp").style("pointer-events", "none");
             d3.select("#w1").style("opacity", 0);
@@ -318,9 +319,9 @@ eDisplayer
         .append("text")
         .text("W")
         .attr("id", "w2").attr("class", "mathjax-latex")
-        .attr("x", dX + 75 + 75 + 60 + 40+5)
-        .attr("y", textH)
-        .attr("font-size", fontSize)
+        .attr("x", dX + 75 + 75 + 60 + 40+5 )
+        .attr("y", textH + 15)
+        .attr("font-size", fontSize).style("font-weight", "bold")
         .on("mouseenter", function () {
             d3.selectAll(".temp").style("pointer-events", "none");
             d3.select("#w2").style("opacity", 0);
