@@ -4,7 +4,7 @@ import * as d3 from "d3";
 import { loadLinkWeights, loadNodeWeights, loadWeights } from "./matHelperUtils";
 import * as ort from "onnxruntime-web";
 import { env } from "onnxruntime-web";
-import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature, outputVisualizer, scaleFeatureGroup, nodeOutputVisualizer } from "@/utils/graphUtils";
+import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature, scaleFeatureGroup, nodeOutputVisualizer, pathColor, moveFeatures, moveFeaturesBack } from "@/utils/graphUtils";
 import { features, off } from 'process';
 
 import { IGraphData, IntmData, IntmDataLink, IntmDataNode } from "../types";
@@ -18,11 +18,17 @@ import {
   highlightNodes,
   moveNextLayer,
 } from "@/utils/graphUtils"
-import { FeatureGroupLocation, myColor, state } from "@/utils/utils"
+import { calculateAverage, FeatureGroupLocation, handleClickEvent, myColor, State, state } from "@/utils/utils"
 import { stat } from "fs";
 import { Yomogi } from "@next/font/google";
 import { dataPreparationLinkPred, constructComputationalGraph } from "./linkPredictionUtils";
 import { extractSubgraph } from "./graphDataUtils";
+import { isValidElement } from "react";
+import { isValidNode } from "./GraphvislinkPredUtil";
+import { roundToTwo } from "@/components/WebUtils";
+import { hoverOverHandler } from "./graphAnimationHelper";
+import { computeMatrixLocations, drawWeightMatrix } from "./matAnimateUtils";
+import { all, create } from "mathjs";
 
 
 export function linkPredFeatureVisualizer(
@@ -39,16 +45,12 @@ export function linkPredFeatureVisualizer(
   outputLayerRectHeight: number,
   colorSchemes:any,
   mode: number,
+  subgraph: any,
+  innerComputationMode: string
 ) {
   state.isClicked = false;
 
- 
 
-
-
-
-
-  
   // 1. visualize feature
   // 2. handle interaction event
   // 3. do the calculation for animation
@@ -66,7 +68,7 @@ export function linkPredFeatureVisualizer(
   }
   let movedNode: any = null; // to prevent the same node is clicked twice
 
-
+  
 
 
 
@@ -98,13 +100,7 @@ export function linkPredFeatureVisualizer(
        aggregatedDataMap = matrixMultiplication(normalizedAdjMatrix, featureMap)
        calculatedDataMap = matrixMultiplication(aggregatedDataMap, currentWeights)
  
- 
-
       }
-
-
-      
-
 
 
     
@@ -142,10 +138,22 @@ export function linkPredFeatureVisualizer(
 
         // add svgElement to each node simplify the interaction process (maybe)
 
+        let className = "node_group";
+        let opacity = 1;
+        if (!isValidNode(subgraph, node)) {
+          className = "invalid"
+          opacity = 0.2;
+        }
         const nodeGroup = g2.append("g")
-          .attr("class", "node-group")
+          .attr("class", className)
           .attr("transform", `translate(${node.x},${node.y})`);
+
+
+
+
         node.svgElement = nodeGroup.append("circle")
+        .attr("class", className)
+
           .attr("cx", 0)
           .attr("cy", 0)
           .attr("r", 17)
@@ -153,71 +161,27 @@ export function linkPredFeatureVisualizer(
           .attr("stroke", "#69b3a2")
           .attr("stroke-width", 1)
           .attr("stroke-opacity", 1)
-          .attr("opacity", 1)
+          .attr("opacity", opacity)
           .node(); // make the svgElement a DOM element (the original on method somehow doesn't work)
-        if (mode === 1 && graphIndex === 4) {
-          let name = "unknown";
-          if (node.features[0] > 0.5) {
-            name = "A"
-          }
-          if (node.features[1] > 0.5) {
-            name = "B"
-          }
-          if (node.features[2] > 0.5) {
-            name = "C"
-          }
-          if (node.features[3] > 0.5) {
-            name = "D"
-          }
 
 
-          node.text = nodeGroup.append("text")
-          .attr("x", 0)
-          .attr("y", 0)
-          .join("text")
-          .text(name)
-          .attr("text-anchor", "middle")
-          .attr("dominant-baseline", "central")
-          .attr("font-size", `17px`)
-          .attr("opacity", 1);
-
-        }
-        else {
         node.text = nodeGroup.append("text")
           .attr("x", 0)
           .attr("y", 0)
           .join("text")
           .attr("text-anchor", "middle")
           .attr("dominant-baseline", "central")
-          .text(node.id)
-          .attr("font-size", `17px`)
-          .attr("opacity", 1);
-        }
+          .text(node.original_id)
+          .attr("font-size", `10px`)
+          .attr("opacity", opacity - 0.05);
+          
+
+        
 
         const featureGroup = g2.append("g")
           .attr("transform", `translate(${xPos - 7.5}, ${yPos})`);
 
-        if (mode === 1 && graphIndex === 4) {
 
-          featureGroup.selectAll("rect")
-          .data(features)
-          .enter()
-          .append("rect")
-          .attr("x", 0)
-          .attr("y", (d: any, i: number) => i * currRectHeight)
-          .attr("width", rectWidth)
-          .attr("height", currRectHeight)
-          .attr("class", `node-features node-features-${node.graphIndex}-${node.id}`)
-          .attr("id", (d: any, i: number) => "output-layer-rect-" + i) 
-          .style("fill", (d: number) => myColor(d))
-          .style("stroke-width", 0.1)
-          .style("stroke", "grey")
-          .style("opacity", 1);
-
-
-
-
-        } else {
         featureGroup.selectAll("rect")
           .data(features)
           .enter()
@@ -232,7 +196,7 @@ export function linkPredFeatureVisualizer(
           .style("stroke-width", 0.1)
           .style("stroke", "grey")
           .style("opacity", 1);
-        }
+        
 
         const frame = featureGroup.append("rect")
         .attr("class", `node-features-${node.graphIndex}-${node.id}`)
@@ -250,8 +214,8 @@ export function linkPredFeatureVisualizer(
           .attr("y", node.features.length * currRectHeight + 12)
           .attr("class", `node-features-${node.graphIndex}-${node.id}`)
           .attr("dy", ".35em")
-          .text(node.id)
-          .style("font-size", "12px")
+          .text(node.original_id)
+          .style("font-size", "10px")
           .style("fill", "black")
           .style("text-anchor", "middle");
         
@@ -282,8 +246,9 @@ export function linkPredFeatureVisualizer(
         scaleFeatureGroup(node, 0.5);
 
         // add interaction 
+        
         nodeGroup.on("mouseenter", function(this: any) {
-          if (!state.isClicked) {
+          if (!state.isClicked && isValidNode(subgraph, node)) {
             highlightNodes(node);
             if (node.relatedNodes) {
               reduceNodeOpacity(allNodes, node.relatedNodes, node);
@@ -292,7 +257,7 @@ export function linkPredFeatureVisualizer(
         });
 
         nodeGroup.on("mouseleave", function() {
-          if (!state.isClicked) {
+          if (!state.isClicked && isValidNode(subgraph, node)) {
             resetNodes(allNodes, convNum);
           }
         });
@@ -303,7 +268,7 @@ export function linkPredFeatureVisualizer(
           nodeGroup.on("click", function(event:any) {
             event.stopPropagation();
             event.preventDefault();
-            if (state.isClicked) {
+            if (state.isClicked || !isValidNode(subgraph, node)) {
               return;
             }
             state.isClicked = true;
@@ -326,11 +291,9 @@ export function linkPredFeatureVisualizer(
             hideAllLinks(allNodes);
 
 
-           if (mode === 1 && graphIndex === 3) {
-            nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, svg, mode)
-           } else {
-            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
-           };
+          
+            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
+          
 
 
             
@@ -490,7 +453,7 @@ export function linkPredFeatureVisualizer(
             showFeature(node);
 
             if (node.graphIndex === 3) {
-              outputVisualizer(node, allNodes, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, convNum, svg, mode)
+              linkPredOutputVisualizer(node, allNodes, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, convNum, svg, mode)
             }
             
             reduceNodeOpacity(allNodes, relatedNodes, node);
@@ -524,3 +487,197 @@ export function linkPredFeatureVisualizer(
 
 
 }
+
+
+
+
+
+
+
+export function linkPredOutputVisualizer(
+  node: any,
+  allNodes: any[],
+  bias: any[],
+  svg: any,
+  offset: number,
+  isClicked: boolean,
+  moveOffset: number,
+  height: number,
+  prevRectHeight: number,
+  rectHeight: number,
+  rectWidth: number,
+  colorSchemes: any,
+  convNum: number,
+  originalSvg: any,
+  mode: number
+
+) {
+  if (!svg.selectAll) {
+    svg = d3.selectAll(svg)
+  }
+
+
+
+  let intervalID = 0;
+  state.isClicked = true;
+
+  d3.selectAll(".to-be-removed").remove();
+  d3.selectAll(".node-features-Copy").style("visibility", "visible").lower();
+
+  //color schemes interaction
+  for (let i = 0; i < 4; i++) colorSchemes[i].style.opacity = "0.5";
+
+
+
+  let originalCoordinates: any[] = [];
+  let coordinate
+  let index = 0;
+
+    node.relatedNodes.forEach((n: any, i: number) => {
+        
+        if (n.featureGroup) {
+            n.featureGroup
+                .transition()
+                .delay(1000)
+                .duration(1500)
+                .attr(
+                    "transform", (d: any) => {
+                      if (index === 0) {
+                      return `translate(${ (node.graphIndex + 1) * offset + 250 + 27.5}, ${height / 5 + 15 + i * 45 + 100}) rotate(-90)`
+                    }
+                    else {
+                      return `translate(${ (node.graphIndex + 1) * offset + 500 + 27.5}, ${height / 5 + 15 + i * 45 - 75}) rotate(0)`
+                    }
+                  });
+        }
+        index ++;
+        if (n.featureGroupLocation) {
+
+            coordinate = { xPos: n.featureGroupLocation.xPos, yPos: n.featureGroupLocation.yPos };
+            originalCoordinates.push(coordinate);
+        }
+    });
+
+
+    
+    svg.append("text")
+    .attr("x", (node.graphIndex - 1) * offset - 100)
+    .attr("class", "to-be-removed")
+    .attr("y", height / 3 - 15)
+    .attr("xml:space", "preserve")
+    .text("dot (                                                                 )  = ")
+    .attr("font-size", "20")
+    .attr("fill", "black")
+    .style("opacity", 1)
+
+
+    svg.append("rect")
+    .attr("x",  (node.graphIndex - 1) * offset + 330)
+    .attr("class", "to-be-removed")
+    .attr("y", height / 3 - 30)
+    .attr("width", rectHeight)
+    .attr("height", rectHeight)
+    .style("stroke", "black")
+    .attr("fill", myColor(node.features[0]))
+    .lower();
+
+    svg.append("text")
+    .attr("x",  (node.graphIndex - 1) * offset + 330)
+    .attr("class", "to-be-removed")
+    .attr("y", height / 3 - 15)
+    .text(roundToTwo(node.features[0]))
+    .attr("fill", "white")
+    .attr("font-size", "12")
+    .style("opacity", 1)
+
+
+  const g5 = svg
+      .append("g")
+      .attr("transform", `translate(${node.x - 90}, ${node.y - 180})`);
+
+
+  let DisplayerWidth = 300; // Width of the graph-displayer
+  let DisplayHeight = 75;
+
+  const graphDisplayer = g5
+      .append("rect")
+      .attr("x", (node.graphIndex - 2) * 1)
+      .attr("y", 0)
+      .attr("width", DisplayerWidth)
+      .attr("height", DisplayHeight)
+      .attr("rx", 10)
+      .attr("ry", 10)
+      .style("fill", "transparent")
+      .style("stroke", "black")
+      .style("stroke-width", 2)
+      .attr("class", "graph-displayer")
+      .attr("opacity", 0)
+      .lower();
+
+
+
+
+
+
+
+
+
+
+
+
+
+  for (let i = 0; i < node.features.length; i++) {
+      d3.select(`#output-layer-rect-${i}`)
+          .on("mouseover", function () {
+              if (!state.isClicked) {
+                  return;
+              }
+              
+
+
+
+          })
+          .on("mouseout", function () {
+              if (!state.isClicked) {
+                  return;
+              }
+              d3.selectAll(".math-displayer").remove();
+              d3.selectAll(".graph-displayer").attr("opacity", 0);
+              d3.selectAll(".softmax").attr("opacity", 0.07);
+              d3.selectAll(`.softmax${i}`).attr("opacity", 0.07);
+          });
+  }
+
+  d3.select("#my_dataviz").on("click", function(event: any) {
+    d3.selectAll(".math-displayer").remove();
+    d3.selectAll(".graph-displayer").remove();
+ 
+        d3.selectAll(".node-features-Copy").style("visibility", "hidden")
+        d3.selectAll(".weightUnit").remove();
+        d3.selectAll(".columnUnit").remove();
+        d3.selectAll(".procVis").remove();
+        d3.selectAll(".to-be-removed").remove();
+
+        d3.selectAll(".graph-displayer").remove();
+        for (let i = 0; i < 4; i++) {colorSchemes[i].style.opacity = "1";}
+
+
+
+        moveFeaturesBack(node.relatedNodes, originalCoordinates);
+
+        node.featureGroup
+            .transition()
+            .duration(1000)
+            .attr(
+                "transform",
+                `translate(${node.x - 7.5}, ${node.y + 170 + 5}) rotate(0)`
+            );
+
+            handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state)
+
+
+})
+
+}
+
+

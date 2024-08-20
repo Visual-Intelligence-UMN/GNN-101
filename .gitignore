@@ -6,7 +6,7 @@
 /.pnp
 .pnp.js
 .yarn/install-state.gz
-
+/torchExp
 # testing
 /coverage
 

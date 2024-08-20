@@ -1,7 +1,7 @@
 import { deepClone, get_features_origin, graph_to_matrix, linkPrediction, LinkType, load_json, NodeType } from "@/utils/utils";
 import { getNodeSet } from "@/utils/linkPredictionUtils";
 import { error } from "console";
-import { extractSubgraph } from "./graphDataUtils";
+import { AdjacencyListForSearch, extractSubgraph,  } from "./graphDataUtils";
 import { sources } from "next/dist/compiled/webpack/webpack";
 
 
@@ -24,10 +24,35 @@ export async function dataProccessGraphVisLinkPrediction(graph_path: any, hubNod
 
         const mergedNodes = [...nodesA, ...nodesB];
 
+        let nodes2A:number[] = getNodeSet(graph, hubNodeA)[1];
+        let nodes2B:number[] = getNodeSet(graph, hubNodeB)[1];
+
+        const mergedNodes2 = [...nodes2A, ...nodes2B];
+
+
+
         //console.log("mergedNodes", mergedNodes);
 
         //compute the structure of the subgraph
         const subGraph = extractSubgraph(graph, mergedNodes);
+        const subGraph2 = extractSubgraph(graph, mergedNodes2);
+
+
+        let subGraph3: AdjacencyListForSearch = {};
+        subGraph3[hubNodeA] = [];
+        subGraph3[hubNodeB] = [];
+        subGraph3[hubNodeA].push(hubNodeA);
+        subGraph3[hubNodeA].push(hubNodeB);
+        subGraph3[hubNodeB].push(hubNodeA);
+        subGraph3[hubNodeB].push(hubNodeB);
+
+
+        let subGraphSet = [];
+        subGraphSet.push(subGraph)
+        subGraphSet.push(subGraph2)
+        subGraphSet.push(subGraph3)
+
+
 
         //console.log("subGraph", subGraph);
 
@@ -48,7 +73,6 @@ export async function dataProccessGraphVisLinkPrediction(graph_path: any, hubNod
         }
 
 
-
         for (const key in subGraph) {
             if (subGraph.hasOwnProperty(key)) {
                 const value = subGraph[key];
@@ -66,7 +90,6 @@ export async function dataProccessGraphVisLinkPrediction(graph_path: any, hubNod
                 }
                 }
             }
-
 
             var new_relation: LinkType = {
                 source: nodeMapping[hubNodeB],
@@ -87,7 +110,7 @@ export async function dataProccessGraphVisLinkPrediction(graph_path: any, hubNod
               name: node_name,
               features: features,
               is_aromatic: false,
-              original_id: key,
+              original_id: Number(key),
             }
             final_data.nodes.push(new_node);
         }
@@ -98,13 +121,12 @@ export async function dataProccessGraphVisLinkPrediction(graph_path: any, hubNod
         const final_data2 = deepClone(final_data);
 
 
-
         var new_node = {
             id: 0,
             name: "Unknown",
             features: [0],
             is_aromatic: false,
-            original_id: "0",
+            original_id: 0,
           }
         var new_relation = {
             source: 0,
@@ -132,7 +154,7 @@ export async function dataProccessGraphVisLinkPrediction(graph_path: any, hubNod
 // to-do: add the last layer
 
 
-        return result;
+        return [result, subGraphSet, nodeMapping];
 
 
     } catch (error) {
@@ -140,6 +162,21 @@ export async function dataProccessGraphVisLinkPrediction(graph_path: any, hubNod
     }
 }
 
+
+
+export function isValidNode(subgraph: any, node: any) {
+
+    if (node.original_id === 0) {
+        return;
+    }
+    for (const key in subgraph[node.graphIndex]) {
+        if (node.original_id === Number(key)) {
+            return true;
+        }
+    }
+    return false;
+
+}
   
   
 

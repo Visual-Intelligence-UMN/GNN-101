@@ -1,13 +1,13 @@
 import * as d3 from "d3";
 import { computeMids, computeMidsVertical } from "./matFeaturesUtils";
-import { injectPlayButtonSVG } from "./svgUtils";
+import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import {
     drawActivationExplanation,
     drawAttnDisplayer,
     drawDotProduct,
     drawEScoreEquation,
 } from "./matInteractionUtils";
-import { create, all, transposeDependencies } from "mathjs";
+import { create, all, transposeDependencies, flatten } from "mathjs";
 import {
     drawPoints,
     flipHorizontally,
@@ -78,6 +78,7 @@ export function runAnimations(index: number, animations: any) {
     } else {
     }
 }
+
 
 export function drawAniPath(
     Xt: any,
@@ -851,6 +852,24 @@ export function computeMatrixLocations(
     }
     //draw connection
     return weightMatrixPositions;
+}
+
+export function drawMathFormula(
+    g:any,
+    x: number, 
+    y:number,
+    formula:string
+){
+    injectSVG(
+        g,
+        x,
+        y,
+        formula,
+        "procVis math-formula-pos"
+    );
+
+   // flattenSVG(".mats");
+
 }
 
 export function drawWeightMatrix(

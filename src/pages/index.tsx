@@ -19,6 +19,9 @@ import {
 import Sidebar from "./Sidebar";
 import styles from "./index.module.css";
 import * as d3 from "d3";
+import { Steps } from 'intro.js-react';
+import { INTRO_STEPS } from "../utils/const"
+import 'intro.js/introjs.css';
 
 import {
     Selector,
@@ -61,7 +64,7 @@ export const inter3 = Inter({
 export default function Home() {
     const [model, setModel] = useState("graph classification");
     const [selectedGraph, setSelectedGraph] = useState("graph_2");
-    const inputRef = useRef<HTMLInputElement>(null);
+    const introRef = useRef<Steps>(null);
     const [outputData, setOutputData] = useState(null);
 
     const [isGraphView, setIsGraphView] = useState(true);
@@ -112,6 +115,26 @@ export default function Home() {
         setSimulation(false);
     }
 
+    const startIntro = () => {
+        if (introRef.current) {
+            introRef.current.introJs.start();
+        }
+    }
+
+
+    useEffect(() => {
+        (document.body.style as any).zoom = "70%";
+
+    }, []);
+
+    useEffect(() => {
+        if (predicted && introRef.current) {
+            introRef.current.introJs.exit();
+        }
+    }, [predicted]
+    )
+
+
     function handleNodeSelection(
         e: React.ChangeEvent<HTMLSelectElement>
     ): void {
@@ -122,38 +145,47 @@ export default function Home() {
         setSimulation(false);
     }
 
-    useEffect(() => {
-        (document.body.style as any).zoom = "70%";
-    }, []);
+
 
     return (
-        <main className={inter.className}>
-            <div className={inter2.className}>
-                {step === 0 && (
-                    <div
-                        style={{ paddingTop: "15%" }}
-                        className="bg-white min-h-screen flex justify-center items-center"
-                    >
-                        <h1
-                            className="animate-dissolve text-6xl  font-bold text-gradient-stroke"
-                            data-text="Welcome to a Graph Neural Network Visualizer"
-                        />
-                    </div>
-                )}
-            </div>
-            {step === 1 && (
-                <div className="bg-white text-black">
-                    <NavBar />
-                    {/* <PanelGroup direction="horizontal"> */}
+        <div >
+            <Steps
+                enabled={true}
+                steps={INTRO_STEPS}
+                initialStep={0}
+                onExit={() => { }}
+                ref={introRef}
+            />
+            <main className={inter.className}>
+                <div className={inter2.className}>
+                    {step === 0 && (
+                        <div
+                            style={{ paddingTop: "15%" }}
+                            className="bg-white min-h-screen flex justify-center items-center"
+                        >
+                            <h1
+                                className="animate-dissolve text-6xl  font-bold text-gradient-stroke"
+                                data-text="Welcome to a Graph Neural Network Visualizer"
+                            />
+                        </div>
+                    )}
+                </div>
+                {step === 1 && (
+                    <div className="bg-white text-black">
+                        <div id="gnn101">
+                            <NavBar startIntro={startIntro} />
+                        </div>
+                        {/* <PanelGroup direction="horizontal"> */}
 
-                    <div className={` ${styles.body}  grid grid-cols-4 `}>
+                    <div className={` ${styles.body}  grid grid-cols-4 `} >
+                        <div id="text-panel">
                         <Sidebar
                             isGraphView={isGraphView}
                             setIsGraphView={setIsGraphView}
                             predicted={predicted}
                             modelMode={model}
                         />
-
+                        </div>
                         {/* <Panel className="ml-4"> */}
                         {/* GNN model */}
                         <div
@@ -172,120 +204,111 @@ export default function Home() {
                                             Model
                                         </h2>
                                         <Selector
-                                            selectedOption={modelType}
-                                            handleChange={(e) => {
-                                                const newModelType =
-                                                    e.target.value;
-                                                setModelType(newModelType);
-                                                setPredicted(false);
-                                                setSimulation(false);
-                                                setProbabilities([]);
-                                                setIntmData(null);
+                                                selectedOption={modelType}
+                                                handleChange={(e) => {
+                                                    const newModelType = e.target.value;
+                                                    setModelType(newModelType);
+                                                    setPredicted(false);
+                                                    setSimulation(false);
+                                                    setProbabilities([]);
+                                                    setIntmData(null);
 
-                                                if (newModelType === "GCN") {
-                                                    setModel(
-                                                        "graph classification"
-                                                    );
-                                                    setSelectedGraph("graph_2");
-                                                    setModelList(modelGCNList);
-                                                } else if (
-                                                    newModelType === "GAT"
-                                                ) {
-                                                    setSelectedGraph(
-                                                        "twitch_EN"
-                                                    );
-                                                    setModel(
-                                                        "GAT link classification"
-                                                    );
-                                                    setModelList(modelGATList);
-                                                } else {
-                                                    setModel(
-                                                        "GraphSAGE link classification"
-                                                    );
-                                                    setSelectedGraph(
-                                                        "twitch_EN"
-                                                    );
-                                                    setModelList(
-                                                        modelGraphSAGEList
-                                                    );
-                                                }
-                                            }}
-                                            OptionList={Object.keys(
-                                                modelTypeList
-                                            )}
-                                        />
+                                                    if (newModelType === "GCN") {
+                                                        setModel(
+                                                            "graph classification"
+                                                        );
+                                                        setSelectedGraph("graph_2");
+                                                        setModelList(modelGCNList);
+                                                    } else if (newModelType === "GAT") {
+                                                        setSelectedGraph(
+                                                            "twitch_EN"
+                                                        );
+                                                        setModel(
+                                                            "GAT link classification"
+                                                        );
+                                                        setModelList(modelGATList);
+                                                    } else {
+                                                        setModel(
+                                                            "GraphSAGE link classification"
+                                                        );
+                                                        setSelectedGraph(
+                                                            "twitch_EN"
+                                                        );
+                                                        setModelList(
+                                                            modelGraphSAGEList
+                                                        );
+                                                    }
+                                                } }
+                                                OptionList={Object.keys(
+                                                    modelTypeList
+                                                )} id={""}                                        />
                                         <h2 className="text-xl m-auto">Task</h2>
                                         <Selector
-                                            selectedOption={model}
-                                            handleChange={(e) => {
-                                                const newModel = e.target.value;
-                                                setModel(newModel);
-                                                setPredicted(false);
-                                                setSimulation(false);
-                                                setProbabilities([]);
-                                                setIntmData(null);
-                                                if (modelType === "GCN") {
-                                                    if (
-                                                        newModel ===
-                                                        "node classification"
-                                                    ) {
+                                                selectedOption={model}
+                                                handleChange={(e) => {
+                                                    const newModel = e.target.value;
+                                                    setModel(newModel);
+                                                    setPredicted(false);
+                                                    setSimulation(false);
+                                                    setProbabilities([]);
+                                                    setIntmData(null);
+                                                    if (modelType === "GCN") {
+                                                        if (newModel ===
+                                                            "node classification") {
+                                                            setSelectedGraph(
+                                                                "karate"
+                                                            );
+                                                        } else if (newModel ===
+                                                            "graph classification") {
+                                                            setSelectedGraph(
+                                                                "graph_2"
+                                                            );
+                                                        } else {
+                                                            setSelectedGraph(
+                                                                "twitch_EN"
+                                                            );
+                                                        }
+                                                    } else if (modelType === "GAT") {
                                                         setSelectedGraph(
-                                                            "karate"
-                                                        );
-                                                    } else if (
-                                                        newModel ===
-                                                        "graph classification"
-                                                    ) {
-                                                        setSelectedGraph(
-                                                            "graph_2"
+                                                            "twitch_EN"
                                                         );
                                                     } else {
                                                         setSelectedGraph(
                                                             "twitch_EN"
                                                         );
                                                     }
-                                                } else if (
-                                                    modelType === "GAT"
-                                                ) {
-                                                    setSelectedGraph(
-                                                        "twitch_EN"
-                                                    );
-                                                } else {
-                                                    setSelectedGraph(
-                                                        "twitch_EN"
-                                                    );
-                                                }
-                                            }}
-                                            OptionList={Object.keys(modelList)}
-                                        />
+                                                } }
+                                                OptionList={Object.keys(modelList)} id={""}                                        />
                                     </div>
 
+                                    <div id="model-architecture">
                                     {model == "graph classification" ? (
-                                        <ButtonChain
-                                            selectedButtons={selectedButtons}
-                                            setSelectedButtons={
+                                            <ButtonChain
+                                                selectedButtons={selectedButtons}
+                                                setSelectedButtons={
                                                 setSelectedButtons
                                             }
-                                            predicted={predicted}
-                                        />
-                                    ) : model == "node classification" ? (
-                                        <NodeClassifierButtonChain
-                                            selectedButtons={selectedButtons}
-                                            setSelectedButtons={
+                                                predicted={predicted}
+                                            />
+                                        ) : model == "node classification" ? (
+                                            <NodeClassifierButtonChain
+                                                selectedButtons={selectedButtons}
+                                                setSelectedButtons={
                                                 setSelectedButtons
                                             }
-                                            predicted={predicted}
-                                        />
-                                    ) : (
-                                        <LinkClassifierButtonChain
-                                            selectedButtons={selectedButtons}
-                                            setSelectedButtons={
+                                                predicted={predicted}
+                                            />
+                                        ) : (
+                                            <LinkClassifierButtonChain
+                                                selectedButtons={selectedButtons}
+                                                setSelectedButtons={
                                                 setSelectedButtons
                                             }
-                                            predicted={predicted}
+                                                predicted={predicted}
                                             innerComputationMode={modelType}
-                                        />
-                                    )}
+                                            />
+                                        )}
+                                </div>
                                 </div>
                             </div>
                             <hr className="border-t border-gray-300 my-4"></hr>
@@ -312,7 +335,8 @@ export default function Home() {
                                                             OptionList={Object.keys(
                                                                 graphList
                                                             )}
-                                                        />
+                                                            id="dataset-selector"
+                                            />
                                                     </>
                                                 ) : model ==
                                                   "node classification" ? (
@@ -322,15 +346,25 @@ export default function Home() {
                                                     //     OptionList={Object.keys(nodeList)}
                                                     //   />
 
+                                            <span className="text-2xl">Zachary&apos;s Karate Club </span>
+                                        ) : (
+                                            <Selector
+                                                selectedOption={selectedGraph}
+                                                handleChange={handleGraphSelection}
+                                                OptionList={Object.keys(linkList)}
+                                                id="dataset-selector"
+                                            />
+                                        )}
+                                        <p id="dataset-description">{DatasetInfo[model]}</p>
                                                     <span className="text-2xl">
                                                         Zachary&apos;s Karate
                                                         Club{" "}
                                                     </span>
-                                                ) : (
+                                                 : (
                                                     <span className="text-2xl">
                                                         Twitch Users{" "}
                                                     </span>
-                                                )}
+                                                )
                                             </div>
                                         </div>
                                         <div>
@@ -404,6 +438,18 @@ export default function Home() {
 
                                 <hr className="border-t border-gray-300 my-4"></hr>
 
+                            {/* <ClassifyGraph
+                graphPath={graphList[selectedGraph]}
+                modelPath={modelList[model]}
+                setChangedG={setChangedG}
+                setIntmData={setIntmData}
+                setPredicted={setPredicted}
+                predicted={predicted}
+                probabilities={probabilities}
+                setProbabilities={setProbabilities}
+                simulationLoading={simulationLoading}
+              /> */}
+
                                 {/* model visualization */}
 
                                 <div className="flex gap-x-4 items-center">
@@ -458,6 +504,7 @@ export default function Home() {
                                                     simulationLoading
                                                 }
                                                 setSimulation={setSimulation}
+                                                innerComputationMode={modelType}
                                             />
                                         </>
                                     ) : (
@@ -487,6 +534,7 @@ export default function Home() {
                                                 simulationLoading
                                             }
                                             setSimulation={setSimulation}
+                                            innerComputationMode={modelType}
                                         />
                                     ) : (
                                         <NodeMatricesVisualizer
@@ -508,6 +556,7 @@ export default function Home() {
                                         setSimulation={setSimulation}
                                         hubNodeA={hubNodeA}
                                         hubNodeB={hubNodeB}
+                                        innerComputationMode = {modelType}
                                     />
                                 ) : (
                                     <LinkMatricesVisualizer
@@ -524,52 +573,37 @@ export default function Home() {
 
                                 {/* overlay text on visualizer when not predicted */}
                                 {probabilities.length == 0 && (
-                                    <div
-                                        className="absolute top-1/2"
-                                        style={{ right: "300px" }}
-                                    >
+                                    <div className="absolute top-1/2"
+                                        style={{ right: '300px' }}>
                                         <h1 className="text-4xl text-gray-300">
-                                            Model Visualization will show after
-                                            prediction
+                                            Model Visualization will show after prediction
                                         </h1>
 
                                         {model == "graph classification" ? (
                                             <ClassifyGraph
-                                                graphPath={
-                                                    graphList[selectedGraph]
-                                                }
+                                                graphPath={graphList[selectedGraph]}
                                                 modelPath={modelList[model]}
                                                 setChangedG={setChangedG}
                                                 setIntmData={setIntmData}
                                                 setPredicted={setPredicted}
                                                 predicted={predicted}
                                                 probabilities={probabilities}
-                                                setProbabilities={
-                                                    setProbabilities
-                                                }
+                                                setProbabilities={setProbabilities}
                                                 onlyShownButton={true}
-                                                simulationLoading={
-                                                    simulationLoading
-                                                }
+                                                simulationLoading={simulationLoading}
                                             />
                                         ) : (
                                             <ClassifyGraph
-                                                graphPath={
-                                                    nodeList[selectedGraph]
-                                                }
+                                                graphPath={nodeList[selectedGraph]}
                                                 modelPath={modelList[model]}
                                                 setChangedG={setChangedG}
                                                 setIntmData={setIntmData}
                                                 setPredicted={setPredicted}
                                                 predicted={predicted}
                                                 probabilities={probabilities}
-                                                setProbabilities={
-                                                    setProbabilities
-                                                }
+                                                setProbabilities={setProbabilities}
                                                 onlyShownButton={true}
-                                                simulationLoading={
-                                                    simulationLoading
-                                                }
+                                                simulationLoading={simulationLoading}
                                             />
                                         )}
                                     </div>
@@ -580,9 +614,10 @@ export default function Home() {
                         </div>
                     </div>
 
-                    <Footer />
-                </div>
-            )}
-        </main>
+                        <Footer />
+                    </div>
+                )}
+            </main>
+        </div>
     );
 }

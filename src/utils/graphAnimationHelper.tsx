@@ -1,10 +1,11 @@
 import * as d3 from "d3";
 import { create, all, matrix, i } from "mathjs";
-import { State, myColor } from "./utils";
+import { State, flipHorizontally, flipVertically, myColor } from "./utils";
 import { roundToTwo } from "@/components/WebUtils";
 
 
 export function graphVisDrawMatrixWeight(
+    node: any,
     Xt: any,
     startCoordList:any,
     endCoordList:any,
@@ -15,35 +16,48 @@ export function graphVisDrawMatrixWeight(
     featureChannels: number,
     g: any,
     mode: number,
-    node: any,
     id:string = "tempath"
 ){
     if (!g.selectAll) {
         g = d3.select(g)
     }
 
-    
     let flag = true;
 
 
     
     if(Xt[0].length!=Xt.length){
+        //weightMatrixPostions = transposeAnyMatrix(weightMatrixPostions);
         flag = false;
-
         const math = create(all, {});
         Xt = math.transpose(Xt);
     }
+
     if((Xt[0].length==2 && Xt.length==64)
         ||(Xt[0].length==4 && Xt.length==2)
     ){
         const math = create(all, {});
         Xt = math.transpose(Xt);
     }
+
     if((weightMatrixPostions.length==4&&weightMatrixPostions[0].length==2)){
         const math = create(all, {});
         Xt = math.transpose(Xt);
     }
-    const Xv = Xt[currentStep];
+    if (mode === 1 && node.graphIndex === 1 || mode === 1 && node.graphIndex === 3) {
+
+    } else {
+
+
+        Xt = flipVertically(Xt)
+        Xt = flipHorizontally(Xt);
+    }
+    
+    
+
+    let Xv = Xt[currentStep];
+
+    
 
     for (let j = 0; j < Xv.length; j++) {
         let s1 = startCoordList[j];
@@ -53,22 +67,23 @@ export function graphVisDrawMatrixWeight(
             s1 = startCoordList[startCoordList.length - j - 1];
             e1 = endCoordList[currentStep];
         }
-        
-
+        if (mode === 1 && node.graphIndex === 4) {
+            s1 = startCoordList[j]
+        }
+     
 
         let m1 = [0,0];
-        if(flag){
-             m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+        // if(flag){
+        //     m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
 
-        }else{
-             m1 = weightMatrixPostions[currentStep][weightMatrixPostions[0].length-1-j];
-        }
-
-        if(Xt[0].length==64 && Xt.length==2){
-            m1 = weightMatrixPostions[currentStep][j];
-        }else{
-            m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
-        }
+        // }else{
+        //     m1 = weightMatrixPostions[currentStep][weightMatrixPostions[0].length-1-j];
+        // }
+        // if(Xt[0].length==64 && Xt.length==2){
+        //     m1 = weightMatrixPostions[currentStep][j];
+        // }else{
+        //     m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+        // }
         
         
 
@@ -79,8 +94,7 @@ export function graphVisDrawMatrixWeight(
         if(weightMatrixPostions.length==4&&weightMatrixPostions[0].length==2){
             if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
             else m1 = weightMatrixPostions[j][currentStep]
-            
-
+        
             changed = true;
         }
 
@@ -94,14 +108,14 @@ export function graphVisDrawMatrixWeight(
 
         if(Xt.length==Xt[0].length || (Xt.length==64 && Xt[0].length==7)){
             m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
-
             changed = true;
         }
 
         if(Xt.length==Xt[0].length && Xt.length==4){
             if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
             else m1 = weightMatrixPostions[j][currentStep]
-   
+                
+
             changed = true;
         }
 
@@ -129,6 +143,8 @@ export function graphVisDrawMatrixWeight(
             }
         }
         
+
+
 
         let controlPoint1 = [s1[0], m1[1]];
         let controlPoint2 = [e1[0], m1[1]];
@@ -166,40 +182,20 @@ export function graphVisDrawMatrixWeight(
 }
 
 
-export function drawGraphVisWeightVector(weightMatrixPositions: number[][][], rectW: number, weights: number[][][], index: number, g: any, currentStep: number) {
-    if (!g.selectAll) {
-        g = d3.selectAll(g)
-    }
-    let weightMat = weights[index]
 
-    if (index === 0) {
-        const math = create(all, {});
-        weightMat = math.transpose(weightMat);
-    }
-
-
-    for (let j = 0; j < weightMat[currentStep].length; j++)
-    g.append("rect")
-                            .attr("x", 130)
-                            .attr("y", 20 + rectW * j)
-                            .attr("width", 7)
-                            .attr("height", rectW)
-                            .attr("fill", myColor(weightMat[currentStep][j]))
-                            .attr("stroke", "gray")
-                            .attr("stroke-width", 0.1)
-                            .attr("opacity", 1)
-                            .attr("class", "columnUnit math-displayer")
-                            .attr("id", `columnUnit-${j}`);
-
-}
-export function displayerHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], i: number, mode: number, isOutput: boolean) {
+export function displayerHandler(node: any, aggregatedData: any, calculatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], i: number, mode: number, isOutput: boolean) {
 
                 if (!g.selectAll) {
                     g = d3.selectAll(g)
                 }
 
+ 
+       
+ 
+                
+
                 d3.select(".graph-displayer").attr("opacity", 1);
-                console.log('weight before transformations', weights)
+
 
 
                 d3.selectAll(".weightUnit").style("opacity", 0.3);
@@ -224,11 +220,14 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
 
 
 
+        
                 for (let j = 0; j < weightMat[i].length; j++) {
-             
+
+               
+                    
                     g.append("rect")
                     .attr("x", 130)
-                    .attr("y", 20 + wmRectL * j)
+                    .attr("y", 40 + wmRectL * j)
                     .attr("width", 7)
                     .attr("height", wmRectL)
                     .attr("fill", myColor(weightMat[i][j]))
@@ -236,11 +235,11 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
                     .attr("stroke-width", 0.1)
                     .attr("opacity", 1)
                     .attr("class", "columnUnit math-displayer")
-                    .attr("id", `columnUnit-${j}`)
+           
                     .style("opacity", 1)
                 }
                 const featureGroup = g.append("g")
-                .attr("transform", `translate(${70}, ${displayHeight - 40})`);
+                .attr("transform", `translate(${70}, ${displayHeight - 50})`);
 
 
 
@@ -249,7 +248,7 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
                 .attr("y", displayHeight - 65)
                 .text("Matmul Visualization")
                 .attr("class", "math-displayer")
-                .attr("font-size", "10");
+                .attr("font-size", "15");
 
 
                 featureGroup.selectAll("rect")
@@ -270,21 +269,30 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
 
 
                 g.append("text")
-                    .attr("x", 70 - 25)
-                    .attr("y", displayHeight - 30)
+                    .attr("x", 70 - 35)
+                    .attr("y", displayHeight - 40)
                     .attr("xml:space", "preserve")
-                    .text("dot(                   ,                 )")
+                    .text("dot(           ,         )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "10");
+                    .attr("font-size", "15");
 
-
-                g.append("text")
-                    .attr("x", 70 - 30)
+                if (mode === 1 && node.graphIndex === 4) {
+                    g.append("text")
+                    .attr("x", 70 - 40)
                     .attr("y", displayHeight - 10)
                     .attr("xml:space", "preserve")
-                    .text("=       x         +         x          ...     =     ")
+                    .text("=       x      +     x      ...  =     ")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5");
+                    .attr("font-size", "10");
+                } else  {
+                g.append("text")
+                    .attr("x", 70 - 40)
+                    .attr("y", displayHeight - 10)
+                    .attr("xml:space", "preserve")
+                    .text("=       x      +     x      ...  =     ")
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "10");
+                }
 
 
 
@@ -293,9 +301,9 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
                 g.append("rect")    
       
                 .attr("x", 70 - 30 + 5)
-                .attr("y", displayHeight - 10 - 7)
-                .attr("width", 7)
-                .attr("height", 7)
+                .attr("y", displayHeight - 10 - 9)
+                .attr("width", 9)
+                .attr("height", 9)
                 .attr("class", `math-displayer`)
                 .style("fill", myColor(aggregatedData[0]))
                 .style("stroke-width", 0.1)
@@ -307,16 +315,17 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
                 .attr("y", displayHeight - 10 - 5)
                 .text(roundToTwo(aggregatedData[0]))
                 .attr("class", "math-displayer")
-                .attr("font-size", "3");
+                .attr("font-size", "4")
+                .attr("fill", Math.abs(aggregatedData[0]) > 0.7 ? "white" : "black");
 
 
 
 
                 g.append("rect")    
-                .attr("x", 70 - 30 + 20)
-                .attr("y", displayHeight - 10 - 7)
-                .attr("width", 7)
-                .attr("height", 7)
+                .attr("x", 70 - 30 + 25)
+                .attr("y", displayHeight - 10 - 9)
+                .attr("width", 9)
+                .attr("height", 9)
                 .attr("class", `math-displayer`)
                 .style("fill", myColor(weights[index][0][i]))
                 .style("stroke-width", 0.1)
@@ -324,21 +333,22 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
                 .style("opacity", 1);
 
                 g.append("text")
-                .attr("x", 70 - 30 + 20)
+                .attr("x", 70 - 30 + 25)
                 .attr("y", displayHeight - 10 - 5)
                 .text(roundToTwo(weights[index][0][i]))
                 .attr("class", "math-displayer")
-                .attr("font-size", "3");
+                .attr("font-size", "4")
+                .attr("fill", Math.abs(weights[index][0][1]) > 0.7 ? "white" : "black");
 
 
 
                 // second component
                 g.append("rect")    
 
-                .attr("x", 70 - 30 + 35)
-                .attr("y", displayHeight - 10 - 7)
-                .attr("width", 7)
-                .attr("height", 7)
+                .attr("x", 70 - 30 + 45)
+                .attr("y", displayHeight - 10 - 9)
+                .attr("width", 9)
+                .attr("height", 9)
                 .attr("class", `math-displayer`)
                 .style("fill", myColor(aggregatedData[1]))
                 .style("stroke-width", 0.1)
@@ -346,20 +356,21 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
                 .style("opacity", 1);
 
                 g.append("text")
-                .attr("x", 70 - 30 + 35)
+                .attr("x", 70 - 30 + 45)
                 .attr("y", displayHeight - 10 - 5)
                 .text(roundToTwo(aggregatedData[1]))
                 .attr("class", "math-displayer")
-                .attr("font-size", "3");
+                .attr("font-size", "4")
+                .attr("fill", Math.abs(aggregatedData[1]) > 0.7 ? "white" : "black");
 
 
 
                 g.append("rect")    
 
-                .attr("x", 70 - 30 + 50)
-                .attr("y", displayHeight - 10 - 7)
-                .attr("width", 7)
-                .attr("height", 7)
+                .attr("x", 70 - 30 + 65)
+                .attr("y", displayHeight - 10 - 9)
+                .attr("width", 9)
+                .attr("height", 9)
                 .attr("class", `math-displayer`)
                 .style("fill", myColor(weights[index][1][i]))
                 .style("stroke-width", 0.1)
@@ -367,11 +378,12 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
                 .style("opacity", 1);
 
                 g.append("text")
-                .attr("x", 70 - 30 + 50)
+                .attr("x", 70 - 30 + 65)
                 .attr("y", displayHeight - 10 - 5)
                 .text(roundToTwo(weights[index][1][i]))
                 .attr("class", "math-displayer")
-                .attr("font-size", "3");
+                .attr("font-size", "4")
+                .attr("fill", Math.abs(weights[index][1][i]) > 0.7 ? "white" : "black");
 
 
 
@@ -379,25 +391,23 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
                 // output
                 g.append("rect")    
 
-                .attr("x", 70 - 30 + 80)
-                .attr("y", displayHeight - 10 - 7)
-                .attr("width", 7)
-                .attr("height", 7)
+                .attr("x", 70 - 30 + 100)
+                .attr("y", displayHeight - 10 - 9)
+                .attr("width", 9)
+                .attr("height", 9)
                 .attr("class", `math-displayer`)
-                .style("fill", myColor(node.features[i]))
+                .style("fill", myColor(calculatedData[i]))
                 .style("stroke-width", 0.1)
                 .style("stroke", "grey")
                 .style("opacity", 1);
 
                 g.append("text")
-                .attr("x", 70 - 30 + 80)
+                .attr("x", 70 - 30 + 100)
                 .attr("y", displayHeight - 10 - 5)
-                .text(roundToTwo(node.features[i]))
+                .text(roundToTwo(calculatedData[i]))
                 .attr("class", "math-displayer")
-                .attr("font-size", "3");
-
-
-
+                .attr("font-size", "4")
+                .attr("fill", Math.abs(calculatedData[i]) > 0.7 ? "white" : "black");
 
 
 
@@ -405,36 +415,37 @@ export function displayerHandler(node: any, aggregatedData: any, state: State, g
     }
 
 
-export function hoverOverHandler(node: any, aggregatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], Xt: any, startCoordList: any, endCoordList: any, svg: any, mode: number, isOutput: boolean) {
+export function hoverOverHandler(node: any, aggregatedData: any, calculatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], Xt: any, startCoordList: any, endCoordList: any, svg: any, mode: number, isOutput: boolean) {
 
     
 
     for (let i = 0; i < node.features.length; i++) {
         d3.select(`.calculatedFeatures${i}`)
             .on("mouseover", function () {
-                if (!state.isClicked || state.isPlaying) {
+                if (!state.isClicked || state.isPlaying || state.isAnimating) {
                     return;
                 }
                
-                if (mode === 2 && node.graphIndex === 1) {
-                    graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode, node)
-                } else {
-                    graphVisDrawMatrixWeight(Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode, node)
+                if (mode === 1 && node.graphIndex === 4) {
+                    graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, 1, i, myColor, weightsLocation, node.features.length, svg, mode)
+                }
+                else {
+                graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode)
                 }
                 d3.selectAll(".calculatedRect").style("opacity", 0.2)
                 d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1)
+                d3.selectAll(".formula_weights").style("fill", "red")
+                d3.selectAll(".formula_neighbor_aggregate").style("fill", "red")
+                d3.selectAll(".formula_summation").style("fill", "red")
                 d3.selectAll(`#tempath${i}`).style("opacity", 1);
-                displayerHandler(node, aggregatedData, state, g, displayHeight, rectL, wmRectL, myColor, weights, index, weightsLocation, i, mode, isOutput)
-
-
-
+                displayerHandler(node, aggregatedData, calculatedData, state, g, displayHeight, rectL, wmRectL, myColor, weights, index, weightsLocation, i, mode, isOutput)
 
 
 
 
     })
             .on("mouseout", function () {
-                if (!state.isClicked || state.isPlaying) {
+                if (!state.isClicked || state.isPlaying || state.isAnimating) {
                     return;
                 }
                 d3.selectAll(".math-displayer").remove();
@@ -444,6 +455,9 @@ export function hoverOverHandler(node: any, aggregatedData: any, state: State, g
                 d3.selectAll(`#tempath${i}`).style("opacity", 0).raise();
                 d3.selectAll(".weightUnit").style("opacity", 1);
                 d3.selectAll(".calculatedRect").style("opacity", 1)
+                d3.selectAll(".formula_weights").style("fill", "black")
+                d3.selectAll(".formula_summation").style("fill", "black")
+                d3.selectAll(".formula_neighbor_aggregate").style("fill", "black")
                 
 
             });

@@ -1,3 +1,5 @@
+import { electricConstantDependencies } from "mathjs";
+
 export const graphList = graph_list_generate(3);
 
 export const nodeList: { [k: string]: string } = {
@@ -64,3 +66,47 @@ export const DatasetInfo: { [k: string]: string } = {
   "GAT link classification": TWITCH_INFO,
   "GraphSAGE link classification": TWITCH_INFO,
 };
+
+
+export const INTRO_STEPS = [
+    {
+        // element: "#gnn101",
+        intro: "🎉 Welcome to GNN 101! Ready to dive into the world of Graph Neural Networks?",
+    },
+    {
+        element: "#model-selector",
+        intro: "🔍 GNN models of different tasks and architectures!",
+    },
+    {
+        element: "#graph-selector",
+        intro: "🔍 Explore different graphs used in GNN. ",
+    },
+    // {
+    //     element: '#task-selector',
+    //     intro: 'Click here to select the task for GNN!',
+    // },
+    // {
+    //     element: '#model-architecture',
+    //     intro: 'The model architecture menu is here!',
+    // },
+    // {
+    //     element: '#dataset-selector',
+    //     intro: 'Click here to switch the input data!',
+    // },
+    // {
+    //     element: '#dataset-description',
+    //     intro: 'The dataset description is here!',
+    // },
+    // {
+    //     element: '#graph-statistics',
+    //     intro: 'Here is the graph statistic!',
+    // },
+    {
+        element: '#text-panel',
+        intro: '📖  Dive deeper into GNNs with the text panel! Scroll down to see more!',
+    },
+    {
+        element: '#click-to-predict',
+        intro: '🚀 Ready to start? Click "Start Prediction" ',
+    }
+];

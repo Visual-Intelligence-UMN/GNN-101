@@ -27,7 +27,7 @@ import {
     drawTanh,
     drawWeightMatrix,
     computeMatrixLocations,
-    drawAttentions,
+    drawAttentions
 } from "./matAnimateUtils";
 import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import { drawMatmulExplanation, drawSoftmaxDisplayer } from "./matInteractionUtils";
@@ -649,6 +649,8 @@ export function featureVisClick(
 
     d3.select(".mats").style("pointer-events", "none");
 
+    const formula:any = d3.select(".mats").append("g").attr("class", "math-formula");
+
     let animateSeqAfterPath: any = [
         {func: () => {
             drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir)
@@ -701,6 +703,7 @@ export function featureVisClick(
             d3.select(".ctrlBtn").style("pointer-events", "auto");
             d3.select(".mats").style("pointer-events", "auto");
         },delay: 1,},
+
     ];
 
     // if(activation=="tanh"){
@@ -2287,5 +2290,3 @@ export function featureSAGEClick(
         features: features,
     };
 }
-
-

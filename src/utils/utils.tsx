@@ -22,6 +22,7 @@ import { stat } from "fs";
 import { Yomogi } from "@next/font/google";
 import { dataPreparationLinkPred, constructComputationalGraph } from "./linkPredictionUtils";
 import { extractSubgraph } from "./graphDataUtils";
+import { isValidNode } from "./GraphvislinkPredUtil";
 
 env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
@@ -346,7 +347,6 @@ export type NodeType = {
   name: string;
   features: number[];
   is_aromatic: boolean;
-  original_id: string
 };
 
 export type LinkType = {
@@ -424,12 +424,16 @@ export async function data_prep(o_data: any) {
         } else {
           node_train = "?"
         }
+
+
+        
       }
       if (aromatic_node_index_set.has(i)) {
         is_aromatic = true;
       } else {
         is_aromatic = false;
       }
+      
 
 
       if (is_train.length != 0) {
@@ -443,8 +447,7 @@ export async function data_prep(o_data: any) {
         id: i,
         name: node_name,
         features: nodes[i],
-        is_aromatic: is_aromatic,
-        original_id: "Unknown"
+        is_aromatic: is_aromatic
       }
       final_data.nodes.push(new_node);
     }
@@ -489,8 +492,7 @@ export async function prep_graphs(g_num: number, data: any) {
       id: 0,
       name: " ",
       features: [0],
-      is_aromatic: false,
-      original_id: "Unknown"
+      is_aromatic: false
     } 
 
     var node_array = [];
@@ -536,11 +538,13 @@ export function transposeAnyMatrix(matrix:any){
 export interface State {
   isClicked: boolean;
   isPlaying: boolean;
+  isAnimating: boolean;
 }
 
 export const state: State = {
   isClicked: false, // if isClicked is true, all mouseover/out operation would be banned and some certain functions would be called
   isPlaying: false,
+  isAnimating: false,
 };
 
 
@@ -553,10 +557,10 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
   if (!movedNode || !state.isClicked) {
     return;
   }
+  d3.selectAll(".hintLabel").attr("opacity", 1);
 
   if (movedNode && (!event.target.classList.contains("vis-component"))) {
     svg.selectAll(".vis-component").style("opacity", 0);
-    d3.selectAll(".hintLabel").attr("opacity", 1);
     let currMoveOffset = moveOffset;
 
     for (let i = 0; i < colorSchemes.length; i++) {
@@ -582,6 +586,7 @@ export function featureVisualizer(
   offset: number, 
   height: number, 
   graphs: any[], 
+  firstLayerMoveOffset: number,
   moveOffset: number, 
   fcLayerMoveOffset: number, 
   rectWidth: number, 
@@ -590,13 +595,9 @@ export function featureVisualizer(
   outputLayerRectHeight: number,
   colorSchemes:any,
   mode: number,
+  innerComputationMode: string,
 ) {
   state.isClicked = false;
-
-  console.log("fwad", allNodes)
-
-
-
 
 
   
@@ -657,18 +658,12 @@ export function featureVisualizer(
 
 
 
-    
+
 
     let xOffset = (graphIndex - 2.5) * offset;
     if (graphIndex >= 4 && mode === 0) {
       xOffset = (graphIndex - 2.5) * offset - 25 * (graphIndex * 1.5);
     }
-    if (mode === 2) {
-      xOffset = (graphIndex - 3.5) * offset;
-
-    }
-
-
 
     const g2 = svg.append("g")
       .attr("layerNum", graphIndex)
@@ -819,15 +814,22 @@ export function featureVisualizer(
 
         let prevRectHeight;
  
-
+        let currMoveOffset = moveOffset;
         if (graphIndex === 1) {
           prevRectHeight = firstLayerRectHeight;
+          currMoveOffset = firstLayerMoveOffset
         } else {
           prevRectHeight = rectHeight;
         }
+
+        if (mode === 1 && graphIndex === 4) {
+          currMoveOffset = fcLayerMoveOffset;
+
+        } 
  
 
-        let currMoveOffset = moveOffset;
+    
+        
 
 
       //the bottom of the featureGroup 
@@ -885,7 +887,7 @@ export function featureVisualizer(
            if (mode === 1 && graphIndex === 4) {
             nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, svg, mode)
            } else {
-            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
+            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
            };
 
 
@@ -920,6 +922,7 @@ export function featureVisualizer(
           
         
         let currMoveOffset = fcLayerMoveOffset;
+
 
 
 
@@ -1025,6 +1028,7 @@ export function featureVisualizer(
                 link.style("opacity", 0);
               });
             }
+       
           }
         });
         node.featureGroup.on("click", function(event: any) {
@@ -1096,7 +1100,7 @@ export function calculateAverage(arr: number[]): number {
   return average * 10;
 }
 
-export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset: number, mode: number) {
+export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset: number, subgraph: any, mode: number, hubNodeA: number, hubNodeB: number) {
   const nodesByIndex = d3.group(nodes, (d: any) => d.graphIndex);
 
 
@@ -1135,7 +1139,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
          nextGraphLinks.forEach((link: any) => {
            const sortedIds = [link.source.id, link.target.id].sort();
            const linkId = sortedIds.join("-");
-           if ((link.source.id === node.id || link.target.id === node.id) && !drawnLinks.has(linkId)) {
+           if (((link.source.id === node.id || link.target.id === node.id) && !drawnLinks.has(linkId))) {
              drawnLinks.add(linkId);
 
              const neighborNode = link.source.id === node.id ? link.target : link.source;
@@ -1145,6 +1149,9 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
              if (!neighborNode.relatedNodes) {
               neighborNode.relatedNodes = [];
              }
+
+
+             if (!(node.original_id === hubNodeA && neighborNode.original_id === hubNodeB) && !(node.original_id === hubNodeB && neighborNode.original_id === hubNodeA)) {
             
               const controlX1 = node.x + xOffset1 + (neighborNode.x + xOffset2 - node.x - xOffset1) * 0.8;
               const controlY1 = node.y + 10;
@@ -1159,9 +1166,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
                   `M 
                   ${node.x + xOffset1 + 16}
                   ${node.y + 10}
-                  C 
-                  ${controlX1} 
-                  ${controlY1}, 
+                  Q 
                   ${controlX2} 
                   ${controlY2}, 
                   ${neighborNode.x + neighborOffset - 16} 
@@ -1176,6 +1181,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
 
               neighborNode.links.push(path);
               neighborNode.relatedNodes.push(node);
+                }
         
            }
           })
@@ -1198,7 +1204,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
               const path = svg.append("path")
                 .attr("d", 
                   `M ${node.x + xOffset1 + 16} ${node.y + 10} 
-                   C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, 
+                   Q ${controlX2} ${controlY2}, 
                    ${nextNode.x + xOffsetNext - 16} ${nextNode.y + 10}`
                 )
                 .style("stroke-width", 1)
@@ -1257,6 +1263,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
           }
           return;
         }
+        else if (mode === 0) {
           const avg = calculateAverage(node.features)
 
           xOffset1 = (graphIndex - 2.5) * offset - 150;
@@ -1266,11 +1273,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
             xOffset1 = (graphIndex - 2.5) * offset;
             
           }
-          if (mode === 2) {
-            xOffset1 = xOffset1 - offset + 150
-            xOffset2 = xOffset2 - offset + 100
-
-          }
+        
           
           
           const nextLayer = graphs[graphIndex + 1];
@@ -1284,7 +1287,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
 
             
             const path = svg.append("path")
-              .attr("d", `M ${node.x + xOffset1} ${node.y + 10} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 20} ${nextNode.y + 10}`)
+              .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 20} ${nextNode.y + 10}`)
               .style("stroke", linkStrength(avg))
               .style("opacity", 0.1)
               .style('stroke-width', 1)
@@ -1299,11 +1302,53 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
           }
           nextNode.links.push(path);
           nextNode.relatedNodes.push(node);
+        
+        }
+      } else {
+        const avg = calculateAverage(node.features)
+        
+
+   
+        xOffset1 = (graphIndex - 3.5) * offset;
+        xOffset2 = (graphIndex - 2.5) * offset - 30 * (graphIndex * 1.5) + 100;
+
           
+          
+          const nextLayer = graphs[graphIndex + 1];
+          if (nextLayer) {
+            let nextNode = nextLayer.nodes[0];
+
+            const controlX1 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.3;
+            const controlY1 = node.y + 10;
+            const controlX2 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.7;
+            const controlY2 = nextNode.y + 10;
+            if (isValidNode(subgraph, node)) {
+            
+            const path = svg.append("path")
+              .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 20} ${nextNode.y + 10}`)
+              .style("stroke", linkStrength(avg))
+              .style("opacity", 0)
+              .style('stroke-width', 1)
+              .style("fill", "none");
+           
+  
+          if (!nextNode.links) {
+            nextNode.links = [];
+          }
+          if (!nextNode.relatedNodes) {
+            nextNode.relatedNodes = [];
+          }
+          nextNode.links.push(path);
+          nextNode.relatedNodes.push(node);
+        }
+        
         }
       }
+    }
+    
       
     });
+    
   });
 
 
@@ -1451,6 +1496,7 @@ export const graphPrediction = async (modelPath: string, graphPath: string) => {
 }
 
 
+
 export const linkPrediction = async (modelPath: string, graphPath: string) => {
  
 
@@ -1539,7 +1585,6 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
   return {prob, intmData};
 
 }
-
 
 function splitArray(arr: number[], chunkSize: number): number[][] {
   const chunks: number[][] = [];
