@@ -81,7 +81,6 @@ export function drawMathFormula(
         "math-formula-pos to-be-removed"
     );
 
-    flattenSVG(".mats");
 
 }
 
@@ -132,6 +131,7 @@ export function drawAniPath(
         const rectID = d3.select(this).attr("rectID")
 
         d3.select(".wMatLink").style("opacity", 0.3);
+        d3.selectAll(".interactRect").style("opacity", 0);
 
 
         d3.selectAll(".interactRect").style("opacity", 0.5);
@@ -149,6 +149,8 @@ export function drawAniPath(
         const rectID = d3.select(this).attr("rectID")
 
         d3.select(".wMatLink").style("opacity", 1);
+
+        d3.selectAll(".interactRect").style("opacity", 1);
 
         d3.selectAll(".weightUnit").style("opacity", 1);
 
@@ -353,7 +355,7 @@ export function drawSummationFeature(
     mulValues: any,
     curveDir: number
 ) {
-    const g = g1.append("g").attr("class", "procVis aggregate")
+    const g = g1.append("g").attr("class", "aggregatedFeatureGroup")
     for (let m = 0; m < X.length; m++) {
         g.append("rect")
             .attr("x", coordFeatureVis[0] + w * m)
@@ -380,7 +382,7 @@ export function drawSummationFeature(
         .attr("class", "procVis summation");
 
     //draw label
-    drawHintLabel(g1, coordFeatureVis[0], coordFeatureVis[1] + rectH * curveDir * 1.1, "Vector Summation", "procVis");
+    drawHintLabel(g1, coordFeatureVis[0], coordFeatureVis[1] + rectH * curveDir * 1.1, "Vector Summation", "procVis aggText");
 
     //path connect - connect prev layer feature vis to intermediate feature vis
     const curve = d3.line().curve(d3.curveBasis);
@@ -477,6 +479,7 @@ export function drawWeightsVector(
 
         d3.selectAll(".interactRect").style("opacity", 0.5);
         d3.select(`.interactRect[rectID="${rectID}"]`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
+        d3.select(".weight-matrix-frame").style("opacity", 0);
         drawMatrixWeight(Xv, startCoordList, endCoordList, curveDir, Number(rectID), myColor, weightMatrixPostions, featureChannels, "weightPath", paintMode);
         d3.selectAll(".weightUnit").style("opacity", 0.3).lower();
         d3.selectAll(`#weightUnit-${rectID}`).style("opacity", 1).raise();
@@ -493,6 +496,8 @@ export function drawWeightsVector(
         d3.select(".wMatLink").style("opacity", 1);
 
         d3.selectAll(".weightUnit").style("opacity", 1);
+
+        d3.select(".weight-matrix-frame").style("opacity", 1);
 
         d3.selectAll(".columnUnit").style("opacity", 0);
         d3.selectAll(".interactRect").style("opacity", 1).style("stroke", "gray").style("stroke-width", 0.1);
@@ -718,10 +723,10 @@ export function drawBiasVector(
             .attr("width", rectW)
             .attr("height", rectH)
             .attr("fill", myColor(layerBias[m]))
-            .attr("opacity", 0)
+            .style("opacity", 1)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1)
-            .attr("class", "procVis biasVector");
+            .attr("class", "procVis bias");
     }
 
     //draw frame
@@ -731,12 +736,12 @@ export function drawBiasVector(
         .attr("width", rectW * channels)
         .attr("height", rectH)
         .attr("fill", "none")
-        .attr("opacity", 0)
+        .style("opacity", 1)
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("class", "procVis biasVector");
-    const label = drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+6, "Bias Vector", "procVis biasVector");
-    d3.selectAll(".biasVector").transition().duration(100).attr("opacity", 1);
+    const label = drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+6, "Bias Vector", "procVis biasFrame");
+   // d3.selectAll(".biasVector").transition().duration(100).style("opacity", 1);
 }
 
 export function drawBiasPath(
@@ -816,11 +821,11 @@ export function drawReLU(
             d3.select(ReLU)
                 .attr("x", cx1)
                 .attr("y", cy1)
-                .attr("class", "procVis")
+                .attr("class", "procVis relu-icon")
                 .raise();
             }
         });
-        drawHintLabel(relu, cx1-20, cy1+radius*4+12+4, "ReLU Non-linear Function", "procVis");
+        drawHintLabel(relu, cx1-20, cy1+radius*4+12+4, "ReLU Non-linear Function", "procVis reluText");
 
         relu.on("mouseover", function(event, d){
             const [x, y] = d3.pointer(event);

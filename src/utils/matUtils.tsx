@@ -864,7 +864,7 @@ export function visualizeNodeClassifierFeatures(
             const initSec = 300;
             const aniSec = 500;
 
-            const g1 = d3.select(".mats").append("g").attr("class", "procVis");
+            const g1 = d3.select(".mats").append("g");
 
             let pathMap: any = null;
 
@@ -970,7 +970,7 @@ export function visualizeNodeClassifierFeatures(
                     "./assets/SVGs/matmul.svg"
                 );
                 const gLabel = d3.select(".mats").append("g");
-                injectSVG(gLabel, btnX - 120 - 64, btnY - 120 - 64, "./assets/SVGs/interactionHint.svg", "procVis");
+                injectSVG(gLabel, btnX - 120 - 64, btnY - 120 - 64, "./assets/SVGs/interactionHint.svg", "procVis hintLabel");
             }, aniSec);
 
             let firstPlay = true;
