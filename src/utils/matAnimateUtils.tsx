@@ -73,14 +73,13 @@ export function drawMathFormula(
     y:number,
     formula:string
 ){
- 
-// injectSVG(
-//         g,
-//         x,
-//         y,
-//         formula,
-//         "procVis math-formula-pos"
-//     );
+    injectSVG(
+        g,
+        x,
+        y,
+        formula,
+        "math-formula-pos to-be-removed"
+    );
 
 const defs = g.append("defs");
 const filter = defs.append("filter")
@@ -655,7 +654,7 @@ weightMatrixPostions:any
             //draw label hint
             drawHintLabel(g, weightMatrixPostions[0][0][0], 
                 weightMatrixPostions[0][0][1] - 12, "Weight Matrix", 
-                "procVis");
+                "procVis weightMatrixText to-be-removed");
 
             //flip
           //  weightMat = flipVertically(weightMat);
@@ -684,6 +683,15 @@ weightMatrixPostions:any
             weightMat = flipVertically(weightMat);
         }
 
+        g.append("rect")
+        .attr("class", "weight-matrix-frame to-be-removed procVis")
+        .attr("x", weightMatrixPostions[0][0][0])
+        .attr("y", weightMatrixPostions[0][0][1])
+        .attr("width", rectW*weightMatrixPostions[0].length)
+        .attr("height", rectW*weightMatrixPostions.length)
+        .style("stroke", "black")
+        .style("fill", "none")
+        .style("stroke-width", 2)
 
             for(let i=0; i<weightMatrixPostions.length; i++){
                 let tempArr = [];
@@ -691,10 +699,10 @@ weightMatrixPostions:any
                     //adjust the location if dimensions are different
                     if(i==0){
                         g.append("rect")
-                            .attr("x", weightMatrixPostions[i][j][0])
-                            .attr("y", weightMatrixPostions[i][j][1])
-                            .attr("width", rectW/coefficient)
-                            .attr("height", rectW/coefficient*weightMat.length)
+                            .attr("x", weightMatrixPostions[i][j][0] )
+                            .attr("y", weightMatrixPostions[i][j][1] )
+                            .attr("width", rectW/coefficient + 1)
+                            .attr("height", rectW/coefficient*weightMat.length )
                             .attr("fill", "none")
                             .attr("stroke", "black")
                             .attr("stroke-width", 0.5)
@@ -721,7 +729,7 @@ weightMatrixPostions:any
                         .attr("width", rectW/coefficient)
                         .attr("height", rectW/coefficient)
                         .attr("fill", myColor(colorVal))
-                        .attr("class", "weightUnit")
+                        .attr("class", "weightUnit procVis")
                         .attr("id", `weightUnit-${j}`);
 
                     tempArr.push([matX+j*rectW/coefficient+rectW/(coefficient*2), matY+i*rectW/coefficient+rectW/(coefficient*2)]);
