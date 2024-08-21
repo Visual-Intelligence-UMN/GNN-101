@@ -118,6 +118,7 @@ export function detailedViewRecovery(
     //remove calculation process visualizer
     //d3.selectAll(".procVis").transition().duration(500).attr("opacity", 0);
     d3.selectAll(".procVis").remove();
+    d3.selectAll(".to-be-removed").remove();
 
     //recover all frames
     d3.select(".poolingFrame").style("opacity", 0.25);
@@ -500,7 +501,7 @@ export function featureVisClick(
 
 
 
-    const g = d3.select(".mats").append("g").attr("class", "procVis");
+    const g = d3.select(".mats").append("g");
     let w = 5;
     if (Xt[0].length < featureChannels) {
         w = 10;
@@ -671,13 +672,12 @@ export function featureVisClick(
             );
             //drawHintLabel(g, btnX, btnY - 36, "Click for Animation", "procVis");
 
-            const gLabel = d3.select(".mats").append("g");
-            injectSVG(gLabel, btnX-120-64, btnY-30-120-64, "./assets/SVGs/interactionHint.svg", "procVis");
-
+            
+            
             drawPathBtwOuputResult([coordFeatureVis], coordFeatureVis3)
             drawWeightMatrix(btnX, btnY, curveDir, rectW, rectH, featureChannels, weights, layerID, myColor, g, weightMatrixPostions);
             drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor, weights[layerID], startCoordList, endCoordList, curveDir, weightMatrixPostions, featureChannels, X)
-            drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2Copy, myColor, layerBias, layerID)
+            
         }, delay:aniSec*2},
         // {func:()=>{
             
@@ -685,6 +685,7 @@ export function featureVisClick(
         // {func: () => {}, delay: aniSec},
         // {func: () => , delay: aniSec},
         {func: () => {
+            
             drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels)
             drawFinalPath(coordPathStartingPt, res00, res01, nextCoord, layerID, featureChannels)
             if(featureVisTable.length==4&&layerID==2){
@@ -696,6 +697,7 @@ export function featureVisClick(
                 drawReLU(midX1, wmCoord, biasCoord, nextCoord)
             }
             curNode.style.opacity = "1";
+            drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2Copy, myColor, layerBias, layerID)
             
         }, delay: aniSec*2},
         // {func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels), delay: 1,},
@@ -703,7 +705,11 @@ export function featureVisClick(
         // {func: () => {curNode.style.opacity = "1";},delay: aniSec,},
         {
             func:()=>{
-                drawMathFormula(formula, coordFeatureVis[0], coordFeatureVis[1]-80, "./assets/SVGs/GCNFormula_test.svg");
+                drawMathFormula(formula, coordFeatureVis2Copy[0], coordFeatureVis2Copy[1]+curveDir*125, "./assets/SVGs/GCNFormula.svg");
+                
+                const gLabel = d3.select(".mats").append("g");
+                injectSVG(gLabel, btnX-120-64, btnY-30-120-64, "./assets/SVGs/interactionHint.svg", "procVis hintLabel");
+
             }
         },
         {func: () => {
@@ -718,7 +724,8 @@ export function featureVisClick(
     // }
 
     AnimationController.runAnimations(0, animateSeqAfterPath);
-    //     d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
+        d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
+
 
     function getIntervalID() {
 
@@ -1075,7 +1082,7 @@ export function outputVisClick(
             );
             //drawHintLabel(g1, btnX, btnY-12, "Click for Animation", "procVis");
             const gLabel = d3.select(".mats").append("g");
-            injectSVG(gLabel, btnX-120-64, btnY-120-64, "./assets/SVGs/interactionHint.svg", "procVis");
+            injectSVG(gLabel, btnX-120-64, btnY-120-64, "./assets/SVGs/interactionHint.svg", "procVis hintLabel");
         }, delay:aniSec+600},
         {func:()=>{
 
