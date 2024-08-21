@@ -1,3 +1,5 @@
+import { electricConstantDependencies } from "mathjs";
+
 export const graphList = graph_list_generate(3);
 
 export const nodeList: { [k: string]: string } = {
@@ -13,6 +15,23 @@ export const modelList: { [k: string]: string } = {
   "node classification": "./gnn_node_model.onnx",
   //  "link classification": "./gnn_link_model.onnx",
 };
+export const formulaClass: { [k: string]: string[]} = {
+  "formula_weights": ["weight-matrix-frame", "weightUnit"],
+  "formula_bias": ["biasFrame", "bias"],
+  "formula_x": ["output"],
+  "formula_summation": ["aggregatedFeatureGroup", "origin-to-aggregated"],
+  "formula_neighbor_aggregate": ["original-features"],
+  "formula_activation": ["relu-icon"]
+}
+
+export const formulaTextClass: { [k: string]: string[]} = {
+  "formula_weights": ["weightMatrixText"],
+  "formula_bias": ["biasText"],
+  "formula_x": ["outputText"],
+  "formula_summation": ["aggText"],
+  "formula_neighbor_aggregate": [],
+  "formula_activation": ["reluText"]
+}
 
 function graph_list_generate(num: number) {
   let res: { [k: string]: string } = {};
@@ -44,3 +63,47 @@ export const DatasetInfo: { [k: string]: string } = {
   "graph classification": MUTAG_INFO,
   "edge classification": TWITCH_INFO,
 };
+
+
+export const INTRO_STEPS = [
+    {
+        // element: "#gnn101",
+        intro: "🎉 Welcome to GNN 101! Ready to dive into the world of Graph Neural Networks?",
+    },
+    {
+        element: "#model-selector",
+        intro: "🔍 GNN models of different tasks and architectures!",
+    },
+    {
+        element: "#graph-selector",
+        intro: "🔍 Explore different graphs used in GNN. ",
+    },
+    // {
+    //     element: '#task-selector',
+    //     intro: 'Click here to select the task for GNN!',
+    // },
+    // {
+    //     element: '#model-architecture',
+    //     intro: 'The model architecture menu is here!',
+    // },
+    // {
+    //     element: '#dataset-selector',
+    //     intro: 'Click here to switch the input data!',
+    // },
+    // {
+    //     element: '#dataset-description',
+    //     intro: 'The dataset description is here!',
+    // },
+    // {
+    //     element: '#graph-statistics',
+    //     intro: 'Here is the graph statistic!',
+    // },
+    {
+        element: '#text-panel',
+        intro: '📖  Dive deeper into GNNs with the text panel! Scroll down to see more!',
+    },
+    {
+        element: '#click-to-predict',
+        intro: '🚀 Ready to start? Click "Start Prediction" ',
+    }
+];

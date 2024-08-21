@@ -726,7 +726,6 @@ export function featureVisualizer(
           .attr("transform", `translate(${xPos - 7.5}, ${yPos})`);
 
         if (mode === 1 && graphIndex === 4) {
-
           featureGroup.selectAll("rect")
           .data(features)
           .enter()
@@ -763,27 +762,25 @@ export function featureVisualizer(
         }
 
         const frame = featureGroup.append("rect")
-        .attr("class", `node-features-${node.graphIndex}-${node.id}`)
+        .attr("class", `node-features-${node.graphIndex}-${node.id} nodeFeatureFrame`)
         .attr("x", 0)  
         .attr("y", 0)
         .attr("width", rectWidth)
         .attr("height", currRectHeight * (node.features.length) )
-        .attr("class", `node-features-${node.graphIndex}-${node.id}`)
         .style("fill", "none")
         .style("stroke", "black")
         .style("stroke-width", 1);
+    
 
-        featureGroup.append("text")
+        const featureId = featureGroup.append("text")
           .attr("x", rectWidth / 2)
           .attr("y", node.features.length * currRectHeight + 12)
-          .attr("class", `node-features-${node.graphIndex}-${node.id}`)
+          .attr("class", `node-features-${node.graphIndex}-${node.id} feature-id`)
           .attr("dy", ".35em")
           .text(node.id)
           .style("font-size", "12px")
           .style("fill", "black")
           .style("text-anchor", "middle");
-        
-
 
 
 
@@ -813,6 +810,7 @@ export function featureVisualizer(
         let featureGroupLocation: FeatureGroupLocation = {xPos, yPos}; 
 
         node.featureGroup = featureGroup;
+        node.featureId = featureId;
         node.featureGroupLocation = featureGroupLocation; // this will be used in calculationvisualizer
         scaleFeatureGroup(node, 0.5);
 
@@ -842,6 +840,7 @@ export function featureVisualizer(
               return;
             }
             state.isClicked = true;
+            node.featureGroup.style("opacity", 0)
             d3.selectAll(".hintLabel").attr("opacity", 0);
 
                     //  // prevent clicking on other nodes and move the layers to the right again
