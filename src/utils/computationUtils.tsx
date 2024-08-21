@@ -22,6 +22,13 @@ export function computeAttnStep(
     ithFeature: number[], //target node feature
     jthFeature: number[], //computing node feature
 ){
+    console.log("ithFeature", ithFeature)
+    console.log("jthFeature", jthFeature)
+    console.log("learnableVectorSrc", learnableVectorsDst)
+    console.log("learnableVectorDSt", learnableVectorsDst)
+    
+
+
     const math = create(all);
     const val = math.multiply(math.multiply(math.transpose(learnableVectorsSrc), weightMatrix), math.transpose(ithFeature));
     console.log("attn val", val);

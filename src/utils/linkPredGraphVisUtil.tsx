@@ -80,6 +80,7 @@ export function linkPredFeatureVisualizer(
     let currentWeights: any[] = [];
     let currentBias: any[] = []
 
+    let featureMap: number[][] = [];
 
 
     // do some calculation that sill be used in the animation
@@ -88,7 +89,6 @@ export function linkPredFeatureVisualizer(
     currentBias = bias[graphIndex - 1]
       
 
-     let featureMap: number[][] = [];
      const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex);
      nodesByIndex.forEach((nodes, index) => { 
        if (index === graphIndex - 1) {
@@ -292,7 +292,7 @@ export function linkPredFeatureVisualizer(
 
 
           
-            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
+            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, featureMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
           
 
 

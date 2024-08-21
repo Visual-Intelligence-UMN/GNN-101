@@ -633,14 +633,13 @@ export function featureVisualizer(
     let currentBias: any[] = []
 
 
-
+    let featureMap: number[][] = [];
     // do some calculation that sill be used in the animation
     if (graphs.length != 0 && graphIndex > 0 && graphIndex < (convNum)) {
     currentWeights = weights[graphIndex - 1];
     currentBias = bias[graphIndex - 1]
       
 
-     let featureMap: number[][] = [];
      const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex);
      nodesByIndex.forEach((nodes, index) => { 
        if (index === graphIndex - 1) {
@@ -887,7 +886,7 @@ export function featureVisualizer(
            if (mode === 1 && graphIndex === 4) {
             nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, svg, mode)
            } else {
-            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
+            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, featureMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
            };
 
 

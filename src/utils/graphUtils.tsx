@@ -19,10 +19,10 @@ import { injectPlayButtonSVGForGraphView, injectSVG} from "./svgUtils";
 import { stat, truncateSync } from "fs";
 
 
-import { drawActivationExplanation, drawMatmulExplanation, graphVisDrawMatmulExplanation } from "./matInteractionUtils";
+import { drawActivationExplanation, drawAttnDisplayer, drawEScoreEquation, drawMatmulExplanation, graphVisDrawMatmulExplanation } from "./matInteractionUtils";
 import { computeMatrixLocations, drawMathFormula, drawMatrixWeight, drawWeightMatrix } from "./matAnimateUtils";
 import { graphVisDrawActivationExplanation, graphVisDrawMatrixWeight, displayerHandler, hoverOverHandler} from "./graphAnimationHelper";
-import { computeAttentionCoefficient } from "./computationUtils";
+import { computeAttentionCoefficient, computeAttnStep } from "./computationUtils";
 
 export const pathColor = d3
     .scaleLinear<string>()
@@ -717,6 +717,7 @@ export function calculationVisualizer(
     normalizedAdjMatrix: any,
     aggregatedDataMap: any[],
     calculatedDataMap: any[],
+    featureMap: any[],
     svg: any,
     offset: number,
     height: number,
@@ -803,14 +804,20 @@ export function calculationVisualizer(
         );
     
     aggregatedFeatureGroup.on("mouseover", function(event:any, d:any){
+        if (innerComputationMode === "GCN") {
         d3.selectAll(".parameter").style("opacity", 1);
-        d3.selectAll(".formula_neighbor_aggregate").style("fill", "red")
+        }
     });
 
     aggregatedFeatureGroup.on("mouseout", function(event:any, d:any){
+        if (innerComputationMode === "GCN") {
         d3.selectAll(".parameter").style("opacity", 0);
-        d3.selectAll(".formula_neighbor_aggregate").style("fill", "black")
+        }
     });
+
+
+
+
 
     aggregatedFeatureGroup
         .selectAll("rect")
@@ -1122,7 +1129,7 @@ export function calculationVisualizer(
                 }
             }
         )}
-
+        let extendAttnView = false;
 
 
         if (node.relatedNodes) {
@@ -1151,10 +1158,21 @@ export function calculationVisualizer(
                         .attr("opacity", 0).raise();
                     }
                     else {
+
+
+                        const frame = g3.append("rect")
+                        .attr("x", start_x + 20)
+                        .attr("y", start_y - 10)
+                        .attr("width", 10)
+                        .attr("height", 10)
+                        .style("fill", "white")
+                        .style("stroke", "black")
+                        .attr("class", "parameter")
+                        .attr("opacity", 1).raise();
                         
 
                        
-                        const multiplier = computeAttentionCoefficient(node.graphIndex, n.features, lastLayerNodefeature, neighborFeatures);
+                        const multiplier = roundToTwo(computeAttentionCoefficient(node.graphIndex, n.features, lastLayerNodefeature, neighborFeatures));
                         
 
                         g3.append("text")
@@ -1163,7 +1181,86 @@ export function calculationVisualizer(
                         .text(multiplier)
                         .attr("font-size", 7.5)
                         .attr("class", "parameter")
-                        .attr("opacity", 0).raise();
+                        .attr("opacity", 1).raise();
+
+
+                        const learnableData = require("../../public/learnableVectorsGAT.json");
+                        const learnableVectors = [
+                            [learnableData["conv1_att_dst"], learnableData["conv1_att_src"]],
+                            [learnableData["conv2_att_dst"], learnableData["conv2_att_src"]]
+                        ];
+                        const weightMatrix = require("../../public/gat_link_weights.json");
+                        const weightMatrices = [
+                            weightMatrix["conv1.lin_l.weight"],
+                            weightMatrix["conv2.lin_l.weight"]
+                        ]
+                        
+
+                        const usingVectors = learnableVectors[node.graphIndex - 1];
+                        const usingWeightMatrix = weightMatrices[node.graphIndex - 1];
+
+                        console.log("Vectors", learnableVectors)
+                        console.log("matrix", weightMatrices)
+                        let eij: number[] = [];
+                        let lgIndices: number[][] = [];
+                        node.relatedNodes.forEach((n: any) => {
+                            let e = computeAttnStep(usingVectors[1], usingVectors[0], usingWeightMatrix, n.features, lastLayerNodefeature)
+                            eij.push(e);
+
+                            let index: number[] = [];
+                            index.push(node.id);
+                            index.push(n.id);
+                            lgIndices.push(index)
+                        })
+                        const targetE = computeAttnStep(usingVectors[1], usingVectors[0], usingWeightMatrix, lastLayerNodefeature, lastLayerNodefeature)
+          
+                        
+
+                        frame.on("click", function(this: any, event: any) {
+                            let extendAttnView = true;
+                            event.stopPropagation();
+                            event.preventDefault();
+                            drawAttnDisplayer(g3, start_x, start_y, eij, lgIndices, targetE, myColor, node.id, multiplier)
+                            d3.selectAll(".attnE").on("mouseover", function () {
+                                const targetIdx = Number(d3.select(this).attr("index"));
+                                d3.selectAll(".e-displayer").remove();
+                                const eDisplayer = g3
+                                    .append("g")
+                                    .attr("class", "procVis e-displayer attn-displayer");
+                                
+                                console.log( `e_${targetIdx}_${lgIndices[targetIdx][1]} = LeakyReLU(                            +                        )`, lgIndices)
+                                const inputVector = featureMap[node.graphIndex][Number(d3.select(this).attr("index"))];
+                                let jthIndexElement = lgIndices[targetIdx][1];
+                                if(d3.select(this).classed("attnTargetE")){
+                                    jthIndexElement = lgIndices[node.id][1];
+                                    
+                                }
+                                drawEScoreEquation(lgIndices, eDisplayer, jthIndexElement, start_x, start_y, usingVectors[1], usingVectors[0], myColor, inputVector, node.graphIndex);
+                            });
+                            const eDisplayer = g3
+                            .append("g")
+                            .attr("class", "procVis e-displayer attn-displayer");
+                            const inputVector = featureMap[node.graphIndex][Number(d3.select(this).attr("index"))];
+                            let jthIndexElement = lgIndices[node.id][1];
+                            drawEScoreEquation(lgIndices, eDisplayer, jthIndexElement, start_x, start_y, usingVectors[1], usingVectors[0], myColor, inputVector, node.graphIndex);
+                
+                        })
+                        let recoverEvent: any = d3.select("#my_dataviz").on("click");
+                        d3.selectAll("#my_dataviz").on("click", function (event: any, d: any) {
+                            if (extendAttnView) {
+                                extendAttnView = false;
+                                d3.selectAll(".attn-displayer").remove();
+                
+                                event.stopPropagation();
+                                d3.selectAll(".attention").attr("font-size", 15);
+                                extendAttnView = false;
+                                d3.selectAll(".mats")
+                                    .style("pointer-events", "auto")
+                                    .on("click", recoverEvent);
+                            }
+                        })
+
+        
 
                     }
 
