@@ -1208,7 +1208,7 @@ export function drawTanh(
             d3.select(ReLU)
                 .attr("x", cx1)
                 .attr("y", cy1)
-                .attr("class", "procVis")
+                .attr("class", "procVis relu-icon")
                 .raise();
         }
     });
@@ -1218,7 +1218,7 @@ export function drawTanh(
         cx1 - 20,
         cy1 + radius * 4 + 12 + 4,
         "Tanh Non-linear Function",
-        "procVis"
+        "procVis relu-icon"
     );
 
     relu.on("mouseover", function (event, d) {
