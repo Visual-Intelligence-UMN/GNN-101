@@ -113,7 +113,10 @@ export function detailedViewRecovery(
     gap:number,
     resultLabelsList:any
 ) {
-
+    //remove temp classes
+    d3.selectAll(".cant-remove").classed("cant-remove", false);
+    d3.selectAll(".inputFeature").classed("inputFeature", false);
+    d3.selectAll(".outputFeature").classed("outputFeature", false);
 
     //remove calculation process visualizer
     //d3.selectAll(".procVis").transition().duration(500).attr("opacity", 0);
@@ -438,6 +441,8 @@ export function featureVisClick(
         let cur = neighbors[i];
         featureVisTable[layerID][cur].style.opacity = "1";
 
+        d3.select(featureVisTable[layerID][cur]).classed("cant-remove inputFeature", true);
+
         //find position and save it
         let c = calculatePrevFeatureVisPos(
             featureVisTable,
@@ -452,7 +457,13 @@ export function featureVisClick(
     }
     let curNode = featureVisTable[layerID + 1][node];
     curNode.style.opacity = "0.25"; //display current node
-    d3.select(curNode).selectAll(".frame").attr("opacity", 1);
+
+    d3.select(curNode).classed("cant-remove outputFeature", true);
+
+    d3.select(curNode)
+    .selectAll(".frame")
+    .attr("opacity", 1)
+    .classed("cant-remove outputFeature", true);
 
     //calculation process visualizer
     let coord = calculatePrevFeatureVisPos(
