@@ -1594,6 +1594,7 @@ function weightAnimation(
         }
 
         d3.selectAll(".weightUnit").style("opacity", 0.3).lower();
+        d3.selectAll(".weight-matrix-frame").style("opacity", 0.3).lower()
         if (i >= endNumber) {
             i = 0; // Reset the index to replay the animation
         }
@@ -1657,6 +1658,7 @@ function weightAnimation(
                     clearInterval(intervalID);
                     state.isPlaying = false;
                     state.isAnimating = false;
+                    d3.selectAll(".weight-matrix-frame").style("opacity", 1)
                     d3.selectAll(".math-displayer").remove();
                     d3.selectAll(".graph-displayer").attr("opacity", 0);
 
