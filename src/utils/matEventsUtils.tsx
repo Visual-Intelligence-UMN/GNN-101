@@ -118,6 +118,8 @@ export function detailedViewRecovery(
     d3.selectAll(".inputFeature").classed("inputFeature", false);
     d3.selectAll(".outputFeature").classed("outputFeature", false);
 
+    d3.selectAll(".columnUnit").remove();
+
     //remove calculation process visualizer
     //d3.selectAll(".procVis").transition().duration(500).attr("opacity", 0);
     d3.selectAll(".procVis").remove();
