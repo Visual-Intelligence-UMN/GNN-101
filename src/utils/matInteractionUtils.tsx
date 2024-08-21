@@ -1199,7 +1199,7 @@ export function drawDotProduct(
         
 
         for(let i=0; i<operators.length; i++){
-            tooltip
+            const text = tooltip
             .append("text").attr("xml:space", "preserve")
             .attr("x", displayerX + 3 + unitSize*(i+1) + 25*(i+1))
             .attr("y", displayerY + vectorLength/2 + 20 )
@@ -1207,6 +1207,9 @@ export function drawDotProduct(
             .attr("font-size", unitSize*1.25)
             .attr("class", "matmul-displayer procVis")
             .raise();
+            if(i==operators.length-1){
+                text.style("font-weight", "bold");
+            }
     }
 
         tooltip
