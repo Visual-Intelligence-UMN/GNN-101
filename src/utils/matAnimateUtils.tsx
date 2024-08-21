@@ -739,7 +739,7 @@ export function drawBiasVector(
         .style("opacity", 1)
         .attr("stroke", "black")
         .attr("stroke-width", 1)
-        .attr("class", "procVis biasVector");
+        .attr("class", "procVis biasFrame");
     const label = drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+6, "Bias Vector", "procVis biasFrame");
    // d3.selectAll(".biasVector").transition().duration(100).style("opacity", 1);
 }
@@ -876,12 +876,12 @@ export function drawTanh(
             d3.select(ReLU)
                 .attr("x", cx1)
                 .attr("y", cy1)
-                .attr("class", "procVis")
+                .attr("class", "procVis relu-icon")
                 .raise();
             }
         });
         
-        drawHintLabel(relu, cx1-20, cy1+radius*4+12+4, "Tanh Non-linear Function", "procVis");
+        drawHintLabel(relu, cx1-20, cy1+radius*4+12+4, "Tanh Non-linear Function", "procVis reluText");
 
         relu.on("mouseover", function(event, d){
             const [x, y] = d3.pointer(event);
