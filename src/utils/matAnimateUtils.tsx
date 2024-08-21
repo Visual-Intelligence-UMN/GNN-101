@@ -412,15 +412,15 @@ export function drawSummationFeature(
             .attr("text-anchor", "middle")
             .attr("font-size", 7.5)
             .attr("class", "procVis multiplier")
-            .attr("opacity", 0);
+            .attr("opacity", 1);
     }
     d3.selectAll(".summation").transition().duration(100).attr("opacity", 1);
-    d3.select(".aggregate").on("mouseover", function(){
-        d3.selectAll(".multiplier").style("opacity", 1);
-    })
-    d3.select(".aggregate").on("mouseout", function(){
-        d3.selectAll(".multiplier").style("opacity", 0);
-    })
+    // d3.select(".aggregate").on("mouseover", function(){
+    //     d3.selectAll(".multiplier").style("opacity", 1);
+    // })
+    // d3.select(".aggregate").on("mouseout", function(){
+    //     d3.selectAll(".multiplier").style("opacity", 0);
+    // })
 }
 
 export function drawWeightsVector(
