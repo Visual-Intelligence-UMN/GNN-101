@@ -131,6 +131,7 @@ export function drawAniPath(
         const rectID = d3.select(this).attr("rectID")
 
         d3.select(".wMatLink").style("opacity", 0.3);
+        d3.selectAll(".interactRect").style("opacity", 0);
 
 
         d3.selectAll(".interactRect").style("opacity", 0.5);
@@ -148,6 +149,8 @@ export function drawAniPath(
         const rectID = d3.select(this).attr("rectID")
 
         d3.select(".wMatLink").style("opacity", 1);
+
+        d3.selectAll(".interactRect").style("opacity", 1);
 
         d3.selectAll(".weightUnit").style("opacity", 1);
 
@@ -476,6 +479,7 @@ export function drawWeightsVector(
 
         d3.selectAll(".interactRect").style("opacity", 0.5);
         d3.select(`.interactRect[rectID="${rectID}"]`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
+        d3.select(".weight-matrix-frame").style("opacity", 0);
         drawMatrixWeight(Xv, startCoordList, endCoordList, curveDir, Number(rectID), myColor, weightMatrixPostions, featureChannels, "weightPath", paintMode);
         d3.selectAll(".weightUnit").style("opacity", 0.3).lower();
         d3.selectAll(`#weightUnit-${rectID}`).style("opacity", 1).raise();
@@ -492,6 +496,8 @@ export function drawWeightsVector(
         d3.select(".wMatLink").style("opacity", 1);
 
         d3.selectAll(".weightUnit").style("opacity", 1);
+
+        d3.select(".weight-matrix-frame").style("opacity", 1);
 
         d3.selectAll(".columnUnit").style("opacity", 0);
         d3.selectAll(".interactRect").style("opacity", 1).style("stroke", "gray").style("stroke-width", 0.1);
