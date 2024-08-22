@@ -554,6 +554,8 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
     showAllLinks(allNodes);
     resetNodes(allNodes, convNum);
     state.isClicked = false;
+    state.isAnimating = false;
+    state.isPlaying = false;
   }
 };
 
