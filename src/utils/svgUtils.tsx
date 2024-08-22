@@ -50,14 +50,23 @@ function formularInteractionHandler(x: number, y: number, g: any, class_name: st
     .attr("stroke", "none") 
     .attr("class", "to-be-removed")
     .on("mouseover", function(this: any) {
-        d3.selectAll(".procVis").style("opacity", 0.2) 
+
+
+
+
+        d3.selectAll(".procVis").style("opacity", 0.2)
+        d3.selectAll(".cant-remove").style("opacity", 0.2);
         d3.selectAll(".formula").style("opacity", 0.2)
         d3.select(`.${class_name}`).style("opacity", 1)
 
-        for (let i = 0; i < formulaClass[class_name].length; i ++) {
-            d3.selectAll(`.${formulaClass[class_name][i]}`).style("opacity", 1)
-        }
 
+        
+        for (let i = 0; i < formulaClass[class_name].length; i ++) {
+            d3.selectAll(`.${formulaClass[class_name][i]}`).interrupt();
+            d3.selectAll(`.${formulaClass[class_name][i]}`).style("opacity", 1);
+            
+    
+        }
         for (let i = 0; i < formulaTextClass[class_name].length; i ++) {
             d3.selectAll(`.${formulaTextClass[class_name][i]}`).style("opacity", 1)
         }
@@ -66,6 +75,11 @@ function formularInteractionHandler(x: number, y: number, g: any, class_name: st
     }).on("mouseout", function(this: any) {
         d3.selectAll(".procVis").style("opacity", 1) 
         d3.selectAll(".formula").style("opacity", 1)
+
+
+        d3.selectAll(".cant-remove").style("opacity", 1);
+
+
         // for (let i = 0; i < formulaClass[class_name].length; i ++) {
         //     d3.selectAll(`.${formulaClass[class_name][i]}`).style("stroke_width", 1).style("stroke", "gray");
         // }
@@ -86,15 +100,17 @@ export function injectSVG(g:any, x: number, y: number, SVGPath:string, svgClass:
         d3.select(play).attr("x", x).attr("y", y).attr("class", svgClass)
        
         if (SVGPath === "./assets/SVGs/GCNFormula.svg") {
+
             g.append("rect")
             .attr("class", "to-be-removed")
             .attr("x", x - 50)
             .attr("y", y)
             .attr("width", 400)
             .attr("height", 100)
-            .style("fill", "none")
-            .style("stroke", "black")
+            .style("fill", "white")
+            .style("stroke", "black").raise()
 
+            d3.select(play).raise();
 
             g.append("text")
             .attr("class", "to-be-removed")
