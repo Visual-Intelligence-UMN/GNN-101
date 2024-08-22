@@ -1,10 +1,12 @@
-import { calculatePrevFeatureVisPos, loadNodeWeights, loadWeights, translateLayers } from "./matHelperUtils";
+import { calculatePrevFeatureVisPos, loadLinkGATWeights, loadLinkWeights, loadNodeWeights, loadWeights, translateLayers } from "./matHelperUtils";
 import {
     drawMatrixPreparation,
     drawNodeFeatures,
     drawGCNConvGraphModel,
     drawGCNConvNodeModel,
     computeMids,
+    drawGCNConvLinkModel,
+    drawCrossConnectionForSubgraph,
 } from "./matFeaturesUtils";
 import * as d3 from "d3";
 import {
@@ -17,14 +19,17 @@ import {
     outputVisClick,
     resultRectMouseover,
     resultRectMouseout,
-    resultVisMouseEvent
+    resultVisMouseEvent,
+    featureGATClick,
+    featureSAGEClick
 } from "./matEventsUtils";
-import { drawPoints } from "./utils";
+import { deepClone, drawPoints } from "./utils";
 import { AnimationController, computeMatrixLocations, drawAniPath, drawBiasPath, drawBiasVector, drawPathBtwOuputResult, drawPathInteractiveComponents, drawWeightMatrix, drawWeightsVector } from "./matAnimateUtils";
 import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import { roundToTwo } from "../components/WebUtils";
 import { drawMatmulExplanation, drawSoftmaxDisplayerNodeClassifier } from "./matInteractionUtils";
 import { create, all } from "mathjs";
+import { sigmoid } from "./linkPredictionUtils";
 
 //Graph Classifier： features visualization pipeline: draw all feature visualizers for original features and GCNConv
 export function visualizeGraphClassifierFeatures(
@@ -1087,15 +1092,744 @@ export function visualizeNodeClassifierFeatures(
         }
 
     });
-
-
-
-
-
-
     return null;
 }
 
 
+export function visualizeLinkClassifierFeatures(
+    locations: any,
+    features: any,
+    myColor: any,
+    conv1: any,
+    conv2: any,
+    probResult: number,
+    graph: any,
+    adjList: any,
+    maxVals: any,
+    featureKeys: number[],
+    featureKeysEachLayer: number[][],
+    innerComputationMode: string = "GCN"
+    // trainingNodes: number[]
+) {
+    //--------------------------------DATA PREP MANAGEMENT--------------------------------
+    let intervalID: any = null; // to manage animation controls
 
+    let poolingVis = null; //to manage pooling visualizer
+    let outputVis = null; //to manage model output
+    let resultVis: any = null; //tp manage result visualizer
+    //load weights and bias
+    let dataPackage = loadLinkWeights();
+
+    //conditional loading
+    if(innerComputationMode == "GCN"){
+        dataPackage = loadLinkGATWeights();
+    }
+
+
+    const weights = dataPackage["weights"];
+    const bias = dataPackage["bias"];
+
+    //table that manage all feature visualizers for GCNConv
+    let featureVisTable: SVGElement[][] = [[], [], [], [], []];
+    //table that manage color schemes
+    let colorSchemesTable: SVGElement[] = [];
+    //control detail view
+    let dview = false;
+    //control lock and unlock
+    let lock = false;
+    //a data structure to store all feature vis frames information
+    interface FrameDS {
+        features: any[];
+        GCNConv1: any[];
+        GCNConv2: any[];
+        GCNConv3: any[];
+        results: any[];
+    }
+    var frames: FrameDS = {
+        features: [],
+        GCNConv1: [],
+        GCNConv2: [],
+        GCNConv3: [],
+        results: []
+    };
+    var schemeLocations: any = [];
+
+    //--------------------------------DRAW FRAMES--------------------------------
+    const framePackage = drawMatrixPreparation(graph, locations, 400, -25);
+    let colFrames: SVGElement[] = framePackage.colFrames; //a
+    let matFrames: SVGElement[] = framePackage.matFrames; //a
+
+    //-----------------------------------FIRST LAYER-----------------------------------------------
+    const firstLayerPackage = drawNodeFeatures(
+        locations,
+        graph,
+        myColor,
+        features,
+        frames,
+        schemeLocations,
+        featureVisTable,
+        128,
+        2.5,
+        15,
+        150,
+        false
+    );
+    //updated variables
+    locations = firstLayerPackage.locations;
+    frames = firstLayerPackage.frames;
+    schemeLocations = firstLayerPackage.schemeLocations;
+    featureVisTable = firstLayerPackage.featureVisTable;
+    const firstLayer = firstLayerPackage.firstLayer;
+
+    //drawPoints(".mats", "red", locations);
+
+    //draw paths
+    const pathsForFisrtLayer = drawCrossConnectionForSubgraph(graph, locations, 2.5*128, 100, 0, featureKeys, featureKeys, featureKeysEachLayer[1]);
+
+    console.log("paths for first layer", pathsForFisrtLayer);
+
+    //-----------------------------------GCNConv LAYERS-----------------------------------------------
+    const featureChannels = 64;
+    
+    // we need have the locations and indices of the nodes involved during the computation
+
+    const GCNConvPackage = drawGCNConvLinkModel(
+        conv1,
+        conv2,
+        probResult, 
+        locations,
+        myColor,
+        frames,
+        schemeLocations,
+        featureVisTable,
+        graph,
+        colorSchemesTable,
+        firstLayer,
+        maxVals,
+        featureChannels,
+        featureKeys,
+        featureKeysEachLayer,
+        innerComputationMode
+    );
+    locations = GCNConvPackage.locations;
+    frames = GCNConvPackage.frames;
+    schemeLocations = GCNConvPackage.schemeLocations;
+    featureVisTable = GCNConvPackage.featureVisTable;
+    colorSchemesTable = GCNConvPackage.colorSchemesTable;
+    maxVals = GCNConvPackage.maxVals;
+    let paths = GCNConvPackage.paths;
+    let locationsForLastLayer = GCNConvPackage.locationsForLastLayer;
+
+    console.log("frames", frames);
+
+    //-----------------------------------INTERACTIONS EVENTS MANAGEMENT-----------------------------------------------
+
+    let recordLayerID: number = -1;
+    // a state to controls the recover event
+    let transState = "GCNConv";
+    //save events for poolingVis
+    let poolingOverEvent: any = null;
+    let poolingOutEvent: any = null;
+
+    //added interactions
+    //add mouse event
+    d3.selectAll(".oFeature").on("mouseover", function (event, d) {
+        //if not in the state of lock
+        if (!lock) {
+            const layerID = d3.select(this).attr("layerID");
+            const node = d3.select(this).attr("node");
+            const pack = oFeatureMouseOver(layerID, node, frames, matFrames);
+            //update variables
+            frames = pack.frames;
+            matFrames = pack.matFrames;
+        }
+    });
+    d3.selectAll(".oFeature").on("mouseout", function (event, d) {
+        const layerID = d3.select(this).attr("layerID");
+        const node = d3.select(this).attr("node");
+        const pack = oFeatureMouseOut(layerID, node, frames, matFrames);
+        //update variables
+        frames = pack.frames;
+        matFrames = pack.matFrames;
+    });
+
+    d3.selectAll(".featureVis").on("mouseover", function (event, d) {
+        //if not in the state of lock
+        if (!lock) {
+            //paths interactions
+            const layerID = Number(d3.select(this).attr("layerID")) - 1;
+            const node = Number(d3.select(this).attr("node"));
+            const featureOverPack = featureVisMouseOver(
+                layerID,
+                node,
+                paths,
+                frames,
+                adjList,
+                matFrames,
+                colFrames,
+                featureChannels
+            );
+            paths = featureOverPack.paths;
+            frames = featureOverPack.frames;
+            matFrames = featureOverPack.matFrames;
+            colFrames = featureOverPack.colFrames;
+        }
+    });
+    d3.selectAll(".featureVis").on("mouseout", function (event, d) {
+        if (!lock) {
+            const layerID = Number(d3.select(this).attr("layerID")) - 1;
+            const node = Number(d3.select(this).attr("node"));
+            const featureOverPack = featureVisMouseOut(
+                layerID,
+                node,
+                paths,
+                frames,
+                adjList,
+                matFrames,
+                colFrames
+            );
+            paths = featureOverPack.paths;
+            frames = featureOverPack.frames;
+            matFrames = featureOverPack.matFrames;
+            colFrames = featureOverPack.colFrames;
+        }
+    });
+    d3.selectAll(".mats, .switchBtn").on("click", function (event, d) {
+        if (event.target && event.target.id === "btn") {
+            return;
+        }
+        if (lock) {
+            d3.selectAll(".resultVis")
+                .style("pointer-events", "auto")
+                .style("opacity", 1);
+            const recoverPackage = detailedViewRecovery(
+                event,
+                dview,
+                lock,
+                transState,
+                recordLayerID,
+                poolingOutEvent,
+                poolingOverEvent,
+                poolingVis,
+                colorSchemesTable,
+                featureChannels,
+                90,
+                []
+            );
+            //update variables
+            dview = recoverPackage.dview;
+            lock = recoverPackage.lock;
+            transState = recoverPackage.transState;
+            recordLayerID = recoverPackage.recordLayerID;
+            poolingOutEvent = recoverPackage.poolingOutEvent;
+            poolingOverEvent = recoverPackage.poolingOverEvent;
+            colorSchemesTable = recoverPackage.colorSchemesTable;
+
+            clearInterval(intervalID);
+        }
+    });
+
+    function setIntervalID(id: any) {
+        intervalID = id;
+
+    }
+
+    d3.selectAll(".featureVis").on("click", function (event, d) {
+        if (lock != true) {
+            //state
+            transState = "GCNConv";
+            lock = true;
+            event.stopPropagation();
+            dview = true;
+
+            //lock all feature visualizers and transparent paths
+            d3.selectAll(".resultVis")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".oFeature")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.select(".pooling")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".twoLayer")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".crossConnection").style("opacity", 0);
+            //transparent other feature visualizers
+            d3.selectAll(".featureVis").style("opacity", 0.2);
+            d3.selectAll(".oFeature").style("opacity", 0.2);
+            d3.selectAll(".legend").style("opacity", 0.25);
+            d3.selectAll(".binary-legend").style("opacity", 0.25);
+            //translate each layer
+            const layerID = Number(d3.select(this).attr("layerID")) - 1;
+            const node = Number(d3.select(this).attr("node"));
+            if(innerComputationMode == "GCN"){
+                const featureVisPack = featureVisClick(
+                    layerID,
+                    node,
+                    recordLayerID,
+                    colorSchemesTable,
+                    adjList,
+                    featureVisTable,
+                    features,
+                    conv1,
+                    conv2,
+                    bias,
+                    myColor,
+                    weights,
+                    lock,
+                    setIntervalID,
+                    featureChannels,
+                    15,
+                    5,
+                    90,
+                    128,
+                    2.5,
+                );
+                // update variables
+                recordLayerID = featureVisPack.recordLayerID;
+                colorSchemesTable = featureVisPack.colorSchemesTable;
+                featureVisTable = featureVisPack.featureVisTable;
+                features = featureVisPack.features;
+                intervalID = featureVisPack.getIntervalID();
+            } else if(innerComputationMode == "GAT"){
+                const featureVisPack = featureGATClick(
+                    layerID,
+                    node,
+                    recordLayerID,
+                    colorSchemesTable,
+                    adjList,
+                    featureVisTable,
+                    features,
+                    conv1,
+                    conv2,
+                    bias,
+                    myColor,
+                    weights,
+                    lock,
+                    setIntervalID,
+                    featureChannels,
+                    15,
+                    5,
+                    90,
+                    128,
+                    2.5,
+                    featureKeysEachLayer
+                );
+                // update variables
+                recordLayerID = featureVisPack.recordLayerID;
+                colorSchemesTable = featureVisPack.colorSchemesTable;
+                featureVisTable = featureVisPack.featureVisTable;
+                features = featureVisPack.features;
+                intervalID = featureVisPack.getIntervalID();
+                
+            } else if(innerComputationMode == "SAGE"){
+                const featureVisPack = featureSAGEClick(
+                    layerID,
+                    node,
+                    recordLayerID,
+                    colorSchemesTable,
+                    adjList,
+                    featureVisTable,
+                    features,
+                    conv1,
+                    conv2,
+                    bias,
+                    myColor,
+                    weights,
+                    lock,
+                    setIntervalID,
+                    featureChannels,
+                    15,
+                    5,
+                    90,
+                    128,
+                    2.5,
+                    featureKeysEachLayer
+                );
+                // update variables
+                recordLayerID = featureVisPack.recordLayerID;
+                colorSchemesTable = featureVisPack.colorSchemesTable;
+                featureVisTable = featureVisPack.featureVisTable;
+                features = featureVisPack.features;
+                intervalID = featureVisPack.getIntervalID();
+            }
+            
+
+            //path connect - connect intermediate feature vis to current feature vis
+
+
+        }
+    });
+
+
+    //result visualizer interactions
+    d3.selectAll(".resultVis").on("mouseover", function (event) {
+        if(!lock){
+            d3.selectAll(".pathsToResult").style("opacity", 1);
+            d3.select(".resultFrame").style("opacity", 1);
+            d3.selectAll(".frame[layerID='2']").style("opacity", 1);
+        }
+    });
+    d3.selectAll(".resultVis").on("mouseout", function (event) {
+        if(!lock){
+            d3.selectAll(".pathsToResult").style("opacity", 0.05);
+            d3.select(".resultFrame").style("opacity", 0.25);
+            d3.selectAll(".frame[layerID='2']").style("opacity", 0.25);
+        }
+    });
+    d3.selectAll(".resultVis").on("click", function (event) {
+        console.log("click result visualizer!");
+        if (lock != true) {
+            //state
+            transState = "linkResult";
+            lock = true;
+            event.stopPropagation();
+            dview = true;
+
+            //lock all feature visualizers and transparent paths
+            d3.selectAll(".resultVis")
+                .style("pointer-events", "none");
+            d3.selectAll(".oFeature")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.select(".pooling")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".twoLayer")
+                .style("pointer-events", "none")
+                .style("opacity", 0.2);
+            d3.selectAll(".crossConnection").style("opacity", 0);
+            d3.selectAll(".pathsToResult").attr("opacity", 0);
+
+            d3.selectAll(".legend").style("opacity", 0.25);
+            d3.selectAll(".binary-legend").style("opacity", 0.25);
+
+            colorSchemesTable[2].style.opacity = "1";
+            colorSchemesTable[3].style.opacity = "1";
+
+            console.log("selection check", d3.selectAll(".pathsToResult"));
+
+            d3.selectAll(".frame[layerID='2']").style("opacity", 1);
+
+            //transparent other feature visualizers
+            d3.selectAll(".featureVis").style("opacity", 0.2);
+            d3.selectAll(".oFeature").style("opacity", 0.2);
+            //translate each layer
+            const layerID = Number(d3.select(this).attr("layerID")) - 1;
+            const node = Number(d3.select(this).attr("node"));
+            translateLayers(2, 250);
+
+
+            //recover necesary components
+            d3.selectAll("#layerNum_2").style("opacity", 1);
+            d3.selectAll(".featureVis[layerID='2']").style("opacity", 1);
+
+            //visualize the inner computation process
+            
+            //compute locationing
+            // let prevFeatureCoord:any = [];
+
+            const location1: [number, number] = locationsForLastLayer[0];
+            const location2: [number, number] = locationsForLastLayer[1];
+
+            const midY = (location1[1] + location2[1])/2;
+            const featureX = location1[0] + 64 * 5 + 100;
+            const midYForFeature = midY + 15;
+
+            const startingPoint1:[number, number] = [location1[0]+64*5, location1[1]+15/2];
+            const startingPoint2:[number, number] = [location2[0]+64*5, location2[1]+15/2];
+            const endingPoint:[number, number] = [featureX, midYForFeature];
+
+            //draw the connection between two layers
+            const res1 = computeMids(startingPoint1, endingPoint);
+            const hpoint1:[number, number] = res1[0];
+            const lpoint1:[number, number] = res1[1];
+
+            const res2 = computeMids(startingPoint2, endingPoint);
+            const hpoint2:[number, number] = res2[0];
+            const lpoint2:[number, number] = res2[1];
+
+            const curve = d3.line().curve(d3.curveBasis);
+
+            d3.select(".mats")
+                .append("path")
+                .attr(
+                    "d",
+                    curve([startingPoint1, hpoint1, lpoint1, endingPoint])
+                )
+                .attr("stroke", "black")
+                .attr("opacity", 1)
+                .attr("fill", "none")
+                .attr("layerID", 3)
+                .attr("class", "procVis");
+
+            d3.select(".mats")
+                .append("path")
+                .attr(
+                    "d",
+                    curve([startingPoint2, hpoint2, lpoint2, endingPoint])
+                )
+                .attr("stroke", "black")
+                .attr("opacity", 1)
+                .attr("fill", "none")
+                .attr("layerID", 3)
+                .attr("class", "procVis");
+
+            const g = d3.select(".mats").append("g");
+
+            const g1 = d3.select(".mats").append("g").attr("class", "dotProduct");
+
+            injectSVG(g1, endingPoint[0], endingPoint[1]-12, "./assets/SVGs/matmul.svg", "procVis");
+            
+            let resultVisPos = deepClone(endingPoint);
+            resultVisPos[0] += 150;
+            
+            // drawPoints(".mats", "red", [resultVisPos]);
+
+            g.append("line")
+                .attr("x1", endingPoint[0])
+                .attr("y1", endingPoint[1])
+                .attr("x2", resultVisPos[0])
+                .attr("y2", resultVisPos[1])
+                .attr("stroke", "black")
+                .attr("stroke-width", 1)
+                .attr("class", "procVis");
+
+            //TODO: add data fetching for dot product result
+            const hubNodeA = featureKeysEachLayer[2][0];
+            const hubNodeB = featureKeysEachLayer[2][1];
+
+            const featureInvolvedCOmputingA = Array.prototype.slice.call(conv2[hubNodeA]);
+            const featureInvolvedCOmputingB = Array.prototype.slice.call(conv2[hubNodeB]);
+
+            console.log("result vis comp", hubNodeA, hubNodeB, featureInvolvedCOmputingA, featureInvolvedCOmputingB);
+            
+            const math = create(all, {});
+            const resultVal = math.dot(featureInvolvedCOmputingA, featureInvolvedCOmputingB);
+
+            g.append("rect")
+                .attr("x", resultVisPos[0])
+                .attr("y", resultVisPos[1]-7.5)
+                .attr("width", 15)
+                .attr("height", 15)
+                .attr("fill", myColor(resultVal))
+                .attr("stroke", "black")
+                .attr("class", "dotResult procVis");
+
+            g.append("line")
+                .attr("x1", resultVisPos[0]+15)
+                .attr("y1", resultVisPos[1])
+                .attr("x2", resultVisPos[0]+100)
+                .attr("y2", resultVisPos[1])
+                .attr("stroke", myColor(resultVal))
+                .attr("stroke-width", 1)
+                .attr("class", "procVis")
+                .lower();
+
+            const sigmoidTextPos = [
+                resultVisPos[0]+50,
+                resultVisPos[1]+25
+            ];
+
+            g.append("text")
+                .attr("x", sigmoidTextPos[0])
+                .attr("y", sigmoidTextPos[1])
+                .attr("fill", "gray")
+                .attr("class", "procVis sigmoid")
+                .text("Sigmoid")
+                .style("font-size", "12px");
+
+            //for testing
+            d3.select(".mats").selectAll(".dotProduct").on("mouseover", function(event){
+                //add dot product explanation there
+                    const [x, y] = d3.pointer(event);
+                    const displayW = 250;
+                    const displayH = 100;
+
+                    //find coordination for the math displayer first
+                    const displayX = x + 10;
+                    const displayY = y - 10;
+
+                    //add displayer
+                    d3.select(".mats")
+                        .append("rect")
+                        .attr("x", displayX)
+                        .attr("y", displayY)
+                        .attr("width", displayW)
+                        .attr("height", displayH)
+                        .attr("rx", 10)
+                        .attr("ry", 10)
+                        .style("fill", "white")
+                        .style("stroke", "black")
+                        .style("stroke-width", 2)
+                        .attr("class", "math-displayer procVis")
+                        .raise();
+
+                    console.log("in!!!!");
+
+                    d3.select(".mats")
+                        .append("text")
+                        .attr("x", displayX + 75)
+                        .attr("y", displayY + 20)
+                        .text("Dot Product")
+                        .style("font-size", "16px")
+                        .attr("class", "math-displayer procVis")
+                        .raise();
+                    
+                    d3.select(".mats")
+                        .append("text")
+                        .attr("x", displayX + 15)
+                        .attr("y", displayY + 50)
+                        .attr("xml:space", "preserve")
+                        .text("dot(               ,              )   =   ")
+                        .attr("class", "math-displayer procVis")
+                    
+                    d3.select(".mats")
+                        .append("rect")
+                        .attr("x", displayX + 15 + 235 - 45)
+                        .attr("y", displayY + 37.5)
+                        .attr("width", 15)
+                        .attr("height", 15)
+                        .attr("fill", myColor(resultVal))
+                        .attr("class", "math-displayer procVis");
+                    
+                    const feature1Pos = [
+                        displayX + 60,
+                        displayY + 20
+                    ];
+
+                    const h = 50/64;
+
+                    for(let i=0; i<featureInvolvedCOmputingA.length; i++){
+                        d3.select(".mats")
+                            .append("rect")
+                            .attr("x", feature1Pos[0] + 7.5)
+                            .attr("y", feature1Pos[1] + i*h)
+                            .attr("width", 7.5)
+                            .attr("height", h)
+                            .attr("fill", myColor(featureInvolvedCOmputingA[i]))
+                            .attr("class", "math-displayer procVis")
+                            .raise();
+                    }
+
+                    const feature2Pos = [
+                        displayX + 125,
+                        displayY + 37.5
+                    ];
+
+                    for(let i=0; i<featureInvolvedCOmputingB.length; i++){
+                        d3.select(".mats")
+                            .append("rect")
+                            .attr("x", feature2Pos[0] + i*h)
+                            .attr("y", feature2Pos[1] + 7.5)
+                            .attr("width", h)
+                            .attr("height", 7.5)
+                            .attr("fill", myColor(featureInvolvedCOmputingB[i]))
+                            .attr("class", "math-displayer procVis")
+                            .raise();
+                    }
+
+            });
+
+            d3.select(".mats").selectAll(".dotProduct").on("mouseout", function(event){
+                d3.selectAll(".math-displayer").remove();
+            });
+
+            //add sigmoid explanation
+            d3.select(".sigmoid").on("mouseover", function(event){
+                const [x, y] = d3.pointer(event);
+                const displayW = 250;
+                const displayH = 100;
+
+                //find coordination for the math displayer first
+                const displayX = x + 10;
+                const displayY = y - 10;
+
+                //add displayer
+                d3.select(".mats")
+                    .append("rect")
+                    .attr("x", displayX)
+                    .attr("y", displayY)
+                    .attr("width", displayW)
+                    .attr("height", displayH)
+                    .attr("rx", 10)
+                    .attr("ry", 10)
+                    .style("fill", "white")
+                    .style("stroke", "black")
+                    .style("stroke-width", 2)
+                    .attr("class", "math-displayer procVis")
+                    .raise();
+
+                console.log("in!!!!");
+
+                d3.select(".mats")
+                    .append("text")
+                    .attr("x", displayX + 75)
+                    .attr("y", displayY + 20)
+                    .text("Sigmoid")
+                    .style("font-size", "16px")
+                    .attr("class", "math-displayer procVis")
+                    .raise();
+
+
+                d3.select(".mats")
+                    .append("text")
+                    .attr("x", displayX + 50)
+                    .attr("y", displayY + 40)
+                    .attr("xml:space", "preserve")
+                    .text("1")
+                    .attr("class", "math-displayer procVis")
+
+                d3.select(".mats").append("line")
+                    .attr("x1", displayX + 5)
+                    .attr("y1", displayY + 50)
+                    .attr("x2", displayX + 105)
+                    .attr("y2", displayY + 50)
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 1)
+                    .attr("class", "math-displayer procVis");
+
+                d3.select(".mats")
+                    .append("text")
+                    .attr("x", displayX + 110)
+                    .attr("y", displayY + 50)
+                    .attr("xml:space", "preserve")
+                    .text("=")
+                    .attr("class", "math-displayer procVis")
+                
+                d3.select(".mats")
+                    .append("rect")
+                    .attr("x", displayX + 125)
+                    .attr("y", displayY + 35)
+                    .attr("width", 15)
+                    .attr("height", 15)
+                    .attr("fill", myColor(sigmoid(resultVal)))
+                    .attr("class", "math-displayer procVis");
+                
+                d3.select(".mats")
+                    .append("text")
+                    .attr("x", displayX + 5)
+                    .attr("y", displayY + 75)
+                    .attr("xml:space", "preserve")
+                    .text("1 + expr( -       )")
+                    .attr("class", "math-displayer procVis")
+
+                d3.select(".mats")
+                    .append("rect")
+                    .attr("x", displayX + 90)
+                    .attr("y", displayY + 65)
+                    .attr("width", 15)
+                    .attr("height", 15)
+                    .attr("fill", myColor(resultVal))
+            });
+
+            d3.select(".sigmoid").on("mouseout", function(event){
+                d3.selectAll(".math-displayer").remove();
+            })
+
+        }
+    });
+}
 

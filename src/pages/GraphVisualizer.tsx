@@ -28,6 +28,7 @@ interface GraphVisualizerProps {
   selectedButtons: boolean[];
   simulationLoading: boolean;
   setSimulation: Function;
+  innerComputationMode: string
 }
 
 const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
@@ -38,6 +39,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
   selectedButtons,
   simulationLoading,
   setSimulation,
+  innerComputationMode
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -288,6 +290,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             allNodes.push(node);
           });
 
+
           
           let maxXDistance = 0;
           let maxYDistance = 0;
@@ -387,7 +390,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             .text(text)
             .attr("font-weight", "normal")
             .attr('opacity', 0.5);
-
+            console.log("value", value)
             const absMax = findAbsMax(value);
 
 
@@ -414,6 +417,9 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
               svg,
               graphs,
               offset,
+              [],
+              0,
+              0,
               0
             );
 
@@ -423,7 +429,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
             if (intmData) {
 
-              featureVisualizer(svg, allNodes, offset, height, graphs, 700, 900, 600, 15, 10, 3, 20, colorSchemes, 0); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
+              featureVisualizer(svg, allNodes, offset, height, graphs, 700, 900, 600, 15, 10, 3, 20, colorSchemes, 0, innerComputationMode); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
               //function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, graphs: any[], moveOffset: number, fcLayerMoveOffset: number, rectWidth: number, firstLayerRectHeight: number, rectHeight: number, outputLayerRectHeight: number)
             }
 
