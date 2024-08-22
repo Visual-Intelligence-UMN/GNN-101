@@ -51,7 +51,8 @@ function formularInteractionHandler(x: number, y: number, g: any, class_name: st
     .attr("class", "to-be-removed")
     .on("mouseover", function(this: any) {
         d3.selectAll(".procVis").style("opacity", 0.2) 
-        d3.select((`.${class_name}`)).style("fill", "red")
+        d3.selectAll(".formula").style("opacity", 0.2)
+        d3.select(`.${class_name}`).style("opacity", 1)
 
         for (let i = 0; i < formulaClass[class_name].length; i ++) {
             d3.selectAll(`.${formulaClass[class_name][i]}`).style("opacity", 1)
@@ -64,7 +65,7 @@ function formularInteractionHandler(x: number, y: number, g: any, class_name: st
 
     }).on("mouseout", function(this: any) {
         d3.selectAll(".procVis").style("opacity", 1) 
-        d3.select((`.${class_name}`)).style("fill", "black")
+        d3.selectAll(".formula").style("opacity", 1)
         // for (let i = 0; i < formulaClass[class_name].length; i ++) {
         //     d3.selectAll(`.${formulaClass[class_name][i]}`).style("stroke_width", 1).style("stroke", "gray");
         // }
