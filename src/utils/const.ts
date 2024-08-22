@@ -15,6 +15,23 @@ export const modelList: { [k: string]: string } = {
   "node classification": "./gnn_node_model.onnx",
   //  "link classification": "./gnn_link_model.onnx",
 };
+export const formulaClass: { [k: string]: string[]} = {
+  "formula_weights": ["weight-matrix-frame", "weightUnit"],
+  "formula_bias": ["biasFrame", "bias"],
+  "formula_x": ["output", "outputFeature"],
+  "formula_summation": ["aggregatedFeatureGroup", "origin-to-aggregated", "summation", "multiplier"],
+  "formula_neighbor_aggregate": ["original-features", "inputFeature"],
+  "formula_activation": ["relu-icon"]
+}
+
+export const formulaTextClass: { [k: string]: string[]} = {
+  "formula_weights": ["weightMatrixText"],
+  "formula_bias": ["biasText"],
+  "formula_x": ["outputText"],
+  "formula_summation": ["aggText"],
+  "formula_neighbor_aggregate": [],
+  "formula_activation": ["reluText"]
+}
 
 function graph_list_generate(num: number) {
   let res: { [k: string]: string } = {};
