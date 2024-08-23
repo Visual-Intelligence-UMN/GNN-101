@@ -60,7 +60,7 @@ export default function Sidebar(props: Props) {
                 <div className="p-4">
                     <h1 className="text-3xl font-semibold text-3xl">Input Data of a GNN:</h1>
                     <p>
-                        To start, let's establish what a graph is. A graph represents the
+                        To start, let`&apos;`s establish what a graph is. A graph represents the
                         relations (edges) between a collection of entities (nodes). For
                         example, the right panel shows a graph of a chemical compound, from
                         the{" "}
@@ -127,7 +127,7 @@ export default function Sidebar(props: Props) {
                         Graphs have an irregular structure can directly use traditional neural networks, which are designed to operate on
                         a fixed, grid-like structure input (such as sentences, images and video).
                         To process graphs, GNNs employ a technique called <span className="font-bold">message passing</span>, where neighboring nodes exchange information and update
-                        each other's embeddings  to better reflect their interconnectedness and individual features.
+                        each other`&apos;`s embeddings  to better reflect their interconnectedness and individual features.
                     </p>
 
                     {!props.predicted &&
