@@ -411,7 +411,7 @@ export function hoverOverHandler(node: any, aggregatedData: any, calculatedData:
                 if (!state.isClicked || state.isPlaying || state.isAnimating) {
                     return;
                 }
-                console.log('Xt', Xt)
+                d3.selectAll(".weight-matrix-frame").style("opacity", 0.3).lower()
                 if (mode === 1 && node.graphIndex === 4) {
                     graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, 1, i, myColor, weightsLocation, node.features.length, svg, mode)
                 }
@@ -431,6 +431,7 @@ export function hoverOverHandler(node: any, aggregatedData: any, calculatedData:
                 if (!state.isClicked || state.isPlaying || state.isAnimating) {
                     return;
                 }
+                d3.selectAll(".weight-matrix-frame").style("opacity", 1).lower()
                 d3.selectAll(".math-displayer").remove();
                 d3.selectAll(".graph-displayer").attr("opacity", 0);
                 d3.selectAll(`#weightUnit-${i}`).style("opacity", 0.3).raise();

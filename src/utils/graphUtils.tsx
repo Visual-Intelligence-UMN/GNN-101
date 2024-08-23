@@ -128,6 +128,7 @@ export function resetNodes(allNodes: any[], convNum: number) {
             if (node.featureGroup) {
                 node.featureGroup.style("transition", "opacity 0.2s ease-out, visibility 0.2s ease-out")
                     .style("opacity", 0)
+                    .style("visibility", "hidden")
                     .style("pointer-events", "none");
                 
             }
@@ -139,6 +140,7 @@ export function resetNodes(allNodes: any[], convNum: number) {
                     d3.select(relatedNode.svgElement).attr("stroke-width", 1);
                     relatedNode.featureGroup.style("transition", "opacity 0.2s ease-out, visibility 0.2s ease-out")
                         .style("opacity", 0)
+                        .style("visibility", "hidden")
                         .style("pointer-events", "none");
                     
                 });
@@ -742,7 +744,9 @@ export function calculationVisualizer(
     let intervalID = 0;
 
     d3.selectAll(".graph-displayer").remove();
+
     showFeature(node);
+    
     let currentWeights = weights[node.graphIndex - 1]
 
 
@@ -1594,6 +1598,7 @@ function weightAnimation(
         }
 
         d3.selectAll(".weightUnit").style("opacity", 0.3).lower();
+        d3.selectAll(".weight-matrix-frame").style("opacity", 0.3).lower()
         if (i >= endNumber) {
             i = 0; // Reset the index to replay the animation
         }
@@ -1657,6 +1662,7 @@ function weightAnimation(
                     clearInterval(intervalID);
                     state.isPlaying = false;
                     state.isAnimating = false;
+                    d3.selectAll(".weight-matrix-frame").style("opacity", 1)
                     d3.selectAll(".math-displayer").remove();
                     d3.selectAll(".graph-displayer").attr("opacity", 0);
 

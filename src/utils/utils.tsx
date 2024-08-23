@@ -554,6 +554,8 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
     showAllLinks(allNodes);
     resetNodes(allNodes, convNum);
     state.isClicked = false;
+    state.isAnimating = false;
+    state.isPlaying = false;
   }
 };
 
@@ -762,7 +764,7 @@ export function featureVisualizer(
         }
 
         const frame = featureGroup.append("rect")
-        .attr("class", `node-features-${node.graphIndex}-${node.id} nodeFeatureFrame`)
+        .attr("class", `node-features-${node.graphIndex}-${node.id} nodeFeatureFrame node-features`)
         .attr("x", 0)  
         .attr("y", 0)
         .attr("width", rectWidth)
@@ -839,8 +841,12 @@ export function featureVisualizer(
             if (state.isClicked) {
               return;
             }
+            // d3.selectAll(".node-features").style("visibility", "hidden")
+            // highlightNodes(node)
+        
             state.isClicked = true;
-            node.featureGroup.style("opacity", 0)
+
+            
             d3.selectAll(".hintLabel").attr("opacity", 0);
 
                     //  // prevent clicking on other nodes and move the layers to the right again
