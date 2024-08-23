@@ -7,6 +7,8 @@ import { drawEqComponentLabel } from "./matHelperUtils";
 
 
 //---------------------------functions for the softmax interaction in the graph classifier------------------------------
+
+
 export function drawAttnDisplayer(
     attnDisplayer: any,
     dX: number,
@@ -25,7 +27,7 @@ export function drawAttnDisplayer(
         .attr("rx", 5)
         .attr("ry", 5)
         .attr("width", 375)
-        .attr("height", 150)
+        .attr("height", 250)
         .attr("fill", "white")
         .attr("stroke", "black")
         .attr("stroke-width", 1)
@@ -79,15 +81,7 @@ export function drawAttnDisplayer(
         .attr("id", `e-${i}`)
         .attr("index", i);
 
-        escoreComponent
-            .append("rect")
-            .attr("x", dX + 100 + 65 * i)
-            .attr("y", dY + 75)
-            .attr("width", 15)
-            .attr("height", 15)
-            .attr("fill", myColor(eij[i]))
-            .attr("stroke", "black")
-            
+
 
         if (i != 0) {
             escoreComponent
@@ -130,16 +124,16 @@ export function drawAttnDisplayer(
             `${lgIndices[i][0]},${lgIndices[i][1]}`);
     }
 
-    attnDisplayer
-        .append("rect")
-        .attr("x", dX + 100 + 50)
-        .attr("y", dY + 50 - 7.5)
-        .attr("width", 15)
-        .attr("height", 15)
-        .attr("fill", myColor(targetE))
-        .attr("class", "procVis attn-displayer attnTargetE attnE")
-        .attr("stroke", "black")
-        .attr("index", 0);
+    // attnDisplayer
+    //     .append("rect")
+    //     .attr("x", dX + 100 + 50)
+    //     .attr("y", dY + 50 - 7.5)
+    //     .attr("width", 15)
+    //     .attr("height", 15)
+    //     .attr("fill", myColor(targetE))
+    //     .attr("class", "procVis attn-displayer attnTargetE attnE")
+    //     .attr("stroke", "black")
+    //     .attr("index", 0);
 
     const escore = attnDisplayer.append("g").attr("id", 0).attr("class", "math-latex");
     injectMathSymbol(
@@ -182,7 +176,7 @@ export function drawEScoreEquation(
     eDisplayer
         .append("text")
         .text(
-            `          = LeakyReLU(                      +                               )`
+            `          = exp(LeakyReLU(                      +                               ))`
         )
         .attr("x", dX + 15)
         .attr("y", dY + 125)
@@ -194,42 +188,44 @@ export function drawEScoreEquation(
     const fontSize = 12;
     const textH = dY + 110;
 
+    dX += 25;
+
 
     const aTs = eDisplayer.append("g").attr("id", "ats").attr("class", "math-latex");
     injectSVG(aTs, dX + 130, textH, "./assets/SVGs/a_t_s.svg", "math-latex");
     
     
 
-    aTs.on("mouseenter", function () {
-        d3.select("#ats-text").style("opacity", 1);
-        d3.select("#ats").style("opacity", 0);
+    // aTs.on("mouseenter", function () {
+    //     d3.select("#ats-text").style("opacity", 1);
+    //     d3.select("#ats").style("opacity", 0);
         
-        d3.selectAll(".temp").style("pointer-events", "none");
+    //     d3.selectAll(".temp").style("pointer-events", "none");
 
-        eDisplayer.append("text")
-            .text("Learnable Vector for Source")
-            .attr("x", dX + 140 - 10 + 12.5 + 5)
-            .attr("y", dY + 112.5 + srcVector.length * (25 / srcVector.length) + 5)
-            .attr("class", "temp")
-            .style("fill", "gray")
-            .style("font-size", 5);
+    //     eDisplayer.append("text")
+    //         .text("Learnable Vector for Source")
+    //         .attr("x", dX + 140 - 10 + 12.5 + 5)
+    //         .attr("y", dY + 112.5 + srcVector.length * (25 / srcVector.length) + 5)
+    //         .attr("class", "temp")
+    //         .style("fill", "gray")
+    //         .style("font-size", 5);
 
-        for (let i = 0; i < dstVector.length; i++) {
-            eDisplayer
-                .append("rect")
-                .attr("x", dX + 140 - 10 + 12.5)
-                .attr("y", dY + 112.5 + i * (25 / srcVector.length))
-                .attr("width", 2.5)
-                .attr("height", 25 / srcVector.length)
-                .attr("fill", myColor(srcVector[i])).attr("class", "temp");
-            }
+    //     for (let i = 0; i < dstVector.length; i++) {
+    //         eDisplayer
+    //             .append("rect")
+    //             .attr("x", dX + 140 - 10 + 12.5)
+    //             .attr("y", dY + 112.5 + i * (25 / srcVector.length))
+    //             .attr("width", 2.5)
+    //             .attr("height", 25 / srcVector.length)
+    //             .attr("fill", myColor(srcVector[i])).attr("class", "temp");
+    //         }
         
-        })
-        .on("mouseout", function () {
-            d3.select("#ats").style("opacity", 1);
-            d3.select("#ats-text").style("opacity", 0);
-            d3.selectAll(".temp").remove();
-        });
+    //     })
+    //     .on("mouseout", function () {
+    //         d3.select("#ats").style("opacity", 1);
+    //         d3.select("#ats-text").style("opacity", 0);
+    //         d3.selectAll(".temp").remove();
+    //     });
 
 
     const aTd = eDisplayer
@@ -237,22 +233,128 @@ export function drawEScoreEquation(
     .attr("id", "atd")
     .attr("class", "math-latex");
 
-    aTd.append("text")
-    .text("Learnable Vector for Destination")
-    .attr("x", dX + 200 + 12.5 + 20)
-    .attr("y", dY + 112.5 + dstVector.length * (25 / dstVector.length))
-
+    
 
     injectSVG(aTd, dX + 220, textH, "./assets/SVGs/a_t_d.svg", "math-latex");
         
-    aTd.on("mouseenter", function () {
-            d3.select("#atd").style("opacity", 0);
-            d3.selectAll(".temp").style("pointer-events", "none");
+    // aTd.on("mouseenter", function () {
+    //         d3.select("#atd").style("opacity", 0);
+    //         d3.selectAll(".temp").style("pointer-events", "none");
 
-            eDisplayer.append("text")
+    //         eDisplayer.append("text")
+    //         .text("Learnable Vector for Destination")
+    //         .attr("x", dX + 200 + 12.5 + 20)
+    //         .attr("y", dY + 112.5 + dstVector.length * (25 / dstVector.length) + 5)
+    //         .attr("class", "temp")
+    //         .style("fill", "gray")
+    //         .style("font-size", 5);
+
+    //         for (let i = 0; i < dstVector.length; i++) {
+    //             eDisplayer
+    //                 .append("rect")
+    //                 .attr("x", dX + 200 + 12.5 + 20)
+    //                 .attr("y", dY + 112.5 + i * (25 / dstVector.length))
+    //                 .attr("width", 2.5)
+    //                 .attr("height", 25 / dstVector.length).attr("class", "temp")
+    //                 .attr("fill", myColor(dstVector[i]))
+    //                 .raise();
+    //         }
+    //     })
+    //     .on("mouseout", function () {
+    //         d3.select("#atd").style("opacity", 1);
+    //         d3.selectAll(".temp").remove();
+    //     });
+
+    const x1 = eDisplayer.append("g").attr("id", "xi").attr("class", "math-latex");
+    injectMathSymbol(x1, dX + 140 - 10 + 50, textH, "./assets/SVGs/vector_x.svg", "math-latex", "input", lgIndices[0][0]);
+
+    //     x1.on("mouseenter", function () {
+    //         d3.select("#xi").style("opacity", 0);
+    //         d3.selectAll(".temp").style("pointer-events", "none");
+
+    //         drawEqComponentLabel(eDisplayer, dX + 140 - 10 + 50 + inputVector.length * (25 / inputVector.length), dY + 112.5 + 12.5 + 5, "Input Vector")
+            
+    //         for (let i = 0; i < inputVector.length; i++) {
+    //             eDisplayer
+    //                 .append("rect")
+    //                 .attr(
+    //                     "x",
+    //                     dX + 140 - 10 + 50 + i * (25 / inputVector.length)
+    //                 )
+    //                 .attr("y", dY + 112.5 + 12.5)
+    //                 .attr("width", 25 / inputVector.length)
+    //                 .attr("height", 2.5).attr("class", "temp")
+    //                 .attr("fill", myColor(inputVector[i]));
+    //         }
+    //     })
+    //     .on("mouseout", function () {
+    //         d3.select("#xi").style("opacity", 1);
+    //         d3.selectAll(".temp").remove();
+    //     });
+
+        const x2 = eDisplayer.append("g").attr("id", "xj").attr("class", "math-latex");
+        injectMathSymbol(x2, dX + 220+ 50, textH, "./assets/SVGs/vector_x.svg", "math-latex", "input", jthIndexElement);
+    
+    // x2
+    //     .on("mouseenter", function () {
+    //         d3.select("#xj").style("opacity", 0);
+    //         d3.selectAll(".temp").style("pointer-events", "none");
+
+    //         drawEqComponentLabel(eDisplayer, dX + 200 + 20 + 50 + inputVector.length * (25 / inputVector.length), dY + 112.5 + 12.5 + 5, "Input Vector")
+
+    //         for (let i = 0; i < inputVector.length; i++) {
+    //             eDisplayer
+    //                 .append("rect").attr("class", "temp")
+    //                 .attr(
+    //                     "x",
+    //                     dX + 200 + 20 + 50 + i * (25 / inputVector.length)
+    //                 )
+    //                 .attr("y", dY + 112.5 + 12.5)
+    //                 .attr("width", 25 / inputVector.length)
+    //                 .attr("height", 2.5)
+    //                 .attr("fill", myColor(inputVector[i]));
+    //         }
+    //     })
+    //     .on("mouseout", function () {
+    //         d3.select("#xj").style("opacity", 1);
+    //         d3.selectAll(".temp").remove();
+    //     });
+
+    
+    
+        eDisplayer
+            .append("text")
+            .text("W")
+            .attr("id", "w1").attr("class", "mathjax-latex")
+            .attr("x", dX + 75 + 75 + 15 )
+            .attr("y", textH + 15)
+            .attr("font-size", fontSize).style("font-weight", "bold")
+        eDisplayer
+            .append("text")
+            .text("W")
+            .attr("id", "w2").attr("class", "mathjax-latex")
+            .attr("x", dX + 75 + 75 + 60 + 40+5 )
+            .attr("y", textH + 15)
+            .attr("font-size", fontSize).style("font-weight", "bold")
+
+            dY += 35;
+            dX -= 75;
+
+            drawEqComponentLabel(eDisplayer, dX + 200 + 25 + inputVector.length * (25 / inputVector.length) - 10, dY + 112.5 + 12.5 + 2.5, "Input Vector")
+            drawEqComponentLabel(eDisplayer, dX + 200 + 25 + inputVector.length * (25 / inputVector.length) - 10, dY + 112.5 + 12.5 + 2.5 + 50, "Input Vector")
+            
+        eDisplayer.append("text")
             .text("Learnable Vector for Destination")
-            .attr("x", dX + 200 + 12.5 + 20)
-            .attr("y", dY + 112.5 + dstVector.length * (25 / dstVector.length) + 5)
+            .attr("x", dX + 140 - 10 + 12.5 + 5 - 75)
+            .attr("y", dY + 112.5 + dstVector.length * (25 / dstVector.length) + 5 - 12.5)
+            .attr("class", "temp")
+            .style("fill", "gray")
+            .style("font-size", 5);
+
+        eDisplayer.append("text")
+            .text("Learnable Vector for Source")
+            .attr("x", dX + 140 - 10 + 12.5 + 5 - 75)
+            .attr("y", dY + 112.5 + 50 + srcVector.length * (25 / srcVector.length) + 5 - 12.5)
             .attr("class", "temp")
             .style("fill", "gray")
             .style("font-size", 5);
@@ -260,73 +362,51 @@ export function drawEScoreEquation(
             for (let i = 0; i < dstVector.length; i++) {
                 eDisplayer
                     .append("rect")
-                    .attr("x", dX + 200 + 12.5 + 20)
-                    .attr("y", dY + 112.5 + i * (25 / dstVector.length))
-                    .attr("width", 2.5)
-                    .attr("height", 25 / dstVector.length).attr("class", "temp")
+                    .attr("x", dX + 140 +15 + i * (25 / dstVector.length))
+                    .attr("y", dY + 112.5 + 15)
+                    .attr("width", 25 / srcVector.length)
+                    .attr("height", 2.5).attr("class", "temp")
                     .attr("fill", myColor(dstVector[i]))
                     .raise();
             }
-        })
-        .on("mouseout", function () {
-            d3.select("#atd").style("opacity", 1);
-            d3.selectAll(".temp").remove();
-        });
 
-    const x1 = eDisplayer.append("g").attr("id", "xi").attr("class", "math-latex");
-    injectMathSymbol(x1, dX + 140 - 10 + 50, textH, "./assets/SVGs/vector_x.svg", "math-latex", "input", lgIndices[0][0]);
+        for (let i = 0; i < srcVector.length; i++) {
+            eDisplayer
+                .append("rect")
+                .attr("x", dX + 140 + 15 + i * (25 / srcVector.length))
+                .attr("y", dY + 112.5 + 50 + 15)
+                .attr("width",25 / srcVector.length)
+                .attr("height", 2.5)
+                .attr("fill", myColor(srcVector[i])).attr("class", "temp");
+            }
 
-        x1.on("mouseenter", function () {
-            d3.select("#xi").style("opacity", 0);
-            d3.selectAll(".temp").style("pointer-events", "none");
+        
+            for (let i = 0; i < inputVector.length; i++) {
+                eDisplayer
+                    .append("rect").attr("class", "temp")
+                    .attr(
+                        "x",
+                        dX + 200 + 12.5 + 20
+                    )
+                    .attr("y", dY + 112.5 + i * (25 / inputVector.length))
+                    .attr("width", 2.5)
+                    .attr("height", 25 / inputVector.length)
+                    .attr("fill", myColor(inputVector[i]));
+            }
 
-            drawEqComponentLabel(eDisplayer, dX + 140 - 10 + 50 + inputVector.length * (25 / inputVector.length), dY + 112.5 + 12.5 + 5, "Input Vector")
             
             for (let i = 0; i < inputVector.length; i++) {
                 eDisplayer
                     .append("rect")
                     .attr(
                         "x",
-                        dX + 140 - 10 + 50 + i * (25 / inputVector.length)
+                        dX + 200 + 12.5 + 20
                     )
-                    .attr("y", dY + 112.5 + 12.5)
-                    .attr("width", 25 / inputVector.length)
-                    .attr("height", 2.5).attr("class", "temp")
+                    .attr("y", dY + 50 +112.5 + i * (25 / inputVector.length))
+                    .attr("width", 2.5)
+                    .attr("height", 25 / inputVector.length).attr("class", "temp")
                     .attr("fill", myColor(inputVector[i]));
             }
-        })
-        .on("mouseout", function () {
-            d3.select("#xi").style("opacity", 1);
-            d3.selectAll(".temp").remove();
-        });
-
-        const x2 = eDisplayer.append("g").attr("id", "xj").attr("class", "math-latex");
-        injectMathSymbol(x2, dX + 220+ 50, textH, "./assets/SVGs/vector_x.svg", "math-latex", "input", jthIndexElement);
-    
-    x2
-        .on("mouseenter", function () {
-            d3.select("#xj").style("opacity", 0);
-            d3.selectAll(".temp").style("pointer-events", "none");
-
-            drawEqComponentLabel(eDisplayer, dX + 200 + 20 + 50 + inputVector.length * (25 / inputVector.length), dY + 112.5 + 12.5 + 5, "Input Vector")
-
-            for (let i = 0; i < inputVector.length; i++) {
-                eDisplayer
-                    .append("rect").attr("class", "temp")
-                    .attr(
-                        "x",
-                        dX + 200 + 20 + 50 + i * (25 / inputVector.length)
-                    )
-                    .attr("y", dY + 112.5 + 12.5)
-                    .attr("width", 25 / inputVector.length)
-                    .attr("height", 2.5)
-                    .attr("fill", myColor(inputVector[i]));
-            }
-        })
-        .on("mouseout", function () {
-            d3.select("#xj").style("opacity", 1);
-            d3.selectAll(".temp").remove();
-        });
 
     let imageMat = "./assets/PNGs/GATConvMat1.png";
     let imgW = 50;
@@ -344,64 +424,60 @@ export function drawEScoreEquation(
     eDisplayer
         .append("image")
         .attr("xlink:href", imageMat).attr("id", "w1png")
-        .attr("x", dX + 75 + 75 - 10 + offset)
+        .attr("x", dX + 75 + 75 - 10 + offset + 100)
         .attr("y", dY + 75 + 25 + offset)
         .attr("width", imgW)
         .attr("height", imgH).attr("opacity", 0);
+    
+        drawEqComponentLabel(eDisplayer, dX + 75 + 75 + 100 - 10 + offset, dY + 75 + 25 + offset + imgH + 5, "Weight Matrix")
+        d3.select("#w1png").attr("opacity", 1); 
 
-    eDisplayer
-        .append("image")
-        .attr("xlink:href", imageMat)
-        .attr("id", "w2png")
-        .attr("x", dX + 75 + 75 + 60 + 20 + offset)
-        .attr("y", dY + 75 + 25 + offset)
-        .attr("width", imgW)
-        .attr("height", imgH).attr("opacity", 0);
+    // drawEqComponentLabel(eDisplayer, dX + 75 + 75 + 60 + 20 + offset, dY + 75 + 25 + offset + imgH + 5, "Weight Matrix")
+    // d3.select("#w2png").attr("opacity", 1); 
 
-    eDisplayer
-        .append("text")
-        .text("W")
-        .attr("id", "w1").attr("class", "mathjax-latex")
-        .attr("x", dX + 75 + 75 + 15 )
-        .attr("y", textH + 15)
-        .attr("font-size", fontSize).style("font-weight", "bold")
-        .on("mouseenter", function () {
-            drawEqComponentLabel(eDisplayer, dX + 75 + 75 - 10 + offset, dY + 75 + 25 + offset + imgH + 5, "Weight Matrix")
+    // eDisplayer
+    //     .append("image")
+    //     .attr("xlink:href", imageMat)
+    //     .attr("id", "w2png")
+    //     .attr("x", dX + 75 + 75 + 60 + 20 + offset)
+    //     .attr("y", dY + 75 + 25 + offset)
+    //     .attr("width", imgW)
+    //     .attr("height", imgH).attr("opacity", 0);
 
-            d3.selectAll(".temp").style("pointer-events", "none");
-            d3.select("#w1").style("opacity", 0);
-            d3.select("#w1png").attr("opacity", 1); 
-        })
-        .on("mouseout", function () {
+    
+
+    
+        // .on("mouseenter", function () {
+        //     drawEqComponentLabel(eDisplayer, dX + 75 + 75 - 10 + offset, dY + 75 + 25 + offset + imgH + 5, "Weight Matrix")
+
+        //     d3.selectAll(".temp").style("pointer-events", "none");
+        //     d3.select("#w1").style("opacity", 0);
+        //     d3.select("#w1png").attr("opacity", 1); 
+        // })
+        // .on("mouseout", function () {
             
-            d3.selectAll(".temp").style("pointer-events", "none");
-            d3.select("#w1").style("opacity", 1);
-            d3.select("#w1png").attr("opacity", 0); 
-            d3.selectAll(".temp").remove();
-        });
+        //     d3.selectAll(".temp").style("pointer-events", "none");
+        //     d3.select("#w1").style("opacity", 1);
+        //     d3.select("#w1png").attr("opacity", 0); 
+        //     d3.selectAll(".temp").remove();
+        // });
 
-        
 
-    eDisplayer
-        .append("text")
-        .text("W")
-        .attr("id", "w2").attr("class", "mathjax-latex")
-        .attr("x", dX + 75 + 75 + 60 + 40+5 )
-        .attr("y", textH + 15)
-        .attr("font-size", fontSize).style("font-weight", "bold")
-        .on("mouseenter", function () {
-            drawEqComponentLabel(eDisplayer, dX + 75 + 75 + 60 + 20 + offset, dY + 75 + 25 + offset + imgH + 5, "Weight Matrix")
 
-            d3.selectAll(".temp").style("pointer-events", "none");
-            d3.select("#w2").style("opacity", 0);
-            d3.select("#w2png").attr("opacity", 1); 
-        })
-        .on("mouseout", function () {
-            d3.selectAll(".temp").style("pointer-events", "none");
-            d3.select("#w2").style("opacity", 1);
-            d3.select("#w2png").attr("opacity", 0);
-            d3.selectAll(".temp").remove();
-        });
+    
+        // .on("mouseenter", function () {
+        //     drawEqComponentLabel(eDisplayer, dX + 75 + 75 + 60 + 20 + offset, dY + 75 + 25 + offset + imgH + 5, "Weight Matrix")
+
+        //     d3.selectAll(".temp").style("pointer-events", "none");
+        //     d3.select("#w2").style("opacity", 0);
+        //     d3.select("#w2png").attr("opacity", 1); 
+        // })
+        // .on("mouseout", function () {
+        //     d3.selectAll(".temp").style("pointer-events", "none");
+        //     d3.select("#w2").style("opacity", 1);
+        //     d3.select("#w2png").attr("opacity", 0);
+        //     d3.selectAll(".temp").remove();
+        // });
 
         
 

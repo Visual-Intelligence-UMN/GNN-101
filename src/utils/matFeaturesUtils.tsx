@@ -1000,7 +1000,11 @@ export function drawGCNConvLinkModel(
         const l2 = d3.select(`g#layerNum_2`);
         const l3 = d3.select(`g#layerNum_3`);
 
-        const schemeOffset = 250;
+        let schemeOffset = 250;
+        if(innerComputationMode=="GraphSAGE"){
+            schemeOffset += 400;
+        }
+
         console.log("schemeLocations", schemeLocations);
         const loc2 = [schemeLocations[0][0] + 64*5+50, schemeLocations[0][1]];
         schemeLocations.push(loc2);

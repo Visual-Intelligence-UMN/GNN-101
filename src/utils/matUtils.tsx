@@ -1155,7 +1155,11 @@ export function visualizeLinkClassifierFeatures(
     var schemeLocations: any = [];
 
     //--------------------------------DRAW FRAMES--------------------------------
-    const framePackage = drawMatrixPreparation(graph, locations, 400, -25);
+    let gridSize = 400;
+    if(innerComputationMode == "GraphSAGE"){
+        gridSize = 800;
+    }
+    const framePackage = drawMatrixPreparation(graph, locations, gridSize, -25);
     let colFrames: SVGElement[] = framePackage.colFrames; //a
     let matFrames: SVGElement[] = framePackage.matFrames; //a
 
@@ -1424,7 +1428,7 @@ export function visualizeLinkClassifierFeatures(
                 features = featureVisPack.features;
                 intervalID = featureVisPack.getIntervalID();
                 
-            } else if(innerComputationMode == "SAGE"){
+            } else if(innerComputationMode == "GraphSAGE"){
                 const featureVisPack = featureSAGEClick(
                     layerID,
                     node,

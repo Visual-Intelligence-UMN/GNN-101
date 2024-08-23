@@ -622,6 +622,91 @@ export function drawAttentions(
     });
 }
 
+export function drawSamplingAggregation(
+    g1: any,
+    X: any,
+    coordFeatureVis: any,
+    w: number,
+    rectH: number,
+    myColor: any,
+    posList: any,
+    mulValues: any,
+    curveDir: number
+) {
+    const g = g1.append("g").attr("class", "procVis aggregate");
+    for (let m = 0; m < X.length; m++) {
+        g.append("rect")
+            .attr("x", coordFeatureVis[0] + w * m)
+            .attr("y", coordFeatureVis[1] - rectH / 2)
+            .attr("width", w)
+            .attr("height", rectH)
+            .attr("fill", myColor(X[m]))
+            .attr("opacity", 0)
+            .attr("stroke", "gray")
+            .attr("stroke-width", 0.1)
+            .attr("class", "procVis summation");
+    }
+
+    //draw frame
+    g1.append("rect")
+        .attr("x", coordFeatureVis[0])
+        .attr("y", coordFeatureVis[1] - rectH / 2)
+        .attr("width", w * X.length)
+        .attr("height", rectH)
+        .attr("fill", "none")
+        .attr("opacity", 0)
+        .attr("stroke", "black")
+        .attr("stroke-width", 1)
+        .attr("class", "procVis summation");
+
+    //draw label
+    drawHintLabel(
+        g1,
+        coordFeatureVis[0],
+        coordFeatureVis[1] + rectH * curveDir * 1.1,
+        "Mean Aggregator",
+        "procVis"
+    );
+
+    //path connect - connect prev layer feature vis to intermediate feature vis
+    const curve = d3.line().curve(d3.curveBasis);
+    for (let i = 0; i < posList.length; i++) {
+        const res = computeMids(posList[i], coordFeatureVis);
+        const hpoint = res[0];
+        const lpoint = res[1];
+
+        d3.select(".mats")
+            .append("path")
+            .attr("d", curve([posList[i], hpoint, lpoint, coordFeatureVis]))
+            .attr("stroke", myColor(mulValues[i]))
+            .attr("opacity", 0)
+            .attr("fill", "none")
+            .attr("class", "procVis summation")
+            .attr("id", "procPath");
+
+        //draw multipliers
+        let x = (coordFeatureVis[0] - posList[i][0]) / 2 + posList[i][0];
+        let y = (coordFeatureVis[1] - posList[i][1]) / 2 + posList[i][1];
+
+        d3.select(".mats")
+            .append("text")
+            .text(mulValues[i].toFixed(2))
+            .attr("x", x - 2)
+            .attr("y", y - 2)
+            .attr("text-anchor", "middle")
+            .attr("font-size", 7.5)
+            .attr("class", "procVis multiplier")
+            .attr("opacity", 0);
+    }
+    d3.selectAll(".summation").transition().duration(100).attr("opacity", 1);
+    d3.select(".aggregate").on("mouseover", function () {
+        d3.selectAll(".multiplier").style("opacity", 1);
+    });
+    d3.select(".aggregate").on("mouseout", function () {
+        d3.selectAll(".multiplier").style("opacity", 0);
+    });
+}
+
 export function drawSummationFeature(
     g1: any,
     X: any,
