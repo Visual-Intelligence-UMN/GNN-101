@@ -631,8 +631,11 @@ export function drawSamplingAggregation(
     myColor: any,
     posList: any,
     mulValues: any,
-    curveDir: number
+    curveDir: number,
+    lgIndices: number[]
 ) {
+    const samplingIndices = require("../../public/sampling.json");
+
     const g = g1.append("g").attr("class", "procVis aggregate");
     for (let m = 0; m < X.length; m++) {
         g.append("rect")
@@ -675,15 +678,15 @@ export function drawSamplingAggregation(
         const hpoint = res[0];
         const lpoint = res[1];
 
-        d3.select(".mats")
-            .append("path")
-            .attr("d", curve([posList[i], hpoint, lpoint, coordFeatureVis]))
-            .attr("stroke", myColor(mulValues[i]))
-            .attr("opacity", 0)
-            .attr("fill", "none")
-            .attr("class", "procVis summation")
-            .attr("id", "procPath");
-
+        const path = d3.select(".mats")
+                .append("path")
+                .attr("d", curve([posList[i], hpoint, lpoint, coordFeatureVis]))
+                .attr("stroke", myColor(mulValues[i]))
+                .attr("opacity", 0)
+                .attr("fill", "none")
+                .attr("class", "procVis summation")
+                .attr("id", "procPath");
+        
         //draw multipliers
         let x = (coordFeatureVis[0] - posList[i][0]) / 2 + posList[i][0];
         let y = (coordFeatureVis[1] - posList[i][1]) / 2 + posList[i][1];
@@ -697,6 +700,12 @@ export function drawSamplingAggregation(
             .attr("font-size", 7.5)
             .attr("class", "procVis multiplier")
             .attr("opacity", 0);
+
+        if((lgIndices[i]!=i)&&(!samplingIndices.includes(lgIndices[i]))){
+            path.attr("stroke", "gray").attr("stroke-dasharray", "3,2");
+        }
+
+        
     }
     d3.selectAll(".summation").transition().duration(100).attr("opacity", 1);
     d3.select(".aggregate").on("mouseover", function () {

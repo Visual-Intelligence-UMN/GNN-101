@@ -1864,10 +1864,13 @@ export function featureSAGEClick(
     let X:any = new Array(featuresTable[layerID][node].length).fill(0);
     let mulValues = []; //an array to store all multiplier values
     let neighborsFeatures:number[][] = [];
+    let lgIndices = [];
     for (let i = 0; i < adjList[node].length; i++) {
         //find multipliers
         let node_i = node;
         let node_j = adjList[node_i][i];
+
+        lgIndices.push(node_j);
         
         //find a way to compute the attn coef - mulV
         let jthIndex = largeGraphIndexes[i];
@@ -2047,7 +2050,9 @@ export function featureSAGEClick(
 
     let animateSeqAfterPath: any = [
         {func: () => {
-            drawSamplingAggregation(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir)
+            drawSamplingAggregation(
+                g, X, coordFeatureVis, w, rectH, myColor, 
+                posList, mulValues, curveDir, lgIndices)
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
         }, 
