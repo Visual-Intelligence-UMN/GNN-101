@@ -865,7 +865,7 @@ export function drawMathFormula(
         x,
         y,
         formula,
-        "math-formula-pos"
+        "math-formula-pos to-be-removed"
     );
 
    // flattenSVG(".mats");

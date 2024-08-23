@@ -92,7 +92,9 @@ export function showFeature(node: any) {
 export function highlightNodes(node: any) {
     if (node.featureGroup && node.svgElement) {
         d3.select(node.svgElement).attr("stroke-width", 3);
+        if (node.featureId) {
         node.featureId.style("visibility", "visible")
+        }
         node.featureGroup.style("transition", "none")
             .style("opacity", 1)
             .style("visibility", "visible")
@@ -102,9 +104,13 @@ export function highlightNodes(node: any) {
 
     if (node.relatedNodes) {
         node.relatedNodes.forEach((n: any) => {
+            if (n.featureId) {
             n.featureId.style("visibility", "visible")
+            }
             d3.select(n.svgElement).attr("stroke-width", 3);
+            if (node.featureId) {
             node.featureId.style("visibility", "visible")
+            }
             n.featureGroup.style("transition", "none")
                 .style("opacity", 1)
                 .style("visibility", "visible")
@@ -757,8 +763,10 @@ export function calculationVisualizer(
 
 
     node.relatedNodes.forEach((n: any) => {
+        if (n.featureId && n.featureGroup) {
         n.featureId.style("visibility", "hidden")
         n.featureGroup.attr("class", "procVis original-features")
+        }
     })
     
 
@@ -989,7 +997,7 @@ export function calculationVisualizer(
         if (innerComputationMode === "GCN") {
         drawMathFormula(formula, endCoordList[0][0] - 300, endCoordList[0][1] - 400 + 100, "./assets/SVGs/GCNFormula.svg");
         } else if (innerComputationMode === "GAT") {
-            drawMathFormula(formula, endCoordList[0][0] - 390, endCoordList[0][1] - 30 + 100, "./assets/SVGs/GATFormula.svg");
+            drawMathFormula(formula, endCoordList[0][0] - 300, endCoordList[0][1] - 400 + 100, "./assets/SVGs/GATFormula.svg");
         } 
 
         
@@ -1182,7 +1190,7 @@ export function calculationVisualizer(
                         .attr("height", 10)
                         .style("fill", "white")
                         .style("stroke", "black")
-                        .attr("class", "parameter")
+                        .attr("class", "parameter to-be-removed")
                         .attr("opacity", 1).raise();
                         
 
@@ -1195,7 +1203,7 @@ export function calculationVisualizer(
                         .attr("y", start_y - 10)
                         .text(multiplier)
                         .attr("font-size", 7.5)
-                        .attr("class", "parameter")
+                        .attr("class", "parameter to-be-removed")
                         .attr("opacity", 1).raise();
 
 
@@ -1241,7 +1249,7 @@ export function calculationVisualizer(
                                 d3.selectAll(".e-displayer").remove();
                                 const eDisplayer = g3
                                     .append("g")
-                                    .attr("class", "procVis e-displayer attn-displayer");
+                                    .attr("class", "procVis e-displayer attn-displayer to-be-removed");
                                 
                                 console.log( `e_${targetIdx}_${lgIndices[targetIdx][1]} = LeakyReLU(                            +                        )`, lgIndices)
                                 const inputVector = featureMap[node.graphIndex][Number(d3.select(this).attr("index"))];
@@ -1254,26 +1262,53 @@ export function calculationVisualizer(
                             });
                             const eDisplayer = g3
                             .append("g")
-                            .attr("class", "procVis e-displayer attn-displayer");
+                            .attr("class", "procVis e-displayer attn-displayer to-be-removed");
                             const inputVector = featureMap[node.graphIndex][Number(d3.select(this).attr("index"))];
                             let jthIndexElement = lgIndices[node.id][1];
                             drawEScoreEquation(lgIndices, eDisplayer, jthIndexElement, start_x, start_y, usingVectors[1], usingVectors[0], myColor, inputVector, node.graphIndex);
-                
-                        })
-                        let recoverEvent: any = d3.select("#my_dataviz").on("click");
-                        d3.selectAll("#my_dataviz").on("click", function (event: any, d: any) {
-                            if (extendAttnView) {
-                                extendAttnView = false;
-                                d3.selectAll(".attn-displayer").remove();
-                
+
+                            d3.selectAll("#my_dataviz").on("click", function(event) {
                                 event.stopPropagation();
-                                d3.selectAll(".attention").attr("font-size", 15);
-                                extendAttnView = false;
-                                d3.selectAll(".mats")
-                                    .style("pointer-events", "auto")
-                                    .on("click", recoverEvent);
-                            }
+                  
+                                    d3.selectAll(".attn-displayer").remove();
+                                    d3.selectAll(".e-displayer").remove()
+                                    
+                                    console.log("edisplayer clicked and not within #my_dataviz");
+                                    d3.select("#my_dataviz").on("click", function(event: any) {
+                                        if (!state.isClicked) {
+                                            return;
+                                        }
+                                        d3.selectAll(".math-displayer").remove();
+                                        d3.selectAll(".graph-displayer").remove();
+                                        moveFeaturesBack(node.relatedNodes, originalCoordinates);
+                                        d3.selectAll(".to-be-removed").remove();
+                                        d3.selectAll(".weightUnit").remove();
+                                        d3.selectAll(".columnUnit").remove();
+                                
+                                
+                                        state.isPlaying = false;
+                                        clearInterval(intervalID);
+                                        d3.selectAll(".bias").remove();
+                                        d3.selectAll(".vis-component").remove();
+                                        d3.selectAll(".relu").remove();
+                                        d3.selectAll(".intermediate-path").remove();
+                                        d3.selectAll(".parameter").remove();
+                                        d3.selectAll(".to-be-removed").remove();
+                                        d3.selectAll(".intermediate-path").remove();
+                                        handleClickEvent(svg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
+                                
+                                    }) 
+                 
+                                
+                            });
                         })
+
+
+
+                            
+                
+             
+
 
         
 
