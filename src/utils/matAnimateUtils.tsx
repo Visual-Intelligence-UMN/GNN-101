@@ -703,6 +703,34 @@ export function drawSamplingAggregation(
 
         if((lgIndices[i]!=i)&&(!samplingIndices.includes(lgIndices[i]))){
             path.attr("stroke", "gray").attr("stroke-dasharray", "3,2");
+            const sampling = g1.append("g");
+            injectSVG(sampling, posList[i][0], posList[i][1]-8.5, "./assets/SVGs/sampling.svg", "procVis sampling");
+            drawHintLabel(
+                sampling,
+                posList[i][0] - 55,
+                posList[i][1] + 22,
+                "Sampling Out during Training Stage",
+                "procVis",
+                "10px"
+            );
+
+            sampling.on("mouseover", function (event:any, d:any) {
+                const [x, y] = d3.pointer(event);
+        
+                //set-up the paramtere for the math displayer
+                drawActivationExplanation(
+                    x,
+                    y,
+                    "Neighborhood Sampling",
+                    "This notation indicate this node",
+                    " is drop-out during training stage."
+                );
+            });
+        
+            sampling.on("mouseout", function () {
+                d3.selectAll(".math-displayer").remove();
+            });
+            
         }
 
         
