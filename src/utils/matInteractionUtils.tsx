@@ -151,6 +151,10 @@ export function drawAttnDisplayer(
     //     .attr("font-size", 10)
     //     .attr("class", "procVis attn-displayer attnTargetE attnE")
     //     .attr("index", 0);
+
+    const scale = 2;
+    attnDisplayer.attr("transform", `translate(${dX * (1 - scale)}, ${dY * (1 - scale)}) scale(${scale})`);
+
 }
 
 export function drawEScoreEquation(
@@ -424,12 +428,12 @@ export function drawEScoreEquation(
     eDisplayer
         .append("image")
         .attr("xlink:href", imageMat).attr("id", "w1png")
-        .attr("x", dX + 75 + 75 - 10 + offset + 100)
+        .attr("x", dX + 75 + 75 - 10 + offset + 100 + 100)
         .attr("y", dY + 75 + 25 + offset)
         .attr("width", imgW)
         .attr("height", imgH).attr("opacity", 0);
     
-        drawEqComponentLabel(eDisplayer, dX + 75 + 75 + 100 - 10 + offset, dY + 75 + 25 + offset + imgH + 5, "Weight Matrix")
+        drawEqComponentLabel(eDisplayer, dX + 75 + 75 + 100 - 10 + offset + 100, dY + 75 + 25 + offset + imgH + 5, "Weight Matrix")
         d3.select("#w1png").attr("opacity", 1); 
 
     // drawEqComponentLabel(eDisplayer, dX + 75 + 75 + 60 + 20 + offset, dY + 75 + 25 + offset + imgH + 5, "Weight Matrix")
