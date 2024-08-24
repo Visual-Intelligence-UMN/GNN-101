@@ -632,8 +632,10 @@ export function drawSamplingAggregation(
     posList: any,
     mulValues: any,
     curveDir: number,
-    lgIndices: number[]
+    lgIndices: number[],
+    actualIndices: number[]
 ) {
+    console.log("lgIndices lg",lgIndices);
     const samplingIndices = require("../../public/sampling.json");
 
     const g = g1.append("g").attr("class", "procVis aggregate");
@@ -701,7 +703,7 @@ export function drawSamplingAggregation(
             .attr("class", "procVis multiplier")
             .attr("opacity", 0);
 
-        if((lgIndices[i]!=i)&&(!samplingIndices.includes(lgIndices[i]))){
+        if((samplingIndices.includes(actualIndices[lgIndices[i]]))){
             path.attr("stroke", "gray").attr("stroke-dasharray", "3,2");
             const sampling = g1.append("g");
             injectSVG(sampling, posList[i][0], posList[i][1]-8.5, "./assets/SVGs/sampling.svg", "procVis sampling");
@@ -709,7 +711,7 @@ export function drawSamplingAggregation(
                 sampling,
                 posList[i][0] - 55,
                 posList[i][1] + 22,
-                "Sampling Out during Training Stage",
+                "Drop Out during Training Stage",
                 "procVis",
                 "10px"
             );

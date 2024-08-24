@@ -2052,7 +2052,8 @@ export function featureSAGEClick(
         {func: () => {
             drawSamplingAggregation(
                 g, X, coordFeatureVis, w, rectH, myColor, 
-                posList, mulValues, curveDir, lgIndices)
+                posList, mulValues, curveDir, lgIndices, featureKeysEachLayer[0]
+            )
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
         }, 
