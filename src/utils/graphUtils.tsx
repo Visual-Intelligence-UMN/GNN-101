@@ -1165,8 +1165,8 @@ export function calculationVisualizer(
                         .attr("y", start_y - 10)
                         .text(adjMatrixSlice[i])
                         .attr("font-size", 7.5)
-                        .attr("class", "parameter procVis")
-                        .attr("opacity", 0).raise();
+                        .attr("class", "parameter procVis to-be-removed")
+                        .attr("opacity", 1).raise();
                     }
                     else {
 
@@ -1178,7 +1178,7 @@ export function calculationVisualizer(
                         .attr("height", 10)
                         .style("fill", "white")
                         .style("stroke", "black")
-                        .attr("class", "parameter to-be-removed")
+                        .attr("class", "parameter procVis to-be-removed")
                         .attr("opacity", 1).raise();
                         
 
@@ -1191,7 +1191,7 @@ export function calculationVisualizer(
                         .attr("y", start_y - 10)
                         .text(multiplier)
                         .attr("font-size", 7.5)
-                        .attr("class", "parameter to-be-removed")
+                        .attr("class", "parameter procVis to-be-removed")
                         .attr("opacity", 1).raise();
 
 
