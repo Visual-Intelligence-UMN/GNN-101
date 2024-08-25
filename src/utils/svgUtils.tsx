@@ -50,10 +50,15 @@ function formularInteractionHandler(x: number, y: number, g: any, class_name: st
     .attr("stroke", "none") 
     .attr("class", "to-be-removed")
     .on("mouseover", function(this: any) {
-        d3.selectAll(".procVis").interrupt();
+
+
+
+
         d3.selectAll(".procVis").style("opacity", 0.2)
         d3.selectAll(".cant-remove").style("opacity", 0.2);
-        d3.select((`.${class_name}`)).style("fill", "red")
+        d3.selectAll(".formula").style("opacity", 0.2)
+        d3.select(`.${class_name}`).style("opacity", 1)
+
 
         
         for (let i = 0; i < formulaClass[class_name].length; i ++) {
@@ -68,10 +73,13 @@ function formularInteractionHandler(x: number, y: number, g: any, class_name: st
 
 
     }).on("mouseout", function(this: any) {
-        d3.selectAll(".procVis").style("opacity", 1);
+        d3.selectAll(".procVis").style("opacity", 1) 
+        d3.selectAll(".formula").style("opacity", 1)
+
+
         d3.selectAll(".cant-remove").style("opacity", 1);
 
-        d3.select((`.${class_name}`)).style("fill", "black");
+
         // for (let i = 0; i < formulaClass[class_name].length; i ++) {
         //     d3.selectAll(`.${formulaClass[class_name][i]}`).style("stroke_width", 1).style("stroke", "gray");
         // }
@@ -91,7 +99,7 @@ export function injectSVG(g:any, x: number, y: number, SVGPath:string, svgClass:
         const play = g!.node()!.appendChild(data.documentElement)
         d3.select(play).attr("x", x).attr("y", y).attr("class", svgClass)
        
-        if (SVGPath === "./assets/SVGs/GCNFormula.svg") {
+        if (SVGPath === "./assets/SVGs/GCNFormula.svg" || SVGPath === "./assets/SVGs/GATFormula.svg") {
 
             g.append("rect")
             .attr("class", "to-be-removed")
@@ -115,52 +123,28 @@ export function injectSVG(g:any, x: number, y: number, SVGPath:string, svgClass:
             formularInteractionHandler(x, y, g, "formula_bias")
             formularInteractionHandler(x, y, g, "formula_weights")
             formularInteractionHandler(x, y, g, "formula_summation")
-            formularInteractionHandler(x, y, g, "formula_neighbor_aggregate")
+            formularInteractionHandler(x, y, g, "formula_degree")
+            formularInteractionHandler(x, y, g, "formula_xj")
             formularInteractionHandler(x, y, g, "formula_activation")
         }
         
     });
 }
 
-export function flattenSVG(svg:string) {
-    // 选择所有的use元素
-    console.log("use", d3.select(svg).selectAll('use'))
-    d3.select(svg).selectAll('use').each(function() {
-        var use:any = d3.select(this);
-        var href = use.attr('href') || use.attr('xlink:href');
-
-console.log("href: ", href);
-
-        if (!href) return;
-
-        // 找到被引用的元素
-        var target = d3.select(href);
-        if (target.empty()) return;
-
-        // 创建一个新的元素，类型与目标元素相同
-        var newElement = d3.create('svg:' + target.node().tagName);
-
-        // 复制目标元素的属性
-        target.node()?.getAttributeNames().forEach(function(attr:string) {
-            newElement.attr(attr, target.attr(attr));
-        });
-
-        // 复制use元素的属性（位置、变换等）
-        use.node()?.getAttributeNames().forEach(function(attr:string) {
-            if (attr !== 'href' && attr !== 'xlink:href') {
-                newElement.attr(attr, use.attr(attr));
-            }
-        });
-
-        // 复制目标元素的子节点
-        newElement.html(target.html());
-
-        // 用新元素替换use元素
-        use.replaceWith(function() { return newElement.node(); });
+export function injectMathSymbol(
+    g:any, x: number, y: number, 
+    SVGPath:string, svgClass:string, 
+    mode:string, lowerIndex:number|string
+){
+    g.selectAll("*").remove();
+    d3.xml(SVGPath).then(function(data) {
+        const play = g!.node()!.appendChild(data.documentElement)
+        d3.select(play).attr("x", x).attr("y", y).attr("class", svgClass)
+        if(mode=="input"){
+            d3.select(play)
+            .select("#lowerIndex_a")
+            .text(lowerIndex)
+            .style("font-size", "1px");
+        }
     });
 }
-
-
-
-
-
