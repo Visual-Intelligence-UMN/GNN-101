@@ -1165,7 +1165,7 @@ export function calculationVisualizer(
                         .attr("y", start_y - 10)
                         .text(adjMatrixSlice[i])
                         .attr("font-size", 7.5)
-                        .attr("class", "parameter")
+                        .attr("class", "parameter procVis")
                         .attr("opacity", 0).raise();
                     }
                     else {
