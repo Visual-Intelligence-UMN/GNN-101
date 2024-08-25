@@ -694,15 +694,15 @@ export function drawSummationFeature(
             .attr("text-anchor", "middle")
             .attr("font-size", 7.5)
             .attr("class", "procVis multiplier")
-            .attr("opacity", 0);
+            .attr("opacity", 1);
     }
     d3.selectAll(".summation").transition().duration(100).attr("opacity", 1);
-    d3.select(".aggregate").on("mouseover", function () {
-        d3.selectAll(".multiplier").style("opacity", 1);
-    });
-    d3.select(".aggregate").on("mouseout", function () {
-        d3.selectAll(".multiplier").style("opacity", 0);
-    });
+    // d3.select(".aggregate").on("mouseover", function(){
+    //     d3.selectAll(".multiplier").style("opacity", 1);
+    // })
+    // d3.select(".aggregate").on("mouseout", function(){
+    //     d3.selectAll(".multiplier").style("opacity", 0);
+    // })
 }
 
 export function drawWeightsVector(
@@ -1082,7 +1082,7 @@ export function drawBiasVector(
         .style("opacity", 1)
         .attr("stroke", "black")
         .attr("stroke-width", 1)
-        .attr("class", "procVis biasVector biasFrame");
+        .attr("class", "procVis biasVector");
     const label = drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+6, "Bias Vector", "procVis biasFrame");
    // d3.selectAll(".biasVector").transition().duration(100).style("opacity", 1);
 }
@@ -1208,18 +1208,12 @@ export function drawTanh(
             d3.select(ReLU)
                 .attr("x", cx1)
                 .attr("y", cy1)
-                .attr("class", "procVis")
+                .attr("class", "procVis relu-icon")
                 .raise();
-        }
-    });
-
-    drawHintLabel(
-        relu,
-        cx1 - 20,
-        cy1 + radius * 4 + 12 + 4,
-        "Tanh Non-linear Function",
-        "procVis"
-    );
+            }
+        });
+        
+        drawHintLabel(relu, cx1-20, cy1+radius*4+12+4, "Tanh Non-linear Function", "procVis");
 
     relu.on("mouseover", function (event, d) {
         const [x, y] = d3.pointer(event);

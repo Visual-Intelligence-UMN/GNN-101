@@ -50,14 +50,12 @@ function formularInteractionHandler(x: number, y: number, g: any, class_name: st
     .attr("stroke", "none") 
     .attr("class", "to-be-removed")
     .on("mouseover", function(this: any) {
-
-
-
-
+        d3.selectAll(".procVis").interrupt();
         d3.selectAll(".procVis").style("opacity", 0.2)
         d3.selectAll(".cant-remove").style("opacity", 0.2);
         d3.selectAll(".formula").style("opacity", 0.2)
         d3.select(`.${class_name}`).style("opacity", 1)
+
 
 
         
@@ -123,7 +121,8 @@ export function injectSVG(g:any, x: number, y: number, SVGPath:string, svgClass:
             formularInteractionHandler(x, y, g, "formula_bias")
             formularInteractionHandler(x, y, g, "formula_weights")
             formularInteractionHandler(x, y, g, "formula_summation")
-            formularInteractionHandler(x, y, g, "formula_neighbor_aggregate")
+            formularInteractionHandler(x, y, g, "formula_degree")
+            formularInteractionHandler(x, y, g, "formula_xj")
             formularInteractionHandler(x, y, g, "formula_activation")
         }
         
@@ -137,7 +136,6 @@ export function injectMathSymbol(
 ){
     g.selectAll("*").remove();
     d3.xml(SVGPath).then(function(data) {
-
         const play = g!.node()!.appendChild(data.documentElement)
         d3.select(play).attr("x", x).attr("y", y).attr("class", svgClass)
         if(mode=="input"){

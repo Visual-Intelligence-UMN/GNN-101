@@ -75,11 +75,11 @@ export function scaleFeatureGroup(node: any, scale: number) {
 
 export function showFeature(node: any) {
     const scale = 1;
-    if (node.featureGroup && node.featureId) {
+    if (node.featureGroup) {
 
         scaleFeatureGroup(node, scale);
     }
-    if (node.relatedNodes && node.featureId) {
+    if (node.relatedNodes) {
 
         node.relatedNodes.forEach((n: any) => {
             if (n.featureGroup) {
@@ -93,7 +93,7 @@ export function highlightNodes(node: any) {
     if (node.featureGroup && node.svgElement) {
         d3.select(node.svgElement).attr("stroke-width", 3);
         if (node.featureId) {
-        node.featureId.style("visibility", "visible")
+            node.featureId.style("visibility", "visible")
         }
         node.featureGroup.style("transition", "none")
             .style("opacity", 1)
@@ -104,13 +104,10 @@ export function highlightNodes(node: any) {
 
     if (node.relatedNodes) {
         node.relatedNodes.forEach((n: any) => {
-            if (n.featureId) {
+            if (node.featureId) {
             n.featureId.style("visibility", "visible")
             }
             d3.select(n.svgElement).attr("stroke-width", 3);
-            if (node.featureId) {
-            node.featureId.style("visibility", "visible")
-            }
             n.featureGroup.style("transition", "none")
                 .style("opacity", 1)
                 .style("visibility", "visible")
@@ -135,7 +132,6 @@ export function resetNodes(allNodes: any[], convNum: number) {
             if (node.featureGroup) {
                 node.featureGroup.style("transition", "opacity 0.2s ease-out, visibility 0.2s ease-out")
                     .style("opacity", 0)
-                    .style("visibility", "hidden")
                     .style("pointer-events", "none");
                 
             }
@@ -147,9 +143,7 @@ export function resetNodes(allNodes: any[], convNum: number) {
                     d3.select(relatedNode.svgElement).attr("stroke-width", 1);
                     relatedNode.featureGroup.style("transition", "opacity 0.2s ease-out, visibility 0.2s ease-out")
                         .style("opacity", 0)
-                        .style("visibility", "hidden")
                         .style("pointer-events", "none");
-                    
                 });
             }
             if (node.intermediateFeatureGroups) {
@@ -158,7 +152,6 @@ export function resetNodes(allNodes: any[], convNum: number) {
                         intermediateFeatureGroup.style("transition", "opacity 0.2s ease-out, visibility 0.2s ease-out")
                             .style("opacity", 0)
                             .style("pointer-events", "none");
-                        
                     }
                 );
             }
@@ -204,6 +197,14 @@ export function outputVisualizer(
     if (!svg.selectAll) {
         svg = d3.selectAll(svg);
     }
+    for (let i = 0; i < node.relatedNodes[0].features.length; i++) {
+        d3.select(`#pooling-layer-rect-${i}`)
+            .on("mouseover", function () {
+            })
+        }
+
+    
+    
 
 
     let intervalID = 0;
@@ -754,9 +755,7 @@ export function calculationVisualizer(
     let intervalID = 0;
 
     d3.selectAll(".graph-displayer").remove();
-
     showFeature(node);
-    
     let currentWeights = weights[node.graphIndex - 1]
 
 
@@ -829,17 +828,6 @@ export function calculationVisualizer(
             }, ${height / 5 + 150})`
         );
     
-    aggregatedFeatureGroup.on("mouseover", function(event:any, d:any){
-        if (innerComputationMode === "GCN") {
-        d3.selectAll(".parameter").style("opacity", 1);
-        }
-    });
-
-    aggregatedFeatureGroup.on("mouseout", function(event:any, d:any){
-        if (innerComputationMode === "GCN") {
-        d3.selectAll(".parameter").style("opacity", 0);
-        }
-    });
 
 
 
@@ -1798,7 +1786,6 @@ function weightAnimation(
         }
 
         d3.selectAll(".weightUnit").style("opacity", 0.3).lower();
-        d3.selectAll(".weight-matrix-frame").style("opacity", 0.3).lower()
         if (i >= endNumber) {
             i = 0; // Reset the index to replay the animation
         }
@@ -1862,7 +1849,6 @@ function weightAnimation(
                     clearInterval(intervalID);
                     state.isPlaying = false;
                     state.isAnimating = false;
-                    d3.selectAll(".weight-matrix-frame").style("opacity", 1)
                     d3.selectAll(".math-displayer").remove();
                     d3.selectAll(".graph-displayer").attr("opacity", 0);
 
@@ -3030,4 +3016,3 @@ export function nodeOutputVisualizer(
 
 
 }
-

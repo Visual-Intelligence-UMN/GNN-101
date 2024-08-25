@@ -52,6 +52,11 @@ export function graphVisDrawMatrixWeight(
         Xt = flipVertically(Xt)
         Xt = flipHorizontally(Xt);
     }
+    if (mode === 0 && node.graphIndex === 5) {
+        console.log("AWF")
+        Xt = flipHorizontally(Xt);
+        Xt = flipVertically(Xt);
+    }
     
     
 
