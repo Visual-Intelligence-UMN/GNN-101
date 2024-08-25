@@ -576,9 +576,11 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
 
     showAllLinks(allNodes);
     resetNodes(allNodes, convNum);
-    state.isClicked = false;
-    state.isAnimating = false;
-    state.isPlaying = false;
+
+      state.isClicked = false;
+      state.isAnimating = false;
+      state.isPlaying = false;
+
   }
 };
 
@@ -1249,7 +1251,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
                   .attr("y2", nextNode.y + 10)
                   .style("stroke", linkStrength(avg))
                   .style("stroke-width", 1)
-                  .style("opacity", 0.1)
+                  .style("opacity", 0)
                   .style("fill", "none");
 
                 if (!nextNode.links) {
@@ -1294,7 +1296,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
             const path = svg.append("path")
               .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 20} ${nextNode.y + 10}`)
               .style("stroke", linkStrength(avg))
-              .style("opacity", 0.1)
+              .style("opacity", 0)
               .style('stroke-width', 1)
               .style("fill", "none");
            

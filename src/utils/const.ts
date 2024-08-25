@@ -15,6 +15,21 @@ export const modelGCNList: { [k: string]: string } = {
   "node classification": "./gnn_node_model.onnx",
   "link classification": "./gnn_link_model.onnx"
 };
+
+export const modelGATList: { [k: string]: string } = {
+  "GAT link classification": "./gat_link_model.onnx"
+};
+
+export const modelGraphSAGEList: { [k: string]: string } = {
+  "GraphSAGE link classification": "./sage_link_model.onnx"
+};
+
+export const modelTypeList:{ [k: string]: string } = {
+  "GCN":"GCN",
+  "GAT":"GAT",
+  "GraphSAGE":"GraphSAGE"
+};
+
 export const formulaClass: { [k: string]: string[]} = {
   "formula_weights": ["weight-matrix-frame", "weightUnit"],
   "formula_bias": ["biasFrame", "bias"],
@@ -34,20 +49,6 @@ export const formulaTextClass: { [k: string]: string[]} = {
   "formula_xj": [],
   "formula_activation": ["reluText"]
 }
-
-export const modelGATList: { [k: string]: string } = {
-  "GAT link classification": "./gat_link_model.onnx"
-};
-
-export const modelGraphSAGEList: { [k: string]: string } = {
-  "GraphSAGE link classification": "./sage_link_model.onnx"
-};
-
-export const modelTypeList:{ [k: string]: string } = {
-  "GCN":"GCN",
-  "GAT":"GAT",
-  "GraphSAGE":"GraphSAGE"
-};
 
 export const nodeSelectionList = [
   148, 407, 79, 116, 994, 632, 71, 110, 420, 772, 394, 109, 241, 471
