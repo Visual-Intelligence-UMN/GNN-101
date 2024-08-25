@@ -15,6 +15,7 @@ import {
     modelTypeList,
     modelGATList,
     modelGraphSAGEList,
+    midGraphNodeSelectionList,
 } from "../utils/const";
 import Sidebar from "./Sidebar";
 import styles from "./index.module.css";
@@ -227,6 +228,8 @@ export default function Home() {
                                                         setModel(
                                                             "GAT link classification"
                                                         );
+                                                        setHubNodeA(148);
+                                                        setHubNodeB(407);
                                                         setModelList(modelGATList);
                                                     } else {
                                                         setModel(
@@ -238,6 +241,8 @@ export default function Home() {
                                                         setModelList(
                                                             modelGraphSAGEList
                                                         );
+                                                        setHubNodeA(696);
+                                                        setHubNodeB(784);
                                                     }
                                                 } }
                                                 OptionList={Object.keys(
@@ -398,6 +403,7 @@ export default function Home() {
                                     {model == "link classification" ||
                                     modelType == "GAT" ||
                                     modelType == "GraphSAGE" ? (
+                                        modelType == "GAT"?
                                         <>
                                             Predict a link from node
                                             <NodeSelector
@@ -420,7 +426,30 @@ export default function Home() {
                                                 }
                                             />
 
-                                        </>
+                                        </>:
+                                        <>
+                                        Predict a link from node(GraphSAGE)
+                                        <NodeSelector
+                                            nodeList={midGraphNodeSelectionList}
+                                            selectedNode={hubNodeA}
+                                            dependNode={hubNodeB}
+                                            setSelectedNode={setHubNodeA}
+                                            handleChange={
+                                                handleNodeSelection
+                                            }
+                                        />
+                                        to node
+                                        <NodeSelector
+                                            nodeList={midGraphNodeSelectionList}
+                                            selectedNode={hubNodeB}
+                                            dependNode={hubNodeA}
+                                            setSelectedNode={setHubNodeB}
+                                            handleChange={
+                                                handleNodeSelection
+                                            }
+                                        />
+
+                                    </>
 
                                     ) : (
                                         <></>

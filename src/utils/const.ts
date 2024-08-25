@@ -53,6 +53,10 @@ export const nodeSelectionList = [
   148, 407, 79, 116, 994, 632, 71, 110, 420, 772, 394, 109, 241, 471
 ];
 
+export const midGraphNodeSelectionList = [
+  696, 784, 203, 651, 50, 70, 297, 317, 623, 590, 194
+];
+
 function graph_list_generate(num: number) {
   let res: { [k: string]: string } = {};
   res["graph_0"] = "./input_graph.json";

@@ -28,12 +28,13 @@ import {
     drawWeightMatrix,
     computeMatrixLocations,
     drawAttentions,
-    drawMathFormula
+    drawMathFormula,
+    drawSamplingAggregation
 } from "./matAnimateUtils";
 import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import { drawMatmulExplanation, drawSoftmaxDisplayer } from "./matInteractionUtils";
 import path from "node:path/win32";
-import { computeAttentionCoefficient, testCompute } from "./computationUtils";
+import { computeAttentionCoefficient, meanAggregation, testCompute } from "./computationUtils";
 
 //graph feature events interactions - mouseover
 export function oFeatureMouseOver(
@@ -1810,7 +1811,7 @@ export function featureSAGEClick(
     featureKeysEachLayer: number[][],
     activation: string = "relu",
 ){
-    console.log("convs", conv1, conv2, featureKeysEachLayer);
+    console.log("convs sage", conv1, conv2, featureKeysEachLayer);
     const largeGraphIndexes = featureKeysEachLayer[0];
     //testCompute();
     let biasCoord: [number, number];
@@ -1886,52 +1887,40 @@ export function featureSAGEClick(
     //compute x
     const math = create(all, {});
     let featuresTable = [features, conv1, conv2];
-    let X = new Array(featuresTable[layerID][node].length).fill(0);
+    let X:any = new Array(featuresTable[layerID][node].length).fill(0);
     let mulValues = []; //an array to store all multiplier values
+    let neighborsFeatures:number[][] = [];
+    let lgIndices = [];
     for (let i = 0; i < adjList[node].length; i++) {
         //find multipliers
         let node_i = node;
         let node_j = adjList[node_i][i];
+
+        lgIndices.push(node_j);
         
         //find a way to compute the attn coef - mulV
+        let jthIndex = largeGraphIndexes[i];
+        if(layerID==0){jthIndex = i;}
+        Array.prototype.slice.call(featuresTable[layerID][jthIndex]);
 
-        //get all neigbor features
-        let neighborsFeatures = [];
-        for(let j=0; j<adjList[node_i].length; j++){
-            if(i!=j){
-                //index mapping: (i -> itself index; j-> neighbor index)
-                let jthIndex = largeGraphIndexes[j];
-                if(layerID==0){jthIndex = j;}
-                console.log("attn inner loop", featuresTable[layerID][jthIndex], jthIndex, layerID, featuresTable);
+        // //get all neigbor features
+        // let neighborsFeatures = [];
+        // for(let j=0; j<adjList[node_i].length; j++){
+        //     if(i!=j){
+        //         //index mapping: (i -> itself index; j-> neighbor index)
+                
+        //         console.log("attn inner loop", featuresTable[layerID][jthIndex], jthIndex, layerID, featuresTable);
                 neighborsFeatures.push(
                     Array.prototype.slice.call(featuresTable[layerID][jthIndex]));
-            }
-        }
-
-        let lgI = largeGraphIndexes[node_i];
-        let lgJ = largeGraphIndexes[node_j];
-
-        if(layerID==0){
-            lgI = node_i;
-            lgJ = node_j;
-        }
-
-        let selfFeature = Array.prototype.slice.call(featuresTable[layerID][lgI]);
-
-        let targetFeature = Array.prototype.slice.call(featuresTable[layerID][lgJ]);
-
-        //get the feature of node_i
-
-        console.log("attn features", layerID, selfFeature, targetFeature, neighborsFeatures, largeGraphIndexes[node_i], largeGraphIndexes[node_j]);
-
-        const mulV = computeAttentionCoefficient(layerID+1, selfFeature, targetFeature, neighborsFeatures);
+         //   }
+        // }
+        const mulV = 1 / adjList[node].length;
         mulValues.push(mulV);
-        //compute x'
-
-        const prepMat = [...featuresTable[layerID][node_j]];
-        let matA = math.matrix(prepMat);
-        X = math.add(math.multiply(prepMat, mulV), X);
+        //com
+        
     }
+    X = math.multiply(meanAggregation(neighborsFeatures), 1 / adjList[node].length);
+    console.log("output X", X);
     const dummy: number[] = math.multiply(math.transpose(weights[layerID]), X);
     const Xt = math.transpose(weights[layerID]);
 
@@ -2087,7 +2076,10 @@ export function featureSAGEClick(
 
     let animateSeqAfterPath: any = [
         {func: () => {
-            //drawAttentions(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir)
+            drawSamplingAggregation(
+                g, X, coordFeatureVis, w, rectH, myColor, 
+                posList, mulValues, curveDir, lgIndices, featureKeysEachLayer[0]
+            )
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
         }, 

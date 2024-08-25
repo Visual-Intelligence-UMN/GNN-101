@@ -7,12 +7,18 @@ export function leakyRelu(x: number): number {
 }
 
 export function meanAggregation(x: number[][]): number[] {
-    return x.map((d) => d.reduce((a, b) => a + b, 0) / d.length);
+    // 转置矩阵，将行变为列
+    const transpose = (matrix: number[][]) => 
+        matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
+    
+    const transposedX = transpose(x);
+    console.log("transposed x", transposedX);
+    
+    // 对每一列（即转置后的每一行）计算均值
+    return transposedX.map((col) => col.reduce((a, b) => a + b, 0) / col.length);
 }
 
-export function concatAggregation(x: number[][]): number[] {
-    return x.reduce((a, b) => a.concat(b), []);
-}
+
 
 
 export function computeAttnStep(
