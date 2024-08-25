@@ -989,7 +989,10 @@ export function calculationVisualizer(
         drawMathFormula(formula, endCoordList[0][0] - 300, endCoordList[0][1] - 400 + 100, "./assets/SVGs/GCNFormula.svg");
         } else if (innerComputationMode === "GAT") {
             drawMathFormula(formula, endCoordList[0][0] - 300, endCoordList[0][1] - 400 + 100, "./assets/SVGs/GATFormula.svg");
-        } 
+        } else {
+            drawMathFormula(formula, endCoordList[0][0] - 300, endCoordList[0][1] - 400 + 100, "./assets/SVGs/GsageFormula.svg");
+
+        }
 
         
 
