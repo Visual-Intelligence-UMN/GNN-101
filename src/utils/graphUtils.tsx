@@ -697,31 +697,34 @@ export function outputVisualizer(
     }
 
 
-
-    d3.select("#my_dataviz").on("click", function(event: any) {
-        d3.selectAll(".math-displayer").remove();
-        d3.selectAll(".graph-displayer").remove();
-     
-            d3.selectAll(".node-features-Copy").style("visibility", "hidden")
-            d3.selectAll(".weightUnit").remove();
-            d3.selectAll(".columnUnit").remove();
-            d3.selectAll(".to-be-removed").remove();
-    
+    setTimeout(() => {
+        d3.select("#my_dataviz").on("click", function(event: any) {
+            d3.selectAll(".math-displayer").remove();
             d3.selectAll(".graph-displayer").remove();
-            for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "1";
-            moveFeaturesBack(node.relatedNodes, originalCoordinates);
-            node.featureGroup
-                .transition()
-                .duration(1000)
-                .attr(
-                    "transform",
-                    `translate(${node.x - 7.5}, ${node.y + 170 + 5}) rotate(0)`
-                );
+         
+                d3.selectAll(".node-features-Copy").style("visibility", "hidden")
+                d3.selectAll(".weightUnit").remove();
+                d3.selectAll(".columnUnit").remove();
+                d3.selectAll(".to-be-removed").remove();
+        
+                d3.selectAll(".graph-displayer").remove();
+                for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "1";
+                moveFeaturesBack(node.relatedNodes, originalCoordinates);
+                node.featureGroup
+                    .transition()
+                    .duration(1000)
+                    .attr(
+                        "transform",
+                        `translate(${node.x - 7.5}, ${node.y + 170 + 5}) rotate(0)`
+                    );
+    
+                    handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state)
+    
+    
+        })
 
-                handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state)
-
-
-    })
+    }, 3000)
+    
 
 }
 
@@ -1592,34 +1595,44 @@ export function calculationVisualizer(
     node.intermediateFeatureGroups = intermediateFeatureGroups;
 
 
+    if (!state.isClicked) {
+        return;
+    }
 
-
-
-    d3.select("#my_dataviz").on("click", function(event: any) {
+    setTimeout(() => {
         if (!state.isClicked) {
             return;
         }
-        d3.selectAll(".math-displayer").remove();
-        d3.selectAll(".graph-displayer").remove();
-        moveFeaturesBack(node.relatedNodes, originalCoordinates);
-        d3.selectAll(".to-be-removed").remove();
-        d3.selectAll(".weightUnit").remove();
-        d3.selectAll(".columnUnit").remove();
+        d3.select("#my_dataviz").on("click", function(event: any) {
+ 
+            if (!state.isClicked) {
+                return;
+            }
+            console.log("VAWD")
+            d3.selectAll(".math-displayer").remove();
+            d3.selectAll(".graph-displayer").remove();
+            moveFeaturesBack(node.relatedNodes, originalCoordinates);
+            d3.selectAll(".to-be-removed").remove();
+            d3.selectAll(".weightUnit").remove();
+            d3.selectAll(".columnUnit").remove();
+    
+    
+            state.isPlaying = false;
+            clearInterval(intervalID);
+            d3.selectAll(".bias").remove();
+            d3.selectAll(".vis-component").remove();
+            d3.selectAll(".relu").remove();
+            d3.selectAll(".intermediate-path").remove();
+            d3.selectAll(".parameter").remove();
+            d3.selectAll(".to-be-removed").remove();
+            d3.selectAll(".intermediate-path").remove();
+            handleClickEvent(svg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
+    
+        }) 
+    
 
-
-        state.isPlaying = false;
-        clearInterval(intervalID);
-        d3.selectAll(".bias").remove();
-        d3.selectAll(".vis-component").remove();
-        d3.selectAll(".relu").remove();
-        d3.selectAll(".intermediate-path").remove();
-        d3.selectAll(".parameter").remove();
-        d3.selectAll(".to-be-removed").remove();
-        d3.selectAll(".intermediate-path").remove();
-        handleClickEvent(svg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
-
-    }) 
-
+    }, 3000)
+    
 }
 
 export function moveNextLayer(
@@ -2249,33 +2262,37 @@ export function fcLayerCalculationVisualizer(
 
 
 
-
-    d3.select("#my_dataviz").on("click", function(event: any) {
-        d3.selectAll(".math-displayer").remove();
-        d3.selectAll(".graph-displayer").remove();
-        
-
-            d3.selectAll(".origin-to-aggregated").remove();
-    
-            d3.selectAll(".node-features-Copy").style("visibility", "hidden");
-    
-            for (let i = 0; i < colorSchemes.length; i++)colorSchemes[i].style.opacity = "1";
-    
-            moveFeaturesBack(relatedNodes, originalCoordinates);
-            node.featureGroup
-                .transition()
-                .duration(1000)
-                .attr(
-                    "transform",
-                    `translate(${xPos - 300 - 15 / 2}, ${yPos}) rotate(0)`
-                );
-            d3.selectAll("rect").style("opacity", 1);
+    setTimeout(() => {
+        d3.select("#my_dataviz").on("click", function(event: any) {
+            d3.selectAll(".math-displayer").remove();
             d3.selectAll(".graph-displayer").remove();
-            handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
-       
+            
+    
+                d3.selectAll(".origin-to-aggregated").remove();
+        
+                d3.selectAll(".node-features-Copy").style("visibility", "hidden");
+        
+                for (let i = 0; i < colorSchemes.length; i++)colorSchemes[i].style.opacity = "1";
+        
+                moveFeaturesBack(relatedNodes, originalCoordinates);
+                node.featureGroup
+                    .transition()
+                    .duration(1000)
+                    .attr(
+                        "transform",
+                        `translate(${xPos - 300 - 15 / 2}, ${yPos}) rotate(0)`
+                    );
+                d3.selectAll("rect").style("opacity", 1);
+                d3.selectAll(".graph-displayer").remove();
+                handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
+           
+    
+    
+        })
 
 
-    })
+    }, 3000)
+    
 
 }
 
@@ -2980,37 +2997,40 @@ export function nodeOutputVisualizer(
 
 
 
-
-    d3.select("#my_dataviz").on("click", function(event: any) {
-        if (!state.isClicked) {
-            return;
-        }
-        d3.selectAll(".math-displayer").remove();
-        d3.selectAll(".graph-displayer").remove();
-                d3.selectAll(".node-features-Copy").style("opacity", "hidden");
-    
-                d3.selectAll(".to-be-removed").remove();
-                handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
-    
-
-    
-    
+    setTimeout(() => {
+        d3.select("#my_dataviz").on("click", function(event: any) {
+            if (!state.isClicked) {
+                return;
+            }
+            d3.selectAll(".math-displayer").remove();
             d3.selectAll(".graph-displayer").remove();
-            d3.selectAll(".weightUnit").remove();
-            d3.selectAll(".columnUnit").remove();
-            for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "1";
-            moveFeaturesBack(node.relatedNodes, originalCoordinates);
-            node.featureGroup
-                .transition()
-                .duration(1000)
-                .attr(
-                    "transform",
-                    `translate(${node.x - 7.5}, ${node.y + 25}) rotate(0)`
-                )
-                .style("visibility", "hidden");
+                    d3.selectAll(".node-features-Copy").style("opacity", "hidden");
+        
+                    d3.selectAll(".to-be-removed").remove();
+                    handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
+        
     
+        
+        
+                d3.selectAll(".graph-displayer").remove();
+                d3.selectAll(".weightUnit").remove();
+                d3.selectAll(".columnUnit").remove();
+                for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "1";
+                moveFeaturesBack(node.relatedNodes, originalCoordinates);
+                node.featureGroup
+                    .transition()
+                    .duration(1000)
+                    .attr(
+                        "transform",
+                        `translate(${node.x - 7.5}, ${node.y + 25}) rotate(0)`
+                    )
+                    .style("visibility", "hidden");
+        
+    
+        })
 
-    })
+    }, 3000)
+    
 
 
 

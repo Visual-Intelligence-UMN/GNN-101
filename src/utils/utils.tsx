@@ -581,6 +581,10 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
       state.isAnimating = false;
       state.isPlaying = false;
 
+
+      d3.select("#my_dataviz").on("click", function(event: any) {
+      })
+
   }
 };
 
