@@ -1317,10 +1317,9 @@ export function drawPoolingVis(
                     .attr("font-size", "12.5")
                     .attr("fill", "black");
             })
+            
             .on("mouseout", function (event) {
                 const id: number = Number(d3.select(this).attr("id"));
-
-
                 if(poolingRects!=null){
                     for (let ii = 0; ii < poolingRects.length; ii++) {
                             poolingRects[ii]!.style.opacity = "1";

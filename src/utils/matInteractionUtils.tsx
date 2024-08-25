@@ -20,6 +20,11 @@ export function drawAttnDisplayer(
     ithIdx: number,
     attnScore: number
 ) {
+
+    console.log("lgIndices:", lgIndices)
+    console.log("eij:", eij)
+    console.log("ithIdx:", ithIdx)
+
     attnDisplayer
         .append("rect")
         .attr("x", dX + 10)
@@ -141,6 +146,10 @@ export function drawAttnDisplayer(
         "./assets/SVGs/escore.svg", 
         "procVis attn-displayer attnTargetE attnE", "input",
         `${lgIndices[0][0]},${lgIndices[ithIdx][1]}`);
+
+
+
+        
 
     // attnDisplayer
     //     .append("text")

@@ -80,6 +80,7 @@ export function runAnimations(index: number, animations: any) {
 }
 
 
+
 export function drawAniPath(
     Xt: any,
     currentStep: number,
@@ -142,6 +143,7 @@ export function drawAniPath(
         const rectID = d3.select(this).attr("rectID");
 
         d3.select(".wMatLink").style("opacity", 0.3);
+        d3.selectAll(".interactRect").style("opacity", 0);
 
         d3.selectAll(".interactRect").style("opacity", 0.5);
         d3.select(`.interactRect[rectID="${rectID}"]`)
@@ -177,6 +179,8 @@ export function drawAniPath(
         const rectID = d3.select(this).attr("rectID");
 
         d3.select(".wMatLink").style("opacity", 1);
+
+        d3.selectAll(".interactRect").style("opacity", 1);
 
         d3.selectAll(".weightUnit").style("opacity", 1);
 
@@ -757,7 +761,7 @@ export function drawSummationFeature(
     mulValues: any,
     curveDir: number
 ) {
-    const g = g1.append("g").attr("class", "procVis aggregate");
+    const g = g1.append("g").attr("class", "aggregatedFeatureGroup")
     for (let m = 0; m < X.length; m++) {
         g.append("rect")
             .attr("x", coordFeatureVis[0] + w * m)
@@ -784,13 +788,7 @@ export function drawSummationFeature(
         .attr("class", "procVis summation");
 
     //draw label
-    drawHintLabel(
-        g1,
-        coordFeatureVis[0],
-        coordFeatureVis[1] + rectH * curveDir * 1.1,
-        "Vector Summation",
-        "procVis"
-    );
+    drawHintLabel(g1, coordFeatureVis[0], coordFeatureVis[1] + rectH * curveDir * 1.1, "Vector Summation", "procVis aggText");
 
     //path connect - connect prev layer feature vis to intermediate feature vis
     const curve = d3.line().curve(d3.curveBasis);
@@ -820,15 +818,15 @@ export function drawSummationFeature(
             .attr("text-anchor", "middle")
             .attr("font-size", 7.5)
             .attr("class", "procVis multiplier")
-            .attr("opacity", 0);
+            .attr("opacity", 1);
     }
     d3.selectAll(".summation").transition().duration(100).attr("opacity", 1);
-    d3.select(".aggregate").on("mouseover", function () {
-        d3.selectAll(".multiplier").style("opacity", 1);
-    });
-    d3.select(".aggregate").on("mouseout", function () {
-        d3.selectAll(".multiplier").style("opacity", 0);
-    });
+    // d3.select(".aggregate").on("mouseover", function(){
+    //     d3.selectAll(".multiplier").style("opacity", 1);
+    // })
+    // d3.select(".aggregate").on("mouseout", function(){
+    //     d3.selectAll(".multiplier").style("opacity", 0);
+    // })
 }
 
 export function drawWeightsVector(
@@ -929,6 +927,8 @@ export function drawWeightsVector(
 
         d3.selectAll(".weightUnit").style("opacity", 1);
 
+        d3.select(".weight-matrix-frame").style("opacity", 1);
+
         d3.selectAll(".columnUnit").style("opacity", 0);
         d3.selectAll(".interactRect")
             .style("opacity", 1)
@@ -989,7 +989,7 @@ export function drawMathFormula(
         x,
         y,
         formula,
-        "procVis math-formula-pos"
+        "math-formula-pos to-be-removed"
     );
 
    // flattenSVG(".mats");
@@ -1084,7 +1084,7 @@ export function drawWeightMatrix(
         weightMatrixPostions[0][0][0],
         weightMatrixPostions[0][0][1] - 12,
         "Weight Matrix",
-        "procVis"
+        "procVis weightMatrixText to-be-removed"
     );
 
     //flip
@@ -1114,48 +1114,60 @@ export function drawWeightMatrix(
         weightMat = flipVertically(weightMat);
     }
 
-    for (let i = 0; i < weightMatrixPostions.length; i++) {
-        let tempArr = [];
-        for (let j = 0; j < weightMatrixPostions[0].length; j++) {
-            //adjust the location if dimensions are different
-            if (i == 0) {
+        g.append("rect")
+        .attr("class", "weight-matrix-frame to-be-removed procVis")
+        .attr("x", weightMatrixPostions[0][0][0])
+        .attr("y", weightMatrixPostions[0][0][1])
+        .attr("width", rectW*weightMatrixPostions[0].length)
+        .attr("height", rectW*weightMatrixPostions.length)
+        .style("stroke", "black")
+        .style("fill", "none")
+        .style("stroke-width", 2)
+
+        for (let i = 0; i < weightMatrixPostions.length; i++) {
+            let tempArr = [];
+            for (let j = 0; j < weightMatrixPostions[0].length; j++) {
+                //adjust the location if dimensions are different
+                if (i == 0) {
+                    g.append("rect")
+                        .attr("x", weightMatrixPostions[i][j][0])
+                        .attr("y", weightMatrixPostions[i][j][1])
+                        .attr("width", rectW / coefficient)
+                        .attr("height", (rectW / coefficient) * weightMat.length)
+                        .attr("fill", "none")
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 0.5)
+                        .attr("opacity", 0)
+                        .attr("class", "columnUnit")
+                        .attr("id", `columnUnit-${j}`);
+                }
+                //select the weight based on the shape of the matrix
+                let colorVal = 0;
+                if (flag) {
+                    colorVal = weightMat[weightMat.length - i - 1][j];
+                } else {
+                    colorVal = weightMat[j][weightMat[0].length - i - 1];
+                }
+                if (weightMat[0].length == weightMat.length) {
+                    colorVal = weightMat[i][j];
+    
+                }
                 g.append("rect")
                     .attr("x", weightMatrixPostions[i][j][0])
                     .attr("y", weightMatrixPostions[i][j][1])
                     .attr("width", rectW / coefficient)
-                    .attr("height", (rectW / coefficient) * weightMat.length)
-                    .attr("fill", "none")
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 0.5)
-                    .attr("opacity", 0)
-                    .attr("class", "columnUnit")
-                    .attr("id", `columnUnit-${j}`);
+                    .attr("height", rectW / coefficient)
+                    .attr("fill", myColor(colorVal))
+                    .attr("class", "procVis weightUnit")
+                    .attr("id", `weightUnit-${j}`);
+    
+                tempArr.push([
+                    matX + (j * rectW) / coefficient + rectW / (coefficient * 2),
+                    matY + (i * rectW) / coefficient + rectW / (coefficient * 2),
+                ]);
             }
-            //select the weight based on the shape of the matrix
-            let colorVal = 0;
-            if (flag) {
-                colorVal = weightMat[weightMat.length - i - 1][j];
-            } else {
-                colorVal = weightMat[j][weightMat[0].length - i - 1];
-            }
-            if (weightMat[0].length == weightMat.length) {
-                colorVal = weightMat[i][j];
-            }
-            g.append("rect")
-                .attr("x", weightMatrixPostions[i][j][0])
-                .attr("y", weightMatrixPostions[i][j][1])
-                .attr("width", rectW / coefficient)
-                .attr("height", rectW / coefficient)
-                .attr("fill", myColor(colorVal))
-                .attr("class", "weightUnit")
-                .attr("id", `weightUnit-${j}`);
-
-            tempArr.push([
-                matX + (j * rectW) / coefficient + rectW / (coefficient * 2),
-                matY + (i * rectW) / coefficient + rectW / (coefficient * 2),
-            ]);
         }
-    }
+
     d3.selectAll(".columnUnit").raise();
 }
 
@@ -1178,10 +1190,10 @@ export function drawBiasVector(
             .attr("width", rectW)
             .attr("height", rectH)
             .attr("fill", myColor(layerBias[m]))
-            .attr("opacity", 0)
+            .style("opacity", 1)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1)
-            .attr("class", "procVis biasVector");
+            .attr("class", "procVis bias");
     }
 
     //draw frame
@@ -1191,18 +1203,12 @@ export function drawBiasVector(
         .attr("width", rectW * channels)
         .attr("height", rectH)
         .attr("fill", "none")
-        .attr("opacity", 0)
+        .style("opacity", 1)
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("class", "procVis biasVector");
-    const label = drawHintLabel(
-        g,
-        coordFeatureVis[0],
-        coordFeatureVis[1] + rectH + 6,
-        "Bias Vector",
-        "procVis biasVector"
-    );
-    d3.selectAll(".biasVector").transition().duration(100).attr("opacity", 1);
+    const label = drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+6, "Bias Vector", "procVis biasFrame");
+   // d3.selectAll(".biasVector").transition().duration(100).style("opacity", 1);
 }
 
 export function drawBiasPath(
@@ -1281,17 +1287,11 @@ export function drawReLU(
             d3.select(ReLU)
                 .attr("x", cx1)
                 .attr("y", cy1)
-                .attr("class", "procVis")
+                .attr("class", "procVis relu-icon")
                 .raise();
-        }
-    });
-    drawHintLabel(
-        relu,
-        cx1 - 20,
-        cy1 + radius * 4 + 12 + 4,
-        "ReLU Non-linear Function",
-        "procVis"
-    );
+            }
+        });
+        drawHintLabel(relu, cx1-20, cy1+radius*4+12+4, "ReLU Non-linear Function", "procVis reluText");
 
     relu.on("mouseover", function (event, d) {
         const [x, y] = d3.pointer(event);
@@ -1334,6 +1334,7 @@ export function drawTanh(
                 .attr("y", cy1)
                 .attr("class", "procVis relu-icon")
                 .raise();
+
         }
     });
 
@@ -1344,6 +1345,7 @@ export function drawTanh(
         "Tanh Non-linear Function",
         "procVis relu-icon"
     );
+
 
     relu.on("mouseover", function (event, d) {
         const [x, y] = d3.pointer(event);
