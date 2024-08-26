@@ -1240,14 +1240,16 @@ export function visualizePartialGraph(
                 const simulation = d3
                 .forceSimulation(data.nodes)
                 .force(
-                    "link",
-                    d3
-                        .forceLink(data.links)
-                        .id((d: any) => d.id)
-                        .distance(10)
+                  "link",
+                  d3
+                    .forceLink(data.links)
+                    .id((d: any) => d.id)
+                    .distance(20)
                 )
-                .force("charge", d3.forceManyBody().strength(-500))
+                .force("charge", d3.forceManyBody().strength(-1000))
                 .force("center", d3.forceCenter(width / 2, height / 3))
+                .force("y", d3.forceY(height / 3).strength(0.2)) 
+                .force("x", d3.forceX(width / 2).strength(0.8))  
                 .on("tick", function ticked() {
                     link.attr("x1", (d: any) => d.source.x)
                         .attr("y1", (d: any) => d.source.y)
