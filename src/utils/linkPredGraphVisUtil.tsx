@@ -69,7 +69,17 @@ export function linkPredFeatureVisualizer(
   let movedNode: any = null; // to prevent the same node is clicked twice
 
   
-
+  let allFeatureMap: number[][][] = [];
+  nodesByIndex.forEach((nodes, index) => {
+   let featureMap: number[][] = []
+     if (index < convNum) {
+      nodes.forEach((n) => { 
+        featureMap.push(n.features)
+      })
+      allFeatureMap.push(featureMap)
+     }
+      
+  })
 
 
   nodesByIndex.forEach((nodes, graphIndex) => { // iterate through each graphs
@@ -297,7 +307,7 @@ export function linkPredFeatureVisualizer(
 
 
           
-            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, featureMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
+            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, allFeatureMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
           
 
 

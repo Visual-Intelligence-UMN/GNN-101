@@ -23,6 +23,7 @@ import { Yomogi } from "@next/font/google";
 import { dataPreparationLinkPred, constructComputationalGraph } from "./linkPredictionUtils";
 import { extractSubgraph } from "./graphDataUtils";
 import { isValidNode } from "./GraphvislinkPredUtil";
+import { all, number } from "mathjs";
 
 env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
@@ -581,6 +582,10 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
       state.isAnimating = false;
       state.isPlaying = false;
 
+
+      d3.select("#my_dataviz").on("click", function(event: any) {
+      })
+
   }
 };
 
@@ -605,6 +610,9 @@ export function featureVisualizer(
   state.isClicked = false;
 
 
+
+
+
   
   // 1. visualize feature
   // 2. handle interaction event
@@ -627,6 +635,18 @@ export function featureVisualizer(
   let movedNode: any = null; // to prevent the same node is clicked twice
 
 
+  let allFeatureMap: number[][][] = [];
+  nodesByIndex.forEach((nodes, index) => {
+   let featureMap: number[][] = []
+     if (index < convNum) {
+      nodes.forEach((n) => { 
+        featureMap.push(n.features)
+      })
+      allFeatureMap.push(featureMap)
+     }
+      
+  })
+  console.log("VAEWDDW", allFeatureMap)
 
 
   nodesByIndex.forEach((nodes, graphIndex) => { // iterate through each graphs
@@ -638,16 +658,17 @@ export function featureVisualizer(
     let currentBias: any[] = []
 
 
-    let featureMap: number[][] = [];
+
     // do some calculation that sill be used in the animation
     if (graphs.length != 0 && graphIndex > 0 && graphIndex < (convNum)) {
     currentWeights = weights[graphIndex - 1];
     currentBias = bias[graphIndex - 1]
       
-
      const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex);
+
+     let featureMap: number[][] = []
      nodesByIndex.forEach((nodes, index) => { 
-       if (index === graphIndex - 1) {
+        if (index === graphIndex - 1) {
          nodes.forEach((n) => { 
            featureMap.push(n.features)
          })
@@ -657,9 +678,6 @@ export function featureVisualizer(
        calculatedDataMap = matrixMultiplication(aggregatedDataMap, currentWeights)
 
       }
-
-      
-
 
 
 
@@ -894,7 +912,7 @@ export function featureVisualizer(
            if (mode === 1 && graphIndex === 4) {
             nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, svg, mode)
            } else {
-            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, featureMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
+            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, allFeatureMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
            };
 
 
