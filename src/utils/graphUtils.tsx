@@ -23,6 +23,7 @@ import { drawActivationExplanation, drawAttnDisplayer, drawEScoreEquation, drawM
 import { computeMatrixLocations, drawMathFormula, drawMatrixWeight, drawWeightMatrix } from "./matAnimateUtils";
 import { graphVisDrawActivationExplanation, graphVisDrawMatrixWeight, displayerHandler, hoverOverHandler} from "./graphAnimationHelper";
 import { computeAttentionCoefficient, computeAttnStep } from "./computationUtils";
+import { start } from "repl";
 
 export const pathColor = d3
     .scaleLinear<string>()
@@ -757,6 +758,7 @@ export function calculationVisualizer(
 
 
 
+
     let intervalID = 0;
 
     d3.selectAll(".graph-displayer").remove();
@@ -1151,6 +1153,11 @@ export function calculationVisualizer(
         let extendAttnView = false;
 
 
+
+
+
+
+
         if (node.relatedNodes) {
             node.relatedNodes.forEach((n: any, i: number) => {
                 if (n.featureGroupLocation) {
@@ -1176,7 +1183,7 @@ export function calculationVisualizer(
                         .attr("class", "parameter procVis to-be-removed")
                         .attr("opacity", 1).raise();
                     }
-                    else {
+                    else if (innerComputationMode === "GAT"){
 
 
                         const frame = g3.append("rect")
@@ -1232,21 +1239,22 @@ export function calculationVisualizer(
                             lgIndices.push(index)
                         })
                         const targetE = computeAttnStep(usingVectors[1], usingVectors[0], usingWeightMatrix, lastLayerNodefeature, lastLayerNodefeature)
-          
                         
 
                         frame.on("click", function(this: any, event: any) {
+                            const attentionDisplayer = g3.append("g")
+                            .attr("class", "attn-displayer")
                             let extendAttnView = true;
                             event.stopPropagation();
                             event.preventDefault();
-                            drawAttnDisplayer(g3, start_x, start_y, eij, lgIndices, targetE, myColor, node.id, multiplier)
+                            drawAttnDisplayer(attentionDisplayer, start_x - 1200, start_y, eij, lgIndices, targetE, myColor, node.id, multiplier)
                             d3.selectAll(".attnE").on("mouseover", function () {
                                 const targetIdx = Number(d3.select(this).attr("index"));
                                 d3.selectAll(".e-displayer").remove();
-                                const eDisplayer = g3
+                                const eDisplayer = attentionDisplayer
                                     .append("g")
                                     .attr("class", "procVis e-displayer attn-displayer to-be-removed");
-                                
+
                                 console.log( `e_${targetIdx}_${lgIndices[targetIdx][1]} = LeakyReLU(                            +                        )`, lgIndices)
                                 const inputVector = featureMap[node.graphIndex][Number(d3.select(this).attr("index"))];
                                 let jthIndexElement = lgIndices[targetIdx][1];
@@ -1254,14 +1262,14 @@ export function calculationVisualizer(
                                     jthIndexElement = lgIndices[node.id][1];
                                     
                                 }
-                                drawEScoreEquation(lgIndices, eDisplayer, jthIndexElement, start_x, start_y, usingVectors[1], usingVectors[0], myColor, inputVector, node.graphIndex);
+                                drawEScoreEquation(lgIndices, eDisplayer, jthIndexElement, start_x - 1200, start_y, usingVectors[1], usingVectors[0], myColor, inputVector, node.graphIndex);
                             });
-                            const eDisplayer = g3
+                            const eDisplayer = attentionDisplayer
                             .append("g")
                             .attr("class", "procVis e-displayer attn-displayer to-be-removed");
                             const inputVector = featureMap[node.graphIndex][Number(d3.select(this).attr("index"))];
                             let jthIndexElement = lgIndices[node.id][1];
-                            drawEScoreEquation(lgIndices, eDisplayer, jthIndexElement, start_x, start_y, usingVectors[1], usingVectors[0], myColor, inputVector, node.graphIndex);
+                            drawEScoreEquation(lgIndices, eDisplayer, jthIndexElement, start_x - 1200, start_y, usingVectors[1], usingVectors[0], myColor, inputVector, node.graphIndex);
 
                             d3.selectAll("#my_dataviz").on("click", function(event) {
                                 event.stopPropagation();
@@ -1299,14 +1307,13 @@ export function calculationVisualizer(
                             });
                         })
 
+                    } else if (innerComputationMode === "GraphSAGE") {
+
+                        // to do
 
 
-                            
-                
-             
 
 
-        
 
                     }
 

@@ -1247,9 +1247,10 @@ export function visualizePartialGraph(
                     .distance(20)
                 )
                 .force("charge", d3.forceManyBody().strength(-1000))
-                .force("center", d3.forceCenter(width / 2, height / 3))
-                .force("y", d3.forceY(height / 3).strength(0.2)) 
+                .force("center", d3.forceCenter(width / 2, height / 2.5))
+                .force("y", d3.forceY(height / 2.5).strength(0.2)) 
                 .force("x", d3.forceX(width / 2).strength(0.8))  
+       
                 .on("tick", function ticked() {
                     link.attr("x1", (d: any) => d.source.x)
                         .attr("y1", (d: any) => d.source.y)
@@ -1284,18 +1285,18 @@ export function visualizePartialGraph(
             });
             const graphWidth = maxXDistance + 20;
             const graphHeight = maxYDistance + 20;
-            const point1 = { x: 0.9 * offset - 260, y: height / 8 };
+            const point1 = { x: 0.9 * offset - 260, y: height / 8 + 30};
             const point2 = {
                 x: 0.8 * offset - 260,
-                y: height / 20,
+                y: height / 20 + 30,
             };
             const point3 = {
                 x: 0.8 * offset - 260,
-                y: height / 1.7,
+                y: height / 1.7 + 30,
             };
             const point4 = {
                 x: 0.9 * offset - 260,
-                y: height / 1.5,
+                y: height / 1.5 + 30,
             };
             const tolerance = 100;
 
