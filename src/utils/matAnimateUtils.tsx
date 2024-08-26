@@ -98,11 +98,6 @@ export function drawAniPath(
 ) {
     d3.selectAll("#tempath").remove();
     d3.selectAll(".matmul-displayer").remove();
-    // if(currentStep==0){
-    //     drawHintLabel(g, coordFeatureVis[0] - (endCoordList[currentStep][0] - startCoordList[0][0])/2 - 20,
-    //     coordFeatureVis[1] + rectH - curveDir*Xt[currentStep].length*(2),
-    //     "Matrix Multiplication", "procVis");
-    // }
     g.append("rect")
         .attr("x", coordFeatureVis[0] + rectW * currentStep)
         .attr("y", coordFeatureVis[1] - rectH / 2)
@@ -159,8 +154,9 @@ export function drawAniPath(
             featureChannels,
             "weightPath"
         );
-        d3.selectAll(".weightUnit").style("opacity", 0.3).lower();
-        d3.selectAll(`#weightUnit-${rectID}`).style("opacity", 1).raise();
+        d3.selectAll(".columnGroup").style("opacity", 0.5);
+        d3.select(`#columnGroup-${rectID}`).style("opacity", 1);
+
         d3.select(`#columnUnit-${Number(rectID) - 1}`).style("opacity", 0);
         d3.select(`#columnUnit-${rectID}`).style("opacity", 1).raise();
         drawDotProduct(
@@ -178,7 +174,8 @@ export function drawAniPath(
 
         d3.select(".wMatLink").style("opacity", 1);
 
-        d3.selectAll(".weightUnit").style("opacity", 1);
+        d3.selectAll(".columnGroup").style("opacity", 1);
+
 
         d3.selectAll(".columnUnit").style("opacity", 0);
         d3.selectAll(".interactRect")
@@ -883,6 +880,8 @@ export function drawWeightsVector(
         .attr("class", "procVis wRect");
     // d3.selectAll(".wRect").transition().duration(100).attr("opacity", 1);
 
+
+
     d3.selectAll(".interactRect").on("mouseover", function () {
         let paintMode = "reverse";
         if (curveDir == -1) paintMode = "normal";
@@ -890,6 +889,9 @@ export function drawWeightsVector(
         d3.select(".wMatLink").style("opacity", 0.3);
 
         const rectID = d3.select(this).attr("rectID");
+
+        d3.selectAll(".columnGroup").style("opacity", 0.5);
+        d3.select(`#columnGroup-${rectID}`).style("opacity", 1);
 
         d3.selectAll(".interactRect").style("opacity", 0.5);
         d3.select(`.interactRect[rectID="${rectID}"]`)
@@ -908,8 +910,6 @@ export function drawWeightsVector(
             "weightPath",
             paintMode
         );
-        d3.selectAll(".weightUnit").style("opacity", 0.3).lower();
-        d3.selectAll(`#weightUnit-${rectID}`).style("opacity", 1).raise();
         d3.select(`#columnUnit-${Number(rectID) - 1}`).style("opacity", 0);
         d3.select(`#columnUnit-${rectID}`).style("opacity", 1).raise();
         drawDotProduct(
@@ -927,7 +927,7 @@ export function drawWeightsVector(
 
         d3.select(".wMatLink").style("opacity", 1);
 
-        d3.selectAll(".weightUnit").style("opacity", 1);
+        d3.selectAll(".columnGroup").style("opacity", 1);
 
         d3.selectAll(".columnUnit").style("opacity", 0);
         d3.selectAll(".interactRect")
@@ -1114,14 +1114,15 @@ export function drawWeightMatrix(
         weightMat = flipVertically(weightMat);
     }
 
-    for (let i = 0; i < weightMatrixPostions.length; i++) {
+    for (let i = 0; i < weightMatrixPostions[0].length; i++) {
         let tempArr = [];
-        for (let j = 0; j < weightMatrixPostions[0].length; j++) {
+        const columnG = g.append("g").attr("class", "procVis columnGroup").attr("id",`columnGroup-${i}`);
+        for (let j = 0; j < weightMatrixPostions.length; j++) {
             //adjust the location if dimensions are different
-            if (i == 0) {
+            if (j == 0) {
                 g.append("rect")
-                    .attr("x", weightMatrixPostions[i][j][0])
-                    .attr("y", weightMatrixPostions[i][j][1])
+                    .attr("x", weightMatrixPostions[j][i][0])
+                    .attr("y", weightMatrixPostions[j][i][1])
                     .attr("width", rectW / coefficient)
                     .attr("height", (rectW / coefficient) * weightMat.length)
                     .attr("fill", "none")
@@ -1129,21 +1130,22 @@ export function drawWeightMatrix(
                     .attr("stroke-width", 0.5)
                     .attr("opacity", 0)
                     .attr("class", "columnUnit")
-                    .attr("id", `columnUnit-${j}`);
+                    .attr("id", `columnUnit-${i}`);
+                
             }
             //select the weight based on the shape of the matrix
             let colorVal = 0;
             if (flag) {
-                colorVal = weightMat[weightMat.length - i - 1][j];
+                colorVal = weightMat[weightMat.length - j - 1][i];
             } else {
-                colorVal = weightMat[j][weightMat[0].length - i - 1];
+                colorVal = weightMat[i][weightMat[0].length - j - 1];
             }
             if (weightMat[0].length == weightMat.length) {
-                colorVal = weightMat[i][j];
+                colorVal = weightMat[j][i];
             }
-            g.append("rect")
-                .attr("x", weightMatrixPostions[i][j][0])
-                .attr("y", weightMatrixPostions[i][j][1])
+            columnG.append("rect")
+                .attr("x", weightMatrixPostions[j][i][0])
+                .attr("y", weightMatrixPostions[j][i][1])
                 .attr("width", rectW / coefficient)
                 .attr("height", rectW / coefficient)
                 .attr("fill", myColor(colorVal))

@@ -26,6 +26,17 @@ export function drawHintLabel(
 }
 
 
+export function drawScoreE(g:any, x:number, y:number, leftIndex:number, rightIndex:number){
+    const e = g.append("text")
+        .attr("x", x)
+        .attr("y", y)
+        .text(`e(${leftIndex},${rightIndex})`)
+        .style("fill", "black")
+        .style("font-size", 10)
+        .attr("class", "procVis attn-displayer");
+    return e;
+}
+
 export function drawEqComponentLabel(
     eDisplayer:any,
     x: number,

@@ -3,7 +3,7 @@ import { roundToTwo } from "../components/WebUtils";
 import { flipVertically, softmax } from "./utils";
 import { create, all, transposeDependencies } from "mathjs";
 import { injectMathSymbol, injectSVG } from "./svgUtils";
-import { drawEqComponentLabel } from "./matHelperUtils";
+import { drawEqComponentLabel, drawScoreE } from "./matHelperUtils";
 
 
 //---------------------------functions for the softmax interaction in the graph classifier------------------------------
@@ -80,14 +80,16 @@ export function drawAttnDisplayer(
         const escoreComponent = attnDisplayer.append("g").attr("class", "procVis attn-displayer attnE")
         .attr("id", `e-${i}`)
         .attr("index", i);
-
+        const str = `e(${lgIndices[i][0]},${lgIndices[i][1]})`
+        const offset = str.length * 2.5;
 
 
         if (i != 0) {
-            escoreComponent
+            
+            attnDisplayer
                 .append("text")
                 .text("+")
-                .attr("x", dX + 100 + 65 * i - 30)
+                .attr("x", dX + 100 + 65 * (i) - (10))
                 .attr("y", dY + 75 + 12.5)
                 .attr("text-anchor", "middle")
                 .attr("font-size", 15)
@@ -117,11 +119,14 @@ export function drawAttnDisplayer(
             .attr("id", "targetE"); // 确保路径不被填充
 
         const escore = escoreComponent.append("g");
-        injectMathSymbol(
-            escore, dX + 100 + 65 * i-7.5, dY + 75-7.5, 
-            "./assets/SVGs/escore.svg", 
-            "procVis attn-displayer", "input",
-            `${lgIndices[i][0]},${lgIndices[i][1]}`);
+        // injectMathSymbol(
+        //     escore, dX + 100 + 65 * i-7.5, dY + 75-7.5, 
+        //     "./assets/SVGs/escore.svg", 
+        //     "procVis attn-displayer", "input",
+        //     `${lgIndices[i][0]},${lgIndices[i][1]}`);
+
+        
+        drawScoreE(escore, dX + 100 + 65 * i, dY + 75 + 9.5, lgIndices[i][0], lgIndices[i][1]);
     }
 
     // attnDisplayer
@@ -136,11 +141,13 @@ export function drawAttnDisplayer(
     //     .attr("index", 0);
 
     const escore = attnDisplayer.append("g").attr("id", 0).attr("class", "math-latex");
-    injectMathSymbol(
-        escore, dX + 100 + 50-7.5, dY + 50-15, 
-        "./assets/SVGs/escore.svg", 
-        "procVis attn-displayer attnTargetE attnE", "input",
-        `${lgIndices[0][0]},${lgIndices[ithIdx][1]}`);
+    // injectMathSymbol(
+    //     escore, dX + 100 + 50-7.5, dY + 50-15, 
+    //     "./assets/SVGs/escore.svg", 
+    //     "procVis attn-displayer attnTargetE attnE", "input",
+    //     `${lgIndices[0][0]},${lgIndices[ithIdx][1]}`);
+
+    drawScoreE(escore, dX + 100 + 50-7.5, dY + 50, lgIndices[0][0], lgIndices[ithIdx][1]);
 
     // attnDisplayer
     //     .append("text")
@@ -359,54 +366,54 @@ export function drawEScoreEquation(
             .style("fill", "gray")
             .style("font-size", 5);
 
-            for (let i = 0; i < dstVector.length; i++) {
-                eDisplayer
-                    .append("rect")
-                    .attr("x", dX + 140 +15 + i * (25 / dstVector.length))
-                    .attr("y", dY + 112.5 + 15)
-                    .attr("width", 25 / srcVector.length)
-                    .attr("height", 2.5).attr("class", "temp")
-                    .attr("fill", myColor(dstVector[i]))
-                    .raise();
-            }
+        //     for (let i = 0; i < dstVector.length; i++) {
+        //         eDisplayer
+        //             .append("rect")
+        //             .attr("x", dX + 140 +15 + i * (25 / dstVector.length))
+        //             .attr("y", dY + 112.5 + 15)
+        //             .attr("width", 25 / srcVector.length)
+        //             .attr("height", 2.5).attr("class", "temp")
+        //             .attr("fill", myColor(dstVector[i]))
+        //             .raise();
+        //     }
 
-        for (let i = 0; i < srcVector.length; i++) {
-            eDisplayer
-                .append("rect")
-                .attr("x", dX + 140 + 15 + i * (25 / srcVector.length))
-                .attr("y", dY + 112.5 + 50 + 15)
-                .attr("width",25 / srcVector.length)
-                .attr("height", 2.5)
-                .attr("fill", myColor(srcVector[i])).attr("class", "temp");
-            }
+        // for (let i = 0; i < srcVector.length; i++) {
+        //     eDisplayer
+        //         .append("rect")
+        //         .attr("x", dX + 140 + 15 + i * (25 / srcVector.length))
+        //         .attr("y", dY + 112.5 + 50 + 15)
+        //         .attr("width",25 / srcVector.length)
+        //         .attr("height", 2.5)
+        //         .attr("fill", myColor(srcVector[i])).attr("class", "temp");
+        //     }
 
         
-            for (let i = 0; i < inputVector.length; i++) {
-                eDisplayer
-                    .append("rect").attr("class", "temp")
-                    .attr(
-                        "x",
-                        dX + 200 + 12.5 + 20
-                    )
-                    .attr("y", dY + 112.5 + i * (25 / inputVector.length))
-                    .attr("width", 2.5)
-                    .attr("height", 25 / inputVector.length)
-                    .attr("fill", myColor(inputVector[i]));
-            }
+        //     for (let i = 0; i < inputVector.length; i++) {
+        //         eDisplayer
+        //             .append("rect").attr("class", "temp")
+        //             .attr(
+        //                 "x",
+        //                 dX + 200 + 12.5 + 20
+        //             )
+        //             .attr("y", dY + 112.5 + i * (25 / inputVector.length))
+        //             .attr("width", 2.5)
+        //             .attr("height", 25 / inputVector.length)
+        //             .attr("fill", myColor(inputVector[i]));
+        //     }
 
             
-            for (let i = 0; i < inputVector.length; i++) {
-                eDisplayer
-                    .append("rect")
-                    .attr(
-                        "x",
-                        dX + 200 + 12.5 + 20
-                    )
-                    .attr("y", dY + 50 +112.5 + i * (25 / inputVector.length))
-                    .attr("width", 2.5)
-                    .attr("height", 25 / inputVector.length).attr("class", "temp")
-                    .attr("fill", myColor(inputVector[i]));
-            }
+        //     for (let i = 0; i < inputVector.length; i++) {
+        //         eDisplayer
+        //             .append("rect")
+        //             .attr(
+        //                 "x",
+        //                 dX + 200 + 12.5 + 20
+        //             )
+        //             .attr("y", dY + 50 +112.5 + i * (25 / inputVector.length))
+        //             .attr("width", 2.5)
+        //             .attr("height", 25 / inputVector.length).attr("class", "temp")
+        //             .attr("fill", myColor(inputVector[i]));
+        //     }
 
     let imageMat = "./assets/PNGs/GATConvMat1.png";
     let imgW = 50;
@@ -421,16 +428,16 @@ export function drawEScoreEquation(
         offset = 10;
     }
 
-    eDisplayer
-        .append("image")
-        .attr("xlink:href", imageMat).attr("id", "w1png")
-        .attr("x", dX + 75 + 75 - 10 + offset + 100)
-        .attr("y", dY + 75 + 25 + offset)
-        .attr("width", imgW)
-        .attr("height", imgH).attr("opacity", 0);
+    // eDisplayer
+    //     .append("image")
+    //     .attr("xlink:href", imageMat).attr("id", "w1png")
+    //     .attr("x", dX + 75 + 75 - 10 + offset + 100 + 50)
+    //     .attr("y", dY + 75 + 25 + offset)
+    //     .attr("width", imgW)
+    //     .attr("height", imgH).attr("opacity", 0);
     
-        drawEqComponentLabel(eDisplayer, dX + 75 + 75 + 100 - 10 + offset, dY + 75 + 25 + offset + imgH + 5, "Weight Matrix")
-        d3.select("#w1png").attr("opacity", 1); 
+    //     drawEqComponentLabel(eDisplayer, dX + 75 + 75 + 100 - 10 + offset + 50, dY + 75 + 25 + offset + imgH + 5, "Weight Matrix")
+    //     d3.select("#w1png").attr("opacity", 1); 
 
     // drawEqComponentLabel(eDisplayer, dX + 75 + 75 + 60 + 20 + offset, dY + 75 + 25 + offset + imgH + 5, "Weight Matrix")
     // d3.select("#w2png").attr("opacity", 1); 
