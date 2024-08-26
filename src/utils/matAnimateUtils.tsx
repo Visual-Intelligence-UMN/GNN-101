@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import { computeMids, computeMidsVertical } from "./matFeaturesUtils";
-import { flattenSVG, injectPlayButtonSVG, injectSVG } from "./svgUtils";
+import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import { drawActivationExplanation, drawDotProduct } from "./matInteractionUtils";
 import { create, all, transposeDependencies, flatten } from "mathjs";
 import { drawPoints, flipHorizontally, flipVertically, rotateMatrixCounterClockwise, transposeAnyMatrix } from "./utils";
