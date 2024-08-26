@@ -20,7 +20,7 @@ import { stat, truncateSync } from "fs";
 
 
 import { drawActivationExplanation, drawAttnDisplayer, drawEScoreEquation, drawMatmulExplanation, graphVisDrawMatmulExplanation } from "./matInteractionUtils";
-import { computeMatrixLocations, drawMathFormula, drawMatrixWeight, drawWeightMatrix } from "./matAnimateUtils";
+import { computeMatrixLocations, drawMathFormula, drawMatrixWeight, drawSamplingAggregation, drawWeightMatrix } from "./matAnimateUtils";
 import { graphVisDrawActivationExplanation, graphVisDrawMatrixWeight, displayerHandler, hoverOverHandler} from "./graphAnimationHelper";
 import { computeAttentionCoefficient, computeAttnStep } from "./computationUtils";
 import { start } from "repl";
@@ -706,7 +706,7 @@ export function outputVisualizer(
             d3.selectAll(".graph-displayer").remove();
          
                 d3.selectAll(".node-features-Copy").style("visibility", "hidden")
-                d3.selectAll(".weightUnit").remove();
+                d3.selectAll(".columnGroup").remove();
                 d3.selectAll(".columnUnit").remove();
                 d3.selectAll(".to-be-removed").remove();
         
@@ -856,10 +856,14 @@ export function calculationVisualizer(
         .style("opacity", 0);
 
     //draw label
+    let text = "Vectors Summation"
+    if (innerComputationMode === "GraphSAGE") {
+        text = "Mean aggregator"
+    }
     aggregatedFeatureGroup.append("text")
         .attr("x", 0)
         .attr("y", -5)
-        .text("Vectors Summation")
+        .text(text)
         .style("fill", "gray")
         .style("font-size", "17px")
         .attr("class", "aggregatedFeatureGroup to-be-removed aggText procVis")
@@ -1174,6 +1178,26 @@ export function calculationVisualizer(
                     
 
                     let color = calculateAverage(n.features);
+
+
+                    const originToAggregated = g3
+                        .append("path")
+                        .attr(
+                            "d",
+                            `M${start_x},${start_y} C ${control1_x},${control1_y}, ${control2_x},${control2_y}, ${end_x},${end_y}`
+                        )
+                        .style("stroke", myColor(adjMatrixSlice[i]))
+                        .style("stroke-width", 1)
+                        .style("fill", "none")
+                        .attr("class", "to-be-removed origin-to-aggregated procVis")
+                        .attr("id", `path${n.original_id}`)
+                        .style("stroke-dasharray", "none")
+                        .style("opacity", 0).lower();
+
+                    d3.selectAll(".origin-to-aggregated").style("opacity", 1);
+
+                    paths.push(originToAggregated);
+
                     if (innerComputationMode === "GCN") {
                     g3.append("text")
                         .attr("x", start_x + 20)
@@ -1286,7 +1310,7 @@ export function calculationVisualizer(
                                         d3.selectAll(".graph-displayer").remove();
                                         moveFeaturesBack(node.relatedNodes, originalCoordinates);
                                         d3.selectAll(".to-be-removed").remove();
-                                        d3.selectAll(".weightUnit").remove();
+                                        d3.selectAll(".columnGroup").remove();
                                         d3.selectAll(".columnUnit").remove();
                                 
                                 
@@ -1302,36 +1326,32 @@ export function calculationVisualizer(
                                         handleClickEvent(svg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
                                 
                                     }) 
-                 
-                                
                             });
                         })
 
                     } else if (innerComputationMode === "GraphSAGE") {
 
-                        // to do
+                        const sampleOutList: number[] = require("../../public/sampling.json");
+
+                        if (sampleOutList.includes(n.original_id)) {
+                            d3.selectAll(`#path${n.original_id}`).style("stroke-dasharray", "3")
+                            const sampling = g3.append("g")
+                            injectSVG(sampling, start_x, start_y - 10, "./assets/SVGs/sampling.svg", "procVis to-be-removed sampling");
+                            drawHintLabel(
+                                sampling,
+                                start_x - 55,
+                                start_y + 22,
+                                "Drop Out during Training Stage",
+                                "procVis to-be-removed sampling",
+                                "10px"
+                            );
 
 
-
+                        }
 
 
                     }
 
-                    const originToAggregated = g3
-                        .append("path")
-                        .attr(
-                            "d",
-                            `M${start_x},${start_y} C ${control1_x},${control1_y}, ${control2_x},${control2_y}, ${end_x},${end_y}`
-                        )
-                        .style("stroke", myColor(adjMatrixSlice[i]))
-                        .style("stroke-width", 1)
-                        .style("fill", "none")
-                        .attr("class", "to-be-removed origin-to-aggregated procVis")
-                        .style("opacity", 0).lower();
-
-                    d3.selectAll(".origin-to-aggregated").style("opacity", 1);
-
-                    paths.push(originToAggregated);
                 }
             });
 
@@ -1625,7 +1645,7 @@ export function calculationVisualizer(
             d3.selectAll(".graph-displayer").remove();
             moveFeaturesBack(node.relatedNodes, originalCoordinates);
             d3.selectAll(".to-be-removed").remove();
-            d3.selectAll(".weightUnit").remove();
+            d3.selectAll(".columnGroup").remove();
             d3.selectAll(".columnUnit").remove();
     
     
@@ -1810,7 +1830,7 @@ function weightAnimation(
             return;
         }
 
-        d3.selectAll(".weightUnit").style("opacity", 0.3).lower();
+        d3.selectAll(".columnGroup").style("opacity", 0.3).lower();
         if (i >= endNumber) {
             i = 0; // Reset the index to replay the animation
         }
@@ -1855,9 +1875,9 @@ function weightAnimation(
                 
                 graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode = mode)
 
-                d3.selectAll(`#weightUnit-${i - 1}`).style("opacity", 0.3).lower();
+                d3.selectAll(`#columnGroup-${i - 1}`).style("opacity", 0.3).lower();
                 d3.selectAll(`#columnUnit-${i - 1}`).style("opacity", 0).lower();
-                d3.selectAll(`#weightUnit-${i}`).style("opacity", 1).raise();
+                d3.selectAll(`#columnGroup-${i}`).style("opacity", 1).raise();
                 d3.select(`#columnUnit-${i}`).style("opacity", 1).raise();
 
                 i++;
@@ -1880,7 +1900,7 @@ function weightAnimation(
 
                     injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_play.svg")
                     d3.selectAll(".aniRect").style("opacity", 1);
-                    d3.selectAll(".weightUnit").style("opacity", 1);
+                    d3.selectAll(".columnGroup").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
                     d3.selectAll(`#tempath${i - 1}`).style("opacity", 0);
                   
@@ -3025,7 +3045,7 @@ export function nodeOutputVisualizer(
         
         
                 d3.selectAll(".graph-displayer").remove();
-                d3.selectAll(".weightUnit").remove();
+                d3.selectAll(".columnGroup").remove();
                 d3.selectAll(".columnUnit").remove();
                 for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "1";
                 moveFeaturesBack(node.relatedNodes, originalCoordinates);
