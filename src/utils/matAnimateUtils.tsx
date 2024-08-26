@@ -1206,7 +1206,7 @@ export function drawBiasVector(
         .style("opacity", 1)
         .attr("stroke", "black")
         .attr("stroke-width", 1)
-        .attr("class", "procVis biasVector");
+        .attr("class", "procVis biasVector biasFrame");
     const label = drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+6, "Bias Vector", "procVis biasFrame");
    // d3.selectAll(".biasVector").transition().duration(100).style("opacity", 1);
 }

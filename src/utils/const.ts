@@ -31,7 +31,7 @@ export const modelTypeList:{ [k: string]: string } = {
 };
 
 export const formulaClass: { [k: string]: string[]} = {
-  "formula_weights": ["weight-matrix-frame", "weightUnit"],
+  "formula_weights": ["weight-matrix-frame", "columnGroup"],
   "formula_bias": ["biasFrame", "bias"],
   "formula_x": ["output", "outputFeature"],
   "formula_summation": ["aggregatedFeatureGroup", "origin-to-aggregated", "summation", "parameter","multiplier", "original-features", "inputFeature"],
