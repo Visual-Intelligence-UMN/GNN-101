@@ -403,7 +403,7 @@ export default function Home() {
                                     {model == "link classification" ||
                                     modelType == "GAT" ||
                                     modelType == "GraphSAGE" ? (
-                                        modelType == "GAT"?
+                                        modelType == "GAT" || modelType == "GCN"?
                                         <>
                                             Predict a link from node
                                             <NodeSelector
