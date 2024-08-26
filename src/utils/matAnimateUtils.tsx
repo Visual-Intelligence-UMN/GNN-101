@@ -708,7 +708,7 @@ export function drawSamplingAggregation(
                 sampling,
                 posList[i][0] - 55,
                 posList[i][1] + 22,
-                "Drop Out during Training Stage",
+                "Removed from Sampling during Training Stage",
                 "procVis",
                 "10px"
             );
@@ -722,7 +722,7 @@ export function drawSamplingAggregation(
                     y,
                     "Neighborhood Sampling",
                     "This notation indicate this node",
-                    " is drop-out during training stage."
+                    " was removed during training stage."
                 );
             });
         
