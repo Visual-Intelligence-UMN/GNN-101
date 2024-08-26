@@ -646,7 +646,7 @@ export function featureVisualizer(
      }
       
   })
-  console.log("VAEWDDW", allFeatureMap)
+
 
 
   nodesByIndex.forEach((nodes, graphIndex) => { // iterate through each graphs

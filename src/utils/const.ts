@@ -34,7 +34,7 @@ export const formulaClass: { [k: string]: string[]} = {
   "formula_weights": ["weight-matrix-frame", "weightUnit"],
   "formula_bias": ["biasFrame", "bias"],
   "formula_x": ["output", "outputFeature"],
-  "formula_summation": ["aggregatedFeatureGroup", "origin-to-aggregated", "summation", "parameter","multiplier", "original-features", "inputFeature"],
+  "formula_summation": ["aggregatedFeatureGroup", "origin-to-aggregated", "summation", "parameter","multiplier", "original-features", "inputFeature", "sampling"],
   "formula_xj": ["original-features", "inputFeature"],
   "formula_degree": ["multiplier", "origin-to-aggregated", "parameter"],
   "formula_activation": ["relu-icon"]
