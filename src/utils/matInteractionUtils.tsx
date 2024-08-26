@@ -359,6 +359,7 @@ export function drawEScoreEquation(
 
             dY += 35;
             dX -= 75;
+            console.log("INI",inputVector.length)
 
             drawEqComponentLabel(eDisplayer, dX + 200 + 25 + inputVector.length * (25 / inputVector.length) - 10, dY + 112.5 + 12.5 + 2.5, "Input Vector")
             drawEqComponentLabel(eDisplayer, dX + 200 + 25 + inputVector.length * (25 / inputVector.length) - 10, dY + 112.5 + 12.5 + 2.5 + 50, "Input Vector")

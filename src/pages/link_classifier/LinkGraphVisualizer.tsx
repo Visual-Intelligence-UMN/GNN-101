@@ -127,7 +127,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
               
 
               if (is_source && is_target){ 
-                return "20";
+                return "5";
               }
 
     
@@ -192,16 +192,19 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
           .attr("opacity", 0)
 
 
-        d3.forceSimulation(data.nodes)
+          const simulation = d3
+          .forceSimulation(data.nodes)
           .force(
             "link",
             d3
               .forceLink(data.links)
               .id((d: any) => d.id)
-              .distance(10)
+              .distance(20)
           )
-          .force("charge", d3.forceManyBody().strength(-500))
-          .force("center", d3.forceCenter(width / 2, height / 3))
+          .force("charge", d3.forceManyBody().strength(-1000))
+          .force("center", d3.forceCenter(width / 2, height / 2.5))
+          .force("y", d3.forceY(height / 2.5).strength(0.2)) 
+          .force("x", d3.forceX(width / 2).strength(0.8))  
           .on("tick", ticked)
           .on("end", updatePositions);
 
@@ -220,7 +223,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
         function updatePositions() {
 
 
-          let value:number[] = [];
+          let value:any[] = [];
           if (intmData != null) {
             if (i === 1) {
               value = intmData.conv1;
@@ -229,25 +232,24 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
               value = intmData.conv2;
             }
             if (i === 3) {
-              value = intmData.prob_adj;
+              value = intmData.prob_adj[hubNodeA * hubNodeB + hubNodeA];
             }
           }
+          console.log("VAW", value, intmData.prob_adj)
 
           let allValues: any[] = []
           data.nodes.forEach((node: any) => {
             node.graphIndex = i;
             if (value != null && i <= 2 && value instanceof Float32Array) {
                node.features = Array.from(value.subarray(
-                64 * node.id,
-                64 * (node.id + 1)
+                64 * node.original_id,
+                64 * (node.original_id + 1)
               ));
               allValues = allValues.concat(node.features)
             }
-            if (value != null && i === 3 && value instanceof Float32Array) {
-              node.features = Array.from(value.subarray(
-                node.id,
-                (node.id + 1)
-              ));
+            if (value != null && i === 3) {
+              node.features = [value]
+
               allValues = allValues.concat(node.features)
             }
 
@@ -260,31 +262,88 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
 
 
   
-  const extentX = d3.extent(data.nodes, (d: any) => d.x) as [number | undefined, number | undefined];
-  const extentY = d3.extent(data.nodes, (d: any) => d.y) as [number | undefined, number | undefined];
-
-  if (extentX[0] === undefined || extentX[1] === undefined || extentY[0] === undefined || extentY[1] === undefined) {
-    console.error("Extent calculation returned undefined values");
-    return;
-  }
-  if (i === 0) {
-  widthPadding = (extentX[1] - extentX[0]) * 1;
-  heightPadding = (extentY[1] - extentY[0]) * 0.1;
 
 
-  point1 = { x: 4.0 * offset - widthPadding, y: height / 8 - heightPadding};
-  point2 = { x: 3.9 * offset + widthPadding, y: height / 20 - heightPadding};
-  point3 = { x: 3.9 * offset + widthPadding, y: height / 1.7 + heightPadding};
-  point4 = { x: 4.0 * offset - widthPadding, y: height / 1.5 + heightPadding};
-  }
+
+  let maxXDistance = 0;
+  let maxYDistance = 0;
+  let xDistance = 0;
+  let yDistance = 0;
+            data.nodes.forEach((node1: any) => {
+                data.nodes.forEach((node2: any) => {
+                    if (node1 !== node2) {
+                        const xDistance = Math.abs(node1.x - node2.x);
+                        const yDistance = Math.abs(node1.y - node2.y);
+    
+                        if (xDistance > maxXDistance) {
+                          maxXDistance = xDistance;
+                        }
+    
+                        if (yDistance > maxYDistance) {
+                          maxYDistance = yDistance;
+                        }
+                      }
+                });
+            });
+            const graphWidth = maxXDistance + 20;
+            const graphHeight = maxYDistance + 20;
+
+            if (i === 0) {
+            point1 = { 
+                x: 4 * offset - xDistance, 
+                y: height / 8 - yDistance + 30
+            };
+            point2 = {
+                x: 3.9 * offset + xDistance,
+                y: height / 20 - yDistance + 30,
+            };
+            point3 = {
+                x: 3.9 * offset + xDistance,
+                y: height / 1.7 - yDistance + 30,
+            };
+            point4 = {
+                x: 4 * offset - xDistance,
+                y: height / 1.5 + yDistance + 30,
+            };
+          }
+            const tolerance = 100;
+
+            const x_dist = Math.abs(point1.x - point2.x);
+            const y_dist = Math.abs(point1.y - point4.y);
+
+            const centerX = (point1.x + point3.x) / 2;
+            const centerY = (point1.y + point3.y) / 2;
+            let scaleX = (graphWidth + tolerance) / x_dist;
+            let scaleY = (graphHeight + tolerance) / y_dist;
+            let transform = `translate(${centerX}, ${centerY}) scale(${scaleX}, ${scaleY}) translate(${-centerX}, ${-centerY})`;
+            if (
+                graphWidth + tolerance < x_dist &&
+                graphHeight + tolerance < y_dist
+            ) {
+                transform = `scale(1, 1)`;
+            }
+
+            const parallelogram = g1
+            .append("polygon")
+            .attr(
+                "points",
+                `${point1.x},${point1.y} ${point2.x},${point2.y} ${point3.x},${point3.y} ${point4.x},${point4.y}`
+            )
+            .attr("stroke", "black")
+            .attr("fill", "none")
+            .attr("transform", transform);
+              
 
 
-  let x_dist = Math.abs(point1.x - point2.x);
-  let y_dist = Math.abs(point1.y - point4.y)
-  let centerX = (point1.x + point3.x) / 2;
-  let centerY = (point1.y + point3.y) / 2;
+  // point1 = { x: 4.0 * offset - widthPadding, y: height / 8 - heightPadding};
+  // point2 = { x: 3.9 * offset + widthPadding, y: height / 20 - heightPadding};
+  // point3 = { x: 3.9 * offset + widthPadding, y: height / 1.7 + heightPadding};
+  // point4 = { x: 4.0 * offset - widthPadding, y: height / 1.5 + heightPadding};
+  
+
+
   const text_x = point1.x
-  let text_y = point4.y;
+  let text_y = point4.y + 50;
 
 
   let featureCoords = [{ x: 0, y: 0 }, { x: 0, y: 0 }];
@@ -308,9 +367,6 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
           }
 
 
-          if (graph_path === "./json_data/graphs/input_graph0.json") {
-            text_y += 80;
-          }
           const textElement = g1.append("text")
             .attr("class", "layer-label")
             .attr("x", text_x)
@@ -344,13 +400,6 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
 
 
 
-
-
-          const parallelogram = g1
-            .append("polygon")
-            .attr("points", `${point1.x},${point1.y} ${point2.x},${point2.y} ${point3.x},${point3.y} ${point4.x},${point4.y}`)
-            .attr("stroke", "black")
-            .attr("fill", "none");
 
 
 
