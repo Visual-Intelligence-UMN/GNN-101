@@ -202,9 +202,9 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 d3.select(".graph-displayer").attr("opacity", 1);
 
 
-                d3.selectAll(".weightUnit").style("opacity", 0.3);
+                d3.selectAll(".columnGroup").style("opacity", 0.3);
                 d3.selectAll(`#tempath${i}`).attr("opacity", 1).raise();
-                d3.selectAll(`#weightUnit-${i}`).style("opacity", 1).raise();
+                d3.selectAll(`#columnGroup-${i}`).style("opacity", 1).raise();
                 d3.selectAll(`#columnUnit-${i}`).style("opacity", 1).raise();
                 
 
@@ -452,10 +452,9 @@ export function hoverOverHandler(node: any, aggregatedData: any, calculatedData:
                 d3.selectAll(".weight-matrix-frame").style("opacity", 1).lower()
                 d3.selectAll(".math-displayer").remove();
                 d3.selectAll(".graph-displayer").attr("opacity", 0);
-                d3.selectAll(`#weightUnit-${i}`).style("opacity", 0.3).raise();
                 d3.selectAll(`#columnUnit-${i}`).style("opacity", 0).raise();
                 d3.selectAll(`#tempath${i}`).style("opacity", 0).raise();
-                d3.selectAll(".weightUnit").style("opacity", 1);
+                d3.selectAll(".columnGroup").style("opacity", 1);
                 d3.selectAll(".calculatedRect").style("opacity", 1)
 
                 
