@@ -706,7 +706,7 @@ export function outputVisualizer(
             d3.selectAll(".graph-displayer").remove();
          
                 d3.selectAll(".node-features-Copy").style("visibility", "hidden")
-                d3.selectAll(".weightUnit").remove();
+                d3.selectAll(".columnGroup").remove();
                 d3.selectAll(".columnUnit").remove();
                 d3.selectAll(".to-be-removed").remove();
         
@@ -1310,7 +1310,7 @@ export function calculationVisualizer(
                                         d3.selectAll(".graph-displayer").remove();
                                         moveFeaturesBack(node.relatedNodes, originalCoordinates);
                                         d3.selectAll(".to-be-removed").remove();
-                                        d3.selectAll(".weightUnit").remove();
+                                        d3.selectAll(".columnGroup").remove();
                                         d3.selectAll(".columnUnit").remove();
                                 
                                 
@@ -1326,8 +1326,6 @@ export function calculationVisualizer(
                                         handleClickEvent(svg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
                                 
                                     }) 
-                 
-                                
                             });
                         })
 
@@ -1647,7 +1645,7 @@ export function calculationVisualizer(
             d3.selectAll(".graph-displayer").remove();
             moveFeaturesBack(node.relatedNodes, originalCoordinates);
             d3.selectAll(".to-be-removed").remove();
-            d3.selectAll(".weightUnit").remove();
+            d3.selectAll(".columnGroup").remove();
             d3.selectAll(".columnUnit").remove();
     
     
@@ -1832,7 +1830,7 @@ function weightAnimation(
             return;
         }
 
-        d3.selectAll(".weightUnit").style("opacity", 0.3).lower();
+        d3.selectAll(".columnGroup").style("opacity", 0.3).lower();
         if (i >= endNumber) {
             i = 0; // Reset the index to replay the animation
         }
@@ -1877,9 +1875,9 @@ function weightAnimation(
                 
                 graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode = mode)
 
-                d3.selectAll(`#weightUnit-${i - 1}`).style("opacity", 0.3).lower();
+                d3.selectAll(`#columnGroup-${i - 1}`).style("opacity", 0.3).lower();
                 d3.selectAll(`#columnUnit-${i - 1}`).style("opacity", 0).lower();
-                d3.selectAll(`#weightUnit-${i}`).style("opacity", 1).raise();
+                d3.selectAll(`#columnGroup-${i}`).style("opacity", 1).raise();
                 d3.select(`#columnUnit-${i}`).style("opacity", 1).raise();
 
                 i++;
@@ -1902,7 +1900,7 @@ function weightAnimation(
 
                     injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_play.svg")
                     d3.selectAll(".aniRect").style("opacity", 1);
-                    d3.selectAll(".weightUnit").style("opacity", 1);
+                    d3.selectAll(".columnGroup").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
                     d3.selectAll(`#tempath${i - 1}`).style("opacity", 0);
                   
@@ -3047,7 +3045,7 @@ export function nodeOutputVisualizer(
         
         
                 d3.selectAll(".graph-displayer").remove();
-                d3.selectAll(".weightUnit").remove();
+                d3.selectAll(".columnGroup").remove();
                 d3.selectAll(".columnUnit").remove();
                 for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "1";
                 moveFeaturesBack(node.relatedNodes, originalCoordinates);
