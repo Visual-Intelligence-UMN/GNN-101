@@ -132,6 +132,7 @@ export function resetNodes(allNodes: any[], convNum: number) {
             if (node.featureGroup) {
                 node.featureGroup.style("transition", "opacity 0.2s ease-out, visibility 0.2s ease-out")
                     .style("opacity", 0)
+                    .style("visibility", "hidden")
                     .style("pointer-events", "none");
                 
             }
@@ -143,6 +144,7 @@ export function resetNodes(allNodes: any[], convNum: number) {
                     d3.select(relatedNode.svgElement).attr("stroke-width", 1);
                     relatedNode.featureGroup.style("transition", "opacity 0.2s ease-out, visibility 0.2s ease-out")
                         .style("opacity", 0)
+                        .style("visibility", "hidden")
                         .style("pointer-events", "none");
                 });
             }
