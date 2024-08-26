@@ -26,6 +26,7 @@ g.layerVis {
 path,
 text,
 svgElement,
+svg,
 rect {
   transition: all;
   transition-duration: 1s;

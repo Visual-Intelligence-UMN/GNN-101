@@ -15,7 +15,8 @@
      id="layer2">
     <ellipse
        style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.107209;stroke-opacity:1"
-       id="path1"
+       id="relu-frame"
+       class="relu-frame"
        cx="3.1825042"
        cy="3.0557461"
        rx="3.0592785"

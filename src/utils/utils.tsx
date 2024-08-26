@@ -558,6 +558,7 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
     return;
   }
   d3.selectAll(".hintLabel").attr("opacity", 1);
+  d3.selectAll(".formula").remove()
 
   if (movedNode && (!event.target.classList.contains("vis-component"))) {
     svg.selectAll(".vis-component").style("opacity", 0);
@@ -575,7 +576,11 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
 
     showAllLinks(allNodes);
     resetNodes(allNodes, convNum);
-    state.isClicked = false;
+
+      state.isClicked = false;
+      state.isAnimating = false;
+      state.isPlaying = false;
+
   }
 };
 
@@ -633,14 +638,13 @@ export function featureVisualizer(
     let currentBias: any[] = []
 
 
-
+    let featureMap: number[][] = [];
     // do some calculation that sill be used in the animation
     if (graphs.length != 0 && graphIndex > 0 && graphIndex < (convNum)) {
     currentWeights = weights[graphIndex - 1];
     currentBias = bias[graphIndex - 1]
       
 
-     let featureMap: number[][] = [];
      const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex);
      nodesByIndex.forEach((nodes, index) => { 
        if (index === graphIndex - 1) {
@@ -749,7 +753,6 @@ export function featureVisualizer(
           .attr("transform", `translate(${xPos - 7.5}, ${yPos})`);
 
         if (mode === 1 && graphIndex === 4) {
-
           featureGroup.selectAll("rect")
           .data(features)
           .enter()
@@ -786,27 +789,25 @@ export function featureVisualizer(
         }
 
         const frame = featureGroup.append("rect")
-        .attr("class", `node-features-${node.graphIndex}-${node.id}`)
+        .attr("class", `node-features-${node.graphIndex}-${node.id} nodeFeatureFrame node-features`)
         .attr("x", 0)  
         .attr("y", 0)
         .attr("width", rectWidth)
         .attr("height", currRectHeight * (node.features.length) )
-        .attr("class", `node-features-${node.graphIndex}-${node.id}`)
         .style("fill", "none")
         .style("stroke", "black")
         .style("stroke-width", 1);
+    
 
-        featureGroup.append("text")
+        const featureId = featureGroup.append("text")
           .attr("x", rectWidth / 2)
           .attr("y", node.features.length * currRectHeight + 12)
-          .attr("class", `node-features-${node.graphIndex}-${node.id}`)
+          .attr("class", `node-features-${node.graphIndex}-${node.id} feature-id`)
           .attr("dy", ".35em")
           .text(node.id)
           .style("font-size", "12px")
           .style("fill", "black")
           .style("text-anchor", "middle");
-        
-
 
 
 
@@ -836,6 +837,7 @@ export function featureVisualizer(
         let featureGroupLocation: FeatureGroupLocation = {xPos, yPos}; 
 
         node.featureGroup = featureGroup;
+        node.featureId = featureId;
         node.featureGroupLocation = featureGroupLocation; // this will be used in calculationvisualizer
         scaleFeatureGroup(node, 0.5);
 
@@ -864,7 +866,12 @@ export function featureVisualizer(
             if (state.isClicked) {
               return;
             }
+            // d3.selectAll(".node-features").style("visibility", "hidden")
+            // highlightNodes(node)
+        
             state.isClicked = true;
+
+            
             d3.selectAll(".hintLabel").attr("opacity", 0);
 
                     //  // prevent clicking on other nodes and move the layers to the right again
@@ -887,7 +894,7 @@ export function featureVisualizer(
            if (mode === 1 && graphIndex === 4) {
             nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, svg, mode)
            } else {
-            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
+            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, featureMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
            };
 
 
@@ -1244,7 +1251,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
                   .attr("y2", nextNode.y + 10)
                   .style("stroke", linkStrength(avg))
                   .style("stroke-width", 1)
-                  .style("opacity", 0.1)
+                  .style("opacity", 0)
                   .style("fill", "none");
 
                 if (!nextNode.links) {
@@ -1289,7 +1296,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
             const path = svg.append("path")
               .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 20} ${nextNode.y + 10}`)
               .style("stroke", linkStrength(avg))
-              .style("opacity", 0.1)
+              .style("opacity", 0)
               .style('stroke-width', 1)
               .style("fill", "none");
            

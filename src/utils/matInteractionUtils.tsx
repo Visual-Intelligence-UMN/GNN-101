@@ -20,6 +20,11 @@ export function drawAttnDisplayer(
     ithIdx: number,
     attnScore: number
 ) {
+
+    console.log("lgIndices:", lgIndices)
+    console.log("eij:", eij)
+    console.log("ithIdx:", ithIdx)
+
     attnDisplayer
         .append("rect")
         .attr("x", dX + 10)
@@ -149,6 +154,10 @@ export function drawAttnDisplayer(
 
     drawScoreE(escore, dX + 100 + 50-7.5, dY + 50, lgIndices[0][0], lgIndices[ithIdx][1]);
 
+
+
+        
+
     // attnDisplayer
     //     .append("text")
     //     .text("exp(" + `e_${lgIndices[0][0]}_${lgIndices[ithIdx][1]}` + ")")
@@ -158,6 +167,10 @@ export function drawAttnDisplayer(
     //     .attr("font-size", 10)
     //     .attr("class", "procVis attn-displayer attnTargetE attnE")
     //     .attr("index", 0);
+
+    const scale = 2;
+    attnDisplayer.attr("transform", `translate(${dX * (1 - scale)}, ${dY * (1 - scale)}) scale(${scale})`);
+
 }
 
 export function drawEScoreEquation(
@@ -438,6 +451,16 @@ export function drawEScoreEquation(
     
     //     drawEqComponentLabel(eDisplayer, dX + 75 + 75 + 100 - 10 + offset + 50, dY + 75 + 25 + offset + imgH + 5, "Weight Matrix")
     //     d3.select("#w1png").attr("opacity", 1); 
+    eDisplayer
+        .append("image")
+        .attr("xlink:href", imageMat).attr("id", "w1png")
+        .attr("x", dX + 75 + 75 - 10 + offset + 100 + 100)
+        .attr("y", dY + 75 + 25 + offset)
+        .attr("width", imgW)
+        .attr("height", imgH).attr("opacity", 0);
+    
+        drawEqComponentLabel(eDisplayer, dX + 75 + 75 + 100 - 10 + offset + 100, dY + 75 + 25 + offset + imgH + 5, "Weight Matrix")
+        d3.select("#w1png").attr("opacity", 1); 
 
     // drawEqComponentLabel(eDisplayer, dX + 75 + 75 + 60 + 20 + offset, dY + 75 + 25 + offset + imgH + 5, "Weight Matrix")
     // d3.select("#w2png").attr("opacity", 1); 

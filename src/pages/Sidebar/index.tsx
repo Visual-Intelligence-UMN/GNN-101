@@ -3,6 +3,7 @@ import { Scrollbar } from "react-scrollbars-custom";
 import styles from "./sidebar.module.css";
 import { AnnotatedImage } from "@/components/WebUtils";
 
+
 const inter = Inter({
     variable: "--font-inter",
     // weight: "300",
@@ -59,7 +60,7 @@ export default function Sidebar(props: Props) {
                 <div className="p-4">
                     <h1 className="text-3xl font-semibold text-3xl">Input Data of a GNN:</h1>
                     <p>
-                        To start, let's establish what a graph is. A graph represents the
+                        To start, let`&apos;`s establish what a graph is. A graph represents the
                         relations (edges) between a collection of entities (nodes). For
                         example, the right panel shows a graph of a chemical compound, from
                         the{" "}
@@ -126,7 +127,7 @@ export default function Sidebar(props: Props) {
                         Graphs have an irregular structure can directly use traditional neural networks, which are designed to operate on
                         a fixed, grid-like structure input (such as sentences, images and video).
                         To process graphs, GNNs employ a technique called <span className="font-bold">message passing</span>, where neighboring nodes exchange information and update
-                        each other’s embeddings  to better reflect their interconnectedness and individual features.
+                        each other`&apos;`s embeddings  to better reflect their interconnectedness and individual features.
                     </p>
 
                     {!props.predicted &&
@@ -155,8 +156,8 @@ export default function Sidebar(props: Props) {
                     <ol className="list-inside list-disc">
                         <li>
                             <b className="font-bold">Aggregation with Normalization: </b>
-                            First, a node aggregates the feature vectors of its neighbors and itself via a normalized degree matrix.
-                            Intuitively, this reduces the influence of information from nodes with too many neighbors and strengthens the influence from those with fewer neighbors.
+                            First, a node aggregates the feature vectors of its neighbors <b className="font-bold">Xj</b> and itself <b className="font-bold">Xi</b> via a normalized degree matrix 
+                            <b className="font-bold"> W</b>. Intuitively, this reduces the influence of information from nodes with too many neighbors and strengthens the influence from those with fewer neighbors.
                         </li>
                         <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/summation.png" label="Aggregated Vector" />
                         <li>
@@ -166,7 +167,7 @@ export default function Sidebar(props: Props) {
                         <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/matmul.png" label="Weighted Transformation" />
                         <li>
                             <b className="font-bold">Activation Function: </b>
-                            Finally, we add a bias vector and a non-linear activation function (ReLU) to the aggregated information to obtain an updated feature vector of this node.
+                            Finally, we add a bias vector <b className="font-bold"> b </b>and a non-linear activation function <b className="font-bold"> σ </b>(ReLU) to the aggregated information to obtain an updated feature vector of this node.
                         </li>
                         <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/activation.png" label="Activation Function" />
                         Note that the learnable weight matrix and bias vector are shared across all nodes in the graph, mimicking the convolution operation in CNNs and minimizing the number of parameters.

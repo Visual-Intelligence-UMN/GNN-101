@@ -80,6 +80,7 @@ export function linkPredFeatureVisualizer(
     let currentWeights: any[] = [];
     let currentBias: any[] = []
 
+    let featureMap: number[][] = [];
 
 
     // do some calculation that sill be used in the animation
@@ -88,7 +89,6 @@ export function linkPredFeatureVisualizer(
     currentBias = bias[graphIndex - 1]
       
 
-     let featureMap: number[][] = [];
      const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex);
      nodesByIndex.forEach((nodes, index) => { 
        if (index === graphIndex - 1) {
@@ -146,13 +146,15 @@ export function linkPredFeatureVisualizer(
         }
         const nodeGroup = g2.append("g")
           .attr("class", className)
-          .attr("transform", `translate(${node.x},${node.y})`);
+          .attr("transform", `translate(${node.x},${node.y})`)
+          .style("opacity", opacity)
 
 
 
 
         node.svgElement = nodeGroup.append("circle")
         .attr("class", className)
+    
 
           .attr("cx", 0)
           .attr("cy", 0)
@@ -161,7 +163,7 @@ export function linkPredFeatureVisualizer(
           .attr("stroke", "#69b3a2")
           .attr("stroke-width", 1)
           .attr("stroke-opacity", 1)
-          .attr("opacity", opacity)
+
           .node(); // make the svgElement a DOM element (the original on method somehow doesn't work)
 
 
@@ -173,7 +175,9 @@ export function linkPredFeatureVisualizer(
           .attr("dominant-baseline", "central")
           .text(node.original_id)
           .attr("font-size", `10px`)
-          .attr("opacity", opacity - 0.05);
+
+
+
           
 
         
@@ -209,7 +213,7 @@ export function linkPredFeatureVisualizer(
         .style("stroke", "black")
         .style("stroke-width", 1);
 
-        featureGroup.append("text")
+        const featureId = featureGroup.append("text")
           .attr("x", rectWidth / 2)
           .attr("y", node.features.length * currRectHeight + 12)
           .attr("class", `node-features-${node.graphIndex}-${node.id}`)
@@ -242,6 +246,7 @@ export function linkPredFeatureVisualizer(
         let featureGroupLocation: FeatureGroupLocation = {xPos, yPos}; 
 
         node.featureGroup = featureGroup;
+        node.featureId = featureId;
         node.featureGroupLocation = featureGroupLocation; // this will be used in calculationvisualizer
         scaleFeatureGroup(node, 0.5);
 
@@ -292,7 +297,7 @@ export function linkPredFeatureVisualizer(
 
 
           
-            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
+            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, featureMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
           
 
 
@@ -351,7 +356,7 @@ export function linkPredFeatureVisualizer(
           .attr("width", rectWidth)
           .attr("id", (d: any, i: number) => rectName +"-layer-rect-" + i) 
           .attr("height", currRectHeight)
-          .attr("class", "node-features")
+          .attr("class", `node-features`)
           .style("fill", (d: number) => myColor(d))
           .style("stroke-width", 0.1)
           .style("stroke", "grey")
