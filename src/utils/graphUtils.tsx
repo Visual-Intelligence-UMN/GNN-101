@@ -1878,7 +1878,7 @@ function weightAnimation(
 
 
             d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1);
-            d3.selectAll(`#tempath${i - 1}`).style("opacity", 0);
+            d3.selectAll(`#tempath${i - 1}`).remove()
             d3.selectAll(".math-displayer").remove();
 
             if (state.isPlaying) {
@@ -1912,7 +1912,7 @@ function weightAnimation(
                 graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode = mode)
 
                 d3.selectAll(`#columnGroup-${i - 1}`).style("opacity", 0.3).lower();
-                d3.selectAll(`#columnUnit-${i - 1}`).style("opacity", 0).lower();
+                d3.selectAll(`#columnUnit-${i - 1}`).remove()
                 d3.selectAll(`#columnGroup-${i}`).style("opacity", 1).raise();
                 d3.select(`#columnUnit-${i}`).style("opacity", 1).raise();
 
