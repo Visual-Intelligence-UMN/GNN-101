@@ -459,12 +459,14 @@ export function drawAttentions(
         .attr("stroke-width", 1)
         .attr("class", "procVis summation");
 
+    const dim = X.length;
+
     //draw label
     drawHintLabel(
         g1,
         coordFeatureVis[0],
         coordFeatureVis[1] + rectH * curveDir * 1.1,
-        "Vector Summation",
+        `Vector Summation: 1 x ${dim}`,
         "procVis"
     );
 
@@ -670,7 +672,7 @@ export function drawSamplingAggregation(
         g1,
         coordFeatureVis[0],
         coordFeatureVis[1] + rectH * curveDir * 1.1,
-        "Mean Aggregator",
+        `Mean Aggregator: 1 x ${X.length}`,
         "procVis"
     );
 
@@ -785,8 +787,16 @@ export function drawSummationFeature(
         .attr("class", "procVis summation");
 
     //draw label
-    drawHintLabel(g1, coordFeatureVis[0], coordFeatureVis[1] + rectH * curveDir * 1.1, "Vector Summation", "procVis aggText");
+    const dim = X.length;
 
+    //draw label
+    drawHintLabel(
+        g1,
+        coordFeatureVis[0],
+        coordFeatureVis[1] + rectH * curveDir * 1.1,
+        `Vector Summation: 1 x ${dim}`,
+        "procVis"
+    );
     //path connect - connect prev layer feature vis to intermediate feature vis
     const curve = d3.line().curve(d3.curveBasis);
     for (let i = 0; i < posList.length; i++) {
@@ -841,7 +851,7 @@ export function drawWeightsVector(
     featureChannels: number,
     X: number[],
     rectClass: string = "procVis removeRect wRect interactRect",
-    labelName = "Matmul Result"
+    labelName = `Matmul Result: ${dummy.length} x 1`
 ) {
     for (let m = 0; m < dummy.length; m++) {
         g.append("rect")
@@ -1078,12 +1088,15 @@ export function drawWeightMatrix(
         flag = true;
     }
 
+    const dimX = weightMat[0].length;
+    const dimY = weightMat.length;
+
     //draw label hint
     drawHintLabel(
         g,
         weightMatrixPostions[0][0][0],
         weightMatrixPostions[0][0][1] - 12,
-        "Weight Matrix",
+        `Weight Matrix: ${dimY} x ${dimX}`,
         "procVis weightMatrixText to-be-removed"
     );
 
@@ -1207,7 +1220,7 @@ export function drawBiasVector(
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("class", "procVis biasVector biasFrame");
-    const label = drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+6, "Bias Vector", "procVis biasFrame");
+    const label = drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+6, `Bias Vector: ${layerBias.length} x 1`, "procVis biasFrame");
    // d3.selectAll(".biasVector").transition().duration(100).style("opacity", 1);
 }
 
