@@ -20,7 +20,10 @@ import {
 } from "@/utils/graphUtils"
 import { stat } from "fs";
 import { Yomogi } from "@next/font/google";
-import { dataPreparationLinkPred, indexingFeatures } from "./linkPredictionUtils";
+import { dataPreparationLinkPred, constructComputationalGraph } from "./linkPredictionUtils";
+import { extractSubgraph } from "./graphDataUtils";
+import { isValidNode } from "./GraphvislinkPredUtil";
+import { all, number } from "mathjs";
 
 env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
@@ -175,6 +178,26 @@ export function findMaxIndex(arr: number[]): number {
   return arr.indexOf(maxValue);
 }
 
+export function splitAnyIntoMatrices<T>(
+  array: T[],
+  matrixSize: number = 64
+): T[][] {
+  // 创建一个空的二维数组
+  let result: T[][] = [];
+  // 计算每个子数组的长度
+  let n = Math.ceil(array.length / matrixSize);
+
+  // 遍历 n 次来创建子数组
+  for (let i = 0; i < n; i++) {
+      // 截取从 i * matrixSize 开始的 matrixSize 长度的部分
+      let subArray = array.slice(i * matrixSize, (i + 1) * matrixSize);
+      // 将截取的子数组添加到结果数组中
+      result.push(subArray);
+  }
+
+  // 返回生成的二维数组
+  return result;
+}
 
 //Split a large 1d array into a 1d array with multiple 8*8 matrices
 
@@ -536,6 +559,7 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
     return;
   }
   d3.selectAll(".hintLabel").attr("opacity", 1);
+  d3.selectAll(".formula").remove()
 
   if (movedNode && (!event.target.classList.contains("vis-component"))) {
     svg.selectAll(".vis-component").style("opacity", 0);
@@ -553,9 +577,15 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
 
     showAllLinks(allNodes);
     resetNodes(allNodes, convNum);
-    state.isClicked = false;
-    state.isAnimating = false;
-    state.isPlaying = false;
+
+      state.isClicked = false;
+      state.isAnimating = false;
+      state.isPlaying = false;
+
+
+      d3.select("#my_dataviz").on("click", function(event: any) {
+      })
+
   }
 };
 
@@ -575,8 +605,12 @@ export function featureVisualizer(
   outputLayerRectHeight: number,
   colorSchemes:any,
   mode: number,
+  innerComputationMode: string,
 ) {
   state.isClicked = false;
+
+
+
 
 
   
@@ -601,6 +635,18 @@ export function featureVisualizer(
   let movedNode: any = null; // to prevent the same node is clicked twice
 
 
+  let allFeatureMap: number[][][] = [];
+  nodesByIndex.forEach((nodes, index) => {
+   let featureMap: number[][] = []
+     if (index < convNum) {
+      nodes.forEach((n) => { 
+        featureMap.push(n.features)
+      })
+      allFeatureMap.push(featureMap)
+     }
+      
+  })
+
 
 
   nodesByIndex.forEach((nodes, graphIndex) => { // iterate through each graphs
@@ -618,11 +664,11 @@ export function featureVisualizer(
     currentWeights = weights[graphIndex - 1];
     currentBias = bias[graphIndex - 1]
       
-
-     let featureMap: number[][] = [];
      const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex);
+
+     let featureMap: number[][] = []
      nodesByIndex.forEach((nodes, index) => { 
-       if (index === graphIndex - 1) {
+        if (index === graphIndex - 1) {
          nodes.forEach((n) => { 
            featureMap.push(n.features)
          })
@@ -632,9 +678,6 @@ export function featureVisualizer(
        calculatedDataMap = matrixMultiplication(aggregatedDataMap, currentWeights)
 
       }
-
-      
-
 
 
 
@@ -869,7 +912,7 @@ export function featureVisualizer(
            if (mode === 1 && graphIndex === 4) {
             nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, svg, mode)
            } else {
-            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode);
+            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, allFeatureMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
            };
 
 
@@ -1082,14 +1125,13 @@ export function calculateAverage(arr: number[]): number {
   return average * 10;
 }
 
-export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset: number, mode: number) {
+export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset: number, subgraph: any, mode: number, hubNodeA: number, hubNodeB: number) {
   const nodesByIndex = d3.group(nodes, (d: any) => d.graphIndex);
 
 
 
 
   nodesByIndex.forEach((nodes, graphIndex) => {
-
     nodes.forEach((node: any, i) => {
 
       if (!node.links) {
@@ -1102,11 +1144,17 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
         let xOffset1 = (graphIndex - 2.5) * offset;
         let xOffset2 = (graphIndex - 1.5) * offset;
 
+
       let conv = 3;
       // if (mode === 1) {
       //   conv = 4;
         
       // }
+      if (mode === 2) {
+        xOffset1 = (graphIndex - 3.5) * offset;
+        xOffset2 = (graphIndex - 2.5) * offset;
+        conv = 2
+      }
       if (graphIndex < conv) { 
         
         let drawnLinks = new Set();
@@ -1116,7 +1164,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
          nextGraphLinks.forEach((link: any) => {
            const sortedIds = [link.source.id, link.target.id].sort();
            const linkId = sortedIds.join("-");
-           if ((link.source.id === node.id || link.target.id === node.id) && !drawnLinks.has(linkId)) {
+           if (((link.source.id === node.id || link.target.id === node.id) && !drawnLinks.has(linkId))) {
              drawnLinks.add(linkId);
 
              const neighborNode = link.source.id === node.id ? link.target : link.source;
@@ -1126,23 +1174,27 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
              if (!neighborNode.relatedNodes) {
               neighborNode.relatedNodes = [];
              }
+
+
+             if (!(node.original_id === hubNodeA && neighborNode.original_id === hubNodeB) && !(node.original_id === hubNodeB && neighborNode.original_id === hubNodeA)) {
             
               const controlX1 = node.x + xOffset1 + (neighborNode.x + xOffset2 - node.x - xOffset1) * 0.8;
               const controlY1 = node.y + 10;
               const controlX2 = node.x + xOffset1 + (neighborNode.x + xOffset2 - node.x - xOffset1) * 0.2;
               const controlY2 = neighborNode.y + 10;
               const avg = calculateAverage(node.features)
+              let neighborOffset = (neighborNode.graphIndex - 2.5) * offset
+              if (mode === 2) {neighborOffset -= offset}
 
               const path = svg.append("path")
                 .attr("d", 
                   `M 
                   ${node.x + xOffset1 + 16}
                   ${node.y + 10}
-                  Q
+                  Q 
                   ${controlX2} 
                   ${controlY2}, 
-
-                  ${neighborNode.x + (neighborNode.graphIndex - 2.5) * offset - 16} 
+                  ${neighborNode.x + neighborOffset - 16} 
                   ${neighborNode.y + 10}
                 `)
                 .style("stroke", linkStrength(avg))
@@ -1154,6 +1206,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
 
               neighborNode.links.push(path);
               neighborNode.relatedNodes.push(node);
+                }
         
            }
           })
@@ -1162,7 +1215,9 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
           if (nextNode) {
           nextNode.forEach((nextNode: any) => {
             if (node.id === nextNode.id) {
-              const xOffsetNext = (graphIndex + 1 - 2.5) * offset;
+              let xOffsetNext = (graphIndex + 1 - 2.5) * offset;
+              if (mode === 2) {xOffsetNext -= offset}
+
 
               const controlX1 = node.x + xOffset1 + (nextNode.x + xOffsetNext - node.x - xOffset1) * 0.3;
               const controlY1 = node.y + 10;
@@ -1195,11 +1250,12 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
             }
           })
         }
+     
       
         
       } else {  
         if (mode === 1) {
-          if (graphIndex === 3) {
+          if (graphIndex === 2) {
             const nextLayerNodes = nodesByIndex.get(graphIndex + 1);
           if (nextLayerNodes) {
             nextLayerNodes.forEach((nextNode: any) => {
@@ -1232,6 +1288,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
           }
           return;
         }
+        else if (mode === 0) {
           const avg = calculateAverage(node.features)
 
           xOffset1 = (graphIndex - 2.5) * offset - 150;
@@ -1241,20 +1298,21 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
             xOffset1 = (graphIndex - 2.5) * offset;
             
           }
+        
           
           
           const nextLayer = graphs[graphIndex + 1];
           if (nextLayer) {
             let nextNode = nextLayer.nodes[0];
 
-            const controlX1 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.5;
+            const controlX1 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.3;
             const controlY1 = node.y + 10;
             const controlX2 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.7;
             const controlY2 = nextNode.y + 10;
 
             
             const path = svg.append("path")
-              .attr("d", `M ${node.x + xOffset1} ${node.y + 10} C ${controlX2} ${controlY2}, ${controlX2} ${controlY2} ${nextNode.x + xOffset2 - 20} ${nextNode.y + 10}`)
+              .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 20} ${nextNode.y + 10}`)
               .style("stroke", linkStrength(avg))
               .style("opacity", 0)
               .style('stroke-width', 1)
@@ -1269,12 +1327,55 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
           }
           nextNode.links.push(path);
           nextNode.relatedNodes.push(node);
+        
+        }
+      } else {
+        const avg = calculateAverage(node.features)
+        
+
+   
+        xOffset1 = (graphIndex - 3.5) * offset;
+        xOffset2 = (graphIndex - 2.5) * offset - 30 * (graphIndex * 1.5) + 100;
+
           
+          
+          const nextLayer = graphs[graphIndex + 1];
+          if (nextLayer) {
+            let nextNode = nextLayer.nodes[0];
+
+            const controlX1 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.3;
+            const controlY1 = node.y + 10;
+            const controlX2 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.7;
+            const controlY2 = nextNode.y + 10;
+            if (isValidNode(subgraph, node)) {
+            
+            const path = svg.append("path")
+              .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 20} ${nextNode.y + 10}`)
+              .style("stroke", linkStrength(avg))
+              .style("opacity", 0)
+              .style('stroke-width', 1)
+              .style("fill", "none");
+           
+  
+          if (!nextNode.links) {
+            nextNode.links = [];
+          }
+          if (!nextNode.relatedNodes) {
+            nextNode.relatedNodes = [];
+          }
+          nextNode.links.push(path);
+          nextNode.relatedNodes.push(node);
+        }
+        
         }
       }
+    }
+    
       
     });
+    
   });
+
 
  }
 
@@ -1326,7 +1427,7 @@ export function softmax(logits: number[]) {
 export function analyzeGraph(graphData: any) {
     const nodeCount = graphData.x.length;
     const edgePairs = graphData.edge_index;
-    const edges = edgePairs[0].length;
+    let edges = edgePairs[0].length;
     const degreeMap = new Array(nodeCount).fill(0);
     const hasLoop = new Set();
     let isDirected = false;
@@ -1357,7 +1458,9 @@ export function analyzeGraph(graphData: any) {
 
 
 
-
+  if(isDirected){
+    edges *= 2;
+  }
 
 
 
@@ -1418,6 +1521,7 @@ export const graphPrediction = async (modelPath: string, graphPath: string) => {
 }
 
 
+
 export const linkPrediction = async (modelPath: string, graphPath: string) => {
  
 
@@ -1457,9 +1561,24 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
     edge_label_index: edgeIndexTensor,
   });
 
+  let conv1 = [];
+  let conv2 = [];
+
+  if(modelPath === "./gat_link_model.onnx"){
+    conv1 = outputMap.gat1.cpuData;
+    conv2 = outputMap.gat2.cpuData;
+    console.log("gat model", conv1, conv2);
+  }else if(modelPath === "./sage_link_model.onnx"){
+    conv1 = outputMap.sage1.cpuData;
+    conv2 = outputMap.sage2.cpuData;
+    console.log("sage model", conv1, conv2);
+  }else{
+    conv1 = outputMap.conv1.cpuData;
+    conv2 = outputMap.conv2.cpuData;
+  }
   const intmData: IntmDataLink = {
-    conv1: outputMap.conv1.cpuData,
-    conv2: outputMap.conv2.cpuData,
+    conv1: conv1,
+    conv2: conv2,
     decode_mul: outputMap.decode_mul.cpuData,
     decode_sum: outputMap.decode_sum.cpuData,
     prob_adj: outputMap.prob_adj.cpuData,
@@ -1468,24 +1587,29 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
 
   const prob = outputMap.prob_adj.cpuData;
 
-
+  console.log("predicted!",intmData, modelPath);
 
   const data = dataPreparationLinkPred(intmData);
 
   const features = graphData.x;
 
 
+  console.log("data!", data);
 
+    const mat = graphToMatrix(graphData);
 
-    const indexedFeaturesI = indexingFeatures(
+    const computationalGraph = constructComputationalGraph(
       graphData, features, data.conv1Data, data.conv2Data, 241
     );
+    const nodesNeedConstruct = computationalGraph.getNodesAtHopLevel(2);
+    const subgraph = extractSubgraph(mat, nodesNeedConstruct)
 
-
+    console.log("subgraph", subgraph);
+    console.log("computationalGraph", computationalGraph);
+  
   return {prob, intmData};
 
 }
-
 
 function splitArray(arr: number[], chunkSize: number): number[][] {
   const chunks: number[][] = [];
@@ -1561,11 +1685,11 @@ export const nodePrediction = async (modelPath: string, graphPath: string): Prom
 	
 }
 
-export function graphToAdjList(graph:any){
+export function graphToAdjList(graph:any, addingSelfLoop=true){
   let adjList: number[][] = Array.from({ length: graph.length }, () => []);
     for (let i = 0; i < graph.length; i++) {
         //push itself to the linkMap
-        adjList[i].push(i);
+        if(addingSelfLoop)adjList[i].push(i);
         for (let j = 0; j < graph[0].length; j++) {
             if (graph[i][j] == 1) {
                 //push its neighbors to linkMap
@@ -1607,4 +1731,8 @@ export function loadNodesLocation(mode: number, path: string) {
 
   return data;
 }
+
+
+
+
 

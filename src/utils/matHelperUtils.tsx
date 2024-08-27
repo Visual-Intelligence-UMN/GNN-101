@@ -1,5 +1,6 @@
 import {
     deepClone,
+    drawPoints,
     get_cood_from_parent,
     get_coordination,
     myColor
@@ -23,6 +24,34 @@ export function drawHintLabel(
         .attr("class", classTag); 
     return label;
 }
+
+
+export function drawScoreE(g:any, x:number, y:number, leftIndex:number, rightIndex:number){
+    const e = g.append("text")
+        .attr("x", x)
+        .attr("y", y)
+        .text(`e(${leftIndex},${rightIndex})`)
+        .style("fill", "black")
+        .style("font-size", 10)
+        .attr("class", "procVis attn-displayer");
+    return e;
+}
+
+export function drawEqComponentLabel(
+    eDisplayer:any,
+    x: number,
+    y: number,
+    text: string
+){
+    eDisplayer.append("text")
+            .text(text)
+            .attr("x", x)
+            .attr("y", y)
+            .attr("class", "temp")
+            .style("fill", "gray")
+            .style("font-size", 5);
+}
+
 
 //get node attributes from graph data
 export function getNodeAttributes(data: any) {
@@ -76,21 +105,27 @@ export function drawNodeAttributes(nodeAttrs: any, graph: any, offset: number) {
     //for x-axis
     const rectCood = get_cood_from_parent(".mats", "rect");
 
+    console.log("rectCoord", rectCood);
+
     const step = graph.length;
     let xTextCood = [];
     for (let i = step - 1; i < graph.length * graph.length; i += step) {
         xTextCood.push(rectCood[i]);
     }
 
-    //drawPoints(".mats", "red", xTextCood);
+    console.log("xTextCood", xTextCood);
+
+    // drawPoints(".mats", "red", xTextCood);
     for (let i = 0; i < xTextCood.length; i++) {
         d3.select(".mats")
             .append("text")
             .attr("x", xTextCood[i][0] - 2.5)
-            .attr("y", xTextCood[i][1] + 60)
+            .attr("y", xTextCood[i][1] + 75)
             .attr("font-size", "10px")
             .text(nodeAttrs[i]);
     }
+    //drawPoints(".mats", "red", rectCood);
+    console.log("rectCoord", rectCood);
 }
 
 export interface HeatmapData {
@@ -181,7 +216,9 @@ export function buildBinaryLegend(
             (d: number, i: number) => `rotate(-90, ${i * offsetText}, 0)`
         )
         .style("font-size", "7px").style("fill", "gray")
-        .text((d: number) => format(d));
+        .text((d: number, i: number) => {
+            return format(d)
+        });
 
     // g0.append("text")
     //     .text(label)
@@ -190,8 +227,8 @@ export function buildBinaryLegend(
     //     .attr("text-anchor", "center")
     //     .attr("font-size", 7.5);
     
-    const hint:any = drawHintLabel(g0, -50, 65, label, "", "17px");
-    hint.attr("text-anchor", "center");
+    // const hint:any = drawHintLabel(g0, -50, 65, label, "", "17px");
+    // hint.attr("text-anchor", "center");
     return g0.node() as SVGElement;
 }
 
@@ -246,8 +283,10 @@ export function buildLegend(
             "transform",
             (d: number, i: number) => `rotate(-90, ${i * offsetText}, 0)`
         )
-        .style("font-size", "7px").style("fill", "gray")
-        .text((d: number) => format(d));
+        .style("font-size", "17px").style("fill", "gray")
+        .text((d: number, i: number) => {
+            if(i==0||i==dummies.length-1||format(d)=="0.00")return format(d)
+        });
 
     // g0.append("text")
     //     .text(label)
@@ -256,8 +295,8 @@ export function buildLegend(
     //     .attr("text-anchor", "center")
     //     .attr("font-size", 7.5);
     
-    const hint = drawHintLabel(g0, absVal * 10, 65, label, "", "17px");
-    hint.attr("text-anchor", "center");
+    // const hint = drawHintLabel(g0, absVal * 10, 65, label, "", "17px");
+    // hint.attr("text-anchor", "center");
     return g0.node() as SVGElement;
 }
 
@@ -331,6 +370,46 @@ export function loadNodeWeights(){
         weightsJSON["conv2.bias"],
         weightsJSON["conv3.bias"],
         weightsJSON["classifier.bias"],
+    ];
+
+    return { weights: weights, bias: bias };
+}
+
+export function loadLinkWeights(){
+    // weights data preparation
+    let weights: any = []; // DS to manage weights for each layer
+    let bias: any = []; // DS to manage bias for each layer
+
+    const weightsJSON: any = require("../../public/link_weights.json");
+
+
+
+    weights = [
+        weightsJSON["onnx::MatMul_196"],
+        weightsJSON["onnx::MatMul_199"]
+    ];
+    bias = [
+        weightsJSON["conv1.bias"],
+        weightsJSON["conv2.bias"]
+    ];
+
+    return { weights: weights, bias: bias };
+}
+
+export function loadLinkGATWeights(){
+    // weights data preparation
+    let weights: any = []; // DS to manage weights for each layer
+    let bias: any = []; // DS to manage bias for each layer
+
+    const weightsJSON: any = require("../../public/gat_link_weights.json");
+    
+    weights = [
+        weightsJSON["onnx::MatMul_196"],
+        weightsJSON["onnx::MatMul_199"]
+    ];
+    bias = [
+        weightsJSON["conv1.bias"],
+        weightsJSON["conv2.bias"]
     ];
 
     return { weights: weights, bias: bias };

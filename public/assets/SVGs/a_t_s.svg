@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="6mm"
+   height="6mm"
+   viewBox="0 0 6 6"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   sodipodi:docname="a_t_s.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#111111"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="22.153314"
+     inkscape:cx="12.955172"
+     inkscape:cy="10.630464"
+     inkscape:window-width="2560"
+     inkscape:window-height="1334"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#b6b6b6;stroke:#b6b6b6;stroke-width:0.264583"
+       x="1.8750957"
+       y="4.0248866"
+       id="text1"
+       inkscape:highlight-color="#000000"><tspan
+         sodipodi:role="line"
+         id="tspan1"
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.264583;stroke-opacity:1"
+         x="1.8750957"
+         y="4.0248866">a</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:1.55213px;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.0733288;stroke-dasharray:none;stroke-opacity:1"
+       x="3.6288579"
+       y="1.9749758"
+       id="text2"
+       transform="scale(1.0466005,0.95547442)"><tspan
+         sodipodi:role="line"
+         id="tspan2"
+         style="stroke:none;stroke-width:0.0733288;stroke-dasharray:none"
+         x="3.6288579"
+         y="1.9749758">T</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:1.55213px;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.0733288;stroke-dasharray:none;stroke-opacity:1"
+       x="3.6032922"
+       y="5.6062541"
+       id="text2-5"
+       transform="scale(1.0466005,0.95547442)"><tspan
+         sodipodi:role="line"
+         id="lowerIndex1"
+         style="stroke:none;stroke-width:0.0733288;stroke-dasharray:none"
+         x="3.6032922"
+         y="5.6062541">s</tspan></text>
+  </g>
+</svg>
