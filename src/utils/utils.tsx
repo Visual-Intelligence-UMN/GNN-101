@@ -1159,10 +1159,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
 
 
       let conv = 3;
-      // if (mode === 1) {
-      //   conv = 4;
-        
-      // }
+
       if (mode === 2) {
         xOffset1 = (graphIndex - 3.5) * offset;
         xOffset2 = (graphIndex - 2.5) * offset;
@@ -1268,7 +1265,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
         
       } else {  
         if (mode === 1) {
-          if (graphIndex === 2) {
+          if (graphIndex === 3) {
             const nextLayerNodes = nodesByIndex.get(graphIndex + 1);
           if (nextLayerNodes) {
             nextLayerNodes.forEach((nextNode: any) => {
