@@ -8,8 +8,7 @@
     "build": "next build",
     "start": "next start",
     "predeploy": "npm run build && echo > out/.nojekyll",
-    "deploy": "gh-pages -d out -t true",
-    "test": "jest"
+    "deploy": "gh-pages -d out -t true"
   },
   "dependencies": {
     "@fontsource/inter": "5.0.18",
