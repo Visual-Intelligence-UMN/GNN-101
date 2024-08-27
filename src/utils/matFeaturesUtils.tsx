@@ -538,7 +538,7 @@ export function drawGCNConvGraphModel(
         addLayerName(
             locations,
             "GCNConv" + (k + 1),
-            0,
+            100,
             30,
             d3.select(`g#layerNum_${k + 1}`)
         );
@@ -613,6 +613,9 @@ export function drawGCNConvGraphModel(
         const l6 = d3.select(`g#layerNum_6`);
 
         const schemeOffset = 250;
+
+        schemeLocations[0][0] += 10;
+        schemeLocations[1][0] += 40;
 
         const infoTable = {
             valueTable:[

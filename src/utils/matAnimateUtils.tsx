@@ -433,7 +433,7 @@ export function drawAttentions(
 
 
     
-    const g = g1.append("g").attr("class", "procVis aggregate");
+    const g = g1.append("g").attr("class", "aggregate");
     for (let m = 0; m < X.length; m++) {
         g.append("rect")
             .attr("x", coordFeatureVis[0] + w * m)
@@ -641,7 +641,7 @@ export function drawSamplingAggregation(
     console.log("lgIndices lg",lgIndices);
     const samplingIndices = require("../../public/sampling.json");
 
-    const g = g1.append("g").attr("class", "procVis aggregate");
+    const g = g1.append("g").attr("class", "aggregate");
     for (let m = 0; m < X.length; m++) {
         g.append("rect")
             .attr("x", coordFeatureVis[0] + w * m)

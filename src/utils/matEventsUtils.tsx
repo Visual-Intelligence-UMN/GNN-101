@@ -1282,6 +1282,11 @@ export function featureGATClick(
     featureKeysEachLayer: number[][],
     activation: string = "relu",
 ){
+    d3.selectAll(".cant-remove").classed("cant-remove", false);
+    d3.selectAll(".inputFeature").classed("inputFeature", false);
+    d3.selectAll(".outputFeature").classed("outputFeature", false);
+
+
     console.log("convs", conv1, conv2, featureKeysEachLayer, adjList[node]);
     const largeGraphIndexes = featureKeysEachLayer[0];
     //testCompute();
@@ -1327,6 +1332,8 @@ export function featureGATClick(
         let cur = neighbors[i];
         featureVisTable[layerID][cur].style.opacity = "1";
 
+        d3.select(featureVisTable[layerID][cur]).classed("cant-remove inputFeature", true);
+
         //find position and save it
         let c = calculatePrevFeatureVisPos(
             featureVisTable,
@@ -1341,7 +1348,12 @@ export function featureGATClick(
     }
     let curNode = featureVisTable[layerID + 1][node];
     curNode.style.opacity = "0.25"; //display current node
-    d3.select(curNode).selectAll(".frame").attr("opacity", 1);
+    d3.select(curNode).classed("cant-remove outputFeature", true);
+
+    d3.select(curNode)
+    .selectAll(".frame")
+    .attr("opacity", 1)
+    .classed("cant-remove outputFeature", true);
 
     //calculation process visualizer
     let coord = calculatePrevFeatureVisPos(
@@ -1428,7 +1440,7 @@ export function featureGATClick(
 
 
 
-    const g = d3.select(".mats").append("g").attr("class", "procVis");
+    const g = d3.select(".mats").append("g");
     let w = 5;
     if (Xt[0].length < featureChannels) {
         w = 10;
@@ -1839,6 +1851,10 @@ export function featureSAGEClick(
     featureKeysEachLayer: number[][],
     activation: string = "relu",
 ){
+    d3.selectAll(".cant-remove").classed("cant-remove", false);
+    d3.selectAll(".inputFeature").classed("inputFeature", false);
+    d3.selectAll(".outputFeature").classed("outputFeature", false);
+
     console.log("convs sage", conv1, conv2, featureKeysEachLayer);
     const largeGraphIndexes = featureKeysEachLayer[0];
     //testCompute();
@@ -1884,6 +1900,8 @@ export function featureSAGEClick(
         let cur = neighbors[i];
         featureVisTable[layerID][cur].style.opacity = "1";
 
+        d3.select(featureVisTable[layerID][cur]).classed("cant-remove inputFeature", true);
+
         //find position and save it
         let c = calculatePrevFeatureVisPos(
             featureVisTable,
@@ -1898,7 +1916,12 @@ export function featureSAGEClick(
     }
     let curNode = featureVisTable[layerID + 1][node];
     curNode.style.opacity = "0.25"; //display current node
-    d3.select(curNode).selectAll(".frame").attr("opacity", 1);
+    d3.select(curNode).classed("cant-remove outputFeature", true);
+
+    d3.select(curNode)
+    .selectAll(".frame")
+    .attr("opacity", 1)
+    .classed("cant-remove outputFeature", true);
 
     //calculation process visualizer
     let coord = calculatePrevFeatureVisPos(
@@ -1967,7 +1990,7 @@ export function featureSAGEClick(
 
 
 
-    const g = d3.select(".mats").append("g").attr("class", "procVis");
+    const g = d3.select(".mats").append("g");
     let w = 5;
     if (Xt[0].length < featureChannels) {
         w = 10;

@@ -36,7 +36,7 @@ export const formulaClass: { [k: string]: string[]} = {
   "formula_x": ["output", "outputFeature"],
   "formula_summation": ["aggregatedFeatureGroup", "origin-to-aggregated", "summation", "parameter","multiplier", "original-features", "inputFeature", "sampling"],
   "formula_xj": ["original-features", "inputFeature"],
-  "formula_degree": ["multiplier", "origin-to-aggregated", "parameter"],
+  "formula_degree": ["multiplier", "origin-to-aggregated", "parameter", "attention"],
   "formula_activation": ["relu-icon"]
 }
 
