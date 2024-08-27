@@ -1461,17 +1461,19 @@ export function drawTwoLayers(one: any, final: any, myColor: any, featureChannel
     g.append("text")
         .attr("x", one[0][0] + 5)
         .attr("y", one[0][1])
-        .attr("font-size", "5px")
+        .attr("font-size", "10px")
+        .attr("fill", "gray")
         .attr("transform", "rotate(-45," + one[0][0] + "," + one[0][1] + ")")
         .text("Non-Mutagenic");
 
     g.append("text")
-        .attr("x", one[0][0] + 15)
+        .attr("x", one[0][0] + 25)
         .attr("y", one[0][1])
-        .attr("font-size", "5px")
+        .attr("font-size", "10px")
+        .attr("fill", "gray")
         .attr(
             "transform",
-            "rotate(-45," + (one[0][0] + 10) + "," + one[0][1] + ")"
+            "rotate(-45," + (one[0][0] + 25) + "," + one[0][1] + ")"
         )
         .text("Mutagenic");
 
