@@ -387,7 +387,12 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
  
 
           if(i==0){
-            cst = buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x, text_y + cstOffset, g1)
+
+          
+
+
+
+            cst = buildLegend(myColor, 1, text+" Color Scheme", text_x - 50, text_y + cstOffset, g1);
           }
 
           else {
