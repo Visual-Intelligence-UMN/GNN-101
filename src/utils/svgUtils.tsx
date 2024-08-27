@@ -1,10 +1,12 @@
 import * as d3 from "d3";
 import { gcd } from "mathjs";
 import { formulaClass, formulaTextClass } from "./const";
+import { drawHintLabel } from "./matHelperUtils";
 
 //a specific function for SVG injection for play-pause button
 export function injectPlayButtonSVG(btn:any, btnX: number, btnY: number, SVGPath:string){
     btn.selectAll("*").remove();
+    const textLabel = btn.append("g")
     d3.xml(SVGPath).then(function(data) {
 
         const play = btn!.node()!.appendChild(data.documentElement)
@@ -16,6 +18,8 @@ export function injectPlayButtonSVG(btn:any, btnX: number, btnY: number, SVGPath
             d3.select(play).select("ellipse").style("fill", "rgb(255, 255, 255)");
         });
     });
+
+    drawHintLabel(textLabel, btnX - 20, btnY - 5, "Matrix Multiplication", "procVis", "12px");
 }
 
 //a specific function for SVG injection for play-pause button for graph view
