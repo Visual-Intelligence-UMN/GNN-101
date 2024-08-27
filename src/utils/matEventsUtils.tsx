@@ -435,7 +435,17 @@ export function featureVisClick(
     d3.select(".hintLabel").style("opacity", 0);
 
     //reduce color schemes opacity
-
+    colorSchemesTable.forEach((d: any, i: any) => {
+        console.log(
+            `Before modification: Element ${i} opacity`,
+            d.style.opacity
+        );
+        d.style.opacity = "0.2";
+        console.log(
+            `After modification: Element ${i} opacity`,
+            d.style.opacity
+        );
+    });
     
     //choose the right color schemes to display
     colorSchemesTable[layerID].style.opacity = "1";
@@ -1293,6 +1303,17 @@ export function featureGATClick(
     d3.select(".hintLabel").style("opacity", 0);
 
     //reduce color schemes opacity
+    colorSchemesTable.forEach((d: any, i: any) => {
+        console.log(
+            `Before modification: Element ${i} opacity`,
+            d.style.opacity
+        );
+        d.style.opacity = "0.2";
+        console.log(
+            `After modification: Element ${i} opacity`,
+            d.style.opacity
+        );
+    });
 
     
     //choose the right color schemes to display
@@ -1839,6 +1860,17 @@ export function featureSAGEClick(
     d3.select(".hintLabel").style("opacity", 0);
 
     //reduce color schemes opacity
+    colorSchemesTable.forEach((d: any, i: any) => {
+        console.log(
+            `Before modification: Element ${i} opacity`,
+            d.style.opacity
+        );
+        d.style.opacity = "0.2";
+        console.log(
+            `After modification: Element ${i} opacity`,
+            d.style.opacity
+        );
+    });
 
     
     //choose the right color schemes to display
