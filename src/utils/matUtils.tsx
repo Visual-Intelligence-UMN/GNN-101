@@ -1827,6 +1827,7 @@ export function visualizeLinkClassifierFeatures(
                     .attr("width", 15)
                     .attr("height", 15)
                     .attr("fill", myColor(resultVal))
+                    .attr("class", "math-displayer procVis")
             });
 
             d3.select(".sigmoid").on("mouseout", function(event){
