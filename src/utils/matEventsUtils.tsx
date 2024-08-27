@@ -1552,6 +1552,7 @@ export function featureGATClick(
     let weightMatrixPostions:any = computeMatrixLocations(btnX+15, btnY, curveDir, rectW, featureChannels, weights, layerID);
 
     d3.select(".mats").style("pointer-events", "none");
+    const formula:any = d3.select(".mats").append("g").attr("class", "math-formula");
 
     let animateSeqAfterPath: any = [
         {func: () => {
@@ -1572,9 +1573,6 @@ export function featureGATClick(
                 "./assets/SVGs/matmul.svg"
             );
             //drawHintLabel(g, btnX, btnY - 36, "Click for Animation", "procVis");
-
-            const gLabel = d3.select(".mats").append("g");
-            injectSVG(gLabel, btnX-120-64, btnY-30-120-64, "./assets/SVGs/interactionHint.svg", "procVis");
 
             drawPathBtwOuputResult([coordFeatureVis], coordFeatureVis3)
             drawWeightMatrix(btnX, btnY, curveDir, rectW, rectH, featureChannels, weights, layerID, myColor, g, weightMatrixPostions);
@@ -1601,6 +1599,14 @@ export function featureGATClick(
             curNode.style.opacity = "1";
             
         }, delay: aniSec*2},
+        {
+            func:()=>{
+                drawMathFormula(formula, coordFeatureVis2Copy[0], coordFeatureVis2Copy[1]+curveDir*125, "./assets/SVGs/GATFormula.svg");
+                
+                const gLabel = d3.select(".mats").append("g");
+                injectSVG(gLabel, btnX-120-64, btnY-30-120-64, "./assets/SVGs/interactionHint.svg", "procVis hintLabel");
+            }
+        },
         // {func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels), delay: 1,},
         // {func: () => drawReLU(midX1, wmCoord, biasCoord, nextCoord), delay: aniSec,},
         // {func: () => {curNode.style.opacity = "1";},delay: aniSec,},
@@ -2070,6 +2076,8 @@ export function featureSAGEClick(
     }
 
 
+    const formula:any = d3.select(".mats").append("g").attr("class", "math-formula");
+
 
     let weightMatrixPostions:any = computeMatrixLocations(btnX+15, btnY, curveDir, rectW, featureChannels, weights, layerID);
 
@@ -2123,6 +2131,14 @@ export function featureSAGEClick(
             curNode.style.opacity = "1";
             
         }, delay: aniSec*2},
+        {
+            func:()=>{
+                drawMathFormula(formula, coordFeatureVis2Copy[0], coordFeatureVis2Copy[1]+curveDir*125, "./assets/SVGs/GsageFormula.svg");
+                
+                const gLabel = d3.select(".mats").append("g");
+                injectSVG(gLabel, btnX-120-64, btnY-30-120-64, "./assets/SVGs/interactionHint.svg", "procVis hintLabel");
+            }
+        },
         // {func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels), delay: 1,},
         // {func: () => drawReLU(midX1, wmCoord, biasCoord, nextCoord), delay: aniSec,},
         // {func: () => {curNode.style.opacity = "1";},delay: aniSec,},

@@ -1450,10 +1450,10 @@ export function calculationVisualizer(
         if (!(mode === 0 && node.graphIndex === 3)) {
         const relu = g3.append("g");
         let svgPath = "./assets/SVGs/ReLU.svg";
-        let labelText = "ReLU Non-linear Function";
+        let labelText = "ReLU";
         if (mode == 1) {
             svgPath = "./assets/SVGs/tanh.svg";
-            labelText = "Tanh Non-linear Function";
+            labelText = "Tanh";
         }
         d3.xml(svgPath).then(function (data) {
 
@@ -1472,11 +1472,11 @@ export function calculationVisualizer(
             const [x, y] = d3.pointer(event);
 
             //set-up the paramtere for the math displayer
-            let text = "ReLU Non-Linear Function";
+            let text = "ReLU";
             let formular = "f(x) = max(0, x)";
             let descirption = "Range:  [0 to Infinity)."
             if (mode === 1) {
-                text = "Tanh Non-Linear Function";
+                text = "Tanh";
                 formular = "f(x) = (e^x - e^(-x)) / (e^x + e^(-x))";
                 descirption = "Range:  (-1 to 1)."
 

@@ -1291,7 +1291,7 @@ export function drawReLU(
                 .raise();
             }
         });
-        drawHintLabel(relu, cx1-20, cy1+radius*4+12+4, "ReLU Non-linear Function", "procVis reluText");
+        drawHintLabel(relu, cx1-10, cy1+radius*4+12+4, "ReLU", "procVis reluText");
 
     relu.on("mouseover", function (event, d) {
         const [x, y] = d3.pointer(event);
@@ -1300,7 +1300,7 @@ export function drawReLU(
         drawActivationExplanation(
             x,
             y,
-            "ReLU Non-Linear Function",
+            "ReLU Non-linear Function",
             "f(x) = max(0, x)",
             "Range: [ 0 to infinity)"
         );
@@ -1342,7 +1342,7 @@ export function drawTanh(
         relu,
         cx1 - 20,
         cy1 + radius * 4 + 12 + 4,
-        "Tanh Non-linear Function",
+        "Tanh",
         "procVis relu-icon"
     );
 
