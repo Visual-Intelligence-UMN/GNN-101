@@ -249,7 +249,7 @@ export function outputVisualizer(
         .attr("y", node.y - 50)
         .style("fill", "grey")
         .style("opacity", 0)
-        .text(`Final Output Vector: 1 x ${node.relatedNodes[0].features.length}`);
+        .text(`Initial Vector: 1x${node.relatedNodes[0].features.length}`);
 
     let temp = 600;
 
@@ -312,7 +312,7 @@ export function outputVisualizer(
     calculatedFeatureGroup.append("text")
         .attr("x", 5)
         .attr("y", -43)
-        .text(`Matmul Result: 1 x ${calculatedData.length}`)
+        .text(`Matmul Result: 1x${calculatedData.length}`)
         .style("fill", "gray")
 
         .style("font-size", "17px")
@@ -404,7 +404,7 @@ export function outputVisualizer(
         .attr("y", -17)
         .style("fill", "grey")
         .style("opacity", 0)
-        .text(`Final Output Vector: 1 x ${outputData.length}`);
+        .text(`Final Output Vector: 1x${outputData.length}`);
 
 
 
@@ -432,7 +432,7 @@ export function outputVisualizer(
     BiasGroup.append("text")
         .attr("x", 5 - moveOffset)
         .attr("y", -20)
-        .text(`Bias Vector: 1 x ${bias.length}`)
+        .text(`Bias Vector: 1x${bias.length}`)
         .style("fill", "gray")
 
         .style("font-size", "17px")
@@ -897,7 +897,7 @@ export function calculationVisualizer(
         .style("opacity", 0);
 
     //draw label
-    let text = `Vectors \nSummation:\n1 x ${aggregatedData.length} T`
+    let text = `Vectors \nSummation:\n1x${aggregatedData.length}T`
     if (innerComputationMode === "GraphSAGE") {
         text = "Mean aggregator"
     }
@@ -906,7 +906,7 @@ export function calculationVisualizer(
         const lines = text.split('\n');
 
         const aggText = aggregatedFeatureGroup.append("text")
-        .attr("x", -30)
+        .attr("x", -45)
         .attr("y", 25)
         .style("fill", "gray")
         .style("font-size", "17px")
@@ -922,7 +922,7 @@ export function calculationVisualizer(
     } else {
 
     aggregatedFeatureGroup.append("text")
-        .attr("x", 0)
+        .attr("x", -25)
         .attr("y", -5)
         .text(text)
         .style("fill", "gray")
@@ -1000,7 +1000,7 @@ export function calculationVisualizer(
     calculatedFeatureGroup.append("text")
         .attr("x", 0)
         .attr("y", -5)
-        .text(`Matmul Result: 1 x ${calculatedData.length}`)
+        .text(`Matmul Result: 1x${calculatedData.length}`)
         .style("fill", "gray")
         .style("font-size", "17px")
         .attr("class", "calFrame to-be-removed procVis")
@@ -1144,7 +1144,7 @@ export function calculationVisualizer(
     BiasGroup.append("text")
         .attr("x", 0)
         .attr("y", -5)
-        .text(`Bias Vector: 1 x ${biasData.length}`)
+        .text(`Bias Vector: 1x${biasData.length}`)
         .style("fill", "gray")
         .style("font-size", "17px")
         .attr("class", "bias to-be-removed biasText procVis").style("opacity", 0);
@@ -1630,7 +1630,7 @@ export function calculationVisualizer(
     outputGroupCopy.append("text")
         .attr("x", 0)
         .attr("y", 28)
-        .text(`Final Output Vector: 1 x ${node.features.length}`)
+        .text(`Final Output Vector: 1x${node.features.length}`)
         .style("fill", "gray")
 
         .style("font-size", "17px")
@@ -1837,6 +1837,14 @@ function weightAnimation(
 
     const gLabel = svg.append("g");
     injectSVG(gLabel, endCoordList[0][0] - 80-120-64, endCoordList[0][1] - 22.5-120-64, "./assets/SVGs/interactionHint.svg", "to-be-removed procVis");
+
+    btn.append("text")
+    .attr("x", endCoordList[0][0] - 100)
+    .attr("y", endCoordList[0][1] - 22.5)
+    .attr("font-size", "10px")
+    .text("Matrix Multiplication")
+    .attr("fill", "grey")
+    .attr("class", "to-be-removed weight-matrix-text")
 
     btn.on("mouseover", function() {
         if (!state.isAnimating) {
@@ -2591,7 +2599,7 @@ export function nodeOutputVisualizer(
     .attr("y", node.y - 50)
     .style("fill", "grey")
     .style("opacity", 0)
-    .text(`Final Output Vector: 1 x ${node.relatedNodes[0].features.length}`);
+    .text(`Initial Vector: 1x${node.relatedNodes[0].features.length}`);
 
 
     const calculatedFeatureGroup = svg
@@ -2620,7 +2628,7 @@ export function nodeOutputVisualizer(
     calculatedFeatureGroup.append("text")
         .attr("x", 5)
         .attr("y", -43)
-        .text(`MatMul Result: 1 x ${calculatedData.length}`)
+        .text(`MatMul Result: 1x${calculatedData.length}`)
         .style("fill", "gray")
 
         .style("font-size", "17px")
@@ -2719,7 +2727,7 @@ export function nodeOutputVisualizer(
     .attr("y", -20)
     .style("fill", "grey")
     .style("opacity", 0)
-    .text(`Final Output Vector: 1 x ${outputData.length}`);
+    .text(`Final Output Vector: 1x${outputData.length}`);
 
 
 
@@ -2744,7 +2752,7 @@ export function nodeOutputVisualizer(
     BiasGroup.append("text")
         .attr("x", 5)
         .attr("y", 28)
-        .text(`Bias Vector 1 x ${bias.length}`)
+        .text(`Bias Vector 1x${bias.length}`)
         .style("fill", "gray")
         .style("font-size", "17px")
         .attr("class", "bias to-be-removed")
