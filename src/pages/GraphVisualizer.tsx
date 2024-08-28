@@ -133,6 +133,9 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           .style("stroke-width", 1)
           .style("stroke-opacity", 1)
           .attr("opacity", 1)
+
+
+
           let maxXDistance = 0;
           let maxYDistance = 0;
           let limitedNodes = data.nodes.slice(0, 17); 
@@ -180,6 +183,23 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           node.x = centerX + 10
           node.y = centerY - 10
       });
+
+      if (i === 5) {
+        console.log("VAWSD")
+        g1.append("text")
+          .attr("x", (i - 2) * offset)
+          .attr("y", centerY - 20)
+          .text("Mutagenic")
+          .style("stroke", "black")
+
+
+
+          g1.append("text")
+          .attr("x", (i - 2) * offset)
+          .attr("y", centerY + 15)
+          .text("Non-Mutagenic")
+          .style("stroke", "black")   
+      }
       }
 
      
