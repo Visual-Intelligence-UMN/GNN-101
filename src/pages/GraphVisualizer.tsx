@@ -187,7 +187,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
       if (i === 5) {
         console.log("VAWSD")
         g1.append("text")
-          .attr("x", (i - 2) * offset)
+          .attr("x", (i - 2) * offset - 17)
           .attr("y", centerY - 20)
           .text("Mutagenic")
           .style("stroke", "black")
@@ -195,7 +195,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
 
           g1.append("text")
-          .attr("x", (i - 2) * offset)
+          .attr("x", (i - 2) * offset - 17)
           .attr("y", centerY + 15)
           .text("Non-Mutagenic")
           .style("stroke", "black")   

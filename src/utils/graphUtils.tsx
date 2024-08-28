@@ -206,6 +206,14 @@ export function outputVisualizer(
             })
         }
 
+        
+    node.relatedNodes.forEach((n: any) => {
+        if (n.featureId && n.featureGroup) {
+        n.featureId.style("visibility", "hidden")
+        n.featureGroup.attr("class", "procVis original-features")
+        }
+    })
+
     
     
 
@@ -232,6 +240,16 @@ export function outputVisualizer(
             "transform",
             `translate(${node.x - 100}, ${node.y - 25}) rotate(-90)`
         );
+
+
+
+        svg.append("text")
+        .attr("class", "bias to-be-removed")
+        .attr("x", (node.graphIndex - 3.5) * offset - 70)
+        .attr("y", node.y - 50)
+        .style("fill", "grey")
+        .style("opacity", 0)
+        .text(`Final Output Vector: 1 x ${node.relatedNodes[0].features.length}`);
 
     let temp = 600;
 
@@ -378,6 +396,15 @@ export function outputVisualizer(
         .style("stroke-width", 1)
         .style("stroke", "grey")
         .style("opacity", 0);
+
+        outputGroup
+        .append("text")
+        .attr("class", "bias to-be-removed")
+        .attr("x", 100 - moveOffset)
+        .attr("y", -17)
+        .style("fill", "grey")
+        .style("opacity", 0)
+        .text(`Final Output Vector: 1 x ${outputData.length}`);
 
 
 
@@ -1794,7 +1821,7 @@ function weightAnimation(
     }
 
     // Pause and replay button
-    const btn = svg.append("g").attr("class", "button-group");
+    const btn = svg.append("g").attr("class", "button-group to-be-removed");
 
 
     let btnYOffset = 100;
@@ -1858,6 +1885,7 @@ function weightAnimation(
     d3.selectAll(".aniRect").style("opacity", 0);
 
 
+
     let featureLength = node.features.length;
     let prevLayerFeatureLength = node.relatedNodes[0].features.length;
 
@@ -1867,6 +1895,7 @@ function weightAnimation(
         }
 
         d3.selectAll(".columnGroup").style("opacity", 0.3).lower();
+        d3.select(".weight-matrix-frame").style("opacity", 0)
         if (i >= endNumber) {
             i = 0; // Reset the index to replay the animation
         }
@@ -1939,6 +1968,7 @@ function weightAnimation(
                     d3.selectAll(".columnGroup").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
                     d3.selectAll(`#tempath${i - 1}`).style("opacity", 0);
+                    d3.select(".weight-matrix-frame").style("opacity", 1)
                   
        
                     setTimeout(() => {
@@ -2501,6 +2531,13 @@ export function nodeOutputVisualizer(
     state.isClicked = true;
 
 
+    node.relatedNodes.forEach((n: any) => {
+        if (n.featureId && n.featureGroup) {
+        n.featureId.style("visibility", "hidden")
+        n.featureGroup.attr("class", "procVis original-features")
+        }
+    })
+
 
     d3.selectAll(".to-be-removed").remove();
     d3.selectAll(".node-features-Copy").style("visibility", "visible").lower();
@@ -2548,6 +2585,13 @@ export function nodeOutputVisualizer(
         ];
         startCoordList.push(s);
     }
+    svg.append("text")
+    .attr("class", "bias to-be-removed")
+    .attr("x", (node.graphIndex - 2.5) * offset - 180)
+    .attr("y", node.y - 50)
+    .style("fill", "grey")
+    .style("opacity", 0)
+    .text(`Final Output Vector: 1 x ${node.relatedNodes[0].features.length}`);
 
 
     const calculatedFeatureGroup = svg
@@ -2576,7 +2620,7 @@ export function nodeOutputVisualizer(
     calculatedFeatureGroup.append("text")
         .attr("x", 5)
         .attr("y", -43)
-        .text("Matrix Multiplication")
+        .text(`MatMul Result: 1 x ${calculatedData.length}`)
         .style("fill", "gray")
 
         .style("font-size", "17px")
@@ -2593,13 +2637,13 @@ export function nodeOutputVisualizer(
     const math = create(all, {});
     const wMat = math.transpose(allWeights[3]);
 
-    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1], -1, 10, node.features.length, [wMat], 0);
+    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 200, endCoordList[0][1], -1, 10, node.features.length, [wMat], 0);
 
     setTimeout(() => {
         if (!state.isClicked) {
             return;
         }
-        drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1], 1, 10, 10, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
+        drawWeightMatrix(endCoordList[0][0] - 200, endCoordList[0][1], 1, 10, 10, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
 
 
         d3.selectAll(".bias").style("opacity", 1);
@@ -2668,6 +2712,17 @@ export function nodeOutputVisualizer(
 
 
 
+    outputGroup
+    .append("text")
+    .attr("class", "bias to-be-removed")
+    .attr("x", 130)
+    .attr("y", -20)
+    .style("fill", "grey")
+    .style("opacity", 0)
+    .text(`Final Output Vector: 1 x ${outputData.length}`);
+
+
+
     const BiasGroup = svg
         .append("g")
         .attr("transform", `translate(${xPos - temp - moveOffset}, ${node.y + 30})`);
@@ -2689,9 +2744,8 @@ export function nodeOutputVisualizer(
     BiasGroup.append("text")
         .attr("x", 5)
         .attr("y", 28)
-        .text("Bias Vector")
+        .text(`Bias Vector 1 x ${bias.length}`)
         .style("fill", "gray")
-
         .style("font-size", "17px")
         .attr("class", "bias to-be-removed")
 
