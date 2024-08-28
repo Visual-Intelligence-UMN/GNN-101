@@ -97,8 +97,9 @@ function formularInteractionHandler(x: number, y: number, g: any, class_name: st
 export function injectSVG(g:any, x: number, y: number, SVGPath:string, svgClass:string){
     g.selectAll("*").remove();
     d3.xml(SVGPath).then(function(data) {
-
-        const play = g!.node()!.appendChild(data.documentElement)
+        let play;
+ 
+        play = g!.node()!.appendChild(data.documentElement)
         d3.select(play).attr("x", x).attr("y", y).attr("class", svgClass)
        
         if (SVGPath === "./assets/SVGs/GCNFormula.svg" || SVGPath === "./assets/SVGs/GATFormula.svg" || SVGPath === "./assets/SVGs/GsageFormula.svg") {
