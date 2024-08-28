@@ -128,15 +128,26 @@ export function graphVisDrawMatrixWeight(
             if((Xt[0].length<Xt.length && Xt.length!=64)||(Xt[0].length==64&&Xt.length==2)
             ||(Xt[0].length==34&&Xt.length==4)
             ||(Xt.length==34&&Xt[0].length==4)){
+       
                 if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
                 else m1 = weightMatrixPostions[j][currentStep]
+                
+
             }
             else{
-                if(curveDir==-1)m1 = weightMatrixPostions[j][currentStep]
+    
+                if(curveDir==-1) { 
+                    m1 = weightMatrixPostions[j][currentStep] 
+                    if (mode === 2 && node.graphIndex === 1) {
+                        m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+                    } 
+                }
                 else m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
+
 
             }
         }
+        
 
 
 
@@ -182,16 +193,18 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
                 if (!g.selectAll) {
                     g = d3.selectAll(g)
                 }
+
+ 
+       
+ 
                 
 
                 d3.select(".graph-displayer").attr("opacity", 1);
-                
-                console.log('weight before transformations', weights)
 
 
-                d3.selectAll(".weightUnit").style("opacity", 0.3);
+                d3.selectAll(".columnGroup").style("opacity", 0.3);
                 d3.selectAll(`#tempath${i}`).attr("opacity", 1).raise();
-                d3.selectAll(`#weightUnit-${i}`).style("opacity", 1).raise();
+                d3.selectAll(`#columnGroup-${i}`).style("opacity", 1).raise();
                 d3.selectAll(`#columnUnit-${i}`).style("opacity", 1).raise();
                 
 
@@ -211,10 +224,10 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
 
 
 
-                console.log('weights matrix is', weightMat, 'at index', index, 'and i is', i, 'which means the column selected is', weightMat[i])
+        
                 for (let j = 0; j < weightMat[i].length; j++) {
 
-                    console.log(j)
+               
                     
                     g.append("rect")
                     .attr("x", 130)
@@ -416,7 +429,7 @@ export function hoverOverHandler(node: any, aggregatedData: any, calculatedData:
                 if (!state.isClicked || state.isPlaying || state.isAnimating) {
                     return;
                 }
-                d3.selectAll(".weight-matrix-frame").style("opacity", 0.3).lower()
+                d3.selectAll(".weight-matrix-frame").style("opacity", 0).lower()
                 if (mode === 1 && node.graphIndex === 4) {
                     graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, 1, i, myColor, weightsLocation, node.features.length, svg, mode)
                 }
@@ -439,11 +452,11 @@ export function hoverOverHandler(node: any, aggregatedData: any, calculatedData:
                 d3.selectAll(".weight-matrix-frame").style("opacity", 1).lower()
                 d3.selectAll(".math-displayer").remove();
                 d3.selectAll(".graph-displayer").attr("opacity", 0);
-                d3.selectAll(`#weightUnit-${i}`).style("opacity", 0.3).raise();
                 d3.selectAll(`#columnUnit-${i}`).style("opacity", 0).raise();
                 d3.selectAll(`#tempath${i}`).style("opacity", 0).raise();
-                d3.selectAll(".weightUnit").style("opacity", 1);
+                d3.selectAll(".columnGroup").style("opacity", 1);
                 d3.selectAll(".calculatedRect").style("opacity", 1)
+
                 
 
             });

@@ -95,7 +95,7 @@ export default function Sidebar(props: Props) {
                         <br />
                         A graph can be represented as either a node-link diagram or an
                         adjacency matrix. A node-link diagram is an intuitive visual
-                        representation of the graph where nodes are depcited as circles and
+                        representation of the graph where nodes are depicted as circles and
                         edges are lines connecting the circles. It is easy to understand and
                         informative, especially for small graphs.
                         <br />

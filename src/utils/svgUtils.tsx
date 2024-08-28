@@ -1,10 +1,12 @@
 import * as d3 from "d3";
 import { gcd } from "mathjs";
 import { formulaClass, formulaTextClass } from "./const";
+import { drawHintLabel } from "./matHelperUtils";
 
 //a specific function for SVG injection for play-pause button
 export function injectPlayButtonSVG(btn:any, btnX: number, btnY: number, SVGPath:string){
     btn.selectAll("*").remove();
+    const textLabel = btn.append("g")
     d3.xml(SVGPath).then(function(data) {
 
         const play = btn!.node()!.appendChild(data.documentElement)
@@ -16,6 +18,8 @@ export function injectPlayButtonSVG(btn:any, btnX: number, btnY: number, SVGPath
             d3.select(play).select("ellipse").style("fill", "rgb(255, 255, 255)");
         });
     });
+
+    drawHintLabel(textLabel, btnX - 20, btnY - 5, "Matrix Multiplication", "procVis", "12px");
 }
 
 //a specific function for SVG injection for play-pause button for graph view
@@ -50,14 +54,12 @@ function formularInteractionHandler(x: number, y: number, g: any, class_name: st
     .attr("stroke", "none") 
     .attr("class", "to-be-removed")
     .on("mouseover", function(this: any) {
-
-
-
-
+        d3.selectAll(".procVis").interrupt();
         d3.selectAll(".procVis").style("opacity", 0.2)
         d3.selectAll(".cant-remove").style("opacity", 0.2);
         d3.selectAll(".formula").style("opacity", 0.2)
         d3.select(`.${class_name}`).style("opacity", 1)
+
 
 
         
@@ -95,11 +97,12 @@ function formularInteractionHandler(x: number, y: number, g: any, class_name: st
 export function injectSVG(g:any, x: number, y: number, SVGPath:string, svgClass:string){
     g.selectAll("*").remove();
     d3.xml(SVGPath).then(function(data) {
-
-        const play = g!.node()!.appendChild(data.documentElement)
+        let play;
+ 
+        play = g!.node()!.appendChild(data.documentElement)
         d3.select(play).attr("x", x).attr("y", y).attr("class", svgClass)
        
-        if (SVGPath === "./assets/SVGs/GCNFormula.svg" || SVGPath === "./assets/SVGs/GATFormula.svg") {
+        if (SVGPath === "./assets/SVGs/GCNFormula.svg" || SVGPath === "./assets/SVGs/GATFormula.svg" || SVGPath === "./assets/SVGs/GsageFormula.svg") {
 
             g.append("rect")
             .attr("class", "to-be-removed")

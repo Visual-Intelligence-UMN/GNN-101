@@ -28,6 +28,7 @@ interface GraphVisualizerProps {
   selectedButtons: boolean[];
   simulationLoading: boolean;
   setSimulation: Function;
+  innerComputationMode: string
 }
 
 const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
@@ -38,6 +39,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
   selectedButtons,
   simulationLoading,
   setSimulation,
+  innerComputationMode
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -131,6 +133,9 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           .style("stroke-width", 1)
           .style("stroke-opacity", 1)
           .attr("opacity", 1)
+
+
+
           let maxXDistance = 0;
           let maxYDistance = 0;
           let limitedNodes = data.nodes.slice(0, 17); 
@@ -178,6 +183,23 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           node.x = centerX + 10
           node.y = centerY - 10
       });
+
+      if (i === 5) {
+        console.log("VAWSD")
+        g1.append("text")
+          .attr("x", (i - 2) * offset - 17)
+          .attr("y", centerY - 20)
+          .text("Mutagenic")
+          .style("stroke", "black")
+
+
+
+          g1.append("text")
+          .attr("x", (i - 2) * offset - 17)
+          .attr("y", centerY + 15)
+          .text("Non-Mutagenic")
+          .style("stroke", "black")   
+      }
       }
 
      
@@ -288,6 +310,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             allNodes.push(node);
           });
 
+
           
           let maxXDistance = 0;
           let maxYDistance = 0;
@@ -387,7 +410,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             .text(text)
             .attr("font-weight", "normal")
             .attr('opacity', 0.5);
-
+            console.log("value", value)
             const absMax = findAbsMax(value);
 
 
@@ -414,6 +437,9 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
               svg,
               graphs,
               offset,
+              [],
+              0,
+              0,
               0
             );
 
@@ -423,7 +449,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
             if (intmData) {
 
-              featureVisualizer(svg, allNodes, offset, height, graphs, 700, 900, 600, 15, 10, 3, 20, colorSchemes, 0); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
+              featureVisualizer(svg, allNodes, offset, height, graphs, 700, 900, 600, 15, 10, 3, 20, colorSchemes, 0, innerComputationMode); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
               //function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, graphs: any[], moveOffset: number, fcLayerMoveOffset: number, rectWidth: number, firstLayerRectHeight: number, rectHeight: number, outputLayerRectHeight: number)
             }
 
