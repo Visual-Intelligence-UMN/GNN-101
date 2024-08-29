@@ -688,6 +688,8 @@ import { convertToAdjacencyMatrix, getNodeSet } from "@/utils/linkPredictionUtil
 import { extractSubgraph } from "@/utils/graphDataUtils";
 import { dataProccessGraphVisLinkPrediction } from "@/utils/GraphvislinkPredUtil";
 
+
+
 interface ViewSwitchProps {
     handleChange: () => void;
     checked: boolean;
@@ -949,6 +951,7 @@ export function visualizeGraph(
                                 }
                             });
                         });
+
 
                         const graphWidth = maxXDistance + 20;
                         const graphHeight = maxYDistance + 20;
@@ -1247,6 +1250,7 @@ export function visualizePartialGraph(
                 .selectAll("circle")
                 .data(data.nodes)
                 .join("circle")
+                .attr("id", (d: any) => `node-${d.id}-${hubNodeA}-${hubNodeB}`)
                 .attr("r", 17)
                 .style("fill", "white")
                 .style("stroke", "#69b3a2")
@@ -1366,9 +1370,11 @@ export function visualizePartialGraph(
                 onComplete();
                 resolve();
         })
+
+
           
             
-    
+
         }
 
 
@@ -1383,6 +1389,7 @@ export function visualizePartialGraph(
                       let subgraph = processedData[1];
                       let nodeMapping = processedData[2]
                       await init(graphs, subgraph, nodeMapping);
+
                     
 
     
@@ -1395,6 +1402,7 @@ export function visualizePartialGraph(
         };
 
         visualizeG();
+        
     });
 }
 

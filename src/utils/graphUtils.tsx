@@ -1948,6 +1948,7 @@ function weightAnimation(
         if (!state.isClicked || !state.isPlaying) {
             return;
         }
+        d3.selectAll(".bbox").style("pointer-events", "none");
 
         d3.selectAll(".columnGroup").style("opacity", 0.3).lower();
         d3.select(".weight-matrix-frame").style("opacity", 0)
@@ -2012,21 +2013,28 @@ function weightAnimation(
 
     
                     clearInterval(intervalID);
+  
                     state.isPlaying = false;
                     state.isAnimating = false;
                     d3.selectAll(".math-displayer").remove();
                     d3.selectAll(".graph-displayer").attr("opacity", 0);
-
 
                     injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_play.svg")
                     d3.selectAll(".aniRect").style("opacity", 1);
                     d3.selectAll(".columnGroup").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
                     d3.selectAll(`#tempath${i - 1}`).style("opacity", 0);
-                    d3.select(".weight-matrix-frame").style("opacity", 1)
+                    d3.select(".weight-matrix-frame").style("opacity", 1);
+                
+
+                    
+                    
+        
+          
                   
        
                     setTimeout(() => {
+              
    
             
 
@@ -2045,9 +2053,19 @@ function weightAnimation(
                                 }) rotate(90)`
                             );
                     }, 500);
+                    setTimeout(() => {
+                        if (state.isAnimating) {
+                            d3.selectAll(".bbox").style("pointer-events", "none");
+                        } else {
+                        
+                        d3.selectAll(".bbox").style("pointer-events", "all");
+                        }
+
+                    }, 3000)
+                    
                 }
             }
-        }, 250);
+        }, 100);
     }
 
     setTimeout(() => {

@@ -40,6 +40,7 @@ export function injectPlayButtonSVGForGraphView(btn:any, btnX: number, btnY: num
 
 function formularInteractionHandler(x: number, y: number, g: any, class_name: string) {
     var element = d3.select(`.${class_name}`)
+ 
     var node = element.node();
     if (node !== null) {
         const bbox = (node as SVGGraphicsElement).getBBox();
@@ -50,9 +51,9 @@ function formularInteractionHandler(x: number, y: number, g: any, class_name: st
     .attr("width", bbox.width)
     .attr("height", bbox.height)
     .attr("fill", "none") 
-    .attr("pointer-events", "all") 
-    .attr("stroke", "none") 
-    .attr("class", "to-be-removed")
+    .attr("stroke", "none")
+    .attr("class", "to-be-removed bbox")
+    .style("pointer-events", "all")
     .on("mouseover", function(this: any) {
         d3.selectAll(".procVis").interrupt();
         d3.selectAll(".procVis").style("opacity", 0.2)
@@ -77,8 +78,6 @@ function formularInteractionHandler(x: number, y: number, g: any, class_name: st
     }).on("mouseout", function(this: any) {
         d3.selectAll(".procVis").style("opacity", 1) 
         d3.selectAll(".formula").style("opacity", 1)
-
-
         d3.selectAll(".cant-remove").style("opacity", 1);
 
 
@@ -91,6 +90,7 @@ function formularInteractionHandler(x: number, y: number, g: any, class_name: st
         // }
 
     })
+
     }
 }
 
@@ -129,7 +129,14 @@ export function injectSVG(g:any, x: number, y: number, SVGPath:string, svgClass:
             formularInteractionHandler(x, y, g, "formula_degree")
             formularInteractionHandler(x, y, g, "formula_xj")
             formularInteractionHandler(x, y, g, "formula_activation")
+
+            // d3.selectAll(".bbox").style("pointer-events", "none");
+      
+           
+
+
         }
+
         
     });
 }
