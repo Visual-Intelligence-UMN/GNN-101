@@ -206,6 +206,14 @@ export function outputVisualizer(
             })
         }
 
+        
+    node.relatedNodes.forEach((n: any) => {
+        if (n.featureId && n.featureGroup) {
+        n.featureId.style("visibility", "hidden")
+        n.featureGroup.attr("class", "procVis original-features")
+        }
+    })
+
     
     
 
@@ -232,6 +240,16 @@ export function outputVisualizer(
             "transform",
             `translate(${node.x - 100}, ${node.y - 25}) rotate(-90)`
         );
+
+
+
+        svg.append("text")
+        .attr("class", "bias to-be-removed")
+        .attr("x", (node.graphIndex - 3.5) * offset - 70)
+        .attr("y", node.y - 50)
+        .style("fill", "grey")
+        .style("opacity", 0)
+        .text(`Initial Vector: 1x${node.relatedNodes[0].features.length}`);
 
     let temp = 600;
 
@@ -294,7 +312,7 @@ export function outputVisualizer(
     calculatedFeatureGroup.append("text")
         .attr("x", 5)
         .attr("y", -43)
-        .text("Matmul Result")
+        .text(`Matmul Result: 1x${calculatedData.length}`)
         .style("fill", "gray")
 
         .style("font-size", "17px")
@@ -329,7 +347,7 @@ export function outputVisualizer(
 
     const g5 = svg
         .append("g")
-        .attr("transform", `translate(${endCoordList[0][0] - 90}, ${endCoordList[0][1] - 180})`);
+        .attr("transform", `translate(${endCoordList[0][0] - 90}, ${endCoordList[0][1] - 230})`);
 
 
     let DisplayerWidth = 300; // Width of the graph-displayer
@@ -379,6 +397,15 @@ export function outputVisualizer(
         .style("stroke", "grey")
         .style("opacity", 0);
 
+        outputGroup
+        .append("text")
+        .attr("class", "bias to-be-removed")
+        .attr("x", 100 - moveOffset)
+        .attr("y", -17)
+        .style("fill", "grey")
+        .style("opacity", 0)
+        .text(`Final Output Vector: 1x${outputData.length}`);
+
 
 
 
@@ -404,8 +431,8 @@ export function outputVisualizer(
 
     BiasGroup.append("text")
         .attr("x", 5 - moveOffset)
-        .attr("y", 28)
-        .text("Bias Vector")
+        .attr("y", -20)
+        .text(`Bias Vector: 1x${bias.length}`)
         .style("fill", "gray")
 
         .style("font-size", "17px")
@@ -570,6 +597,10 @@ export function outputVisualizer(
                 if (!state.isClicked) {
                     return;
                 }
+                let category = "Mutagenic";
+                if (i === 1) {
+                    category = "Non-Mutagenic"
+                } 
                 d3.selectAll(".graph-displayer").attr("opacity", 1);
                 d3.selectAll(`.softmax${i}`).attr("opacity", 1);
                 g5.append("rect")
@@ -609,7 +640,7 @@ export function outputVisualizer(
 
                 g5.append("rect")
                     .attr("x", 100)
-                    .attr("y", 10)
+                    .attr("y", 30)
                     .attr("width", rectL)
                     .attr("height", rectL)
                     .style("stroke", "black")
@@ -618,7 +649,7 @@ export function outputVisualizer(
                     .lower();
                 g5.append("text")
                     .attr("x", 100)
-                    .attr("y", 10 + rectL / 2)
+                    .attr("y", 30 + rectL / 2)
                     .text(roundToTwo(calculatedData[i]))
                     .attr("class", "math-displayer")
                     .attr("font-size", "5")
@@ -633,7 +664,7 @@ export function outputVisualizer(
 
                 g5.append("text")
                     .attr("x", 100 - 25)
-                    .attr("y", 20)
+                    .attr("y", 40)
                     .attr("xml:space", "preserve")
                     .text("exp(        )")
                     .attr("class", "math-displayer")
@@ -657,23 +688,23 @@ export function outputVisualizer(
 
                 g5.append("line")
                     .attr("x1", 20)
-                    .attr("y1", 30)
+                    .attr("y1", 50)
                     .attr("x2", displayerWidth - 80)
-                    .attr("y2", 30)
+                    .attr("y2", 50)
                     .attr("stroke", "black")
                     .attr("class", "math-displayer")
                     .attr("stroke-width", 1);
 
                 g5.append("text")
                     .attr("x", displayerWidth - 60)
-                    .attr("y", 35)
+                    .attr("y", 55)
                     .text("=")
                     .attr("class", "math-displayer")
                     .attr("font-size", "15");
 
                 g5.append("rect")
                     .attr("x", displayerWidth - 50)
-                    .attr("y", 25)
+                    .attr("y", 45)
                     .attr("width", rectL)
                     .attr("height", rectL)
                     .style("stroke", "black")
@@ -682,11 +713,21 @@ export function outputVisualizer(
                     .lower();
                 g5.append("text")
                     .attr("x", displayerWidth - 50)
-                    .attr("y", 25 + rectL / 2)
+                    .attr("y", 45 + rectL / 2)
                     .text(roundToTwo(node.features[i]))
                     .attr("class", "math-displayer")
                     .attr("font-size", "5")
                     .attr("fill", Math.abs(node.features[i]) > 0.7 ? "white" : "black");
+
+
+                g5.append("text")
+                    .attr("x", 35)
+                    .attr("y", 10)
+                    .text(`Softmax score for '${category}'`)
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "10")
+
+
             })
             .on("mouseout", function () {
                 if (!state.isClicked) {
@@ -726,7 +767,7 @@ export function outputVisualizer(
     
         })
 
-    }, 3000)
+    }, 5500)
     
 
 }
@@ -856,18 +897,40 @@ export function calculationVisualizer(
         .style("opacity", 0);
 
     //draw label
-    let text = "Vectors Summation"
+    let text = `Vectors \nSummation:\n1x${aggregatedData.length}T`
     if (innerComputationMode === "GraphSAGE") {
         text = "Mean aggregator"
     }
+
+    if (node.graphIndex === 1) {
+        const lines = text.split('\n');
+
+        const aggText = aggregatedFeatureGroup.append("text")
+        .attr("x", -45)
+        .attr("y", 25)
+        .style("fill", "gray")
+        .style("font-size", "17px")
+        .attr("class", "aggregatedFeatureGroup to-be-removed aggText procVis")
+        .style("opacity", 0);
+        lines.forEach((line, index) => {
+            aggText.append("tspan")
+                .attr("x", -30) 
+                .attr("dy", index === 25 ? 25 : "1.2em") 
+                .text(line);
+        })
+
+    } else {
+
     aggregatedFeatureGroup.append("text")
-        .attr("x", 0)
+        .attr("x", -25)
         .attr("y", -5)
         .text(text)
         .style("fill", "gray")
         .style("font-size", "17px")
         .attr("class", "aggregatedFeatureGroup to-be-removed aggText procVis")
         .style("opacity", 0);
+    }
+    
 
 
     const aggFrame = aggregatedFeatureGroup.append("rect")
@@ -937,7 +1000,7 @@ export function calculationVisualizer(
     calculatedFeatureGroup.append("text")
         .attr("x", 0)
         .attr("y", -5)
-        .text("Matmul")
+        .text(`Matmul Result: 1x${calculatedData.length}`)
         .style("fill", "gray")
         .style("font-size", "17px")
         .attr("class", "calFrame to-be-removed procVis")
@@ -1081,7 +1144,7 @@ export function calculationVisualizer(
     BiasGroup.append("text")
         .attr("x", 0)
         .attr("y", -5)
-        .text("Bias Vector")
+        .text(`Bias Vector: 1x${biasData.length}`)
         .style("fill", "gray")
         .style("font-size", "17px")
         .attr("class", "bias to-be-removed biasText procVis").style("opacity", 0);
@@ -1567,7 +1630,7 @@ export function calculationVisualizer(
     outputGroupCopy.append("text")
         .attr("x", 0)
         .attr("y", 28)
-        .text("Final Output Vector")
+        .text(`Final Output Vector: 1x${node.features.length}`)
         .style("fill", "gray")
 
         .style("font-size", "17px")
@@ -1663,7 +1726,7 @@ export function calculationVisualizer(
         }) 
     
 
-    }, 3000)
+    }, 5500)
     
 }
 
@@ -1758,7 +1821,7 @@ function weightAnimation(
     }
 
     // Pause and replay button
-    const btn = svg.append("g").attr("class", "button-group");
+    const btn = svg.append("g").attr("class", "button-group to-be-removed");
 
 
     let btnYOffset = 100;
@@ -1774,6 +1837,14 @@ function weightAnimation(
 
     const gLabel = svg.append("g");
     injectSVG(gLabel, endCoordList[0][0] - 80-120-64, endCoordList[0][1] - 22.5-120-64, "./assets/SVGs/interactionHint.svg", "to-be-removed procVis");
+
+    btn.append("text")
+    .attr("x", endCoordList[0][0] - 100)
+    .attr("y", endCoordList[0][1] - 22.5)
+    .attr("font-size", "10px")
+    .text("Matrix Multiplication")
+    .attr("fill", "grey")
+    .attr("class", "to-be-removed weight-matrix-text")
 
     btn.on("mouseover", function() {
         if (!state.isAnimating) {
@@ -1822,6 +1893,7 @@ function weightAnimation(
     d3.selectAll(".aniRect").style("opacity", 0);
 
 
+
     let featureLength = node.features.length;
     let prevLayerFeatureLength = node.relatedNodes[0].features.length;
 
@@ -1831,6 +1903,7 @@ function weightAnimation(
         }
 
         d3.selectAll(".columnGroup").style("opacity", 0.3).lower();
+        d3.select(".weight-matrix-frame").style("opacity", 0)
         if (i >= endNumber) {
             i = 0; // Reset the index to replay the animation
         }
@@ -1842,7 +1915,7 @@ function weightAnimation(
 
 
             d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1);
-            d3.selectAll(`#tempath${i - 1}`).style("opacity", 0);
+            d3.selectAll(`#tempath${i - 1}`).remove()
             d3.selectAll(".math-displayer").remove();
 
             if (state.isPlaying) {
@@ -1876,7 +1949,7 @@ function weightAnimation(
                 graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode = mode)
 
                 d3.selectAll(`#columnGroup-${i - 1}`).style("opacity", 0.3).lower();
-                d3.selectAll(`#columnUnit-${i - 1}`).style("opacity", 0).lower();
+                d3.selectAll(`#columnUnit-${i - 1}`).remove()
                 d3.selectAll(`#columnGroup-${i}`).style("opacity", 1).raise();
                 d3.select(`#columnUnit-${i}`).style("opacity", 1).raise();
 
@@ -1903,6 +1976,7 @@ function weightAnimation(
                     d3.selectAll(".columnGroup").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
                     d3.selectAll(`#tempath${i - 1}`).style("opacity", 0);
+                    d3.select(".weight-matrix-frame").style("opacity", 1)
                   
        
                     setTimeout(() => {
@@ -2323,7 +2397,7 @@ export function fcLayerCalculationVisualizer(
         })
 
 
-    }, 3000)
+    }, 5500)
     
 
 }
@@ -2465,6 +2539,13 @@ export function nodeOutputVisualizer(
     state.isClicked = true;
 
 
+    node.relatedNodes.forEach((n: any) => {
+        if (n.featureId && n.featureGroup) {
+        n.featureId.style("visibility", "hidden")
+        n.featureGroup.attr("class", "procVis original-features")
+        }
+    })
+
 
     d3.selectAll(".to-be-removed").remove();
     d3.selectAll(".node-features-Copy").style("visibility", "visible").lower();
@@ -2512,6 +2593,13 @@ export function nodeOutputVisualizer(
         ];
         startCoordList.push(s);
     }
+    svg.append("text")
+    .attr("class", "bias to-be-removed")
+    .attr("x", (node.graphIndex - 2.5) * offset - 180)
+    .attr("y", node.y - 50)
+    .style("fill", "grey")
+    .style("opacity", 0)
+    .text(`Initial Vector: 1x${node.relatedNodes[0].features.length}`);
 
 
     const calculatedFeatureGroup = svg
@@ -2540,7 +2628,7 @@ export function nodeOutputVisualizer(
     calculatedFeatureGroup.append("text")
         .attr("x", 5)
         .attr("y", -43)
-        .text("Matrix Multiplication")
+        .text(`MatMul Result: 1x${calculatedData.length}`)
         .style("fill", "gray")
 
         .style("font-size", "17px")
@@ -2557,13 +2645,13 @@ export function nodeOutputVisualizer(
     const math = create(all, {});
     const wMat = math.transpose(allWeights[3]);
 
-    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1], -1, 10, node.features.length, [wMat], 0);
+    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 200, endCoordList[0][1], -1, 10, node.features.length, [wMat], 0);
 
     setTimeout(() => {
         if (!state.isClicked) {
             return;
         }
-        drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1], 1, 10, 10, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
+        drawWeightMatrix(endCoordList[0][0] - 200, endCoordList[0][1], 1, 10, 10, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
 
 
         d3.selectAll(".bias").style("opacity", 1);
@@ -2632,6 +2720,17 @@ export function nodeOutputVisualizer(
 
 
 
+    outputGroup
+    .append("text")
+    .attr("class", "bias to-be-removed")
+    .attr("x", 130)
+    .attr("y", -20)
+    .style("fill", "grey")
+    .style("opacity", 0)
+    .text(`Final Output Vector: 1x${outputData.length}`);
+
+
+
     const BiasGroup = svg
         .append("g")
         .attr("transform", `translate(${xPos - temp - moveOffset}, ${node.y + 30})`);
@@ -2653,9 +2752,8 @@ export function nodeOutputVisualizer(
     BiasGroup.append("text")
         .attr("x", 5)
         .attr("y", 28)
-        .text("Bias Vector")
+        .text(`Bias Vector 1x${bias.length}`)
         .style("fill", "gray")
-
         .style("font-size", "17px")
         .attr("class", "bias to-be-removed")
 
@@ -2813,11 +2911,24 @@ export function nodeOutputVisualizer(
                 if (!state.isClicked) {
                     return;
                 }
+                
+                let category = "Class A";
+                switch(i) {
+                    case 1: 
+                        category = "Class B";
+                        break;
+                    case 2: 
+                        category = "Class C"
+                        break;
+                    case 3:
+                        category = "Class D"
+                        break;
+                }
                 d3.selectAll(".graph-displayer").attr("opacity", 1);
                 d3.selectAll(`.softmax${i}`).attr("opacity", 1);
                 g5.append("rect")
                     .attr("x", 50)
-                    .attr("y", displayHeight - 40)
+                    .attr("y", displayHeight - 40 + 20)
                     .attr("width", rectL)
                     .attr("height", rectL)
                     .style("stroke", "black")
@@ -2826,7 +2937,7 @@ export function nodeOutputVisualizer(
                     .lower();
                 g5.append("text")
                     .attr("x", 50)
-                    .attr("y", displayHeight - 40 + rectL / 2)
+                    .attr("y", displayHeight - 40 + rectL / 2 + 20)
                     .text(roundToTwo(calculatedData[0]))
                     .attr("class", "math-displayer")
                     .attr("font-size", "5")
@@ -2834,7 +2945,7 @@ export function nodeOutputVisualizer(
 
                 g5.append("rect")
                     .attr("x", 100)
-                    .attr("y", displayHeight - 40)
+                    .attr("y", displayHeight - 40 + 20)
                     .attr("width", rectL)
                     .attr("height", rectL)
                     .style("stroke", "black")
@@ -2843,17 +2954,15 @@ export function nodeOutputVisualizer(
                     .lower();
                 g5.append("text")
                     .attr("x", 100)
-                    .attr("y", displayHeight - 40 + rectL / 2)
+                    .attr("y", displayHeight - 40 + rectL / 2 + 20)
                     .text(roundToTwo(calculatedData[1]))
                     .attr("class", "math-displayer")
                     .attr("font-size", "5")
                     .attr("fill", Math.abs(calculatedData[1]) > 0.7 ? "white" : "black");
 
-
-
-                    g5.append("rect")
+                g5.append("rect")
                     .attr("x", displayerWidth - 150)
-                    .attr("y", displayHeight - 40)
+                    .attr("y", displayHeight - 40 + 20)
                     .attr("width", rectL)
                     .attr("height", rectL)
                     .style("stroke", "black")
@@ -2862,16 +2971,15 @@ export function nodeOutputVisualizer(
                     .lower();
                 g5.append("text")
                     .attr("x", displayerWidth - 150)
-                    .attr("y", displayHeight - 40 + rectL / 2)
+                    .attr("y", displayHeight - 40 + rectL / 2 + 20)
                     .text(roundToTwo(calculatedData[2]))
                     .attr("class", "math-displayer")
                     .attr("font-size", "5")
                     .attr("fill", Math.abs(calculatedData[2]) > 0.7 ? "white" : "black");
 
-
-                    g5.append("rect")
+                g5.append("rect")
                     .attr("x", displayerWidth - 100)
-                    .attr("y", displayHeight - 40)
+                    .attr("y", displayHeight - 40 + 20)
                     .attr("width", rectL)
                     .attr("height", rectL)
                     .style("stroke", "black")
@@ -2880,29 +2988,15 @@ export function nodeOutputVisualizer(
                     .lower();
                 g5.append("text")
                     .attr("x", displayerWidth - 100)
-                    .attr("y", displayHeight - 40 + rectL / 2)
+                    .attr("y", displayHeight - 40 + rectL / 2 + 20)
                     .text(roundToTwo(calculatedData[3]))
                     .attr("class", "math-displayer")
                     .attr("font-size", "5")
                     .attr("fill", Math.abs(calculatedData[3]) > 0.7 ? "white" : "black");
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                 g5.append("rect")
                     .attr("x", 100)
-                    .attr("y", 10)
+                    .attr("y", 10 + 20)
                     .attr("width", rectL)
                     .attr("height", rectL)
                     .style("stroke", "black")
@@ -2911,7 +3005,7 @@ export function nodeOutputVisualizer(
                     .lower();
                 g5.append("text")
                     .attr("x", 100)
-                    .attr("y", 10 + rectL / 2)
+                    .attr("y", 10 + rectL / 2 + 20)
                     .text(roundToTwo(calculatedData[i]))
                     .attr("class", "math-displayer")
                     .attr("font-size", "5")
@@ -2919,31 +3013,28 @@ export function nodeOutputVisualizer(
 
                 g5.append("text")
                     .attr("x", 100 - 27)
-                    .attr("y", displayHeight - 30)
+                    .attr("y", displayHeight - 30 + 20)
                     .text("+")
                     .attr("class", "math-displayer")
                     .attr("font-size", "12");
 
-                    g5.append("text")
+                g5.append("text")
                     .attr("x", displayerWidth - 25 - 105)
-                    .attr("y", displayHeight - 30)
+                    .attr("y", displayHeight - 30 + 20)
                     .text("+")
                     .attr("class", "math-displayer")
                     .attr("font-size", "12");
 
-
-                    g5.append("text")
+                g5.append("text")
                     .attr("x", displayerWidth - 25 - 152)
-                    .attr("y", displayHeight - 30)
+                    .attr("y", displayHeight - 30 + 20)
                     .text("+")
                     .attr("class", "math-displayer")
                     .attr("font-size", "12");
-
-
 
                 g5.append("text")
                     .attr("x", 100 - 20)
-                    .attr("y", 20)
+                    .attr("y", 20 + 20)
                     .attr("xml:space", "preserve")
                     .text("exp(          )")
                     .attr("class", "math-displayer")
@@ -2951,7 +3042,7 @@ export function nodeOutputVisualizer(
 
                 g5.append("text")
                     .attr("x", 50 - 20)
-                    .attr("y", displayHeight - 30)
+                    .attr("y", displayHeight - 30 + 20)
                     .attr("xml:space", "preserve")
                     .text("exp(            )")
                     .attr("class", "math-displayer")
@@ -2959,48 +3050,47 @@ export function nodeOutputVisualizer(
 
                 g5.append("text")
                     .attr("x", displayerWidth - 150 - 20)
-                    .attr("y", displayHeight - 30)
+                    .attr("y", displayHeight - 30 + 20)
                     .attr("xml:space", "preserve")
                     .text("exp(          )")
                     .attr("class", "math-displayer")
                     .attr("font-size", "8");
 
-                    g5.append("text")
+                g5.append("text")
                     .attr("x", displayerWidth - 100 - 20)
-                    .attr("y", displayHeight - 30)
+                    .attr("y", displayHeight - 30 + 20)
                     .attr("xml:space", "preserve")
                     .text("exp(          )")
                     .attr("class", "math-displayer")
                     .attr("font-size", "8");
 
-                    g5.append("text")
+                g5.append("text")
                     .attr("x", 100 - 20)
-                    .attr("y", displayHeight - 30)
+                    .attr("y", displayHeight - 30 + 20)
                     .attr("xml:space", "preserve")
                     .text("exp(        )")
                     .attr("class", "math-displayer")
                     .attr("font-size", "8");
 
-
                 g5.append("line")
                     .attr("x1", 20)
-                    .attr("y1", 30)
+                    .attr("y1", 30 + 20)
                     .attr("x2", displayerWidth - 80)
-                    .attr("y2", 30)
+                    .attr("y2", 30 + 20)
                     .attr("stroke", "black")
                     .attr("class", "math-displayer")
                     .attr("stroke-width", 1);
 
                 g5.append("text")
                     .attr("x", displayerWidth - 60)
-                    .attr("y", 35)
+                    .attr("y", 35 + 20)
                     .text("=")
                     .attr("class", "math-displayer")
                     .attr("font-size", "15")
 
                 g5.append("rect")
                     .attr("x", displayerWidth - 50)
-                    .attr("y", 25)
+                    .attr("y", 25 + 20)
                     .attr("width", rectL)
                     .attr("height", rectL)
                     .style("stroke", "black")
@@ -3009,11 +3099,22 @@ export function nodeOutputVisualizer(
                     .lower();
                 g5.append("text")
                     .attr("x", displayerWidth - 50)
-                    .attr("y", 25 + rectL / 2)
+                    .attr("y", 25 + rectL / 2 + 20)
                     .text(roundToTwo(node.features[i]))
                     .attr("class", "math-displayer")
                     .attr("font-size", "5")
                     .attr("fill", Math.abs(node.features[i]) > 0.7 ? "white" : "black");
+
+
+
+                g5.append("text")
+                    .attr("x", 35)
+                    .attr("y", 10)
+                    .text(`Softmax score for '${category}'`)
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "10")
+
+
             })
             .on("mouseout", function () {
                 if (!state.isClicked) {
@@ -3061,7 +3162,7 @@ export function nodeOutputVisualizer(
     
         })
 
-    }, 3000)
+    }, 5500)
     
 
 

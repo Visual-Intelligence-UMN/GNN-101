@@ -251,6 +251,9 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
               node.features = [value]
 
               allValues = allValues.concat(node.features)
+
+
+              
             }
 
             allNodes.push(node);
@@ -313,6 +316,21 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
 
             const centerX = (point1.x + point3.x) / 2;
             const centerY = (point1.y + point3.y) / 2;
+          if (i === 3) {
+            let bool = "True"
+            if (value[0] > 0.5) {
+              bool = "False"
+            }
+            
+              console.log("VAWSD")
+              g1.append("text")
+                .attr("x", (i + 1) * offset + 50)
+                .attr("y", centerY + 20)
+                .text(bool)
+                .style("stroke", "black")
+            
+          }
+      
             let scaleX = (graphWidth + tolerance) / x_dist;
             let scaleY = (graphHeight + tolerance) / y_dist;
             let transform = `translate(${centerX}, ${centerY}) scale(${scaleX}, ${scaleY}) translate(${-centerX}, ${-centerY})`;
@@ -387,7 +405,12 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
  
 
           if(i==0){
-            cst = buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x, text_y + cstOffset, g1)
+
+          
+
+
+
+            cst = buildLegend(myColor, 1, text+" Color Scheme", text_x - 50, text_y + cstOffset, g1);
           }
 
           else {

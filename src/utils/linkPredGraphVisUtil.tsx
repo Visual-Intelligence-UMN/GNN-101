@@ -662,36 +662,40 @@ export function linkPredOutputVisualizer(
               d3.selectAll(`.softmax${i}`).attr("opacity", 0.07);
           });
   }
+  setTimeout(() => {
+    d3.select("#my_dataviz").on("click", function(event: any) {
+      d3.selectAll(".math-displayer").remove();
+      d3.selectAll(".graph-displayer").remove();
+   
+          d3.selectAll(".node-features-Copy").style("visibility", "hidden")
+     
+          d3.selectAll(".columnUnit").remove();
+          d3.selectAll(".procVis").remove();
+          d3.selectAll(".to-be-removed").remove();
+  
+          d3.selectAll(".graph-displayer").remove();
+          for (let i = 0; i < 4; i++) {colorSchemes[i].style.opacity = "1";}
+  
+  
+  
+          moveFeaturesBack(node.relatedNodes, originalCoordinates);
+  
+          node.featureGroup
+              .transition()
+              .duration(1000)
+              .attr(
+                  "transform",
+                  `translate(${node.x - 7.5}, ${node.y + 170 + 5}) rotate(0)`
+              );
+  
+              handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state)
+  
+  
+  })
+    
+  }, 4000)
 
-  d3.select("#my_dataviz").on("click", function(event: any) {
-    d3.selectAll(".math-displayer").remove();
-    d3.selectAll(".graph-displayer").remove();
- 
-        d3.selectAll(".node-features-Copy").style("visibility", "hidden")
-        d3.selectAll(".weightUnit").remove();
-        d3.selectAll(".columnUnit").remove();
-        d3.selectAll(".procVis").remove();
-        d3.selectAll(".to-be-removed").remove();
-
-        d3.selectAll(".graph-displayer").remove();
-        for (let i = 0; i < 4; i++) {colorSchemes[i].style.opacity = "1";}
-
-
-
-        moveFeaturesBack(node.relatedNodes, originalCoordinates);
-
-        node.featureGroup
-            .transition()
-            .duration(1000)
-            .attr(
-                "transform",
-                `translate(${node.x - 7.5}, ${node.y + 170 + 5}) rotate(0)`
-            );
-
-            handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state)
-
-
-})
+  
 
 }
 

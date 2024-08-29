@@ -728,8 +728,9 @@ export function featureVisualizer(
           .attr("stroke-opacity", 1)
           .attr("opacity", 1)
           .node(); // make the svgElement a DOM element (the original on method somehow doesn't work)
-        if (mode === 1 && graphIndex === 4) {
           let name = "unknown";
+        if (mode === 1 && graphIndex === 4) {
+
           if (node.features[0] > 0.5) {
             name = "A"
           }
@@ -754,6 +755,18 @@ export function featureVisualizer(
           .attr("font-size", `17px`)
           .attr("opacity", 1);
 
+        }
+        else  if (graphIndex === 0) {
+          node.text = nodeGroup.append("text")
+          .attr("x", 0)
+          .attr("y", 0)
+          .join("text")
+          .attr("text-anchor", "middle")
+          .attr("dominant-baseline", "central")
+          .text(node.name)
+          .attr("font-size", `17px`)
+          .attr("opacity", 1);
+          
         }
         else {
         node.text = nodeGroup.append("text")
@@ -1146,10 +1159,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
 
 
       let conv = 3;
-      // if (mode === 1) {
-      //   conv = 4;
-        
-      // }
+
       if (mode === 2) {
         xOffset1 = (graphIndex - 3.5) * offset;
         xOffset2 = (graphIndex - 2.5) * offset;
@@ -1255,7 +1265,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
         
       } else {  
         if (mode === 1) {
-          if (graphIndex === 2) {
+          if (graphIndex === 3) {
             const nextLayerNodes = nodesByIndex.get(graphIndex + 1);
           if (nextLayerNodes) {
             nextLayerNodes.forEach((nextNode: any) => {
