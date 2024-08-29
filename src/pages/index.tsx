@@ -8,13 +8,11 @@ import { IntmData, IntmDataNode } from "../types";
 import {
     graphList,
     linkList,
-    modelGCNList,
+    modelList,
     nodeList,
     DatasetInfo,
     nodeSelectionList,
     modelTypeList,
-    modelGATList,
-    modelGraphSAGEList,
     midGraphNodeSelectionList,
 } from "../utils/const";
 import Sidebar from "./Sidebar";
@@ -63,7 +61,7 @@ export const inter3 = Inter({
 });
 
 export default function Home() {
-    const [model, setModel] = useState("graph classification");
+    const [model, setModel] = useState("GCN - graph classification");
     const [selectedGraph, setSelectedGraph] = useState("graph_2");
     const introRef = useRef<Steps>(null);
     const [outputData, setOutputData] = useState(null);
@@ -79,14 +77,6 @@ export default function Home() {
     const [hubNodeB, setHubNodeB] = useState(109);
 
     const [modelType, setModelType] = useState("GCN");
-
-    const [modelList, setModelList] = useState<{ [k: string]: string }>(
-        modelType === "GCN"
-            ? modelGCNList
-            : modelType === "GAT"
-            ? modelGATList
-            : modelGraphSAGEList
-    );
 
     //intermediate output
     const [intmData, setIntmData] = useState<IntmData | IntmDataNode | null>(
@@ -202,53 +192,9 @@ export default function Home() {
                                 </h1>
                                 <div className="flex flex-col space-y-4">
                                     <div className="flex flex-row">
-                                        <h2 className="text-xl m-auto">
-                                            Model
+                                        <h2 className="text-xl">
+                                            Model - Task
                                         </h2>
-                                        <Selector
-                                                selectedOption={modelType}
-                                                handleChange={(e) => {
-                                                    const newModelType = e.target.value;
-                                                    setModelType(newModelType);
-                                                    setPredicted(false);
-                                                    setSimulation(false);
-                                                    setProbabilities([]);
-                                                    setIntmData(null);
-
-                                                    if (newModelType === "GCN") {
-                                                        setModel(
-                                                            "graph classification"
-                                                        );
-                                                        setSelectedGraph("graph_2");
-                                                        setModelList(modelGCNList);
-                                                    } else if (newModelType === "GAT") {
-                                                        setSelectedGraph(
-                                                            "twitch_EN"
-                                                        );
-                                                        setModel(
-                                                            "GAT link classification"
-                                                        );
-                                                        setHubNodeA(148);
-                                                        setHubNodeB(407);
-                                                        setModelList(modelGATList);
-                                                    } else {
-                                                        setModel(
-                                                            "GraphSAGE link classification"
-                                                        );
-                                                        setSelectedGraph(
-                                                            "twitch_EN"
-                                                        );
-                                                        setModelList(
-                                                            modelGraphSAGEList
-                                                        );
-                                                        setHubNodeA(696);
-                                                        setHubNodeB(784);
-                                                    }
-                                                } }
-                                                OptionList={Object.keys(
-                                                    modelTypeList
-                                                )} id="task-selector"                                        />
-                                        <h2 className="text-xl m-auto">Task</h2>
                                         <Selector
                                                 selectedOption={model}
                                                 handleChange={(e) => {
@@ -258,37 +204,35 @@ export default function Home() {
                                                     setSimulation(false);
                                                     setProbabilities([]);
                                                     setIntmData(null);
-                                                    if (modelType === "GCN") {
-                                                        if (newModel ===
-                                                            "node classification") {
-                                                            setSelectedGraph(
-                                                                "karate"
-                                                            );
-                                                        } else if (newModel ===
-                                                            "graph classification") {
-                                                            setSelectedGraph(
-                                                                "graph_2"
-                                                            );
-                                                        } else {
-                                                            setSelectedGraph(
-                                                                "twitch_EN"
-                                                            );
+                                                    if(newModel.includes("GAT")){
+                                                        setModelType("GAT");
+                                                        setSelectedGraph("twitch_EN");
+                                                        setHubNodeA(148);
+                                                        setHubNodeB(407);
+                                                    }else if(newModel.includes("GraphSAGE")){
+                                                        setModelType("GraphSAGE");
+                                                        setSelectedGraph("twitch_EN");
+                                                        setHubNodeA(696);
+                                                        setHubNodeB(784);
+                                                    }else if(newModel.includes("GCN")){
+                                                        setModelType("GCN");
+                                                        if(newModel.includes("graph classification")){
+                                                            setSelectedGraph("graph_2");
+                                                        }else if(newModel.includes("node classification")){
+                                                            setSelectedGraph("karate");
+                                                        }else if(newModel.includes("link classification")){
+                                                            setSelectedGraph("twitch_EN");
+                                                            setHubNodeA(148);
+                                                            setHubNodeB(407);
                                                         }
-                                                    } else if (modelType === "GAT") {
-                                                        setSelectedGraph(
-                                                            "twitch_EN"
-                                                        );
-                                                    } else {
-                                                        setSelectedGraph(
-                                                            "twitch_EN"
-                                                        );
                                                     }
-                                                } }
+                                                    }
+                                                } 
                                                 OptionList={Object.keys(modelList)} id={""}                                        />
                                     </div>
 
                                     <div id="model-architecture">
-                                    {model == "graph classification" ? (
+                                    {model == "GCN - graph classification" ? (
                                             <ButtonChain
                                                 selectedButtons={selectedButtons}
                                                 setSelectedButtons={
@@ -296,7 +240,7 @@ export default function Home() {
                                             }
                                                 predicted={predicted}
                                             />
-                                        ) : model == "node classification" ? (
+                                        ) : model == "GCN - node classification" ? (
                                             <NodeClassifierButtonChain
                                                 selectedButtons={selectedButtons}
                                                 setSelectedButtons={
@@ -330,7 +274,7 @@ export default function Home() {
                                         <div className="flex items-center gap-x-4 ">
                                             <div className={inter3.className}>
                                                 {model ==
-                                                "graph classification" ? (
+                                                "GCN - graph classification" ? (
                                                     <>
                                                         <Selector
                                                             selectedOption={
@@ -346,7 +290,7 @@ export default function Home() {
                                                         />
                                                     </>
                                                 ) : model ==
-                                                  "node classification" ? (
+                                                  "GCN - node classification" ? (
                                                     //   <Selector
                                                     //     selectedOption={selectedGraph}
                                                     //     handleChange={handleGraphSelection}
@@ -370,7 +314,7 @@ export default function Home() {
                                                 graphList[selectedGraph] ||
                                                 nodeList[selectedGraph]) ? (
                                                 model ==
-                                                "graph classification" ? (
+                                                "GCN - graph classification" ? (
                                                     <GraphAnalysisViewer
                                                         path={
                                                             graphList[
@@ -379,7 +323,7 @@ export default function Home() {
                                                         }
                                                     />
                                                 ) : model ==
-                                                  "node classification" ? (
+                                                  "GCN - node classification" ? (
                                                     <GraphAnalysisViewer
                                                         path={
                                                             nodeList[
@@ -400,10 +344,8 @@ export default function Home() {
                                         </div>
                                     </div>
 
-                                    {model == "link classification" ||
-                                    modelType == "GAT" ||
-                                    modelType == "GraphSAGE" ? (
-                                        modelType == "GAT" || modelType == "GCN"?
+                                    {model.includes("link classification") ? (
+                                        model.includes("GAT") || model.includes("GCN")?
                                         <>
                                             Predict a link from node
                                             <NodeSelector
@@ -496,7 +438,7 @@ export default function Home() {
                             </div>
 
                             <div className={styles.vizContainer}>
-                                {model == "graph classification" ? (
+                                {model == "GCN - graph classification" ? (
                                     isGraphView ? (
                                         <>
                                             <GraphVisualizer
@@ -531,7 +473,7 @@ export default function Home() {
                                             />
                                         </>
                                     )
-                                ) : model == "node classification" ? (
+                                ) : model == "GCN - node classification" ? (
                                     isGraphView ? (
                                         <NodeGraphVisualizer
                                             graph_path={nodeList[selectedGraph]}
@@ -591,7 +533,7 @@ export default function Home() {
                                             prediction
                                         </h1>
 
-                                        {model == "graph classification" ? (
+                                        {model == "GCN - graph classification" ? (
                                             <ClassifyGraph
                                                 graphPath={
                                                     graphList[selectedGraph]

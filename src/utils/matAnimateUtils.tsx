@@ -466,7 +466,7 @@ export function drawAttentions(
         g1,
         coordFeatureVis[0],
         coordFeatureVis[1] + rectH * curveDir * 1.1,
-        `Vector Summation: 1 x ${dim}`,
+        `Vector Summation^T: 1 x ${dim}`,
         "procVis"
     );
 
@@ -794,7 +794,7 @@ export function drawSummationFeature(
         g1,
         coordFeatureVis[0],
         coordFeatureVis[1] + rectH * curveDir * 1.1,
-        `Vector Summation: 1 x ${dim}`,
+        `Vector Summation^T: 1 x ${dim}`,
         "procVis"
     );
     //path connect - connect prev layer feature vis to intermediate feature vis
