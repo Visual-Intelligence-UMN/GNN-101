@@ -20,6 +20,8 @@ import { injectSVG } from "@/utils/svgUtils";
 import { dataProccessGraphVisLinkPrediction } from "@/utils/GraphvislinkPredUtil";
 import { linkPredFeatureVisualizer } from "@/utils/linkPredGraphVisUtil";
 
+import { sigmoid } from "@/utils/linkPredictionUtils";
+
 
 
 interface LinkVisualizerProps {
@@ -223,7 +225,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
         function updatePositions() {
 
 
-          let value:any[] = [];
+          let value: any;
           if (intmData != null) {
             if (i === 1) {
               value = intmData.conv1;
@@ -248,7 +250,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
               allValues = allValues.concat(node.features)
             }
             if (value != null && i === 3) {
-              node.features = [value]
+              node.features = [sigmoid(value)]
 
               allValues = allValues.concat(node.features)
 

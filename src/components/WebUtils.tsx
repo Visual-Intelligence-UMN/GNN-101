@@ -688,6 +688,8 @@ import { convertToAdjacencyMatrix, getNodeSet } from "@/utils/linkPredictionUtil
 import { extractSubgraph } from "@/utils/graphDataUtils";
 import { dataProccessGraphVisLinkPrediction } from "@/utils/GraphvislinkPredUtil";
 
+
+
 interface ViewSwitchProps {
     handleChange: () => void;
     checked: boolean;
@@ -950,6 +952,7 @@ export function visualizeGraph(
                             });
                         });
 
+
                         const graphWidth = maxXDistance + 20;
                         const graphHeight = maxYDistance + 20;
                         const point1 = { x: 0.9 * offset - 260, y: height / 8 };
@@ -981,6 +984,7 @@ export function visualizeGraph(
                         ) {
                             transform = `scale(1, 1)`;
                         }
+                        
                         const parallelogram = svg
                             .append("polygon")
                             .attr(
@@ -1185,7 +1189,7 @@ export function visualizePartialGraph(
     hubNodeB: number
 ): Promise<void> {
     return new Promise<void>((resolve) => {
-        const init = async (data: any) => {
+        const init = async (data: any, subgraph: any[], nodeMapping: any) => {
             const offset = 600;
             const margin = { top: 10, right: 30, bottom: 30, left: 40 };
             const width = 6 * offset - margin.left - margin.right;
@@ -1209,16 +1213,44 @@ export function visualizePartialGraph(
 
             // Initialize the links
             const link = g1
-                .selectAll("line")
-                .data(data.links)
-                .join("line")
-                .style("stroke", "#aaa");
+            .selectAll("line")
+            .data(data.links)
+            .join("line")
+            .style("stroke", "#aaa")
+            .style("stroke-dasharray", (d: any) => {
+  
+     
+                let is_source = false;
+                let is_target = false;
+                  if (nodeMapping[hubNodeA] === d.source || nodeMapping[hubNodeA] == d.target) {
+      
+                    is_source = true
+       
+                  }
+                
+                  if (nodeMapping[hubNodeB] === d.target || nodeMapping[hubNodeB] == d.source) {
+                    is_target = true
+     
+                  }
+                
+  
+                if (is_source && is_target){ 
+                  return "5";
+                }
+  
+
+              return "none"
+            
+          })
+            
+
 
             // Initialize the nodes
             const node = g1
                 .selectAll("circle")
                 .data(data.nodes)
                 .join("circle")
+                .attr("id", (d: any) => `node-${d.id}-${hubNodeA}-${hubNodeB}`)
                 .attr("r", 17)
                 .style("fill", "white")
                 .style("stroke", "#69b3a2")
@@ -1230,7 +1262,7 @@ export function visualizePartialGraph(
                 .selectAll("text")
                 .data(data.nodes)
                 .join("text")
-                .text((d: any) => d.id)
+                .text((d: any) => d.original_id)
                 .attr("font-size", `12px`)
                 .attr("text-anchor", "middle")
                 .attr("dominant-baseline", "central");
@@ -1267,6 +1299,18 @@ export function visualizePartialGraph(
                 .on("end", function ended() {
                     let maxXDistance = 0;
             let maxYDistance = 0;
+            let initialCoordinates: { [id: string]: { x: number; y: number } } = {};
+
+            data.nodes.forEach((node: any) => {
+                initialCoordinates[node.id] = { x: node.x, y: node.y };
+            });
+
+            //Convert the dictionary to a JSON string
+        
+               
+               
+            console.log('Coordinates saved successfully to coordinates.json');
+
             data.nodes.forEach((node1: any) => {
                 data.nodes.forEach((node2: any) => {
                     if (node1 !== node2) {
@@ -1326,9 +1370,11 @@ export function visualizePartialGraph(
                 onComplete();
                 resolve();
         })
+
+
           
             
-    
+
         }
 
 
@@ -1338,7 +1384,15 @@ export function visualizePartialGraph(
                 if (processedData) {
                     const graphs = processedData[0][0]
 
-                    await init(graphs);
+          
+      
+                      let subgraph = processedData[1];
+                      let nodeMapping = processedData[2]
+                      await init(graphs, subgraph, nodeMapping);
+
+                    
+
+    
 
                 }
 
@@ -1348,6 +1402,7 @@ export function visualizePartialGraph(
         };
 
         visualizeG();
+        
     });
 }
 

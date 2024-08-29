@@ -186,10 +186,6 @@ export function linkPredFeatureVisualizer(
           .text(node.original_id)
           .attr("font-size", `10px`)
 
-
-
-          
-
         
 
         const featureGroup = g2.append("g")

@@ -17,6 +17,7 @@
     "colorsys": "1.0.22",
     "copy-webpack-plugin": "12.0.2",
     "d3": "7.9.0",
+    "express": "4.19.2",
     "fs": "0.0.1-security",
     "intro.js": "7.0.1",
     "intro.js-react": "1.0.0",
@@ -35,7 +36,8 @@
     "react-scrollbars-custom": "4.1.1",
     "react-tooltip": "5.27.0",
     "react-transition-group": "4.4.5",
-    "run": "1.5.0"
+    "run": "1.5.0",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@types/d3": "7.4.3",
@@ -49,6 +51,6 @@
     "jest": "27.0.0",
     "postcss": "8",
     "tailwindcss": "3.4.3",
-    "typescript": "5.4.5"
+    "typescript": "^5.4.5"
   }
 }
