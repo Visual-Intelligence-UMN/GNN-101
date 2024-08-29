@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="6.5mm"
-   height="6.5mm"
-   viewBox="0 0 6.5 6.5"
+   width="9.5mm"
+   height="9.5mm"
+   viewBox="0 0 9.5 9.5"
    version="1.1"
    id="svg1"
    inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
@@ -23,13 +23,13 @@
      inkscape:pagecheckerboard="1"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="15.664759"
-     inkscape:cx="2.5854213"
-     inkscape:cy="13.88467"
+     inkscape:zoom="11.076657"
+     inkscape:cx="14.173951"
+     inkscape:cy="16.11497"
      inkscape:window-width="1649"
      inkscape:window-height="1266"
-     inkscape:window-x="3598"
-     inkscape:window-y="605"
+     inkscape:window-x="708"
+     inkscape:window-y="52"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer1" />
   <defs
@@ -40,7 +40,7 @@
      id="layer1">
     <g
        id="layer2"
-       transform="translate(0.03237515,0.13032958)">
+       transform="matrix(1.4906802,0,0,1.539967,-4.7633793e-4,0.10461426)">
       <ellipse
          style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.107209;stroke-opacity:1"
          id="path1"
@@ -50,8 +50,8 @@
          ry="2.956984" />
     </g>
     <path
-       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25683;stroke-linejoin:round;stroke-dasharray:none"
-       d="M 2.0831254,1.5671635 2.0397123,4.7693879 4.8702478,3.2831234 Z"
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.389129;stroke-linejoin:round;stroke-dasharray:none"
+       d="M 3.0565365,2.3172911 2.9918215,7.2486109 7.2112448,4.9598126 Z"
        id="path2" />
   </g>
 </svg>

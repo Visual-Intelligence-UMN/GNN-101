@@ -683,6 +683,9 @@ export function featureVisClick(
             drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir)
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
+            d3.select(".switchBtn").style("pointer-events", "none");
+            d3.select(".switchBtn").style("opacity", 0.3);
+            console.log("switchbtn", d3.select("div.switchBtn"));
         }, 
             delay: initSec + aniSec,
         },
@@ -739,6 +742,8 @@ export function featureVisClick(
         {func: () => {
             d3.select(".ctrlBtn").style("pointer-events", "auto");
             d3.select(".mats").style("pointer-events", "auto");
+            d3.select(".switchBtn").style("pointer-events", "auto");
+            d3.select(".switchBtn").style("opacity", 1);
         },delay: 1,},
 
     ];
@@ -778,7 +783,9 @@ export function featureVisClick(
 
     btn.on("click", function (event: any, d: any) {
 
-        d3.selectAll(".interactRect").style("pointer-events", "none");
+        d3.selectAll(".interactRect .math-formula").style("pointer-events", "none");
+
+        d3.selectAll(".weight-matrix-frame").style("opacity", 0);
 
         allowExpl = false;
 
@@ -807,8 +814,9 @@ export function featureVisClick(
                 d3.select(".mats").selectAll(".removeRect").remove();
                 //   d3.select(".mats").selectAll(".pauseRemove").remove();
                 d3.selectAll("#tempath").remove();
+                d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                 d3.select(".wMatLink").style("opacity", 1);
-                d3.selectAll(".interactRect").style("pointer-events", "none");
+                d3.selectAll(".interactRect .math-formula").style("pointer-events", "none");
               //  d3.select(".mats").selectAll(".").remove();
               d3.selectAll(".matmul-displayer").remove();
                 currentStep = 0; // 重置步骤
@@ -850,12 +858,13 @@ export function featureVisClick(
 
                 if(featureChannels==4&&layerID==2&&currentStep >= 2){
                     d3.selectAll("#tempath").remove();
+                    d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                     d3.select(".wMatLink").style("opacity", 1);
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".columnGroup").style("opacity", 1);
 
                     d3.selectAll(".columnUnit").style("opacity", 0);
-                    d3.selectAll(".interactRect").style("pointer-events", "auto");
+                    d3.selectAll(".interactRect  .math-formula").style("pointer-events", "auto");
                     injectPlayButtonSVG(
                         btn,
                         btnX,
@@ -877,11 +886,12 @@ export function featureVisClick(
 
                 if (currentStep >= featureChannels || !lock) {
                     d3.selectAll("#tempath").remove();
+                    d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                     d3.select(".wMatLink").style("opacity", 1);
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".columnGroup").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
-                    d3.selectAll(".interactRect").style("pointer-events", "auto");
+                    d3.selectAll(".interactRect .math-formula").style("pointer-events", "auto");
                     injectPlayButtonSVG(
                         btn,
                         btnX,
@@ -899,7 +909,7 @@ export function featureVisClick(
             isPlaying = true;
         } else if (isPlaying) {
             //d3.selectAll("#tempath").remove();
-            d3.selectAll(".interactRect").style("pointer-events", "none");
+            d3.selectAll(".interactRect .math-formula").style("pointer-events", "none");
             btn.selectAll("*").remove();
             injectPlayButtonSVG(
                 btn,
@@ -1108,6 +1118,8 @@ export function outputVisClick(
             //drawHintLabel(g1, btnX, btnY-12, "Click for Animation", "procVis");
             const gLabel = d3.select(".mats").append("g");
             injectSVG(gLabel, btnX-120-64, btnY-120-64, "./assets/SVGs/interactionHint.svg", "procVis hintLabel");
+            d3.select(".switchBtn").style("pointer-events", "none");
+            d3.select(".switchBtn").style("opacity", 0.3);
         }, delay:aniSec+600},
         {func:()=>{
 
@@ -1156,6 +1168,8 @@ export function outputVisClick(
             d3.selectAll("path").lower();
             //d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
             d3.selectAll("path").lower();
+            d3.select(".switchBtn").style("pointer-events", "auto");
+            d3.select(".switchBtn").style("opacity", 1);
         }, delay:aniSec},
     ];
     AnimationController.runAnimations(0, animateSeqAfterPath);
@@ -1201,7 +1215,9 @@ export function outputVisClick(
     // play button interaction add-ons
     btn.on("click", function (event: any, d: any) {
 
-        d3.selectAll(".interactRect").style("pointer-events", "none");
+        d3.selectAll(".interactRect .math-formula").style("pointer-events", "none");
+
+        d3.selectAll(".weight-matrix-frame").style("opacity", 0);
 
         event.stopPropagation();
 
@@ -1217,8 +1233,9 @@ export function outputVisClick(
         //replay controls
         if (!isPlaying || currentStep >= 2 || currentStep == 0) {
             d3.selectAll("#tempath").remove();
+            d3.selectAll(".weight-matrix-frame").style("opacity", 1);
             d3.select(".wMatLink").style("opacity", 1);
-            d3.selectAll(".interactRect").style("pointer-events", "auto");
+            d3.selectAll(".interactRect .math-formula").style("pointer-events", "auto");
             d3.selectAll(".matmul-displayer").remove();
             injectPlayButtonSVG(
                 btn,
@@ -1228,8 +1245,9 @@ export function outputVisClick(
             );
             if (currentStep >= 2) {
                 d3.selectAll(".matmul-displayer").remove();
+                d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                 d3.select(".wMatLink").style("opacity", 1);
-                d3.selectAll(".interactRect").style("pointer-events", "auto");
+                d3.selectAll(".interactRect .math-formula").style("pointer-events", "auto");
                 d3.selectAll("#tempath").remove();
                 d3.select(".mats").selectAll(".removeRect").remove();
                 currentStep = 0; // 重置步骤
@@ -1583,7 +1601,7 @@ export function featureGATClick(
 
 
 
-    let weightMatrixPostions:any = computeMatrixLocations(btnX+15, btnY, curveDir, rectW, featureChannels, weights, layerID);
+    let weightMatrixPostions:any = computeMatrixLocations(btnX+15, btnY, curveDir, w, featureChannels, weights, layerID);
 
     d3.select(".mats").style("pointer-events", "none");
     const formula:any = d3.select(".mats").append("g").attr("class", "math-formula");
@@ -1596,6 +1614,8 @@ export function featureGATClick(
             )
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
+            d3.select(".switchBtn").style("pointer-events", "none");
+            d3.select(".switchBtn").style("opacity", 0.3);
         }, 
             delay: initSec + aniSec,
         },
@@ -1609,7 +1629,7 @@ export function featureGATClick(
             //drawHintLabel(g, btnX, btnY - 36, "Click for Animation", "procVis");
 
             drawPathBtwOuputResult([coordFeatureVis], coordFeatureVis3)
-            drawWeightMatrix(btnX, btnY, curveDir, rectW, rectH, featureChannels, weights, layerID, myColor, g, weightMatrixPostions);
+            drawWeightMatrix(btnX, btnY, curveDir, w, w, featureChannels, weights, layerID, myColor, g, weightMatrixPostions);
             drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor, weights[layerID], startCoordList, endCoordList, curveDir, weightMatrixPostions, featureChannels, X)
             drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2Copy, myColor, layerBias, layerID)
         }, delay:aniSec*2},
@@ -1647,6 +1667,8 @@ export function featureGATClick(
         {func: () => {
             d3.select(".ctrlBtn").style("pointer-events", "auto");
             d3.select(".mats").style("pointer-events", "auto");
+            d3.select(".switchBtn").style("pointer-events", "auto");
+            d3.select(".switchBtn").style("opacity", 1);
         },delay: 1,},
     ];
 
@@ -1684,7 +1706,8 @@ export function featureGATClick(
 
     btn.on("click", function (event: any, d: any) {
 
-        d3.selectAll(".interactRect").style("pointer-events", "none");
+        d3.selectAll(".interactRect .math-formula").style("pointer-events", "none");
+        d3.selectAll(".weight-matrix-frame").style("opacity", 0);
 
         allowExpl = false;
 
@@ -1713,8 +1736,9 @@ export function featureGATClick(
                 d3.select(".mats").selectAll(".removeRect").remove();
                 //   d3.select(".mats").selectAll(".pauseRemove").remove();
                 d3.selectAll("#tempath").remove();
+                d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                 d3.select(".wMatLink").style("opacity", 1);
-                d3.selectAll(".interactRect").style("pointer-events", "none");
+                d3.selectAll(".interactRect .math-formula").style("pointer-events", "none");
               //  d3.select(".mats").selectAll(".").remove();
               d3.selectAll(".matmul-displayer").remove();
                 currentStep = 0; // 重置步骤
@@ -1756,11 +1780,12 @@ export function featureGATClick(
 
                 if(featureChannels==4&&layerID==2&&currentStep >= 2){
                     d3.selectAll("#tempath").remove();
+                    d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                     d3.select(".wMatLink").style("opacity", 1);
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".columnGroup").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
-                    d3.selectAll(".interactRect").style("pointer-events", "auto");
+                    d3.selectAll(".interactRect .math-formula").style("pointer-events", "auto");
                     injectPlayButtonSVG(
                         btn,
                         btnX,
@@ -1782,11 +1807,12 @@ export function featureGATClick(
 
                 if (currentStep >= featureChannels || !lock) {
                     d3.selectAll("#tempath").remove();
+                    d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                     d3.select(".wMatLink").style("opacity", 1);
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".columnGroup").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
-                    d3.selectAll(".interactRect").style("pointer-events", "auto");
+                    d3.selectAll(".interactRect .math-formula").style("pointer-events", "auto");
                     injectPlayButtonSVG(
                         btn,
                         btnX,
@@ -1804,7 +1830,7 @@ export function featureGATClick(
             isPlaying = true;
         } else if (isPlaying) {
             //d3.selectAll("#tempath").remove();
-            d3.selectAll(".interactRect").style("pointer-events", "none");
+            d3.selectAll(".interactRect .math-formula").style("pointer-events", "none");
             btn.selectAll("*").remove();
             injectPlayButtonSVG(
                 btn,
@@ -2135,7 +2161,7 @@ export function featureSAGEClick(
     const formula:any = d3.select(".mats").append("g").attr("class", "math-formula");
 
 
-    let weightMatrixPostions:any = computeMatrixLocations(btnX+15, btnY, curveDir, rectW, featureChannels, weights, layerID);
+    let weightMatrixPostions:any = computeMatrixLocations(btnX+15, btnY, curveDir, w, featureChannels, weights, layerID);
 
     d3.select(".mats").style("pointer-events", "none");
 
@@ -2147,6 +2173,8 @@ export function featureSAGEClick(
             )
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
+            d3.select(".switchBtn").style("pointer-events", "none");
+            d3.select(".switchBtn").style("opacity", 0.3);
         }, 
             delay: initSec + aniSec,
         },
@@ -2163,7 +2191,7 @@ export function featureSAGEClick(
             injectSVG(gLabel, btnX-120-64, btnY-30-120-64, "./assets/SVGs/interactionHint.svg", "procVis");
 
             drawPathBtwOuputResult([coordFeatureVis], coordFeatureVis3)
-            drawWeightMatrix(btnX, btnY, curveDir, rectW, rectH, featureChannels, weights, layerID, myColor, g, weightMatrixPostions);
+            drawWeightMatrix(btnX, btnY, curveDir, w, w, featureChannels, weights, layerID, myColor, g, weightMatrixPostions);
             drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor, weights[layerID], startCoordList, endCoordList, curveDir, weightMatrixPostions, featureChannels, X)
             drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2Copy, myColor, layerBias, layerID)
         }, delay:aniSec*2},
@@ -2201,6 +2229,8 @@ export function featureSAGEClick(
         {func: () => {
             d3.select(".ctrlBtn").style("pointer-events", "auto");
             d3.select(".mats").style("pointer-events", "auto");
+            d3.select(".switchBtn").style("pointer-events", "auto");
+            d3.select(".switchBtn").style("opacity", 1);
         },delay: 1,},
     ];
 
@@ -2238,7 +2268,8 @@ export function featureSAGEClick(
 
     btn.on("click", function (event: any, d: any) {
 
-        d3.selectAll(".interactRect").style("pointer-events", "none");
+        d3.selectAll(".interactRect .math-formula").style("pointer-events", "none");
+        d3.selectAll(".weight-matrix-frame").style("opacity", 0);
 
         allowExpl = false;
 
@@ -2267,8 +2298,9 @@ export function featureSAGEClick(
                 d3.select(".mats").selectAll(".removeRect").remove();
                 //   d3.select(".mats").selectAll(".pauseRemove").remove();
                 d3.selectAll("#tempath").remove();
+                d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                 d3.select(".wMatLink").style("opacity", 1);
-                d3.selectAll(".interactRect").style("pointer-events", "none");
+                d3.selectAll(".interactRect .math-formula").style("pointer-events", "none");
               //  d3.select(".mats").selectAll(".").remove();
               d3.selectAll(".matmul-displayer").remove();
                 currentStep = 0; // 重置步骤
@@ -2310,11 +2342,12 @@ export function featureSAGEClick(
 
                 if(featureChannels==4&&layerID==2&&currentStep >= 2){
                     d3.selectAll("#tempath").remove();
+                    d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                     d3.select(".wMatLink").style("opacity", 1);
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".columnGroup").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
-                    d3.selectAll(".interactRect").style("pointer-events", "auto");
+                    d3.selectAll(".interactRect .math-formula").style("pointer-events", "auto");
                     injectPlayButtonSVG(
                         btn,
                         btnX,
@@ -2336,11 +2369,12 @@ export function featureSAGEClick(
 
                 if (currentStep >= featureChannels || !lock) {
                     d3.selectAll("#tempath").remove();
+                    d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                     d3.select(".wMatLink").style("opacity", 1);
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".columnGroup").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
-                    d3.selectAll(".interactRect").style("pointer-events", "auto");
+                    d3.selectAll(".interactRect .math-formula").style("pointer-events", "auto");
                     injectPlayButtonSVG(
                         btn,
                         btnX,
@@ -2358,7 +2392,7 @@ export function featureSAGEClick(
             isPlaying = true;
         } else if (isPlaying) {
             //d3.selectAll("#tempath").remove();
-            d3.selectAll(".interactRect").style("pointer-events", "none");
+            d3.selectAll(".interactRect .math-formula").style("pointer-events", "none");
             btn.selectAll("*").remove();
             injectPlayButtonSVG(
                 btn,
