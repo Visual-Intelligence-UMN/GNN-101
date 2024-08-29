@@ -192,7 +192,7 @@ export default function Home() {
                                 </h1>
                                 <div className="flex flex-col space-y-4">
                                     <div className="flex flex-row">
-                                        <h2 className="text-xl m-auto">
+                                        <h2 className="text-xl">
                                             Model - Task
                                         </h2>
                                         <Selector
