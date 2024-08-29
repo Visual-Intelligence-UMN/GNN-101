@@ -1301,18 +1301,11 @@ export function visualizePartialGraph(
                 initialCoordinates[node.id] = { x: node.x, y: node.y };
             });
 
-            // Convert the dictionary to a JSON string
-            // const jsonString = JSON.stringify(initialCoordinates, null, 2); // formatted with indentation
-
-            // // Use Node.js fs module to save the JSON string to a file
-            // const fs = require('fs');
-            // fs.writeFileSync('../../json_data/coordinates.json', jsonString, 'utf8', (err: any) => {
-            //     if (err) {
-            //         console.error('Error saving coordinates:', err);
-            //         return;
-            //     }
-            //     console.log('Coordinates saved successfully to coordinates.json');
-            // });
+            //Convert the dictionary to a JSON string
+        
+               
+               
+            console.log('Coordinates saved successfully to coordinates.json');
 
             data.nodes.forEach((node1: any) => {
                 data.nodes.forEach((node2: any) => {
