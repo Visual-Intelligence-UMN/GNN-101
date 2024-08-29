@@ -783,7 +783,7 @@ export function featureVisClick(
 
     btn.on("click", function (event: any, d: any) {
 
-        d3.selectAll(".interactRect").style("pointer-events", "none");
+        d3.selectAll(".interactRect .math-formula").style("pointer-events", "none");
 
         d3.selectAll(".weight-matrix-frame").style("opacity", 0);
 
@@ -816,7 +816,7 @@ export function featureVisClick(
                 d3.selectAll("#tempath").remove();
                 d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                 d3.select(".wMatLink").style("opacity", 1);
-                d3.selectAll(".interactRect").style("pointer-events", "none");
+                d3.selectAll(".interactRect .math-formula").style("pointer-events", "none");
               //  d3.select(".mats").selectAll(".").remove();
               d3.selectAll(".matmul-displayer").remove();
                 currentStep = 0; // 重置步骤
@@ -864,7 +864,7 @@ export function featureVisClick(
                     d3.selectAll(".columnGroup").style("opacity", 1);
 
                     d3.selectAll(".columnUnit").style("opacity", 0);
-                    d3.selectAll(".interactRect").style("pointer-events", "auto");
+                    d3.selectAll(".interactRect  .math-formula").style("pointer-events", "auto");
                     injectPlayButtonSVG(
                         btn,
                         btnX,
@@ -891,7 +891,7 @@ export function featureVisClick(
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".columnGroup").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
-                    d3.selectAll(".interactRect").style("pointer-events", "auto");
+                    d3.selectAll(".interactRect .math-formula").style("pointer-events", "auto");
                     injectPlayButtonSVG(
                         btn,
                         btnX,
@@ -909,7 +909,7 @@ export function featureVisClick(
             isPlaying = true;
         } else if (isPlaying) {
             //d3.selectAll("#tempath").remove();
-            d3.selectAll(".interactRect").style("pointer-events", "none");
+            d3.selectAll(".interactRect .math-formula").style("pointer-events", "none");
             btn.selectAll("*").remove();
             injectPlayButtonSVG(
                 btn,
@@ -1215,7 +1215,7 @@ export function outputVisClick(
     // play button interaction add-ons
     btn.on("click", function (event: any, d: any) {
 
-        d3.selectAll(".interactRect").style("pointer-events", "none");
+        d3.selectAll(".interactRect .math-formula").style("pointer-events", "none");
 
         d3.selectAll(".weight-matrix-frame").style("opacity", 0);
 
@@ -1235,7 +1235,7 @@ export function outputVisClick(
             d3.selectAll("#tempath").remove();
             d3.selectAll(".weight-matrix-frame").style("opacity", 1);
             d3.select(".wMatLink").style("opacity", 1);
-            d3.selectAll(".interactRect").style("pointer-events", "auto");
+            d3.selectAll(".interactRect .math-formula").style("pointer-events", "auto");
             d3.selectAll(".matmul-displayer").remove();
             injectPlayButtonSVG(
                 btn,
@@ -1247,7 +1247,7 @@ export function outputVisClick(
                 d3.selectAll(".matmul-displayer").remove();
                 d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                 d3.select(".wMatLink").style("opacity", 1);
-                d3.selectAll(".interactRect").style("pointer-events", "auto");
+                d3.selectAll(".interactRect .math-formula").style("pointer-events", "auto");
                 d3.selectAll("#tempath").remove();
                 d3.select(".mats").selectAll(".removeRect").remove();
                 currentStep = 0; // 重置步骤
@@ -1706,7 +1706,7 @@ export function featureGATClick(
 
     btn.on("click", function (event: any, d: any) {
 
-        d3.selectAll(".interactRect").style("pointer-events", "none");
+        d3.selectAll(".interactRect .math-formula").style("pointer-events", "none");
         d3.selectAll(".weight-matrix-frame").style("opacity", 0);
 
         allowExpl = false;
@@ -1738,7 +1738,7 @@ export function featureGATClick(
                 d3.selectAll("#tempath").remove();
                 d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                 d3.select(".wMatLink").style("opacity", 1);
-                d3.selectAll(".interactRect").style("pointer-events", "none");
+                d3.selectAll(".interactRect .math-formula").style("pointer-events", "none");
               //  d3.select(".mats").selectAll(".").remove();
               d3.selectAll(".matmul-displayer").remove();
                 currentStep = 0; // 重置步骤
@@ -1785,7 +1785,7 @@ export function featureGATClick(
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".columnGroup").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
-                    d3.selectAll(".interactRect").style("pointer-events", "auto");
+                    d3.selectAll(".interactRect .math-formula").style("pointer-events", "auto");
                     injectPlayButtonSVG(
                         btn,
                         btnX,
@@ -1812,7 +1812,7 @@ export function featureGATClick(
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".columnGroup").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
-                    d3.selectAll(".interactRect").style("pointer-events", "auto");
+                    d3.selectAll(".interactRect .math-formula").style("pointer-events", "auto");
                     injectPlayButtonSVG(
                         btn,
                         btnX,
@@ -1830,7 +1830,7 @@ export function featureGATClick(
             isPlaying = true;
         } else if (isPlaying) {
             //d3.selectAll("#tempath").remove();
-            d3.selectAll(".interactRect").style("pointer-events", "none");
+            d3.selectAll(".interactRect .math-formula").style("pointer-events", "none");
             btn.selectAll("*").remove();
             injectPlayButtonSVG(
                 btn,
@@ -2268,7 +2268,7 @@ export function featureSAGEClick(
 
     btn.on("click", function (event: any, d: any) {
 
-        d3.selectAll(".interactRect").style("pointer-events", "none");
+        d3.selectAll(".interactRect .math-formula").style("pointer-events", "none");
         d3.selectAll(".weight-matrix-frame").style("opacity", 0);
 
         allowExpl = false;
@@ -2300,7 +2300,7 @@ export function featureSAGEClick(
                 d3.selectAll("#tempath").remove();
                 d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                 d3.select(".wMatLink").style("opacity", 1);
-                d3.selectAll(".interactRect").style("pointer-events", "none");
+                d3.selectAll(".interactRect .math-formula").style("pointer-events", "none");
               //  d3.select(".mats").selectAll(".").remove();
               d3.selectAll(".matmul-displayer").remove();
                 currentStep = 0; // 重置步骤
@@ -2347,7 +2347,7 @@ export function featureSAGEClick(
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".columnGroup").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
-                    d3.selectAll(".interactRect").style("pointer-events", "auto");
+                    d3.selectAll(".interactRect .math-formula").style("pointer-events", "auto");
                     injectPlayButtonSVG(
                         btn,
                         btnX,
@@ -2374,7 +2374,7 @@ export function featureSAGEClick(
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".columnGroup").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
-                    d3.selectAll(".interactRect").style("pointer-events", "auto");
+                    d3.selectAll(".interactRect .math-formula").style("pointer-events", "auto");
                     injectPlayButtonSVG(
                         btn,
                         btnX,
@@ -2392,7 +2392,7 @@ export function featureSAGEClick(
             isPlaying = true;
         } else if (isPlaying) {
             //d3.selectAll("#tempath").remove();
-            d3.selectAll(".interactRect").style("pointer-events", "none");
+            d3.selectAll(".interactRect .math-formula").style("pointer-events", "none");
             btn.selectAll("*").remove();
             injectPlayButtonSVG(
                 btn,
