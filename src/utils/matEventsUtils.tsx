@@ -785,6 +785,8 @@ export function featureVisClick(
 
         d3.selectAll(".interactRect").style("pointer-events", "none");
 
+        d3.selectAll(".weight-matrix-frame").style("opacity", 0);
+
         allowExpl = false;
 
 
@@ -812,6 +814,7 @@ export function featureVisClick(
                 d3.select(".mats").selectAll(".removeRect").remove();
                 //   d3.select(".mats").selectAll(".pauseRemove").remove();
                 d3.selectAll("#tempath").remove();
+                d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                 d3.select(".wMatLink").style("opacity", 1);
                 d3.selectAll(".interactRect").style("pointer-events", "none");
               //  d3.select(".mats").selectAll(".").remove();
@@ -855,6 +858,7 @@ export function featureVisClick(
 
                 if(featureChannels==4&&layerID==2&&currentStep >= 2){
                     d3.selectAll("#tempath").remove();
+                    d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                     d3.select(".wMatLink").style("opacity", 1);
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".columnGroup").style("opacity", 1);
@@ -882,6 +886,7 @@ export function featureVisClick(
 
                 if (currentStep >= featureChannels || !lock) {
                     d3.selectAll("#tempath").remove();
+                    d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                     d3.select(".wMatLink").style("opacity", 1);
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".columnGroup").style("opacity", 1);
@@ -1212,6 +1217,8 @@ export function outputVisClick(
 
         d3.selectAll(".interactRect").style("pointer-events", "none");
 
+        d3.selectAll(".weight-matrix-frame").style("opacity", 0);
+
         event.stopPropagation();
 
         allowExpl = false;
@@ -1226,6 +1233,7 @@ export function outputVisClick(
         //replay controls
         if (!isPlaying || currentStep >= 2 || currentStep == 0) {
             d3.selectAll("#tempath").remove();
+            d3.selectAll(".weight-matrix-frame").style("opacity", 1);
             d3.select(".wMatLink").style("opacity", 1);
             d3.selectAll(".interactRect").style("pointer-events", "auto");
             d3.selectAll(".matmul-displayer").remove();
@@ -1237,6 +1245,7 @@ export function outputVisClick(
             );
             if (currentStep >= 2) {
                 d3.selectAll(".matmul-displayer").remove();
+                d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                 d3.select(".wMatLink").style("opacity", 1);
                 d3.selectAll(".interactRect").style("pointer-events", "auto");
                 d3.selectAll("#tempath").remove();
@@ -1698,6 +1707,7 @@ export function featureGATClick(
     btn.on("click", function (event: any, d: any) {
 
         d3.selectAll(".interactRect").style("pointer-events", "none");
+        d3.selectAll(".weight-matrix-frame").style("opacity", 0);
 
         allowExpl = false;
 
@@ -1726,6 +1736,7 @@ export function featureGATClick(
                 d3.select(".mats").selectAll(".removeRect").remove();
                 //   d3.select(".mats").selectAll(".pauseRemove").remove();
                 d3.selectAll("#tempath").remove();
+                d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                 d3.select(".wMatLink").style("opacity", 1);
                 d3.selectAll(".interactRect").style("pointer-events", "none");
               //  d3.select(".mats").selectAll(".").remove();
@@ -1769,6 +1780,7 @@ export function featureGATClick(
 
                 if(featureChannels==4&&layerID==2&&currentStep >= 2){
                     d3.selectAll("#tempath").remove();
+                    d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                     d3.select(".wMatLink").style("opacity", 1);
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".columnGroup").style("opacity", 1);
@@ -1795,6 +1807,7 @@ export function featureGATClick(
 
                 if (currentStep >= featureChannels || !lock) {
                     d3.selectAll("#tempath").remove();
+                    d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                     d3.select(".wMatLink").style("opacity", 1);
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".columnGroup").style("opacity", 1);
@@ -2256,6 +2269,7 @@ export function featureSAGEClick(
     btn.on("click", function (event: any, d: any) {
 
         d3.selectAll(".interactRect").style("pointer-events", "none");
+        d3.selectAll(".weight-matrix-frame").style("opacity", 0);
 
         allowExpl = false;
 
@@ -2284,6 +2298,7 @@ export function featureSAGEClick(
                 d3.select(".mats").selectAll(".removeRect").remove();
                 //   d3.select(".mats").selectAll(".pauseRemove").remove();
                 d3.selectAll("#tempath").remove();
+                d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                 d3.select(".wMatLink").style("opacity", 1);
                 d3.selectAll(".interactRect").style("pointer-events", "none");
               //  d3.select(".mats").selectAll(".").remove();
@@ -2327,6 +2342,7 @@ export function featureSAGEClick(
 
                 if(featureChannels==4&&layerID==2&&currentStep >= 2){
                     d3.selectAll("#tempath").remove();
+                    d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                     d3.select(".wMatLink").style("opacity", 1);
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".columnGroup").style("opacity", 1);
@@ -2353,6 +2369,7 @@ export function featureSAGEClick(
 
                 if (currentStep >= featureChannels || !lock) {
                     d3.selectAll("#tempath").remove();
+                    d3.selectAll(".weight-matrix-frame").style("opacity", 1);
                     d3.select(".wMatLink").style("opacity", 1);
                     d3.selectAll(".matmul-displayer").remove();
                     d3.selectAll(".columnGroup").style("opacity", 1);
