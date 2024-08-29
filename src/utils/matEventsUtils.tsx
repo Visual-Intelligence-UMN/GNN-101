@@ -522,6 +522,7 @@ export function featureVisClick(
         let matA = math.matrix(prepMat);
         X = math.add(math.multiply(prepMat, mulV), X);
     }
+    console.log("issue here", X, weights[layerID])
     const dummy: number[] = math.multiply(math.transpose(weights[layerID]), X);
     const Xt = math.transpose(weights[layerID]);
 
