@@ -1120,12 +1120,6 @@ export function visualizeLinkClassifierFeatures(
     //load weights and bias
     let dataPackage = loadLinkWeights();
 
-    //conditional loading
-    if(innerComputationMode == "GCN"){
-        dataPackage = loadLinkGATWeights();
-    }
-
-
     const weights = dataPackage["weights"];
     const bias = dataPackage["bias"];
 
