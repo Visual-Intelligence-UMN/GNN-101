@@ -683,6 +683,9 @@ export function featureVisClick(
             drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir)
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
+            d3.select(".switchBtn").style("pointer-events", "none");
+            d3.select(".switchBtn").style("opacity", 0);
+            console.log("switchbtn", d3.select("div.switchBtn"));
         }, 
             delay: initSec + aniSec,
         },
@@ -739,6 +742,8 @@ export function featureVisClick(
         {func: () => {
             d3.select(".ctrlBtn").style("pointer-events", "auto");
             d3.select(".mats").style("pointer-events", "auto");
+            d3.select(".switchBtn").style("pointer-events", "auto");
+            d3.select(".switchBtn").style("opacity", 1);
         },delay: 1,},
 
     ];
@@ -1583,7 +1588,7 @@ export function featureGATClick(
 
 
 
-    let weightMatrixPostions:any = computeMatrixLocations(btnX+15, btnY, curveDir, rectW, featureChannels, weights, layerID);
+    let weightMatrixPostions:any = computeMatrixLocations(btnX+15, btnY, curveDir, w, featureChannels, weights, layerID);
 
     d3.select(".mats").style("pointer-events", "none");
     const formula:any = d3.select(".mats").append("g").attr("class", "math-formula");
@@ -1609,7 +1614,7 @@ export function featureGATClick(
             //drawHintLabel(g, btnX, btnY - 36, "Click for Animation", "procVis");
 
             drawPathBtwOuputResult([coordFeatureVis], coordFeatureVis3)
-            drawWeightMatrix(btnX, btnY, curveDir, rectW, rectH, featureChannels, weights, layerID, myColor, g, weightMatrixPostions);
+            drawWeightMatrix(btnX, btnY, curveDir, w, w, featureChannels, weights, layerID, myColor, g, weightMatrixPostions);
             drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor, weights[layerID], startCoordList, endCoordList, curveDir, weightMatrixPostions, featureChannels, X)
             drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2Copy, myColor, layerBias, layerID)
         }, delay:aniSec*2},
@@ -2135,7 +2140,7 @@ export function featureSAGEClick(
     const formula:any = d3.select(".mats").append("g").attr("class", "math-formula");
 
 
-    let weightMatrixPostions:any = computeMatrixLocations(btnX+15, btnY, curveDir, rectW, featureChannels, weights, layerID);
+    let weightMatrixPostions:any = computeMatrixLocations(btnX+15, btnY, curveDir, w, featureChannels, weights, layerID);
 
     d3.select(".mats").style("pointer-events", "none");
 
@@ -2163,7 +2168,7 @@ export function featureSAGEClick(
             injectSVG(gLabel, btnX-120-64, btnY-30-120-64, "./assets/SVGs/interactionHint.svg", "procVis");
 
             drawPathBtwOuputResult([coordFeatureVis], coordFeatureVis3)
-            drawWeightMatrix(btnX, btnY, curveDir, rectW, rectH, featureChannels, weights, layerID, myColor, g, weightMatrixPostions);
+            drawWeightMatrix(btnX, btnY, curveDir, w, w, featureChannels, weights, layerID, myColor, g, weightMatrixPostions);
             drawWeightsVector(g, dummy, coordFeatureVis3, rectH, rectW, myColor, weights[layerID], startCoordList, endCoordList, curveDir, weightMatrixPostions, featureChannels, X)
             drawBiasVector(g, featureChannels, rectH, rectW, coordFeatureVis2Copy, myColor, layerBias, layerID)
         }, delay:aniSec*2},
