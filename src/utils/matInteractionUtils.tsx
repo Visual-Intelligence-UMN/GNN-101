@@ -345,14 +345,14 @@ export function drawEScoreEquation(
         imageMat = "./assets/PNGs/GATConvMat2.png";
         imgW = 25;
         imgH = 25;
-        offset = 10;
+        offset = 12.5;
     }
 
     eDisplayer
         .append("image")
         .attr("xlink:href", imageMat).attr("id", "w1png")
         .attr("x", dX + 75 + 75 - 10 + offset + 100 + 65)
-        .attr("y", dY + 75 + 25 + offset)
+        .attr("y", dY + 75 + 25)
         .attr("width", imgW)
         .attr("height", imgH).attr("opacity", 0);
 
@@ -363,7 +363,7 @@ export function drawEScoreEquation(
         .attr("xlink:href", imageMat)
         .attr("id", "w2png")
         .attr("x", dX + 75 + 75 + 60 + offset)
-        .attr("y", dY + 75 + 25 + offset)
+        .attr("y", dY + 75 + 25)
         .attr("width", imgW)
         .attr("height", imgH).attr("opacity", 1);
 
