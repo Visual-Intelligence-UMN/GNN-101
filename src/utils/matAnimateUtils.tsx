@@ -434,7 +434,7 @@ export function drawAttentions(
 
 
     
-    const g = g1.append("g").attr("class", "aggregate");
+    const g = g1.append("g").attr("class", "procVis aggregate");
     for (let m = 0; m < X.length; m++) {
         g.append("rect")
             .attr("x", coordFeatureVis[0] + w * m)
@@ -460,14 +460,12 @@ export function drawAttentions(
         .attr("stroke-width", 1)
         .attr("class", "procVis summation");
 
-    const dim = X.length;
-
     //draw label
     drawHintLabel(
         g1,
         coordFeatureVis[0],
         coordFeatureVis[1] + rectH * curveDir * 1.1,
-        `Vector Summation^T: 1 x ${dim}`,
+        "Vector Summation",
         "procVis"
     );
 
@@ -625,6 +623,7 @@ export function drawAttentions(
         //.attr("font-size", 15);
     });
 }
+
 
 export function drawSamplingAggregation(
     g1: any,
