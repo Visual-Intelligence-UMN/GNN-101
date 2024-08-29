@@ -684,7 +684,7 @@ export function featureVisClick(
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
             d3.select(".switchBtn").style("pointer-events", "none");
-            d3.select(".switchBtn").style("opacity", 0);
+            d3.select(".switchBtn").style("opacity", 0.3);
             console.log("switchbtn", d3.select("div.switchBtn"));
         }, 
             delay: initSec + aniSec,
@@ -1113,6 +1113,8 @@ export function outputVisClick(
             //drawHintLabel(g1, btnX, btnY-12, "Click for Animation", "procVis");
             const gLabel = d3.select(".mats").append("g");
             injectSVG(gLabel, btnX-120-64, btnY-120-64, "./assets/SVGs/interactionHint.svg", "procVis hintLabel");
+            d3.select(".switchBtn").style("pointer-events", "none");
+            d3.select(".switchBtn").style("opacity", 0.3);
         }, delay:aniSec+600},
         {func:()=>{
 
@@ -1161,6 +1163,8 @@ export function outputVisClick(
             d3.selectAll("path").lower();
             //d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
             d3.selectAll("path").lower();
+            d3.select(".switchBtn").style("pointer-events", "auto");
+            d3.select(".switchBtn").style("opacity", 1);
         }, delay:aniSec},
     ];
     AnimationController.runAnimations(0, animateSeqAfterPath);
@@ -1601,6 +1605,8 @@ export function featureGATClick(
             )
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
+            d3.select(".switchBtn").style("pointer-events", "none");
+            d3.select(".switchBtn").style("opacity", 0.3);
         }, 
             delay: initSec + aniSec,
         },
@@ -1652,6 +1658,8 @@ export function featureGATClick(
         {func: () => {
             d3.select(".ctrlBtn").style("pointer-events", "auto");
             d3.select(".mats").style("pointer-events", "auto");
+            d3.select(".switchBtn").style("pointer-events", "auto");
+            d3.select(".switchBtn").style("opacity", 1);
         },delay: 1,},
     ];
 
@@ -2152,6 +2160,8 @@ export function featureSAGEClick(
             )
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
+            d3.select(".switchBtn").style("pointer-events", "none");
+            d3.select(".switchBtn").style("opacity", 0.3);
         }, 
             delay: initSec + aniSec,
         },
@@ -2206,6 +2216,8 @@ export function featureSAGEClick(
         {func: () => {
             d3.select(".ctrlBtn").style("pointer-events", "auto");
             d3.select(".mats").style("pointer-events", "auto");
+            d3.select(".switchBtn").style("pointer-events", "auto");
+            d3.select(".switchBtn").style("opacity", 1);
         },delay: 1,},
     ];
 
