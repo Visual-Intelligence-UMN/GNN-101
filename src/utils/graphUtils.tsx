@@ -902,12 +902,12 @@ export function calculationVisualizer(
         text = "Mean aggregator"
     }
 
-    if (node.graphIndex === 1) {
+    if ((node.graphIndex === 1 && mode === 0) || mode === 1 && node.graphIndex != 1) {
         const lines = text.split('\n');
 
         const aggText = aggregatedFeatureGroup.append("text")
-        .attr("x", -45)
-        .attr("y", 25)
+        .attr("x", -50)
+        .attr("y", 25 )
         .style("fill", "gray")
         .style("font-size", "17px")
         .attr("class", "aggregatedFeatureGroup to-be-removed aggText procVis")
@@ -920,16 +920,18 @@ export function calculationVisualizer(
         })
 
     } else {
+        let textOffset = 0;
+        if (mode === 1) {textOffset = 30} 
 
     aggregatedFeatureGroup.append("text")
-        .attr("x", -25)
+        .attr("x", -30 + textOffset)
         .attr("y", -5)
         .text(text)
         .style("fill", "gray")
         .style("font-size", "17px")
         .attr("class", "aggregatedFeatureGroup to-be-removed aggText procVis")
         .style("opacity", 0);
-    }
+    } 
     
 
 
@@ -997,6 +999,29 @@ export function calculationVisualizer(
         .style("opacity", 0);
 
     //draw label
+
+
+    text = `Matmul \nResult:\n1x${calculatedData.length}T`
+    if (mode === 1) {
+        const lines = text.split('\n');
+
+        const calText = calculatedFeatureGroup.append("text")
+        .attr("x", 0)
+        .attr("y", 20)
+        .style("fill", "gray")
+
+        .style("font-size", "17px")
+        .attr("class", "bias to-be-removed")
+
+        .style("opacity", 0);
+        lines.forEach((line, index) => {
+            calText.append("tspan")
+                .attr("x", 0) 
+                .attr("dy", index === 25 ? 25 : "1.2em") 
+                .text(line);
+        })
+
+    } else {
     calculatedFeatureGroup.append("text")
         .attr("x", 0)
         .attr("y", -5)
@@ -1005,6 +1030,7 @@ export function calculationVisualizer(
         .style("font-size", "17px")
         .attr("class", "calFrame to-be-removed procVis")
         .style("opacity", 0);
+    }
 
 
 
@@ -1035,7 +1061,7 @@ export function calculationVisualizer(
     if (mode === 1 && node.graphIndex === 1) {
         matrixRectSize /= 2
     }
-    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1], -1, matrixRectSize, node.features.length, weights, node.graphIndex - 1);
+    let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1] + 50, -1, matrixRectSize, node.features.length, weights, node.graphIndex - 1);
 
 
 
@@ -1055,7 +1081,7 @@ export function calculationVisualizer(
         if (!state.isClicked) {
             return;
         }
-        drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] - 30, -1, matrixRectSize, matrixRectSize, node.features.length, weights, node.graphIndex - 1, myColor, svg, weightsLocation)
+        drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] + 20, -1, matrixRectSize, matrixRectSize, node.features.length, weights, node.graphIndex - 1, myColor, svg, weightsLocation)
         if (innerComputationMode === "GCN") {
         drawMathFormula(formula, endCoordList[0][0] - 300, endCoordList[0][1] - 400 + 100, "./assets/SVGs/GCNFormula.svg");
         } else if (innerComputationMode === "GAT") {
@@ -1387,7 +1413,6 @@ export function calculationVisualizer(
                                         d3.selectAll(".to-be-removed").remove();
                                         d3.selectAll(".intermediate-path").remove();
                                         handleClickEvent(svg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
-                                
                                     }) 
                             });
                         })
@@ -1627,6 +1652,27 @@ export function calculationVisualizer(
         .style("opacity", 0).raise();
 
     //draw label
+    text = `Final Output\nVector:\n1x${node.features.length}T`
+    if (mode === 1) {
+        const lines = text.split('\n');
+
+        const calText = outputGroupCopy.append("text")
+        .attr("x", 0)
+        .attr("y", 28)
+        .style("fill", "gray")
+
+        .style("font-size", "17px")
+        .attr("class", "bias to-be-removed")
+
+        .style("opacity", 0);
+        lines.forEach((line, index) => {
+            calText.append("tspan")
+                .attr("x", 0) 
+                .attr("dy", index === 25 ? 25 : "1.2em") 
+                .text(line);
+        })
+
+    } else {
     outputGroupCopy.append("text")
         .attr("x", 0)
         .attr("y", 28)
@@ -1635,6 +1681,7 @@ export function calculationVisualizer(
 
         .style("font-size", "17px")
         .attr("class", "procVis relu outputText to-be-removed").style("opacity", 0);
+    }
 
 
         const outputGroup = g3
@@ -1844,7 +1891,7 @@ function weightAnimation(
     .attr("font-size", "10px")
     .text("Matrix Multiplication")
     .attr("fill", "grey")
-    .attr("class", "to-be-removed weight-matrix-text")
+    .attr("class", "to-be-removed procVis weight-matrix-text")
 
     btn.on("mouseover", function() {
         if (!state.isAnimating) {
@@ -1901,6 +1948,7 @@ function weightAnimation(
         if (!state.isClicked || !state.isPlaying) {
             return;
         }
+        d3.selectAll(".bbox").style("pointer-events", "none");
 
         d3.selectAll(".columnGroup").style("opacity", 0.3).lower();
         d3.select(".weight-matrix-frame").style("opacity", 0)
@@ -1965,21 +2013,28 @@ function weightAnimation(
 
     
                     clearInterval(intervalID);
+  
                     state.isPlaying = false;
                     state.isAnimating = false;
                     d3.selectAll(".math-displayer").remove();
                     d3.selectAll(".graph-displayer").attr("opacity", 0);
-
 
                     injectPlayButtonSVGForGraphView(btn, endCoordList[0][0] - 80, endCoordList[0][1] - 22.5, "./assets/SVGs/playBtn_play.svg")
                     d3.selectAll(".aniRect").style("opacity", 1);
                     d3.selectAll(".columnGroup").style("opacity", 1);
                     d3.selectAll(".columnUnit").style("opacity", 0);
                     d3.selectAll(`#tempath${i - 1}`).style("opacity", 0);
-                    d3.select(".weight-matrix-frame").style("opacity", 1)
+                    d3.select(".weight-matrix-frame").style("opacity", 1);
+                
+
+                    
+                    
+        
+          
                   
        
                     setTimeout(() => {
+              
    
             
 
@@ -1998,9 +2053,19 @@ function weightAnimation(
                                 }) rotate(90)`
                             );
                     }, 500);
+                    setTimeout(() => {
+                        if (state.isAnimating) {
+                            d3.selectAll(".bbox").style("pointer-events", "none");
+                        } else {
+                        
+                        d3.selectAll(".bbox").style("pointer-events", "all");
+                        }
+
+                    }, 3000)
+                    
                 }
             }
-        }, 250);
+        }, 100);
     }
 
     setTimeout(() => {
@@ -2624,7 +2689,6 @@ export function nodeOutputVisualizer(
         .style("stroke", "grey")
      
         .style("opacity", 0);
-
     calculatedFeatureGroup.append("text")
         .attr("x", 5)
         .attr("y", -43)

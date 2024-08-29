@@ -23,6 +23,8 @@ g.layerVis {
   transition-duration: 2s;
 }
 
+
+
 path,
 text,
 svgElement,
@@ -35,6 +37,9 @@ rect {
 .frame {
   transition: all;
   transition-duration: 1.5s;
+}
+.parent .bbox {
+  pointer-events: none;
 }
 
 .introjs-tooltiptext {

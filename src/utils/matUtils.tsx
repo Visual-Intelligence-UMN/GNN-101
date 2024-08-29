@@ -894,6 +894,8 @@ export function visualizeNodeClassifierFeatures(
                             myColor, wMat, startPathCoords, endPathCoords, curveDir,
                             weightMatrixPostions, featureChannels, prevCon3Val)
                         drawPathBtwOuputResult([prevFeatureCoord], outputCoord);
+                        d3.select(".switchBtn").style("pointer-events", "none");
+                        d3.select(".switchBtn").style("opacity", 0.3);
                     }, delay: aniSec
                 },
                 {
@@ -922,6 +924,8 @@ export function visualizeNodeClassifierFeatures(
                         //display the result feature visualizer
                         featureVisTable[4][node].style.opacity = "1";
                         resultLabelsList[node].style.fill = "black";
+                        d3.select(".switchBtn").style("pointer-events", "auto");
+                        d3.select(".switchBtn").style("opacity", 1);
                     }, delay: aniSec
                 }
             ]

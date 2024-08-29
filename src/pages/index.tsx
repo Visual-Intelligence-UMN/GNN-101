@@ -125,6 +125,10 @@ export default function Home() {
     }, [predicted]
     )
 
+    useEffect(() => {
+        
+    }, [model]);
+
 
     function handleNodeSelection(
         e: React.ChangeEvent<HTMLSelectElement>
