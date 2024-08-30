@@ -686,6 +686,9 @@ export function visualizeNodeClassifierFeatures(
             event.stopPropagation();
             dview = true;
 
+            d3.select(".switchBtn").style("pointer-events", "none");
+            d3.select(".switchBtn").style("opacity", 0.3);
+
             //lock all feature visualizers and transparent paths
             d3.selectAll(".resultVis")
                 .style("pointer-events", "none")
@@ -894,8 +897,7 @@ export function visualizeNodeClassifierFeatures(
                             myColor, wMat, startPathCoords, endPathCoords, curveDir,
                             weightMatrixPostions, featureChannels, prevCon3Val)
                         drawPathBtwOuputResult([prevFeatureCoord], outputCoord);
-                        d3.select(".switchBtn").style("pointer-events", "none");
-                        d3.select(".switchBtn").style("opacity", 0.3);
+                        
                     }, delay: aniSec
                 },
                 {

@@ -117,6 +117,8 @@ export function detailedViewRecovery(
     resultLabelsList:any
 ) {
     //remove temp classes
+    d3.select(".switchBtn").style("pointer-events", "auto");
+    d3.select(".switchBtn").style("opacity", 1);
     d3.selectAll(".cant-remove").classed("cant-remove", false);
     d3.selectAll(".inputFeature").classed("inputFeature", false);
     d3.selectAll(".outputFeature").classed("outputFeature", false);
@@ -417,6 +419,8 @@ export function featureVisClick(
     oRectW:number,
     activation: string = "relu"
 ) {
+    d3.select(".switchBtn").style("pointer-events", "none");
+    d3.select(".switchBtn").style("opacity", 0.3);
     let biasCoord: [number, number];
     let res10: [number, number];
     let res11: [number, number];
@@ -683,8 +687,6 @@ export function featureVisClick(
             drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir)
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
-            d3.select(".switchBtn").style("pointer-events", "none");
-            d3.select(".switchBtn").style("opacity", 0.3);
             console.log("switchbtn", d3.select("div.switchBtn"));
         }, 
             delay: initSec + aniSec,
@@ -942,6 +944,8 @@ export function outputVisClick(
     featureChannels: number,
     poolingValues: number[]
 ) {
+    d3.select(".switchBtn").style("pointer-events", "none");
+    d3.select(".switchBtn").style("opacity", 0.3);
     const aniSec = 300;
 
     const curve = d3.line().curve(d3.curveBasis);
@@ -1118,8 +1122,6 @@ export function outputVisClick(
             //drawHintLabel(g1, btnX, btnY-12, "Click for Animation", "procVis");
             const gLabel = d3.select(".mats").append("g");
             injectSVG(gLabel, btnX-120-64, btnY-120-64, "./assets/SVGs/interactionHint.svg", "procVis hintLabel");
-            d3.select(".switchBtn").style("pointer-events", "none");
-            d3.select(".switchBtn").style("opacity", 0.3);
         }, delay:aniSec+600},
         {func:()=>{
 
@@ -1301,6 +1303,8 @@ export function featureGATClick(
     featureKeysEachLayer: number[][],
     activation: string = "relu",
 ){
+    d3.select(".switchBtn").style("pointer-events", "none");
+    d3.select(".switchBtn").style("opacity", 0.3);
     d3.selectAll(".cant-remove").classed("cant-remove", false);
     d3.selectAll(".inputFeature").classed("inputFeature", false);
     d3.selectAll(".outputFeature").classed("outputFeature", false);
@@ -1614,8 +1618,7 @@ export function featureGATClick(
             )
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
-            d3.select(".switchBtn").style("pointer-events", "none");
-            d3.select(".switchBtn").style("opacity", 0.3);
+            
         }, 
             delay: initSec + aniSec,
         },
@@ -1878,6 +1881,8 @@ export function featureSAGEClick(
     featureKeysEachLayer: number[][],
     activation: string = "relu",
 ){
+    d3.select(".switchBtn").style("pointer-events", "none");
+    d3.select(".switchBtn").style("opacity", 0.3);
     d3.selectAll(".cant-remove").classed("cant-remove", false);
     d3.selectAll(".inputFeature").classed("inputFeature", false);
     d3.selectAll(".outputFeature").classed("outputFeature", false);
@@ -2173,8 +2178,6 @@ export function featureSAGEClick(
             )
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
-            d3.select(".switchBtn").style("pointer-events", "none");
-            d3.select(".switchBtn").style("opacity", 0.3);
         }, 
             delay: initSec + aniSec,
         },
