@@ -28,7 +28,7 @@ import { isValidNode } from "./GraphvislinkPredUtil";
 import { roundToTwo } from "@/components/WebUtils";
 import { hoverOverHandler } from "./graphAnimationHelper";
 import { computeMatrixLocations, drawWeightMatrix } from "./matAnimateUtils";
-import { all, create } from "mathjs";
+import math, { all, create } from "mathjs";
 
 
 export function linkPredFeatureVisualizer(
@@ -56,6 +56,15 @@ export function linkPredFeatureVisualizer(
   // 3. do the calculation for animation
   let convNum = 3;
   let {weights, bias} = loadLinkWeights();
+
+  d3.select(".switchBtn").style("pointer-events", "none");
+  d3.select(".switchBtn").style("opacity", 0.3);
+
+  setTimeout(() => {
+      d3.select(".switchBtn").style("pointer-events", "auto");
+      d3.select(".switchBtn").style("opacity", 1);
+
+  }, 3000)
 
 
 
@@ -573,33 +582,94 @@ export function linkPredOutputVisualizer(
     
     svg.append("text")
     .attr("x", (node.graphIndex - 1) * offset - 100)
-    .attr("class", "to-be-removed")
+    .attr("class", "to-be-removed dot-product")
     .attr("y", height / 3 - 15)
     .attr("xml:space", "preserve")
     .text("dot (                                                                 )  = ")
     .attr("font-size", "20")
     .attr("fill", "black")
-    .style("opacity", 1)
+    .style("opacity", 0)
+
+    let sum = 0
+    for (let i = 0; i < node.relatedNodes[0].features.length; i++) {
+      sum += node.relatedNodes[0].features[i] * node.relatedNodes[1].features[i]
+    }
 
 
     svg.append("rect")
     .attr("x",  (node.graphIndex - 1) * offset + 330)
-    .attr("class", "to-be-removed")
+    .attr("class", "to-be-removed dot-product")
+    .attr("y", height / 3 - 30)
+    .attr("width", rectHeight)
+    .attr("height", rectHeight)
+    .style("stroke", "black")
+    .attr("fill", myColor(sum))
+    .style("opacity", 0)
+    .lower();
+
+    svg.append("text")
+    .attr("x",  (node.graphIndex - 1) * offset + 330)
+    .attr("class", "to-be-removed dot-product")
+    .attr("y", height / 3 - 15)
+    .text(roundToTwo(sum))
+    .attr("fill",  sum > 0.7 ? "white" : "black")
+    .attr("font-size", "10")
+    .style("opacity", 0)
+
+    svg.append("text")
+    .attr("x",  (node.graphIndex - 1) * offset + 500)
+    .attr("class", "to-be-removed dot-product")
+    .attr("y", height / 3 - 15)
+    .text(roundToTwo(node.features[0]))
+    .attr("fill",  Math.abs(node.features[0]) > 0.7 ? "white" : "black")
+    .attr("font-size", "10")
+    .style("opacity", 0)
+
+
+
+
+    svg.append("rect")
+    .attr("x",  (node.graphIndex - 1) * offset + 500)
+    .attr("class", "to-be-removed dot-product")
     .attr("y", height / 3 - 30)
     .attr("width", rectHeight)
     .attr("height", rectHeight)
     .style("stroke", "black")
     .attr("fill", myColor(node.features[0]))
+    .style("opacity", 0)
     .lower();
 
+    const path = svg.append("path")
+    .attr("d", `M${ (node.graphIndex - 1) * offset + 330},${height / 3 - 15} L ${ (node.graphIndex - 1) * offset + 500},${height / 3 - 15}`)
+    .attr("class", "to-be-removed dot-product")
+    .style("stroke", "black")
+    .style("opacity", 0)
+
     svg.append("text")
-    .attr("x",  (node.graphIndex - 1) * offset + 330)
-    .attr("class", "to-be-removed")
-    .attr("y", height / 3 - 15)
-    .text(roundToTwo(node.features[0]))
-    .attr("fill", "white")
-    .attr("font-size", "12")
-    .style("opacity", 1)
+    .attr("x",  (node.graphIndex - 1) * offset + 420)
+    .attr("class", "to-be-removed dot-product")
+    .attr("y", height / 3 - 30)
+    .text("Sigmoid")
+    .attr("fill", "black")
+    .attr("font-size", "17")
+    .style("opacity", 0)
+    
+
+
+    
+
+
+
+
+    
+
+
+    
+
+    setTimeout(() => {
+      d3.selectAll(".dot-product").style("opacity", 1)
+    }, 2000)
+
 
 
   const g5 = svg
