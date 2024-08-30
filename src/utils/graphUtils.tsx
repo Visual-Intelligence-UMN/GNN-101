@@ -196,6 +196,15 @@ export function outputVisualizer(
 
 ) {
 
+    d3.select(".switchBtn").style("pointer-events", "none");
+    d3.select(".switchBtn").style("opacity", 0.3);
+
+    setTimeout(() => {
+        d3.select(".switchBtn").style("pointer-events", "auto");
+        d3.select(".switchBtn").style("opacity", 1);
+
+    }, 3000)
+
     let weights = allWeights[3];
     if (!svg.selectAll) {
         svg = d3.selectAll(svg);
@@ -249,7 +258,7 @@ export function outputVisualizer(
         .attr("y", node.y - 50)
         .style("fill", "grey")
         .style("opacity", 0)
-        .text(`Initial Vector: 1x${node.relatedNodes[0].features.length}`);
+        .text(`Initial Vector^T: 1x${node.relatedNodes[0].features.length}`);
 
     let temp = 600;
 
@@ -808,6 +817,14 @@ export function calculationVisualizer(
 
 
 
+    d3.select(".switchBtn").style("pointer-events", "none");
+    d3.select(".switchBtn").style("opacity", 0.3);
+
+    setTimeout(() => {
+        d3.select(".switchBtn").style("pointer-events", "auto");
+        d3.select(".switchBtn").style("opacity", 1);
+
+    }, 5000)
 
     node.relatedNodes.forEach((n: any) => {
         if (n.featureId && n.featureGroup) {
@@ -897,7 +914,7 @@ export function calculationVisualizer(
         .style("opacity", 0);
 
     //draw label
-    let text = `Vectors \nSummation:\n1x${aggregatedData.length}T`
+    let text = `Vectors \nSummation^T:\n1x${aggregatedData.length}`
     if (innerComputationMode === "GraphSAGE") {
         text = "Mean aggregator"
     }
@@ -920,7 +937,7 @@ export function calculationVisualizer(
         })
 
     } else {
-        let textOffset = 0;
+        let textOffset = -10;
         if (mode === 1) {textOffset = 30} 
 
     aggregatedFeatureGroup.append("text")
@@ -1001,7 +1018,7 @@ export function calculationVisualizer(
     //draw label
 
 
-    text = `Matmul \nResult:\n1x${calculatedData.length}T`
+    text = `Matmul \nResult^T:\n1x${calculatedData.length}`
     if (mode === 1) {
         const lines = text.split('\n');
 
@@ -1652,7 +1669,7 @@ export function calculationVisualizer(
         .style("opacity", 0).raise();
 
     //draw label
-    text = `Final Output\nVector:\n1x${node.features.length}T`
+    text = `Final Output\nVector^T:\n1x${node.features.length}`
     if (mode === 1) {
         const lines = text.split('\n');
 
@@ -2299,6 +2316,16 @@ export function fcLayerCalculationVisualizer(
     mode: number
 ) {
 
+
+    d3.select(".switchBtn").style("pointer-events", "none");
+    d3.select(".switchBtn").style("opacity", 0.3);
+
+    setTimeout(() => {
+        d3.select(".switchBtn").style("pointer-events", "auto");
+        d3.select(".switchBtn").style("opacity", 1);
+
+    }, 3000)
+
     d3.selectAll(".node-features-Copy").style("visibility", "visible");
     d3.selectAll(".node-features-Copy").raise();
     let moveToX = graphIndex * offset - 350;
@@ -2603,6 +2630,14 @@ export function nodeOutputVisualizer(
     let intervalID = 0;
     state.isClicked = true;
 
+    d3.select(".switchBtn").style("pointer-events", "none");
+    d3.select(".switchBtn").style("opacity", 0.3);
+
+    setTimeout(() => {
+        d3.select(".switchBtn").style("pointer-events", "auto");
+        d3.select(".switchBtn").style("opacity", 1);
+
+    }, 3000)
 
     node.relatedNodes.forEach((n: any) => {
         if (n.featureId && n.featureGroup) {
@@ -2664,7 +2699,7 @@ export function nodeOutputVisualizer(
     .attr("y", node.y - 50)
     .style("fill", "grey")
     .style("opacity", 0)
-    .text(`Initial Vector: 1x${node.relatedNodes[0].features.length}`);
+    .text(`Initial Vector^T: 1x${node.relatedNodes[0].features.length}`);
 
 
     const calculatedFeatureGroup = svg
