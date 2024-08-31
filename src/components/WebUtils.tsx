@@ -15,6 +15,7 @@ import {
     get_features_origin,
     loadNodesLocation,
     graphToMatrix,
+    fetchSubGraphNodeLocation,
 } from "@/utils/utils";
 import {
     HeatmapData,
@@ -1186,7 +1187,8 @@ export function visualizePartialGraph(
     isAttribute: boolean,
     mode: number,
     hubNodeA: number,
-    hubNodeB: number
+    hubNodeB: number,
+    innerComputationMode: string
 ): Promise<void> {
     return new Promise<void>((resolve) => {
         const init = async (data: any, subgraph: any[], nodeMapping: any) => {
@@ -1195,7 +1197,9 @@ export function visualizePartialGraph(
             const width = 6 * offset - margin.left - margin.right;
             const height = 1000 - margin.top - margin.bottom;
 
-            console.log(data);
+
+
+   
 
             // Append the SVG object to the body of the page
             d3.select("#my_dataviz").selectAll("svg").remove();
@@ -1257,7 +1261,20 @@ export function visualizePartialGraph(
                 .style("stroke-width", 1)
                 .style("stroke-opacity", 1)
                 .attr("opacity", 1);
+                console.log('Current directory:', __dirname);
+                console.log('File path:', __filename);
+                const location = fetchSubGraphNodeLocation(hubNodeA + hubNodeB, innerComputationMode);
+                console.log("location", location)
 
+                data.nodes.forEach((node: any, i: number) => {
+                    if (location[node.id]) {
+                      node.x = location[node.id].x;
+                      node.y = location[node.id].y;
+                    } else {
+                        node.x = Math.random() * width;
+                        node.y = Math.random() * height;
+                      }
+                  });
             const labels = g1
                 .selectAll("text")
                 .data(data.nodes)
@@ -1282,6 +1299,7 @@ export function visualizePartialGraph(
                 .force("center", d3.forceCenter(width / 2, height / 2.5))
                 .force("y", d3.forceY(height / 2.5).strength(0.2)) 
                 .force("x", d3.forceX(width / 2).strength(0.8))  
+                .stop()
        
                 .on("tick", function ticked() {
                     link.attr("x1", (d: any) => d.source.x)
@@ -1296,7 +1314,18 @@ export function visualizePartialGraph(
                     labels.attr("x", (d: any) => d.x)
                           .attr("y", (d: any) => d.y);
                 })
-                .on("end", function ended() {
+                function updatePositions () {
+                    link.attr("x1", (d: any) => d.source.x)
+        .attr("y1", (d: any) => d.source.y)
+        .attr("x2", (d: any) => d.target.x)
+        .attr("y2", (d: any) => d.target.y);
+    
+    node.attr("cx", (d: any) => d.x).attr("cy", (d: any) => d.y);
+
+    labels.attr("x", (d: any) => d.x)
+          .attr("y", (d: any) => d.y);
+
+          
                     let maxXDistance = 0;
             let maxYDistance = 0;
             let initialCoordinates: { [id: string]: { x: number; y: number } } = {};
@@ -1306,10 +1335,6 @@ export function visualizePartialGraph(
             });
 
             //Convert the dictionary to a JSON string
-        
-               
-               
-            console.log('Coordinates saved successfully to coordinates.json');
 
             data.nodes.forEach((node1: any) => {
                 data.nodes.forEach((node2: any) => {
@@ -1369,7 +1394,9 @@ export function visualizePartialGraph(
                 .attr("transform", transform);
                 onComplete();
                 resolve();
-        })
+            }
+            updatePositions()
+        
 
 
           

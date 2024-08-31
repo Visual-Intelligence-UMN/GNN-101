@@ -8,7 +8,8 @@ import {
   featureVisualizer,
   softmax,
   myColor,
-  loadNodesLocation
+  loadNodesLocation,
+  fetchSubGraphNodeLocation
 } from "@/utils/utils";
 
 import { visualizeGraph, visualizePartialGraph } from "@/components/WebUtils";
@@ -192,6 +193,18 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
           .attr("text-anchor", "middle")
           .attr("dominant-baseline", "central")
           .attr("opacity", 0)
+          const location = fetchSubGraphNodeLocation(hubNodeA + hubNodeB, innerComputationMode);
+
+
+          data.nodes.forEach((node: any, i: number) => {
+              if (location[node.id]) {
+                node.x = location[node.id].x + offset;
+                node.y = location[node.id].y;
+              } else {
+                  node.x = Math.random() * width;
+                  node.y = Math.random() * height;
+                }
+            });
 
 
           const simulation = d3
@@ -207,8 +220,9 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
           .force("center", d3.forceCenter(width / 2, height / 2.5))
           .force("y", d3.forceY(height / 2.5).strength(0.2)) 
           .force("x", d3.forceX(width / 2).strength(0.8))  
+          .stop()
           .on("tick", ticked)
-          .on("end", updatePositions);
+          
 
         function ticked() {
           link
@@ -223,6 +237,16 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
 
 
         function updatePositions() {
+          link.attr("x1", (d: any) => d.source.x)
+                    .attr("y1", (d: any) => d.source.y)
+                    .attr("x2", (d: any) => d.target.x)
+                    .attr("y2", (d: any) => d.target.y);
+                
+                node.attr("cx", (d: any) => d.x).attr("cy", (d: any) => d.y);
+
+                labels.attr("x", (d: any) => d.x)
+                    .attr("y", (d: any) => d.y);
+
 
 
           let value: any;
@@ -447,6 +471,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
               }
             }
         }
+        updatePositions()
         
 
         setIsLoading(false);
@@ -461,7 +486,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
 
     const runVisualization = async () => {
       if ((intmData == null || changed) && !predicted) {
-        await visualizePartialGraph(graph_path, () => handleSimulationComplete(visualizationId), true, 2, hubNodeA, hubNodeB);
+        await visualizePartialGraph(graph_path, () => handleSimulationComplete(visualizationId), true, 2, hubNodeA, hubNodeB, innerComputationMode);
       } else {
         await visualizeGNN();
         handleSimulationComplete(visualizationId);
