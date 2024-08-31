@@ -387,7 +387,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
 
 
   const text_x = point1.x
-  let text_y = point4.y + 50;
+  let text_y = point4.y + 100;
 
 
   let featureCoords = [{ x: 0, y: 0 }, { x: 0, y: 0 }];
