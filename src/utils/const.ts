@@ -59,7 +59,7 @@ export const nodeSelectionList = [
 ];
 
 export const midGraphNodeSelectionList = [
-  317, 784, 203, 651, 50, 70, 297, 696, 623, 590, 194
+  696, 784, 203, 651, 50, 70, 297, 317, 623, 590, 194
 ];
 
 function graph_list_generate(num: number) {

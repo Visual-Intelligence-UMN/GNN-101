@@ -216,7 +216,7 @@ export default function Home() {
                                                     }else if(newModel.includes("GraphSAGE")){
                                                         setModelType("GraphSAGE");
                                                         setSelectedGraph("twitch_EN");
-                                                        setHubNodeA(317);
+                                                        setHubNodeA(696);
                                                         setHubNodeB(784);
                                                     }else if(newModel.includes("GCN")){
                                                         setModelType("GCN");
