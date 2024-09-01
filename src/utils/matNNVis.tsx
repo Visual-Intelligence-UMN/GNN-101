@@ -304,7 +304,7 @@ export async function visualizeLinkClassifier(setIsLoading:any, graph_path:strin
         console.log("subMatrix", subMatrix);
 
         // Initialize and run D3 visualization with processe  d data
-        await initLinkClassifier(subMatrix, features, intmData, graph_path, hubNodeA, hubNodeB, keys, innerComputationMode);
+        await initLinkClassifier(subMatrix, features, intmData, graph_path, hubNodeA, hubNodeB, keys, innerComputationMode, mergedNodes);
     } catch (error) {
         console.error("Error in visualizeGNN:", error);
     } finally {
@@ -323,7 +323,8 @@ async function initLinkClassifier(
     hubNodeA:number,
     hubNodeB:number,
     keys: number[],
-    innerComputationMode:string
+    innerComputationMode:string,
+    mergedNodes:number[]
 )  {
 
     //process the origin data
@@ -491,7 +492,7 @@ async function initLinkClassifier(
     const featuresManager = visualizeLinkClassifierFeatures(
         locations, featuresArray, myColor, 
         conv1, conv2, prob_adj[hubNodeA][hubNodeB], graph, adjList, [], keys, 
-        keysForEach, innerComputationMode);
+        keysForEach, mergedNodes, innerComputationMode);
     
 
     // const intervalID = featuresManager.getIntervalID();

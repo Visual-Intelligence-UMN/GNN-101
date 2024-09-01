@@ -423,7 +423,8 @@ export function drawAttentions(
     curveDir: number,
     layerID: number, //layer index_0->layer_1, index_1-> layer_2
     featuresTable:any,
-    lgIndices: number[][]
+    lgIndices: number[][],
+    mergedNodes:number[]
 ) {
     //learnable vectors
     const learnableData = require("../../public/learnableVectorsGAT.json");
@@ -432,6 +433,15 @@ export function drawAttentions(
         [learnableData["conv2_att_dst"], learnableData["conv2_att_src"]]
     ];
 
+    if(layerID==0){
+        mergedNodes = mergedNodes.sort((a, b) => a - b);
+        for(let i=0; i<lgIndices.length; i++){
+            for(let j=0; j<lgIndices[0].length; j++){
+                lgIndices[i][j] = mergedNodes[lgIndices[i][j]];
+            }
+        }
+    }
+    console.log("lg lg", lgIndices)
 
     
     const g = g1.append("g").attr("class", "procVis aggregate");
@@ -550,12 +560,7 @@ export function drawAttentions(
         let eij:any = [];
         console.log("push eij before", lgIndices)
         for(let i=0; i<lgIndices.length; i++){
-            eij.push(computeAttnStep(
-                Array.prototype.slice.call(srcVector), 
-                Array.prototype.slice.call(dstVector), 
-                weightMatrices[layerID],
-                Array.prototype.slice.call(featuresTable[layerID][0]),
-                Array.prototype.slice.call(featuresTable[layerID][lgIndices[i][1]])));
+            eij.push(0);
             console.log("push eij", i, eij);
         }
         
