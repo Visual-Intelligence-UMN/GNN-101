@@ -1,5 +1,5 @@
 import { IntmDataLink } from "@/types";
-import { chunkArray, graph_to_matrix, graphToAdjList, graphToMatrix, preprocessFloat32ArrayToNumber } from "./utils";
+import { chunkArray, graph_to_matrix, graphToAdjList, graphToMatrix, load_json, preprocessFloat32ArrayToNumber } from "./utils";
 import { extractSubgraph, Graph, removeDuplicatesFromSubarrays } from "./graphDataUtils";
 
 // format the intmData from link prediction result into correct format
@@ -166,3 +166,11 @@ export function sigmoid(x: number) {
     return 1 / (1 + Math.exp(-x));
 }
 
+export function fetchSubGraphNodeLocation(index: number, innerComputationMode: string) {
+    let path = "../public/json_data/node_location/subGraphList.json"
+    if (innerComputationMode === "GraphSAGE") {
+        path = "../public/json_data/node_location/subMidGraphList.json"
+    }
+    const location = require(path)
+    return location;
+}

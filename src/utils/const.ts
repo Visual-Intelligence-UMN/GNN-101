@@ -15,9 +15,9 @@ export const linkList: { [k: string]: string } = {
 export const modelList: { [k: string]: string } = {
   "GCN - graph classification": "./gnn_model2.onnx",
   "GCN - node classification": "./gnn_node_model.onnx",
-  "GCN - link classification": "./gnn_link_model.onnx",
-  "GAT - link classification": "./gat_link_model.onnx",
-  "GraphSAGE - link classification": "./sage_link_model.onnx"
+  "GCN - link prediction": "./gnn_link_model.onnx",
+  "GAT - link prediction": "./gat_link_model.onnx",
+  "GraphSAGE - link prediction": "./sage_link_model.onnx"
 };
 
 // export const modelGATList: { [k: string]: string } = {
@@ -59,14 +59,14 @@ export const nodeSelectionList = [
 ];
 
 export const midGraphNodeSelectionList = [
-  696, 784, 203, 651, 50, 70, 297, 317, 623, 590, 194
+  317, 784, 203, 651, 50, 70, 297, 696, 623, 590, 194
 ];
 
 function graph_list_generate(num: number) {
   let res: { [k: string]: string } = {};
-  res["graph_0"] = "./input_graph.json";
+  res["molecule_0"] = "./input_graph.json";
   for (let i = 0; i < num; i++) {
-    res[`graph_${i}`] = `./json_data/graphs/input_graph${i}.json`;
+    res[`molecule_${i}`] = `./json_data/graphs/input_graph${i}.json`;
   }
 
   return res;
@@ -90,9 +90,9 @@ The task is to predict whether two users are friends or not. The graph has 77774
 export const DatasetInfo: { [k: string]: string } = {
   "GCN - node classification": KARATE_INFO,
   "GCN - graph classification": MUTAG_INFO,
-  "GCN - link classification": TWITCH_INFO,
-  "GAT - link classification": TWITCH_INFO,
-  "GraphSAGE - link classification": TWITCH_INFO,
+  "GCN - link prediction": TWITCH_INFO,
+  "GAT - link prediction": TWITCH_INFO,
+  "GraphSAGE - link prediction": TWITCH_INFO,
 };
 
 

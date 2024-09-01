@@ -30,7 +30,7 @@ export function drawScoreE(g:any, x:number, y:number, leftIndex:number, rightInd
     const e = g.append("text")
         .attr("x", x)
         .attr("y", y)
-        .text(`e(${leftIndex},${rightIndex})`)
+        .text(`exp(e(${leftIndex},${rightIndex}))`)
         .style("fill", "black")
         .style("font-size", 10)
         .attr("class", "procVis attn-displayer");
@@ -396,6 +396,7 @@ export function loadLinkWeights(){
     return { weights: weights, bias: bias };
 }
 
+
 export function loadLinkGATWeights(){
     // weights data preparation
     let weights: any = []; // DS to manage weights for each layer
@@ -421,8 +422,6 @@ export function loadWeights() {
     let bias: any = []; // DS to manage bias for each layer
 
     const weightsJSON: any = require("../../public/weights.json");
-
-
 
     weights = [
         weightsJSON["onnx::MatMul_311"],

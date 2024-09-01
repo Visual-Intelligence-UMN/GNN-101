@@ -1114,6 +1114,7 @@ export function visualizeLinkClassifierFeatures(
     maxVals: any,
     featureKeys: number[],
     featureKeysEachLayer: number[][],
+    mergedNodes: number[],
     innerComputationMode: string = "GCN"
     // trainingNodes: number[]
 ) {
@@ -1419,7 +1420,8 @@ export function visualizeLinkClassifierFeatures(
                     90,
                     128,
                     2.5,
-                    featureKeysEachLayer
+                    featureKeysEachLayer,
+                    mergedNodes
                 );
                 // update variables
                 recordLayerID = featureVisPack.recordLayerID;
