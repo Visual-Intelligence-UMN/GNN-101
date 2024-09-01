@@ -96,7 +96,7 @@ export function drawAttnDisplayer(
             attnDisplayer
                 .append("text")
                 .text("+")
-                .attr("x", dX + 100 + 90 * (i) - (10))
+                .attr("x", dX + 100 + 100 * (i) - (10))
                 .attr("y", dY + 75 + 12.5)
                 .attr("text-anchor", "middle")
                 .attr("font-size", 15)
@@ -133,7 +133,7 @@ export function drawAttnDisplayer(
         //     `${lgIndices[i][0]},${lgIndices[i][1]}`);
 
         
-        drawScoreE(escore, dX + 100 + 90 * i, dY + 75 + 9.5, lgIndices[i][0], lgIndices[i][1]);
+        drawScoreE(escore, dX + 100 + 100 * i, dY + 75 + 9.5, lgIndices[i][0], lgIndices[i][1]);
     }
 
     // attnDisplayer
