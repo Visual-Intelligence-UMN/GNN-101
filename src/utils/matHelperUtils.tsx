@@ -30,7 +30,7 @@ export function drawScoreE(g:any, x:number, y:number, leftIndex:number, rightInd
     const e = g.append("text")
         .attr("x", x)
         .attr("y", y)
-        .text(`e(${leftIndex},${rightIndex})`)
+        .text(`exp(e(${leftIndex},${rightIndex}))`)
         .style("fill", "black")
         .style("font-size", 10)
         .attr("class", "procVis attn-displayer");

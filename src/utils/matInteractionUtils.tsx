@@ -7,8 +7,6 @@ import { drawEqComponentLabel, drawScoreE } from "./matHelperUtils";
 
 
 //---------------------------functions for the softmax interaction in the graph classifier------------------------------
-
-
 export function drawAttnDisplayer(
     attnDisplayer: any,
     dX: number,
@@ -25,14 +23,18 @@ export function drawAttnDisplayer(
     console.log("eij:", eij)
     console.log("ithIdx:", ithIdx)
 
+    let attnDisplayerWidth = 120 + 90 * (eij.length);
+    if(eij.length < 3){
+        attnDisplayerWidth += 50;
+    }
     attnDisplayer
         .append("rect")
         .attr("x", dX + 10)
         .attr("y", dY + 10)
         .attr("rx", 5)
         .attr("ry", 5)
-        .attr("width", 375)
-        .attr("height", 250)
+        .attr("width", attnDisplayerWidth)
+        .attr("height", 200)
         .attr("fill", "white")
         .attr("stroke", "black")
         .attr("stroke-width", 1)
@@ -94,7 +96,7 @@ export function drawAttnDisplayer(
             attnDisplayer
                 .append("text")
                 .text("+")
-                .attr("x", dX + 100 + 65 * (i) - (10))
+                .attr("x", dX + 100 + 90 * (i) - (10))
                 .attr("y", dY + 75 + 12.5)
                 .attr("text-anchor", "middle")
                 .attr("font-size", 15)
@@ -104,7 +106,7 @@ export function drawAttnDisplayer(
         type Point = { x: number; y: number };
         const points: Point[] = [
             { x: dX + 100, y: dY + 65 },
-            { x: dX + 100 + 65 * (eij.length - 1), y: dY + 65 },
+            { x: dX + 100 + 90 * (eij.length), y: dY + 65 },
         ];
 
         const lineGenerator = d3
@@ -131,7 +133,7 @@ export function drawAttnDisplayer(
         //     `${lgIndices[i][0]},${lgIndices[i][1]}`);
 
         
-        drawScoreE(escore, dX + 100 + 65 * i, dY + 75 + 9.5, lgIndices[i][0], lgIndices[i][1]);
+        drawScoreE(escore, dX + 100 + 90 * i, dY + 75 + 9.5, lgIndices[i][0], lgIndices[i][1]);
     }
 
     // attnDisplayer
@@ -186,19 +188,20 @@ export function drawEScoreEquation(
     layerID: number
 ) {
     const eqEScore = eDisplayer.append("g").attr("class", "procVis attn-displayer");
-    
-    injectMathSymbol(
-        eqEScore, dX + 15, dY + 100 + 7.5, 
-        "./assets/SVGs/escore.svg", 
-        "procVis attn-displayer", "input",
-        `${lgIndices[0][0]}, ${jthIndexElement}`
-    );
+    const offsetX = -25;
+    const e = eqEScore.append("text")
+        .attr("x", dX + 15)
+        .attr("y", dY + 100 + 7.5 + 15)
+        .text(`e(${lgIndices[0][0]},${jthIndexElement})`)
+        .style("fill", "black")
+        .style("font-size", 10)
+        .attr("class", "procVis attn-displayer");
     eDisplayer
         .append("text")
         .text(
-            `          = exp(LeakyReLU(                      +                               ))`
+            `          = LeakyReLU(                      +                      )`
         )
-        .attr("x", dX + 15)
+        .attr("x", dX + 40)
         .attr("y", dY + 125)
         .attr("xml:space", "preserve")
         .attr("font-size", 12)
@@ -212,20 +215,20 @@ export function drawEScoreEquation(
 
 
     const aTs = eDisplayer.append("g").attr("id", "ats").attr("class", "math-latex");
-    injectSVG(aTs, dX + 130, textH, "./assets/SVGs/a_t_s.svg", "math-latex");
+    injectSVG(aTs, dX + 130 +offsetX+17, textH, "./assets/SVGs/a_t_s.svg", "math-latex");
     
     
 
         eDisplayer.append("text")
             .text("Learnable Vector")
-            .attr("x", dX + 75 + 12.5 + 5)
+            .attr("x", dX + 75 + 12.5 + 5 +offsetX)
             .attr("y", dY + 112.5 + 25 + srcVector.length * (25 / srcVector.length) + 5)
             .attr("class", "temp")
             .style("fill", "gray")
             .style("font-size", 5);
         eDisplayer.append("text")
             .text("for Source")
-            .attr("x", dX + 75 + 12.5 + 5)
+            .attr("x", dX + 75 + 12.5 + 5 +offsetX)
             .attr("y", dY + 112.5 + 5 + 25 + srcVector.length * (25 / srcVector.length) + 5)
             .attr("class", "temp")
             .style("fill", "gray")
@@ -234,12 +237,26 @@ export function drawEScoreEquation(
         for (let i = 0; i < dstVector.length; i++) {
         eDisplayer
             .append("rect")
-            .attr("x", dX + 140 - 10 + 12.5)
+            .attr("x", dX + 140 - 10 + 12.5 +offsetX)
             .attr("y", dY + 112.5 + 25 + i * (25 / srcVector.length))
             .attr("width", 2.5)
             .attr("height", 25 / srcVector.length)
             .attr("fill", myColor(srcVector[i])).attr("class", "temp");
         }
+
+        eDisplayer
+                    .append("rect")
+                    .attr(
+                        "x",
+                        dX + 140 - 10 + 12.5 +offsetX
+                    )
+                    .attr("y", dY + 112.5 + 25)
+                    .attr("width", 2.5)
+                    .attr("height", 25)
+                    .attr("stroke", "black")
+                    .attr("class", "temp")
+                    .attr("fill", "none")
+                    .attr("stroke-width", 0.1);
 
 
     const aTd = eDisplayer
@@ -249,11 +266,11 @@ export function drawEScoreEquation(
 
     
 
-    injectSVG(aTd, dX + 220, textH, "./assets/SVGs/a_t_d.svg", "math-latex");
+    injectSVG(aTd, dX + 220 +offsetX+17, textH, "./assets/SVGs/a_t_d.svg", "math-latex");
         
             eDisplayer.append("text")
             .text("Learnable Vector")
-            .attr("x", dX + 165 + 12.5 + 20)
+            .attr("x", dX + 165 + 12.5 + 20 +offsetX)
             .attr("y", dY + 112.5 + 25 + dstVector.length * (25 / dstVector.length) + 5)
             .attr("class", "temp")
             .style("fill", "gray")
@@ -261,7 +278,7 @@ export function drawEScoreEquation(
 
             eDisplayer.append("text")
             .text(" for Destination")
-            .attr("x", dX + 165 + 12.5 + 20)
+            .attr("x", dX + 165 + 12.5 + 20 +offsetX)
             .attr("y", dY + 112.5 + 25 + 5 + dstVector.length * (25 / dstVector.length) + 5)
             .attr("class", "temp")
             .style("fill", "gray")
@@ -270,7 +287,7 @@ export function drawEScoreEquation(
             for (let i = 0; i < dstVector.length; i++) {
                 eDisplayer
                     .append("rect")
-                    .attr("x", dX + 200 + 12.5 + 20)
+                    .attr("x", dX + 200 + 12.5 + 20 +offsetX)
                     .attr("y", dY + 112.5 +25+ i * (25 / dstVector.length))
                     .attr("width", 2.5)
                     .attr("height", 25 / dstVector.length).attr("class", "temp")
@@ -278,17 +295,31 @@ export function drawEScoreEquation(
                     .raise();
             }
 
-    const x1 = eDisplayer.append("g").attr("id", "xi").attr("class", "math-latex");
-    injectMathSymbol(x1, dX + 140 - 10 + 50, textH, "./assets/SVGs/vector_x.svg", "math-latex", "input", lgIndices[0][0]);
+            eDisplayer
+                    .append("rect")
+                    .attr(
+                        "x",
+                        dX + 200 + 12.5 + 20 +offsetX
+                    )
+                    .attr("y", dY + 112.5 +25)
+                    .attr("width", 2.5)
+                    .attr("height", 25)
+                    .attr("stroke", "black")
+                    .attr("class", "temp")
+                    .attr("fill", "none")
+                    .attr("stroke-width", 0.1);
 
-             drawEqComponentLabel(eDisplayer, dX + 140 - 10 + 50 + inputVector.length * (25 / inputVector.length) - 25, dY + 112.5 + 25 + 12.5 + 10 , "Input Vector")
+    const x1 = eDisplayer.append("g").attr("id", "xi").attr("class", "math-latex");
+    injectMathSymbol(x1, dX + 140 - 10 + 50 +offsetX, textH, "./assets/SVGs/vector_x.svg", "math-latex", "input", lgIndices[0][0]);
+
+             drawEqComponentLabel(eDisplayer, dX +offsetX + 140 - 10 + 50 + inputVector.length * (25 / inputVector.length) - 25, dY + 112.5 + 25 + 12.5 + 10 , "Input Vector")
             
             for (let i = 0; i < inputVector.length; i++) {
                 eDisplayer
                     .append("rect")
                     .attr(
                         "x",
-                        dX + 140 - 10 + 50 + i * (25 / inputVector.length)
+                        dX + 140 - 10 + 50 + i * (25 / inputVector.length) +offsetX
                     )
                     .attr("y", dY + 112.5 + 12.5 + 25)
                     .attr("width", 25 / inputVector.length)
@@ -296,17 +327,31 @@ export function drawEScoreEquation(
                     .attr("fill", myColor(inputVector[i]));
             }
 
+            eDisplayer
+                    .append("rect")
+                    .attr(
+                        "x",
+                        dX + 140 - 10 + 50 +offsetX
+                    )
+                    .attr("y", dY + 112.5 + 12.5 + 25)
+                    .attr("width", 25)
+                    .attr("height", 2.5)
+                    .attr("stroke", "black")
+                    .attr("class", "temp")
+                    .attr("fill", "none")
+                    .attr("stroke-width", 0.1);
+
         const x2 = eDisplayer.append("g").attr("id", "xj").attr("class", "math-latex");
-        injectMathSymbol(x2, dX + 220+ 50, textH, "./assets/SVGs/vector_x.svg", "math-latex", "input", jthIndexElement);
+        injectMathSymbol(x2, dX + 220+ 50 +offsetX, textH, "./assets/SVGs/vector_x.svg", "math-latex", "input", jthIndexElement);
     
-             drawEqComponentLabel(eDisplayer, dX + 200 + 20 + 50 + inputVector.length * (25 / inputVector.length) - 25, dY + 25 + 112.5 + 12.5 + 10, "Input Vector")
+             drawEqComponentLabel(eDisplayer, dX + 200 + 20 + 50 +offsetX + inputVector.length * (25 / inputVector.length) - 25, dY + 25 + 112.5 + 12.5 + 10, "Input Vector")
 
             for (let i = 0; i < inputVector.length; i++) {
                 eDisplayer
                     .append("rect").attr("class", "temp")
                     .attr(
                         "x",
-                        dX + 200 + 20 + 50 + i * (25 / inputVector.length)
+                        dX  +offsetX+ 200 + 20 + 50 + i * (25 / inputVector.length)
                     )
                     .attr("y", dY + 112.5 + 12.5 + 25)
                     .attr("width", 25 / inputVector.length)
@@ -314,20 +359,34 @@ export function drawEScoreEquation(
                     .attr("fill", myColor(inputVector[i]));
             }
 
+            eDisplayer
+                    .append("rect")
+                    .attr(
+                        "x",
+                        dX  +offsetX+ 200 + 20 + 50
+                    )
+                    .attr("y", dY + 112.5 + 12.5 + 25)
+                    .attr("width", 25)
+                    .attr("height", 2.5)
+                    .attr("stroke", "black")
+                    .attr("class", "temp")
+                    .attr("fill", "none")
+                    .attr("stroke-width", 0.1);
+
     
     
         eDisplayer
             .append("text")
             .text("W")
             .attr("id", "w1").attr("class", "mathjax-latex")
-            .attr("x", dX + 75 + 75 + 15 )
+            .attr("x", dX + 75 + 75 + 15 +offsetX )
             .attr("y", textH + 15)
             .attr("font-size", fontSize).style("font-weight", "bold")
         eDisplayer
             .append("text")
             .text("W")
             .attr("id", "w2").attr("class", "mathjax-latex")
-            .attr("x", dX + 75 + 75 + 60 + 40+5 )
+            .attr("x", dX + 75 + 75 + 60 + 40+5 +offsetX )
             .attr("y", textH + 15)
             .attr("font-size", fontSize).style("font-weight", "bold")
 
@@ -351,10 +410,11 @@ export function drawEScoreEquation(
     eDisplayer
         .append("image")
         .attr("xlink:href", imageMat).attr("id", "w1png")
-        .attr("x", dX + 75 + 75 - 10 + offset + 100 + 65)
+        .attr("x", dX + 75 + 75 - 10  +offsetX+ offset + 100 + 65)
         .attr("y", dY + 75 + 25)
         .attr("width", imgW)
-        .attr("height", imgH).attr("opacity", 0);
+        .attr("height", imgH).attr("opacity", 0)
+        .attr("stroke-width", 0.1);
 
         d3.select("#w1png").attr("opacity", 1); 
 
@@ -362,18 +422,19 @@ export function drawEScoreEquation(
         .append("image")
         .attr("xlink:href", imageMat)
         .attr("id", "w2png")
-        .attr("x", dX + 75 + 75 + 60 + offset)
+        .attr("x", dX + 75 + 75  +offsetX+ 60 + offset)
         .attr("y", dY + 75 + 25)
         .attr("width", imgW)
-        .attr("height", imgH).attr("opacity", 1);
+        .attr("height", imgH).attr("opacity", 1)
+        .attr("stroke-width", 0.1);
 
     
 
     
         // .on("mouseenter", function () {
-        drawEqComponentLabel(eDisplayer, dX + 75 + 75 + 60 + 20 - 10 + offset, dY + 75 + 25 + offset + imgH + 5, "Weight Matrix")
+        drawEqComponentLabel(eDisplayer, dX + 75 + 75 +offsetX + 60 + 20 - 10 , dY + 75 + 25  + imgH + 5, "Weight Matrix")
 
-        drawEqComponentLabel(eDisplayer, dX + 75 + 75 + 60 + 20 - 10 +100 + offset, dY + 75 + 25 + offset + imgH + 5, "Weight Matrix")
+        drawEqComponentLabel(eDisplayer, dX + 75 + 75  +offsetX+ 60 + 20 - 10 +100, dY + 75 + 25  + imgH + 5, "Weight Matrix")
 
 }
 
