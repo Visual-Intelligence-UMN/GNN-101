@@ -224,7 +224,7 @@ export default function Home() {
                                                             setSelectedGraph("molecule_2");
                                                         }else if(newModel.includes("node classification")){
                                                             setSelectedGraph("karate");
-                                                        }else if(newModel.includes("link classification")){
+                                                        }else if(newModel.includes("link prediction")){
                                                             setSelectedGraph("twitch_EN");
                                                             setHubNodeA(148);
                                                             setHubNodeB(407);
@@ -348,7 +348,7 @@ export default function Home() {
                                         </div>
                                     </div>
 
-                                    {model.includes("link classification") ? (
+                                    {model.includes("link prediction") ? (
                                         model.includes("GAT") || model.includes("GCN")?
                                         <>
                                             Predict a link from node
