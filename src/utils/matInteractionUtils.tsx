@@ -381,14 +381,14 @@ export function drawEScoreEquation(
             .attr("id", "w1").attr("class", "mathjax-latex")
             .attr("x", dX + 75 + 75 + 15 +offsetX )
             .attr("y", textH + 15)
-            .attr("font-size", fontSize).style("font-weight", "bold")
+            .attr("font-size", fontSize).style("font-weight", "bold").style("font-family", "serif");
         eDisplayer
             .append("text")
             .text("W")
             .attr("id", "w2").attr("class", "mathjax-latex")
             .attr("x", dX + 75 + 75 + 60 + 40+5 +offsetX )
             .attr("y", textH + 15)
-            .attr("font-size", fontSize).style("font-weight", "bold")
+            .attr("font-size", fontSize).style("font-weight", "bold").style("font-family", "serif");
 
             dY += 35;
             dX -= 75;
