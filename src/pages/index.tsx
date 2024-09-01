@@ -62,7 +62,7 @@ export const inter3 = Inter({
 
 export default function Home() {
     const [model, setModel] = useState("GCN - graph classification");
-    const [selectedGraph, setSelectedGraph] = useState("graph_2");
+    const [selectedGraph, setSelectedGraph] = useState("molecule_2");
     const introRef = useRef<Steps>(null);
     const [outputData, setOutputData] = useState(null);
 
@@ -221,7 +221,7 @@ export default function Home() {
                                                     }else if(newModel.includes("GCN")){
                                                         setModelType("GCN");
                                                         if(newModel.includes("graph classification")){
-                                                            setSelectedGraph("graph_2");
+                                                            setSelectedGraph("molecule_2");
                                                         }else if(newModel.includes("node classification")){
                                                             setSelectedGraph("karate");
                                                         }else if(newModel.includes("link classification")){
