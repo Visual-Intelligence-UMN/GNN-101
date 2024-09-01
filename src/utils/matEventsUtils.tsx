@@ -1301,6 +1301,7 @@ export function featureGATClick(
     oFeatureChannels:number,
     oRectW:number,
     featureKeysEachLayer: number[][],
+    mergedNodes:number[],
     activation: string = "relu",
 ){
     d3.select(".switchBtn").style("pointer-events", "none");
@@ -1614,7 +1615,7 @@ export function featureGATClick(
         {func: () => {
             drawAttentions(
                 g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir, layerID,
-                featuresTable, lgIndices
+                featuresTable, lgIndices, mergedNodes
             )
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
