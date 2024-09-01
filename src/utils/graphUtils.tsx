@@ -1314,6 +1314,7 @@ export function calculationVisualizer(
                         .attr("opacity", 1).raise();
                     }
                     else if (innerComputationMode === "GAT"){
+                        
 
 
                         const frame = g3.append("rect")
@@ -1364,14 +1365,18 @@ export function calculationVisualizer(
                             eij.push(e);
 
                             let index: number[] = [];
-                            index.push(node.id);
-                            index.push(n.id);
+                            index.push(node.original_id);
+                            index.push(n.original_id);
                             lgIndices.push(index)
                         })
                         const targetE = computeAttnStep(usingVectors[1], usingVectors[0], usingWeightMatrix, lastLayerNodefeature, lastLayerNodefeature)
                         
 
                         frame.on("click", function(this: any, event: any) {
+                            d3.selectAll(".weightUnit").lower()
+                            d3.selectAll(".columnGroup").lower()
+                            d3.selectAll(".weightMatrixText").lower()
+                            d3.selectAll(".weight-matrix-frame").lower()
                             const attentionDisplayer = g3.append("g")
                             .attr("class", "attn-displayer")
                             let extendAttnView = true;
@@ -1392,14 +1397,14 @@ export function calculationVisualizer(
                                     jthIndexElement = lgIndices[node.id][1];
                                     
                                 }
-                                drawEScoreEquation(lgIndices, eDisplayer, jthIndexElement, start_x - 1200, start_y, usingVectors[1], usingVectors[0], myColor, inputVector, node.graphIndex);
+                                drawEScoreEquation(lgIndices, eDisplayer, jthIndexElement, start_x - 1200, start_y, usingVectors[1], usingVectors[0], myColor, inputVector, node.graphIndex - 1);
                             });
                             const eDisplayer = attentionDisplayer
                             .append("g")
                             .attr("class", "procVis e-displayer attn-displayer to-be-removed");
                             const inputVector = featureMap[node.graphIndex][Number(d3.select(this).attr("index"))];
                             let jthIndexElement = lgIndices[node.id][1];
-                            drawEScoreEquation(lgIndices, eDisplayer, jthIndexElement, start_x - 1200, start_y, usingVectors[1], usingVectors[0], myColor, inputVector, node.graphIndex);
+                            drawEScoreEquation(lgIndices, eDisplayer, jthIndexElement, start_x - 1200, start_y, usingVectors[1], usingVectors[0], myColor, inputVector, node.graphIndex - 1);
 
                             d3.selectAll("#my_dataviz").on("click", function(event) {
                                 event.stopPropagation();
@@ -1909,6 +1914,7 @@ function weightAnimation(
     .text("Matrix Multiplication")
     .attr("fill", "grey")
     .attr("class", "to-be-removed procVis weight-matrix-text")
+    btn.lower()
 
     btn.on("mouseover", function() {
         if (!state.isAnimating) {

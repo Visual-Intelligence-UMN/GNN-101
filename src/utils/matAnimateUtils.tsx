@@ -1188,7 +1188,7 @@ export function drawWeightMatrix(
             ]);
         }
     }
-    d3.selectAll(".columnUnit").raise();
+
 }
 
 export function drawBiasVector(
