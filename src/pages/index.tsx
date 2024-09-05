@@ -76,6 +76,8 @@ export default function Home() {
     const [hubNodeA, setHubNodeA] = useState(241);
     const [hubNodeB, setHubNodeB] = useState(109);
 
+    const [datasetIndex, setDatasetIndex] = useState(0);
+
     const [modelType, setModelType] = useState("GCN");
 
     //intermediate output
@@ -115,7 +117,7 @@ export default function Home() {
 
     useEffect(() => {
         (document.body.style as any).zoom = "70%";
-
+        //load resources
     }, []);
 
     useEffect(() => {
