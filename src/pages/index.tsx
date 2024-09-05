@@ -213,6 +213,8 @@ export default function Home() {
                                                         setSelectedGraph("twitch_EN");
                                                         setHubNodeA(148);
                                                         setHubNodeB(407);
+                                                        // setHubNodeA(317);
+                                                        // setHubNodeB(784);
                                                     } else if (newModel.includes("GraphSAGE")) {
                                                         setModelType("GraphSAGE");
                                                         setSelectedGraph("twitch_EN");
@@ -228,6 +230,8 @@ export default function Home() {
                                                             setSelectedGraph("twitch_EN");
                                                             setHubNodeA(148);
                                                             setHubNodeB(407);
+                                                            // setHubNodeA(317);
+                                                            // setHubNodeB(784);
                                                         }
                                                     }
                                                 }
@@ -272,47 +276,63 @@ export default function Home() {
                                 <div>
                                     <div className="flex gap-x-4 items-center  mb-3 ">
                                         <h1 className="text-3xl font-black min-w-48">
-                                            Input Graph{" "}
+                                            Input Graph
                                         </h1>
-                                        <div className="flex flex-row gap-x-4">
-                                            <div className="flex items-center gap-x-4 ">
-                                                <div className={inter3.className}>
-                                                    {model ==
-                                                        "GCN - graph classification" ? (
-                                                        <>
-                                                            <Selector
-                                                                selectedOption={
-                                                                    selectedGraph
-                                                                }
-                                                                handleChange={
-                                                                    handleGraphSelection
-                                                                }
-                                                                OptionList={Object.keys(
-                                                                    graphList
-                                                                )}
-                                                                id="dataset-selector"
-                                                            />
-                                                        </>
-                                                    ) : model ==
-                                                        "GCN - node classification" ? (
-                                                        //   <Selector
-                                                        //     selectedOption={selectedGraph}
-                                                        //     handleChange={handleGraphSelection}
-                                                        //     OptionList={Object.keys(nodeList)}
-                                                        //   />
+                                        <div className={`flex-1 items-center gap-x-6 ${inter2.className}`} id="dataset-description">
+                                            {DatasetInfo[model]}
+                                        </div>
+                                        <div className="flex-1 items-center gap-x-4 text-xl">
+                                            <div className={inter3.className}>
+                                                {model.includes("graph classification") && (
+                                                    <> <div className="m-1"> Predict the graph of </div>
+                                                        <Selector
+                                                            selectedOption={
+                                                                selectedGraph
+                                                            }
+                                                            handleChange={
+                                                                handleGraphSelection
+                                                            }
+                                                            OptionList={Object.keys(
+                                                                graphList
+                                                            )}
+                                                            id="dataset-selector"
+                                                        />
+                                                    </>
+                                                )}
 
-                                                        <span className="text-2xl">
-                                                            Zachary&apos;s Karate
-                                                            Club{" "}
-                                                        </span>
-                                                    ) : (
-                                                        <span className="text-2xl">
-                                                            Twitch Users{" "}
-                                                        </span>
-                                                    )}
-                                                </div>
+                                                {model.includes("node classification") && (
+                                                    <span>Predict all nodes of the karate club network</span>
+                                                )}
+
+                                                {model.includes("link prediction") && (
+                                                    <>
+                                                        Predict the link <br /> from node {" "}
+                                                        <NodeSelector
+                                                            nodeList={model.includes('GraphSAGE') ? midGraphNodeSelectionList : nodeSelectionList}
+                                                            selectedNode={hubNodeA}
+                                                            dependNode={hubNodeB}
+                                                            setSelectedNode={setHubNodeA}
+                                                            handleChange={
+                                                                handleNodeSelection
+                                                            }
+                                                        />
+                                                        {" "} to node {" "}
+                                                        <NodeSelector
+                                                            nodeList={model.includes('GraphSAGE') ? midGraphNodeSelectionList : nodeSelectionList}
+                                                            selectedNode={hubNodeB}
+                                                            dependNode={hubNodeA}
+                                                            setSelectedNode={setHubNodeB}
+                                                            handleChange={
+                                                                handleNodeSelection
+                                                            }
+                                                        />
+
+                                                    </>
+
+                                                )}
                                             </div>
-                                            <div>
+                                        </div>
+                                        {/* <div>
                                                 {selectedGraph &&
                                                     (linkList[selectedGraph] ||
                                                         graphList[selectedGraph] ||
@@ -345,63 +365,11 @@ export default function Home() {
                                                         />
                                                     )
                                                 ) : null}
-                                            </div>
-                                        </div>
+                                            </div> */}
 
-                                        {model.includes("link prediction") ? (
-                                            model.includes("GAT") || model.includes("GCN") ?
-                                                <>
-                                                    Predict a link from node
-                                                    <NodeSelector
-                                                        nodeList={nodeSelectionList}
-                                                        selectedNode={hubNodeA}
-                                                        dependNode={hubNodeB}
-                                                        setSelectedNode={setHubNodeA}
-                                                        handleChange={
-                                                            handleNodeSelection
-                                                        }
-                                                    />
-                                                    to node
-                                                    <NodeSelector
-                                                        nodeList={nodeSelectionList}
-                                                        selectedNode={hubNodeB}
-                                                        dependNode={hubNodeA}
-                                                        setSelectedNode={setHubNodeB}
-                                                        handleChange={
-                                                            handleNodeSelection
-                                                        }
-                                                    />
 
-                                                </> :
-                                                <>
-                                                    Predict a link from node(GraphSAGE)
-                                                    <NodeSelector
-                                                        nodeList={midGraphNodeSelectionList}
-                                                        selectedNode={hubNodeA}
-                                                        dependNode={hubNodeB}
-                                                        setSelectedNode={setHubNodeA}
-                                                        handleChange={
-                                                            handleNodeSelection
-                                                        }
-                                                    />
-                                                    to node
-                                                    <NodeSelector
-                                                        nodeList={midGraphNodeSelectionList}
-                                                        selectedNode={hubNodeB}
-                                                        dependNode={hubNodeA}
-                                                        setSelectedNode={setHubNodeB}
-                                                        handleChange={
-                                                            handleNodeSelection
-                                                        }
-                                                    />
-
-                                                </>
-
-                                        ) : (
-                                            <></>
-                                        )}
                                     </div>
-                                    <p id="dataset-description">{DatasetInfo[model]}</p>
+
 
                                     <hr className="border-t border-gray-300 my-4"></hr>
 
