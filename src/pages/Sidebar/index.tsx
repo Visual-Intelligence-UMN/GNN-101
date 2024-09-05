@@ -60,7 +60,7 @@ export default function Sidebar(props: Props) {
                 <div className="p-4">
                     <h1 className="text-3xl font-semibold text-3xl">Input Data of a GNN:</h1>
                     <p>
-                        To start, let`&apos;`s establish what a graph is. A graph represents the
+                        To start, let`s establish what a graph is. A graph represents the
                         relations (edges) between a collection of entities (nodes). For
                         example, the right panel shows a graph of a chemical compound, from
                         the{" "}
@@ -156,7 +156,7 @@ export default function Sidebar(props: Props) {
                     <ol className="list-inside list-disc">
                         <li>
                             <b className="font-bold">Aggregation with Normalization: </b>
-                            First, a node aggregates the feature vectors of its neighbors <b className="font-bold">Xj</b> and itself <b className="font-bold">Xi</b> via a normalized degree matrix 
+                            First, a node aggregates the feature vectors of its neighbors <b className="font-bold">Xj</b> and itself <b className="font-bold">Xi</b> via a normalized degree matrix
                             <b className="font-bold"> W</b>. Intuitively, this reduces the influence of information from nodes with too many neighbors and strengthens the influence from those with fewer neighbors.
                         </li>
                         <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/summation.png" label="Aggregated Vector" />
@@ -203,10 +203,10 @@ export default function Sidebar(props: Props) {
                             After sevela layers of GCNConv, we apply a <b className="font-bold">fully connected layer </b> to each node to make the prediction.
                         </p>
 
-                        {props.modelMode=="node classification"?(props.isGraphView ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCGraphNode.png" label="Fully Connected Layer" /> :
-                            <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCMatrixNode.png" label="Fully Connected Layer" />):<></>}
+                        {props.modelMode == "node classification" ? (props.isGraphView ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCGraphNode.png" label="Fully Connected Layer" /> :
+                            <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCMatrixNode.png" label="Fully Connected Layer" />) : <></>}
 
-                        {props.modelMode=="node classification" ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCDetails.png" label="FC in Details" />:<></>}
+                        {props.modelMode == "node classification" ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCDetails.png" label="FC in Details" /> : <></>}
 
                         <span className={styles.tag}>Graph-Level Tasks </span>
                         {/* <span className={styles.button} onClick={() => { }}>Click to Predict a Graph </span> */}
@@ -219,10 +219,10 @@ export default function Sidebar(props: Props) {
                             the prediction.
                         </p>
 
-                        {props.modelMode=="graph classification" ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/pooling.png" label="Pooling Layer" />:<></>}
-                        {props.modelMode=="graph classification" ? (props.isGraphView ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCGraphGraph.png" label="Fully Connected Layer" /> :
-                                                    <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCMatrixGraph.png" label="Fully Connected Layer" />) : <></>}
-                        {props.modelMode=="graph classification" ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCDetails.png" label="FC in Details" />:<></>}
+                        {props.modelMode == "graph classification" ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/pooling.png" label="Pooling Layer" /> : <></>}
+                        {props.modelMode == "graph classification" ? (props.isGraphView ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCGraphGraph.png" label="Fully Connected Layer" /> :
+                            <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCMatrixGraph.png" label="Fully Connected Layer" />) : <></>}
+                        {props.modelMode == "graph classification" ? <AnnotatedImage imgSrc="./assets/PNGs/annotatedSrcShots/FCDetails.png" label="FC in Details" /> : <></>}
 
                         <span className={styles.tag}>Edge-Level Tasks </span>
                         <p>

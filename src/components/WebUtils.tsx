@@ -15,6 +15,7 @@ import {
     get_features_origin,
     loadNodesLocation,
     graphToMatrix,
+    fetchSubGraphNodeLocation,
 } from "@/utils/utils";
 import {
     HeatmapData,
@@ -44,19 +45,19 @@ export function chunkArray<T>(inputArray: T[], chunkSize: number): T[][] {
 
 //node selector in link prediction
 
-export const NodeSelector:React.FC<{
-    nodeList: number[], selectedNode: number, dependNode:number, setSelectedNode: Function,
+export const NodeSelector: React.FC<{
+    nodeList: number[], selectedNode: number, dependNode: number, setSelectedNode: Function,
     handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-}> = ({nodeList, selectedNode, dependNode, setSelectedNode, handleChange}) => {
+}> = ({ nodeList, selectedNode, dependNode, setSelectedNode, handleChange }) => {
     return (
         <select
-            className="text-2xl rounded-md px-3 shadow-none border-solid border-gray-200 border-2 min-w-80 bg-white text-gray-600"
+            className="text-2xl rounded-md px-3 shadow-none border-solid border-gray-200 border-2 min-w-35 bg-white text-gray-600"
             value={selectedNode}
             onChange={(e) => {
-                if(Number(e.target.value)!=dependNode){
+                if (Number(e.target.value) != dependNode) {
                     setSelectedNode(Number(e.target.value));
                     handleChange(e);
-                }else{
+                } else {
                     window.alert("Can't select the same node for link prediction");
                 }
             }}
@@ -273,14 +274,14 @@ export const AnnotatedImage = ({
     imgSrc,
     label
 }: {
-    imgSrc:string;
-    label:string
+    imgSrc: string;
+    label: string
 }) => {
     return (
-      <div className="flex flex-col items-center">
-        <img src={imgSrc} alt={label} />
-        <span className="mt-2 text-center">{label}</span>
-      </div>
+        <div className="flex flex-col items-center">
+            <img src={imgSrc} alt={label} />
+            <span className="mt-2 text-center">{label}</span>
+        </div>
     );
 }
 
@@ -425,11 +426,11 @@ export const LinkClassifierButtonChain = ({
     const [archList, setArchList] = useState<string[]>(["GCNConv1", "GCNConv2"]);
 
     useEffect(() => {
-        if(innerComputationMode === "GCN"){
+        if (innerComputationMode === "GCN") {
             setArchList(["GCNConv1", "GCNConv2"]);
-        }else if (innerComputationMode === "GAT"){
+        } else if (innerComputationMode === "GAT") {
             setArchList(["GATConv1", "GATConv2"]);
-        }else {
+        } else {
             setArchList(["SAGEConv1", "SAGEConv2"]);
         }
     }, [innerComputationMode]);
@@ -582,7 +583,7 @@ interface SelectorProps {
     selectedOption: string;
     handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
     OptionList: string[];
-    id:string
+    id: string
 }
 
 export const Selector: React.FC<SelectorProps> = ({
@@ -687,6 +688,8 @@ import { i } from "mathjs";
 import { convertToAdjacencyMatrix, getNodeSet } from "@/utils/linkPredictionUtils";
 import { extractSubgraph } from "@/utils/graphDataUtils";
 import { dataProccessGraphVisLinkPrediction } from "@/utils/GraphvislinkPredUtil";
+
+
 
 interface ViewSwitchProps {
     handleChange: () => void;
@@ -811,21 +814,21 @@ export function visualizeGraph(
                 .attr("width", width)
                 .attr("height", height);
 
-                const xOffset = -2.5 * offset;
-                const g1 = svg
+            const xOffset = -2.5 * offset;
+            const g1 = svg
                 .append("g")
                 .attr("class", "layerVis")
                 .attr("transform", `translate(${xOffset},${margin.top})`)
 
-                // Initialize the links
-                const link = g1
-                    .selectAll("line")
-                    .data(data.links)
-                    .join("line")
-                    .style("stroke", "#aaa");
+            // Initialize the links
+            const link = g1
+                .selectAll("line")
+                .data(data.links)
+                .join("line")
+                .style("stroke", "#aaa");
 
-                // Initialize the nodes
-                const node = g1
+            // Initialize the nodes
+            const node = g1
                 .selectAll("circle")
                 .data(data.nodes)
                 .join("circle")
@@ -836,7 +839,7 @@ export function visualizeGraph(
                 .style("stroke-opacity", 1)
                 .attr("opacity", 1)
 
-                const labels = g1
+            const labels = g1
                 .selectAll("text")
                 .data(data.nodes)
                 .join("text")
@@ -844,156 +847,158 @@ export function visualizeGraph(
                 .attr("font-size", `17px`)
                 .attr("text-anchor", "middle")
                 .attr("dominant-baseline", "central")
-                                
 
-                data.nodes.forEach((node: any, i: number) => {
-  
-                    if (location[i.toString()]) {
-                      node.x = location[i.toString()].x;
-                      node.y = location[i.toString()].y;
-                    } else {
-                        node.x = Math.random() * width;
-                        node.y = Math.random() * height;
-                      }
-                  });
-                
 
-                	
-                  d3.forceSimulation(data.nodes)
-                  .force("link", d3.forceLink(data.links).id((d: any) => d.id).distance(20))
-                  .stop()
-                  .on("tick", ticked);
-                    function ticked() {
-                        link.attr("x1", (d: any) => d.source.x)
-                            .attr("y1", (d: any) => d.source.y)
-                            .attr("x2", (d: any) => d.target.x)
-                            .attr("y2", (d: any) => d.target.y)
-                            .attr("transform", function (d: any) {
-                                if (d.type === "double") {
-                                    const dx = d.target.x - d.source.x;
-                                    const dy = d.target.y - d.source.y;
-                                    const dr = Math.sqrt(dx * dx + dy * dy);
-                                    const offsetX = 5 * (dy / dr);
-                                    const offsetY = 5 * (-dx / dr);
-                                    return `translate(${offsetX}, ${offsetY})`;
-                                } else {
-                                    return null;
-                                }
-                            })
-                            .style("stroke", function (d: any) {
-                                if (d.type === "aromatic") {
-                                    return "purple";
-                                } else {
-                                    return "#aaa";
-                                }
-                            });
+            data.nodes.forEach((node: any, i: number) => {
 
-                        node.attr("cx", (d: any) => d.x).attr(
-                            "cy",
-                            (d: any) => d.y
-                        );
+                if (location[i.toString()]) {
+                    node.x = location[i.toString()].x;
+                    node.y = location[i.toString()].y;
+                } else {
+                    node.x = Math.random() * width;
+                    node.y = Math.random() * height;
+                }
+            });
 
-                            
 
-                    }
-                    function updatePositions() {
-                        link
-                        .attr("x1", (d: any) => d.source.x)
-                        .attr("y1", (d: any) => d.source.y)
-                        .attr("x2", (d: any) => d.target.x)
-                        .attr("y2", (d: any) => d.target.y)
-                        .attr("transform", function (d: any) {
-                          if (d.type === "double") {
+
+            d3.forceSimulation(data.nodes)
+                .force("link", d3.forceLink(data.links).id((d: any) => d.id).distance(20))
+                .stop()
+                .on("tick", ticked);
+            function ticked() {
+                link.attr("x1", (d: any) => d.source.x)
+                    .attr("y1", (d: any) => d.source.y)
+                    .attr("x2", (d: any) => d.target.x)
+                    .attr("y2", (d: any) => d.target.y)
+                    .attr("transform", function (d: any) {
+                        if (d.type === "double") {
                             const dx = d.target.x - d.source.x;
                             const dy = d.target.y - d.source.y;
                             const dr = Math.sqrt(dx * dx + dy * dy);
                             const offsetX = 5 * (dy / dr);
                             const offsetY = 5 * (-dx / dr);
                             return `translate(${offsetX}, ${offsetY})`;
-                          }
-                          return null;
-                        })
-                        .style("stroke", function (d: any) {
-                          return d.type === "aromatic" ? "purple" : "#aaa";
-                        });
-                      node.attr("cx", (d: any) => d.x)
-                        .attr("cy", (d: any) => d.y);
-                        labels
-                        .attr("x", (d: any) => d.x)
-                        .attr("y", (d: any) => d.y);
-                        let maxXDistance = 0;
-                        let maxYDistance = 0;
-                        initialCoordinates = {};
-                        data.nodes.forEach((node1: any) => {
-                            initialCoordinates[node1.id] = {
-                                x: node1.x,
-                                y: node1.y,
-                            };
-                            
-                            data.nodes.forEach((node2: any) => {
-                                if (node1 !== node2) {
-                                    const xDistance = Math.abs(
-                                        node1.x - node2.x
-                                    );
-                                    const yDistance = Math.abs(
-                                        node1.y - node2.y
-                                    );
-
-                                    if (xDistance > maxXDistance) {
-                                        maxXDistance = xDistance;
-                                    }
-
-                                    if (yDistance > maxYDistance) {
-                                        maxYDistance = yDistance;
-                                    }
-                                }
-                            });
-                        });
-
-                        const graphWidth = maxXDistance + 20;
-                        const graphHeight = maxYDistance + 20;
-                        const point1 = { x: 0.9 * offset - 260, y: height / 8 };
-                        const point2 = {
-                            x: 0.8 * offset - 260,
-                            y: height / 20,
-                        };
-                        const point3 = {
-                            x: 0.8 * offset - 260,
-                            y: height / 1.7,
-                        };
-                        const point4 = {
-                            x: 0.9 * offset - 260,
-                            y: height / 1.5,
-                        };
-                        const tolerance = 100;
-
-                        const x_dist = Math.abs(point1.x - point2.x);
-                        const y_dist = Math.abs(point1.y - point4.y);
-
-                        const centerX = (point1.x + point3.x) / 2;
-                        const centerY = (point1.y + point3.y) / 2;
-                        let scaleX = (graphWidth + tolerance) / x_dist;
-                        let scaleY = (graphHeight + tolerance) / y_dist;
-                        let transform = `translate(${centerX}, ${centerY}) scale(${scaleX}, ${scaleY}) translate(${-centerX}, ${-centerY})`;
-                        if (
-                            graphWidth + tolerance < x_dist &&
-                            graphHeight + tolerance < y_dist
-                        ) {
-                            transform = `scale(1, 1)`;
+                        } else {
+                            return null;
                         }
-                        const parallelogram = svg
-                            .append("polygon")
-                            .attr(
-                                "points",
-                                `${point1.x},${point1.y} ${point2.x},${point2.y} ${point3.x},${point3.y} ${point4.x},${point4.y}`
-                            )
-                            .attr("stroke", "black")
-                            .attr("fill", "none")
-                            .attr("transform", transform);
-                            onComplete();
-                            resolve();
-                    }
-                    updatePositions();
+                    })
+                    .style("stroke", function (d: any) {
+                        if (d.type === "aromatic") {
+                            return "purple";
+                        } else {
+                            return "#aaa";
+                        }
+                    });
+
+                node.attr("cx", (d: any) => d.x).attr(
+                    "cy",
+                    (d: any) => d.y
+                );
+
+
+
+            }
+            function updatePositions() {
+                link
+                    .attr("x1", (d: any) => d.source.x)
+                    .attr("y1", (d: any) => d.source.y)
+                    .attr("x2", (d: any) => d.target.x)
+                    .attr("y2", (d: any) => d.target.y)
+                    .attr("transform", function (d: any) {
+                        if (d.type === "double") {
+                            const dx = d.target.x - d.source.x;
+                            const dy = d.target.y - d.source.y;
+                            const dr = Math.sqrt(dx * dx + dy * dy);
+                            const offsetX = 5 * (dy / dr);
+                            const offsetY = 5 * (-dx / dr);
+                            return `translate(${offsetX}, ${offsetY})`;
+                        }
+                        return null;
+                    })
+                    .style("stroke", function (d: any) {
+                        return d.type === "aromatic" ? "purple" : "#aaa";
+                    });
+                node.attr("cx", (d: any) => d.x)
+                    .attr("cy", (d: any) => d.y);
+                labels
+                    .attr("x", (d: any) => d.x)
+                    .attr("y", (d: any) => d.y);
+                let maxXDistance = 0;
+                let maxYDistance = 0;
+                initialCoordinates = {};
+                data.nodes.forEach((node1: any) => {
+                    initialCoordinates[node1.id] = {
+                        x: node1.x,
+                        y: node1.y,
+                    };
+
+                    data.nodes.forEach((node2: any) => {
+                        if (node1 !== node2) {
+                            const xDistance = Math.abs(
+                                node1.x - node2.x
+                            );
+                            const yDistance = Math.abs(
+                                node1.y - node2.y
+                            );
+
+                            if (xDistance > maxXDistance) {
+                                maxXDistance = xDistance;
+                            }
+
+                            if (yDistance > maxYDistance) {
+                                maxYDistance = yDistance;
+                            }
+                        }
+                    });
+                });
+
+
+                const graphWidth = maxXDistance + 20;
+                const graphHeight = maxYDistance + 20;
+                const point1 = { x: 0.9 * offset - 260, y: height / 8 };
+                const point2 = {
+                    x: 0.8 * offset - 260,
+                    y: height / 20,
+                };
+                const point3 = {
+                    x: 0.8 * offset - 260,
+                    y: height / 1.7,
+                };
+                const point4 = {
+                    x: 0.9 * offset - 260,
+                    y: height / 1.5,
+                };
+                const tolerance = 100;
+
+                const x_dist = Math.abs(point1.x - point2.x);
+                const y_dist = Math.abs(point1.y - point4.y);
+
+                const centerX = (point1.x + point3.x) / 2;
+                const centerY = (point1.y + point3.y) / 2;
+                let scaleX = (graphWidth + tolerance) / x_dist;
+                let scaleY = (graphHeight + tolerance) / y_dist;
+                let transform = `translate(${centerX}, ${centerY}) scale(${scaleX}, ${scaleY}) translate(${-centerX}, ${-centerY})`;
+                if (
+                    graphWidth + tolerance < x_dist &&
+                    graphHeight + tolerance < y_dist
+                ) {
+                    transform = `scale(1, 1)`;
+                }
+
+                const parallelogram = svg
+                    .append("polygon")
+                    .attr(
+                        "points",
+                        `${point1.x},${point1.y} ${point2.x},${point2.y} ${point3.x},${point3.y} ${point4.x},${point4.y}`
+                    )
+                    .attr("stroke", "black")
+                    .attr("fill", "none")
+                    .attr("transform", transform);
+                onComplete();
+                resolve();
+            }
+            updatePositions();
         };
 
         const visualizeG = async () => {
@@ -1074,7 +1079,7 @@ export function visualizeMatrixBody(gridSize: number, graph: any, width: number,
         .attr("y", (d: HeatmapData) => y(d.variable)! + 150)
         .attr("width", x.bandwidth())
         .attr("height", y.bandwidth())
-        .attr("id", (d:any)=>`gridCell-${d.group}-${d.variable}`)
+        .attr("id", (d: any) => `gridCell-${d.group}-${d.variable}`)
         .style("fill", (d: HeatmapData) => myColor(d.value))
         .style("stroke-width", 1)
         .style("stroke", "grey")
@@ -1130,8 +1135,8 @@ export function visualizePartialGraphMatrix(
         const width = gridSize + margin.left + margin.right;
         const height = (gridSize + margin.top + margin.bottom) * 2;
         //get the nodes
-        let nodesA:number[] = getNodeSet(graph, hubNodeA)[0];
-        let nodesB:number[] = getNodeSet(graph, hubNodeB)[0];
+        let nodesA: number[] = getNodeSet(graph, hubNodeA)[0];
+        let nodesB: number[] = getNodeSet(graph, hubNodeB)[0];
 
         console.log("nodesA", nodesA);
         console.log("nodesB", nodesB);
@@ -1182,16 +1187,19 @@ export function visualizePartialGraph(
     isAttribute: boolean,
     mode: number,
     hubNodeA: number,
-    hubNodeB: number
+    hubNodeB: number,
+    innerComputationMode: string
 ): Promise<void> {
     return new Promise<void>((resolve) => {
-        const init = async (data: any) => {
+        const init = async (data: any, subgraph: any[], nodeMapping: any) => {
             const offset = 600;
             const margin = { top: 10, right: 30, bottom: 30, left: 40 };
             const width = 6 * offset - margin.left - margin.right;
             const height = 1000 - margin.top - margin.bottom;
 
-            console.log(data);
+
+
+
 
             // Append the SVG object to the body of the page
             d3.select("#my_dataviz").selectAll("svg").remove();
@@ -1212,45 +1220,87 @@ export function visualizePartialGraph(
                 .selectAll("line")
                 .data(data.links)
                 .join("line")
-                .style("stroke", "#aaa");
+                .style("stroke", "#aaa")
+                .style("stroke-dasharray", (d: any) => {
+
+
+                    let is_source = false;
+                    let is_target = false;
+                    if (nodeMapping[hubNodeA] === d.source || nodeMapping[hubNodeA] == d.target) {
+
+                        is_source = true
+
+                    }
+
+                    if (nodeMapping[hubNodeB] === d.target || nodeMapping[hubNodeB] == d.source) {
+                        is_target = true
+
+                    }
+
+
+                    if (is_source && is_target) {
+                        return "5";
+                    }
+
+
+                    return "none"
+
+                })
+
+
 
             // Initialize the nodes
             const node = g1
                 .selectAll("circle")
                 .data(data.nodes)
                 .join("circle")
+                .attr("id", (d: any) => `node-${d.id}-${hubNodeA}-${hubNodeB}`)
                 .attr("r", 17)
                 .style("fill", "white")
                 .style("stroke", "#69b3a2")
                 .style("stroke-width", 1)
                 .style("stroke-opacity", 1)
                 .attr("opacity", 1);
+            console.log('Current directory:', __dirname);
+            console.log('File path:', __filename);
+            const location = fetchSubGraphNodeLocation(hubNodeA + hubNodeB, innerComputationMode);
+            console.log("location", location)
 
+            data.nodes.forEach((node: any, i: number) => {
+                if (location[node.id]) {
+                    node.x = location[node.id].x;
+                    node.y = location[node.id].y;
+                } else {
+                    node.x = Math.random() * width;
+                    node.y = Math.random() * height;
+                }
+            });
             const labels = g1
                 .selectAll("text")
                 .data(data.nodes)
                 .join("text")
-                .text((d: any) => d.id)
+                .text((d: any) => d.original_id)
                 .attr("font-size", `12px`)
                 .attr("text-anchor", "middle")
                 .attr("dominant-baseline", "central");
 
 
 
-                const simulation = d3
+            const simulation = d3
                 .forceSimulation(data.nodes)
                 .force(
-                  "link",
-                  d3
-                    .forceLink(data.links)
-                    .id((d: any) => d.id)
-                    .distance(20)
+                    "link",
+                    d3
+                        .forceLink(data.links)
+                        .id((d: any) => d.id)
+                        .distance(20)
                 )
                 .force("charge", d3.forceManyBody().strength(-1000))
                 .force("center", d3.forceCenter(width / 2, height / 2.5))
-                .force("y", d3.forceY(height / 2.5).strength(0.2)) 
-                .force("x", d3.forceX(width / 2).strength(0.8))  
-       
+                .force("y", d3.forceY(height / 2.5).strength(0.2))
+                .force("x", d3.forceX(width / 2).strength(0.8))
+                .stop()
+
                 .on("tick", function ticked() {
                     link.attr("x1", (d: any) => d.source.x)
                         .attr("y1", (d: any) => d.source.y)
@@ -1262,73 +1312,96 @@ export function visualizePartialGraph(
                     );
 
                     labels.attr("x", (d: any) => d.x)
-                          .attr("y", (d: any) => d.y);
+                        .attr("y", (d: any) => d.y);
                 })
-                .on("end", function ended() {
-                    let maxXDistance = 0;
-            let maxYDistance = 0;
-            data.nodes.forEach((node1: any) => {
-                data.nodes.forEach((node2: any) => {
-                    if (node1 !== node2) {
-                        const xDistance = Math.abs(node1.x - node2.x);
-                        const yDistance = Math.abs(node1.y - node2.y);
-    
-                        if (xDistance > maxXDistance) {
-                          maxXDistance = xDistance;
-                        }
-    
-                        if (yDistance > maxYDistance) {
-                          maxYDistance = yDistance;
-                        }
-                      }
+            function updatePositions() {
+                link.attr("x1", (d: any) => d.source.x)
+                    .attr("y1", (d: any) => d.source.y)
+                    .attr("x2", (d: any) => d.target.x)
+                    .attr("y2", (d: any) => d.target.y);
+
+                node.attr("cx", (d: any) => d.x).attr("cy", (d: any) => d.y);
+
+                labels.attr("x", (d: any) => d.x)
+                    .attr("y", (d: any) => d.y);
+
+
+                let maxXDistance = 0;
+                let maxYDistance = 0;
+                let initialCoordinates: { [id: string]: { x: number; y: number } } = {};
+
+                data.nodes.forEach((node: any) => {
+                    initialCoordinates[node.id] = { x: node.x, y: node.y };
                 });
-            });
-            const graphWidth = maxXDistance + 20;
-            const graphHeight = maxYDistance + 20;
-            const point1 = { x: 0.9 * offset - 260, y: height / 8 + 30};
-            const point2 = {
-                x: 0.8 * offset - 260,
-                y: height / 20 + 30,
-            };
-            const point3 = {
-                x: 0.8 * offset - 260,
-                y: height / 1.7 + 30,
-            };
-            const point4 = {
-                x: 0.9 * offset - 260,
-                y: height / 1.5 + 30,
-            };
-            const tolerance = 100;
 
-            const x_dist = Math.abs(point1.x - point2.x);
-            const y_dist = Math.abs(point1.y - point4.y);
+                //Convert the dictionary to a JSON string
 
-            const centerX = (point1.x + point3.x) / 2;
-            const centerY = (point1.y + point3.y) / 2;
-            let scaleX = (graphWidth + tolerance) / x_dist;
-            let scaleY = (graphHeight + tolerance) / y_dist;
-            let transform = `translate(${centerX}, ${centerY}) scale(${scaleX}, ${scaleY}) translate(${-centerX}, ${-centerY})`;
-            if (
-                graphWidth + tolerance < x_dist &&
-                graphHeight + tolerance < y_dist
-            ) {
-                transform = `scale(1, 1)`;
-            }
-            const parallelogram = svg
-                .append("polygon")
-                .attr(
-                    "points",
-                    `${point1.x},${point1.y} ${point2.x},${point2.y} ${point3.x},${point3.y} ${point4.x},${point4.y}`
-                )
-                .attr("stroke", "black")
-                .attr("fill", "none")
-                .attr("transform", transform);
+                data.nodes.forEach((node1: any) => {
+                    data.nodes.forEach((node2: any) => {
+                        if (node1 !== node2) {
+                            const xDistance = Math.abs(node1.x - node2.x);
+                            const yDistance = Math.abs(node1.y - node2.y);
+
+                            if (xDistance > maxXDistance) {
+                                maxXDistance = xDistance;
+                            }
+
+                            if (yDistance > maxYDistance) {
+                                maxYDistance = yDistance;
+                            }
+                        }
+                    });
+                });
+                const graphWidth = maxXDistance + 20;
+                const graphHeight = maxYDistance + 20;
+                const point1 = { x: 0.9 * offset - 260, y: height / 8 + 30 };
+                const point2 = {
+                    x: 0.8 * offset - 260,
+                    y: height / 20 + 30,
+                };
+                const point3 = {
+                    x: 0.8 * offset - 260,
+                    y: height / 1.7 + 30,
+                };
+                const point4 = {
+                    x: 0.9 * offset - 260,
+                    y: height / 1.5 + 30,
+                };
+                const tolerance = 100;
+
+                const x_dist = Math.abs(point1.x - point2.x);
+                const y_dist = Math.abs(point1.y - point4.y);
+
+                const centerX = (point1.x + point3.x) / 2;
+                const centerY = (point1.y + point3.y) / 2;
+                let scaleX = (graphWidth + tolerance) / x_dist;
+                let scaleY = (graphHeight + tolerance) / y_dist;
+                let transform = `translate(${centerX}, ${centerY}) scale(${scaleX}, ${scaleY}) translate(${-centerX}, ${-centerY})`;
+                if (
+                    graphWidth + tolerance < x_dist &&
+                    graphHeight + tolerance < y_dist
+                ) {
+                    transform = `scale(1, 1)`;
+                }
+                const parallelogram = svg
+                    .append("polygon")
+                    .attr(
+                        "points",
+                        `${point1.x},${point1.y} ${point2.x},${point2.y} ${point3.x},${point3.y} ${point4.x},${point4.y}`
+                    )
+                    .attr("stroke", "black")
+                    .attr("fill", "none")
+                    .attr("transform", transform);
                 onComplete();
                 resolve();
-        })
-          
-            
-    
+            }
+            updatePositions()
+
+
+
+
+
+
         }
 
 
@@ -1338,7 +1411,15 @@ export function visualizePartialGraph(
                 if (processedData) {
                     const graphs = processedData[0][0]
 
-                    await init(graphs);
+
+
+                    let subgraph = processedData[1];
+                    let nodeMapping = processedData[2]
+                    await init(graphs, subgraph, nodeMapping);
+
+
+
+
 
                 }
 
@@ -1348,6 +1429,7 @@ export function visualizePartialGraph(
         };
 
         visualizeG();
+
     });
 }
 
