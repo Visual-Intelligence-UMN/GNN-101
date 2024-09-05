@@ -211,15 +211,17 @@ export default function Home() {
                                                     if (newModel.includes("GAT")) {
                                                         setModelType("GAT");
                                                         setSelectedGraph("twitch_EN");
-                                                        setHubNodeA(148);
-                                                        setHubNodeB(407);
-                                                        // setHubNodeA(317);
-                                                        // setHubNodeB(784);
+                                                        // setHubNodeA(148);
+                                                        // setHubNodeB(407);
+                                                        setHubNodeA(194);
+                                                        setHubNodeB(590);
                                                     } else if (newModel.includes("GraphSAGE")) {
                                                         setModelType("GraphSAGE");
                                                         setSelectedGraph("twitch_EN");
-                                                        setHubNodeA(317);
-                                                        setHubNodeB(784);
+                                                        // setHubNodeA(317);
+                                                        // setHubNodeB(784);
+                                                        setHubNodeA(194);
+                                                        setHubNodeB(590);
                                                     } else if (newModel.includes("GCN")) {
                                                         setModelType("GCN");
                                                         if (newModel.includes("graph classification")) {
@@ -228,10 +230,10 @@ export default function Home() {
                                                             setSelectedGraph("karate");
                                                         } else if (newModel.includes("link prediction")) {
                                                             setSelectedGraph("twitch_EN");
-                                                            setHubNodeA(148);
-                                                            setHubNodeB(407);
-                                                            // setHubNodeA(317);
-                                                            // setHubNodeB(784);
+                                                            // setHubNodeA(148);
+                                                            // setHubNodeB(407);
+                                                            setHubNodeA(194);
+                                                            setHubNodeB(590);
                                                         }
                                                     }
                                                 }
@@ -308,7 +310,8 @@ export default function Home() {
                                                     <>
                                                         Predict whether there is a link <br /> from node {" "}
                                                         <NodeSelector
-                                                            nodeList={model.includes('GraphSAGE') ? midGraphNodeSelectionList : nodeSelectionList}
+                                                            // nodeList={model.includes('GraphSAGE') ? midGraphNodeSelectionList : nodeSelectionList}
+                                                            nodeList={midGraphNodeSelectionList}
                                                             selectedNode={hubNodeA}
                                                             dependNode={hubNodeB}
                                                             setSelectedNode={setHubNodeA}
@@ -318,7 +321,7 @@ export default function Home() {
                                                         />
                                                         {" "} to node {" "}
                                                         <NodeSelector
-                                                            nodeList={model.includes('GraphSAGE') ? midGraphNodeSelectionList : nodeSelectionList}
+                                                            nodeList={midGraphNodeSelectionList}
                                                             selectedNode={hubNodeB}
                                                             dependNode={hubNodeA}
                                                             setSelectedNode={setHubNodeB}
