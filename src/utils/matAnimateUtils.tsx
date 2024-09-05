@@ -697,15 +697,14 @@ export function drawSamplingAggregation(
             .attr("class", "procVis summation")
             .attr("id", "procPath");
 
-        //draw multipliers
-        let x = (coordFeatureVis[0] - posList[i][0]) / 2 + posList[i][0];
-        let y = (coordFeatureVis[1] - posList[i][1]) / 2 + posList[i][1];
+        console.log("poslist", posList[i])
 
+        //draw multipliers
         d3.select(".mats")
             .append("text")
             .text(mulValues[i].toFixed(2))
-            .attr("x", x - 2)
-            .attr("y", y - 2)
+            .attr("x", posList[i][0] + 5)
+            .attr("y", posList[i][1] + 5)
             .attr("text-anchor", "middle")
             .attr("font-size", 7.5)
             .attr("class", "procVis multiplier")
@@ -825,8 +824,8 @@ export function drawSummationFeature(
         d3.select(".mats")
             .append("text")
             .text(mulValues[i].toFixed(2))
-            .attr("x", x - 2)
-            .attr("y", y - 2)
+            .attr("x", posList[i][0] + 7.5)
+            .attr("y", posList[i][1])
             .attr("text-anchor", "middle")
             .attr("font-size", 7.5)
             .attr("class", "procVis multiplier")
