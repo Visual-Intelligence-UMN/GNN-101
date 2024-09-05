@@ -284,7 +284,7 @@ export default function Home() {
                                         <div className="flex-1 items-center gap-x-4 text-xl">
                                             <div className={inter3.className}>
                                                 {model.includes("graph classification") && (
-                                                    <> <div className="m-1"> Predict the graph of </div>
+                                                    <> <div className="m-1"> Classify the graph of </div>
                                                         <Selector
                                                             selectedOption={
                                                                 selectedGraph
@@ -301,12 +301,12 @@ export default function Home() {
                                                 )}
 
                                                 {model.includes("node classification") && (
-                                                    <span>Predict all nodes of the karate club network</span>
+                                                    <span>Classify all nodes of the karate club network</span>
                                                 )}
 
                                                 {model.includes("link prediction") && (
                                                     <>
-                                                        Predict the link <br /> from node {" "}
+                                                        Predict whether there is a link <br /> from node {" "}
                                                         <NodeSelector
                                                             nodeList={model.includes('GraphSAGE') ? midGraphNodeSelectionList : nodeSelectionList}
                                                             selectedNode={hubNodeA}
