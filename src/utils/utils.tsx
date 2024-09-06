@@ -1138,7 +1138,7 @@ export function calculateAverage(arr: number[]): number {
     return average * 10;
 }
 
-export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset: number, subgraph: any, mode: number, hubNodeA: number, hubNodeB: number) {
+export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offset: number, subgraph: any, mode: number, hubNodeA: number, hubNodeB: number, centerY: number) {
     const nodesByIndex = d3.group(nodes, (d: any) => d.graphIndex);
 
 
@@ -1356,11 +1356,11 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
                         const controlX1 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.3;
                         const controlY1 = node.y + 10;
                         const controlX2 = node.x + xOffset1 + (nextNode.x + xOffset2 - node.x - xOffset1) * 0.7;
-                        const controlY2 = nextNode.y + 10;
+                        const controlY2 = centerY + 20
                         if (isValidNode(subgraph, node)) {
 
                             const path = svg.append("path")
-                                .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 20} ${nextNode.y + 10}`)
+                                .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 20} ${centerY + 20}`)
                                 .style("stroke", linkStrength(avg))
                                 .style("opacity", 0)
                                 .style('stroke-width', 1)

@@ -46,7 +46,8 @@ export function linkPredFeatureVisualizer(
   colorSchemes:any,
   mode: number,
   subgraph: any,
-  innerComputationMode: string
+  innerComputationMode: string,
+  centerY: number,
 ) {
   state.isClicked = false;
 
@@ -356,18 +357,18 @@ export function linkPredFeatureVisualizer(
           rectName = "output";
         }
         let prevRectHeight = 3;
-        let groupCentralHeight = currRectHeight * features.length / 2;
-        let yOffset = groupCentralHeight - (height / 5);
+        let groupCentralHeight = 175;
+        let yOffset = groupCentralHeight;
 
         const featureGroup = g2.append("g")
-          .attr("transform", `translate(${node.x - 7.5}, ${node.y - yOffset})`);
+          .attr("transform", `translate(${node.x - 7.5}, ${centerY})`);
 
         featureGroup.selectAll("rect")
           .data(features)
           .enter()
           .append("rect")
           .attr("x", -10) //adjust x and y coordination so it locates in the middle of the graph
-          .attr("y", (d: any, i: number) => i * currRectHeight - 190)
+          .attr("y", (d: any, i: number) => i * currRectHeight)
           .attr("width", rectWidth)
           .attr("id", (d: any, i: number) => rectName +"-layer-rect-" + i) 
           .attr("height", currRectHeight)
@@ -380,7 +381,7 @@ export function linkPredFeatureVisualizer(
 
           const frame = featureGroup.append("rect")
           .attr("x", -10)  
-          .attr("y", -190)
+          .attr("y", 0)
           .attr("width", 15)
           .attr("class", "node-features")
           .attr("height", currRectHeight * (node.features.length))
@@ -391,14 +392,14 @@ export function linkPredFeatureVisualizer(
 
 
         const featureGroupCopy = g2.append("g")
-          .attr("transform", `translate(${node.x - 7.5}, ${node.y - yOffset})`);
+          .attr("transform", `translate(${node.x - 7.5}, ${centerY})`);
 
         featureGroupCopy.selectAll("rect")
           .data(features)
           .enter()
           .append("rect")
           .attr("x", -10) //adjust x and y coordination so it locates in the middle of the graph
-          .attr("y", (d: any, i: number) => i * currRectHeight - 190)
+          .attr("y", (d: any, i: number) => i * currRectHeight)
           .attr("width", rectWidth)
           .attr("height", currRectHeight)
           .attr("class", "node-features-Copy")
@@ -411,7 +412,7 @@ export function linkPredFeatureVisualizer(
 
           const frameCopy = featureGroupCopy.append("rect")
           .attr("x", -10)  
-          .attr("y", -190)
+          .attr("y", 0)
           .attr("width", 15)
           .attr("class", "node-features-Copy")
           .attr("height", currRectHeight * (node.features.length))
@@ -427,7 +428,7 @@ export function linkPredFeatureVisualizer(
         
         node.featureGroup = featureGroup;
         xPos = node.x;
-        yPos = node.y + rectHeight * node.features.length + yOffset; 
+        yPos = centerY;
         let featureGroupLocation: FeatureGroupLocation = {xPos, yPos}; 
         node.featureGroupLocation = featureGroupLocation; // this will be used in calculationvisualizer
 
@@ -650,7 +651,7 @@ export function linkPredOutputVisualizer(
     .attr("class", "to-be-removed dot-product")
     .attr("y", height / 3 - 30)
     .text("Sigmoid")
-    .attr("fill", "black")
+    .attr("fill", "grey")
     .attr("font-size", "17")
     .style("opacity", 0)
     
@@ -746,13 +747,7 @@ export function linkPredOutputVisualizer(
   
           moveFeaturesBack(node.relatedNodes, originalCoordinates);
   
-          node.featureGroup
-              .transition()
-              .duration(1000)
-              .attr(
-                  "transform",
-                  `translate(${node.x - 7.5}, ${node.y + 170 + 5}) rotate(0)`
-              );
+ 
   
               handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state)
   
