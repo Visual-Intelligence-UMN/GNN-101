@@ -344,9 +344,9 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
                     const centerX = (point1.x + point3.x) / 2;
                     const centerY = (point1.y + point3.y) / 2;
                     if (i === 3) {
-                        let bool = "True"
+                        let bool = "False"
                         if (value[0] > 0.5) {
-                            bool = "False"
+                            bool = "True"
                         }
 
                         console.log("VAWSD")
