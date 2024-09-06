@@ -1396,7 +1396,7 @@ export function visualizeLinkClassifierFeatures(
                 features = featureVisPack.features;
                 intervalID = featureVisPack.getIntervalID();
             } else if(innerComputationMode == "GAT"){
-                const featureVisPack = (
+                const featureVisPack = featureGATClick(
                     layerID,
                     node,
                     recordLayerID,
