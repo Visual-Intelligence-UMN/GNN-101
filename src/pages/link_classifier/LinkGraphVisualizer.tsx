@@ -259,7 +259,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
                             value = intmData.conv2;
                         }
                         if (i === 3) {
-                            value = intmData.prob_adj[hubNodeA * hubNodeB + hubNodeA];
+                            value = intmData.prob_adj[hubNodeA * 7126 + hubNodeB];
                         }
                     }
                     console.log("VAW", value, intmData.prob_adj)
@@ -276,6 +276,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
                         }
                         if (value != null && i === 3) {
                             node.features = [sigmoid(value)]
+                        
 
                             allValues = allValues.concat(node.features)
 
@@ -344,9 +345,11 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
                     const centerX = (point1.x + point3.x) / 2;
                     const centerY = (point1.y + point3.y) / 2;
                     if (i === 3) {
-                        let bool = "False"
+           
+                        let bool = "True"
+
                         if (value[0] > 0.5) {
-                            bool = "True"
+                            bool = "False"
                         }
 
                         console.log("VAWSD")
@@ -391,7 +394,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
 
 
                     let featureCoords = [{ x: 0, y: 0 }, { x: 0, y: 0 }];
-                    if (i == 4) {
+                    if (i === 3) {
                         featureCoords[0] = { x: centerX, y: centerY };
                     }
                     if (i == 5) {
@@ -453,6 +456,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
 
 
                     if (i === graphs.length - 1) {
+                      
                         connectCrossGraphNodes(
                             allNodes,
                             svg,
@@ -461,13 +465,15 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
                             subgraph,
                             2,
                             hubNodeA,
-                            hubNodeB
+                            hubNodeB,
+                            centerY
+                            
                         );
                         svg.selectAll("circle")
                             .attr("opacity", 0);
 
                         if (intmData) {
-                            linkPredFeatureVisualizer(svg, allNodes, offset, height, graphs, 1200, 900, 15, 2, 3, 20, colorSchemes, 2, subgraph, innerComputationMode);
+                            linkPredFeatureVisualizer(svg, allNodes, offset, height, graphs, 1200, 900, 15, 2, 3, 20, colorSchemes, 2, subgraph, innerComputationMode, centerY);
                         }
                     }
                 }
