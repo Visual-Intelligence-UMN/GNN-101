@@ -364,10 +364,7 @@ async function initLinkClassifier(
 
     const gLen = graph.length;
 
-    let gridSize = 400;
-    if(innerComputationMode == "GraphSAGE"){
-        gridSize = 800;
-    }
+    let gridSize = 800;
     const margin = { top: 10, right: 80, bottom: 30, left: 80 };
     const width = 20 * gLen + 50 + 6 * 102 + 1200 * 2;
     const height = (gridSize + margin.top + margin.bottom) * 2;
