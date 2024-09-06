@@ -258,7 +258,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
               value = intmData.conv2;
             }
             if (i === 3) {
-              value = intmData.prob_adj[hubNodeA * hubNodeB + hubNodeA];
+              value = intmData.prob_adj[(hubNodeB * 7126) + hubNodeA];
             }
           }
           console.log("VAW", value, intmData.prob_adj)
@@ -344,7 +344,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
             const centerY = (point1.y + point3.y) / 2;
           if (i === 3) {
             let bool = "True"
-            if (value[0] > 0.5) {
+            if (sigmoid(value[0]) > 0.5) {
               bool = "False"
             }
             
