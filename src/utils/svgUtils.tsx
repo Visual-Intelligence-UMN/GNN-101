@@ -59,7 +59,7 @@ function formularInteractionHandler(x: number, y: number, g: any, class_name: st
         d3.selectAll(".procVis").style("opacity", 0.2)
         d3.selectAll(".cant-remove").style("opacity", 0.2);
         d3.selectAll(".formula").style("opacity", 0.2)
-        d3.select(`.${class_name}`).style("opacity", 1)
+        d3.selectAll(`.${class_name}`).style("opacity", 1)
 
 
 
