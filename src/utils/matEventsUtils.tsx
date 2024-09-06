@@ -734,8 +734,12 @@ export function featureVisClick(
         // {func: () => {curNode.style.opacity = "1";},delay: aniSec,},
         {
             func:()=>{
-                drawMathFormula(formula, coordFeatureVis2Copy[0], coordFeatureVis2Copy[1]+curveDir*125, "./assets/SVGs/GCNFormula.svg");
-                
+                if((featureVisTable.length==4&&layerID==2)||
+                (oFeatureChannels==128&&layerID==1)){
+                    drawMathFormula(formula, coordFeatureVis2Copy[0], coordFeatureVis2Copy[1]+curveDir*125, "./assets/SVGs/GCNFormulaWithoutActivation.svg");
+                }else{
+                    drawMathFormula(formula, coordFeatureVis2Copy[0], coordFeatureVis2Copy[1]+curveDir*125, "./assets/SVGs/GCNFormula.svg");
+                }
                 const gLabel = d3.select(".mats").append("g");
                 injectSVG(gLabel, btnX-120-64, btnY-30-120-64, "./assets/SVGs/interactionHint.svg", "procVis hintLabel");
 
@@ -1659,8 +1663,12 @@ export function featureGATClick(
         }, delay: aniSec*2},
         {
             func:()=>{
-                drawMathFormula(formula, coordFeatureVis2Copy[0], coordFeatureVis2Copy[1]+curveDir*125, "./assets/SVGs/GATFormula.svg");
-                
+                console.log("layerID", layerID)
+                if(layerID==1){
+                    drawMathFormula(formula, coordFeatureVis2Copy[0], coordFeatureVis2Copy[1]+curveDir*125, "./assets/SVGs/GATFormulaWithoutActivation.svg");
+                }else{
+                    drawMathFormula(formula, coordFeatureVis2Copy[0], coordFeatureVis2Copy[1]+curveDir*125, "./assets/SVGs/GATFormula.svg");
+                }
                 const gLabel = d3.select(".mats").append("g");
                 injectSVG(gLabel, btnX-120-64, btnY-30-120-64, "./assets/SVGs/interactionHint.svg", "procVis hintLabel");
             }
@@ -2221,8 +2229,11 @@ export function featureSAGEClick(
         }, delay: aniSec*2},
         {
             func:()=>{
-                drawMathFormula(formula, coordFeatureVis2Copy[0], coordFeatureVis2Copy[1]+curveDir*125, "./assets/SVGs/GsageFormula.svg");
-                
+                if(layerID==1){
+                    drawMathFormula(formula, coordFeatureVis2Copy[0], coordFeatureVis2Copy[1]+curveDir*125, "./assets/SVGs/GsageFormulaWithoutActivation.svg");
+                }else{
+                    drawMathFormula(formula, coordFeatureVis2Copy[0], coordFeatureVis2Copy[1]+curveDir*125, "./assets/SVGs/GsageFormula.svg");
+                }
                 const gLabel = d3.select(".mats").append("g");
                 injectSVG(gLabel, btnX-120-64, btnY-30-120-64, "./assets/SVGs/interactionHint.svg", "procVis hintLabel");
             }

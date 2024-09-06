@@ -1000,6 +1000,7 @@ export function drawMathFormula(
     y: number,
     formula: string
 ) {
+    console.log("formula", formula);
     injectSVG(
         g,
         x,

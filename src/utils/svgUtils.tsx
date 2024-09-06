@@ -102,7 +102,7 @@ export function injectSVG(g:any, x: number, y: number, SVGPath:string, svgClass:
         play = g!.node()!.appendChild(data.documentElement)
         d3.select(play).attr("x", x).attr("y", y).attr("class", svgClass)
        
-        if (SVGPath === "./assets/SVGs/GCNFormula.svg" || SVGPath === "./assets/SVGs/GATFormula.svg" || SVGPath === "./assets/SVGs/GsageFormula.svg") {
+        if (SVGPath.includes("Formula")) {
 
             g.append("rect")
             .attr("class", "to-be-removed")

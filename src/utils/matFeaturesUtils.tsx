@@ -1706,6 +1706,12 @@ export function drawResultVisForLinkModel(
         .attr("stroke-width", 0.1)
         .attr("class", "resultVis")
         .attr("id", `resultRect`);
+    g.append("text")
+        .attr("x", featureX)
+        .attr("y", midYForFeature)
+        .text(trueProb.toFixed(2))
+        .style("fill", "white")
+        .style("font-size", "5px");
 //    }
 
     //add result label

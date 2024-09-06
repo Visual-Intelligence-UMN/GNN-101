@@ -5,7 +5,7 @@ import { on } from "events";
 import { useEffect } from "react";
 import { IntmData, IntmDataLink, IntmDataNode } from "@/types";
 import { only } from "node:test";
-import {ColorRing} from 'react-loader-spinner';
+import { ColorRing } from 'react-loader-spinner';
 
 interface ClassifyGraphProps {
   graphPath: string;
@@ -104,14 +104,14 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
     <>
       <span>Predicting...Estimated waiting time is 10 seconds...</span>
       <ColorRing
-  visible={true}
-  height="80"
-  width="80"
-  ariaLabel="color-ring-loading"
-  wrapperStyle={{}}
-  wrapperClass="color-ring-wrapper"
-  colors={['#e15b64', '#f47e60', '#f8b26a', '#abbd81', '#849b87']}
-  />
+        visible={true}
+        height="80"
+        width="80"
+        ariaLabel="color-ring-loading"
+        wrapperStyle={{}}
+        wrapperClass="color-ring-wrapper"
+        colors={['#e15b64', '#f47e60', '#f8b26a', '#abbd81', '#849b87']}
+        />
     </>
   );
   const content =
