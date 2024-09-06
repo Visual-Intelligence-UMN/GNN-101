@@ -438,6 +438,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                             [],
                             0,
                             0,
+                            0,
                             0
                         );
 
