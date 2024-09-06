@@ -1306,8 +1306,8 @@ export function calculationVisualizer(
 
                     if (innerComputationMode === "GCN") {
                     g3.append("text")
-                        .attr("x", start_x + 20)
-                        .attr("y", start_y - 10)
+                        .attr("x", start_x)
+                        .attr("y", start_y)
                         .text(adjMatrixSlice[i])
                         .attr("font-size", 7.5)
                         .attr("class", "parameter procVis to-be-removed")
@@ -1318,8 +1318,8 @@ export function calculationVisualizer(
 
 
                         const frame = g3.append("rect")
-                        .attr("x", start_x + 20)
-                        .attr("y", start_y - 10)
+                        .attr("x", start_x)
+                        .attr("y", start_y)
                         .attr("width", 10)
                         .attr("height", 10)
                         .style("fill", "white")
@@ -1333,8 +1333,8 @@ export function calculationVisualizer(
                         
 
                         g3.append("text")
-                        .attr("x", start_x + 20)
-                        .attr("y", start_y - 10)
+                        .attr("x", start_x)
+                        .attr("y", start_y)
                         .text(multiplier)
                         .attr("font-size", 7.5)
                         .attr("class", "parameter procVis to-be-removed")

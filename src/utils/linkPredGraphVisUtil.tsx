@@ -746,10 +746,7 @@ export function linkPredOutputVisualizer(
   
   
           moveFeaturesBack(node.relatedNodes, originalCoordinates);
-  
- 
-  
-              handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state)
+          handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state)
   
   
   })
