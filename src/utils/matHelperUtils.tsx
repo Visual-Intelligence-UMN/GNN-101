@@ -8,25 +8,25 @@ import {
 import * as d3 from "d3";
 
 export function drawHintLabel(
-    g:any,
-    x:number,
-    y:number,
-    text:string,
-    classTag:string,
-    textSize:string = "17px"
-){
+    g: any,
+    x: number,
+    y: number,
+    text: string,
+    classTag: string,
+    textSize: string = "17px"
+) {
     const label = g.append("text")
         .attr("x", x)
         .attr("y", y)
         .text(text)
         .style("fill", "gray")
         .style("font-size", textSize)
-        .attr("class", classTag); 
+        .attr("class", classTag);
     return label;
 }
 
 
-export function drawScoreE(g:any, x:number, y:number, leftIndex:number, rightIndex:number){
+export function drawScoreE(g: any, x: number, y: number, leftIndex: number, rightIndex: number) {
     const e = g.append("text")
         .attr("x", x)
         .attr("y", y)
@@ -38,18 +38,18 @@ export function drawScoreE(g:any, x:number, y:number, leftIndex:number, rightInd
 }
 
 export function drawEqComponentLabel(
-    eDisplayer:any,
+    eDisplayer: any,
     x: number,
     y: number,
     text: string
-){
+) {
     eDisplayer.append("text")
-            .text(text)
-            .attr("x", x)
-            .attr("y", y)
-            .attr("class", "temp")
-            .style("fill", "gray")
-            .style("font-size", 5);
+        .text(text)
+        .attr("x", x)
+        .attr("y", y)
+        .attr("class", "temp")
+        .style("fill", "gray")
+        .style("font-size", 5);
 }
 
 
@@ -86,26 +86,31 @@ export function getNodeAttributes(data: any) {
 }
 
 //draw node attributes on the matrix
-export function drawNodeAttributes(nodeAttrs: any, graph: any, offset: number) {
+export function drawNodeAttributes(nodeAttrs: string[], graph: any, offset: number) {
     //visualize node attributes
     const textCood = get_cood_from_parent(".y-axis", "text");
 
     //drawPoints(".mats", "red", textCood);
     //get the node attr as an array
 
-    //for y-axis
-    for (let i = 0; i < textCood.length; i++) {
-        d3.select(".mats")
-            .append("text")
-            .attr("x", textCood[i][0] + 20)
-            .attr("y", textCood[i][1] + 22.5+offset)
-            .attr("font-size", "10px")
-            .text(nodeAttrs[i]);
-    }
+
+    d3.select(".mats")
+        .append("g")
+        .attr("class", "node-attrs-x")
+        .selectAll("text.node-attr-x")
+        .data(nodeAttrs)
+        .enter()
+        .append("text")
+        .attr("class", "node-attr-x")
+        .attr("x", (_, i) => textCood[i][0] + 20)
+        .attr("y", (_, i) => textCood[i][1] + 22.5 + offset)
+        .attr("font-size", "10px")
+        .text(d => d);
+
     //for x-axis
     const rectCood = get_cood_from_parent(".mats", "rect");
 
-    console.log("rectCoord", rectCood);
+    // console.log("rectCoord", rectCood);
 
     const step = graph.length;
     let xTextCood = [];
@@ -113,19 +118,22 @@ export function drawNodeAttributes(nodeAttrs: any, graph: any, offset: number) {
         xTextCood.push(rectCood[i]);
     }
 
-    console.log("xTextCood", xTextCood);
-
-    // drawPoints(".mats", "red", xTextCood);
-    for (let i = 0; i < xTextCood.length; i++) {
-        d3.select(".mats")
-            .append("text")
-            .attr("x", xTextCood[i][0] - 2.5)
-            .attr("y", xTextCood[i][1] + 75)
-            .attr("font-size", "10px")
-            .text(nodeAttrs[i]);
-    }
+    d3.select(".mats")
+        .append("g")
+        .attr("class", "node-attrs-y")
+        .selectAll("text.node-attr-y")
+        .data(nodeAttrs)
+        .enter()
+        .append("text")
+        .attr("class", "node-attr-y")
+        .attr("x", (_, i) => xTextCood[i][0] - 2.5)
+        .attr("y", (_, i) => xTextCood[i][1] + 75)
+        .attr("font-size", "10px")
+        .attr('text-anchor', (d, i) => d.toString().length > 1 ? 'end' : 'middle')
+        .attr("transform", (d, i) => d.toString().length > 1 ? `rotate(-40, ${xTextCood[i][0] - 20}, ${xTextCood[i][1] + 62})` : '')
+        .text(d => d);
     //drawPoints(".mats", "red", rectCood);
-    console.log("rectCoord", rectCood);
+    // console.log("rectCoord", rectCood);
 }
 
 export interface HeatmapData {
@@ -226,7 +234,7 @@ export function buildBinaryLegend(
     //     .attr("y", 50)
     //     .attr("text-anchor", "center")
     //     .attr("font-size", 7.5);
-    
+
     // const hint:any = drawHintLabel(g0, -50, 65, label, "", "17px");
     // hint.attr("text-anchor", "center");
     return g0.node() as SVGElement;
@@ -285,7 +293,7 @@ export function buildLegend(
         )
         .style("font-size", "17px").style("fill", "gray")
         .text((d: number, i: number) => {
-            if(i==0||i==dummies.length-1||format(d)=="0.00")return format(d)
+            if (i == 0 || i == dummies.length - 1 || format(d) == "0.00") return format(d)
         });
 
     // g0.append("text")
@@ -294,7 +302,7 @@ export function buildLegend(
     //     .attr("y", 50)
     //     .attr("text-anchor", "center")
     //     .attr("font-size", 7.5);
-    
+
     // const hint = drawHintLabel(g0, absVal * 10, 65, label, "", "17px");
     // hint.attr("text-anchor", "center");
     return g0.node() as SVGElement;
@@ -335,22 +343,22 @@ export function calculatePrevFeatureVisPos(
     node: number,
     featureChannels: number,
     oFeatureChannels: number,
-    rectW: number, 
+    rectW: number,
     oRectW: number
 ) {
     let coord = get_coordination(featureVisTable[layerID][node]);
     //minor position adjustment
     if (layerID == 0) {
-        coord[0] += oFeatureChannels*(oRectW/2);
+        coord[0] += oFeatureChannels * (oRectW / 2);
     } else {
-        coord[0] += (featureChannels*rectW/2);
+        coord[0] += (featureChannels * rectW / 2);
     }
     coord[1] += 10;
 
     return coord;
 }
 
-export function loadNodeWeights(){
+export function loadNodeWeights() {
     // weights data preparation
     let weights: any = []; // DS to manage weights for each layer
     let bias: any = []; // DS to manage bias for each layer
@@ -375,7 +383,7 @@ export function loadNodeWeights(){
     return { weights: weights, bias: bias };
 }
 
-export function loadLinkWeights(){
+export function loadLinkWeights() {
     // weights data preparation
     let weights: any = []; // DS to manage weights for each layer
     let bias: any = []; // DS to manage bias for each layer
@@ -397,13 +405,13 @@ export function loadLinkWeights(){
 }
 
 
-export function loadLinkGATWeights(){
+export function loadLinkGATWeights() {
     // weights data preparation
     let weights: any = []; // DS to manage weights for each layer
     let bias: any = []; // DS to manage bias for each layer
 
     const weightsJSON: any = require("../../public/gat_link_weights.json");
-    
+
     weights = [
         weightsJSON["onnx::MatMul_196"],
         weightsJSON["onnx::MatMul_199"]
@@ -439,17 +447,17 @@ export function loadWeights() {
     return { weights: weights, bias: bias };
 }
 
-export function drawMatrixValid(matrix:number[][], x:number, y:number, w:number, h:number){
-    for(let i=0; i<matrix.length; i++){
-        for(let j=0; j<matrix[i].length; j++){
+export function drawMatrixValid(matrix: number[][], x: number, y: number, w: number, h: number) {
+    for (let i = 0; i < matrix.length; i++) {
+        for (let j = 0; j < matrix[i].length; j++) {
             d3.select(".mats")
-            .append("rect")
-            .attr("x", x + j*w)
-            .attr("y", y + i*h)
-            .attr("width", w)
-            .attr("height", h)
-            .style("fill", myColor(matrix[i][j]))
-            .attr("class", "procVis");
+                .append("rect")
+                .attr("x", x + j * w)
+                .attr("y", y + i * h)
+                .attr("width", w)
+                .attr("height", h)
+                .style("fill", myColor(matrix[i][j]))
+                .attr("class", "procVis");
         }
     }
 }
