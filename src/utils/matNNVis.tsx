@@ -372,7 +372,9 @@ async function initLinkClassifier(
     let locations: number[][] = [];
     d3.select("#matvis").selectAll("*").remove();
     visualizeMatrixBody(gridSize, graph, width, height, margin);
-    drawNodeAttributes(keys, graph, 150);
+    const strKeys:string[] = keys.map(item => String(item));
+
+    drawNodeAttributes(strKeys, graph, 150);
 
     //draw target edge - "?"
     
