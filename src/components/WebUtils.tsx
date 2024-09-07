@@ -1161,7 +1161,10 @@ export function visualizePartialGraphMatrix(
         //visualize matrix body part
         visualizeMatrixBody(gridSize, subMatrix, width, height, margin);
 
-        drawNodeAttributes(keys, subMatrix, 150);
+        //drawNodeAttributes(keys, subMatrix, 150);
+        const strKeys:string[] = keys.map(item => String(item));
+
+        drawNodeAttributes(strKeys, subMatrix, 150);
     };
 
     const visualizeMat = async (path: string) => {
