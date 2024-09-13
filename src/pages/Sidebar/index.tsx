@@ -235,32 +235,7 @@ export default function Sidebar(props: Props) {
                     </>
                 </div>
 
-                <div className="px-4">
-                    <h1 className="text-3xl font-semibold text-3xl">About this website:</h1>
-                    <p>
-                        This website is developed and maintained by the UMN Visual
-                        Intelligence Lab. The GNNs you interact with are inferenced
-                        real-time on the your web browser, supported by the ONNX web
-                        runtime.
-                    </p>
-                    🤸 Team Members:
-                    <ul className="list-disc list-inside px-4">
-                        <li>Yilin(Harry) Lu</li>
-                        <li>Chongwei Chen</li>
-                        <li>Matthew Xu</li>
-                        <li>Qianwen Wang</li>
-                    </ul>
-                    📧 Contact: qianwen@umn.edu
-                    <br />
-                    💻 Source Code:
-                    <a
-                        href="https://github.com/Visual-Intelligence-UMN/web-gnn-vis"
-                        target="_blank"
-                    >
-                        https://github.com/Visual-Intelligence-UMN/web-gnn-vis
-                    </a>
-
-                </div>
+   
             </Scrollbar>
         </div>
     );
