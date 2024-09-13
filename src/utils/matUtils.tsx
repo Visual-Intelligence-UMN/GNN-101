@@ -1156,10 +1156,7 @@ export function visualizeLinkClassifierFeatures(
     var schemeLocations: any = [];
 
     //--------------------------------DRAW FRAMES--------------------------------
-    let gridSize = 400;
-    if(innerComputationMode == "GraphSAGE"){
-        gridSize = 800;
-    }
+    let gridSize = 800;
     const framePackage = drawMatrixPreparation(graph, locations, gridSize, -25);
     let colFrames: SVGElement[] = framePackage.colFrames; //a
     let matFrames: SVGElement[] = framePackage.matFrames; //a

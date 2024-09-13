@@ -59,7 +59,7 @@ function formularInteractionHandler(x: number, y: number, g: any, class_name: st
         d3.selectAll(".procVis").style("opacity", 0.2)
         d3.selectAll(".cant-remove").style("opacity", 0.2);
         d3.selectAll(".formula").style("opacity", 0.2)
-        d3.select(`.${class_name}`).style("opacity", 1)
+        d3.selectAll(`.${class_name}`).style("opacity", 1)
 
 
 
@@ -102,7 +102,7 @@ export function injectSVG(g:any, x: number, y: number, SVGPath:string, svgClass:
         play = g!.node()!.appendChild(data.documentElement)
         d3.select(play).attr("x", x).attr("y", y).attr("class", svgClass)
        
-        if (SVGPath === "./assets/SVGs/GCNFormula.svg" || SVGPath === "./assets/SVGs/GATFormula.svg" || SVGPath === "./assets/SVGs/GsageFormula.svg") {
+        if (SVGPath.includes("Formula")) {
 
             g.append("rect")
             .attr("class", "to-be-removed")

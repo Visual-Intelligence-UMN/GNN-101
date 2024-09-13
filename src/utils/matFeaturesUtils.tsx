@@ -1003,10 +1003,7 @@ export function drawGCNConvLinkModel(
         const l2 = d3.select(`g#layerNum_2`);
         const l3 = d3.select(`g#layerNum_3`);
 
-        let schemeOffset = 250;
-        if(innerComputationMode=="GraphSAGE"){
-            schemeOffset += 400;
-        }
+        let schemeOffset = 650;
 
         console.log("schemeLocations", schemeLocations);
         const loc2 = [schemeLocations[0][0] + 64*5+50, schemeLocations[0][1]];
@@ -1709,6 +1706,12 @@ export function drawResultVisForLinkModel(
         .attr("stroke-width", 0.1)
         .attr("class", "resultVis")
         .attr("id", `resultRect`);
+    g.append("text")
+        .attr("x", featureX)
+        .attr("y", midYForFeature)
+        .text(trueProb.toFixed(2))
+        .style("fill", "white")
+        .style("font-size", "5px");
 //    }
 
     //add result label

@@ -1120,6 +1120,8 @@ export function drawDotProduct(
 
         const tooltip = d3.select(".mats").append("g");
 
+        const rectSize = 12;
+
         tooltip
             .append("rect")
             .attr("x", displayerX)
@@ -1127,8 +1129,8 @@ export function drawDotProduct(
             .attr("y", displayerY - 10)
             .attr("width", displayW)
             .attr("height", displayH)
-            .attr("rx", 10)
-            .attr("ry", 10)
+            .attr("rx", rectSize)
+            .attr("ry", rectSize)
             .style("fill", "white")
             .style("stroke", "black")
             .style("stroke-width", 2)
@@ -1158,7 +1160,7 @@ export function drawDotProduct(
 
         const eqXOffset = titleXOffset / 2;
         const eqYOffset = titleYOffset * 2.5;
-        const unitSize = (eqXOffset / 3 + 3)/2;
+        const unitSize = (eqXOffset / 3 + 8)/2;
         const upperOffset = unitSize * 2;
         tooltip
             .append("text")
@@ -1215,12 +1217,11 @@ export function drawDotProduct(
             if(dataSamples[i]<0.5){color = "black"}
             tooltip
                 .append("text")
-                .attr("x", displayerX + 3 + unitSize*(i+1)+30*i + unitSize/2)
+                .attr("x", displayerX + 0.5 + unitSize*(i+1)+30*i + unitSize/2)
                 .attr("y", displayerY + vectorLength/2 + 20 + unitSize/2)
                 .text(roundToTwo(dataSamples[i]))
                 .attr("class", "matmul-displayer procVis")
-                .attr("font-size", unitSize)
-                .attr("font-size", unitSize)
+                .attr("font-size", unitSize * 0.9)
                 .attr("fill", color);
         }
 
@@ -1242,7 +1243,7 @@ export function drawDotProduct(
 
         tooltip
             .append("rect")
-            .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength + vectorLength/1.5)
+            .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength + vectorLength)
             .attr("y", displayerY + vectorLength/2 + 20 - unitSize)
             .attr("width", unitSize*2.5)
             .attr("height", unitSize*2.5)
@@ -1255,12 +1256,12 @@ export function drawDotProduct(
             if(currentVal<0.5){color = "black"}
             tooltip
                 .append("text")
-                .attr("x", displayerX + 3 + eqXOffset/2 + vectorLength + vectorLength/1.5 + unitSize/2)
+                .attr("x", displayerX + 0.5 + eqXOffset/2 + vectorLength + vectorLength + unitSize/2)
                 .attr("y", displayerY + vectorLength/2 + 20 + unitSize/2)
                 .text(roundToTwo(currentVal))
                 .attr("class", "matmul-displayer procVis")
-                .attr("font-size", unitSize)
-                .attr("font-size", unitSize)
+                .attr("font-size", unitSize * 0.9)
+                .attr("font-size", unitSize * 0.9)
                 .attr("fill", color);
         
         

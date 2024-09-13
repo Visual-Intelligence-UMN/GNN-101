@@ -289,7 +289,7 @@ export function drawMatrixWeight(
 
             m1 =
                 weightMatrixPostions[weightMatrixPostions.length - 1 - j][
-                    currentStep
+                currentStep
                 ];
 
             changed = true;
@@ -313,7 +313,7 @@ export function drawMatrixWeight(
         ) {
             m1 =
                 weightMatrixPostions[weightMatrixPostions.length - 1 - j][
-                    currentStep
+                currentStep
                 ];
 
             changed = true;
@@ -329,7 +329,7 @@ export function drawMatrixWeight(
 
             m1 =
                 weightMatrixPostions[weightMatrixPostions.length - 1 - j][
-                    currentStep
+                currentStep
                 ];
 
             changed = true;
@@ -339,7 +339,7 @@ export function drawMatrixWeight(
             //if(curveDir==-1){
             m1 =
                 weightMatrixPostions[weightMatrixPostions.length - 1 - j][
-                    currentStep
+                currentStep
                 ];
             //}
             // else{ m1 = weightMatrixPostions[j][currentStep]}
@@ -356,7 +356,7 @@ export function drawMatrixWeight(
                 if (curveDir == -1)
                     m1 =
                         weightMatrixPostions[
-                            weightMatrixPostions.length - 1 - j
+                        weightMatrixPostions.length - 1 - j
                         ][currentStep];
                 else m1 = weightMatrixPostions[j][currentStep];
 
@@ -366,7 +366,7 @@ export function drawMatrixWeight(
                 else
                     m1 =
                         weightMatrixPostions[
-                            weightMatrixPostions.length - 1 - j
+                        weightMatrixPostions.length - 1 - j
                         ][currentStep];
 
                 console.log("signal 2");
@@ -422,9 +422,9 @@ export function drawAttentions(
     mulValues: any,
     curveDir: number,
     layerID: number, //layer index_0->layer_1, index_1-> layer_2
-    featuresTable:any,
+    featuresTable: any,
     lgIndices: number[][],
-    mergedNodes:number[]
+    mergedNodes: number[]
 ) {
     //learnable vectors
     const learnableData = require("../../public/learnableVectorsGAT.json");
@@ -433,17 +433,17 @@ export function drawAttentions(
         [learnableData["conv2_att_dst"], learnableData["conv2_att_src"]]
     ];
 
-    if(layerID==0){
+    if (layerID == 0) {
         mergedNodes = mergedNodes.sort((a, b) => a - b);
-        for(let i=0; i<lgIndices.length; i++){
-            for(let j=0; j<lgIndices[0].length; j++){
+        for (let i = 0; i < lgIndices.length; i++) {
+            for (let j = 0; j < lgIndices[0].length; j++) {
                 lgIndices[i][j] = mergedNodes[lgIndices[i][j]];
             }
         }
     }
     console.log("lg lg", lgIndices)
 
-    
+
     const g = g1.append("g").attr("class", "procVis aggregate");
     for (let m = 0; m < X.length; m++) {
         g.append("rect")
@@ -480,7 +480,7 @@ export function drawAttentions(
     );
 
     //path connect - connect prev layer feature vis to intermediate feature vis
-    
+
     const curve = d3.line().curve(d3.curveBasis);
     posList = removeDuplicateSubarrays(posList);
     console.log("poslist", posList, mulValues);
@@ -523,9 +523,9 @@ export function drawAttentions(
         d3.select(".mats")
             .append("text")
             .text(mulValues[i].toFixed(2))
-            .attr("x", x - 2)
-            .attr("y", y - 2)
-            .attr("text-anchor", "middle")
+            .attr("x", posList[i][0] + 5)
+            .attr("y", posList[i][1] + 5)
+            .attr("text-anchor", "start")
             .attr("fill", "url(#text-gradient)")
             .attr("font-size", 15)
             .attr("class", "procVis attention")
@@ -547,7 +547,7 @@ export function drawAttentions(
         //extend the math-displayer
         const dX: number = Number(d3.select(this).attr("x"));
         const dY: number = Number(d3.select(this).attr("y"));
-        
+
         const dstVector = learnableVectors[layerID][0];
         const srcVector = learnableVectors[layerID][1];
 
@@ -557,17 +557,17 @@ export function drawAttentions(
             weightMatrix["conv2.lin_l.weight"]
         ]
         //const eij = Array.from({ length: 3 }, () => Math.random());
-        let eij:any = [];
+        let eij: any = [];
         console.log("push eij before", lgIndices)
-        for(let i=0; i<lgIndices.length; i++){
+        for (let i = 0; i < lgIndices.length; i++) {
             eij.push(0);
             console.log("push eij", i, eij);
         }
-        
-        const ithIdx = Number(d3.select(this).attr("attn-index"));        
+
+        const ithIdx = Number(d3.select(this).attr("attn-index"));
         const targetE = eij[ithIdx];
 
-        console.log("eij",ithIdx, eij, targetE);
+        console.log("eij", ithIdx, eij, targetE);
 
         const attnDisplayer = d3
             .select(".mats")
@@ -582,14 +582,14 @@ export function drawAttentions(
             const eDisplayer = attnDisplayer
                 .append("g")
                 .attr("class", "procVis e-displayer attn-displayer");
-            
-            console.log( `e_${targetIdx}_${lgIndices[targetIdx][1]} = LeakyReLU(                            +                        )`, lgIndices)
+
+            console.log(`e_${targetIdx}_${lgIndices[targetIdx][1]} = LeakyReLU(                            +                        )`, lgIndices)
             const inputVector = featuresTable[layerID][Number(d3.select(this).attr("index"))];
             let jthIndexElement = lgIndices[targetIdx][1];
-            if(d3.select(this).classed("attnTargetE")){
+            if (d3.select(this).classed("attnTargetE")) {
                 jthIndexElement = lgIndices[ithIdx][1];
                 console.log("jthIndexElement", jthIndexElement, ithIdx, lgIndices);
-                
+
             }
             drawEScoreEquation(lgIndices, eDisplayer, jthIndexElement, dX, dY, dstVector, srcVector, myColor, inputVector, layerID);
         });
@@ -643,7 +643,7 @@ export function drawSamplingAggregation(
     lgIndices: number[],
     actualIndices: number[]
 ) {
-    console.log("lgIndices lg",lgIndices);
+    console.log("lgIndices lg", lgIndices);
     const samplingIndices = require("../../public/sampling.json");
 
     const g = g1.append("g").attr("class", "aggregate");
@@ -689,32 +689,31 @@ export function drawSamplingAggregation(
         const lpoint = res[1];
 
         const path = d3.select(".mats")
-                .append("path")
-                .attr("d", curve([posList[i], hpoint, lpoint, coordFeatureVis]))
-                .attr("stroke", myColor(mulValues[i]))
-                .attr("opacity", 0)
-                .attr("fill", "none")
-                .attr("class", "procVis summation")
-                .attr("id", "procPath");
-        
-        //draw multipliers
-        let x = (coordFeatureVis[0] - posList[i][0]) / 2 + posList[i][0];
-        let y = (coordFeatureVis[1] - posList[i][1]) / 2 + posList[i][1];
+            .append("path")
+            .attr("d", curve([posList[i], hpoint, lpoint, coordFeatureVis]))
+            .attr("stroke", myColor(mulValues[i]))
+            .attr("opacity", 0)
+            .attr("fill", "none")
+            .attr("class", "procVis summation")
+            .attr("id", "procPath");
 
+        console.log("poslist", posList[i])
+
+        //draw multipliers
         d3.select(".mats")
             .append("text")
             .text(mulValues[i].toFixed(2))
-            .attr("x", x - 2)
-            .attr("y", y - 2)
+            .attr("x", posList[i][0] + 5)
+            .attr("y", posList[i][1] + 5)
             .attr("text-anchor", "middle")
             .attr("font-size", 7.5)
             .attr("class", "procVis multiplier")
             .attr("opacity", 0);
 
-        if((samplingIndices.includes(actualIndices[lgIndices[i]]))){
+        if ((samplingIndices.includes(actualIndices[lgIndices[i]]))) {
             path.attr("stroke", "gray").attr("stroke-dasharray", "3,2");
             const sampling = g1.append("g");
-            injectSVG(sampling, posList[i][0], posList[i][1]-8.5, "./assets/SVGs/sampling.svg", "procVis sampling");
+            injectSVG(sampling, posList[i][0], posList[i][1] - 8.5, "./assets/SVGs/sampling.svg", "procVis sampling");
             drawHintLabel(
                 sampling,
                 posList[i][0] - 55,
@@ -724,9 +723,9 @@ export function drawSamplingAggregation(
                 "10px"
             );
 
-            sampling.on("mouseover", function (event:any, d:any) {
+            sampling.on("mouseover", function (event: any, d: any) {
                 const [x, y] = d3.pointer(event);
-        
+
                 //set-up the paramtere for the math displayer
                 drawActivationExplanation(
                     x,
@@ -736,14 +735,14 @@ export function drawSamplingAggregation(
                     " was removed during training stage."
                 );
             });
-        
+
             sampling.on("mouseout", function () {
                 d3.selectAll(".math-displayer").remove();
             });
-            
+
         }
 
-        
+
     }
     d3.selectAll(".summation").transition().duration(100).attr("opacity", 1);
     d3.select(".aggregate").on("mouseover", function () {
@@ -825,8 +824,8 @@ export function drawSummationFeature(
         d3.select(".mats")
             .append("text")
             .text(mulValues[i].toFixed(2))
-            .attr("x", x - 2)
-            .attr("y", y - 2)
+            .attr("x", posList[i][0] + 7.5)
+            .attr("y", posList[i][1])
             .attr("text-anchor", "middle")
             .attr("font-size", 7.5)
             .attr("class", "procVis multiplier")
@@ -996,11 +995,12 @@ export function computeMatrixLocations(
 }
 
 export function drawMathFormula(
-    g:any,
-    x: number, 
-    y:number,
-    formula:string
-){
+    g: any,
+    x: number,
+    y: number,
+    formula: string
+) {
+    console.log("formula", formula);
     injectSVG(
         g,
         x,
@@ -1009,7 +1009,7 @@ export function drawMathFormula(
         "math-formula-pos to-be-removed"
     );
 
-   // flattenSVG(".mats");
+    // flattenSVG(".mats");
 
 }
 
@@ -1033,16 +1033,16 @@ export function drawWeightMatrix(
     let wMatPt: [number, number] = [
         (weightMatrixPostions[0][0][0] +
             weightMatrixPostions[0][weightMatrixPostions[0].length - 1][0]) /
-            2,
+        2,
         weightMatrixPostions[0][0][1],
     ];
     if (curveDir == 1) {
         wMatPt = [
             (weightMatrixPostions[0][0][0] +
                 weightMatrixPostions[0][
-                    weightMatrixPostions[0].length - 1
+                weightMatrixPostions[0].length - 1
                 ][0]) /
-                2,
+            2,
             weightMatrixPostions[len - 1][0][1],
         ];
     }
@@ -1134,19 +1134,19 @@ export function drawWeightMatrix(
         weightMat = flipVertically(weightMat);
     }
 
-        g.append("rect")
+    g.append("rect")
         .attr("class", "weight-matrix-frame to-be-removed procVis")
         .attr("x", weightMatrixPostions[0][0][0])
         .attr("y", weightMatrixPostions[0][0][1])
-        .attr("width", rectW*weightMatrixPostions[0].length)
-        .attr("height", rectW*weightMatrixPostions.length)
+        .attr("width", rectW * weightMatrixPostions[0].length)
+        .attr("height", rectW * weightMatrixPostions.length)
         .style("stroke", "black")
         .style("fill", "none")
         .style("stroke-width", 2)
 
     for (let i = 0; i < weightMatrixPostions[0].length; i++) {
         let tempArr = [];
-        const columnG = g.append("g").attr("class", "procVis columnGroup").attr("id",`columnGroup-${i}`);
+        const columnG = g.append("g").attr("class", "procVis columnGroup").attr("id", `columnGroup-${i}`);
         for (let j = 0; j < weightMatrixPostions.length; j++) {
             //adjust the location if dimensions are different
             if (j == 0) {
@@ -1161,7 +1161,7 @@ export function drawWeightMatrix(
                     .attr("opacity", 0)
                     .attr("class", "columnUnit")
                     .attr("id", `columnUnit-${i}`);
-                
+
             }
             //select the weight based on the shape of the matrix
             let colorVal = 0;
@@ -1227,8 +1227,8 @@ export function drawBiasVector(
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("class", "procVis biasVector biasFrame");
-    const label = drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1]+rectH+6, `Bias Vector: ${layerBias.length} x 1`, "procVis biasFrame");
-   // d3.selectAll(".biasVector").transition().duration(100).style("opacity", 1);
+    const label = drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1] + rectH + 6, `Bias Vector: ${layerBias.length} x 1`, "procVis biasFrame");
+    // d3.selectAll(".biasVector").transition().duration(100).style("opacity", 1);
 }
 
 export function drawBiasPath(
@@ -1309,9 +1309,9 @@ export function drawReLU(
                 .attr("y", cy1)
                 .attr("class", "procVis relu-icon")
                 .raise();
-            }
-        });
-        drawHintLabel(relu, cx1-10, cy1+radius*4+12+4, "ReLU", "procVis reluText");
+        }
+    });
+    drawHintLabel(relu, cx1 - 10, cy1 + radius * 4 + 12 + 4, "ReLU", "procVis reluText");
 
     relu.on("mouseover", function (event, d) {
         const [x, y] = d3.pointer(event);

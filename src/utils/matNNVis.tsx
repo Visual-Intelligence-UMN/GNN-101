@@ -218,6 +218,7 @@ async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: str
         colorSchemeTable
     );
     drawNodeAttributes(nodeAttrs, graph, 150);
+    
 
     const intervalID = featuresManager.getIntervalID();
 
@@ -364,10 +365,7 @@ async function initLinkClassifier(
 
     const gLen = graph.length;
 
-    let gridSize = 400;
-    if(innerComputationMode == "GraphSAGE"){
-        gridSize = 800;
-    }
+    let gridSize = 800;
     const margin = { top: 10, right: 80, bottom: 30, left: 80 };
     const width = 20 * gLen + 50 + 6 * 102 + 1200 * 2;
     const height = (gridSize + margin.top + margin.bottom) * 2;
@@ -375,7 +373,9 @@ async function initLinkClassifier(
     let locations: number[][] = [];
     d3.select("#matvis").selectAll("*").remove();
     visualizeMatrixBody(gridSize, graph, width, height, margin);
-    drawNodeAttributes(keys, graph, 150);
+    const strKeys:string[] = keys.map(item => String(item));
+
+    drawNodeAttributes(strKeys, graph, 150);
 
     //draw target edge - "?"
     

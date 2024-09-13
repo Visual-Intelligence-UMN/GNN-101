@@ -1306,8 +1306,8 @@ export function calculationVisualizer(
 
                     if (innerComputationMode === "GCN") {
                     g3.append("text")
-                        .attr("x", start_x + 20)
-                        .attr("y", start_y - 10)
+                        .attr("x", start_x)
+                        .attr("y", start_y)
                         .text(adjMatrixSlice[i])
                         .attr("font-size", 7.5)
                         .attr("class", "parameter procVis to-be-removed")
@@ -1318,8 +1318,8 @@ export function calculationVisualizer(
 
 
                         const frame = g3.append("rect")
-                        .attr("x", start_x + 20)
-                        .attr("y", start_y - 10)
+                        .attr("x", start_x)
+                        .attr("y", start_y)
                         .attr("width", 10)
                         .attr("height", 10)
                         .style("fill", "white")
@@ -1333,8 +1333,8 @@ export function calculationVisualizer(
                         
 
                         g3.append("text")
-                        .attr("x", start_x + 20)
-                        .attr("y", start_y - 10)
+                        .attr("x", start_x)
+                        .attr("y", start_y)
                         .text(multiplier)
                         .attr("font-size", 7.5)
                         .attr("class", "parameter procVis to-be-removed")
@@ -1373,6 +1373,7 @@ export function calculationVisualizer(
                         
 
                         frame.on("click", function(this: any, event: any) {
+                 
                             d3.selectAll(".weightUnit").lower()
                             d3.selectAll(".columnGroup").lower()
                             d3.selectAll(".weightMatrixText").lower()
@@ -1405,9 +1406,11 @@ export function calculationVisualizer(
                             const inputVector = featureMap[node.graphIndex][Number(d3.select(this).attr("index"))];
                             let jthIndexElement = lgIndices[node.id][1];
                             drawEScoreEquation(lgIndices, eDisplayer, jthIndexElement, start_x - 1200, start_y, usingVectors[1], usingVectors[0], myColor, inputVector, node.graphIndex - 1);
+                            d3.selectAll(".button-group").lower()
 
                             d3.selectAll("#my_dataviz").on("click", function(event) {
                                 event.stopPropagation();
+                                d3.selectAll(".button-group").raise()
                   
                                     d3.selectAll(".attn-displayer").remove();
                                     d3.selectAll(".e-displayer").remove()
@@ -1490,6 +1493,9 @@ export function calculationVisualizer(
 
             paths.push(aggregatedToCalculated);
 
+
+
+
             start_x =
                 3.5 * offset +
                 node.relatedNodes[0].features.length * prevRectHeight * 2 +
@@ -1557,7 +1563,7 @@ export function calculationVisualizer(
              
 
         // relu
-        if (!(mode === 0 && node.graphIndex === 3)) {
+        if (!(mode === 0 && node.graphIndex === 3) && !(mode === 2 && node.graphIndex === 2)) {
         const relu = g3.append("g");
         let svgPath = "./assets/SVGs/ReLU.svg";
         let labelText = "ReLU";
@@ -1623,6 +1629,8 @@ export function calculationVisualizer(
             d3.selectAll(".bias").style("opacity", 1);
             d3.selectAll(".softmax").attr("opacity", 0.07);
             d3.selectAll(".relu").style("opacity", 1);
+
+            
             d3.selectAll(".output-path").attr("opacity", 1);
             d3.selectAll(".softmaxLabel").attr("opacity", 1);
             d3.selectAll(".intermediate-path").attr("opacity", 0)     
@@ -1890,6 +1898,17 @@ function weightAnimation(
     }
 
     // Pause and replay button
+
+    const weightMatrixToBTN = svg
+    .append("path")
+    .attr("d", `M${weightsLocation[0][weightsLocation[0].length / 2][0]} ${weightsLocation[0][weightsLocation[0].length / 2][1]} C ${weightsLocation[0][weightsLocation[0].length / 2][0]} ${endCoordList[0][1]}, ${endCoordList[0][0] - 60} ${weightsLocation[0][weightsLocation[0].length / 2][1]} ${endCoordList[0][0] - 60} ${endCoordList[0][1] + 13}`)
+    .style("stroke", "black")
+    .attr("class", "to-be-removed procVis")
+    .style('stroke-width', 1)
+    .style("fill", "none")
+    .lower()
+
+
     const btn = svg.append("g").attr("class", "button-group to-be-removed");
 
 
@@ -1904,6 +1923,7 @@ function weightAnimation(
 
 
 
+
     const gLabel = svg.append("g");
     injectSVG(gLabel, endCoordList[0][0] - 80-120-64, endCoordList[0][1] - 22.5-120-64, "./assets/SVGs/interactionHint.svg", "to-be-removed procVis");
 
@@ -1914,7 +1934,8 @@ function weightAnimation(
     .text("Matrix Multiplication")
     .attr("fill", "grey")
     .attr("class", "to-be-removed procVis weight-matrix-text")
-    btn.lower()
+
+    
 
     btn.on("mouseover", function() {
         if (!state.isAnimating) {

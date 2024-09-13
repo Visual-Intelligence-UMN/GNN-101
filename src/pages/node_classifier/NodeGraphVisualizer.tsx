@@ -382,6 +382,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
               [],
               1,
               0,
+              0,
               0
             );
 
