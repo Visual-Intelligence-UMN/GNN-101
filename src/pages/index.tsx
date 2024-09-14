@@ -11,9 +11,8 @@ import {
     modelList,
     nodeList,
     DatasetInfo,
-    nodeSelectionList,
-    modelTypeList,
     midGraphNodeSelectionList,
+    chemicalNames
 } from "../utils/const";
 import Sidebar from "./Sidebar";
 import styles from "./index.module.css";
@@ -33,7 +32,6 @@ import { Footer, NavBar } from "../components/Surfaces";
 import { Inter } from "@next/font/google";
 import NodeMatricesVisualizer from "./node_classifier/NodeMatrixVisualizer";
 import NodeGraphVisualizer from "./node_classifier/NodeGraphVisualizer";
-import { mod } from "mathjs";
 import LinkMatricesVisualizer from "./link_classifier/LinkMatrixVisualizer";
 
 import LinkGraphVisualizer from "./link_classifier/LinkGraphVisualizer";
@@ -58,7 +56,9 @@ export const inter3 = Inter({
 
 export default function Home() {
     const [model, setModel] = useState("GCN - graph classification");
-    const [selectedGraph, setSelectedGraph] = useState("molecule_2");
+
+    const initialMUTAGGraph = Object.keys(graphList)[2];
+    const [selectedGraph, setSelectedGraph] = useState(initialMUTAGGraph);
     const introRef = useRef<Steps>(null);
     const [outputData, setOutputData] = useState(null);
 
@@ -223,7 +223,7 @@ export default function Home() {
                                                     } else if (newModel.includes("GCN")) {
                                                         setModelType("GCN");
                                                         if (newModel.includes("graph classification")) {
-                                                            setSelectedGraph("molecule_2");
+                                                            setSelectedGraph(initialMUTAGGraph);
                                                         } else if (newModel.includes("node classification")) {
                                                             setSelectedGraph("karate");
                                                         } else if (newModel.includes("link prediction")) {

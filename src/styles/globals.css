@@ -42,10 +42,20 @@ rect {
   pointer-events: none;
 }
 
+.introjs-tooltip {
+    /* max-width: 600px !important;
+    min-width: 400px !important; */
+    text-align: left;
+    font-size: 20px;
+}
+
 .introjs-tooltiptext {
-    text-align: center;
     padding-top: 5px !important;
     padding-bottom: 5px !important;
+    font-size: 20px;
+}
+
+.introjs-button {
     font-size: 20px;
 }
 
