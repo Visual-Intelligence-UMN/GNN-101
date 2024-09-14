@@ -134,10 +134,10 @@ export default function Sidebar(props: Props) {
                         `Click the "predict" button on the right side and show inner layers`}
 
                     <p>
-                        Message-passing forms the backbone of many GNN architectures,
-                        including Graph Convolutional Networks (GCN), Graph Attention
-                        Networks (GAT), Graph Sample and Aggregate (GraphSAGE), Graph
-                        Isomorphism Network (GIN), etc.
+                        Message-passing forms the backbone of many GNN variants.
+                        GNN101 support three popular GNN variants,
+                        Graph Convolutional Networks (GCN), Graph Attention
+                        Networks (GAT), Graph Sample and Aggregate (GraphSAGE).
                         The main differences between these GNN variants are the way they aggregate information from neighbors and the way they update node embeddings.
 
                     </p>
@@ -173,11 +173,11 @@ export default function Sidebar(props: Props) {
                         Note that the learnable weight matrix and bias vector are shared across all nodes in the graph, mimicking the convolution operation in CNNs and minimizing the number of parameters.
                     </ol>
 
-
+                    {/* 
                     <p>
                         We are working on adding other types of GNN layers, please stay
                         tuned!
-                    </p>
+                    </p> */}
                 </div>
 
                 <div className="p-4">
@@ -226,16 +226,16 @@ export default function Sidebar(props: Props) {
 
                         <span className={styles.tag}>Edge-Level Tasks </span>
                         <p>
-                            GNN can predict the properties of each edge
-                            in the graph. For example, in the PPI dataset, the task is to
-                            predict whether two proteins interact with each other. After several layers of GCNConv,
-                            we combine the features of the two nodes of a given edge (e.g., by concatenation) and then apply a fully connected layer to make the prediction.
+                            GNNs can effectively predict edge properties within a graph.
+                            In the Twitch dataset, for instance, the model's objective is to determine if two Twitch users are friends.
+                            By employing multiple layers, the model combines the features of the two nodes associated with a specific edge using dot product multiplication.
+                            Subsequently, a sigmoid function is applied to the resulting score, yielding a probability indicating the likelihood of a friendship between the two users.
                         </p>
-                        <p>The interactive visualization about edge classification is coming soon!</p>
+                        {/* <p>The interactive visualization about edge classification is coming soon!</p> */}
                     </>
                 </div>
 
-   
+
             </Scrollbar>
         </div>
     );
