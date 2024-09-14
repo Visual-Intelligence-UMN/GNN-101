@@ -393,6 +393,39 @@ export default function Home() {
                                     </div>
                                 </div>
 
+                                {/* overlay text on visualizer when not predicted */}
+                                {probabilities.length == 0 && (
+                                    <div
+                                    // className="relative top-2/3"
+                                    >
+                                        <h1 className="text-4xl text-gray-500 bg-white mt-10">
+                                            Model Visualization will show after
+                                            prediction
+                                        </h1>
+
+
+                                        <ClassifyGraph
+                                            graphPath={
+                                                model == "GCN - graph classification" ? graphList[selectedGraph] : nodeList[selectedGraph]
+                                            }
+                                            modelPath={modelList[model]}
+                                            setChangedG={setChangedG}
+                                            setIntmData={setIntmData}
+                                            setPredicted={setPredicted}
+                                            predicted={predicted}
+                                            probabilities={probabilities}
+                                            setProbabilities={
+                                                setProbabilities
+                                            }
+                                            onlyShownButton={true}
+                                            simulationLoading={
+                                                simulationLoading
+                                            }
+                                        />
+
+                                    </div>
+                                )}
+
                                 <div className={styles.vizContainer}>
                                     {model == "GCN - graph classification" ? (
                                         isGraphView ? (
@@ -478,40 +511,7 @@ export default function Home() {
                                         />
                                     )}
 
-                                    {/* overlay text on visualizer when not predicted */}
-                                    {probabilities.length == 0 && (
-                                        <div
-                                            className="relative -top-60"
-                                        >
-                                            <h1 className="text-4xl text-gray-500 bg-white">
-                                                Model Visualization will show after
-                                                prediction
-                                            </h1>
 
-
-                                            <ClassifyGraph
-                                                graphPath={
-                                                    model == "GCN - graph classification" ? graphList[selectedGraph] : nodeList[selectedGraph]
-                                                }
-                                                modelPath={modelList[model]}
-                                                setChangedG={setChangedG}
-                                                setIntmData={setIntmData}
-                                                setPredicted={setPredicted}
-                                                predicted={predicted}
-                                                probabilities={probabilities}
-                                                setProbabilities={
-                                                    setProbabilities
-                                                }
-                                                onlyShownButton={true}
-                                                simulationLoading={
-                                                    simulationLoading
-                                                }
-                                            />
-
-                                        </div>
-                                    )}
-                                    {/* </Panel> */}
-                                    {/* </PanelGroup> */}
                                 </div>
                             </div>
                         </div>
