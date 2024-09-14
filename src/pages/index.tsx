@@ -11,8 +11,6 @@ import {
     modelList,
     nodeList,
     DatasetInfo,
-    nodeSelectionList,
-    modelTypeList,
     midGraphNodeSelectionList,
 } from "../utils/const";
 import Sidebar from "./Sidebar";
@@ -25,19 +23,14 @@ import 'intro.js/introjs.css';
 import {
     Selector,
     Hint,
-    ButtonChain,
     ViewSwitch,
-    GraphAnalysisViewer,
-    NodeClassifierButtonChain,
-    LinkClassifierButtonChain,
     NodeSelector,
-    PredictionVisualizer,
+    ArchitectureButtonChain,
 } from "../components/WebUtils";
 import { Footer, NavBar } from "../components/Surfaces";
 import { Inter } from "@next/font/google";
 import NodeMatricesVisualizer from "./node_classifier/NodeMatrixVisualizer";
 import NodeGraphVisualizer from "./node_classifier/NodeGraphVisualizer";
-import { mod } from "mathjs";
 import LinkMatricesVisualizer from "./link_classifier/LinkMatrixVisualizer";
 
 import LinkGraphVisualizer from "./link_classifier/LinkGraphVisualizer";
@@ -62,7 +55,9 @@ export const inter3 = Inter({
 
 export default function Home() {
     const [model, setModel] = useState("GCN - graph classification");
-    const [selectedGraph, setSelectedGraph] = useState("molecule_2");
+
+    const initialMUTAGGraph = Object.keys(graphList)[2];
+    const [selectedGraph, setSelectedGraph] = useState(initialMUTAGGraph);
     const introRef = useRef<Steps>(null);
     const [outputData, setOutputData] = useState(null);
 
@@ -227,7 +222,7 @@ export default function Home() {
                                                     } else if (newModel.includes("GCN")) {
                                                         setModelType("GCN");
                                                         if (newModel.includes("graph classification")) {
-                                                            setSelectedGraph("molecule_2");
+                                                            setSelectedGraph(initialMUTAGGraph);
                                                         } else if (newModel.includes("node classification")) {
                                                             setSelectedGraph("karate");
                                                         } else if (newModel.includes("link prediction")) {
@@ -243,42 +238,26 @@ export default function Home() {
                                                 OptionList={Object.keys(modelList)} id={""} />
                                         </div>
 
-                                        <div id="model-architecture">
-                                            {model == "GCN - graph classification" ? (
-                                                <ButtonChain
-                                                    selectedButtons={selectedButtons}
-                                                    setSelectedButtons={
-                                                        setSelectedButtons
-                                                    }
-                                                    predicted={predicted}
-                                                />
-                                            ) : model == "GCN - node classification" ? (
-                                                <NodeClassifierButtonChain
-                                                    selectedButtons={selectedButtons}
-                                                    setSelectedButtons={
-                                                        setSelectedButtons
-                                                    }
-                                                    predicted={predicted}
-                                                />
-                                            ) : (
-                                                <LinkClassifierButtonChain
-                                                    selectedButtons={selectedButtons}
-                                                    setSelectedButtons={
-                                                        setSelectedButtons
-                                                    }
-                                                    predicted={predicted}
-                                                    innerComputationMode={modelType}
-                                                />
-                                            )}
-                                        </div>
+
+
+                                        <ArchitectureButtonChain
+
+                                            selectedButtons={selectedButtons}
+                                            setSelectedButtons={
+                                                setSelectedButtons
+                                            }
+                                            predicted={predicted}
+                                            selectedModel={model}
+                                        />
+
                                     </div>
                                 </div>
                                 <hr className="border-t border-gray-300 my-4"></hr>
 
                                 {/* graph data */}
                                 {/* graph data */}
-                                <div>
-                                    <div className="flex gap-x-4 items-center  mb-3 ">
+                                <div >
+                                    <div id='graph-selector' className="flex gap-x-4 items-center  mb-3 ">
                                         <h1 className="text-3xl font-black min-w-48">
                                             Input Graph
                                         </h1>
@@ -414,6 +393,39 @@ export default function Home() {
                                     </div>
                                 </div>
 
+                                {/* overlay text on visualizer when not predicted */}
+                                {probabilities.length == 0 && (
+                                    <div
+                                    // className="relative top-2/3"
+                                    >
+                                        <h1 className="text-4xl text-gray-500 bg-white mt-10">
+                                            Model Visualization will show after
+                                            prediction
+                                        </h1>
+
+
+                                        <ClassifyGraph
+                                            graphPath={
+                                                model == "GCN - graph classification" ? graphList[selectedGraph] : nodeList[selectedGraph]
+                                            }
+                                            modelPath={modelList[model]}
+                                            setChangedG={setChangedG}
+                                            setIntmData={setIntmData}
+                                            setPredicted={setPredicted}
+                                            predicted={predicted}
+                                            probabilities={probabilities}
+                                            setProbabilities={
+                                                setProbabilities
+                                            }
+                                            onlyShownButton={true}
+                                            simulationLoading={
+                                                simulationLoading
+                                            }
+                                        />
+
+                                    </div>
+                                )}
+
                                 <div className={styles.vizContainer}>
                                     {model == "GCN - graph classification" ? (
                                         isGraphView ? (
@@ -499,59 +511,7 @@ export default function Home() {
                                         />
                                     )}
 
-                                    {/* overlay text on visualizer when not predicted */}
-                                    {probabilities.length == 0 && (
-                                        <div
-                                            className="absolute top-1/2 left-1/2 "
-                                        >
-                                            <h1 className="text-4xl text-gray-300 bg-white">
-                                                Model Visualization will show after
-                                                prediction
-                                            </h1>
 
-                                            {model == "GCN - graph classification" ? (
-                                                <ClassifyGraph
-                                                    graphPath={
-                                                        graphList[selectedGraph]
-                                                    }
-                                                    modelPath={modelList[model]}
-                                                    setChangedG={setChangedG}
-                                                    setIntmData={setIntmData}
-                                                    setPredicted={setPredicted}
-                                                    predicted={predicted}
-                                                    probabilities={probabilities}
-                                                    setProbabilities={
-                                                        setProbabilities
-                                                    }
-                                                    onlyShownButton={true}
-                                                    simulationLoading={
-                                                        simulationLoading
-                                                    }
-                                                />
-                                            ) : (
-                                                <ClassifyGraph
-                                                    graphPath={
-                                                        nodeList[selectedGraph]
-                                                    }
-                                                    modelPath={modelList[model]}
-                                                    setChangedG={setChangedG}
-                                                    setIntmData={setIntmData}
-                                                    setPredicted={setPredicted}
-                                                    predicted={predicted}
-                                                    probabilities={probabilities}
-                                                    setProbabilities={
-                                                        setProbabilities
-                                                    }
-                                                    onlyShownButton={true}
-                                                    simulationLoading={
-                                                        simulationLoading
-                                                    }
-                                                />
-                                            )}
-                                        </div>
-                                    )}
-                                    {/* </Panel> */}
-                                    {/* </PanelGroup> */}
                                 </div>
                             </div>
                         </div>

@@ -140,135 +140,6 @@ export const GraphAnalysisViewer: React.FC<GraphAnalysisViewerProps> = ({
     return graphStat;
 };
 
-//button chain on the general UI
-export const ButtonChain = ({
-    selectedButtons,
-    setSelectedButtons,
-    predicted,
-}: {
-    selectedButtons: any[];
-    setSelectedButtons: Function;
-    predicted: boolean;
-}) => {
-    const handleButtonClick = (index: number) => {
-        setSelectedButtons((prevSelectedLayers: any[]) => {
-            const updatedLayers = [...prevSelectedLayers];
-            updatedLayers[index] = !updatedLayers[index];
-
-            return updatedLayers;
-        });
-    };
-    return (
-        <div className="flex gap-x-4 items-center">
-            <div className="flex">
-                <h2 className="text-xl m-auto">Architecture </h2>
-                <div className="my-1 mx-2">
-                    <Hint
-                        text={
-                            "Click to highlight corresponding layer in Model Visualization"
-                        }
-                    />
-                </div>
-            </div>
-            <div>
-                <div className="flex items-center justify-center gap-x-2 opacity-80">
-                    {/* Since input is not shown during the predicted phase, it is disabled */}
-                    <button
-                        disabled={!predicted}
-                        className={`bg-gray-200  ${predicted
-                            ? "hover:border-black hover:bg-gray-300"
-                            : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[0]
-                                ? "outline outline-2 outline-black bg-gray-300"
-                                : ""
-                            }`}
-                        onClick={() => handleButtonClick(0)}
-                    >
-                        Input
-                    </button>
-                    <button
-                        disabled={!predicted}
-                        className={`bg-yellow-200  ${predicted
-                            ? "hover:border-black hover:bg-yellow-300"
-                            : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[1]
-                                ? "outline outline-2 outline-black bg-yellow-300"
-                                : ""
-                            }`}
-                        onClick={() => handleButtonClick(1)}
-                    >
-                        GCNConv1
-                    </button>
-                    <button
-                        disabled={!predicted}
-                        className={`bg-yellow-200  ${predicted
-                            ? "hover:border-black hover:bg-yellow-300"
-                            : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[2]
-                                ? "outline outline-2 outline-black bg-yellow-300"
-                                : ""
-                            }`}
-                        onClick={() => handleButtonClick(2)}
-                    >
-                        GCNConv2
-                    </button>
-                    <button
-                        disabled={!predicted}
-                        className={`bg-yellow-200  ${predicted
-                            ? "hover:border-black hover:bg-yellow-300"
-                            : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[3]
-                                ? "outline outline-2 outline-black bg-yellow-300"
-                                : ""
-                            }`}
-                        onClick={() => handleButtonClick(3)}
-                    >
-                        GCNConv3
-                    </button>
-                    <button
-                        disabled={!predicted}
-                        className={`bg-blue-200  ${predicted
-                            ? "hover:border-black hover:bg-blue-300"
-                            : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[4]
-                                ? "outline outline-2 outline-black bg-blue-300"
-                                : ""
-                            }`}
-                        onClick={() => handleButtonClick(4)}
-                    >
-                        Global Mean Pooling
-                    </button>
-                    {/* <button
-                        disabled={!predicted}
-                        className={`bg-emerald-200  ${predicted
-                            ? "hover:border-black hover:bg-green-300"
-                            : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[5]
-                                ? "outline outline-2 outline-black bg-green-300"
-                                : ""
-                            }`}
-                        onClick={() => handleButtonClick(5)}
-                    >
-                        FC
-                    </button> */}
-                    <button
-                        disabled={!predicted}
-                        className={`bg-gray-200  ${predicted
-                            ? "hover:border-black hover:bg-gray-300"
-                            : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[5]
-                                ? "outline outline-2 outline-black bg-gray-300"
-                                : ""
-                            }`}
-                        onClick={() => handleButtonClick(5)}
-                    >
-                        Output
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-};
 
 export const AnnotatedImage = ({
     imgSrc,
@@ -285,239 +156,67 @@ export const AnnotatedImage = ({
     );
 }
 
-//we may want to find a smater way to do the button chain
-export const NodeClassifierButtonChain = ({
+
+export const ArchitectureButtonChain = ({
     selectedButtons,
     setSelectedButtons,
     predicted,
+    selectedModel,
 }: {
-    selectedButtons: any[];
+    selectedButtons: boolean[];
     setSelectedButtons: Function;
     predicted: boolean;
+    selectedModel: string;
 }) => {
-    const handleButtonClick = (index: number) => {
-        setSelectedButtons((prevSelectedLayers: any[]) => {
-            const updatedLayers = [...prevSelectedLayers];
-            updatedLayers[index] = !updatedLayers[index];
 
-            return updatedLayers;
-        });
-    };
-    return (
-        <div className="flex gap-x-4 items-center">
-            <div className="flex">
-                <h2 className="text-xl m-auto">Architecture </h2>
-                <div className="my-1 mx-2">
-                    <Hint
-                        text={
-                            "Click to highlight corresponding layer in Model Visualization"
-                        }
-                    />
-                </div>
-            </div>
-            <div>
-                <div className="flex items-center justify-center gap-x-2 opacity-80">
-                    {/* Since input is not shown during the predicted phase, it is disabled */}
-                    <button
-                        disabled={!predicted}
-                        className={`bg-gray-200  ${predicted
-                            ? "hover:border-black hover:bg-gray-300"
-                            : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[0]
-                                ? "outline outline-2 outline-black bg-gray-300"
-                                : ""
-                            }`}
-                        onClick={() => handleButtonClick(0)}
-                    >
-                        Input
-                    </button>
-                    <button
-                        disabled={!predicted}
-                        className={`bg-yellow-200  ${predicted
-                            ? "hover:border-black hover:bg-yellow-300"
-                            : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[1]
-                                ? "outline outline-2 outline-black bg-yellow-300"
-                                : ""
-                            }`}
-                        onClick={() => handleButtonClick(1)}
-                    >
-                        GCNConv1
-                    </button>
-                    <button
-                        disabled={!predicted}
-                        className={`bg-yellow-200  ${predicted
-                            ? "hover:border-black hover:bg-yellow-300"
-                            : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[2]
-                                ? "outline outline-2 outline-black bg-yellow-300"
-                                : ""
-                            }`}
-                        onClick={() => handleButtonClick(2)}
-                    >
-                        GCNConv2
-                    </button>
-                    <button
-                        disabled={!predicted}
-                        className={`bg-yellow-200  ${predicted
-                            ? "hover:border-black hover:bg-yellow-300"
-                            : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[3]
-                                ? "outline outline-2 outline-black bg-yellow-300"
-                                : ""
-                            }`}
-                        onClick={() => handleButtonClick(3)}
-                    >
-                        GCNConv3
-                    </button>
-                    {/* <button
-                        disabled={!predicted}
-                        className={`bg-emerald-200  ${predicted
-                            ? "hover:border-black hover:bg-green-300"
-                            : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[5]
-                                ? "outline outline-2 outline-black bg-green-300"
-                                : ""
-                            }`}
-                        onClick={() => handleButtonClick(5)}
-                    >
-                        FC
-                    </button> */}
-                    <button
-                        disabled={!predicted}
-                        className={`bg-gray-200  ${predicted
-                            ? "hover:border-black hover:bg-gray-300"
-                            : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[4]
-                                ? "outline outline-2 outline-black bg-gray-300"
-                                : ""
-                            }`}
-                        onClick={() => handleButtonClick(4)}
-                    >
-                        Output
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-
-export const LinkClassifierButtonChain = ({
-    selectedButtons,
-    setSelectedButtons,
-    predicted,
-    innerComputationMode,
-}: {
-    selectedButtons: any[];
-    setSelectedButtons: Function;
-    predicted: boolean;
-    innerComputationMode: string;
-}) => {
-    const handleButtonClick = (index: number) => {
-        setSelectedButtons((prevSelectedLayers: any[]) => {
-            const updatedLayers = [...prevSelectedLayers];
-            updatedLayers[index] = !updatedLayers[index];
-
-            return updatedLayers;
-        });
-    };
-
-    const [archList, setArchList] = useState<string[]>(["GCNConv1", "GCNConv2"]);
-
-    useEffect(() => {
-        if (innerComputationMode === "GCN") {
-            setArchList(["GCNConv1", "GCNConv2"]);
-        } else if (innerComputationMode === "GAT") {
-            setArchList(["GATConv1", "GATConv2"]);
-        } else {
-            setArchList(["SAGEConv1", "SAGEConv2"]);
+    // TODO: get architecture from onnx directly
+    let archList: string[] = [];
+    if (selectedModel.includes("GCN")) {
+        if (selectedModel.includes("link")) {
+            archList = ["GCNConv1", "GCNConv2"];
         }
-    }, [innerComputationMode]);
+        else if (selectedModel.includes("graph")) {
+            archList = ["GCNConv1", "GCNConv2", "GCNConv3", "Global Pooling"];
+        }
+        else if (selectedModel.includes("node")) {
+            archList = ["GCNConv1", "GCNConv2", "GCNConv3"];
+        }
+    } else if (selectedModel.includes("GAT")) {
+        archList = ["GATConv1", "GATConv2"];
+    }
+    else if (selectedModel.includes("SAGE")) {
+        archList = ["SAGEConv1", "SAGEConv2"];
+    }
 
-    return (
-        <div className="flex gap-x-4 items-center">
-            <div className="flex">
-                <h2 className="text-xl m-auto">Architecture </h2>
-                <div className="my-1 mx-2">
-                    <Hint
-                        text={
-                            "Click to highlight corresponding layer in Model Visualization"
-                        }
-                    />
-                </div>
-            </div>
-            <div>
-                <div className="flex items-center justify-center gap-x-2 opacity-80">
-                    {/* Since input is not shown during the predicted phase, it is disabled */}
-                    <button
-                        disabled={!predicted}
-                        className={`bg-gray-200  ${predicted
-                            ? "hover:border-black hover:bg-gray-300"
-                            : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[0]
-                                ? "outline outline-2 outline-black bg-gray-300"
-                                : ""
-                            }`}
-                        onClick={() => handleButtonClick(0)}
-                    >
-                        Input
-                    </button>
-                    <button
-                        disabled={!predicted}
-                        className={`bg-yellow-200  ${predicted
-                            ? "hover:border-black hover:bg-yellow-300"
-                            : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[1]
-                                ? "outline outline-2 outline-black bg-yellow-300"
-                                : ""
-                            }`}
-                        onClick={() => handleButtonClick(1)}
-                    >
-                        {archList[0]}
-                    </button>
-                    <button
-                        disabled={!predicted}
-                        className={`bg-yellow-200  ${predicted
-                            ? "hover:border-black hover:bg-yellow-300"
-                            : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[2]
-                                ? "outline outline-2 outline-black bg-yellow-300"
-                                : ""
-                            }`}
-                        onClick={() => handleButtonClick(2)}
-                    >
-                        {archList[1]}
-                    </button>
-                    <button
-                        disabled={!predicted}
-                        className={`bg-gray-200  ${predicted
-                            ? "hover:border-black hover:bg-gray-300"
-                            : ""
-                            } text-black py-1 px-2 rounded ${selectedButtons[6]
-                                ? "outline outline-2 outline-black bg-gray-300"
-                                : ""
-                            }`}
-                        onClick={() => handleButtonClick(6)}
-                    >
-                        Output
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-};
+    archList.push("Output");
+    archList.unshift("Input");
 
-export const ModelButtonChain = () => {
-    return (
-        <div className="flex items-center space-x-4">
-            <button>Model 1</button>
-            <button>Model 2</button>
-            <button>Model 3</button>
-            <button>Model 4</button>
-        </div>
-    );
-};
+    const handleButtonClick = (index: number) => {
+        setSelectedButtons((prevSelectedLayers: boolean[]) => {
+            const updatedLayers = [...prevSelectedLayers];
+            updatedLayers[index] = !updatedLayers[index];
+
+            return updatedLayers;
+        })
+    }
+
+    return <div id="model-architecture" className="flex gap-x-4">
+        <h2 className="text-xl m-auto">Architecture </h2>
+        {archList.map((layer, index) => (
+            <button
+                key={index}
+                disabled={!predicted}
+                className={`py-1 px-2 rounded border-2 shadow
+                    ${predicted && "hover:bg-gray-100"}  
+                    ${selectedButtons[index] ? "text-gray-800  border-gray-600 " : "  text-gray-600  border-gray-200 "}
+                    `}
+                onClick={() => handleButtonClick(index)}
+            >
+                {layer}
+            </button>
+        ))}</div>;
+}
+
 
 import { Inter } from "@next/font/google";
 
@@ -684,7 +383,7 @@ export const PredictionVisualizer: React.FC<PredictionVisualizerProps> = ({
 };
 
 import React from "react";
-import { i } from "mathjs";
+import { e, i } from "mathjs";
 import { convertToAdjacencyMatrix, getNodeSet } from "@/utils/linkPredictionUtils";
 import { extractSubgraph } from "@/utils/graphDataUtils";
 import { dataProccessGraphVisLinkPrediction } from "@/utils/GraphvislinkPredUtil";
@@ -1162,7 +861,7 @@ export function visualizePartialGraphMatrix(
         visualizeMatrixBody(gridSize, subMatrix, width, height, margin);
 
         //drawNodeAttributes(keys, subMatrix, 150);
-        const strKeys:string[] = keys.map(item => String(item));
+        const strKeys: string[] = keys.map(item => String(item));
 
         drawNodeAttributes(strKeys, subMatrix, 150);
     };
