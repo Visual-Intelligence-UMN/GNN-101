@@ -256,8 +256,8 @@ export default function Home() {
 
                                 {/* graph data */}
                                 {/* graph data */}
-                                <div>
-                                    <div className="flex gap-x-4 items-center  mb-3 ">
+                                <div >
+                                    <div id='graph-selector' className="flex gap-x-4 items-center  mb-3 ">
                                         <h1 className="text-3xl font-black min-w-48">
                                             Input Graph
                                         </h1>
@@ -481,52 +481,33 @@ export default function Home() {
                                     {/* overlay text on visualizer when not predicted */}
                                     {probabilities.length == 0 && (
                                         <div
-                                            className="relative -top-96"
+                                            className="relative -top-60"
                                         >
                                             <h1 className="text-4xl text-gray-500 bg-white">
                                                 Model Visualization will show after
                                                 prediction
                                             </h1>
 
-                                            {model == "GCN - graph classification" ? (
-                                                <ClassifyGraph
-                                                    graphPath={
-                                                        graphList[selectedGraph]
-                                                    }
-                                                    modelPath={modelList[model]}
-                                                    setChangedG={setChangedG}
-                                                    setIntmData={setIntmData}
-                                                    setPredicted={setPredicted}
-                                                    predicted={predicted}
-                                                    probabilities={probabilities}
-                                                    setProbabilities={
-                                                        setProbabilities
-                                                    }
-                                                    onlyShownButton={true}
-                                                    simulationLoading={
-                                                        simulationLoading
-                                                    }
-                                                />
-                                            ) : (
-                                                <ClassifyGraph
-                                                    graphPath={
-                                                        nodeList[selectedGraph]
-                                                    }
-                                                    modelPath={modelList[model]}
-                                                    setChangedG={setChangedG}
-                                                    setIntmData={setIntmData}
-                                                    setPredicted={setPredicted}
-                                                    predicted={predicted}
-                                                    probabilities={probabilities}
-                                                    setProbabilities={
-                                                        setProbabilities
-                                                    }
-                                                    onlyShownButton={true}
-                                                    simulationLoading={
-                                                        simulationLoading
-                                                    }
-                                                />
-                                            )}
+
+                                            <ClassifyGraph
+                                                graphPath={
+                                                    model == "GCN - graph classification" ? graphList[selectedGraph] : nodeList[selectedGraph]
+                                                }
+                                                modelPath={modelList[model]}
+                                                setChangedG={setChangedG}
+                                                setIntmData={setIntmData}
+                                                setPredicted={setPredicted}
+                                                predicted={predicted}
+                                                probabilities={probabilities}
+                                                setProbabilities={
+                                                    setProbabilities
+                                                }
+                                                onlyShownButton={true}
+                                                simulationLoading={
+                                                    simulationLoading
+                                                }
+                                            />
+
                                         </div>
                                     )}
                                     {/* </Panel> */}
