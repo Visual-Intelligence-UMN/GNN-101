@@ -206,14 +206,10 @@ export const ArchitectureButtonChain = ({
             <button
                 key={index}
                 disabled={!predicted}
-                className={`border-gray-200 text-gray-600 py-1 px-2 rounded
-                    ${predicted
-                        ? "hover:border-black hover:bg-yellow-300"
-                        : ""
-                    }  ${selectedButtons[index]
-                        ? "outline outline-2 outline-black bg-yellow-300"
-                        : ""
-                    }`}
+                className={`py-1 px-2 rounded border-2 shadow
+                    ${predicted && "hover:bg-gray-100"}  
+                    ${selectedButtons[index] ? "text-gray-800  border-gray-600 " : "  text-gray-600  border-gray-200 "}
+                    `}
                 onClick={() => handleButtonClick(index)}
             >
                 {layer}
