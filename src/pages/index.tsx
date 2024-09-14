@@ -504,7 +504,7 @@ export default function Home() {
                                         <div
                                             className="absolute top-1/2 left-1/2 "
                                         >
-                                            <h1 className="text-4xl text-gray-300 bg-white">
+                                            <h1 className="text-4xl text-gray-500 bg-white">
                                                 Model Visualization will show after
                                                 prediction
                                             </h1>
