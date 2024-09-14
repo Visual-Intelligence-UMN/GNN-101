@@ -25,13 +25,9 @@ import 'intro.js/introjs.css';
 import {
     Selector,
     Hint,
-    ButtonChain,
     ViewSwitch,
-    GraphAnalysisViewer,
-    NodeClassifierButtonChain,
-    LinkClassifierButtonChain,
     NodeSelector,
-    PredictionVisualizer,
+    ArchitectureButtonChain,
 } from "../components/WebUtils";
 import { Footer, NavBar } from "../components/Surfaces";
 import { Inter } from "@next/font/google";
@@ -243,34 +239,18 @@ export default function Home() {
                                                 OptionList={Object.keys(modelList)} id={""} />
                                         </div>
 
-                                        <div id="model-architecture">
-                                            {model == "GCN - graph classification" ? (
-                                                <ButtonChain
-                                                    selectedButtons={selectedButtons}
-                                                    setSelectedButtons={
-                                                        setSelectedButtons
-                                                    }
-                                                    predicted={predicted}
-                                                />
-                                            ) : model == "GCN - node classification" ? (
-                                                <NodeClassifierButtonChain
-                                                    selectedButtons={selectedButtons}
-                                                    setSelectedButtons={
-                                                        setSelectedButtons
-                                                    }
-                                                    predicted={predicted}
-                                                />
-                                            ) : (
-                                                <LinkClassifierButtonChain
-                                                    selectedButtons={selectedButtons}
-                                                    setSelectedButtons={
-                                                        setSelectedButtons
-                                                    }
-                                                    predicted={predicted}
-                                                    innerComputationMode={modelType}
-                                                />
-                                            )}
-                                        </div>
+
+
+                                        <ArchitectureButtonChain
+
+                                            selectedButtons={selectedButtons}
+                                            setSelectedButtons={
+                                                setSelectedButtons
+                                            }
+                                            predicted={predicted}
+                                            selectedModel={model}
+                                        />
+
                                     </div>
                                 </div>
                                 <hr className="border-t border-gray-300 my-4"></hr>
