@@ -8,135 +8,141 @@ import { only } from "node:test";
 import { ColorRing } from 'react-loader-spinner';
 
 interface ClassifyGraphProps {
-  graphPath: string;
-  modelPath: string;
-  setChangedG: Function;
-  setIntmData: Function;
-  setPredicted: Function;
-  predicted: boolean;
-  probabilities: number[] | number[][];
-  setProbabilities: (prob: number[] | number[][]) => void;
-  onlyShownButton?: boolean;
-  simulationLoading: boolean;
+    graphPath: string;
+    modelPath: string;
+    setChangedG: Function;
+    setIntmData: Function;
+    setPredicted: Function;
+    predicted: boolean;
+    probabilities: number[] | number[][];
+    setProbabilities: (prob: number[] | number[][]) => void;
+    onlyShownButton?: boolean;
+    simulationLoading: boolean;
 }
 
 // parameter will be the user input for json file
 const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
-  graphPath,
-  modelPath,
-  setChangedG,
-  setIntmData,
-  setPredicted,
-  predicted,
-  probabilities,
-  setProbabilities,
-  onlyShownButton = false,
-  simulationLoading,
+    graphPath,
+    modelPath,
+    setChangedG,
+    setIntmData,
+    setPredicted,
+    predicted,
+    probabilities,
+    setProbabilities,
+    onlyShownButton = false,
+    simulationLoading,
 }) => {
-  let prob: number[] | number[][] = [];
-  const classifyGraph = async () => {
-    setPredicted(true);
+    let prob: number[] | number[][] = [];
+    const classifyGraph = async () => {
+        setPredicted(true);
 
-    //	const { prob, intmData } = await graphPrediction(modelPath, graphPath);
+        //	const { prob, intmData } = await graphPrediction(modelPath, graphPath);
 
-    
-    let intmData: IntmData | IntmDataNode | IntmDataLink;
 
-    if (modelPath == "./gnn_node_model.onnx")
-      ({ prob, intmData } = await nodePrediction(modelPath, graphPath));
-    else if (modelPath == "./gnn_model2.onnx")
-      ({ prob, intmData } = await graphPrediction(modelPath, graphPath));
-    else
-      ({ prob, intmData } = await linkPrediction(
-        modelPath,
-        "./json_data/links/twitch.json"
-      ));
+        let intmData: IntmData | IntmDataNode | IntmDataLink;
 
-    setChangedG(false);
-    setIntmData(intmData);
+        if (modelPath == "./gnn_node_model.onnx")
+            ({ prob, intmData } = await nodePrediction(modelPath, graphPath));
+        else if (modelPath == "./gnn_model2.onnx")
+            ({ prob, intmData } = await graphPrediction(modelPath, graphPath));
+        else
+            ({ prob, intmData } = await linkPrediction(
+                modelPath,
+                "./json_data/links/twitch.json"
+            ));
 
-    
+        setChangedG(false);
+        setIntmData(intmData);
 
-    if (Array.isArray(prob[0])) {
-      setProbabilities(prob as number[][]);
-      console.log("prob 1", probabilities);
-    } else {
-      setProbabilities(prob as number[]);
-      console.log("prob 2", probabilities);
-    }
-    console.log("check in prediction", prob, probabilities);
-  };
 
-  const prediction = !predicted ? (
-    onlyShownButton ? (
-      <button
-        onClick={classifyGraph}
-        className=" border border-4 opacity-60 hover:opacity-90 hover:border-4 py-1 px-2 rounded-lg text-4xl"
-        id="click-to-predict"
-        style={{ color: "rgb(25, 118, 210)", borderColor: "rgb(25, 118, 210)" }}
-      >
-        Click to Predict!
-      </button>
-    ) : (
-      onlyShownButton && (
-        <div className="mt-3">
-          <span
-            className="loading text-xl opacity-60 font-light"
-            style={{ color: "rgb(25, 118, 210" }}
-          >
-            Loading
-          </span>
-        </div>
-      )
-    )
-  ) : modelPath == "./gnn_node_model.onnx" ? (
-    <></>
-  ) : Array.isArray(probabilities[0]) ? (
-    <div></div>
-  ) : probabilities.length > 0 && typeof probabilities[0] === "number" ? (
-    <PredictionVisualizer
-      result={{
-        "Non-Mutagenic": probabilities[0] as number,
-        Mutagenic: probabilities[1] as number,
-      }}
-    />
-  ) : (
-    <>
-      <span>Predicting...Estimated waiting time is 10 seconds...</span>
-      <ColorRing
-        visible={true}
-        height="80"
-        width="80"
-        ariaLabel="color-ring-loading"
-        wrapperStyle={{}}
-        wrapperClass="color-ring-wrapper"
-        colors={['#e15b64', '#f47e60', '#f8b26a', '#abbd81', '#849b87']}
+
+        if (Array.isArray(prob[0])) {
+            setProbabilities(prob as number[][]);
+            console.log("prob 1", probabilities);
+        } else {
+            setProbabilities(prob as number[]);
+            console.log("prob 2", probabilities);
+        }
+        console.log("check in prediction", prob, probabilities);
+    };
+
+    const prediction = !predicted ? (
+        onlyShownButton ? (
+            <button
+                onClick={classifyGraph}
+                className=" border border-4 opacity-60 hover:opacity-90 hover:border-4 py-1 px-2 rounded-lg text-4xl"
+                id="click-to-predict"
+                style={{ color: "rgb(25, 118, 210)", borderColor: "rgb(25, 118, 210)" }}
+            >
+
+                Click to Predict!
+                {/* flash */}
+                <span className="relative h-4 w-4" style={{ right: '-18px', top: '-28px' }}>
+                    <span className="animate-ping absolute inline-flex h-6 w-6 rounded-full bg-sky-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-4 w-4 bg-sky-500"></span>
+                </span>
+            </button>
+        ) : (
+            onlyShownButton && (
+                <div className="mt-3">
+                    <span
+                        className="loading text-xl opacity-60 font-light"
+                        style={{ color: "rgb(25, 118, 210" }}
+                    >
+                        Loading
+                    </span>
+                </div>
+            )
+        )
+    ) : modelPath == "./gnn_node_model.onnx" ? (
+        <></>
+    ) : Array.isArray(probabilities[0]) ? (
+        <div></div>
+    ) : probabilities.length > 0 && typeof probabilities[0] === "number" ? (
+        <PredictionVisualizer
+            result={{
+                "Non-Mutagenic": probabilities[0] as number,
+                Mutagenic: probabilities[1] as number,
+            }}
         />
-    </>
-  );
-  const content =
-    modelPath == "./gnn_node_model.onnx" ? (
-      <>{prediction}</>
     ) : (
-      onlyShownButton ? (
-        prediction
-      ) 
-      : 
-      (
-        <div className="flex gap-x-4 items-center mb-2">
-          {!predicted && (
-            <div className="flex gap-x-4 items-center">
-              <h1 className="text-3xl font-black">Predictions</h1>
-              <p className="mt-1 	mx-3">No data available yet!</p>
-              <Hint text='Press the "Click to Predict!" to predict' />
-            </div>
-          )}
-          {prediction}
-        </div>
-      )
+        <>
+            <span>Predicting...Estimated waiting time is 10 seconds...</span>
+            <ColorRing
+                visible={true}
+                height="80"
+                width="80"
+                ariaLabel="color-ring-loading"
+                wrapperStyle={{}}
+                wrapperClass="color-ring-wrapper"
+                colors={['#e15b64', '#f47e60', '#f8b26a', '#abbd81', '#849b87']}
+            />
+        </>
     );
+    const content =
+        modelPath == "./gnn_node_model.onnx" ? (
+            <>{prediction}</>
+        ) : (
+            onlyShownButton ? (
+                prediction
+            )
+                :
+                (
+                    <div className="flex gap-x-4 items-center mb-2">
+                        {!predicted && (
+                            <div className="flex gap-x-4 items-center">
+                                <h1 className="text-3xl font-black">Predictions</h1>
+                                <p className="mt-1 	mx-3">No data available yet!</p>
+                                <Hint text='Press the "Click to Predict!" to predict' />
+                            </div>
+                        )}
+                        {prediction}
+                    </div>
+                )
+        );
 
-  return content;
+    return content;
 };
 
 export default ClassifyGraph;
