@@ -64,9 +64,11 @@ export const midGraphNodeSelectionList = [
 
 function graph_list_generate(num: number) {
     let res: { [k: string]: string } = {};
-    res["molecule_0"] = "./input_graph.json";
+    const chemicalNames = ['C16NO2', 'C6FNO2', 'C7NO3']
+
+    // res["molecule_0"] = "./input_graph.json";
     for (let i = 0; i < num; i++) {
-        res[`molecule_${i}`] = `./json_data/graphs/input_graph${i}.json`;
+        res[`molecule_${chemicalNames[i]}`] = `./json_data/graphs/input_graph${i}.json`;
     }
 
     return res;
