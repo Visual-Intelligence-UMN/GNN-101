@@ -488,7 +488,6 @@ export function drawGCNConvGraphModel(
     featureVisTable: any,
     pooling: any,
     graph: any,
-    colorSchemesTable: any,
     poolingVis: any,
     outputVis: any,
     final: any,
@@ -574,7 +573,6 @@ export function drawGCNConvGraphModel(
                 pooling,
                 myColor,
                 frames,
-                colorSchemesTable,
                 thirdGCN,
                 conv3,
                 featureChannels
@@ -654,7 +652,6 @@ export function drawGCNConvGraphModel(
             schemeTypeTable:["binary", "", "", "", "", "binary"]
         };
 
-        colorSchemesTable = drawColorSchremeSequence(infoTable, myColor);
     }
 
 
@@ -664,7 +661,6 @@ export function drawGCNConvGraphModel(
         frames: frames,
         schemeLocations: schemeLocations,
         featureVisTable: featureVisTable,
-        colorSchemesTable: colorSchemesTable,
         poolingVis: poolingVis,
         outputVis: outputVis,
         firstLayer: firstLayer,
@@ -691,7 +687,6 @@ export function drawGCNConvNodeModel(
     featureVisTable: any,
     result: any,
     graph: any,
-    colorSchemesTable: any,
     final: any,
     firstLayer: any,
     maxVals: any,
@@ -831,8 +826,6 @@ export function drawGCNConvNodeModel(
         schemeTypeTable:["binary", "", "", "", ""]
     };
 
-    colorSchemesTable = drawColorSchremeSequence(infoTable, myColor);
-
 
 
     return {
@@ -840,7 +833,6 @@ export function drawGCNConvNodeModel(
         frames: frames,
         schemeLocations: schemeLocations,
         featureVisTable: featureVisTable,
-        colorSchemesTable: colorSchemesTable,
         firstLayer: firstLayer,
         maxVals: maxVals,
         paths: paths,
@@ -863,7 +855,6 @@ export function drawGCNConvLinkModel(
     schemeLocations: any,
     featureVisTable: any,
     graph: any,
-    colorSchemesTable: any,
     firstLayer: any,
     maxVals: any,
     featureChannels: number,
@@ -1032,18 +1023,13 @@ export function drawGCNConvLinkModel(
             schemeTypeTable:["", "", "", "binary"]
         };
 
-        colorSchemesTable = drawColorSchremeSequence(infoTable, myColor);
-
     }
-
-    console.log("cst", colorSchemesTable);
 
     return {
         locations: locations,
         frames: frames,
         schemeLocations: schemeLocations,
         featureVisTable: featureVisTable,
-        colorSchemesTable: colorSchemesTable,
         firstLayer: firstLayer,
         maxVals: maxVals,
         paths: paths,
@@ -1057,7 +1043,6 @@ export function drawPoolingVis(
     pooling: number[],
     myColor: any,
     frames: any,
-    colorSchemesTable: any,
     thirdGCN: any,
     conv3: any,
     featureChannels: number

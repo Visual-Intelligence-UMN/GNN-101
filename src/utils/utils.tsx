@@ -549,7 +549,7 @@ export const state: State = {
 };
 
 
-export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffset: number, colorSchemes: any, allNodes: any[], convNum: number, mode: number, state: State, fcLayerMoveOffset: number = 600) {
+export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffset: number, allNodes: any[], convNum: number, mode: number, state: State, fcLayerMoveOffset: number = 600) {
 
     if (!svg.selectAll) {
         svg = d3.selectAll(svg)
@@ -564,10 +564,6 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
     if (movedNode && (!event.target.classList.contains("vis-component"))) {
         svg.selectAll(".vis-component").style("opacity", 0);
         let currMoveOffset = moveOffset;
-
-        for (let i = 0; i < colorSchemes.length; i++) {
-            colorSchemes[i].style.opacity = "1";
-        }
 
         if (mode === 0 && movedNode.graphIndex >= 4) {
             currMoveOffset = fcLayerMoveOffset;
@@ -603,7 +599,6 @@ export function featureVisualizer(
     firstLayerRectHeight: number,
     rectHeight: number,
     outputLayerRectHeight: number,
-    colorSchemes: any,
     mode: number,
     innerComputationMode: string,
 ) {
@@ -913,19 +908,13 @@ export function featureVisualizer(
 
                         //color schemes interaction logic
 
-                        for (let i = 0; i < colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
-
-
-                        colorSchemes[node.graphIndex].style.opacity = "1";
-                        colorSchemes[node.graphIndex - 1].style.opacity = "1";
-
                         hideAllLinks(allNodes);
 
 
                         if (mode === 1 && graphIndex === 4) {
-                            nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, svg, mode)
+                            nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, svg, mode)
                         } else {
-                            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, allFeatureMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
+                            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, allFeatureMap, svg, offset, height, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
                         };
 
 
@@ -1089,11 +1078,11 @@ export function featureVisualizer(
                         } // to make sure relatedNodes is not null
                         showFeature(node);
                         if (node.graphIndex === 4) {
-                            fcLayerCalculationVisualizer(node, allNodes, relatedNodes, offset, height, currMoveOffset, node.graphIndex, g2, state, currRectHeight, colorSchemes, convNum, svg, mode);
+                            fcLayerCalculationVisualizer(node, allNodes, relatedNodes, offset, height, currMoveOffset, node.graphIndex, g2, state, currRectHeight, convNum, svg, mode);
                         }
                         if (node.graphIndex === 5) {
 
-                            outputVisualizer(node, allNodes, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, convNum, svg, mode)
+                            outputVisualizer(node, allNodes, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, convNum, svg, mode)
                         }
 
                         reduceNodeOpacity(allNodes, relatedNodes, node);

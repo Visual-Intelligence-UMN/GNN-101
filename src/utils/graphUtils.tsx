@@ -189,7 +189,6 @@ export function outputVisualizer(
     prevRectHeight: number,
     rectHeight: number,
     rectWidth: number,
-    colorSchemes: any,
     convNum: number,
     originalSvg: any,
     mode: number
@@ -232,9 +231,6 @@ export function outputVisualizer(
 
     d3.selectAll(".to-be-removed").remove();
     d3.selectAll(".node-features-Copy").style("visibility", "visible").lower();
-
-    //color schemes interaction
-    for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "0.5";
 
     let originalCoordinates = moveFeatures(
         node.relatedNodes,
@@ -774,7 +770,6 @@ export function outputVisualizer(
                 d3.selectAll(".to-be-removed").remove();
         
                 d3.selectAll(".graph-displayer").remove();
-                for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "1";
                 moveFeaturesBack(node.relatedNodes, originalCoordinates);
                 node.featureGroup
                     .transition()
@@ -784,7 +779,7 @@ export function outputVisualizer(
                         `translate(${node.x - 7.5}, ${node.y + 170 + 5}) rotate(0)`
                     );
     
-                    handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state)
+                    handleClickEvent(originalSvg, node, event, moveOffset, allNodes, convNum, mode, state)
     
     
         })
@@ -807,7 +802,6 @@ export function calculationVisualizer(
     svg: any,
     offset: number,
     height: number,
-    colorSchemes: any,
     convNum: number,
     moveOffset: number,
     prevRectHeight: number,
@@ -1479,7 +1473,7 @@ export function calculationVisualizer(
                                         d3.selectAll(".parameter").remove();
                                         d3.selectAll(".to-be-removed").remove();
                                         d3.selectAll(".intermediate-path").remove();
-                                        handleClickEvent(svg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
+                                        handleClickEvent(svg, node, event, moveOffset, allNodes, convNum, mode, state);
                                     }) 
                             });
                         })
@@ -1840,7 +1834,7 @@ export function calculationVisualizer(
             d3.selectAll(".parameter").remove();
             d3.selectAll(".to-be-removed").remove();
             d3.selectAll(".intermediate-path").remove();
-            handleClickEvent(svg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
+            handleClickEvent(svg, node, event, moveOffset, allNodes, convNum, mode, state);
     
         }) 
     
@@ -2379,7 +2373,6 @@ export function fcLayerCalculationVisualizer(
     svg: any,
     state: State,
     rectHeight: number,
-    colorSchemes: any,
     convNum: number,
     originalSvg: any,
     mode: number
@@ -2482,8 +2475,7 @@ export function fcLayerCalculationVisualizer(
             rectL,
             posNeed,
             posPlus,
-            state,
-            colorSchemes
+            state
         );
         node.relatedNodes.forEach((n: any, i: number) => {
             let start_x = 0;
@@ -2539,8 +2531,6 @@ export function fcLayerCalculationVisualizer(
         
                 d3.selectAll(".node-features-Copy").style("visibility", "hidden");
         
-                for (let i = 0; i < colorSchemes.length; i++)colorSchemes[i].style.opacity = "1";
-        
                 moveFeaturesBack(relatedNodes, originalCoordinates);
                 node.featureGroup
                     .transition()
@@ -2551,7 +2541,7 @@ export function fcLayerCalculationVisualizer(
                     );
                 d3.selectAll("rect").style("opacity", 1);
                 d3.selectAll(".graph-displayer").remove();
-                handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
+                handleClickEvent(originalSvg, node, event, moveOffset, allNodes, convNum, mode, state);
            
     
     
@@ -2570,17 +2560,11 @@ function poolingLayerInteraction(
     rectL: number,
     posNeed: number[][],
     posPlus: number[][],
-    state: State,
-    colorSchemes: any
+    state: State
 ) {
     if (!svg.selectAll) {
         svg = d3.select(svg);
     }
-
-    for (let i = 0; i < colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
-
-    colorSchemes[3].style.opacity = "1";
-    colorSchemes[4].style.opacity = "1";
 
     for (let i = 0; i < node.features.length; i++) {
         d3.select(`#pooling-layer-rect-${i}`)
@@ -2688,7 +2672,6 @@ export function nodeOutputVisualizer(
     prevRectHeight: number,
     rectHeight: number,
     rectWidth: number,
-    colorSchemes: any,
     originalSvg: any,
     mode: number
 
@@ -2720,7 +2703,6 @@ export function nodeOutputVisualizer(
     d3.selectAll(".node-features-Copy").style("visibility", "visible").lower();
 
     //color schemes interaction
-    for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "0.5";
     let xPos = (node.graphIndex) * offset - 250;
     let yPos = node.y - 15
     let originalCoordinates = moveFeatures(
@@ -3311,7 +3293,7 @@ export function nodeOutputVisualizer(
                     d3.selectAll(".node-features-Copy").style("opacity", "hidden");
         
                     d3.selectAll(".to-be-removed").remove();
-                    handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
+                    handleClickEvent(originalSvg, node, event, moveOffset, allNodes, convNum, mode, state);
         
     
         
@@ -3319,7 +3301,6 @@ export function nodeOutputVisualizer(
                 d3.selectAll(".graph-displayer").remove();
                 d3.selectAll(".columnGroup").remove();
                 d3.selectAll(".columnUnit").remove();
-                for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "1";
                 moveFeaturesBack(node.relatedNodes, originalCoordinates);
                 node.featureGroup
                     .transition()

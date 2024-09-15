@@ -260,7 +260,7 @@ export function buildLegend(
     const g0 = layer
         .append("g")
         .attr("transform", `translate(${x}, ${y}) scale(0.7)`)
-        .attr("class", "legend");
+        .attr("class", "");
 
 
 
