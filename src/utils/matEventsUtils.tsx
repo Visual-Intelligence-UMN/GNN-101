@@ -29,7 +29,8 @@ import {
     computeMatrixLocations,
     drawAttentions,
     drawMathFormula,
-    drawSamplingAggregation
+    drawSamplingAggregation,
+    drawFunctionIcon
 } from "./matAnimateUtils";
 import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import { drawMatmulExplanation, drawSoftmaxDisplayer } from "./matInteractionUtils";
@@ -1135,6 +1136,14 @@ export function outputVisClick(
                 wMat, startCoord, endPathAniCoord, 1, weightMatrixPostions, 
                 featureChannels, poolingValues, "procVis wRect", "");
             drawPathBtwOuputResult([endPt3], endPt4);
+            drawPathBtwOuputResult([[endPt4[0]+30, endPt4[1]]], [endPt4[0]+125, endPt4[1]]);
+
+            const iconX = endPt4[0]+(30+125)/2 + 25;
+            const iconY = endPt4[1];
+
+            drawFunctionIcon([iconX, iconY], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]");
+
+
         }, delay:200},
         {func:()=>{
         pathMap = drawPathInteractiveComponents(resultStartCoord, resultCoord, result, myColor);
@@ -1196,8 +1205,8 @@ export function outputVisClick(
         const id: number = Number(d3.select(this).attr("id"));
 
         if(pathMap!=null){
-            pathMap[0][id]!.style.opacity = "0.1";
-            pathMap[1][id]!.style.opacity = "0.1";
+            pathMap[0][id]!.style.opacity = "0";
+            pathMap[1][id]!.style.opacity = "0";
         }
     });
 

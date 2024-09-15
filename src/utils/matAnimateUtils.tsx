@@ -1385,6 +1385,60 @@ export function drawTanh(
     });
 }
 
+export function drawFunctionIcon(
+    nextCoord: number[],
+    svgPath: string,
+    funcName: string,
+    funcStr: string,
+    funcFormula: string,
+    funcRange: string
+) {
+    console.log("draw!")
+    const svg = d3.select(".mats");
+    const relu = svg.append("g");
+    const radius = 5;
+    const cx1 = nextCoord[0] - 45;
+    const cy1 = nextCoord[1] - 15;
+
+    d3.xml(svgPath).then(function (data) {
+        if (relu.node() != null) {
+            const ReLU = relu!.node()!.appendChild(data.documentElement);
+            d3.select(ReLU)
+                .attr("x", cx1)
+                .attr("y", cy1)
+                .attr("class", "procVis relu-icon")
+                .raise();
+
+        }
+    });
+
+    drawHintLabel(
+        relu,
+        cx1 - 20,
+        cy1 + radius * 4 + 12 + 4,
+        funcName,
+        "procVis relu-icon"
+    );
+
+
+    relu.on("mouseover", function (event, d) {
+        const [x, y] = d3.pointer(event);
+
+        //set-up the paramtere for the math displayer
+        drawActivationExplanation(
+            x,
+            y,
+            funcStr,
+            funcFormula,
+            funcRange
+        );
+    });
+
+    relu.on("mouseout", function () {
+        d3.selectAll(".math-displayer").remove();
+    });
+}
+
 //-----------------------------animation functions for poolingVisClick----------------------------------
 export function drawOutputVisualizer(
     result: number[],
@@ -1442,7 +1496,7 @@ export function drawPathInteractiveComponents(
                 })
                 .attr("class", "procVis")
                 .style("fill", "none")
-                .style("opacity", "0.1")
+                .style("opacity", "0")
                 .attr("stroke", myColor(result[j]));
 
             temPathMap.push(path.node());
@@ -1452,13 +1506,13 @@ export function drawPathInteractiveComponents(
     let yOffset = -clockwise * 70;
     if (clockwise == 0) yOffset = 80;
     const g = d3.select(".mats").append("g");
-    drawHintLabel(
-        g,
-        (resultCoord[0][0] + endCoord[endCoord.length - 1][0]) / 2 - 20,
-        (resultCoord[0][1] + endCoord[endCoord.length - 1][1]) / 2 + yOffset,
-        "Softmax",
-        "procVis"
-    );
+    // drawHintLabel(
+    //     g,
+    //     (resultCoord[0][0] + endCoord[endCoord.length - 1][0]) / 2 - 20,
+    //     (resultCoord[0][1] + endCoord[endCoord.length - 1][1]) / 2 + yOffset,
+    //     "Softmax",
+    //     "procVis"
+    // );
     return pathMap;
 }
 

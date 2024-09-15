@@ -24,7 +24,7 @@ import {
     featureSAGEClick
 } from "./matEventsUtils";
 import { deepClone, drawPoints } from "./utils";
-import { AnimationController, computeMatrixLocations, drawAniPath, drawBiasPath, drawBiasVector, drawPathBtwOuputResult, drawPathInteractiveComponents, drawWeightMatrix, drawWeightsVector } from "./matAnimateUtils";
+import { AnimationController, computeMatrixLocations, drawAniPath, drawBiasPath, drawBiasVector, drawFunctionIcon, drawPathBtwOuputResult, drawPathInteractiveComponents, drawWeightMatrix, drawWeightsVector } from "./matAnimateUtils";
 import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import { roundToTwo } from "../components/WebUtils";
 import { drawMatmulExplanation, drawSoftmaxDisplayerNodeClassifier } from "./matInteractionUtils";
@@ -912,7 +912,13 @@ export function visualizeNodeClassifierFeatures(
                 },
                 { func: () => { drawBiasVector(g, 4, 15, 10, biasCoord, myColor, linBias, 4); }, delay: aniSec },
                 { func: () => { drawBiasPath(endBiasCoord, res10, res11, endBiasPathCoord, 4, 4); }, delay: aniSec },
-                { func: () => { drawPathBtwOuputResult([endOutputCoord], startResultCoord); }, delay: aniSec },
+                { func: () => { 
+                    drawPathBtwOuputResult([endOutputCoord], startResultCoord); 
+                    const iconX = (endOutputCoord[0] + startResultCoord[0]) / 2 + 75;
+                    const iconY = endOutputCoord[1];
+                    drawFunctionIcon([iconX, iconY], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]");
+
+                }, delay: aniSec },
                 {
                     func: () => {
                         let dir = 1;
@@ -1088,7 +1094,7 @@ export function visualizeNodeClassifierFeatures(
                         const rectID = d3.select(this).attr("rectID");
                         //path interaction
                         for (let i = 0; i < pathMap.length; i++) {
-                            pathMap[i][rectID].style.opacity = "0.1";
+                            pathMap[i][rectID].style.opacity = "0";
                         }
                         //remove the math displayer
                         d3.selectAll(".math-displayer").remove();
@@ -1591,6 +1597,7 @@ export function visualizeLinkClassifierFeatures(
             
             // drawPoints(".mats", "red", [resultVisPos]);
 
+            
             g.append("line")
                 .attr("x1", endingPoint[0])
                 .attr("y1", endingPoint[1])
@@ -1635,6 +1642,12 @@ export function visualizeLinkClassifierFeatures(
                 resultVisPos[0]+50,
                 resultVisPos[1]+25
             ];
+
+            const iconX = resultVisPos[0]+100;
+            const iconY = resultVisPos[1]+5;
+
+            drawFunctionIcon([iconX, iconY], "./assets/SVGs/sigmoid.svg", "", "Sigmoid", "f(x) = 1/(1+e^(-x))", "Range: [0 to 1]");
+
 
             g.append("text")
                 .attr("x", sigmoidTextPos[0])
