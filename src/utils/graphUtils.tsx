@@ -1317,28 +1317,56 @@ export function calculationVisualizer(
                         
 
 
-                        const frame = g3.append("rect")
-                        .attr("x", start_x)
-                        .attr("y", start_y)
-                        .attr("width", 10)
-                        .attr("height", 10)
-                        .style("fill", "white")
-                        .style("stroke", "black")
-                        .attr("class", "parameter procVis to-be-removed")
-                        .attr("opacity", 1).raise();
+                        // const frame = g3.append("rect")
+                        // .attr("x", start_x)
+                        // .attr("y", start_y)
+                        // .attr("width", 10)
+                        // .attr("height", 10)
+                        // .style("fill", "white")
+                        // .style("stroke", "black")
+                        // .attr("class", "parameter procVis to-be-removed")
+                        // .attr("opacity", 1).raise();
                         
 
                        
                         const multiplier = roundToTwo(computeAttentionCoefficient(node.graphIndex, n.features, lastLayerNodefeature, neighborFeatures));
                         
+                        const gradient = g3
+                            .append("defs")
+                            .append("linearGradient")
+                            .attr("id", "text-gradient")
+                            .attr("x1", "0%")
+                            .attr("y1", "0%")
+                            .attr("x2", "100%")
+                            .attr("y2", "0%");
 
-                        g3.append("text")
+                            // 设置渐变的颜色
+                        gradient.append("stop").attr("offset", "0%").attr("stop-color", "pink");
+
+                        gradient
+                            .append("stop")
+                            .attr("offset", "100%")
+                            .attr("stop-color", "blue");
+
+                        const frame = g3.append("text")
                         .attr("x", start_x)
                         .attr("y", start_y)
                         .text(multiplier)
-                        .attr("font-size", 7.5)
-                        .attr("class", "parameter procVis to-be-removed")
-                        .attr("opacity", 1).raise();
+                        .attr("font-size", 15)
+                        .attr("fill", "url(#text-gradient)")
+                        .attr("class", "parameter procVis to-be-removed attention")
+                        .attr("font-weight", "bold")
+                        .attr("opacity", 1)
+                        .raise()
+
+                        d3.selectAll(".attention").on("mouseover", function () {
+                            d3.select(this).style("stroke", "black").attr("stroke-width", 0.02);
+                            // .attr("font-size", 30);
+                        });
+                        d3.selectAll(".attention").on("mouseout", function () {
+                            d3.select(this).style("stroke", "none");
+                            //.attr("font-size", 15);
+                        });
 
 
                         const learnableData = require("../../public/learnableVectorsGAT.json");
@@ -1373,7 +1401,7 @@ export function calculationVisualizer(
                         
 
                         frame.on("click", function(this: any, event: any) {
-                 
+                            d3.select(this).attr("font-size", 30);
                             d3.selectAll(".weightUnit").lower()
                             d3.selectAll(".columnGroup").lower()
                             d3.selectAll(".weightMatrixText").lower()
@@ -1410,6 +1438,7 @@ export function calculationVisualizer(
 
                             d3.selectAll("#my_dataviz").on("click", function(event) {
                                 event.stopPropagation();
+                                d3.selectAll(".attention").attr("font-size", 15);
                                 d3.selectAll(".button-group").raise()
                   
                                     d3.selectAll(".attn-displayer").remove();
