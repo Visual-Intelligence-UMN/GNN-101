@@ -936,7 +936,7 @@ export function drawActivationExplanation(
         .style("fill", "white")
         .style("stroke", "black")
         .style("stroke-width", 2)
-        .attr("class", "math-displayer procVis")
+        .attr("class", "math-displayer procVis to-be-removed")
         .raise();
 
     const titleYOffset = 10;
@@ -946,7 +946,7 @@ export function drawActivationExplanation(
         .attr("x", displayX + titleXOffset)
         .attr("y", displayY + titleYOffset)
         .text(title)
-        .attr("class", "math-displayer procVis")
+        .attr("class", "math-displayer procVis to-be-removed")
         .attr("font-size", titleYOffset)
         .attr("fill", "black");
     const eqXOffset = titleXOffset / 2;
@@ -958,7 +958,7 @@ export function drawActivationExplanation(
         .attr("x", displayX + eqXOffset)
         .attr("y", displayY + eqYOffset)
         .text(formula)
-        .attr("class", "math-displayer procVis")
+        .attr("class", "math-displayer procVis to-be-removed")
         .attr("font-size", unitSize)
         .attr("fill", "black");
     d3.select(".mats")
@@ -966,7 +966,7 @@ export function drawActivationExplanation(
         .attr("x", displayX + eqXOffset)
         .attr("y", displayY + eqYOffset + unitSize * 1.5)
         .text(description)
-        .attr("class", "math-displayer procVis")
+        .attr("class", "to-be-removed math-displayer procVis")
         .attr("font-size", unitSize)
         .attr("fill", "black");
 }

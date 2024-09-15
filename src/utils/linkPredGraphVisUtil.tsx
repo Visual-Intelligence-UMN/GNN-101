@@ -27,7 +27,7 @@ import { isValidElement } from "react";
 import { isValidNode } from "./GraphvislinkPredUtil";
 import { roundToTwo } from "@/components/WebUtils";
 import { hoverOverHandler } from "./graphAnimationHelper";
-import { computeMatrixLocations, drawWeightMatrix } from "./matAnimateUtils";
+import { computeMatrixLocations, drawFunctionIcon, drawWeightMatrix } from "./matAnimateUtils";
 import math, { all, create } from "mathjs";
 
 
@@ -641,13 +641,16 @@ export function linkPredOutputVisualizer(
     .lower();
 
     const path = svg.append("path")
-    .attr("d", `M${ (node.graphIndex - 1) * offset + 330},${height / 3 - 15} L ${ (node.graphIndex - 1) * offset + 500},${height / 3 - 15}`)
+    .attr("d", `M${ (node.graphIndex - 1) * offset + 350},${height / 3 - 15} L ${ (node.graphIndex - 1) * offset + 500},${height / 3 - 15}`)
     .attr("class", "to-be-removed dot-product")
     .style("stroke", "black")
     .style("opacity", 0)
 
+    drawFunctionIcon([(node.graphIndex - 1) * offset + 455, height / 3 - 15], "./assets/SVGs/sigmoid.svg", "", "Sigmoid", "f(x) = 1/(1+e^(-x))", "Range: [0 to 1]", svg);
+
+
     svg.append("text")
-    .attr("x",  (node.graphIndex - 1) * offset + 420)
+    .attr("x",  (node.graphIndex - 1) * offset + 390)
     .attr("class", "to-be-removed dot-product")
     .attr("y", height / 3 - 30)
     .text("Sigmoid")

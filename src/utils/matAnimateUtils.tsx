@@ -1391,10 +1391,11 @@ export function drawFunctionIcon(
     funcName: string,
     funcStr: string,
     funcFormula: string,
-    funcRange: string
+    funcRange: string,
+    svg:any = d3.select(".mats")
 ) {
     console.log("draw!")
-    const svg = d3.select(".mats");
+    //const svg = d3.select(".mats");
     const relu = svg.append("g");
     const radius = 5;
     const cx1 = nextCoord[0] - 45;
@@ -1406,7 +1407,7 @@ export function drawFunctionIcon(
             d3.select(ReLU)
                 .attr("x", cx1)
                 .attr("y", cy1)
-                .attr("class", "procVis relu-icon")
+                .attr("class", "procVis relu-icon to-be-removed")
                 .raise();
 
         }
@@ -1417,11 +1418,11 @@ export function drawFunctionIcon(
         cx1 - 20,
         cy1 + radius * 4 + 12 + 4,
         funcName,
-        "procVis relu-icon"
+        "procVis relu-icon to-be-removed"
     );
 
 
-    relu.on("mouseover", function (event, d) {
+    relu.on("mouseover", function (event:any, d:any) {
         const [x, y] = d3.pointer(event);
 
         //set-up the paramtere for the math displayer

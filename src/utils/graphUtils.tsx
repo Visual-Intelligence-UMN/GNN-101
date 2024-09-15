@@ -20,7 +20,7 @@ import { stat, truncateSync } from "fs";
 
 
 import { drawActivationExplanation, drawAttnDisplayer, drawEScoreEquation, drawMatmulExplanation, graphVisDrawMatmulExplanation } from "./matInteractionUtils";
-import { computeMatrixLocations, drawMathFormula, drawMatrixWeight, drawSamplingAggregation, drawWeightMatrix } from "./matAnimateUtils";
+import { computeMatrixLocations, drawFunctionIcon, drawMathFormula, drawMatrixWeight, drawSamplingAggregation, drawWeightMatrix } from "./matAnimateUtils";
 import { graphVisDrawActivationExplanation, graphVisDrawMatrixWeight, displayerHandler, hoverOverHandler} from "./graphAnimationHelper";
 import { computeAttentionCoefficient, computeAttnStep } from "./computationUtils";
 import { start } from "repl";
@@ -405,6 +405,19 @@ export function outputVisualizer(
         .style("stroke-width", 1)
         .style("stroke", "grey")
         .style("opacity", 0);
+
+        outputGroup.append("line")
+                    .attr("x1", 2 * rectHeight + 5 - moveOffset)
+                    .attr("y1", 7.5)
+                    .attr("x2", 2 * rectHeight + 5 - moveOffset + 110)
+                    .attr("y2", 7.5)
+                    .attr("stroke", "black")
+                    .attr("class", "to-be-removed softmax-component");
+        
+
+        drawFunctionIcon([2 * rectHeight + 5 - moveOffset + 75, 7.5], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", outputGroup);
+
+        
 
         outputGroup
         .append("text")
@@ -3047,6 +3060,9 @@ export function nodeOutputVisualizer(
             .attr("class", "output-path to-be-removed")
             .attr("opacity", 1)
             .lower();
+
+            drawFunctionIcon([end_x+170/2+40, end_y], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", svg);
+
     }, 2000);
 
 
