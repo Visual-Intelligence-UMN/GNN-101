@@ -49,7 +49,7 @@ export function drawEqComponentLabel(
         .attr("y", y)
         .attr("class", "temp")
         .style("fill", "gray")
-        .style("font-size", 5);
+        .style("font-size", 3);
 }
 
 
