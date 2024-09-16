@@ -227,7 +227,7 @@ export default function Sidebar(props: Props) {
                         <span className={styles.tag}>Edge-Level Tasks </span>
                         <p>
                             GNNs can effectively predict edge properties within a graph.
-                            In the Twitch dataset, for instance, the model's objective is to determine if two Twitch users are friends.
+                            In the Twitch dataset, for instance, the model&apos;s objective is to determine if two Twitch users are friends.
                             By employing multiple layers, the model combines the features of the two nodes associated with a specific edge using dot product multiplication.
                             Subsequently, a sigmoid function is applied to the resulting score, yielding a probability indicating the likelihood of a friendship between the two users.
                         </p>
