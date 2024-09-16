@@ -88,8 +88,6 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
 
             svgRef.current = svg.node();
 
-            let colorSchemes: any = [];
-
             const transformedSubgraph = Object.fromEntries(
                 Object.entries(subgraph).map(([key, value]) => {
                     const mappedKey = nodeMapping[key];
@@ -433,23 +431,6 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
                     let cstOffset = 25;
 
 
-                    if (i == 0) {
-
-
-
-
-
-                        cst = buildLegend(myColor, 1, text + " Color Scheme", text_x - 50, text_y + cstOffset, g1);
-                    }
-
-                    else {
-                        const absMax = findAbsMax(allValues);
-                        console.log("value", allValues)
-                        cst = buildLegend(myColor, absMax, text + " Color Scheme", text_x - 50, text_y + cstOffset, g1);
-                    }
-
-                    colorSchemes.push(cst);
-
 
 
 
@@ -473,7 +454,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
                             .attr("opacity", 0);
 
                         if (intmData) {
-                            linkPredFeatureVisualizer(svg, allNodes, offset, height, graphs, 1200, 900, 15, 2, 3, 20, colorSchemes, 2, subgraph, innerComputationMode, centerY);
+                            linkPredFeatureVisualizer(svg, allNodes, offset, height, graphs, 1200, 900, 15, 2, 3, 20, 2, subgraph, innerComputationMode, centerY);
                         }
                     }
                 }

@@ -80,8 +80,6 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
 
 
       svgRef.current = svg.node();
-      let colorSchemes:any = [];
-
       graphs.forEach((data, i) => {
         if (i >= 5) {
           return;
@@ -358,18 +356,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
      
             let cst:any = null;
             const cstOffset = 25;
-            
-             if(i==0){
-               cst = buildBinaryLegend(myColor, 0, 1, text+" Color Scheme", text_x, text_y + cstOffset, g1)
-             }
-     
-             else {
-
-               cst = buildLegend(myColor, absMax, text+" Color Scheme", text_x - 50, text_y + cstOffset, g1);
-             }
    
-             colorSchemes.push(cst);
-             
 
 
           // doesn't show the text, need to be fixed 
@@ -391,7 +378,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
 
 
             if (intmData && intmData.final) {
-              featureVisualizer(svg, allNodes, offset, height, graphs, 1100, 600, 800, 15, 10, 20, 20, colorSchemes, 1, innerComputationMode); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
+              featureVisualizer(svg, allNodes, offset, height, graphs, 1100, 600, 800, 15, 10, 20, 20, 1, innerComputationMode); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
             }
 
           }

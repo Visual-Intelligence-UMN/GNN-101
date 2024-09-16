@@ -43,7 +43,6 @@ export function linkPredFeatureVisualizer(
   firstLayerRectHeight: number, 
   rectHeight: number, 
   outputLayerRectHeight: number,
-  colorSchemes:any,
   mode: number,
   subgraph: any,
   innerComputationMode: string,
@@ -302,18 +301,11 @@ export function linkPredFeatureVisualizer(
 
 
             //color schemes interaction logic
-
-            for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
-
-
-            // colorSchemes[node.graphIndex].style.opacity = "1";
-            // colorSchemes[node.graphIndex - 1].style.opacity = "1";
-
             hideAllLinks(allNodes);
 
 
           
-            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, allFeatureMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
+            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, allFeatureMap, svg, offset, height, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
           
 
 
@@ -474,7 +466,7 @@ export function linkPredFeatureVisualizer(
             showFeature(node);
 
             if (node.graphIndex === 3) {
-              linkPredOutputVisualizer(node, allNodes, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, convNum, svg, mode)
+              linkPredOutputVisualizer(node, allNodes, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, convNum, svg, mode)
             }
             
             reduceNodeOpacity(allNodes, relatedNodes, node);
@@ -527,7 +519,6 @@ export function linkPredOutputVisualizer(
   prevRectHeight: number,
   rectHeight: number,
   rectWidth: number,
-  colorSchemes: any,
   convNum: number,
   originalSvg: any,
   mode: number
@@ -544,10 +535,6 @@ export function linkPredOutputVisualizer(
 
   d3.selectAll(".to-be-removed").remove();
   d3.selectAll(".node-features-Copy").style("visibility", "visible").lower();
-
-  //color schemes interaction
-  for (let i = 0; i < 4; i++) colorSchemes[i].style.opacity = "0.5";
-
 
 
   let originalCoordinates: any[] = [];
@@ -744,12 +731,10 @@ export function linkPredOutputVisualizer(
           d3.selectAll(".to-be-removed").remove();
   
           d3.selectAll(".graph-displayer").remove();
-          for (let i = 0; i < 4; i++) {colorSchemes[i].style.opacity = "1";}
-  
   
   
           moveFeaturesBack(node.relatedNodes, originalCoordinates);
-          handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state)
+          handleClickEvent(originalSvg, node, event, moveOffset, allNodes, convNum, mode, state)
   
   
   })
