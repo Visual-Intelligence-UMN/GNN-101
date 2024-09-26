@@ -100,14 +100,14 @@ export function injectSVG(g:any, x: number, y: number, SVGPath:string, svgClass:
         let play;
  
         play = g!.node()!.appendChild(data.documentElement)
-        d3.select(play).attr("x", x).attr("y", y).attr("class", svgClass)
+        d3.select(play).attr("x", x).attr("y", y-20).attr("class", svgClass)
        
         if (SVGPath.includes("Formula")) {
 
             g.append("rect")
             .attr("class", "to-be-removed")
             .attr("x", x - 50)
-            .attr("y", y)
+            .attr("y", y - 20)
             .attr("width", 400)
             .attr("height", 100)
             .style("fill", "white")
@@ -118,7 +118,7 @@ export function injectSVG(g:any, x: number, y: number, SVGPath:string, svgClass:
             g.append("text")
             .attr("class", "to-be-removed")
             .attr("x", x)
-            .attr("y", y + 90)
+            .attr("y", y + 70)
             .style("fill", "gray")
             .text("hover on to see the corresponding part")
             
