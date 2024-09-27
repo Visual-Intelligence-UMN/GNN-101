@@ -132,9 +132,6 @@ export function injectSVG(g:any, x: number, y: number, SVGPath:string, svgClass:
 
             // d3.selectAll(".bbox").style("pointer-events", "none");
       
-           
-
-
         }
 
         
