@@ -190,233 +190,212 @@ export function graphVisDrawMatrixWeight(
 
 export function displayerHandler(node: any, aggregatedData: any, calculatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], i: number, mode: number, isOutput: boolean) {
 
-                if (!g.selectAll) {
-                    g = d3.selectAll(g)
-                }
-
- 
-       
- 
-                
-
-                d3.select(".graph-displayer").attr("opacity", 1);
-
-
-                d3.selectAll(".columnGroup").style("opacity", 0.3);
-                d3.selectAll(`#tempath${i}`).attr("opacity", 1).raise();
-                d3.selectAll(`#columnGroup-${i}`).style("opacity", 1).raise();
-                d3.selectAll(`#columnUnit-${i}`).style("opacity", 1).raise();
-                
-
-        
-                let weightMat = weights[index]
-                const math = create(all, {});   
-                weightMat = math.transpose(weightMat);
-                if (mode === 1) {
-                    if (index !== 1 && !isOutput) {
-                        weightMat = weightMat.map((row: any) => row.reverse());
-                    } else {
-                        weightMat = weightMat.slice().reverse()
-                    }
-                } else if (mode === 0) {
-                    weightMat = weightMat.slice().reverse()
-                }
-
-
-
-        
-                for (let j = 0; j < weightMat[i].length; j++) {
-
-               
-                    
-                    g.append("rect")
-                    .attr("x", 130)
-                    .attr("y", 40 + wmRectL * j)
-                    .attr("width", 7)
-                    .attr("height", wmRectL)
-                    .attr("fill", myColor(weightMat[i][j]))
-                    .attr("stroke", "gray")
-                    .attr("stroke-width", 0.1)
-                    .attr("opacity", 1)
-                    .attr("class", "columnUnit math-displayer")
-           
-                    .style("opacity", 1)
-                }
-                const featureGroup = g.append("g")
-                .attr("transform", `translate(${70}, ${displayHeight - 50})`);
-
-
-
-                g.append("text")
-                .attr("x", 70 - 25)
-                .attr("y", displayHeight - 65)
-                .text("Matmul Visualization")
-                .attr("class", "math-displayer")
-                .attr("font-size", "15");
-
-
-                featureGroup.selectAll("rect")
-                .data(aggregatedData)
-                .enter()
-                .append("rect")
-                .attr("x", (d: any, i: number) => i * rectL)
-                .attr("y", 0)
-                .attr("width", rectL)
-                .attr("height", 7)
-                .attr("class", `math-displayer`)
-                .attr("id", (d: any, i: number) => "output-layer-rect-" + i) 
-                .style("fill", (d: number) => myColor(d))
-                .style("stroke-width", 0.1)
-                .style("stroke", "grey")
-                .style("opacity", 1);
-
-
-
-                g.append("text")
-                    .attr("x", 70 - 35)
-                    .attr("y", displayHeight - 40)
-                    .attr("xml:space", "preserve")
-                    .text("dot(           ,         )")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "15");
-
-                if (mode === 1 && node.graphIndex === 4) {
-                    g.append("text")
-                    .attr("x", 70 - 40)
-                    .attr("y", displayHeight - 10)
-                    .attr("xml:space", "preserve")
-                    .text("=       x      +     x      ...  =     ")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "10");
-                } else  {
-                g.append("text")
-                    .attr("x", 70 - 40)
-                    .attr("y", displayHeight - 10)
-                    .attr("xml:space", "preserve")
-                    .text("=       x      +     x      ...  =     ")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "10");
-                }
-
-
-
-
-                // first component
-                g.append("rect")    
-      
-                .attr("x", 70 - 30 + 5)
-                .attr("y", displayHeight - 10 - 9)
-                .attr("width", 9)
-                .attr("height", 9)
-                .attr("class", `math-displayer`)
-                .style("fill", myColor(aggregatedData[0]))
-                .style("stroke-width", 0.1)
-                .style("stroke", "grey")
-                .style("opacity", 1);
-
-                g.append("text")
-                .attr("x", 70 - 30 + 5)
-                .attr("y", displayHeight - 10 - 5)
-                .text(roundToTwo(aggregatedData[0]))
-                .attr("class", "math-displayer")
-                .attr("font-size", "4")
-                .attr("fill", Math.abs(aggregatedData[0]) > 0.7 ? "white" : "black");
-
-
-
-
-                g.append("rect")    
-                .attr("x", 70 - 30 + 25)
-                .attr("y", displayHeight - 10 - 9)
-                .attr("width", 9)
-                .attr("height", 9)
-                .attr("class", `math-displayer`)
-                .style("fill", myColor(weights[index][0][i]))
-                .style("stroke-width", 0.1)
-                .style("stroke", "grey")
-                .style("opacity", 1);
-
-                g.append("text")
-                .attr("x", 70 - 30 + 25)
-                .attr("y", displayHeight - 10 - 5)
-                .text(roundToTwo(weights[index][0][i]))
-                .attr("class", "math-displayer")
-                .attr("font-size", "4")
-                .attr("fill", Math.abs(weights[index][0][1]) > 0.7 ? "white" : "black");
-
-
-
-                // second component
-                g.append("rect")    
-
-                .attr("x", 70 - 30 + 45)
-                .attr("y", displayHeight - 10 - 9)
-                .attr("width", 9)
-                .attr("height", 9)
-                .attr("class", `math-displayer`)
-                .style("fill", myColor(aggregatedData[1]))
-                .style("stroke-width", 0.1)
-                .style("stroke", "grey")
-                .style("opacity", 1);
-
-                g.append("text")
-                .attr("x", 70 - 30 + 45)
-                .attr("y", displayHeight - 10 - 5)
-                .text(roundToTwo(aggregatedData[1]))
-                .attr("class", "math-displayer")
-                .attr("font-size", "4")
-                .attr("fill", Math.abs(aggregatedData[1]) > 0.7 ? "white" : "black");
-
-
-
-                g.append("rect")    
-
-                .attr("x", 70 - 30 + 65)
-                .attr("y", displayHeight - 10 - 9)
-                .attr("width", 9)
-                .attr("height", 9)
-                .attr("class", `math-displayer`)
-                .style("fill", myColor(weights[index][1][i]))
-                .style("stroke-width", 0.1)
-                .style("stroke", "grey")
-                .style("opacity", 1);
-
-                g.append("text")
-                .attr("x", 70 - 30 + 65)
-                .attr("y", displayHeight - 10 - 5)
-                .text(roundToTwo(weights[index][1][i]))
-                .attr("class", "math-displayer")
-                .attr("font-size", "4")
-                .attr("fill", Math.abs(weights[index][1][i]) > 0.7 ? "white" : "black");
-
-
-
-
-                // output
-                g.append("rect")    
-
-                .attr("x", 70 - 30 + 100)
-                .attr("y", displayHeight - 10 - 9)
-                .attr("width", 9)
-                .attr("height", 9)
-                .attr("class", `math-displayer`)
-                .style("fill", myColor(calculatedData[i]))
-                .style("stroke-width", 0.1)
-                .style("stroke", "grey")
-                .style("opacity", 1);
-
-                g.append("text")
-                .attr("x", 70 - 30 + 100)
-                .attr("y", displayHeight - 10 - 5)
-                .text(roundToTwo(calculatedData[i]))
-                .attr("class", "math-displayer")
-                .attr("font-size", "4")
-                .attr("fill", Math.abs(calculatedData[i]) > 0.7 ? "white" : "black");
-
-
-
-
+    if (!g.selectAll) {
+        g = d3.selectAll(g);
     }
+
+    
+    const group = g.append("g")
+        .attr("class", "visualization-group")
+        .attr("transform", `translate(0, -20)`); 
+
+  
+    const innerGroup = group.append("g")
+        .attr("class", "inner-group")
+        .attr("transform", `translate(0, 20)`); 
+
+   
+    d3.select(".graph-displayer").attr("opacity", 1);
+    d3.selectAll(".columnGroup").style("opacity", 0.3);
+    d3.selectAll(`#tempath${i}`).attr("opacity", 1).raise();
+    d3.selectAll(`#columnGroup-${i}`).style("opacity", 1).raise();
+    d3.selectAll(`#columnUnit-${i}`).style("opacity", 1).raise();
+
+   
+    let weightMat = weights[index];
+    const math = create(all, {});
+    weightMat = math.transpose(weightMat);
+
+    if (mode === 1) {
+        if (index !== 1 && !isOutput) {
+            weightMat = weightMat.map((row: any) => row.reverse());
+        } else {
+            weightMat = weightMat.slice().reverse();
+        }
+    } else if (mode === 0) {
+        weightMat = weightMat.slice().reverse();
+    }
+
+    
+    for (let j = 0; j < weightMat[i].length; j++) {
+        innerGroup.append("rect")
+            .attr("x", 150)
+            .attr("y", 40 + wmRectL * j)
+            .attr("width", 7)
+            .attr("height", wmRectL)
+            .attr("fill", myColor(weightMat[i][j]))
+            .attr("stroke", "gray")
+            .attr("stroke-width", 0.1)
+            .attr("opacity", 1)
+            .attr("class", "columnUnit math-displayer")
+            .style("opacity", 1);
+    }
+
+   
+    const featureGroup = innerGroup.append("g")
+        .attr("transform", `translate(${80}, ${displayHeight - 50})`);
+
+    featureGroup.selectAll("rect")
+        .data(aggregatedData)
+        .enter()
+        .append("rect")
+        .attr("x", (d: any, i: number) => i * rectL)
+        .attr("y", 0)
+        .attr("width", rectL)
+        .attr("height", 7)
+        .attr("class", `math-displayer`)
+        .attr("id", (d: any, i: number) => "output-layer-rect-" + i)
+        .style("fill", (d: number) => myColor(d))
+        .style("stroke-width", 0.1)
+        .style("stroke", "grey")
+        .style("opacity", 1);
+
+
+    innerGroup.append("text")
+        .attr("x", 70 - 25)
+        .attr("y", displayHeight - 65 - 12)
+        .text("Matmul Visualization")
+        .attr("class", "math-displayer")
+        .attr("font-size", "20");
+
+
+    innerGroup.append("text")
+        .attr("x", 70 - 35)
+        .attr("y", displayHeight - 40)
+        .attr("xml:space", "preserve")
+        .text("dot(           ,         )")
+        .attr("class", "math-displayer")
+        .attr("font-size", "20");
+
+
+    if (mode === 1 && node.graphIndex === 4) {
+        innerGroup.append("text")
+            .attr("x", 70 - 40)
+            .attr("y", displayHeight - 10)
+            .attr("xml:space", "preserve")
+            .text("=      x       +      x        ...  =     ")
+            .attr("class", "math-displayer")
+            .attr("font-size", "15");
+    } else {
+        innerGroup.append("text")
+            .attr("x", 70 - 40)
+            .attr("y", displayHeight - 10)
+            .attr("xml:space", "preserve")
+            .text("=      x       +      x        ...  =     ")
+            .attr("class", "math-displayer")
+            .attr("font-size", "15");
+    }
+
+    // 1
+    innerGroup.append("rect")
+        .attr("x", 70 - 30 + 5)
+        .attr("y", displayHeight - 10 - 9)
+        .attr("width", 17)
+        .attr("height", 17)
+        .attr("class", `math-displayer`)
+        .style("fill", myColor(aggregatedData[0]))
+        .style("stroke-width", 0.1)
+        .style("stroke", "grey")
+        .style("opacity", 1);
+
+    innerGroup.append("text")
+        .attr("x", 70 - 30 + 5)
+        .attr("y", displayHeight - 10 - 2)
+        .text(roundToTwo(aggregatedData[0]))
+        .attr("class", "math-displayer")
+        .attr("font-size", "7")
+        .attr("fill", Math.abs(aggregatedData[0]) > 0.7 ? "white" : "black");
+
+    // 2
+    innerGroup.append("rect")
+        .attr("x", 70 - 30 + 25 + 10 + 5)
+        .attr("y", displayHeight - 10 - 9)
+        .attr("width", 17)
+        .attr("height", 17)
+        .attr("class", `math-displayer`)
+        .style("fill", myColor(weights[index][0][i]))
+        .style("stroke-width", 0.1)
+        .style("stroke", "grey")
+        .style("opacity", 1);
+
+    innerGroup.append("text")
+        .attr("x", 70 - 30 + 25 + 10 + 5)
+        .attr("y", displayHeight - 10 - 2)
+        .text(roundToTwo(weights[index][0][i]))
+        .attr("class", "math-displayer")
+        .attr("font-size", "7")
+        .attr("fill", Math.abs(weights[index][0][1]) > 0.7 ? "white" : "black");
+
+    // 3
+    innerGroup.append("rect")
+        .attr("x", 70 - 30 + 45 + 20 + 10)
+        .attr("y", displayHeight - 10 - 9)
+        .attr("width", 17)
+        .attr("height", 17)
+        .attr("class", `math-displayer`)
+        .style("fill", myColor(aggregatedData[1]))
+        .style("stroke-width", 0.1)
+        .style("stroke", "grey")
+        .style("opacity", 1);
+
+    innerGroup.append("text")
+        .attr("x", 70 - 30 + 45 + 20 + 10)
+        .attr("y", displayHeight - 10 - 2)
+        .text(roundToTwo(aggregatedData[1]))
+        .attr("class", "math-displayer")
+        .attr("font-size", "7")
+        .attr("fill", Math.abs(aggregatedData[1]) > 0.7 ? "white" : "black");
+
+    // 4
+    innerGroup.append("rect")
+        .attr("x", 70 - 30 + 65 + 30 + 15)
+        .attr("y", displayHeight - 10 - 9)
+        .attr("width", 17)
+        .attr("height", 17)
+        .attr("class", `math-displayer`)
+        .style("fill", myColor(weights[index][1][i]))
+        .style("stroke-width", 0.1)
+        .style("stroke", "grey")
+        .style("opacity", 1);
+
+    innerGroup.append("text")
+        .attr("x", 70 - 30 + 65 + 30 + 15)
+        .attr("y", displayHeight - 10 - 2)
+        .text(roundToTwo(weights[index][1][i]))
+        .attr("class", "math-displayer")
+        .attr("font-size", "7")
+        .attr("fill", Math.abs(weights[index][1][i]) > 0.7 ? "white" : "black");
+
+    // 绘制输出数据的矩形和文本
+    innerGroup.append("rect")
+        .attr("x", 70 - 30 + 100 + 60 + 20)
+        .attr("y", displayHeight - 10 - 9)
+        .attr("width", 14)
+        .attr("height", 14)
+        .attr("class", `math-displayer`)
+        .style("fill", myColor(calculatedData[i]))
+        .style("stroke-width", 0.1)
+        .style("stroke", "grey")
+        .style("opacity", 1);
+
+    innerGroup.append("text")
+        .attr("x", 70 - 30 + 100 + 60 + 20)
+        .attr("y", displayHeight - 10 - 2)
+        .text(roundToTwo(calculatedData[i]))
+        .attr("class", "math-displayer")
+        .attr("font-size", "7")
+        .attr("fill", Math.abs(calculatedData[i]) > 0.7 ? "white" : "black");
+}
 
 
 export function hoverOverHandler(node: any, aggregatedData: any, calculatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], Xt: any, startCoordList: any, endCoordList: any, svg: any, mode: number, isOutput: boolean) {
