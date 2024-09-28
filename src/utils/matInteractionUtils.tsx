@@ -215,7 +215,7 @@ export function drawEScoreEquation(
 
 
     const aTs = eDisplayer.append("g").attr("id", "ats").attr("class", "math-latex");
-    injectSVG(aTs, dX + 130 +offsetX+17, textH, "./assets/SVGs/a_t_s.svg", "math-latex");
+    injectSVG(aTs, dX + 130 +offsetX+17, textH+20, "./assets/SVGs/a_t_s.svg", "math-latex");
     
     const graphicsYOffset = -60;
 
@@ -248,9 +248,9 @@ export function drawEScoreEquation(
                     .append("rect")
                     .attr(
                         "x",
-                        dX + 140 - 10 + 12.5 +offsetX
+                        dX + 140 - 10 + 12.5 +offsetX + 0 * (25 / srcVector.length) + offsetForVector - 10
                     )
-                    .attr("y", dY + 112.5 + 25+ graphicsYOffset)
+                    .attr("y", dY + 112.5 + 12.5 + graphicsYOffset-offsetForVector)
                     .attr("width", 25)
                     .attr("height", 2.5)
                     .attr("stroke", "black")
@@ -266,7 +266,7 @@ export function drawEScoreEquation(
 
     
 
-    injectSVG(aTd, dX + 220 +offsetX+17, textH, "./assets/SVGs/a_t_d.svg", "math-latex");
+    injectSVG(aTd, dX + 220 +offsetX+17, textH+20, "./assets/SVGs/a_t_d.svg", "math-latex");
 
     
         
@@ -401,19 +401,21 @@ export function drawEScoreEquation(
     let imgH = 50;
 
     let offset = 0;
+    let textOffset = 0;
 
     if (layerID == 1) {
         imageMat = "./assets/PNGs/GATConvMat2.png";
         imgW = 25;
         imgH = 25;
         offset = 12.5;
+        textOffset = 25;
     }
 
     eDisplayer
         .append("image")
         .attr("xlink:href", imageMat).attr("id", "w1png")
-        .attr("x", dX + 75 + 75 - 10  +offsetX+ offset + 100 + 65)
-        .attr("y", dY + 75 +12.5 +  graphicsYOffset)
+        .attr("x", dX + 75 + 75 - 10  +offsetX + 100 + 65+offset/2)
+        .attr("y", dY + 75 +12.5 +  graphicsYOffset + offset)
         .attr("width", imgW)
         .attr("height", imgH).attr("opacity", 0)
         .attr("stroke-width", 0.1);
@@ -424,8 +426,8 @@ export function drawEScoreEquation(
         .append("image")
         .attr("xlink:href", imageMat)
         .attr("id", "w2png")
-        .attr("x", dX + 75 + 75  +offsetX+ 60 + offset)
-        .attr("y", dY + 75 + 12.5+ graphicsYOffset)
+        .attr("x", dX + 75 + 75  +offsetX+ 60 + offset/2)
+        .attr("y", dY + 75 + 12.5+ graphicsYOffset + offset)
         .attr("width", imgW)
         .attr("height", imgH).attr("opacity", 1)
         .attr("stroke-width", 0.1);
@@ -434,9 +436,9 @@ export function drawEScoreEquation(
 
     
         // .on("mouseenter", function () {
-        drawEqComponentLabel(eDisplayer, dX + 75 + 75 +offsetX + 60 + 20 - 10 , dY + 75 + graphicsYOffset + imgH + 5, "Weight Matrix")
+        drawEqComponentLabel(eDisplayer, dX + 75 + 75 +offsetX + 60 + 20 - 10 , dY + 75 + graphicsYOffset + imgH + 5 + textOffset, "Weight Matrix")
 
-        drawEqComponentLabel(eDisplayer, dX + 75 + 75  +offsetX+ 60 + 20 - 10 +100, dY + 75 + graphicsYOffset  + imgH + 5, "Weight Matrix")
+        drawEqComponentLabel(eDisplayer, dX + 75 + 75  +offsetX+ 60 + 20 - 10 +100, dY + 75 + graphicsYOffset  + imgH + 5 + textOffset, "Weight Matrix")
 
 }
 
