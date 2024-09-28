@@ -246,6 +246,8 @@ export default function Sidebar(props: Props) {
                     <ul className="list-disc list-inside px-4">
                         <li>Yilin(Harry) Lu</li>
                         <li>Chongwei Chen</li>
+                        <li>Kexin Huang</li>
+                        <li>Marinka Zitnik</li>
                         <li>Matthew Xu</li>
                         <li>Qianwen Wang</li>
                     </ul>
