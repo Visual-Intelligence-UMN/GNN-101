@@ -114,6 +114,7 @@ export default function Home() {
     useEffect(() => {
         (document.body.style as any).zoom = "70%";
         //load resources
+        document.body.style.overflow = 'hidden';
     }, []);
 
     useEffect(() => {
