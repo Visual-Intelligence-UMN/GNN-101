@@ -110,9 +110,13 @@ export default function Home() {
         }
     }
 
+    const zoomStyle = {
+        zoom: "70%"
+      };
+
 
     useEffect(() => {
-        (document.body.style as any).zoom = "70%";
+       // (document.body.style as any).zoom = "70%";
         //load resources
         document.body.style.overflow = 'hidden';
     }, []);
@@ -142,7 +146,7 @@ export default function Home() {
 
 
     return (
-        <div >
+        <div style={zoomStyle}>
             <Steps
                 enabled={true}
                 steps={INTRO_STEPS}
