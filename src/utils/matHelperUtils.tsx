@@ -49,7 +49,7 @@ export function drawEqComponentLabel(
         .attr("y", y)
         .attr("class", "temp")
         .style("fill", "gray")
-        .style("font-size", 5);
+        .style("font-size", 3);
 }
 
 
@@ -260,7 +260,7 @@ export function buildLegend(
     const g0 = layer
         .append("g")
         .attr("transform", `translate(${x}, ${y}) scale(0.7)`)
-        .attr("class", "legend");
+        .attr("class", "");
 
 
 

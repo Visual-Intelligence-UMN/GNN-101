@@ -20,7 +20,7 @@ import { stat, truncateSync } from "fs";
 
 
 import { drawActivationExplanation, drawAttnDisplayer, drawEScoreEquation, drawMatmulExplanation, graphVisDrawMatmulExplanation } from "./matInteractionUtils";
-import { computeMatrixLocations, drawMathFormula, drawMatrixWeight, drawSamplingAggregation, drawWeightMatrix } from "./matAnimateUtils";
+import { computeMatrixLocations, drawFunctionIcon, drawMathFormula, drawMatrixWeight, drawSamplingAggregation, drawWeightMatrix } from "./matAnimateUtils";
 import { graphVisDrawActivationExplanation, graphVisDrawMatrixWeight, displayerHandler, hoverOverHandler} from "./graphAnimationHelper";
 import { computeAttentionCoefficient, computeAttnStep } from "./computationUtils";
 import { start } from "repl";
@@ -189,7 +189,6 @@ export function outputVisualizer(
     prevRectHeight: number,
     rectHeight: number,
     rectWidth: number,
-    colorSchemes: any,
     convNum: number,
     originalSvg: any,
     mode: number
@@ -232,9 +231,6 @@ export function outputVisualizer(
 
     d3.selectAll(".to-be-removed").remove();
     d3.selectAll(".node-features-Copy").style("visibility", "visible").lower();
-
-    //color schemes interaction
-    for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "0.5";
 
     let originalCoordinates = moveFeatures(
         node.relatedNodes,
@@ -405,6 +401,19 @@ export function outputVisualizer(
         .style("stroke-width", 1)
         .style("stroke", "grey")
         .style("opacity", 0);
+
+        outputGroup.append("line")
+                    .attr("x1", 2 * rectHeight + 5 - moveOffset)
+                    .attr("y1", 7.5)
+                    .attr("x2", 2 * rectHeight + 5 - moveOffset + 110)
+                    .attr("y2", 7.5)
+                    .attr("stroke", "black")
+                    .attr("class", "to-be-removed softmax-component");
+        
+
+        drawFunctionIcon([2 * rectHeight + 5 - moveOffset + 75, 7.5], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", outputGroup);
+
+        
 
         outputGroup
         .append("text")
@@ -761,7 +770,6 @@ export function outputVisualizer(
                 d3.selectAll(".to-be-removed").remove();
         
                 d3.selectAll(".graph-displayer").remove();
-                for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "1";
                 moveFeaturesBack(node.relatedNodes, originalCoordinates);
                 node.featureGroup
                     .transition()
@@ -771,7 +779,7 @@ export function outputVisualizer(
                         `translate(${node.x - 7.5}, ${node.y + 170 + 5}) rotate(0)`
                     );
     
-                    handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state)
+                    handleClickEvent(originalSvg, node, event, moveOffset, allNodes, convNum, mode, state)
     
     
         })
@@ -794,7 +802,6 @@ export function calculationVisualizer(
     svg: any,
     offset: number,
     height: number,
-    colorSchemes: any,
     convNum: number,
     moveOffset: number,
     prevRectHeight: number,
@@ -1317,28 +1324,56 @@ export function calculationVisualizer(
                         
 
 
-                        const frame = g3.append("rect")
-                        .attr("x", start_x)
-                        .attr("y", start_y)
-                        .attr("width", 10)
-                        .attr("height", 10)
-                        .style("fill", "white")
-                        .style("stroke", "black")
-                        .attr("class", "parameter procVis to-be-removed")
-                        .attr("opacity", 1).raise();
+                        // const frame = g3.append("rect")
+                        // .attr("x", start_x)
+                        // .attr("y", start_y)
+                        // .attr("width", 10)
+                        // .attr("height", 10)
+                        // .style("fill", "white")
+                        // .style("stroke", "black")
+                        // .attr("class", "parameter procVis to-be-removed")
+                        // .attr("opacity", 1).raise();
                         
 
                        
                         const multiplier = roundToTwo(computeAttentionCoefficient(node.graphIndex, n.features, lastLayerNodefeature, neighborFeatures));
                         
+                        const gradient = g3
+                            .append("defs")
+                            .append("linearGradient")
+                            .attr("id", "text-gradient")
+                            .attr("x1", "0%")
+                            .attr("y1", "0%")
+                            .attr("x2", "100%")
+                            .attr("y2", "0%");
 
-                        g3.append("text")
+                            // 设置渐变的颜色
+                        gradient.append("stop").attr("offset", "0%").attr("stop-color", "pink");
+
+                        gradient
+                            .append("stop")
+                            .attr("offset", "100%")
+                            .attr("stop-color", "blue");
+
+                        const frame = g3.append("text")
                         .attr("x", start_x)
                         .attr("y", start_y)
                         .text(multiplier)
-                        .attr("font-size", 7.5)
-                        .attr("class", "parameter procVis to-be-removed")
-                        .attr("opacity", 1).raise();
+                        .attr("font-size", 15)
+                        .attr("fill", "url(#text-gradient)")
+                        .attr("class", "parameter procVis to-be-removed attention")
+                        .attr("font-weight", "bold")
+                        .attr("opacity", 1)
+                        .raise()
+
+                        d3.selectAll(".attention").on("mouseover", function () {
+                            d3.select(this).style("stroke", "black").attr("stroke-width", 0.02);
+                            // .attr("font-size", 30);
+                        });
+                        d3.selectAll(".attention").on("mouseout", function () {
+                            d3.select(this).style("stroke", "none");
+                            //.attr("font-size", 15);
+                        });
 
 
                         const learnableData = require("../../public/learnableVectorsGAT.json");
@@ -1373,7 +1408,7 @@ export function calculationVisualizer(
                         
 
                         frame.on("click", function(this: any, event: any) {
-                 
+                            d3.select(this).attr("font-size", 30);
                             d3.selectAll(".weightUnit").lower()
                             d3.selectAll(".columnGroup").lower()
                             d3.selectAll(".weightMatrixText").lower()
@@ -1410,6 +1445,7 @@ export function calculationVisualizer(
 
                             d3.selectAll("#my_dataviz").on("click", function(event) {
                                 event.stopPropagation();
+                                d3.selectAll(".attention").attr("font-size", 15);
                                 d3.selectAll(".button-group").raise()
                   
                                     d3.selectAll(".attn-displayer").remove();
@@ -1437,7 +1473,7 @@ export function calculationVisualizer(
                                         d3.selectAll(".parameter").remove();
                                         d3.selectAll(".to-be-removed").remove();
                                         d3.selectAll(".intermediate-path").remove();
-                                        handleClickEvent(svg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
+                                        handleClickEvent(svg, node, event, moveOffset, allNodes, convNum, mode, state);
                                     }) 
                             });
                         })
@@ -1798,7 +1834,7 @@ export function calculationVisualizer(
             d3.selectAll(".parameter").remove();
             d3.selectAll(".to-be-removed").remove();
             d3.selectAll(".intermediate-path").remove();
-            handleClickEvent(svg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
+            handleClickEvent(svg, node, event, moveOffset, allNodes, convNum, mode, state);
     
         }) 
     
@@ -2337,7 +2373,6 @@ export function fcLayerCalculationVisualizer(
     svg: any,
     state: State,
     rectHeight: number,
-    colorSchemes: any,
     convNum: number,
     originalSvg: any,
     mode: number
@@ -2440,8 +2475,7 @@ export function fcLayerCalculationVisualizer(
             rectL,
             posNeed,
             posPlus,
-            state,
-            colorSchemes
+            state
         );
         node.relatedNodes.forEach((n: any, i: number) => {
             let start_x = 0;
@@ -2497,8 +2531,6 @@ export function fcLayerCalculationVisualizer(
         
                 d3.selectAll(".node-features-Copy").style("visibility", "hidden");
         
-                for (let i = 0; i < colorSchemes.length; i++)colorSchemes[i].style.opacity = "1";
-        
                 moveFeaturesBack(relatedNodes, originalCoordinates);
                 node.featureGroup
                     .transition()
@@ -2509,7 +2541,7 @@ export function fcLayerCalculationVisualizer(
                     );
                 d3.selectAll("rect").style("opacity", 1);
                 d3.selectAll(".graph-displayer").remove();
-                handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
+                handleClickEvent(originalSvg, node, event, moveOffset, allNodes, convNum, mode, state);
            
     
     
@@ -2528,17 +2560,11 @@ function poolingLayerInteraction(
     rectL: number,
     posNeed: number[][],
     posPlus: number[][],
-    state: State,
-    colorSchemes: any
+    state: State
 ) {
     if (!svg.selectAll) {
         svg = d3.select(svg);
     }
-
-    for (let i = 0; i < colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
-
-    colorSchemes[3].style.opacity = "1";
-    colorSchemes[4].style.opacity = "1";
 
     for (let i = 0; i < node.features.length; i++) {
         d3.select(`#pooling-layer-rect-${i}`)
@@ -2646,7 +2672,6 @@ export function nodeOutputVisualizer(
     prevRectHeight: number,
     rectHeight: number,
     rectWidth: number,
-    colorSchemes: any,
     originalSvg: any,
     mode: number
 
@@ -2678,7 +2703,6 @@ export function nodeOutputVisualizer(
     d3.selectAll(".node-features-Copy").style("visibility", "visible").lower();
 
     //color schemes interaction
-    for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "0.5";
     let xPos = (node.graphIndex) * offset - 250;
     let yPos = node.y - 15
     let originalCoordinates = moveFeatures(
@@ -3018,6 +3042,9 @@ export function nodeOutputVisualizer(
             .attr("class", "output-path to-be-removed")
             .attr("opacity", 1)
             .lower();
+
+            drawFunctionIcon([end_x+170/2+40, end_y], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", svg);
+
     }, 2000);
 
 
@@ -3266,7 +3293,7 @@ export function nodeOutputVisualizer(
                     d3.selectAll(".node-features-Copy").style("opacity", "hidden");
         
                     d3.selectAll(".to-be-removed").remove();
-                    handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state);
+                    handleClickEvent(originalSvg, node, event, moveOffset, allNodes, convNum, mode, state);
         
     
         
@@ -3274,7 +3301,6 @@ export function nodeOutputVisualizer(
                 d3.selectAll(".graph-displayer").remove();
                 d3.selectAll(".columnGroup").remove();
                 d3.selectAll(".columnUnit").remove();
-                for (let i = 0; i < 4; i++)colorSchemes[i].style.opacity = "1";
                 moveFeaturesBack(node.relatedNodes, originalCoordinates);
                 node.featureGroup
                     .transition()

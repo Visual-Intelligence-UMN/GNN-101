@@ -23,14 +23,14 @@
      inkscape:pagecheckerboard="1"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="11.076657"
-     inkscape:cx="-16.52123"
-     inkscape:cy="15.708711"
-     inkscape:window-width="2560"
-     inkscape:window-height="1334"
-     inkscape:window-x="-11"
-     inkscape:window-y="-11"
-     inkscape:window-maximized="1"
+     inkscape:zoom="22.153314"
+     inkscape:cx="13.677412"
+     inkscape:cy="4.8525471"
+     inkscape:window-width="1649"
+     inkscape:window-height="1266"
+     inkscape:window-x="3324"
+     inkscape:window-y="256"
+     inkscape:window-maximized="0"
      inkscape:current-layer="layer1" />
   <defs
      id="defs1" />
@@ -46,28 +46,16 @@
        rx="3.049907"
        ry="3.0372391"
        transform="scale(1,-1)" />
-    <g
-       id="g3">
-      <path
-         style="fill:#ffffff;fill-opacity:1;stroke:#ff6060;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
-         d="M 0.24491014,3.1753866 1.8832745,3.2176125 2.2464171,3.9776784 2.7700182,2.6095598 2.9220314,3.2682836"
-         id="path2" />
-      <path
-         style="fill:#ffffff;fill-opacity:1;stroke:#ff6060;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
-         d="M 6.2240958,3.3358449 H 4.3323761 L 4.0959111,4.0536852 3.758104,3.2091675 3.285174,4.6786283 3.0740445,3.6820972"
-         id="path3" />
-    </g>
-    <path
-       style="fill:#ffffff;fill-opacity:1;stroke:#ff6060;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
-       d="M 2.4068756,4.4083827 2.6095598,4.0705754 v 0.4475945 z"
-       id="path4" />
-    <path
-       style="fill:#ffffff;fill-opacity:1;stroke:#ff6060;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
-       d="M 3.3611806,2.525108 3.2345029,3.0149284 3.5385293,2.5926694 Z"
-       id="path5" />
-    <path
-       style="fill:#ffffff;fill-opacity:1;stroke:#ff6060;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
-       d="M 3.9354527,2.9811477 3.4709679,3.2007222 3.7074329,2.9304765 Z"
-       id="path6" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.5861px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.264583;stroke-opacity:1"
+       x="1.6720599"
+       y="4.8848033"
+       id="text2"><tspan
+         sodipodi:role="line"
+         id="tspan2"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:0.264583"
+         x="1.6720599"
+         y="4.8848033">X</tspan></text>
   </g>
 </svg>

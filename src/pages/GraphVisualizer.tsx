@@ -97,7 +97,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
             svgRef.current = svg.node();
 
-            let colorSchemes: any = [];
+          //  let colorSchemes: any = [];
 
 
             graphs.forEach((data, i) => {
@@ -412,19 +412,20 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                     const absMax = findAbsMax(value);
 
 
-                    let cst: any = null;
-                    const cstOffset = 25;
-                    if (i == 0) {
-                        cst = buildBinaryLegend(myColor, 0, 1, text + " Color Scheme", text_x, text_y + cstOffset, g1)
-                    }
-                    else if (i == 5) {
-                        cst = buildBinaryLegend(myColor, value[0], value[1], text + " Color Scheme", text_x, text_y + cstOffset, g1)
-                    }
-                    else {
-                        cst = buildLegend(myColor, absMax, text + " Color Scheme", text_x - 50, text_y + cstOffset, g1);
-                    }
+                    // let cst: any = null;
+                    // const cstOffset = 25;
+                    // if (i == 0) {
+                    //     //cst = buildBinaryLegend(myColor, 0, 1, text + " Color Scheme", text_x, text_y + cstOffset, g1)
+                        
+                    // }
+                    // else if (i == 5) {
+                    //     cst = buildBinaryLegend(myColor, value[0], value[1], text + " Color Scheme", text_x, text_y + cstOffset, g1)
+                    // }
+                    // else {
+                    //     cst = buildLegend(myColor, absMax, text + " Color Scheme", text_x - 50, text_y + cstOffset, g1);
+                    // }
 
-                    colorSchemes.push(cst);
+                    // colorSchemes.push(cst);
 
 
 
@@ -448,7 +449,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
                         if (intmData) {
 
-                            featureVisualizer(svg, allNodes, offset, height, graphs, 700, 900, 600, 15, 10, 3, 20, colorSchemes, 0, innerComputationMode); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
+                            featureVisualizer(svg, allNodes, offset, height, graphs, 700, 900, 600, 15, 10, 3, 20, 0, innerComputationMode); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
                             //function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, graphs: any[], moveOffset: number, fcLayerMoveOffset: number, rectWidth: number, firstLayerRectHeight: number, rectHeight: number, outputLayerRectHeight: number)
                         }
 

@@ -29,7 +29,8 @@ import {
     computeMatrixLocations,
     drawAttentions,
     drawMathFormula,
-    drawSamplingAggregation
+    drawSamplingAggregation,
+    drawFunctionIcon
 } from "./matAnimateUtils";
 import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import { drawMatmulExplanation, drawSoftmaxDisplayer } from "./matInteractionUtils";
@@ -111,7 +112,6 @@ export function detailedViewRecovery(
     poolingOutEvent: any,
     poolingOverEvent: any,
     poolingVis: any,
-    colorSchemesTable: any,
     featureChannels: number,
     gap:number,
     resultLabelsList:any
@@ -212,11 +212,6 @@ export function detailedViewRecovery(
 
     }, 150);
 
-    
-    //recover color schemes opacity
-    colorSchemesTable.forEach((d: any, i: any) => {
-        d.style.opacity = "1";
-    });
 
     // unlock the visualization system
     if (
@@ -235,8 +230,7 @@ export function detailedViewRecovery(
         recordLayerID: recordLayerID,
         poolingOutEvent: poolingOutEvent,
         poolingOverEvent: poolingOverEvent,
-        poolingVis: poolingVis,
-        colorSchemesTable: colorSchemesTable,
+        poolingVis: poolingVis
     };
 }
 
@@ -400,7 +394,6 @@ export function featureVisClick(
     layerID: number,
     node: number,
     recordLayerID: number,
-    colorSchemesTable: any,
     adjList: any,
     featureVisTable: any,
     features: any,
@@ -438,22 +431,6 @@ export function featureVisClick(
 
     d3.select(".hintLabel").style("opacity", 0);
 
-    //reduce color schemes opacity
-    colorSchemesTable.forEach((d: any, i: any) => {
-        console.log(
-            `Before modification: Element ${i} opacity`,
-            d.style.opacity
-        );
-        d.style.opacity = "0.2";
-        console.log(
-            `After modification: Element ${i} opacity`,
-            d.style.opacity
-        );
-    });
-    
-    //choose the right color schemes to display
-    colorSchemesTable[layerID].style.opacity = "1";
-    colorSchemesTable[layerID + 1].style.opacity = "1";
     //choose the right feature viusualizers to display
     let posList = []; //a list to manage all position from the previous layer feature vis
     let neighbors = adjList[node];
@@ -933,7 +910,6 @@ export function featureVisClick(
     return {
         getIntervalID: getIntervalID,
         recordLayerID: recordLayerID,
-        colorSchemesTable: colorSchemesTable,
         featureVisTable: featureVisTable,
         features: features,
     };
@@ -941,7 +917,6 @@ export function featureVisClick(
 
 export function outputVisClick(
     resultVis: any,
-    colorSchemesTable: any,
     one: any,
     result: any,
     myColor: any,
@@ -1135,6 +1110,14 @@ export function outputVisClick(
                 wMat, startCoord, endPathAniCoord, 1, weightMatrixPostions, 
                 featureChannels, poolingValues, "procVis wRect", "");
             drawPathBtwOuputResult([endPt3], endPt4);
+            drawPathBtwOuputResult([[endPt4[0]+30, endPt4[1]]], [endPt4[0]+125, endPt4[1]]);
+
+            const iconX = endPt4[0]+(30+125)/2 + 25;
+            const iconY = endPt4[1];
+
+            drawFunctionIcon([iconX, iconY], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]");
+
+
         }, delay:200},
         {func:()=>{
         pathMap = drawPathInteractiveComponents(resultStartCoord, resultCoord, result, myColor);
@@ -1196,8 +1179,8 @@ export function outputVisClick(
         const id: number = Number(d3.select(this).attr("id"));
 
         if(pathMap!=null){
-            pathMap[0][id]!.style.opacity = "0.1";
-            pathMap[1][id]!.style.opacity = "0.1";
+            pathMap[0][id]!.style.opacity = "0";
+            pathMap[1][id]!.style.opacity = "0";
         }
     });
 
@@ -1274,12 +1257,8 @@ export function outputVisClick(
         d3.selectAll("path").lower();
     });
 
-    for (let i = 0; i < layerID; i++)
-        colorSchemesTable[i].style.opacity = "0.2";
-
     return {
         resultVis: resultVis,
-        colorSchemesTable: colorSchemesTable,
     };
 }
 
@@ -1287,7 +1266,6 @@ export function featureGATClick(
     layerID: number,
     node: number,
     recordLayerID: number,
-    colorSchemesTable: any,
     adjList: any,
     featureVisTable: any,
     features: any,
@@ -1335,23 +1313,6 @@ export function featureGATClick(
 
     d3.select(".hintLabel").style("opacity", 0);
 
-    //reduce color schemes opacity
-    colorSchemesTable.forEach((d: any, i: any) => {
-        console.log(
-            `Before modification: Element ${i} opacity`,
-            d.style.opacity
-        );
-        d.style.opacity = "0.2";
-        console.log(
-            `After modification: Element ${i} opacity`,
-            d.style.opacity
-        );
-    });
-
-    
-    //choose the right color schemes to display
-    colorSchemesTable[layerID].style.opacity = "1";
-    colorSchemesTable[layerID + 1].style.opacity = "1";
     //choose the right feature viusualizers to display
     let posList = []; //a list to manage all position from the previous layer feature vis
     let neighbors = adjList[node];
@@ -1860,7 +1821,6 @@ export function featureGATClick(
     return {
         getIntervalID: getIntervalID,
         recordLayerID: recordLayerID,
-        colorSchemesTable: colorSchemesTable,
         featureVisTable: featureVisTable,
         features: features,
     };
@@ -1870,7 +1830,6 @@ export function featureSAGEClick(
     layerID: number,
     node: number,
     recordLayerID: number,
-    colorSchemesTable: any,
     adjList: any,
     featureVisTable: any,
     features: any,
@@ -1915,24 +1874,6 @@ export function featureSAGEClick(
     recordLayerID = layerID;
 
     d3.select(".hintLabel").style("opacity", 0);
-
-    //reduce color schemes opacity
-    colorSchemesTable.forEach((d: any, i: any) => {
-        console.log(
-            `Before modification: Element ${i} opacity`,
-            d.style.opacity
-        );
-        d.style.opacity = "0.2";
-        console.log(
-            `After modification: Element ${i} opacity`,
-            d.style.opacity
-        );
-    });
-
-    
-    //choose the right color schemes to display
-    colorSchemesTable[layerID].style.opacity = "1";
-    colorSchemesTable[layerID + 1].style.opacity = "1";
     //choose the right feature viusualizers to display
     let posList = []; //a list to manage all position from the previous layer feature vis
     let neighbors = adjList[node];
@@ -2425,7 +2366,6 @@ export function featureSAGEClick(
     return {
         getIntervalID: getIntervalID,
         recordLayerID: recordLayerID,
-        colorSchemesTable: colorSchemesTable,
         featureVisTable: featureVisTable,
         features: features,
     };
