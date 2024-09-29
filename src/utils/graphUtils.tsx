@@ -402,16 +402,10 @@ export function outputVisualizer(
         .style("stroke", "grey")
         .style("opacity", 0);
 
-        outputGroup.append("line")
-                    .attr("x1", 2 * rectHeight + 5 - moveOffset)
-                    .attr("y1", 7.5)
-                    .attr("x2", 2 * rectHeight + 5 - moveOffset + 110)
-                    .attr("y2", 7.5)
-                    .attr("stroke", "black")
-                    .attr("class", "to-be-removed softmax-component");
+
         
 
-        drawFunctionIcon([2 * rectHeight + 5 - moveOffset + 75, 7.5], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", outputGroup);
+       
 
         
 
@@ -462,6 +456,15 @@ export function outputVisualizer(
         if (!state.isClicked) {
             return;
         }
+
+        outputGroup.append("line")
+        .attr("x1", 2 * rectHeight + 5 - moveOffset)
+        .attr("y1", 7.5)
+        .attr("x2", 2 * rectHeight + 5 - moveOffset + 110)
+        .attr("y2", 7.5)
+        .attr("stroke", "black")
+        .attr("class", "to-be-removed softmax-component");
+        drawFunctionIcon([2 * rectHeight + 5 - moveOffset + 75, 7.5], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", outputGroup);
 
         weightAnimation(
             svg,
@@ -514,14 +517,7 @@ export function outputVisualizer(
             }
         }
 
-        svg.append("text")
-            .attr("x", (start_x - 30 + end_x) / 2)
-            .attr("y", end_y + 55)
-            .text("Softmax")
-            .style("fill", "gray")
-            .style("font-size", "17px")
-            .attr("class", "to-be-removed softmaxLabel")
-            .style("opacity", 1);
+
 
 
         let color = calculateAverage(node.features); // to be determined
@@ -2965,14 +2961,6 @@ export function nodeOutputVisualizer(
             }
         }
 
-        svg.append("text")
-            .attr("x", (start_x - 30 + end_x) / 2)
-            .attr("y", end_y + 55)
-            .text("Softmax")
-            .style("fill", "gray")
-            .style("font-size", "17px")
-            .attr("class", "to-be-removed softmaxLabel")
-            .style("opacity", 1);
 
 
         let color = calculateAverage(node.features); // to be determined
