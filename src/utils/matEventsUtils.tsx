@@ -179,7 +179,7 @@ export function detailedViewRecovery(
         translateLayers(4, -300);
     }
 
-    d3.selectAll("path").style("opacity", 0.05);
+    d3.selectAll("path.crossConnection").style("opacity", 0.05);
     d3.select(".mats").selectAll(".lastLayerConnections").style("opacity", 0.25);
     d3.selectAll(".twoLayer").style("opacity", 1);
     d3.select(".pooling").style("opacity", 1);
