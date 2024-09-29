@@ -101,7 +101,7 @@ export const DatasetInfo: { [k: string]: JSX.Element } = {
 export const INTRO_STEPS = [
     {
         // element: "#gnn101",
-        intro: "🎉 Welcome to GNN 101! Ready to dive into the world of Graph Neural Networks?",
+        intro: "🎉 Welcome to GNN 101! Ready to dive into the world of Graph Neural Networks? For best experience, we highly recommend using Chrome or Edge browser. ",
     },
     {
         element: "#model-selector",

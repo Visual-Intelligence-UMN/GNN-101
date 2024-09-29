@@ -461,7 +461,11 @@ export function drawSoftmaxDisplayer(
     const displayY = endCoord[1][1] - (displayH + 50);
 
     //add displayer
-    d3.select(".mats")
+
+
+    const displayer = d3.select(".mats").append("g")
+    
+    displayer
         .append("rect")
         .attr("x", displayX)
         .attr("y", displayY)
@@ -490,7 +494,7 @@ export function drawSoftmaxDisplayer(
     //add title
     const titleYOffset = 10;
     const titleXOffset = 50;
-    d3.select(".mats")
+    displayer
         .append("text")
         .attr("x", displayX + titleXOffset)
         .attr("y", displayY + titleYOffset)
@@ -505,7 +509,7 @@ export function drawSoftmaxDisplayer(
     const eqYOffset = titleYOffset * 2.5;
     const unitSize = eqXOffset / 3 + 3;
     const upperOffset = unitSize * 2;
-    d3.select(".mats")
+    displayer
         .append("text")
         .attr("x", displayX + eqXOffset + upperOffset)
         .attr("y", displayY + eqYOffset)
@@ -513,7 +517,7 @@ export function drawSoftmaxDisplayer(
         .attr("class", "math-displayer")
         .attr("font-size", unitSize)
         .attr("fill", "black");
-    d3.select(".mats")
+    displayer
         .append("rect")
         .attr("x", displayX + eqXOffset + unitSize * 2.5 + upperOffset)
         .attr("y", displayY + eqYOffset - unitSize + 2)
@@ -523,7 +527,7 @@ export function drawSoftmaxDisplayer(
         .attr("fill", myColor(result[id]))
         .attr("class", "math-displayer")
         .raise();
-    d3.select(".mats")
+    displayer
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 2.5 + upperOffset)
         .attr("y", displayY + eqYOffset - unitSize / 3)
@@ -531,7 +535,7 @@ export function drawSoftmaxDisplayer(
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
         .attr("fill", "white");
-    d3.select(".mats")
+    displayer
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 4 + upperOffset)
         .attr("y", displayY + eqYOffset)
@@ -549,8 +553,7 @@ export function drawSoftmaxDisplayer(
         displayX + eqXOffset + unitSize * 10,
         displayY + eqYOffset + unitSize,
     ];
-    const path1 = d3
-        .select(".mats")
+    const path1 = displayer
         .append("path")
         .attr("d", d3.line()([startFLPt, endFLPt]))
         .attr("stroke", "black")
@@ -559,7 +562,7 @@ export function drawSoftmaxDisplayer(
         .attr("class", "math-displayer");
     //draw lower part
     const offsetMul = 2;
-    d3.select(".mats")
+    displayer
         .append("text")
         .attr("x", displayX + eqXOffset)
         .attr("y", displayY + eqYOffset * offsetMul)
@@ -567,7 +570,7 @@ export function drawSoftmaxDisplayer(
         .attr("class", "math-displayer")
         .attr("font-size", unitSize)
         .attr("fill", "black");
-    d3.select(".mats")
+    displayer
         .append("rect")
         .attr("x", displayX + eqXOffset + unitSize * 2.5)
         .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
@@ -577,7 +580,7 @@ export function drawSoftmaxDisplayer(
         .attr("fill", myColor(result[0]))
         .attr("class", "math-displayer")
         .raise();
-    d3.select(".mats")
+    displayer
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 2.5)
         .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
@@ -585,7 +588,7 @@ export function drawSoftmaxDisplayer(
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
         .attr("fill", determineColor(result[0]));
-    d3.select(".mats")
+    displayer
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 4)
         .attr("y", displayY + eqYOffset * offsetMul)
@@ -593,7 +596,7 @@ export function drawSoftmaxDisplayer(
         .attr("class", "math-displayer")
         .attr("font-size", unitSize)
         .attr("fill", "black");
-    d3.select(".mats")
+    displayer
         .append("rect")
         .attr("x", displayX + eqXOffset + unitSize * 7.5)
         .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
@@ -603,7 +606,7 @@ export function drawSoftmaxDisplayer(
         .attr("fill", myColor(result[1]))
         .attr("class", "math-displayer")
         .raise();
-    d3.select(".mats")
+    displayer
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 7.5)
         .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
@@ -611,7 +614,7 @@ export function drawSoftmaxDisplayer(
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
         .attr("fill", determineColor(result[1]));
-    d3.select(".mats")
+    displayer
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 9)
         .attr("y", displayY + eqYOffset * offsetMul)
@@ -621,7 +624,7 @@ export function drawSoftmaxDisplayer(
         .attr("fill", "black");
     //lower part finished
     //eq sign and result
-    d3.select(".mats")
+    displayer
         .append("text")
         .attr("x", endFLPt[0] + unitSize / 2)
         .attr("y", endFLPt[1])
@@ -629,7 +632,7 @@ export function drawSoftmaxDisplayer(
         .attr("class", "math-displayer")
         .attr("font-size", unitSize)
         .attr("fill", "black");
-    d3.select(".mats")
+    displayer
         .append("rect")
         .attr("x", endFLPt[0] + unitSize * 1.5)
         .attr("y", endFLPt[1] - unitSize)
@@ -643,7 +646,7 @@ export function drawSoftmaxDisplayer(
     if (Math.abs(finalResult[id]) < 0.5) {
         textColor = "black";
     }
-    d3.select(".mats")
+    displayer
         .append("text")
         .attr("x", endFLPt[0] + unitSize * 1.5)
         .attr("y", endFLPt[1] - unitSize / 2)
@@ -651,6 +654,21 @@ export function drawSoftmaxDisplayer(
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
         .attr("fill", textColor);
+
+    const scaleFactor = 1.5;
+
+        // 获取 tooltip 元素的边界框
+        const bbox = displayer.node()?.getBBox();
+
+        // 计算中心点
+        if(bbox!=undefined){
+            const centerX = bbox.x + bbox.width / 2;
+            const centerY = bbox.y + bbox.height / 2;
+
+            // 将缩放中心设置为元素的中心点
+            displayer.attr('transform', `translate(${centerX}, ${centerY}) scale(${scaleFactor}) translate(${-centerX}, ${-centerY})`);
+
+        }
 }
 
 
@@ -678,8 +696,9 @@ export function drawSoftmaxDisplayerNodeClassifier(
     const displayY = displayerPos[1];
 
     //add displayer
-    d3.select(".mats")
-        .append("rect")
+    const tooltip = d3.select(".mats").append("g");
+
+        tooltip.append("rect")
         .attr("x", displayX)
         .attr("y", displayY)
         .attr("width", displayW)
@@ -695,7 +714,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
     //add title
     const titleYOffset = 10;
     const titleXOffset = 50;
-    d3.select(".mats")
+    tooltip
         .append("text")
         .attr("x", displayX + titleXOffset)
         .attr("y", displayY + titleYOffset)
@@ -707,7 +726,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
     const eqYOffset = titleYOffset * 2.5;
     const unitSize = eqXOffset / 3 + 3;
     const upperOffset = unitSize * 2;
-    d3.select(".mats")
+    tooltip
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 4 + upperOffset)
         .attr("y", displayY + eqYOffset)
@@ -715,7 +734,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .attr("class", "math-displayer")
         .attr("font-size", unitSize)
         .attr("fill", "black");
-    d3.select(".mats")
+    tooltip
         .append("rect")
         .attr("x", displayX + eqXOffset + unitSize * 6.5 + upperOffset)
         .attr("y", displayY + eqYOffset - unitSize + 2)
@@ -725,7 +744,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .attr("fill", myColor(nthOutputVals[Number(rectID)]))
         .attr("class", "math-displayer")
         .raise();
-    d3.select(".mats")
+    tooltip
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 6.5 + upperOffset)
         .attr("y", displayY + eqYOffset - unitSize / 3)
@@ -733,7 +752,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
         .attr("fill", determineColor(nthOutputVals[Number(rectID)]));
-    d3.select(".mats")
+    tooltip
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 8 + upperOffset)
         .attr("y", displayY + eqYOffset)
@@ -754,8 +773,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         displayX + eqXOffset + unitSize * 19,
         displayY + eqYOffset + unitSize,
     ];
-    const path1 = d3
-        .select(".mats")
+    const path1 = tooltip
         .append("path")
         .attr("d", d3.line()([startFLPt, endPathPt]))
         .attr("stroke", "black")
@@ -765,7 +783,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
 
     //draw lower part
     const offsetMul = 2;
-    d3.select(".mats")
+    tooltip
         .append("text")
         .attr("x", displayX + eqXOffset)
         .attr("y", displayY + eqYOffset * offsetMul)
@@ -773,7 +791,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .attr("class", "math-displayer")
         .attr("font-size", unitSize)
         .attr("fill", "black");
-    d3.select(".mats")
+    tooltip
         .append("rect")
         .attr("x", displayX + eqXOffset + unitSize * 2.5)
         .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
@@ -783,7 +801,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .attr("fill", myColor(nthOutputVals[0]))
         .attr("class", "math-displayer")
         .raise();
-    d3.select(".mats")
+    tooltip
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 2.5)
         .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
@@ -791,7 +809,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
         .attr("fill", determineColor(nthOutputVals[0]));
-    d3.select(".mats")
+    tooltip
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 4)
         .attr("y", displayY + eqYOffset * offsetMul)
@@ -799,7 +817,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .attr("class", "math-displayer")
         .attr("font-size", unitSize)
         .attr("fill", "black");
-    d3.select(".mats")
+    tooltip
         .append("rect")
         .attr("x", displayX + eqXOffset + unitSize * 7.5)
         .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
@@ -809,7 +827,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .attr("fill", myColor(nthOutputVals[1]))
         .attr("class", "math-displayer")
         .raise();
-    d3.select(".mats")
+    tooltip
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 7.5)
         .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
@@ -818,7 +836,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .attr("font-size", unitSize / 2)
         .attr("fill", determineColor(nthOutputVals[1]));
 
-    d3.select(".mats")
+    tooltip
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 9)
         .attr("y", displayY + eqYOffset * offsetMul)
@@ -826,7 +844,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .attr("class", "math-displayer")
         .attr("font-size", unitSize)
         .attr("fill", "black");
-    d3.select(".mats")
+    tooltip
         .append("rect")
         .attr("x", displayX + eqXOffset + unitSize * 12.5)
         .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
@@ -836,7 +854,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .attr("fill", myColor(nthOutputVals[2]))
         .attr("class", "math-displayer")
         .raise();
-    d3.select(".mats")
+    tooltip
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 12.5)
         .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
@@ -845,7 +863,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .attr("font-size", unitSize / 2)
         .attr("fill", determineColor(nthOutputVals[2]));    
 
-    d3.select(".mats")
+    tooltip
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 14)
         .attr("y", displayY + eqYOffset * offsetMul)
@@ -853,7 +871,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .attr("class", "math-displayer")
         .attr("font-size", unitSize)
         .attr("fill", "black");
-    d3.select(".mats")
+    tooltip
         .append("rect")
         .attr("x", displayX + eqXOffset + unitSize * 17.5)
         .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
@@ -863,7 +881,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .attr("fill", myColor(nthOutputVals[3]))
         .attr("class", "math-displayer")
         .raise();
-    d3.select(".mats")
+    tooltip
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 17.5)
         .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
@@ -871,7 +889,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
         .attr("fill", determineColor(nthOutputVals[3]));
-    d3.select(".mats")
+    tooltip
         .append("text")
         .attr("x", displayX + eqXOffset + unitSize * 19)
         .attr("y", displayY + eqYOffset * offsetMul)
@@ -882,7 +900,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
 
     //lower part finished
     //eq sign and result
-    d3.select(".mats")
+    tooltip
         .append("text")
         .attr("x", endFLPt[0] + unitSize * 11)
         .attr("y", endFLPt[1])
@@ -890,7 +908,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .attr("class", "math-displayer")
         .attr("font-size", unitSize)
         .attr("fill", "black");
-    d3.select(".mats")
+    tooltip
         .append("rect")
         .attr("x", endFLPt[0] + unitSize * 12)
         .attr("y", endFLPt[1] - unitSize)
@@ -904,7 +922,7 @@ export function drawSoftmaxDisplayerNodeClassifier(
     if (Math.abs(nthResult[Number(rectID)]) < 0.5) {
         textColor = "black";
     }
-    d3.select(".mats")
+    tooltip
         .append("text")
         .attr("x", endFLPt[0] + unitSize * 12)
         .attr("y", endFLPt[1] - unitSize / 2)
@@ -912,6 +930,21 @@ export function drawSoftmaxDisplayerNodeClassifier(
         .attr("class", "math-displayer")
         .attr("font-size", unitSize / 2)
         .attr("fill", textColor);
+
+    const scaleFactor = 1.5;
+
+        // 获取 tooltip 元素的边界框
+        const bbox = tooltip.node()?.getBBox();
+
+        // 计算中心点
+        if(bbox!=undefined){
+            const centerX = bbox.x + bbox.width / 2;
+            const centerY = bbox.y + bbox.height / 2;
+
+            // 将缩放中心设置为元素的中心点
+            tooltip.attr('transform', `translate(${centerX}, ${centerY}) scale(${scaleFactor}) translate(${-centerX}, ${-centerY})`);
+
+        }
 }
 
 export function drawActivationExplanation(
@@ -1319,19 +1352,19 @@ export function drawDotProduct(
             .raise();
 
            // 定义缩放比例
-const scaleFactor = 1.5;
+        const scaleFactor = 1.5;
 
-// 获取 tooltip 元素的边界框
-const bbox = tooltip.node()?.getBBox();
+        // 获取 tooltip 元素的边界框
+        const bbox = tooltip.node()?.getBBox();
 
-// 计算中心点
-if(bbox!=undefined){
-const centerX = bbox.x + bbox.width / 2;
-const centerY = bbox.y + bbox.height / 2;
+        // 计算中心点
+        if(bbox!=undefined){
+            const centerX = bbox.x + bbox.width / 2;
+            const centerY = bbox.y + bbox.height / 2;
 
-// 将缩放中心设置为元素的中心点
-tooltip.attr('transform', `translate(${centerX}, ${centerY}) scale(${scaleFactor}) translate(${-centerX}, ${-centerY})`);
+            // 将缩放中心设置为元素的中心点
+            tooltip.attr('transform', `translate(${centerX}, ${centerY}) scale(${scaleFactor}) translate(${-centerX}, ${-centerY})`);
 
-}
+        }
 
 }
