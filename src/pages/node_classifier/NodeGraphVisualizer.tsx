@@ -49,9 +49,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
   const select = parse ? parse[1] : '';
   const location = loadNodesLocation(1, select);
   
-  if (intmData != null) {
 
-  }
   
   useEffect(() => {
     setSimulation(false)

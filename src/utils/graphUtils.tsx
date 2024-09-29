@@ -352,7 +352,8 @@ export function outputVisualizer(
 
     const g5 = svg
         .append("g")
-        .attr("transform", `translate(${endCoordList[0][0] - 90}, ${endCoordList[0][1] - 230})`);
+        .attr("class", "displayer-group")
+        .attr("transform", `translate(${endCoordList[0][0] - 90}, ${endCoordList[0][1] - 260})`);
 
 
     let DisplayerWidth = 300; // Width of the graph-displayer
@@ -375,7 +376,11 @@ export function outputVisualizer(
 
         const Xt = weights;
 
-    hoverOverHandler(node, node.relatedNodes[0].features, calculatedData, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true)
+   
+
+
+   
+
 
     let outputData = [];
     for (let i = 0; i < calculatedData.length; i++) {
@@ -466,6 +471,18 @@ export function outputVisualizer(
         .attr("class", "to-be-removed softmax-component");
         drawFunctionIcon([2 * rectHeight + 5 - moveOffset + 75, 7.5], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", outputGroup);
 
+            
+        d3.selectAll(".relu-icon").on("mouseover", function(event: any) {
+            const [x, y] = d3.pointer(event);
+
+            graphVisDrawActivationExplanation(
+                x, y, "Softmax",
+                "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", outputGroup
+            );
+        }).on("mouseout", function() {
+            d3.selectAll(".math-displayer").remove();
+        })
+
         weightAnimation(
             svg,
             node,
@@ -487,6 +504,8 @@ export function outputVisualizer(
             displayHeight,
             mode
         );
+        hoverOverHandler(node, node.relatedNodes[0].features, calculatedData, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true);
+        d3.selectAll(".displayer-group").attr("transform", `translate(${endCoordList[0][0] - 90}, ${endCoordList[0][1] - 260}) scale(1.5)`);
 
         let start_x = node.x + 170 - temp;
         let start_y = node.y - 22.5;
@@ -1103,7 +1122,12 @@ export function calculationVisualizer(
         }
         drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] + 20, -1, matrixRectSize, matrixRectSize, node.features.length, weights, node.graphIndex - 1, myColor, svg, weightsLocation)
         if (innerComputationMode === "GCN") {
-        drawMathFormula(formula, endCoordList[0][0] - 300, endCoordList[0][1] - 400 + 100, "./assets/SVGs/GCNFormula.svg");
+            if (node.graphIndex === 3) {
+                drawMathFormula(formula, endCoordList[0][0] - 300, endCoordList[0][1] - 400 + 100, "./assets/SVGs/GCNFormulaWithoutActivation.svg");
+            } else {
+                drawMathFormula(formula, endCoordList[0][0] - 300, endCoordList[0][1] - 400 + 100, "./assets/SVGs/GCNFormula.svg");
+            }
+        
         } else if (innerComputationMode === "GAT") {
             drawMathFormula(formula, endCoordList[0][0] - 300, endCoordList[0][1] - 400 + 100, "./assets/SVGs/GATFormula.svg");
         } else {
@@ -1125,9 +1149,10 @@ export function calculationVisualizer(
 
     const g4 = g3
         .append("g")
+        .attr("class", "displayer_group")
         .attr("transform", `translate(${3.5 * offset + temp +
             node.relatedNodes[0].features.length * 2 * prevRectHeight +
-            100}, ${height / 5 - 50})`);
+            100}, ${height / 5 - 80})`);
 
     let rectL = 0.5;
     if (mode === 1) {
@@ -1139,20 +1164,7 @@ export function calculationVisualizer(
     let displayerWidth = 300; // Width of the graph-displayer
     let displayHeight = 100;
 
-    const displayer = g4
-        .append("rect")
-        .attr("x", (node.graphIndex - 2) * 1)
-        .attr("y", 0)
-        .attr("width", displayerWidth)
-        .attr("height", displayHeight)
-        .attr("rx", 10)
-        .attr("ry", 10)
-        .style("fill", "transparent")
-        .style("stroke", "black")
-        .style("stroke-width", 2)
-        .attr("class", "graph-displayer")
-        .attr("opacity", 0)
-        .lower();
+
 
     
 
@@ -1248,7 +1260,7 @@ export function calculationVisualizer(
             displayHeight,
             mode
         );
-        hoverOverHandler(node, aggregatedData, calculatedData, state, g4, displayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, weights, node.graphIndex - 1, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, false)
+        
 
         let neighborFeatures: number[][] = []
         let lastLayerNodefeature: number[]
@@ -1637,7 +1649,7 @@ export function calculationVisualizer(
 
 
         });
-
+        
     
 
         relu.on("mouseout", function () {
@@ -1670,6 +1682,24 @@ export function calculationVisualizer(
     } 
             
     }, 3500);
+    const displayer = g4
+    .append("rect")
+    .attr("x", (node.graphIndex - 2) * 1)
+    .attr("y", 0)
+    .attr("width", displayerWidth)
+    .attr("height", displayHeight)
+    .attr("rx", 10)
+    .attr("ry", 10)
+    .style("fill", "white")
+    .style("stroke", "black")
+    .style("stroke-width", 2)
+    .attr("class", "graph-displayer")
+    .attr("opacity", 0)
+
+    hoverOverHandler(node, aggregatedData, calculatedData, state, g4, displayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, weights, node.graphIndex - 1, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, false)
+    d3.selectAll(".displayer_group").attr("transform", `translate(${3.5 * offset + temp +
+        node.relatedNodes[0].features.length * 2 * prevRectHeight +
+        100}, ${height / 5 - 80}) scale(1.5)`);
 
 
 
@@ -1812,7 +1842,7 @@ export function calculationVisualizer(
             if (!state.isClicked) {
                 return;
             }
-            console.log("VAWD")
+
             d3.selectAll(".math-displayer").remove();
             d3.selectAll(".graph-displayer").remove();
             moveFeaturesBack(node.relatedNodes, originalCoordinates);
@@ -2811,7 +2841,8 @@ export function nodeOutputVisualizer(
 
     const g5 = svg
         .append("g")
-        .attr("transform", `translate(${endCoordList[0][0]}, ${endCoordList[0][1] - 200})`);
+        .attr("class", "displayer-group")
+        .attr("transform", `translate(${endCoordList[0][0]}, ${endCoordList[0][1] - 230})`);
 
     let RectL = 0.5;
     if (mode === 1) {
@@ -2837,7 +2868,8 @@ export function nodeOutputVisualizer(
         .lower();
 
         const Xt = math.transpose(weights);
-    hoverOverHandler(node, node.relatedNodes[0].features, calculatedData, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true)
+
+    //d3.selectAll(".displayer_group").attr("transform", `translate(${endCoordList[0][0]}, ${endCoordList[0][1] - 200}) scale(1.5)`);
 
 
 
@@ -2905,6 +2937,7 @@ export function nodeOutputVisualizer(
 
         .style("opacity", 0);
 
+
     setTimeout(() => {
         if (!state.isClicked) {
             return;
@@ -2931,6 +2964,10 @@ export function nodeOutputVisualizer(
             displayHeight,
             mode
         );
+        hoverOverHandler(node, node.relatedNodes[0].features, calculatedData, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true)
+        d3.selectAll(".displayer-group").attr("transform", `translate(${endCoordList[0][0]}, ${endCoordList[0][1] - 230}) scale(1.5)`);
+
+
 
         let start_x = xPos - temp - moveOffset
             + prevRectHeight * 4 + 140;
@@ -3032,8 +3069,26 @@ export function nodeOutputVisualizer(
             .lower();
 
             drawFunctionIcon([end_x+170/2+40, end_y], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", svg);
+            
+            d3.selectAll(".relu-icon").on("mouseover", function() {
+                const [x, y] = d3.pointer(event);
+
+                graphVisDrawActivationExplanation(
+                    x, y, "Softmax",
+                    "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", svg
+                );
+            }).on("mouseout", function() {
+                d3.selectAll(".math-displayer").remove();
+            })
+
+ 
+            
 
     }, 2000);
+
+
+
+
 
 
 

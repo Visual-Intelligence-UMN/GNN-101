@@ -205,7 +205,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
         .attr("transform", `translate(0, 20)`); 
 
    
-    d3.select(".graph-displayer").attr("opacity", 1);
+    d3.selectAll(".graph-displayer").attr("opacity", 1);
     d3.selectAll(".columnGroup").style("opacity", 0.3);
     d3.selectAll(`#tempath${i}`).attr("opacity", 1).raise();
     d3.selectAll(`#columnGroup-${i}`).style("opacity", 1).raise();

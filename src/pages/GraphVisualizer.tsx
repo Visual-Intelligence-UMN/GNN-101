@@ -428,7 +428,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                     // colorSchemes.push(cst);
 
 
-
+                    
                     // doesn't show the text, need to be fixed 
                     if (i === graphs.length - 1) { // 6 layers in total, call the connect when reaching the last layer of convolutional layer.
                         connectCrossGraphNodes( // in this function the connection of last two layers will be drwan
@@ -446,12 +446,15 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                         // since in the featureVisualizer each node has its own svgElement, circles here are made transparent
                         svg.selectAll("circle")
                             .attr("opacity", 0);
+            
+          
 
                         if (intmData) {
 
                             featureVisualizer(svg, allNodes, offset, height, graphs, 700, 900, 600, 15, 10, 3, 20, 0, innerComputationMode); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
                             //function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, graphs: any[], moveOffset: number, fcLayerMoveOffset: number, rectWidth: number, firstLayerRectHeight: number, rectHeight: number, outputLayerRectHeight: number)
                         }
+       
 
                     }
 
