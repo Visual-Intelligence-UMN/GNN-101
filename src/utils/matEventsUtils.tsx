@@ -179,7 +179,7 @@ export function detailedViewRecovery(
         translateLayers(4, -300);
     }
 
-
+    d3.selectAll("path.crossConnection").style("opacity", 0.05);
     d3.select(".mats").selectAll(".lastLayerConnections").style("opacity", 0.25);
     d3.selectAll(".twoLayer").style("opacity", 1);
     d3.select(".pooling").style("opacity", 1);
@@ -669,11 +669,14 @@ export function featureVisClick(
             delay: initSec + aniSec,
         },
         {func: ()=>{
+            let drawLabel = true;
+            if(oFeatureChannels==34)drawLabel = false;
             injectPlayButtonSVG(
                 btn,
                 btnX,
                 btnY - 30,
-                "./assets/SVGs/matmul.svg"
+                "./assets/SVGs/matmul.svg",
+                drawLabel
             );
             //drawHintLabel(g, btnX, btnY - 36, "Click for Animation", "procVis");
 
@@ -1122,6 +1125,8 @@ export function outputVisClick(
         {func:()=>{
         pathMap = drawPathInteractiveComponents(resultStartCoord, resultCoord, result, myColor);
         d3.select(".mats").style("pointer-events", "auto");
+        d3.select(".switchBtn").style("pointer-events", "auto");
+        d3.select(".switchBtn").style("opacity", 1);
         }, delay:200}
     ]
 
@@ -1157,8 +1162,7 @@ export function outputVisClick(
             d3.selectAll("path").lower();
             //d3.selectAll(".procVis").transition().duration(1000).attr("opacity", 1);
             d3.selectAll("path").lower();
-            d3.select(".switchBtn").style("pointer-events", "auto");
-            d3.select(".switchBtn").style("opacity", 1);
+            
         }, delay:aniSec},
     ];
     AnimationController.runAnimations(0, animateSeqAfterPath);
