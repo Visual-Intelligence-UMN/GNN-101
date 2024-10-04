@@ -604,11 +604,6 @@ export function featureVisualizer(
 ) {
     state.isClicked = false;
 
-
-
-
-
-
     // 1. visualize feature
     // 2. handle interaction event
     // 3. do the calculation for animation
@@ -639,6 +634,7 @@ export function featureVisualizer(
             })
             allFeatureMap.push(featureMap)
         }
+        
 
     })
 
@@ -694,6 +690,7 @@ export function featureVisualizer(
             if (graphIndex === 0) {
                 currRectHeight = firstLayerRectHeight;
             }
+
 
 
             const features = node.features;
@@ -1197,6 +1194,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
                     ${neighborNode.y + 10}
                   `)
                                 .style("stroke", linkStrength(avg))
+
                                 .style("stroke-width", 1)
                                 .style("opacity", 0)
                                 .style("fill", "none");
@@ -1232,6 +1230,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
                      ${nextNode.x + xOffsetNext - 16} ${nextNode.y + 10}`
                                 )
                                 .style("stroke-width", 1)
+    
                                 .style("opacity", 0)
                                 .style("stroke", linkStrength(avg))
                                 .style("fill", "none");
@@ -1267,6 +1266,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
                                         .attr("x2", nextNode.x + (graphIndex - 1.5) * offset)
                                         .attr("y2", nextNode.y + 10)
                                         .style("stroke", linkStrength(avg))
+                         
                                         .style("stroke-width", 1)
                                         .style("opacity", 0)
                                         .style("fill", "none");
@@ -1315,6 +1315,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
                             .style("stroke", linkStrength(avg))
                             .style("opacity", 0)
                             .style('stroke-width', 1)
+                    
                             .style("fill", "none");
 
 
@@ -1351,6 +1352,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
                             const path = svg.append("path")
                                 .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 20} ${centerY + 20}`)
                                 .style("stroke", linkStrength(avg))
+                
                                 .style("opacity", 0)
                                 .style('stroke-width', 1)
                                 .style("fill", "none");

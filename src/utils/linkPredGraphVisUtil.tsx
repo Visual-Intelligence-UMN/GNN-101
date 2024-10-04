@@ -26,7 +26,7 @@ import { extractSubgraph } from "./graphDataUtils";
 import { isValidElement } from "react";
 import { isValidNode } from "./GraphvislinkPredUtil";
 import { roundToTwo } from "@/components/WebUtils";
-import { hoverOverHandler } from "./graphAnimationHelper";
+import { graphVisDrawActivationExplanation, hoverOverHandler } from "./graphAnimationHelper";
 import { computeMatrixLocations, drawFunctionIcon, drawWeightMatrix } from "./matAnimateUtils";
 import math, { all, create } from "mathjs";
 
@@ -633,18 +633,9 @@ export function linkPredOutputVisualizer(
     .style("stroke", "black")
     .style("opacity", 0)
 
-    drawFunctionIcon([(node.graphIndex - 1) * offset + 455, height / 3 - 15], "./assets/SVGs/sigmoid.svg", "", "Sigmoid", "f(x) = 1/(1+e^(-x))", "Range: [0 to 1]", svg);
 
 
-    svg.append("text")
-    .attr("x",  (node.graphIndex - 1) * offset + 390)
-    .attr("class", "to-be-removed dot-product")
-    .attr("y", height / 3 - 30)
-    .text("Sigmoid")
-    .attr("fill", "grey")
-    .attr("font-size", "17")
-    .style("opacity", 0)
-    
+
 
 
     
@@ -659,8 +650,18 @@ export function linkPredOutputVisualizer(
 
     setTimeout(() => {
       d3.selectAll(".dot-product").style("opacity", 1)
-    }, 2000)
+      drawFunctionIcon([(node.graphIndex - 1) * offset + 455, height / 3 - 15], "./assets/SVGs/sigmoid.svg", "Sigmoid", "", "f(x) = 1/(1+e^(-x))", "Range: [0, 1]", svg);
+      d3.selectAll(".relu-icon").on("mouseover", function(event: any) {
+        const [x, y] = d3.pointer(event);
 
+        graphVisDrawActivationExplanation(
+            x, y, "Sigmoid",
+            "f(x) = 1/(1+e^(-x))", "Range: [0, 1]", svg
+        );
+    }).on("mouseout", function() {
+        d3.selectAll(".math-displayer").remove();
+    })
+    }, 2000)
 
 
   const g5 = svg
