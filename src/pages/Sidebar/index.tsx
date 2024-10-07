@@ -227,14 +227,41 @@ export default function Sidebar(props: Props) {
                         <span className={styles.tag}>Edge-Level Tasks </span>
                         <p>
                             GNNs can effectively predict edge properties within a graph.
-                            In the Twitch dataset, for instance, the model's objective is to determine if two Twitch users are friends.
+                            In the Twitch dataset, for instance, the model&apos;s objective is to determine if two Twitch users are friends.
                             By employing multiple layers, the model combines the features of the two nodes associated with a specific edge using dot product multiplication.
                             Subsequently, a sigmoid function is applied to the resulting score, yielding a probability indicating the likelihood of a friendship between the two users.
                         </p>
                         {/* <p>The interactive visualization about edge classification is coming soon!</p> */}
                     </>
                 </div>
+                <div className="px-4">
+                    <h1 className="text-3xl font-semibold text-3xl">About this website:</h1>
+                    <p>
+                        This website is developed and maintained by the UMN Visual
+                        Intelligence Lab. The GNNs you interact with are inferenced
+                        real-time on the your web browser, supported by the ONNX web
+                        runtime.
+                    </p>
+                    🤸 Team Members:
+                    <ul className="list-disc list-inside px-4">
+                        <li>Yilin(Harry) Lu</li>
+                        <li>Chongwei Chen</li>
+                        <li>Kexin Huang</li>
+                        <li>Marinka Zitnik</li>
+                        <li>Matthew Xu</li>
+                        <li>Qianwen Wang</li>
+                    </ul>
+                    📧 Contact: qianwen@umn.edu
+                    <br />
+                    💻 Source Code:
+                    <a
+                        href="https://github.com/Visual-Intelligence-UMN/web-gnn-vis"
+                        target="_blank"
+                    >
+                        https://github.com/Visual-Intelligence-UMN/web-gnn-vis
+                    </a>
 
+                </div>
 
             </Scrollbar>
         </div>

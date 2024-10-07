@@ -24,7 +24,7 @@ import {
     featureSAGEClick
 } from "./matEventsUtils";
 import { deepClone, drawPoints } from "./utils";
-import { AnimationController, computeMatrixLocations, drawAniPath, drawBiasPath, drawBiasVector, drawPathBtwOuputResult, drawPathInteractiveComponents, drawWeightMatrix, drawWeightsVector } from "./matAnimateUtils";
+import { AnimationController, computeMatrixLocations, drawAniPath, drawBiasPath, drawBiasVector, drawFunctionIcon, drawPathBtwOuputResult, drawPathInteractiveComponents, drawWeightMatrix, drawWeightsVector } from "./matAnimateUtils";
 import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import { roundToTwo } from "../components/WebUtils";
 import { drawMatmulExplanation, drawSoftmaxDisplayerNodeClassifier } from "./matInteractionUtils";
@@ -59,8 +59,6 @@ export function visualizeGraphClassifierFeatures(
 
     //table that manage all feature visualizers for GCNConv
     let featureVisTable: SVGElement[][] = [[], [], [], []];
-    //table that manage color schemes
-    let colorSchemesTable: SVGElement[] = [];
     //control detail view
     let dview = false;
     //control lock and unlock
@@ -122,7 +120,6 @@ export function visualizeGraphClassifierFeatures(
         featureVisTable,
         pooling,
         graph,
-        colorSchemesTable,
         poolingVis,
         outputVis,
         final,
@@ -134,7 +131,6 @@ export function visualizeGraphClassifierFeatures(
     frames = GCNConvPackage.frames;
     schemeLocations = GCNConvPackage.schemeLocations;
     featureVisTable = GCNConvPackage.featureVisTable;
-    colorSchemesTable = GCNConvPackage.colorSchemesTable;
     poolingVis = GCNConvPackage.poolingVis;
     outputVis = GCNConvPackage.outputVis;
     resultVis = GCNConvPackage.resultVis;
@@ -192,7 +188,6 @@ export function visualizeGraphClassifierFeatures(
                 poolingOutEvent,
                 poolingOverEvent,
                 poolingVis,
-                colorSchemesTable,
                 featureChannels,
                 100,
                 []
@@ -204,8 +199,6 @@ export function visualizeGraphClassifierFeatures(
             recordLayerID = recoverPackage.recordLayerID;
             poolingOutEvent = recoverPackage.poolingOutEvent;
             poolingOverEvent = recoverPackage.poolingOverEvent;
-            colorSchemesTable = recoverPackage.colorSchemesTable;
-
             clearInterval(intervalID);
         }
     });
@@ -250,7 +243,6 @@ export function visualizeGraphClassifierFeatures(
                 layerID,
                 node,
                 recordLayerID,
-                colorSchemesTable,
                 adjList,
                 featureVisTable,
                 features,
@@ -270,7 +262,6 @@ export function visualizeGraphClassifierFeatures(
             );
             // update variables
             recordLayerID = featureVisPack.recordLayerID;
-            colorSchemesTable = featureVisPack.colorSchemesTable;
             featureVisTable = featureVisPack.featureVisTable;
             features = featureVisPack.features;
             intervalID = featureVisPack.getIntervalID();
@@ -345,7 +336,6 @@ export function visualizeGraphClassifierFeatures(
                     //lock all feature visualizers and transparent paths
                     const outputVisPack = outputVisClick(
                         resultVis,
-                        colorSchemesTable,
                         one,
                         final,
                         myColor,
@@ -354,7 +344,6 @@ export function visualizeGraphClassifierFeatures(
                     );
                     //update variables
                     resultVis = outputVisPack.resultVis;
-                    colorSchemesTable = outputVisPack.colorSchemesTable;
                 }
             });
     }
@@ -395,7 +384,6 @@ export function visualizeNodeClassifierFeatures(
     //table that manage all feature visualizers for GCNConv
     let featureVisTable: SVGElement[][] = [[], [], [], [], []];
     //table that manage color schemes
-    let colorSchemesTable: SVGElement[] = [];
     //control detail view
     let dview = false;
     //control lock and unlock
@@ -459,7 +447,6 @@ export function visualizeNodeClassifierFeatures(
         featureVisTable,
         result,
         graph,
-        colorSchemesTable,
         final,
         firstLayer,
         maxVals,
@@ -470,7 +457,6 @@ export function visualizeNodeClassifierFeatures(
     frames = GCNConvPackage.frames;
     schemeLocations = GCNConvPackage.schemeLocations;
     featureVisTable = GCNConvPackage.featureVisTable;
-    colorSchemesTable = GCNConvPackage.colorSchemesTable;
     maxVals = GCNConvPackage.maxVals;
     let resultLabelsList = GCNConvPackage.resultLabelsList;
     let paths = GCNConvPackage.paths;
@@ -587,7 +573,6 @@ export function visualizeNodeClassifierFeatures(
                 poolingOutEvent,
                 poolingOverEvent,
                 poolingVis,
-                colorSchemesTable,
                 featureChannels,
                 90,
                 resultLabelsList
@@ -599,8 +584,6 @@ export function visualizeNodeClassifierFeatures(
             recordLayerID = recoverPackage.recordLayerID;
             poolingOutEvent = recoverPackage.poolingOutEvent;
             poolingOverEvent = recoverPackage.poolingOverEvent;
-            colorSchemesTable = recoverPackage.colorSchemesTable;
-
             clearInterval(intervalID);
         }
     });
@@ -648,7 +631,6 @@ export function visualizeNodeClassifierFeatures(
                 layerID,
                 node,
                 recordLayerID,
-                colorSchemesTable,
                 adjList,
                 featureVisTable,
                 features,
@@ -669,7 +651,6 @@ export function visualizeNodeClassifierFeatures(
             );
             // update variables
             recordLayerID = featureVisPack.recordLayerID;
-            colorSchemesTable = featureVisPack.colorSchemesTable;
             featureVisTable = featureVisPack.featureVisTable;
             features = featureVisPack.features;
             intervalID = featureVisPack.getIntervalID();
@@ -716,8 +697,6 @@ export function visualizeNodeClassifierFeatures(
 
 
             //choose the right color schemes to display
-            colorSchemesTable[layerID].style.opacity = "1";
-            colorSchemesTable[layerID + 1].style.opacity = "1";
 
             featureVisTable[layerID][node].style.opacity = "1";
             let curNode = featureVisTable[layerID + 1][node];
@@ -912,7 +891,13 @@ export function visualizeNodeClassifierFeatures(
                 },
                 { func: () => { drawBiasVector(g, 4, 15, 10, biasCoord, myColor, linBias, 4); }, delay: aniSec },
                 { func: () => { drawBiasPath(endBiasCoord, res10, res11, endBiasPathCoord, 4, 4); }, delay: aniSec },
-                { func: () => { drawPathBtwOuputResult([endOutputCoord], startResultCoord); }, delay: aniSec },
+                { func: () => { 
+                    drawPathBtwOuputResult([endOutputCoord], startResultCoord); 
+                    const iconX = (endOutputCoord[0] + startResultCoord[0]) / 2 + 75;
+                    const iconY = endOutputCoord[1];
+                    drawFunctionIcon([iconX, iconY], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]");
+
+                }, delay: aniSec },
                 {
                     func: () => {
                         let dir = 1;
@@ -1088,7 +1073,7 @@ export function visualizeNodeClassifierFeatures(
                         const rectID = d3.select(this).attr("rectID");
                         //path interaction
                         for (let i = 0; i < pathMap.length; i++) {
-                            pathMap[i][rectID].style.opacity = "0.1";
+                            pathMap[i][rectID].style.opacity = "0";
                         }
                         //remove the math displayer
                         d3.selectAll(".math-displayer").remove();
@@ -1132,8 +1117,6 @@ export function visualizeLinkClassifierFeatures(
 
     //table that manage all feature visualizers for GCNConv
     let featureVisTable: SVGElement[][] = [[], [], [], [], []];
-    //table that manage color schemes
-    let colorSchemesTable: SVGElement[] = [];
     //control detail view
     let dview = false;
     //control lock and unlock
@@ -1205,7 +1188,6 @@ export function visualizeLinkClassifierFeatures(
         schemeLocations,
         featureVisTable,
         graph,
-        colorSchemesTable,
         firstLayer,
         maxVals,
         featureChannels,
@@ -1217,7 +1199,6 @@ export function visualizeLinkClassifierFeatures(
     frames = GCNConvPackage.frames;
     schemeLocations = GCNConvPackage.schemeLocations;
     featureVisTable = GCNConvPackage.featureVisTable;
-    colorSchemesTable = GCNConvPackage.colorSchemesTable;
     maxVals = GCNConvPackage.maxVals;
     let paths = GCNConvPackage.paths;
     let locationsForLastLayer = GCNConvPackage.locationsForLastLayer;
@@ -1313,7 +1294,6 @@ export function visualizeLinkClassifierFeatures(
                 poolingOutEvent,
                 poolingOverEvent,
                 poolingVis,
-                colorSchemesTable,
                 featureChannels,
                 90,
                 []
@@ -1325,7 +1305,6 @@ export function visualizeLinkClassifierFeatures(
             recordLayerID = recoverPackage.recordLayerID;
             poolingOutEvent = recoverPackage.poolingOutEvent;
             poolingOverEvent = recoverPackage.poolingOverEvent;
-            colorSchemesTable = recoverPackage.colorSchemesTable;
 
             clearInterval(intervalID);
         }
@@ -1371,7 +1350,6 @@ export function visualizeLinkClassifierFeatures(
                     layerID,
                     node,
                     recordLayerID,
-                    colorSchemesTable,
                     adjList,
                     featureVisTable,
                     features,
@@ -1391,7 +1369,6 @@ export function visualizeLinkClassifierFeatures(
                 );
                 // update variables
                 recordLayerID = featureVisPack.recordLayerID;
-                colorSchemesTable = featureVisPack.colorSchemesTable;
                 featureVisTable = featureVisPack.featureVisTable;
                 features = featureVisPack.features;
                 intervalID = featureVisPack.getIntervalID();
@@ -1400,7 +1377,6 @@ export function visualizeLinkClassifierFeatures(
                     layerID,
                     node,
                     recordLayerID,
-                    colorSchemesTable,
                     adjList,
                     featureVisTable,
                     features,
@@ -1422,7 +1398,6 @@ export function visualizeLinkClassifierFeatures(
                 );
                 // update variables
                 recordLayerID = featureVisPack.recordLayerID;
-                colorSchemesTable = featureVisPack.colorSchemesTable;
                 featureVisTable = featureVisPack.featureVisTable;
                 features = featureVisPack.features;
                 intervalID = featureVisPack.getIntervalID();
@@ -1432,7 +1407,6 @@ export function visualizeLinkClassifierFeatures(
                     layerID,
                     node,
                     recordLayerID,
-                    colorSchemesTable,
                     adjList,
                     featureVisTable,
                     features,
@@ -1453,7 +1427,6 @@ export function visualizeLinkClassifierFeatures(
                 );
                 // update variables
                 recordLayerID = featureVisPack.recordLayerID;
-                colorSchemesTable = featureVisPack.colorSchemesTable;
                 featureVisTable = featureVisPack.featureVisTable;
                 features = featureVisPack.features;
                 intervalID = featureVisPack.getIntervalID();
@@ -1508,9 +1481,6 @@ export function visualizeLinkClassifierFeatures(
 
             d3.selectAll(".legend").style("opacity", 0.25);
             d3.selectAll(".binary-legend").style("opacity", 0.25);
-
-            colorSchemesTable[2].style.opacity = "1";
-            colorSchemesTable[3].style.opacity = "1";
 
             console.log("selection check", d3.selectAll(".pathsToResult"));
 
@@ -1591,6 +1561,7 @@ export function visualizeLinkClassifierFeatures(
             
             // drawPoints(".mats", "red", [resultVisPos]);
 
+            
             g.append("line")
                 .attr("x1", endingPoint[0])
                 .attr("y1", endingPoint[1])
@@ -1635,6 +1606,12 @@ export function visualizeLinkClassifierFeatures(
                 resultVisPos[0]+50,
                 resultVisPos[1]+25
             ];
+
+            const iconX = resultVisPos[0]+100;
+            const iconY = resultVisPos[1]+5;
+
+            drawFunctionIcon([iconX, iconY], "./assets/SVGs/sigmoid.svg", "", "Sigmoid", "f(x) = 1/(1+e^(-x))", "Range: [0 to 1]");
+
 
             g.append("text")
                 .attr("x", sigmoidTextPos[0])

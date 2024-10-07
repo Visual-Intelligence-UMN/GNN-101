@@ -16,9 +16,11 @@ import {
     loadNodesLocation,
     graphToMatrix,
     fetchSubGraphNodeLocation,
+    myColor,
 } from "@/utils/utils";
 import {
     HeatmapData,
+    buildLegend,
     drawNodeAttributes,
     getNodeAttributes,
 } from "../utils/matHelperUtils";
@@ -1133,5 +1135,15 @@ export function visualizePartialGraph(
         visualizeG();
 
     });
+}
+
+export const ColorLegend = ({}) => {
+    useEffect(() => {
+        
+        const svg = d3.select("#color-legend").append("svg").attr("width", 200)
+        .attr("height", 100);
+        buildLegend(myColor, 1.5, "Color Scheme", 5, 40, svg);
+    }, []);
+    return <div id="color-legend"></div>
 }
 

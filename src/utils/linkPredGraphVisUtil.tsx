@@ -26,8 +26,8 @@ import { extractSubgraph } from "./graphDataUtils";
 import { isValidElement } from "react";
 import { isValidNode } from "./GraphvislinkPredUtil";
 import { roundToTwo } from "@/components/WebUtils";
-import { hoverOverHandler } from "./graphAnimationHelper";
-import { computeMatrixLocations, drawWeightMatrix } from "./matAnimateUtils";
+import { graphVisDrawActivationExplanation, hoverOverHandler } from "./graphAnimationHelper";
+import { computeMatrixLocations, drawFunctionIcon, drawWeightMatrix } from "./matAnimateUtils";
 import math, { all, create } from "mathjs";
 
 
@@ -43,7 +43,6 @@ export function linkPredFeatureVisualizer(
   firstLayerRectHeight: number, 
   rectHeight: number, 
   outputLayerRectHeight: number,
-  colorSchemes:any,
   mode: number,
   subgraph: any,
   innerComputationMode: string,
@@ -302,18 +301,11 @@ export function linkPredFeatureVisualizer(
 
 
             //color schemes interaction logic
-
-            for(let i=0; i<colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
-
-
-            // colorSchemes[node.graphIndex].style.opacity = "1";
-            // colorSchemes[node.graphIndex - 1].style.opacity = "1";
-
             hideAllLinks(allNodes);
 
 
           
-            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, allFeatureMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
+            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, allFeatureMap, svg, offset, height, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
           
 
 
@@ -474,7 +466,7 @@ export function linkPredFeatureVisualizer(
             showFeature(node);
 
             if (node.graphIndex === 3) {
-              linkPredOutputVisualizer(node, allNodes, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, convNum, svg, mode)
+              linkPredOutputVisualizer(node, allNodes, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, convNum, svg, mode)
             }
             
             reduceNodeOpacity(allNodes, relatedNodes, node);
@@ -527,7 +519,6 @@ export function linkPredOutputVisualizer(
   prevRectHeight: number,
   rectHeight: number,
   rectWidth: number,
-  colorSchemes: any,
   convNum: number,
   originalSvg: any,
   mode: number
@@ -544,10 +535,6 @@ export function linkPredOutputVisualizer(
 
   d3.selectAll(".to-be-removed").remove();
   d3.selectAll(".node-features-Copy").style("visibility", "visible").lower();
-
-  //color schemes interaction
-  for (let i = 0; i < 4; i++) colorSchemes[i].style.opacity = "0.5";
-
 
 
   let originalCoordinates: any[] = [];
@@ -641,20 +628,14 @@ export function linkPredOutputVisualizer(
     .lower();
 
     const path = svg.append("path")
-    .attr("d", `M${ (node.graphIndex - 1) * offset + 330},${height / 3 - 15} L ${ (node.graphIndex - 1) * offset + 500},${height / 3 - 15}`)
+    .attr("d", `M${ (node.graphIndex - 1) * offset + 350},${height / 3 - 15} L ${ (node.graphIndex - 1) * offset + 500},${height / 3 - 15}`)
     .attr("class", "to-be-removed dot-product")
     .style("stroke", "black")
     .style("opacity", 0)
 
-    svg.append("text")
-    .attr("x",  (node.graphIndex - 1) * offset + 420)
-    .attr("class", "to-be-removed dot-product")
-    .attr("y", height / 3 - 30)
-    .text("Sigmoid")
-    .attr("fill", "grey")
-    .attr("font-size", "17")
-    .style("opacity", 0)
-    
+
+
+
 
 
     
@@ -669,8 +650,18 @@ export function linkPredOutputVisualizer(
 
     setTimeout(() => {
       d3.selectAll(".dot-product").style("opacity", 1)
-    }, 2000)
+      drawFunctionIcon([(node.graphIndex - 1) * offset + 455, height / 3 - 15], "./assets/SVGs/sigmoid.svg", "Sigmoid", "", "f(x) = 1/(1+e^(-x))", "Range: [0, 1]", svg);
+      d3.selectAll(".relu-icon").on("mouseover", function(event: any) {
+        const [x, y] = d3.pointer(event);
 
+        graphVisDrawActivationExplanation(
+            x, y, "Sigmoid",
+            "f(x) = 1/(1+e^(-x))", "Range: [0, 1]", svg
+        );
+    }).on("mouseout", function() {
+        d3.selectAll(".math-displayer").remove();
+    })
+    }, 2000)
 
 
   const g5 = svg
@@ -741,12 +732,10 @@ export function linkPredOutputVisualizer(
           d3.selectAll(".to-be-removed").remove();
   
           d3.selectAll(".graph-displayer").remove();
-          for (let i = 0; i < 4; i++) {colorSchemes[i].style.opacity = "1";}
-  
   
   
           moveFeaturesBack(node.relatedNodes, originalCoordinates);
-          handleClickEvent(originalSvg, node, event, moveOffset, colorSchemes, allNodes, convNum, mode, state)
+          handleClickEvent(originalSvg, node, event, moveOffset, allNodes, convNum, mode, state)
   
   
   })

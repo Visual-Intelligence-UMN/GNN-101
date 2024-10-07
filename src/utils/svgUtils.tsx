@@ -4,7 +4,7 @@ import { formulaClass, formulaTextClass } from "./const";
 import { drawHintLabel } from "./matHelperUtils";
 
 //a specific function for SVG injection for play-pause button
-export function injectPlayButtonSVG(btn:any, btnX: number, btnY: number, SVGPath:string){
+export function injectPlayButtonSVG(btn:any, btnX: number, btnY: number, SVGPath:string, drawLabel: boolean = true){
     btn.selectAll("*").remove();
     const textLabel = btn.append("g")
     d3.xml(SVGPath).then(function(data) {
@@ -19,7 +19,7 @@ export function injectPlayButtonSVG(btn:any, btnX: number, btnY: number, SVGPath
         });
     });
 
-    drawHintLabel(textLabel, btnX - 20, btnY - 5, "Matrix Multiplication", "procVis", "12px");
+    if(drawLabel)drawHintLabel(textLabel, btnX - 20, btnY - 5, "Matrix Multiplication", "procVis", "12px");
 }
 
 //a specific function for SVG injection for play-pause button for graph view
@@ -132,9 +132,6 @@ export function injectSVG(g:any, x: number, y: number, SVGPath:string, svgClass:
 
             // d3.selectAll(".bbox").style("pointer-events", "none");
       
-           
-
-
         }
 
         

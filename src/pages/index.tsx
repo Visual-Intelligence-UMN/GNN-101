@@ -26,6 +26,7 @@ import {
     ViewSwitch,
     NodeSelector,
     ArchitectureButtonChain,
+    ColorLegend,
 } from "../components/WebUtils";
 import { Footer, NavBar } from "../components/Surfaces";
 import { Inter } from "@next/font/google";
@@ -109,10 +110,15 @@ export default function Home() {
         }
     }
 
+    const zoomStyle = {
+        zoom: "70%"
+      };
+
 
     useEffect(() => {
-        (document.body.style as any).zoom = "70%";
+       // (document.body.style as any).zoom = "70%";
         //load resources
+        document.body.style.overflow = 'hidden';
     }, []);
 
     useEffect(() => {
@@ -140,7 +146,7 @@ export default function Home() {
 
 
     return (
-        <div >
+        <div style={zoomStyle}>
             <Steps
                 enabled={true}
                 steps={INTRO_STEPS}
@@ -389,6 +395,9 @@ export default function Home() {
                                                     "Change the view of GNN model"
                                                 }
                                             />
+                                        </div>
+                                        <div className="flex gap-x-4 colorLegend">
+                                            <ColorLegend />
                                         </div>
                                     </div>
                                 </div>

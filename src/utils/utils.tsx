@@ -549,7 +549,7 @@ export const state: State = {
 };
 
 
-export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffset: number, colorSchemes: any, allNodes: any[], convNum: number, mode: number, state: State, fcLayerMoveOffset: number = 600) {
+export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffset: number, allNodes: any[], convNum: number, mode: number, state: State, fcLayerMoveOffset: number = 600) {
 
     if (!svg.selectAll) {
         svg = d3.selectAll(svg)
@@ -564,10 +564,6 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
     if (movedNode && (!event.target.classList.contains("vis-component"))) {
         svg.selectAll(".vis-component").style("opacity", 0);
         let currMoveOffset = moveOffset;
-
-        for (let i = 0; i < colorSchemes.length; i++) {
-            colorSchemes[i].style.opacity = "1";
-        }
 
         if (mode === 0 && movedNode.graphIndex >= 4) {
             currMoveOffset = fcLayerMoveOffset;
@@ -603,16 +599,10 @@ export function featureVisualizer(
     firstLayerRectHeight: number,
     rectHeight: number,
     outputLayerRectHeight: number,
-    colorSchemes: any,
     mode: number,
     innerComputationMode: string,
 ) {
     state.isClicked = false;
-
-
-
-
-
 
     // 1. visualize feature
     // 2. handle interaction event
@@ -644,6 +634,7 @@ export function featureVisualizer(
             })
             allFeatureMap.push(featureMap)
         }
+        
 
     })
 
@@ -699,6 +690,7 @@ export function featureVisualizer(
             if (graphIndex === 0) {
                 currRectHeight = firstLayerRectHeight;
             }
+
 
 
             const features = node.features;
@@ -913,19 +905,13 @@ export function featureVisualizer(
 
                         //color schemes interaction logic
 
-                        for (let i = 0; i < colorSchemes.length; i++)colorSchemes[i].style.opacity = "0.5";
-
-
-                        colorSchemes[node.graphIndex].style.opacity = "1";
-                        colorSchemes[node.graphIndex - 1].style.opacity = "1";
-
                         hideAllLinks(allNodes);
 
 
                         if (mode === 1 && graphIndex === 4) {
-                            nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, svg, mode)
+                            nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, svg, mode)
                         } else {
-                            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, allFeatureMap, svg, offset, height, colorSchemes, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
+                            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, allFeatureMap, svg, offset, height, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
                         };
 
 
@@ -1089,11 +1075,11 @@ export function featureVisualizer(
                         } // to make sure relatedNodes is not null
                         showFeature(node);
                         if (node.graphIndex === 4) {
-                            fcLayerCalculationVisualizer(node, allNodes, relatedNodes, offset, height, currMoveOffset, node.graphIndex, g2, state, currRectHeight, colorSchemes, convNum, svg, mode);
+                            fcLayerCalculationVisualizer(node, allNodes, relatedNodes, offset, height, currMoveOffset, node.graphIndex, g2, state, currRectHeight, convNum, svg, mode);
                         }
                         if (node.graphIndex === 5) {
 
-                            outputVisualizer(node, allNodes, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, colorSchemes, convNum, svg, mode)
+                            outputVisualizer(node, allNodes, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, convNum, svg, mode)
                         }
 
                         reduceNodeOpacity(allNodes, relatedNodes, node);
@@ -1208,6 +1194,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
                     ${neighborNode.y + 10}
                   `)
                                 .style("stroke", linkStrength(avg))
+
                                 .style("stroke-width", 1)
                                 .style("opacity", 0)
                                 .style("fill", "none");
@@ -1243,6 +1230,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
                      ${nextNode.x + xOffsetNext - 16} ${nextNode.y + 10}`
                                 )
                                 .style("stroke-width", 1)
+    
                                 .style("opacity", 0)
                                 .style("stroke", linkStrength(avg))
                                 .style("fill", "none");
@@ -1278,6 +1266,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
                                         .attr("x2", nextNode.x + (graphIndex - 1.5) * offset)
                                         .attr("y2", nextNode.y + 10)
                                         .style("stroke", linkStrength(avg))
+                         
                                         .style("stroke-width", 1)
                                         .style("opacity", 0)
                                         .style("fill", "none");
@@ -1326,6 +1315,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
                             .style("stroke", linkStrength(avg))
                             .style("opacity", 0)
                             .style('stroke-width', 1)
+                    
                             .style("fill", "none");
 
 
@@ -1362,6 +1352,7 @@ export function connectCrossGraphNodes(nodes: any, svg: any, graphs: any[], offs
                             const path = svg.append("path")
                                 .attr("d", `M ${node.x + xOffset1} ${node.y + 10} Q ${controlX2} ${controlY2}, ${nextNode.x + xOffset2 - 20} ${centerY + 20}`)
                                 .style("stroke", linkStrength(avg))
+                
                                 .style("opacity", 0)
                                 .style('stroke-width', 1)
                                 .style("fill", "none");
