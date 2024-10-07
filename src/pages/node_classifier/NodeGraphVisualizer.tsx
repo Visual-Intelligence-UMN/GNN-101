@@ -27,7 +27,8 @@ interface NodeGraphVisualizerProps {
   selectedButtons: boolean[];
   simulationLoading: boolean;
   setSimulation: Function;
-  innerComputationMode: string
+  innerComputationMode: string,
+  onLoadComplete: () => void;
 }
 
 const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
@@ -38,7 +39,8 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
   selectedButtons,
   simulationLoading,
   setSimulation,
-  innerComputationMode
+  innerComputationMode,
+  onLoadComplete
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -396,10 +398,14 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
 
     const runVisualization = async () => {
       if ((intmData == null || changed) && !predicted) {
-        await visualizeGraph(graph_path,() => handleSimulationComplete(visualizationId), false, 1);
+        await visualizeGraph(graph_path,() => {
+          handleSimulationComplete(visualizationId)
+          onLoadComplete();
+        },false, 1);
       } else {
        await visualizeGNN(5);
        handleSimulationComplete(visualizationId);
+       onLoadComplete()
       }
     };
 

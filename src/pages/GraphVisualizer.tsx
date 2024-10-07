@@ -21,6 +21,7 @@ import { injectSVG } from "@/utils/svgUtils";
 
 
 interface GraphVisualizerProps {
+    onLoadComplete: () => void; 
     graph_path: string;
     intmData: null | any;
     changed: boolean;
@@ -32,6 +33,7 @@ interface GraphVisualizerProps {
 }
 
 const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
+    onLoadComplete,
     graph_path,
     intmData,
     changed,
@@ -473,10 +475,15 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
         const runVisualization = async () => {
             if ((intmData == null || changed) && !predicted) {
-                await visualizeGraph(graph_path, () => handleSimulationComplete(visualizationId), true, 0);
+                await visualizeGraph(graph_path, () => {
+                    handleSimulationComplete(visualizationId);
+                    onLoadComplete();
+                },
+                    true, 0);
             } else {
                 await visualizeGNN(4);
                 handleSimulationComplete(visualizationId);
+                onLoadComplete();
             }
         };
 
