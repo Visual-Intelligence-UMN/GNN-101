@@ -161,7 +161,7 @@ export default function Home() {
                 onExit={() => { }}
                 ref={introRef}
             />
-            {isLoading && <LoadingSpinner />}
+            {/* {isLoading && <LoadingSpinner />} */}
             <main className={inter.className}>
                 <div className={inter2.className}>
                     {step === 0 && (
