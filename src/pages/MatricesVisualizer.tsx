@@ -4,6 +4,7 @@ import { visualizeMatrix } from "../components/WebUtils";
 import { visualizeGraphClassifier } from "@/utils/matNNVis";
 
 interface MatricesVisualizerProps {
+    onLoadComplete: () => void;
     graph_path: string;
     intmData: any;
     changed: boolean;
@@ -16,7 +17,8 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
     intmData,
     changed,
     predicted,
-    selectedButtons
+    selectedButtons,
+    onLoadComplete
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -32,8 +34,10 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
     useEffect(() => {
         if ((intmData == null || changed) && !predicted) {
             visualizeMatrix(graph_path, true, 400);
+            onLoadComplete();
         } else {
             visualizeGraphClassifier(setIsLoading, graph_path, intmData);
+            onLoadComplete();
         }
 
     }, [graph_path, intmData, changed]);

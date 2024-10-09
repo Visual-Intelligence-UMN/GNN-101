@@ -9,6 +9,7 @@ interface NodeMatricesVisualizerProps {
     changed: boolean;
     predicted: boolean;
     selectedButtons: boolean[];
+    onLoadComplete: () => void;
 }
 
 const NodeMatricesVisualizer: React.FC<NodeMatricesVisualizerProps> = ({
@@ -17,6 +18,7 @@ const NodeMatricesVisualizer: React.FC<NodeMatricesVisualizerProps> = ({
     changed,
     predicted,
     selectedButtons,
+    onLoadComplete
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -32,8 +34,10 @@ const NodeMatricesVisualizer: React.FC<NodeMatricesVisualizerProps> = ({
     useEffect(() => {
         if ((intmData == null || changed) && !predicted) {
             visualizeMatrix(graph_path, false, 800);
+            onLoadComplete();
         } else {
            visualizeNodeClassifier(setIsLoading, graph_path, intmData);
+           onLoadComplete();
         }
 
     }, [graph_path, intmData, changed]);

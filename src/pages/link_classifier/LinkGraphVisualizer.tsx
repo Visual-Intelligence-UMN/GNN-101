@@ -36,6 +36,7 @@ interface LinkVisualizerProps {
     hubNodeA: number;
     hubNodeB: number;
     innerComputationMode: string;
+    onLoadComplete: () => void;
 }
 
 
@@ -49,7 +50,8 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
     setSimulation,
     hubNodeA,
     hubNodeB,
-    innerComputationMode
+    innerComputationMode,
+    onLoadComplete
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -473,10 +475,14 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
 
         const runVisualization = async () => {
             if ((intmData == null || changed) && !predicted) {
-                await visualizePartialGraph(graph_path, () => handleSimulationComplete(visualizationId), true, 2, hubNodeA, hubNodeB, innerComputationMode);
+                await visualizePartialGraph(graph_path, () => {
+                    handleSimulationComplete(visualizationId)
+                    onLoadComplete();
+                }, true, 2, hubNodeA, hubNodeB, innerComputationMode);
             } else {
                 await visualizeGNN();
                 handleSimulationComplete(visualizationId);
+                onLoadComplete();
             }
         };
 
@@ -495,6 +501,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
                 console.error("Error in visualizeGNN:", error);
             } finally {
                 setIsLoading(false);
+                onLoadComplete();
             }
         };
 
