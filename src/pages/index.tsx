@@ -54,7 +54,14 @@ export const inter3 = Inter({
     subsets: ["latin-ext"],
 });
 
+const LoadingSpinner = () => (
+    <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-white bg-opacity-75 z-50">
+      <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
+    </div>
+  );
+
 export default function Home() {
+    const [isLoading, setIsLoading] = useState(false);
     const [model, setModel] = useState("GCN - graph classification");
 
     const initialMUTAGGraph = Object.keys(graphList)[2];
@@ -154,6 +161,7 @@ export default function Home() {
                 onExit={() => { }}
                 ref={introRef}
             />
+            {/* {isLoading && <LoadingSpinner />} */}
             <main className={inter.className}>
                 <div className={inter2.className}>
                     {step === 0 && (
@@ -205,6 +213,7 @@ export default function Home() {
                                             <Selector
                                                 selectedOption={model}
                                                 handleChange={(e) => {
+                                                    // setIsLoading(true);
                                                     const newModel = e.target.value;
                                                     setModel(newModel);
                                                     setPredicted(false);
@@ -374,6 +383,7 @@ export default function Home() {
                                         <div className="flex gap-x-4">
                                             <ViewSwitch
                                                 handleChange={() => {
+                                                    setIsLoading(true);
                                                     setIsGraphView(!isGraphView);
                                                     setSimulation(false);
                                                     d3.select(document).on(
@@ -454,6 +464,7 @@ export default function Home() {
                                                     }
                                                     setSimulation={setSimulation}
                                                     innerComputationMode={modelType}
+                                                    onLoadComplete={() => setIsLoading(false)}
                                                 />
                                             </>
                                         ) : (
@@ -468,6 +479,7 @@ export default function Home() {
                                                     selectedButtons={
                                                         selectedButtons
                                                     }
+                                                   onLoadComplete={() => setIsLoading(false)}
                                                 />
                                             </>
                                         )
@@ -484,6 +496,7 @@ export default function Home() {
                                                 }
                                                 setSimulation={setSimulation}
                                                 innerComputationMode={modelType}
+                                                onLoadComplete={() => setIsLoading(false)}
                                             />
                                         ) : (
                                             <NodeMatricesVisualizer
@@ -492,6 +505,7 @@ export default function Home() {
                                                 changed={changedG}
                                                 predicted={predicted}
                                                 selectedButtons={selectedButtons}
+                                                onLoadComplete={() => setIsLoading(false)}
                                             />
                                         )
                                     ) : isGraphView ? (
@@ -506,6 +520,7 @@ export default function Home() {
                                             hubNodeA={hubNodeA}
                                             hubNodeB={hubNodeB}
                                             innerComputationMode={modelType}
+                                            onLoadComplete={() => setIsLoading(false)}
                                         />
                                     ) : (
                                         <LinkMatricesVisualizer
@@ -517,6 +532,7 @@ export default function Home() {
                                             hubNodeA={hubNodeA}
                                             hubNodeB={hubNodeB}
                                             innerComputationMode={modelType}
+                                            onLoadComplete={() => setIsLoading(false)}
                                         />
                                     )}
 
