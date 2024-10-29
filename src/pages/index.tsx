@@ -55,10 +55,11 @@ export const inter3 = Inter({
 });
 
 const LoadingSpinner = () => (
-    <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-white bg-opacity-75 z-50">
+    <div className="fixed top-0 left-0 w-full h-full flex flex-col items-center justify-center bg-white bg-opacity-75 z-50">
       <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
+      <p className="mt-4 text-gray-700 text-lg">Loading the visualization...</p>
     </div>
-  );
+  );  
 
 export default function Home() {
     const [isLoading, setIsLoading] = useState(false);
@@ -161,7 +162,7 @@ export default function Home() {
                 onExit={() => { }}
                 ref={introRef}
             />
-            {/* {isLoading && <LoadingSpinner />} */}
+            {isLoading && model.includes("link prediction") && <LoadingSpinner />}
             <main className={inter.className}>
                 <div className={inter2.className}>
                     {step === 0 && (
@@ -464,7 +465,11 @@ export default function Home() {
                                                     }
                                                     setSimulation={setSimulation}
                                                     innerComputationMode={modelType}
-                                                    onLoadComplete={() => setIsLoading(false)}
+                                                    onLoadComplete={() => {
+                                                        if (model.includes("link prediction")) {
+                                                            setIsLoading(false);
+                                                        }
+                                                    }}
                                                 />
                                             </>
                                         ) : (
