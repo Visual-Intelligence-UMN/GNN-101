@@ -201,6 +201,8 @@ export function outputVisualizer(
     setTimeout(() => {
         d3.select(".switchBtn").style("pointer-events", "auto");
         d3.select(".switchBtn").style("opacity", 1);
+        // d3.select(".exit-button")
+        // .style("background-color", "#4CAF50");
 
     }, 3000)
 
@@ -775,7 +777,7 @@ export function outputVisualizer(
 
 
     setTimeout(() => {
-        d3.select("#my_dataviz").on("click", function(event: any) {
+        d3.select(".exit-button").on("click", function(event: any) {
             d3.selectAll(".math-displayer").remove();
             d3.selectAll(".graph-displayer").remove();
          
@@ -845,6 +847,9 @@ export function calculationVisualizer(
     setTimeout(() => {
         d3.select(".switchBtn").style("pointer-events", "auto");
         d3.select(".switchBtn").style("opacity", 1);
+        // d3.select(".exit-button")
+        // .style("background-color", "#4CAF50");
+
 
     }, 5000)
 
@@ -1460,7 +1465,7 @@ export function calculationVisualizer(
                                     d3.selectAll(".e-displayer").remove()
                                     
                                     console.log("edisplayer clicked and not within #my_dataviz");
-                                    d3.select("#my_dataviz").on("click", function(event: any) {
+                                    d3.select(".exit-button").on("click", function(event: any) {
                                         if (!state.isClicked) {
                                             return;
                                         }
@@ -1470,6 +1475,11 @@ export function calculationVisualizer(
                                         d3.selectAll(".to-be-removed").remove();
                                         d3.selectAll(".columnGroup").remove();
                                         d3.selectAll(".columnUnit").remove();
+                                        d3.selectAll(".attention").attr("font-size", 15);
+                                        d3.selectAll(".button-group").raise()
+                          
+                                            d3.selectAll(".attn-displayer").remove();
+                                            d3.selectAll(".e-displayer").remove()
                                 
                                 
                                         state.isPlaying = false;
@@ -1837,7 +1847,7 @@ export function calculationVisualizer(
         if (!state.isClicked) {
             return;
         }
-        d3.select("#my_dataviz").on("click", function(event: any) {
+        d3.select(".exit-button").on("click", function(event: any) {
  
             if (!state.isClicked) {
                 return;
@@ -1849,6 +1859,8 @@ export function calculationVisualizer(
             d3.selectAll(".to-be-removed").remove();
             d3.selectAll(".columnGroup").remove();
             d3.selectAll(".columnUnit").remove();
+            d3.selectAll(".attn-displayer").remove();
+            d3.selectAll(".e-displayer").remove()
     
     
             state.isPlaying = false;
@@ -2411,6 +2423,8 @@ export function fcLayerCalculationVisualizer(
     setTimeout(() => {
         d3.select(".switchBtn").style("pointer-events", "auto");
         d3.select(".switchBtn").style("opacity", 1);
+        // d3.select(".exit-button")
+        // .style("background-color", "#4CAF50");
 
     }, 3000)
 
@@ -2548,7 +2562,7 @@ export function fcLayerCalculationVisualizer(
 
 
     setTimeout(() => {
-        d3.select("#my_dataviz").on("click", function(event: any) {
+        d3.select(".exit-button").on("click", function(event: any) {
             d3.selectAll(".math-displayer").remove();
             d3.selectAll(".graph-displayer").remove();
             
@@ -2714,6 +2728,8 @@ export function nodeOutputVisualizer(
     setTimeout(() => {
         d3.select(".switchBtn").style("pointer-events", "auto");
         d3.select(".switchBtn").style("opacity", 1);
+        // d3.select(".exit-button")
+        // .style("background-color", "#4CAF50");
 
     }, 3000)
 
@@ -3327,7 +3343,7 @@ export function nodeOutputVisualizer(
 
 
     setTimeout(() => {
-        d3.select("#my_dataviz").on("click", function(event: any) {
+        d3.select(".exit-button").on("click", function(event: any) {
             if (!state.isClicked) {
                 return;
             }

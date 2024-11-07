@@ -410,6 +410,16 @@ export default function Home() {
                                         <div className="flex gap-x-4 colorLegend">
                                             <ColorLegend />
                                         </div>
+                                        <button
+                                            className="exit-button"
+                                            onClick={() => {
+                            
+                                                console.log("Exiting detailed view");
+                                    
+                                            }}
+                                        >
+                                            Exit detailed view
+                                        </button>
                                     </div>
                                 </div>
 

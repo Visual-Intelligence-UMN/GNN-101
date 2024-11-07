@@ -64,8 +64,10 @@ export function linkPredFeatureVisualizer(
       d3.select(".switchBtn").style("pointer-events", "auto");
       d3.select(".switchBtn").style("opacity", 1);
 
-  }, 3000)
 
+  }, 3000)
+  d3.select(".exit-button")
+  .style("background-color", "gray");
 
 
   const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex); //somehow doesn't include the node in the last layer
@@ -721,7 +723,7 @@ export function linkPredOutputVisualizer(
           });
   }
   setTimeout(() => {
-    d3.select("#my_dataviz").on("click", function(event: any) {
+    d3.select(".exit-button").on("click", function(event: any) {
       d3.selectAll(".math-displayer").remove();
       d3.selectAll(".graph-displayer").remove();
    

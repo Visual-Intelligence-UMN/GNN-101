@@ -106,6 +106,20 @@ path {
   min-height: 100vh; /* Set the minimum height to 100% of the viewport height */
 }
 
+.exit-button {
+  background-color: #4CAF50;
+  color: white; 
+  padding: 10px 20px; 
+  font-size: 16px;
+  font-weight: bold; 
+  border: none; 
+  border-radius: 5px; 
+  cursor: pointer; 
+  transition: background-color 0.3s, box-shadow 0.3s; 
+}
+
+
+
 .sidebar {
   top: 0;
   position: relative;
