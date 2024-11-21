@@ -579,7 +579,9 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
         state.isPlaying = false;
 
 
-        d3.select(".exit-button").on("click", function (event: any) {
+        d3.selectAll(".exit-button").on("click", function (event: any) {
+        })
+        d3.selectAll("#my_dataviz").on("click", function(event: any) {
         })
 
     }

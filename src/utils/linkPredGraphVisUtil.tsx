@@ -4,7 +4,7 @@ import * as d3 from "d3";
 import { loadLinkWeights, loadNodeWeights, loadWeights } from "./matHelperUtils";
 import * as ort from "onnxruntime-web";
 import { env } from "onnxruntime-web";
-import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature, scaleFeatureGroup, nodeOutputVisualizer, pathColor, moveFeatures, moveFeaturesBack } from "@/utils/graphUtils";
+import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature, scaleFeatureGroup, nodeOutputVisualizer, pathColor, moveFeatures, moveFeaturesBack, addExitBtn, buildDetailedViewArea } from "@/utils/graphUtils";
 import { features, off } from 'process';
 
 import { IGraphData, IntmData, IntmDataLink, IntmDataNode } from "../types";
@@ -28,7 +28,7 @@ import { isValidNode } from "./GraphvislinkPredUtil";
 import { roundToTwo } from "@/components/WebUtils";
 import { graphVisDrawActivationExplanation, hoverOverHandler } from "./graphAnimationHelper";
 import { computeMatrixLocations, drawFunctionIcon, drawWeightMatrix } from "./matAnimateUtils";
-import math, { all, create } from "mathjs";
+
 
 
 export function linkPredFeatureVisualizer(
@@ -66,8 +66,7 @@ export function linkPredFeatureVisualizer(
 
 
   }, 3000)
-  d3.select(".exit-button")
-  .style("background-color", "gray");
+
 
 
   const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex); //somehow doesn't include the node in the last layer
@@ -652,6 +651,8 @@ export function linkPredOutputVisualizer(
 
     setTimeout(() => {
       d3.selectAll(".dot-product").style("opacity", 1)
+      buildDetailedViewArea((node.graphIndex - 1) * offset - 350, 0, 1000, 1000, svg)
+      addExitBtn((node.graphIndex - 1) * offset, height / 3 - 100, svg);
       drawFunctionIcon([(node.graphIndex - 1) * offset + 455, height / 3 - 15], "./assets/SVGs/sigmoid.svg", "Sigmoid", "", "f(x) = 1/(1+e^(-x))", "Range: [0, 1]", svg);
       d3.selectAll(".relu-icon").on("mouseover", function(event: any) {
         const [x, y] = d3.pointer(event);
@@ -723,7 +724,7 @@ export function linkPredOutputVisualizer(
           });
   }
   setTimeout(() => {
-    d3.select(".exit-button").on("click", function(event: any) {
+    d3.selectAll(".exit-button").on("click", function(event: any) {
       d3.selectAll(".math-displayer").remove();
       d3.selectAll(".graph-displayer").remove();
    
@@ -741,6 +742,25 @@ export function linkPredOutputVisualizer(
   
   
   })
+  d3.select("#my_dataviz").on("click", function (event: any) {
+    if (!d3.select(event.target).classed("click-blocker") && state.isClicked) {
+      d3.selectAll(".math-displayer").remove();
+      d3.selectAll(".graph-displayer").remove();
+   
+          d3.selectAll(".node-features-Copy").style("visibility", "hidden")
+     
+          d3.selectAll(".columnUnit").remove();
+          d3.selectAll(".procVis").remove();
+          d3.selectAll(".to-be-removed").remove();
+  
+          d3.selectAll(".graph-displayer").remove();
+  
+  
+          moveFeaturesBack(node.relatedNodes, originalCoordinates);
+          handleClickEvent(originalSvg, node, event, moveOffset, allNodes, convNum, mode, state)
+        
+        }
+    });
     
   }, 4000)
 
