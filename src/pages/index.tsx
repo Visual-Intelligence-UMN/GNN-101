@@ -81,7 +81,7 @@ export default function Home() {
 
     const [modelType, setModelType] = useState("GCN");
 
-    // Intermediate output
+// Intermediate output
     const [intmData, setIntmData] = useState<IntmData | IntmDataNode | null>(null);
     const [selectedButtons, setSelectedButtons] = useState([
         false,
@@ -379,7 +379,11 @@ export default function Home() {
                                                     className="matrix-view"
                                                     style={{
                                                         flex: 1,
-                                                        overflow: "auto",
+                                                        overflow: "visible",
+                                                        width: model !== "GCN - graph classification" ? "80%" : "auto",
+                                                        transform: model === "GCN - graph classification" ? "scale(1)" : "scale(0.6)",
+                                                        transformOrigin: "top left", 
+                                                        marginRight: model !== "GCN - graph classification" ? "-300px" : "0px", 
                                                     }}
                                                 >
                                                     {model == "GCN - graph classification" ? (
