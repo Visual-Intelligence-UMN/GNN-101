@@ -742,8 +742,20 @@ export function linkPredOutputVisualizer(
   
   
   })
+  d3.selectAll(".to-be-removed").on("click", (event) => {
+    event.stopPropagation(); 
+});
   d3.select("#my_dataviz").on("click", function (event: any) {
-    if (!d3.select(event.target).classed("click-blocker") && state.isClicked) {
+    const clickedElement = event.target; 
+    let isInToBeRemoved = false;
+    d3.selectAll(".to-be-removed").each(function () {
+      const element = this as Element;
+      if (element.contains(clickedElement)) {
+          isInToBeRemoved = true;
+      }
+  });
+
+    if (!d3.select(event.target).classed("click-blocker") && !isInToBeRemoved && state.isClicked) {
       d3.selectAll(".math-displayer").remove();
       d3.selectAll(".graph-displayer").remove();
    

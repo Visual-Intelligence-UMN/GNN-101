@@ -293,7 +293,7 @@ export function outputVisualizer(
     // }
 
 
-
+    buildDetailedViewArea(node.x - temp - 200, 0, 1000, 1000, svg)
     const calculatedFeatureGroup = svg
         .append("g")
         .attr("transform", `translate(${node.x - temp}, ${node.y})`);
@@ -342,7 +342,7 @@ export function outputVisualizer(
         if (!state.isClicked) {
             return;
         }
-        buildDetailedViewArea(endCoordList[0][0] - 350, 0, 1000, 1000, svg)
+      
         addExitBtn(endCoordList[0][0] - 350, endCoordList[0][1] - 100, svg);
         drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1], 1, rectHeight / 3, rectHeight / 3, node.features.length, [wMat], 0, myColor, svg, weightsLocation);
 
@@ -802,8 +802,20 @@ export function outputVisualizer(
     
     
         })
+        
+        d3.selectAll(".to-be-removed").on("click", (event) => {
+            event.stopPropagation();
+        });
         d3.select("#my_dataviz").on("click", function (event: any) {
-            if (!d3.select(event.target).classed("click-blocker") && state.isClicked) {
+            const clickedElement = event.target
+            let isInToBeRemoved = false;
+            d3.selectAll(".to-be-removed").each(function () {
+                const element = this as Element;
+                if (element.contains(clickedElement)) {
+                    isInToBeRemoved = true;
+                }
+            });
+            if (!d3.select(event.target).classed("click-blocker") && !isInToBeRemoved && state.isClicked) {
                 d3.selectAll(".math-displayer").remove();
                 d3.selectAll(".graph-displayer").remove();
              
@@ -922,7 +934,6 @@ export function calculationVisualizer(
     let currentWeights = weights[node.graphIndex - 1]
 
 
-
     d3.select(".switchBtn").style("pointer-events", "none");
     d3.select(".switchBtn").style("opacity", 0.3);
 
@@ -931,8 +942,6 @@ export function calculationVisualizer(
         d3.select(".switchBtn").style("opacity", 1);
         // d3.select(".exit-button")
         // .style("background-color", "#4CAF50");
-
-
     }, 5000)
 
     node.relatedNodes.forEach((n: any) => {
@@ -955,6 +964,7 @@ export function calculationVisualizer(
         );
 
     d3.selectAll(".to-be-removed").remove();
+    buildDetailedViewArea((node.graphIndex + 2.5) * offset, 0, 1000, 1000, g3)
 
 
 
@@ -1207,7 +1217,7 @@ export function calculationVisualizer(
         if (!state.isClicked) {
             return;
         }
-        buildDetailedViewArea(endCoordList[0][0] - 350, 0, 1000, 1000, svg)
+        
         addExitBtn(endCoordList[0][0] - 350, endCoordList[0][1] - 135, svg);
         drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1] + 20, -1, matrixRectSize, matrixRectSize, node.features.length, weights, node.graphIndex - 1, myColor, svg, weightsLocation)
         if (innerComputationMode === "GCN") {
@@ -1960,9 +1970,15 @@ export function calculationVisualizer(
             handleClickEvent(svg, node, event, moveOffset, allNodes, convNum, mode, state);
     
         }) 
-
+        d3.select(g3.node()).on("click", (event) => {
+            event.stopPropagation();
+        });
+        
     d3.select("#my_dataviz").on("click", function (event: any) {
-        if (!d3.select(event.target).classed("click-blocker") && state.isClicked) {
+        const clickedElement = event.target;
+
+        const isInGroup = g3.node().contains(clickedElement);
+        if (!d3.select(event.target).classed("click-blocker") && state.isClicked && !isInGroup) {
             console.log("Global click detected outside of detailed view.");
             d3.selectAll(".math-displayer").remove();
             d3.selectAll(".graph-displayer").remove();
@@ -2554,7 +2570,7 @@ export function fcLayerCalculationVisualizer(
     }, 3000)
     
     let originalCoordinates = moveFeatures(relatedNodes, moveToX, moveToY);
-    buildDetailedViewArea(moveToX, moveToY, 1000, 1000, svg)
+
 
     if (!svg.selectAll) {
         svg = d3.select(svg);
@@ -2943,7 +2959,7 @@ export function nodeOutputVisualizer(
     .style("opacity", 0)
     .text(`Initial Vector^T: 1x${node.relatedNodes[0].features.length}`);
 
-
+    buildDetailedViewArea((node.graphIndex - 2.5) * offset - 180, 0, 1000, 1000, svg)
     const calculatedFeatureGroup = svg
         .append("g")
         .attr("transform", `translate(${xPos - temp - moveOffset}, ${node.y})`);
@@ -2993,7 +3009,7 @@ export function nodeOutputVisualizer(
             return;
         }
         drawWeightMatrix(endCoordList[0][0] - 200, endCoordList[0][1], 1, 10, 10, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
-        buildDetailedViewArea(endCoordList[0][0] - 350, 0, 1000, 1000, svg)
+        
         addExitBtn(endCoordList[0][0] - 350, endCoordList[0][1] - 135, svg);
 
 
@@ -3523,8 +3539,21 @@ export function nodeOutputVisualizer(
         
     
         })
+        d3.selectAll(".to-be-removed").on("click", (event) => {
+            event.stopPropagation(); 
+        });
         d3.select("#my_dataviz").on("click", function (event: any) {
-            if (!d3.select(event.target).classed("click-blocker") && state.isClicked) {
+            const clickedElement = event.target; 
+            
+            let isInToBeRemoved = false;
+            d3.selectAll(".to-be-removed").each(function () {
+                const element = this as Element;
+                if (element.contains(clickedElement)) {
+                    isInToBeRemoved = true;
+                }
+            });
+        
+            if (!d3.select(event.target).classed("click-blocker") && !isInToBeRemoved && state.isClicked) {
                 d3.selectAll(".math-displayer").remove();
                 d3.selectAll(".graph-displayer").remove();
                         d3.selectAll(".node-features-Copy").style("opacity", "hidden");
