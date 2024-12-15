@@ -7,6 +7,7 @@ import NodeGraphVisualizer from "./node_classifier/NodeGraphVisualizer";
 import LinkMatricesVisualizer from "./link_classifier/LinkMatrixVisualizer";
 import LinkGraphVisualizer from "./link_classifier/LinkGraphVisualizer";
 import { IntmData, IntmDataNode } from "../types";
+import GraphMatrixVisualization from "../components/GraphMatrixVisualization";
 import {
     graphList,
     linkList,
@@ -288,7 +289,6 @@ export default function Home() {
                                             </div>
                                         </div>
                                     </div>
-
                                     {/* 在未预测时显示 Click to Predict 按钮 */}
                                     {!predicted && (
                                         <div>
@@ -318,6 +318,7 @@ export default function Home() {
                                                 Input Graph and Matrix View before prediction
                                             </h1>
 
+                                            {/* 新的可视化替换内容 */}
                                             <div
                                                 className={styles.vizContainer}
                                                 style={{
@@ -325,98 +326,24 @@ export default function Home() {
                                                     flexDirection: "row",
                                                 }}
                                             >
-                                                {/* Graph View */}
                                                 <div
-                                                    className="graph-view"
+                                                    className="new-visualization"
                                                     style={{
                                                         flex: 1,
                                                         overflow: "auto",
                                                     }}
                                                 >
-                                                    {model == "GCN - graph classification" ? (
-                                                        <GraphVisualizer
-                                                            graph_path={graphList[selectedGraph]}
-                                                            intmData={null}
-                                                            changed={changedG}
-                                                            predicted={false}
-                                                            selectedButtons={selectedButtons}
-                                                            simulationLoading={simulationLoading}
-                                                            setSimulation={setSimulation}
-                                                            innerComputationMode={modelType}
-                                                            onLoadComplete={() => { }}
-                                                        />
-                                                    ) : model == "GCN - node classification" ? (
-                                                        <NodeGraphVisualizer
-                                                            graph_path={nodeList[selectedGraph]}
-                                                            intmData={null}
-                                                            changed={changedG}
-                                                            predicted={false}
-                                                            selectedButtons={selectedButtons}
-                                                            simulationLoading={simulationLoading}
-                                                            setSimulation={setSimulation}
-                                                            innerComputationMode={modelType}
-                                                            onLoadComplete={() => { }}
-                                                        />
-                                                    ) : (
-                                                        <LinkGraphVisualizer
-                                                            graph_path={linkList[selectedGraph]}
-                                                            intmData={null}
-                                                            changed={changedG}
-                                                            predicted={false}
-                                                            selectedButtons={selectedButtons}
-                                                            simulationLoading={simulationLoading}
-                                                            setSimulation={setSimulation}
-                                                            hubNodeA={hubNodeA}
-                                                            hubNodeB={hubNodeB}
-                                                            innerComputationMode={modelType}
-                                                            onLoadComplete={() => { }}
-                                                        />
-                                                    )}
-                                                </div>
-
-                                                {/* Matrix View */}
-                                                <div
-                                                    className="matrix-view"
-                                                    style={{
-                                                        flex: 1,
-                                                        overflow: "visible",
-                                                        width: model !== "GCN - graph classification" ? "80%" : "auto",
-                                                        transform: model === "GCN - graph classification" ? "scale(1)" : "scale(0.6)",
-                                                        transformOrigin: "top left", 
-                                                        marginRight: model !== "GCN - graph classification" ? "-300px" : "0px", 
-                                                    }}
-                                                >
-                                                    {model == "GCN - graph classification" ? (
-                                                        <MatricesVisualizer
-                                                            graph_path={graphList[selectedGraph]}
-                                                            intmData={null}
-                                                            changed={changedG}
-                                                            predicted={false}
-                                                            selectedButtons={selectedButtons}
-                                                            onLoadComplete={() => { }}
-                                                        />
-                                                    ) : model == "GCN - node classification" ? (
-                                                        <NodeMatricesVisualizer
-                                                            graph_path={nodeList[selectedGraph]}
-                                                            intmData={null}
-                                                            changed={changedG}
-                                                            predicted={false}
-                                                            selectedButtons={selectedButtons}
-                                                            onLoadComplete={() => { }}
-                                                        />
-                                                    ) : (
-                                                        <LinkMatricesVisualizer
-                                                            graph_path={linkList[selectedGraph]}
-                                                            intmData={null}
-                                                            changed={changedG}
-                                                            predicted={false}
-                                                            selectedButtons={selectedButtons}
-                                                            hubNodeA={hubNodeA}
-                                                            hubNodeB={hubNodeB}
-                                                            innerComputationMode={modelType}
-                                                            onLoadComplete={() => { }}
-                                                        />
-                                                    )}
+                                                    <GraphMatrixVisualization
+                                                        dataFile={
+                                                            model.includes("graph classification")
+                                                                ? graphList[selectedGraph]
+                                                                : model.includes("node classification")
+                                                                ? nodeList[selectedGraph]
+                                                                : model.includes("link prediction")
+                                                                ? linkList[selectedGraph]
+                                                                : ""
+                                                        }
+                                                    />
                                                 </div>
                                             </div>
                                         </div>

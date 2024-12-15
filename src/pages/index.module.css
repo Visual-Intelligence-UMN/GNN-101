@@ -14,3 +14,23 @@
   overflow: auto;
 }
 
+.node {
+    cursor: pointer;
+    transition: fill 0.2s;
+}
+
+.node-label {
+    font-size: 12px;
+    pointer-events: none;
+    text-anchor: middle;
+}
+
+.link {
+    transition: stroke 0.2s, stroke-width 0.2s;
+}
+
+.matrix-cell {
+    cursor: pointer;
+    transition: fill 0.2s;
+}
+
