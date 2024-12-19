@@ -42,6 +42,7 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ dat
       stroke: #aaa;
       stroke-width: 1px;
       stroke-opacity: 0.6;
+      cursor: pointer;
     }
     .link.highlighted {
       stroke: #006d5b; /* 深绿色高亮 */
@@ -67,9 +68,7 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ dat
     .axis-label {
       font-size: 8px;
     }
-`;
-
-
+  `;
 
   useEffect(() => {
     const loadData = async () => {
@@ -85,10 +84,9 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ dat
     const createVisualization = (data: any) => {
       if (!containerRef.current) return;
 
-      // 增加视图大小
       const width = 800;
       const height = 700;
-      const padding = 60; // 增加边距以容纳标签
+      const padding = 60; 
 
       d3.select(containerRef.current).selectAll("*").remove();
 
@@ -169,7 +167,6 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ dat
         return acc;
       }, []);
 
-      // 调整力导向图参数
       const simulation = d3.forceSimulation(nodes)
         .force("link", d3.forceLink(filteredLinks)
           .id((d: any) => d.id)
@@ -192,7 +189,6 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ dat
         .enter()
         .append("g");
 
-      // 减小节点大小
       const graphNodes = nodeGroups
         .append("circle")
         .attr("class", "node")
@@ -216,7 +212,6 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ dat
         }
       });
 
-      // 调整矩阵单元格大小
       const cellSize = Math.min(
         (width - 2 * padding) / numNodes,
         (height - 2 * padding) / numNodes
@@ -275,31 +270,41 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ dat
       });
 
       const highlightConnection = (event: any, d: any) => {
-        const nodeId = d.id;
-        const connectedLinks = filteredLinks.filter((l: any) =>
-          l.source.id === nodeId || l.target.id === nodeId
-        );
-        
-        const connectedNodes = new Set();
-        connectedLinks.forEach((l: any) => {
-          connectedNodes.add(l.source.id);
-          connectedNodes.add(l.target.id);
-        });
-
-        graphNodes.classed("highlighted", (n: any) => connectedNodes.has(n.id));
-        graphLinks.classed("highlighted", (l: any) =>
-          connectedNodes.has(l.source.id) && connectedNodes.has(l.target.id)
-        );
-
-        matrixCells.classed("highlighted", (cell: any) => {
-          const sourceNode = nodes[cell.i];
-          const targetNode = nodes[cell.j];
-          return cell.value === 1 && (
-            (sourceNode.id === nodeId && connectedNodes.has(targetNode.id)) ||
-            (targetNode.id === nodeId && connectedNodes.has(sourceNode.id))
+        const isGraphNodeHover = event.currentTarget.tagName === "circle"; 
+        const isGraphEdgeHover = event.currentTarget.tagName === "line";   
+      
+        if (isGraphNodeHover) {
+          const nodeId = d.id;
+      
+          graphNodes.classed("highlighted", (n: any) => n.id === nodeId);
+          graphLinks.classed("highlighted", false); 
+      
+          matrixCells.classed("highlighted", (cell: any) => {
+            const columnIndex = nodes.findIndex((n: any) => n.id === nodeId);
+            return cell.i === columnIndex || cell.j === columnIndex;
+          });
+        } else if (isGraphEdgeHover) {
+          const sourceId = d.source.id;
+          const targetId = d.target.id;
+      
+          graphLinks.classed("highlighted", (l: any) =>
+            l.source.id === sourceId && l.target.id === targetId
           );
-        });
-      };
+      
+          graphNodes.classed("highlighted", (n: any) =>
+            n.id === sourceId || n.id === targetId
+          );
+      
+          matrixCells.classed("highlighted", (cell: any) => {
+            const sourceIndex = nodes.findIndex((n: any) => n.id === sourceId);
+            const targetIndex = nodes.findIndex((n: any) => n.id === targetId);
+            return (
+              (cell.i === sourceIndex && cell.j === targetIndex) ||
+              (cell.i === targetIndex && cell.j === sourceIndex)
+            );
+          });
+        }
+      };      
 
       const highlightMatrixCell = (event: any, d: any) => {
         if (d.value === 0) return;
@@ -329,6 +334,10 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ dat
       };
 
       graphNodes.on("mouseover", highlightConnection)
+        .on("mouseout", unhighlightAll);
+
+      // 为边增加事件监听
+      graphLinks.on("mouseover", highlightConnection)
         .on("mouseout", unhighlightAll);
 
       matrixCells.on("mouseover", highlightMatrixCell)
