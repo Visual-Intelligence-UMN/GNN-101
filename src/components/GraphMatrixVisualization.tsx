@@ -34,8 +34,8 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ dat
       cursor: pointer;
     }
     .node.highlighted {
-      fill: #006d5b; /* 更深的绿色填充 */
-      stroke: #004f41; /* 深绿色边框 */
+      fill: #006d5b; 
+      stroke: #004f41; 
       stroke-width: 2px;
     }
     .link {
@@ -45,7 +45,7 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ dat
       cursor: pointer;
     }
     .link.highlighted {
-      stroke: #006d5b; /* 深绿色高亮 */
+      stroke: #006d5b; 
       stroke-width: 2px;
       stroke-opacity: 1;
     }
@@ -55,8 +55,8 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ dat
       cursor: pointer;
     }
     .matrix-cell.highlighted {
-      fill: #006d5b !important; /* 深绿色填充 */
-      stroke: #004f41; /* 深绿色边框 */
+      fill: #006d5b !important;
+      stroke: #004f41;
       stroke-width: 1px;
     }
     .node-label {
@@ -66,7 +66,7 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ dat
       dominant-baseline: middle;
     }
     .axis-label {
-      font-size: 8px;
+      font-size: 11px;
     }
   `;
 
