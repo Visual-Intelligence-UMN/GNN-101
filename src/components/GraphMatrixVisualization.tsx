@@ -17,13 +17,10 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ dat
   const styles = `
     .container {
       display: flex;
-      justify-content: space-between;
       gap: 20px;
       padding: 20px;
-      min-height: 700px;
     }
     .view {
-      flex: 1;
       border: 1px solid #ccc;
       padding: 10px;
     }
@@ -102,7 +99,7 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ dat
         .attr("id", "chart2")
         .attr("class", "view");
 
-      const graphSvg = graphDiv.append("svg")
+      const graphSvgRoot = graphDiv.append("svg")
         .attr("width", width)
         .attr("height", height)
         .style("display", "block")
@@ -146,6 +143,14 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ dat
           y: undefined
         };
       });
+
+      const graphSvg = graphSvgRoot.append("g");
+
+    // 放大比例
+    const scaleFactor = 1.4;
+    const centerX = (width - 2 * padding) / 2;
+    const centerY = (height - 2 * padding) / 2;
+    graphSvg.attr("transform", `translate(${padding + centerX * (1 - scaleFactor)},${padding + centerY * (1 - scaleFactor)}) scale(${scaleFactor})`);
 
       const filteredLinks = data.edge_index[0].reduce((acc: any[], source: number, i: number) => {
         const target = data.edge_index[1][i];
@@ -212,10 +217,10 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ dat
         }
       });
 
-      const cellSize = Math.min(
+      let cellSize = Math.min(
         (width - 2 * padding) / numNodes,
         (height - 2 * padding) / numNodes
-      );
+      ) * 0.9;
 
       const matrixG = matrixSvg.append("g");
 
