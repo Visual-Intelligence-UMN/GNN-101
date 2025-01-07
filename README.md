@@ -1,5 +1,7 @@
 # GNN101: Visual Learning of Graph Neural Networks in Your Web Browser 
 
+![githubPre-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/799cc2e1-7443-4d53-ac89-f1d62ed813df)
+
 ## Team Members
 
 Yilin Lu, Chongwei Chen, Kexin Huang, Marinka Zitnik, Qianwen Wang
