@@ -343,6 +343,9 @@ export default function Home() {
                                                                 ? linkList[selectedGraph]
                                                                 : ""
                                                         }
+                                                        hubNodeA={model.includes('link prediction') ? hubNodeA : undefined}
+                                                        hubNodeB={model.includes('link prediction') ? hubNodeB : undefined}
+                                                        modelType={model}
                                                     />
                                                 </div>
                                             </div>

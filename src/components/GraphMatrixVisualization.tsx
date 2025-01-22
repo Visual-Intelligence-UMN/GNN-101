@@ -3,15 +3,21 @@ import * as d3 from 'd3';
 
 interface GraphMatrixVisualizationProps {
   dataFile: string;
+  hubNodeA?: number;
+  hubNodeB?: number;
+  modelType?: string;
 }
-
-const SELECTED_NODES = [194, 497, 567, 590, 1147, 1169, 1588, 1882, 1906, 2369, 2779, 3649, 3728, 3797, 4591, 4990, 5117, 6509];
 
 const elementMap = {
   0: 'C', 1: 'N', 2: 'O', 3: 'F', 4: 'H', 5: 'S', 6: 'Cl'
 };
 
-const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ dataFile }) => {
+const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ 
+  dataFile, 
+  hubNodeA, 
+  hubNodeB,
+  modelType 
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const styles = `
@@ -116,8 +122,31 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ dat
       const isTwitchData = dataFile.includes('twitch.json');
       
       let processedNodes;
-      if (isTwitchData) {
-        processedNodes = SELECTED_NODES;
+      if (isTwitchData && (modelType?.includes('link prediction'))) {
+        const subgraphNodes = new Set<number>();
+        
+        console.log("Selected nodes:", hubNodeA, hubNodeB);
+        
+        if (hubNodeA !== undefined) subgraphNodes.add(hubNodeA);
+        if (hubNodeB !== undefined) subgraphNodes.add(hubNodeB);
+        
+        if (data.edge_index) {
+          console.log("Processing edge_index to find neighbors");
+          for (let i = 0; i < data.edge_index[0].length; i++) {
+            const source = data.edge_index[0][i];
+            const target = data.edge_index[1][i];
+            
+            if (source === hubNodeA || source === hubNodeB) {
+              subgraphNodes.add(target);
+            }
+            if (target === hubNodeA || target === hubNodeB) {
+              subgraphNodes.add(source);
+            }
+          }
+        }
+        
+        processedNodes = Array.from(subgraphNodes).sort((a, b) => a - b);
+        console.log("Final processed nodes:", processedNodes);
       } else {
         processedNodes = data.x.map((_: any, i: number) => i);
       }
@@ -154,8 +183,8 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ dat
 
       const filteredLinks = data.edge_index[0].reduce((acc: any[], source: number, i: number) => {
         const target = data.edge_index[1][i];
-        if (isTwitchData) {
-          if (SELECTED_NODES.includes(source) && SELECTED_NODES.includes(target)) {
+        if (isTwitchData && modelType?.includes('link prediction')) {
+          if (processedNodes.includes(source) && processedNodes.includes(target)) {
             acc.push({
               source,
               target,
@@ -171,6 +200,9 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ dat
         }
         return acc;
       }, []);
+
+      console.log("Processed Nodes:", processedNodes);
+      console.log("Filtered Links:", filteredLinks);
 
       const simulation = d3.forceSimulation(nodes)
         .force("link", d3.forceLink(filteredLinks)
@@ -350,7 +382,7 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ dat
     };
 
     loadData();
-  }, [dataFile]);
+  }, [dataFile, hubNodeA, hubNodeB, modelType]);
 
   return (
     <>

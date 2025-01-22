@@ -26,6 +26,7 @@ import {
 } from "../utils/matHelperUtils";
 
 import { Tooltip } from "react-tooltip";
+import { twitchNodeSelectionList } from "@/utils/const";
 
 
 
@@ -51,6 +52,8 @@ export const NodeSelector: React.FC<{
     nodeList: number[], selectedNode: number, dependNode: number, setSelectedNode: Function,
     handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 }> = ({ nodeList, selectedNode, dependNode, setSelectedNode, handleChange }) => {
+    const displayNodeList = twitchNodeSelectionList;
+
     return (
         <select
             className="text-2xl rounded-md px-3 shadow-none border-solid border-gray-200 border-2 min-w-35 bg-white text-gray-600"
@@ -64,9 +67,9 @@ export const NodeSelector: React.FC<{
                 }
             }}
         >
-            {nodeList.map((item, index) => (
-                <option key={index} value={item}>
-                    {item}
+            {displayNodeList.map((node) => (
+                <option key={node} value={node}>
+                    {node}
                 </option>
             ))}
         </select>
