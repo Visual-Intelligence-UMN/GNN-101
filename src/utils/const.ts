@@ -54,6 +54,12 @@ export const formulaTextClass: { [k: string]: string[]} = {
   "formula_activation": ["reluText"]
 }
 
+export const twitchNodeSelectionList = [
+  194, 497, 567, 590, 1147, 1169, 1588, 1882, 
+  1906, 2369, 2779, 3649, 3728, 3797, 4591, 
+  4990, 5117, 6509
+];
+
 export const nodeSelectionList = [
   148, 407, 79, 116, 994, 632, 71, 110, 420, 772, 394, 109, 241, 471
 ];

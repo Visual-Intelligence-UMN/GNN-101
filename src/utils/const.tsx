@@ -30,7 +30,11 @@ export const midGraphNodeSelectionList = [
     317, 784, 203, 651, 50, 70, 297, 696, 623, 590, 194
 ];
 
-
+export const twitchNodeSelectionList = [
+    194, 497, 567, 590, 1147, 1169, 1588, 1882, 
+    1906, 2369, 2779, 3649, 3728, 3797, 4591, 
+    4990, 5117, 6509
+];
 
 export const nodeList: { [k: string]: string } = {
     karate: "./json_data/nodes/karate_dataset1.json",
