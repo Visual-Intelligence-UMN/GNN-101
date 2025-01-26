@@ -579,7 +579,9 @@ export function handleClickEvent(svg: any, movedNode: any, event: any, moveOffse
         state.isPlaying = false;
 
 
-        d3.select("#my_dataviz").on("click", function (event: any) {
+        d3.selectAll(".exit-button").on("click", function (event: any) {
+        })
+        d3.selectAll("#my_dataviz").on("click", function(event: any) {
         })
 
     }
@@ -603,6 +605,7 @@ export function featureVisualizer(
     innerComputationMode: string,
 ) {
     state.isClicked = false;
+
 
     // 1. visualize feature
     // 2. handle interaction event
