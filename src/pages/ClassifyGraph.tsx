@@ -14,6 +14,7 @@ interface ClassifyGraphProps {
     setProbabilities: (prob: number[] | number[][]) => void;
     onlyShownButton?: boolean;
     simulationLoading: boolean;
+    setIsLoading: (loading: boolean) => void;
 }
 
 // parameter will be the user input for json file
@@ -28,41 +29,47 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
     setProbabilities,
     onlyShownButton = false,
     simulationLoading,
+    setIsLoading
 }) => {
     let prob: number[] | number[][] = [];
     const classifyGraph = async () => {
-        setPredicted(true);
+        try {
+            setIsLoading(true); // 开始加载
+            setPredicted(true);
 
         //	const { prob, intmData } = await graphPrediction(modelPath, graphPath);
 
 
-        let intmData: IntmData | IntmDataNode | IntmDataLink;
+            let intmData: IntmData | IntmDataNode | IntmDataLink;
+            let prob: number[] | number[][] = [];
 
-        if (modelPath == "./gnn_node_model.onnx")
-            ({ prob, intmData } = await nodePrediction(modelPath, graphPath));
-        else if (modelPath == "./gnn_model2.onnx")
-            ({ prob, intmData } = await graphPrediction(modelPath, graphPath));
-        else
-            ({ prob, intmData } = await linkPrediction(
-                modelPath,
-                "./json_data/links/twitch.json"
-            ));
-
-        setChangedG(false);
-        setIntmData(intmData);
-
-
-
-        if (Array.isArray(prob[0])) {
-            setProbabilities(prob as number[][]);
-            console.log("prob 1", probabilities);
-        } else {
-            setProbabilities(prob as number[]);
-            console.log("prob 2", probabilities);
+            if (modelPath == "./gnn_node_model.onnx") {
+                ({ prob, intmData } = await nodePrediction(modelPath, graphPath));
+            } else if (modelPath == "./gnn_model2.onnx") {
+                ({ prob, intmData } = await graphPrediction(modelPath, graphPath));
+            } else {
+                ({ prob, intmData } = await linkPrediction(
+                    modelPath,
+                    "./json_data/links/twitch.json"
+                ));
+            }
+    
+            setChangedG(false);
+            setIntmData(intmData);
+    
+            if (Array.isArray(prob[0])) {
+                setProbabilities(prob as number[][]);
+            } else {
+                setProbabilities(prob as number[]);
+            }
+    
+            console.log("Prediction results:", prob);
+        } catch (error) {
+            console.error("Prediction error:", error);
+        } finally {
+            setIsLoading(false); // 加载完成
         }
-        console.log("check in prediction", prob, probabilities);
-    };
-
+    };    
     const prediction = !predicted ? (
         onlyShownButton ? (
             <button

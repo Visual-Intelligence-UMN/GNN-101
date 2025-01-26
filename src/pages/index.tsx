@@ -307,6 +307,7 @@ export default function Home() {
                                                 setProbabilities={setProbabilities}
                                                 onlyShownButton={true}
                                                 simulationLoading={simulationLoading}
+                                                setIsLoading={setIsLoading}
                                             />
                                         </div>
                                     )}
@@ -314,10 +315,6 @@ export default function Home() {
                                     {/* 在未预测时显示 Graph View 和 Matrix View */}
                                     {!predicted && (
                                         <div>
-                                            <h1 className="text-4xl text-gray-500 bg-white mt-10">
-                                                Input Graph and Matrix View before prediction
-                                            </h1>
-
                                             {/* 新的可视化替换内容 */}
                                             <div
                                                 className={styles.vizContainer}
