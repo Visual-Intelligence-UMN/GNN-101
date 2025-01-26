@@ -1042,26 +1042,7 @@ export function calculationVisualizer(
         .attr("class", "aggregatedFeatureGroup to-be-removed procVis")
         .style("stroke", "grey")
         .style("opacity", 0)
-        .on("mouseover", function (this: any, event: any, d: any) {
-            const rect = this.getBoundingClientRect(); 
-    
-            d3.select("body")
-                .append("div")
-                .attr("class", "tooltip phase1")
-                .style("position", "absolute")
-                .style("left", `${rect.left + rect.width / 2}px`) 
-                .style("top", `${rect.top - 35}px`) 
-                .style("transform", "translateX(-50%)") 
-                .style("background-color", "white")
-                .style("border", "1px solid grey")
-                .style("padding", "5px")
-                .style("font-size", "12px")
-                .style("pointer-events", "none")
-                .text(`Value: ${roundToTwo(d)}`);
-        })
-        .on("mouseout", function () {
-            d3.select(".tooltip").remove(); 
-        });
+        
     
 
     //draw label
@@ -1796,7 +1777,7 @@ export function calculationVisualizer(
             d3.selectAll(".intermediate-path").attr("opacity", 0)     
             clearInterval(intervalID)  
     } 
-            
+    
     }, 4500);
     const displayer = g4
     .append("rect")
@@ -1812,7 +1793,7 @@ export function calculationVisualizer(
     .attr("class", "graph-displayer")
     .attr("opacity", 0)
 
-    hoverOverHandler(node, aggregatedData, calculatedData, state, g4, displayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, weights, node.graphIndex - 1, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, false)
+
     d3.selectAll(".displayer_group").attr("transform", `translate(${3.5 * offset + temp +
         node.relatedNodes[0].features.length * 2 * prevRectHeight +
         100}, ${height / 5 - 80}) scale(1.5)`);
@@ -1991,6 +1972,7 @@ export function calculationVisualizer(
 
         const isInGroup = g3.node().contains(clickedElement);
         const isProcvis = d3.select(event.target).classed("to-be-removed")
+        console.log("procvis", isProcvis)
         if (!d3.select(event.target).classed("click-blocker") && state.isClicked && !isInGroup && !isProcvis) {
             console.log("Global click detected outside of detailed view.");
             d3.selectAll(".math-displayer").remove();
@@ -2038,7 +2020,7 @@ export function calculationVisualizer(
     
         
     
-
+        hoverOverHandler(node, aggregatedData, calculatedData, state, g4, displayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, weights, node.graphIndex - 1, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, false)          
     }, 6500)
     
 }
