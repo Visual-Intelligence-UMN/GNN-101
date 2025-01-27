@@ -363,12 +363,52 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
           (l.source.id === targetNode.id && l.target.id === sourceNode.id)
         );
       };
+      const highlightMatrixLabel = (index: number) => {
+        // 高亮矩阵中，第 i 行或第 i 列的 cell
+        matrixCells.classed("highlighted", (cellData: any) => {
+          return cellData.i === index || cellData.j === index;
+        });
+        const nodeId = nodes[index].id;
+        graphNodes.classed("highlighted", (node: any) => node.id === nodeId);
+      };
 
       const unhighlightAll = () => {
         graphNodes.classed("highlighted", false);
         graphLinks.classed("highlighted", false);
         matrixCells.classed("highlighted", false);
       };
+      matrixSvg.append("g")
+      .selectAll("text")
+      .data(nodes)
+      .enter()
+      .append("text")
+      .attr("class", "axis-label")
+      .attr("x", (d: any, i: number) => i * cellSize + cellSize / 2)
+      .attr("y", -5)
+      .attr("text-anchor", "middle")
+      .text((d: any) => d.id)
+      .on("mouseover", function (event, d) {
+        const index = nodes.indexOf(d);   
+        highlightMatrixLabel(index);
+      })
+      .on("mouseout", unhighlightAll);
+
+      matrixSvg.append("g")
+      .selectAll("text")
+      .data(nodes)
+      .enter()
+      .append("text")
+      .attr("class", "axis-label")
+      .attr("x", -5)
+      .attr("y", (d: any, i: number) => i * cellSize + cellSize / 2)
+      .attr("text-anchor", "end")
+      .attr("dominant-baseline", "middle")
+      .text((d: any) => d.id)
+      .on("mouseover", function (event, d) {
+        const index = nodes.indexOf(d);   
+        highlightMatrixLabel(index);
+      })
+      .on("mouseout", unhighlightAll);
 
       graphNodes.on("mouseover", highlightConnection)
         .on("mouseout", unhighlightAll);
