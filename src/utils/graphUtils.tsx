@@ -894,7 +894,7 @@ export function addExitBtn(x: number, y: number, svg: any) {
 
 }
 
-export function buildDetailedViewArea(x: number, y: number, weight: number, height: number, svg: any) {
+export function buildDetailedViewArea(x: number, y: number, width: number, height: number, svg: any) {
     if (!svg.selectAll){
         svg = d3.select(svg)
     }
@@ -904,7 +904,7 @@ export function buildDetailedViewArea(x: number, y: number, weight: number, heig
     .attr("class", "click-blocker to-be-removed")
     .attr("x", x) 
     .attr("y", y) 
-    .attr("width", weight) 
+    .attr("width", width) 
     .attr("height", height) 
     .style("fill", "transparent") 
     .style("pointer-events", "all") 
