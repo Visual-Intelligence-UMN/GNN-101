@@ -438,6 +438,7 @@ export function featureVisClick(
         //display pre layer
         let cur = neighbors[i];
         featureVisTable[layerID][cur].style.opacity = "1";
+        console.log("FeatureVisTable Element:", featureVisTable[layerID][cur]);
 
         d3.select(featureVisTable[layerID][cur]).classed("cant-remove inputFeature", true);
 
@@ -496,6 +497,7 @@ export function featureVisClick(
         let node_i = node;
         let node_j = adjList[node_i][i];
         let mulV = 1 / Math.sqrt(dList[node_i] * dList[node_j]);
+        console.log(`@@@@ Node ${node_i} to ${node_j} multiplier value:`, mulV);
         mulValues.push(mulV);
         //compute x'
 
@@ -661,7 +663,107 @@ export function featureVisClick(
 
     let animateSeqAfterPath: any = [
         {func: () => {
-            drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir)
+            drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir,adjList,   // ✅ 传递 adjList
+                dList,     // ✅ 传递 dList
+                featuresTable, // ✅ 传递 featuresTable
+                layerID,   // ✅ 传递 layerID
+                node)
+            
+            // 为所有连线添加类名
+            d3.selectAll("#procPath")
+                .attr("class", "procVis summation connection-path");
+            
+            // 直接为输入特征添加交互
+            d3.selectAll(".inputFeature")
+                .style("pointer-events", "all")
+                .style("cursor", "pointer")
+                .on("mouseover", function(event, d) {
+                    if (!lock) return;
+                    
+                    event.stopPropagation();
+                    const nodeIndex = Number(d3.select(this).attr("node"));
+                    
+                    // 找到当前节点在 adjList[node] 中的索引
+                    const index = adjList[node].indexOf(nodeIndex);
+                    // 使用索引获取对应的 multiplier value
+                    const mulV = mulValues[index];
+                    
+                    if (mulV === undefined) return; // 如果找不到对应的值就返回
+                    
+                    // 移除已存在的弹框
+                    d3.selectAll(".multiplier-tooltip").remove();
+                    
+                    // 创建弹框
+                    const tooltip = d3.select(".mats")
+                        .append("g")
+                        .attr("class", "multiplier-tooltip procVis");
+                    
+                    // 获取鼠标位置
+                    const [x, y] = d3.pointer(event);
+                    
+                    // 添加弹框背景
+                    tooltip.append("rect")
+                        .attr("x", x + 10)
+                        .attr("y", y - 40)
+                        .attr("width", 200)
+                        .attr("height", 30)
+                        .attr("rx", 5)
+                        .attr("ry", 5)
+                        .style("fill", "white")
+                        .style("stroke", "black");
+                    
+                    // 添加文本
+                    tooltip.append("text")
+                        .attr("x", x + 20)
+                        .attr("y", y - 20)
+                        .text(() => {
+                            // 先获取当前的 node_j
+                            let node_j = Number(d3.select(this).attr("node")); 
+                            let featureVector = featuresTable[layerID][node_j]; 
+
+
+                            if (featureVector) {
+                                return `Value = [${featureVector.map((v: number) => v.toFixed(0)).join(", ")}]`;
+                            } else {
+                                return `Value = [Error: No data]`; // 防止 undefined 错误
+                            }
+                        })
+                        .style("font-size", "12px");
+
+                    
+                    // 高亮当前输入特征
+                    d3.select(this)
+                        .style("stroke", "black")
+                        .style("stroke-width", "2px")
+                        .raise();
+                        
+                    // 高亮相关的连线
+                    d3.selectAll(".connection-path")
+                        .filter(function() {
+                            return Number(d3.select(this).attr("node")) === nodeIndex;
+                        })
+                        .style("stroke-width", "5px")
+                        .raise();
+                })
+                .on("mouseout", function(event, d) {
+                    if (!lock) return;
+                    
+                    event.stopPropagation();
+                    // 移除弹框
+                    d3.selectAll(".multiplier-tooltip").remove();
+                    
+                    // 移除高亮效果
+                    d3.select(this)
+                        .style("stroke", "none")
+                        .style("stroke-width", "0px");
+                        
+                    // 恢复连线样式
+                    d3.selectAll(".connection-path")
+                        .style("stroke-width", "1px");
+                });
+            
+            // 确保连线在输入特征下方
+            d3.selectAll(".connection-path").lower();
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
             console.log("switchbtn", d3.select("div.switchBtn"));
@@ -678,7 +780,9 @@ export function featureVisClick(
                 "./assets/SVGs/matmul.svg",
                 drawLabel
             );
-            //drawHintLabel(g, btnX, btnY - 36, "Click for Animation", "procVis");
+            const hintLabel = drawHintLabel(g, btnX, btnY - 36, "Click for Animation", "procVis");
+            
+            
 
             
             
