@@ -283,7 +283,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
             .attr("x", 70 - 40)
             .attr("y", displayHeight - 10)
             .attr("xml:space", "preserve")
-            .text("=      x       +      x        ···  =     ")
+            .text("=      x       +      x       ···   =     ")
             .attr("class", "math-displayer")
             .attr("font-size", "15");
     } else {
@@ -291,7 +291,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
             .attr("x", 70 - 40)
             .attr("y", displayHeight - 10)
             .attr("xml:space", "preserve")
-            .text("=      x       +      x        ···  =     ")
+            .text("=      x       +      x       ···   =     ")
             .attr("class", "math-displayer")
             .attr("font-size", "15");
     }

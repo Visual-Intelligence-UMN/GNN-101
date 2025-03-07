@@ -1138,7 +1138,7 @@ export function drawDotProduct(
             aggregatedVector[1],
             weightVector[1]
         ];
-        let operators = ["x", "  +", "   x", "       ···    = "];
+        let operators = ["x", "  +", "   x", "      ···    = "];
 
         if(weightVector.length==2&&aggregatedVector.length==2){
             operators[3] = "           =";
@@ -1180,7 +1180,7 @@ export function drawDotProduct(
         tooltip
             .append("text")
             .attr("x", displayerX + titleXOffset - globalXOffest)
-            .attr("y", displayerY + titleYOffset)
+            .attr("y", displayerY + titleYOffset * 3)
             .text("Matmul Visualization")
             .attr("class", "matmul-displayer procVis")
             .attr("font-size", 20)
@@ -1188,10 +1188,10 @@ export function drawDotProduct(
         
         const vectorLength = displayH - titleYOffset;
         
-        let h = vectorLength / aggregatedVector.length;
-        let h2 = vectorLength / weightVector.length;
+        let h = vectorLength / aggregatedVector.length * 0.75;
+        let h2 = vectorLength / weightVector.length * 0.75;
         let w = 14;
-        if(h>vectorLength / weightVector.length)h = vectorLength / weightVector.length;
+        if(h>vectorLength / weightVector.length)h = h2
 
 
 
@@ -1214,7 +1214,7 @@ export function drawDotProduct(
             .attr("y", displayerY + vectorLength/2 + 3)
             .text(",")
             .attr("class", "matmul-displayer procVis")
-            .attr("font-size", titleYOffset*2)
+            .attr("font-size", 20)
             .attr("fill", "black");
         
         tooltip
@@ -1228,11 +1228,11 @@ export function drawDotProduct(
 
         tooltip
             .append("text")
-            .attr("x", displayerX + 3)
-            .attr("y", displayerY + vectorLength/2 + 20)
+            .attr("x", displayerX -5)
+            .attr("y", displayerY + vectorLength/2 + 25)
             .text("=")
             .attr("class", "matmul-displayer procVis")
-            .attr("font-size", titleYOffset*2)
+            .attr("font-size", 15)
             .attr("fill", "black");
 
         for(let i=0; i<dataSamples.length; i++){
@@ -1242,7 +1242,8 @@ export function drawDotProduct(
                 .attr("y", displayerY + vectorLength/2 + 20 - unitSize)
                 .attr("width", unitSize*2.5)
                 .attr("height", unitSize*2.5)
-                .style("stroke", "black")
+                .style("stroke", "grey")
+                .style("stroke-width", 0.1)
                 .attr("fill", myColor(dataSamples[i]))
                 .attr("class", "matmul-displayer procVis")
                 .raise();
@@ -1280,7 +1281,8 @@ export function drawDotProduct(
             .attr("y", displayerY + vectorLength/2 + 20 - unitSize)
             .attr("width", unitSize*2.5)
             .attr("height", unitSize*2.5)
-            .style("stroke", "black")
+            .style("stroke", "grey")
+            .style("stroke-width", 0.1)
             .attr("fill", myColor(currentVal))
             .attr("class", "matmul-displayer procVis")
             .raise();
@@ -1305,6 +1307,8 @@ export function drawDotProduct(
                 .attr("y", displayerY + eqYOffset * -0.5 + vectorLength/2)
                 .attr("width", h/2)
                 .attr("height", w/2)
+                .attr("stroke", "gray")
+                .attr("stroke-width", 0.1)
                 .attr("fill", myColor(aggregatedVector[i]))
                 .attr("class", "procVis matmul-displayer").raise();
         }
@@ -1314,37 +1318,14 @@ export function drawDotProduct(
             tooltip
                 .append("rect")
                 .attr("x", displayerX + eqXOffset * 5.5)
-                .attr("y", displayerY + eqYOffset + i*h2/2)
+                .attr("y", displayerY + eqYOffset * 1.5 + i*h2/2)
                 .attr("width", w/2)
                 .attr("height", h2/2)
+                .attr("stroke", "gray")
+                .attr("stroke-width", 0.1)
                 .attr("fill", myColor(weightVector[i]))
                 .attr("class", "procVis matmul-displayer").raise();
         }
-
-        //draw frames
-        tooltip
-            .append("rect")
-            .attr("x", displayerX + eqXOffset * 2)
-            .attr("y", displayerY + eqYOffset * -0.5 + vectorLength/2)
-            .attr("width", h/2 * aggregatedVector.length)
-            .attr("height", w/2)
-            .attr("fill", "none")
-            .attr("class", "procVis matmul-displayer")
-            .style("stroke-width", 0.1)
-            .style("stroke", "grey")
-            .raise();
-
-            tooltip
-            .append("rect")
-            .attr("x", displayerX + eqXOffset * 5.5)
-            .attr("y", displayerY + eqYOffset)
-            .attr("width", w/2)
-            .attr("height", h2/2 * weightVector.length)
-            .attr("fill", "none")
-            .attr("class", "procVis matmul-displayer")
-            .style("stroke-width", 0.1)
-            .style("stroke", "grey")
-            .raise();
 
            // 定义缩放比例
         const scaleFactor = 1.5;
