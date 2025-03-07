@@ -1138,7 +1138,7 @@ export function drawDotProduct(
             aggregatedVector[1],
             weightVector[1]
         ];
-        let operators = ["x", "  +", "   x", "          ...    = "];
+        let operators = ["x", "  +", "   x", "       ···    = "];
 
         if(weightVector.length==2&&aggregatedVector.length==2){
             operators[3] = "           =";
@@ -1147,7 +1147,8 @@ export function drawDotProduct(
         //matmul-displayer interaction
         let displayerOffset = -150;
         if(curveDir==1)displayerOffset = 100;
-        let displayerX = coordFeatureVis[0];
+        let globalXOffest = 20;
+        let displayerX = coordFeatureVis[0] + globalXOffest;
         let displayerY = coordFeatureVis[1] + displayerOffset + 20;
 
     const displayW = 300;
@@ -1161,7 +1162,7 @@ export function drawDotProduct(
 
         tooltip
             .append("rect")
-            .attr("x", displayerX)
+            .attr("x", displayerX - globalXOffest)
             .attr("y", displayerY - 10)
             .attr("y", displayerY - 10)
             .attr("width", displayW)
@@ -1178,7 +1179,7 @@ export function drawDotProduct(
         const titleXOffset = 50;
         tooltip
             .append("text")
-            .attr("x", displayerX + titleXOffset)
+            .attr("x", displayerX + titleXOffset - globalXOffest)
             .attr("y", displayerY + titleYOffset)
             .text("Matmul Visualization")
             .attr("class", "matmul-displayer procVis")
@@ -1189,7 +1190,7 @@ export function drawDotProduct(
         
         let h = vectorLength / aggregatedVector.length;
         let h2 = vectorLength / weightVector.length;
-        let w = 11.25;
+        let w = 14;
         if(h>vectorLength / weightVector.length)h = vectorLength / weightVector.length;
 
 
@@ -1263,9 +1264,9 @@ export function drawDotProduct(
             const text = tooltip
             .append("text").attr("xml:space", "preserve")
             .attr("x", displayerX + 3 + unitSize*(i+1) + 25*(i+1))
-            .attr("y", displayerY + vectorLength/2 + 20 )
+            .attr("y", displayerY + vectorLength/2 + 25 )
             .text(operators[i])
-            .attr("font-size", unitSize*1.25)
+            .attr("font-size", 15)
             .attr("class", "matmul-displayer procVis")
             .raise();
             if(i==operators.length-1){
@@ -1300,8 +1301,8 @@ export function drawDotProduct(
         for(let i=0; i<aggregatedVector.length; i++){
             tooltip
                 .append("rect")
-                .attr("x", displayerX + eqXOffset+i*h/2)
-                .attr("y", displayerY + vectorLength/2)
+                .attr("x", displayerX + eqXOffset * 2 + i*h/2)
+                .attr("y", displayerY + eqYOffset * -0.5 + vectorLength/2)
                 .attr("width", h/2)
                 .attr("height", w/2)
                 .attr("fill", myColor(aggregatedVector[i]))
@@ -1312,8 +1313,7 @@ export function drawDotProduct(
         for(let i=0; i<weightVector.length; i++){
             tooltip
                 .append("rect")
-                .attr("x", displayerX + eqXOffset * 5)
-                .attr("x", displayerX + eqXOffset * 5)
+                .attr("x", displayerX + eqXOffset * 5.5)
                 .attr("y", displayerY + eqYOffset + i*h2/2)
                 .attr("width", w/2)
                 .attr("height", h2/2)
@@ -1321,28 +1321,29 @@ export function drawDotProduct(
                 .attr("class", "procVis matmul-displayer").raise();
         }
 
-        //draw franes
+        //draw frames
         tooltip
             .append("rect")
-            .attr("x", displayerX + eqXOffset)
-            .attr("y", displayerY + vectorLength/2)
+            .attr("x", displayerX + eqXOffset * 2)
+            .attr("y", displayerY + eqYOffset * -0.5 + vectorLength/2)
             .attr("width", h/2 * aggregatedVector.length)
             .attr("height", w/2)
             .attr("fill", "none")
             .attr("class", "procVis matmul-displayer")
-            .attr("stroke", "black")
+            .style("stroke-width", 0.1)
+            .style("stroke", "grey")
             .raise();
 
             tooltip
             .append("rect")
-            .attr("x", displayerX + eqXOffset * 5)
-            .attr("x", displayerX + eqXOffset * 5)
+            .attr("x", displayerX + eqXOffset * 5.5)
             .attr("y", displayerY + eqYOffset)
             .attr("width", w/2)
             .attr("height", h2/2 * weightVector.length)
             .attr("fill", "none")
             .attr("class", "procVis matmul-displayer")
-            .attr("stroke", "black")
+            .style("stroke-width", 0.1)
+            .style("stroke", "grey")
             .raise();
 
            // 定义缩放比例
