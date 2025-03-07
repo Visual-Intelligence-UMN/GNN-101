@@ -175,7 +175,10 @@ export function visualizeGraphClassifierFeatures(
     let poolingOutEvent: any = null;
     d3.selectAll(".mats, .switchBtn").on("click", function (event, d) {
 
-        if (event.target && event.target.id === "btn") {
+        const isInGroup = event.target.classList.contains('procVis') || event.target.classList.contains('to-be-removed') || event.target.classList.contains('weightUnit')
+        console.log(event.target.classList)
+
+        if (event.target && event.target.id === "btn" || isInGroup) {
             return;
         }
         if (lock) {
@@ -557,7 +560,9 @@ export function visualizeNodeClassifierFeatures(
     });
 
     d3.selectAll(".mats, .switchBtn").on("click", function (event, d) {
-        if (event.target && event.target.id === "btn") {
+
+        const isInGroup = event.target.classList.contains('procVis') || event.target.classList.contains('to-be-removed') || event.target.classList.contains('weightUnit')
+        if (event.target && event.target.id === "btn" || isInGroup) {
             return;
         }
         if (lock) {
@@ -1278,7 +1283,8 @@ export function visualizeLinkClassifierFeatures(
         }
     });
     d3.selectAll(".mats, .switchBtn").on("click", function (event, d) {
-        if (event.target && event.target.id === "btn") {
+        const isInGroup = event.target.classList.contains('procVis') || event.target.classList.contains('to-be-removed') || event.target.classList.contains('weightUnit')
+        if (event.target && event.target.id === "btn" || isInGroup) {
             return;
         }
         if (lock) {

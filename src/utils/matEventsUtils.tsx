@@ -36,6 +36,7 @@ import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import { drawMatmulExplanation, drawSoftmaxDisplayer } from "./matInteractionUtils";
 import path from "node:path/win32";
 import { computeAttentionCoefficient, meanAggregation, testCompute } from "./computationUtils";
+import { addExitBtn, buildDetailedViewArea } from "./graphUtils";
 
 //graph feature events interactions - mouseover
 export function oFeatureMouseOver(
@@ -798,6 +799,7 @@ export function featureVisClick(
         // {func: () => , delay: aniSec},
         {func: () => {
             
+            
             drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels)
             drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels)
             if((featureVisTable.length==4&&layerID==2)||
@@ -826,6 +828,7 @@ export function featureVisClick(
                 }
                 const gLabel = d3.select(".mats").append("g");
                 injectSVG(gLabel, btnX-120-64, btnY-30-120-64, "./assets/SVGs/interactionHint.svg", "procVis hintLabel");
+                addExitBtn(btnX-120, btnY-30-120, gLabel)
 
             }
         },
@@ -1193,6 +1196,7 @@ export function outputVisClick(
     const animateSeqAfterPath = [
         {func:()=>{
       //  d3.select(".mats").style("pointer-events", "none");
+            buildDetailedViewArea(coordForStart[0][0], coordForStart[0][1] - 500, 1000, 1000, g1)
             drawWeightMatrix(btnX, btnY+30, -1, rectW, rectH, featureChannels, [wMat], 0, myColor, g1, weightMatrixPostions);
             drawWeightsVector(g1, resultWithoutBias, endPt2, rectH, rectH, myColor, 
                 wMat, startCoord,endPathAniCoord , 1, weightMatrixPostions, 
@@ -1208,6 +1212,7 @@ export function outputVisClick(
             //drawHintLabel(g1, btnX, btnY-12, "Click for Animation", "procVis");
             const gLabel = d3.select(".mats").append("g");
             injectSVG(gLabel, btnX-120-64, btnY-120-64, "./assets/SVGs/interactionHint.svg", "procVis hintLabel");
+            addExitBtn(btnX-300, btnY-30-120, gLabel)
         }, delay:aniSec+600},
         {func:()=>{
 
@@ -1223,6 +1228,7 @@ export function outputVisClick(
             const iconY = endPt4[1];
 
             drawFunctionIcon([iconX, iconY], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]");
+            
 
 
         }, delay:200},
@@ -1686,6 +1692,7 @@ export function featureGATClick(
 
     let animateSeqAfterPath: any = [
         {func: () => {
+            buildDetailedViewArea(coordStartPoint[0], coordStartPoint[1] - 500, 1000, 1000, g)
             drawAttentions(
                 g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir, layerID,
                 featuresTable, lgIndices, mergedNodes
@@ -1740,6 +1747,7 @@ export function featureGATClick(
                 }
                 const gLabel = d3.select(".mats").append("g");
                 injectSVG(gLabel, btnX-120-64, btnY-30-120-64, "./assets/SVGs/interactionHint.svg", "procVis hintLabel");
+                addExitBtn(btnX-300, btnY-30-120, gLabel)
             }
         },
         // {func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels), delay: 1,},
@@ -2230,6 +2238,7 @@ export function featureSAGEClick(
 
     let animateSeqAfterPath: any = [
         {func: () => {
+            buildDetailedViewArea(c[0], c[1] - 500, 1000, 1000, g)
             drawSamplingAggregation(
                 g, X, coordFeatureVis, w, rectH, myColor, 
                 posList, mulValues, curveDir, lgIndices, featureKeysEachLayer[0]
@@ -2285,6 +2294,7 @@ export function featureSAGEClick(
                 }
                 const gLabel = d3.select(".mats").append("g");
                 injectSVG(gLabel, btnX-120-64, btnY-30-120-64, "./assets/SVGs/interactionHint.svg", "procVis hintLabel");
+                addExitBtn(btnX-300, btnY-30-120, gLabel)
             }
         },
         // {func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels), delay: 1,},
