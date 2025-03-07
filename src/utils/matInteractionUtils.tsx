@@ -1138,7 +1138,7 @@ export function drawDotProduct(
             aggregatedVector[1],
             weightVector[1]
         ];
-        let operators = ["x", "+", "  x", "          ......    = "];
+        let operators = ["x", "  +", "   x", "          ...    = "];
 
         if(weightVector.length==2&&aggregatedVector.length==2){
             operators[3] = "           =";
@@ -1182,8 +1182,7 @@ export function drawDotProduct(
             .attr("y", displayerY + titleYOffset)
             .text("Matmul Visualization")
             .attr("class", "matmul-displayer procVis")
-            .attr("font-size", titleYOffset*2)
-            .attr("font-size", titleYOffset*2)
+            .attr("font-size", 20)
             .attr("fill", "black");
         
         const vectorLength = displayH - titleYOffset;
@@ -1205,8 +1204,7 @@ export function drawDotProduct(
             .attr("y", displayerY + vectorLength/2 + 3)
             .text("dot(")
             .attr("class", "matmul-displayer procVis")
-            .attr("font-size", titleYOffset*2)
-            .attr("font-size", titleYOffset*2)
+            .attr("font-size", 20)
             .attr("fill", "black");
 
         tooltip
@@ -1216,7 +1214,6 @@ export function drawDotProduct(
             .text(",")
             .attr("class", "matmul-displayer procVis")
             .attr("font-size", titleYOffset*2)
-            .attr("font-size", titleYOffset*2)
             .attr("fill", "black");
         
         tooltip
@@ -1225,8 +1222,7 @@ export function drawDotProduct(
             .attr("y", displayerY + vectorLength/2 + 3)
             .text(")")
             .attr("class", "matmul-displayer procVis")
-            .attr("font-size", titleYOffset*2)
-            .attr("font-size", titleYOffset*2)
+            .attr("font-size", 20)
             .attr("fill", "black");
 
         tooltip
@@ -1235,7 +1231,6 @@ export function drawDotProduct(
             .attr("y", displayerY + vectorLength/2 + 20)
             .text("=")
             .attr("class", "matmul-displayer procVis")
-            .attr("font-size", titleYOffset*2)
             .attr("font-size", titleYOffset*2)
             .attr("fill", "black");
 
@@ -1297,7 +1292,6 @@ export function drawDotProduct(
                 .attr("y", displayerY + vectorLength/2 + 20 + unitSize/2)
                 .text(roundToTwo(currentVal))
                 .attr("class", "matmul-displayer procVis")
-                .attr("font-size", unitSize * 0.9)
                 .attr("font-size", unitSize * 0.9)
                 .attr("fill", color);
         
