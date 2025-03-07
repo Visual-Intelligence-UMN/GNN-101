@@ -377,7 +377,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
         .attr("font-size", "7")
         .attr("fill", Math.abs(weights[index][1][i]) > 0.7 ? "white" : "black");
 
-    // 绘制输出数据的矩形和文本
+    // 绘制输出数据的矩形和文本 
     innerGroup.append("rect")
         .attr("x", 70 - 30 + 100 + 60 + 20)
         .attr("y", displayHeight - 10 - 9 + equationYOffest)
