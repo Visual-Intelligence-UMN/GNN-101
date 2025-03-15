@@ -36,6 +36,7 @@ import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import { drawMatmulExplanation, drawSoftmaxDisplayer } from "./matInteractionUtils";
 import path from "node:path/win32";
 import { computeAttentionCoefficient, meanAggregation, testCompute } from "./computationUtils";
+import { addExitBtn, buildDetailedViewArea } from "./graphUtils";
 
 //graph feature events interactions - mouseover
 export function oFeatureMouseOver(
@@ -438,6 +439,7 @@ export function featureVisClick(
         //display pre layer
         let cur = neighbors[i];
         featureVisTable[layerID][cur].style.opacity = "1";
+        console.log("FeatureVisTable Element:", featureVisTable[layerID][cur]);
 
         d3.select(featureVisTable[layerID][cur]).classed("cant-remove inputFeature", true);
 
@@ -496,6 +498,7 @@ export function featureVisClick(
         let node_i = node;
         let node_j = adjList[node_i][i];
         let mulV = 1 / Math.sqrt(dList[node_i] * dList[node_j]);
+        console.log(`@@@@ Node ${node_i} to ${node_j} multiplier value:`, mulV);
         mulValues.push(mulV);
         //compute x'
 
@@ -661,7 +664,107 @@ export function featureVisClick(
 
     let animateSeqAfterPath: any = [
         {func: () => {
-            drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir)
+            drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir,adjList,   // ✅ 传递 adjList
+                dList,     // ✅ 传递 dList
+                featuresTable, // ✅ 传递 featuresTable
+                layerID,   // ✅ 传递 layerID
+                node)
+            
+            // 为所有连线添加类名
+            d3.selectAll("#procPath")
+                .attr("class", "procVis summation connection-path");
+            
+            // 直接为输入特征添加交互
+            d3.selectAll(".inputFeature")
+                .style("pointer-events", "all")
+                .style("cursor", "pointer")
+                .on("mouseover", function(event, d) {
+                    if (!lock) return;
+                    
+                    event.stopPropagation();
+                    const nodeIndex = Number(d3.select(this).attr("node"));
+                    
+                    // 找到当前节点在 adjList[node] 中的索引
+                    const index = adjList[node].indexOf(nodeIndex);
+                    // 使用索引获取对应的 multiplier value
+                    const mulV = mulValues[index];
+                    
+                    if (mulV === undefined) return; // 如果找不到对应的值就返回
+                    
+                    // 移除已存在的弹框
+                    d3.selectAll(".multiplier-tooltip").remove();
+                    
+                    // 创建弹框
+                    const tooltip = d3.select(".mats")
+                        .append("g")
+                        .attr("class", "multiplier-tooltip procVis");
+                    
+                    // 获取鼠标位置
+                    const [x, y] = d3.pointer(event);
+                    
+                    // 添加弹框背景
+                    tooltip.append("rect")
+                        .attr("x", x + 10)
+                        .attr("y", y - 40)
+                        .attr("width", 200)
+                        .attr("height", 30)
+                        .attr("rx", 5)
+                        .attr("ry", 5)
+                        .style("fill", "white")
+                        .style("stroke", "black");
+                    
+                    // 添加文本
+                    tooltip.append("text")
+                        .attr("x", x + 20)
+                        .attr("y", y - 20)
+                        .text(() => {
+                            // 先获取当前的 node_j
+                            let node_j = Number(d3.select(this).attr("node")); 
+                            let featureVector = featuresTable[layerID][node_j]; 
+
+
+                            if (featureVector) {
+                                return `Value = [${featureVector.map((v: number) => v.toFixed(0)).join(", ")}]`;
+                            } else {
+                                return `Value = [Error: No data]`; // 防止 undefined 错误
+                            }
+                        })
+                        .style("font-size", "12px");
+
+                    
+                    // 高亮当前输入特征
+                    d3.select(this)
+                        .style("stroke", "black")
+                        .style("stroke-width", "2px")
+                        .raise();
+                        
+                    // 高亮相关的连线
+                    d3.selectAll(".connection-path")
+                        .filter(function() {
+                            return Number(d3.select(this).attr("node")) === nodeIndex;
+                        })
+                        .style("stroke-width", "5px")
+                        .raise();
+                })
+                .on("mouseout", function(event, d) {
+                    if (!lock) return;
+                    
+                    event.stopPropagation();
+                    // 移除弹框
+                    d3.selectAll(".multiplier-tooltip").remove();
+                    
+                    // 移除高亮效果
+                    d3.select(this)
+                        .style("stroke", "none")
+                        .style("stroke-width", "0px");
+                        
+                    // 恢复连线样式
+                    d3.selectAll(".connection-path")
+                        .style("stroke-width", "1px");
+                });
+            
+            // 确保连线在输入特征下方
+            d3.selectAll(".connection-path").lower();
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
             console.log("switchbtn", d3.select("div.switchBtn"));
@@ -678,7 +781,9 @@ export function featureVisClick(
                 "./assets/SVGs/matmul.svg",
                 drawLabel
             );
-            //drawHintLabel(g, btnX, btnY - 36, "Click for Animation", "procVis");
+            const hintLabel = drawHintLabel(g, btnX, btnY - 36, "Click for Animation", "procVis");
+            
+            
 
             
             
@@ -693,6 +798,7 @@ export function featureVisClick(
         // {func: () => {}, delay: aniSec},
         // {func: () => , delay: aniSec},
         {func: () => {
+            
             
             drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels)
             drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels)
@@ -722,6 +828,7 @@ export function featureVisClick(
                 }
                 const gLabel = d3.select(".mats").append("g");
                 injectSVG(gLabel, btnX-120-64, btnY-30-120-64, "./assets/SVGs/interactionHint.svg", "procVis hintLabel");
+                addExitBtn(btnX-120, btnY-30-120, gLabel)
 
             }
         },
@@ -1089,6 +1196,7 @@ export function outputVisClick(
     const animateSeqAfterPath = [
         {func:()=>{
       //  d3.select(".mats").style("pointer-events", "none");
+            buildDetailedViewArea(coordForStart[0][0], coordForStart[0][1] - 500, 1000, 1000, g1)
             drawWeightMatrix(btnX, btnY+30, -1, rectW, rectH, featureChannels, [wMat], 0, myColor, g1, weightMatrixPostions);
             drawWeightsVector(g1, resultWithoutBias, endPt2, rectH, rectH, myColor, 
                 wMat, startCoord,endPathAniCoord , 1, weightMatrixPostions, 
@@ -1104,6 +1212,7 @@ export function outputVisClick(
             //drawHintLabel(g1, btnX, btnY-12, "Click for Animation", "procVis");
             const gLabel = d3.select(".mats").append("g");
             injectSVG(gLabel, btnX-120-64, btnY-120-64, "./assets/SVGs/interactionHint.svg", "procVis hintLabel");
+            addExitBtn(btnX-300, btnY-30-120, gLabel)
         }, delay:aniSec+600},
         {func:()=>{
 
@@ -1119,6 +1228,7 @@ export function outputVisClick(
             const iconY = endPt4[1];
 
             drawFunctionIcon([iconX, iconY], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]");
+            
 
 
         }, delay:200},
@@ -1582,6 +1692,7 @@ export function featureGATClick(
 
     let animateSeqAfterPath: any = [
         {func: () => {
+            buildDetailedViewArea(coordStartPoint[0], coordStartPoint[1] - 500, 1000, 1000, g)
             drawAttentions(
                 g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir, layerID,
                 featuresTable, lgIndices, mergedNodes
@@ -1636,6 +1747,7 @@ export function featureGATClick(
                 }
                 const gLabel = d3.select(".mats").append("g");
                 injectSVG(gLabel, btnX-120-64, btnY-30-120-64, "./assets/SVGs/interactionHint.svg", "procVis hintLabel");
+                addExitBtn(btnX-300, btnY-30-120, gLabel)
             }
         },
         // {func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels), delay: 1,},
@@ -2126,6 +2238,7 @@ export function featureSAGEClick(
 
     let animateSeqAfterPath: any = [
         {func: () => {
+            buildDetailedViewArea(c[0], c[1] - 500, 1000, 1000, g)
             drawSamplingAggregation(
                 g, X, coordFeatureVis, w, rectH, myColor, 
                 posList, mulValues, curveDir, lgIndices, featureKeysEachLayer[0]
@@ -2181,6 +2294,7 @@ export function featureSAGEClick(
                 }
                 const gLabel = d3.select(".mats").append("g");
                 injectSVG(gLabel, btnX-120-64, btnY-30-120-64, "./assets/SVGs/interactionHint.svg", "procVis hintLabel");
+                addExitBtn(btnX-300, btnY-30-120, gLabel)
             }
         },
         // {func: () => drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels), delay: 1,},

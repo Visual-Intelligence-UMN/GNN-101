@@ -20,6 +20,7 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
+
   const styles = `
     .container {
       display: flex;
@@ -70,6 +71,49 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
     }
     .axis-label {
       font-size: 11px;
+    }
+    .info-container-wrapper {
+      display: flex;
+      gap: 20px;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+      position: relative;
+    }
+    .info-container {
+      background: #f9f9f9;
+      padding: 10px 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      font-size: 14px;
+      flex: 1;
+      min-width: 250px;
+      position: relative;
+      color: #333;
+    }
+    .info-title {
+      font-size: 16px;
+      font-weight: bold;
+      position: relative;
+      color: #333;
+    }
+    .info-box {
+      position: relative;
+      width: 100%;
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      font-size: 13px;
+      line-height: 1.5;
+      z-index: 10;
+      margin-top: 10px;
+      color: #333;
+    }
+    @media (max-width: 768px) {
+      .info-container-wrapper {
+        flex-direction: column;
+      }
     }
   `;
 
@@ -175,11 +219,11 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
 
       const graphSvg = graphSvgRoot.append("g");
 
-    // 放大比例
-    const scaleFactor = 1.4;
-    const centerX = (width - 2 * padding) / 2;
-    const centerY = (height - 2 * padding) / 2;
-    graphSvg.attr("transform", `translate(${padding + centerX * (1 - scaleFactor)},${padding + centerY * (1 - scaleFactor)}) scale(${scaleFactor})`);
+      // 放大比例
+      const scaleFactor = 1.4;
+      const centerX = (width - 2 * padding) / 2;
+      const centerY = (height - 2 * padding) / 2;
+      graphSvg.attr("transform", `translate(${padding + centerX * (1 - scaleFactor)},${padding + centerY * (1 - scaleFactor)}) scale(${scaleFactor})`);
 
       const filteredLinks = data.edge_index[0].reduce((acc: any[], source: number, i: number) => {
         const target = data.edge_index[1][i];
@@ -427,6 +471,19 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
   return (
     <>
       <style>{styles}</style>
+      <div className="info-container-wrapper">
+        <div className="info-container" style={{ color: "gray" }}>
+          <div className="info-title" style={{ color: "gray" }}>
+            Understanding Graphs and Adjacency Matrices
+          </div>
+          <div className="info-box" style={{ color: "gray" }}>
+            <p>
+              A graph can be visualized as either a node-link diagram or an adjacency matrix.
+              Hover over the nodes, edges, matrix cells, or matrix labels to highlight their connections.
+            </p>
+          </div>
+        </div>
+      </div>
       <div ref={containerRef} />
     </>
   );

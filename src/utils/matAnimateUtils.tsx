@@ -762,7 +762,12 @@ export function drawSummationFeature(
     myColor: any,
     posList: any,
     mulValues: any,
-    curveDir: number
+    curveDir: number,
+    adjList: any,  // ✅ 新增
+    dList: any,     // ✅ 新增
+    featuresTable: any, // ✅ 可能需要访问 featuresTable
+    layerID: number,  // ✅ 可能需要访问 layerID
+    node: number 
 ) {
     const g = g1.append("g").attr("class", "aggregatedFeatureGroup")
     for (let m = 0; m < X.length; m++) {
@@ -801,6 +806,72 @@ export function drawSummationFeature(
         `Vector Summation^T: 1 x ${dim}`,
         "procVis"
     );
+
+    // 给 Hint Label 添加鼠标交互
+    d3.select(".aggregatedFeatureGroup") // 选中 `drawHintLabel` 生成的文本
+        .style("pointer-events", "all")
+        .style("cursor", "pointer")
+        .on("mouseover", function(event) {
+            event.stopPropagation();
+            const [x, y] = d3.pointer(event);
+
+            // 创建 tooltip 容器
+            const tooltip = d3.select(".mats")
+                .append("g")
+                .attr("class", "multiplier-tooltip procVis");
+
+            // 添加 tooltip 背景矩形
+            tooltip.append("rect")
+                .attr("x", x + 10)
+                .attr("y", y - 40)
+                .attr("width", 400)
+                .attr("height", 100)
+                .attr("rx", 5)
+                .attr("ry", 5)
+                .style("fill", "white")
+                .style("stroke", "black");
+            
+            
+            tooltip.append("text")
+                .attr("x", x + 20)
+                .attr("y", y - 20)
+                .style("font-size", "12px")
+                .style("font-family", "monospace")
+                .selectAll("tspan")
+                .data(() => {
+                    let steps = [];
+
+                    for (let i = 0; i < adjList[node].length; i++) {
+                        let node_j = adjList[node][i];
+                        let mulV = 1 / Math.sqrt(dList[node] * dList[node_j]);
+                        const prepMat = [...featuresTable[layerID][node_j]];
+
+                        // 每步计算
+                        steps.push(`(${prepMat.map(v => v.toFixed(0)).join(", ")}) × ${mulV.toFixed(3)}`);
+                    }
+                    
+
+                    // 返回分行数据
+                    return [`= Σ [`, ...steps, `]`];
+                })
+                .enter()
+                .append("tspan")
+                .attr("x", x + 20) // 保持相同的 X 坐标，换行
+                .attr("dy", "1.2em") // 设置行间距
+                .text(d => d);
+            tooltip.append("text")
+                .attr("x", x + 20)
+                .attr("y", y - 20)
+                .text(`Value = [${X.map((v: number) => v.toFixed(3)).join(", ")}]`)  // ✅ 用反引号
+                .style("font-size", "12px");
+                
+            
+        })
+        .on("mouseout", function() {
+            // 移除 tooltip
+            d3.selectAll(".multiplier-tooltip").remove();
+        });
+
     //path connect - connect prev layer feature vis to intermediate feature vis
     const curve = d3.line().curve(d3.curveBasis);
     for (let i = 0; i < posList.length; i++) {

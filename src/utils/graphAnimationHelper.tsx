@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { create, all, matrix, i } from "mathjs";
+import { create, all, matrix, i, e } from "mathjs";
 import { State, flipHorizontally, flipVertically, myColor } from "./utils";
 import { roundToTwo } from "@/components/WebUtils";
 
@@ -229,8 +229,8 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
     
     for (let j = 0; j < weightMat[i].length; j++) {
         innerGroup.append("rect")
-            .attr("x", 150)
-            .attr("y", 40 + wmRectL * j)
+            .attr("x", 160)
+            .attr("y", 35 + wmRectL * j)
             .attr("width", 7)
             .attr("height", wmRectL)
             .attr("fill", myColor(weightMat[i][j]))
@@ -277,21 +277,22 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
         .attr("class", "math-displayer")
         .attr("font-size", "20");
 
-
+    const equationYOffest = -5;
+    const equationValueYOffest = 2.5;
     if (mode === 1 && node.graphIndex === 4) {
         innerGroup.append("text")
             .attr("x", 70 - 40)
-            .attr("y", displayHeight - 10)
+            .attr("y", displayHeight - 10 + equationYOffest + equationValueYOffest)
             .attr("xml:space", "preserve")
-            .text("=      x       +      x        ...  =     ")
+            .text("=      x       +      x       ...   =     ")
             .attr("class", "math-displayer")
             .attr("font-size", "15");
     } else {
         innerGroup.append("text")
             .attr("x", 70 - 40)
-            .attr("y", displayHeight - 10)
+            .attr("y", displayHeight - 10 + equationYOffest + equationValueYOffest)
             .attr("xml:space", "preserve")
-            .text("=      x       +      x        ...  =     ")
+            .text("=      x       +      x       ···   =     ")
             .attr("class", "math-displayer")
             .attr("font-size", "15");
     }
@@ -299,7 +300,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
     // 1
     innerGroup.append("rect")
         .attr("x", 70 - 30 + 5)
-        .attr("y", displayHeight - 10 - 9)
+        .attr("y", displayHeight - 10 - 9 + equationYOffest)
         .attr("width", 17)
         .attr("height", 17)
         .attr("class", `math-displayer`)
@@ -310,7 +311,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
 
     innerGroup.append("text")
         .attr("x", 70 - 30 + 5)
-        .attr("y", displayHeight - 10 - 2)
+        .attr("y", displayHeight - 10 - 2 + equationYOffest + equationValueYOffest)
         .text(roundToTwo(aggregatedData[0]))
         .attr("class", "math-displayer")
         .attr("font-size", "7")
@@ -319,7 +320,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
     // 2
     innerGroup.append("rect")
         .attr("x", 70 - 30 + 25 + 10 + 5)
-        .attr("y", displayHeight - 10 - 9)
+        .attr("y", displayHeight - 10 - 9 + equationYOffest)
         .attr("width", 17)
         .attr("height", 17)
         .attr("class", `math-displayer`)
@@ -330,7 +331,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
 
     innerGroup.append("text")
         .attr("x", 70 - 30 + 25 + 10 + 5)
-        .attr("y", displayHeight - 10 - 2)
+        .attr("y", displayHeight - 10 - 2 + equationYOffest + equationValueYOffest)
         .text(roundToTwo(weights[index][0][i]))
         .attr("class", "math-displayer")
         .attr("font-size", "7")
@@ -339,7 +340,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
     // 3
     innerGroup.append("rect")
         .attr("x", 70 - 30 + 45 + 20 + 10)
-        .attr("y", displayHeight - 10 - 9)
+        .attr("y", displayHeight - 10 - 9 + equationYOffest)
         .attr("width", 17)
         .attr("height", 17)
         .attr("class", `math-displayer`)
@@ -350,7 +351,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
 
     innerGroup.append("text")
         .attr("x", 70 - 30 + 45 + 20 + 10)
-        .attr("y", displayHeight - 10 - 2)
+        .attr("y", displayHeight - 10 - 2 + equationYOffest + equationValueYOffest)
         .text(roundToTwo(aggregatedData[1]))
         .attr("class", "math-displayer")
         .attr("font-size", "7")
@@ -359,7 +360,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
     // 4
     innerGroup.append("rect")
         .attr("x", 70 - 30 + 65 + 30 + 15)
-        .attr("y", displayHeight - 10 - 9)
+        .attr("y", displayHeight - 10 - 9 + equationYOffest)
         .attr("width", 17)
         .attr("height", 17)
         .attr("class", `math-displayer`)
@@ -370,18 +371,18 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
 
     innerGroup.append("text")
         .attr("x", 70 - 30 + 65 + 30 + 15)
-        .attr("y", displayHeight - 10 - 2)
+        .attr("y", displayHeight - 10 - 2 + equationYOffest + equationValueYOffest)
         .text(roundToTwo(weights[index][1][i]))
         .attr("class", "math-displayer")
         .attr("font-size", "7")
         .attr("fill", Math.abs(weights[index][1][i]) > 0.7 ? "white" : "black");
 
-    // 绘制输出数据的矩形和文本
+    // 绘制输出数据的矩形和文本 
     innerGroup.append("rect")
         .attr("x", 70 - 30 + 100 + 60 + 20)
-        .attr("y", displayHeight - 10 - 9)
-        .attr("width", 14)
-        .attr("height", 14)
+        .attr("y", displayHeight - 10 - 9 + equationYOffest)
+        .attr("width", 17)
+        .attr("height", 17)
         .attr("class", `math-displayer`)
         .style("fill", myColor(calculatedData[i]))
         .style("stroke-width", 0.1)
@@ -390,7 +391,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
 
     innerGroup.append("text")
         .attr("x", 70 - 30 + 100 + 60 + 20)
-        .attr("y", displayHeight - 10 - 2)
+        .attr("y", displayHeight - 10 - 2 + equationYOffest + equationValueYOffest)
         .text(roundToTwo(calculatedData[i]))
         .attr("class", "math-displayer")
         .attr("font-size", "7")
