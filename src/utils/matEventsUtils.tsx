@@ -664,11 +664,7 @@ export function featureVisClick(
 
     let animateSeqAfterPath: any = [
         {func: () => {
-            drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir,adjList,   // ✅ 传递 adjList
-                dList,     // ✅ 传递 dList
-                featuresTable, // ✅ 传递 featuresTable
-                layerID,   // ✅ 传递 layerID
-                node)
+            drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir,adjList, dList, featuresTable, layerID, node)
             
             // 为所有连线添加类名
             d3.selectAll("#procPath")
@@ -762,7 +758,6 @@ export function featureVisClick(
                     d3.selectAll(".connection-path")
                         .style("stroke-width", "1px");
                 });
-            
             // 确保连线在输入特征下方
             d3.selectAll(".connection-path").lower();
             
