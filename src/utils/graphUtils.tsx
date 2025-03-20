@@ -77,14 +77,114 @@ export function scaleFeatureGroup(node: any, scale: number) {
 export function showFeature(node: any) {
     const scale = 1;
     if (node.featureGroup) {
-
         scaleFeatureGroup(node, scale);
+        // 添加触碰事件
+        node.featureGroup.on("mouseover", function(event: any) {
+            console.log("@@@####");
+            
+            // 移除已存在的弹框
+            d3.selectAll(".multiplier-tooltip").remove();
+            
+            // 获取 SVG 元素
+            const svg = d3.select(node.featureGroup.node().closest("svg"));
+            
+            // 创建弹框
+            const tooltip = svg
+                .append("g")
+                .attr("class", "multiplier-tooltip procVis")
+                .style("pointer-events", "none");
+            
+            // 获取鼠标相对于 SVG 的位置
+            const [x, y] = d3.pointer(event, svg.node());
+            
+            // 添加弹框背景
+            tooltip.append("rect")
+                .attr("x", x + 10)
+                .attr("y", y - 40)
+                .attr("width", 200)
+                .attr("height", 30)
+                .attr("rx", 5)
+                .attr("ry", 5)
+                .style("fill", "white")
+                .style("stroke", "black")
+                .style("opacity", 1);
+            
+            // 添加文本
+            tooltip.append("text")
+                .attr("x", x + 20)
+                .attr("y", y - 20)
+                .text(() => {
+                    if (node.features) {
+                        return `Value = [${node.features.map((v: number) => v.toFixed(0)).join(", ")}]`;
+                    } else {
+                        return `Value = [Error: No data]`;
+                    }
+                })
+                .style("font-size", "12px")
+                .style("fill", "black")
+                .style("opacity", 1);
+        });
+
+        // 添加鼠标移出事件，移除弹框
+        node.featureGroup.on("mouseout", function() {
+            d3.selectAll(".multiplier-tooltip").remove();
+        });
     }
     if (node.relatedNodes) {
-
         node.relatedNodes.forEach((n: any) => {
             if (n.featureGroup) {
                 scaleFeatureGroup(n, scale);
+                // 为相关节点也添加触碰事件
+                n.featureGroup.on("mouseover", function(event: any) {
+                    console.log("@@@####");
+                    
+                    // 移除已存在的弹框
+                    d3.selectAll(".multiplier-tooltip").remove();
+                    
+                    // 获取 SVG 元素
+                    const svg = d3.select(n.featureGroup.node().closest("svg"));
+                    
+                    // 创建弹框
+                    const tooltip = svg
+                        .append("g")
+                        .attr("class", "multiplier-tooltip procVis")
+                        .style("pointer-events", "none");
+                    
+                    // 获取鼠标相对于 SVG 的位置
+                    const [x, y] = d3.pointer(event, svg.node());
+                    
+                    // 添加弹框背景
+                    tooltip.append("rect")
+                        .attr("x", x + 10)
+                        .attr("y", y - 40)
+                        .attr("width", 200)
+                        .attr("height", 30)
+                        .attr("rx", 5)
+                        .attr("ry", 5)
+                        .style("fill", "white")
+                        .style("stroke", "black")
+                        .style("opacity", 1);
+                    
+                    // 添加文本
+                    tooltip.append("text")
+                        .attr("x", x + 20)
+                        .attr("y", y - 20)
+                        .text(() => {
+                            if (n.features) {
+                                return `Value = [${n.features.map((v: number) => v.toFixed(0)).join(", ")}]`;
+                            } else {
+                                return `Value = [Error: No data]`;
+                            }
+                        })
+                        .style("font-size", "12px")
+                        .style("fill", "black")
+                        .style("opacity", 1);
+                });
+
+                // 添加鼠标移出事件，移除弹框
+                n.featureGroup.on("mouseout", function() {
+                    d3.selectAll(".multiplier-tooltip").remove();
+                });
             }
         });
     }
@@ -313,7 +413,6 @@ export function outputVisualizer(
         .attr("x", (d: number, i: number) => i * rectHeight + 5)
         .attr("y", -30)
         .attr("width", rectHeight)
-        .attr("height", rectWidth)
         .attr(
             "class",
             (d: number, i: number) => `calculatedFeatures${i} to-be-removed bias calculatedRect`
@@ -894,24 +993,24 @@ export function addExitBtn(x: number, y: number, svg: any) {
 
 }
 
-export function buildDetailedViewArea(x: number, y: number, width: number, height: number, svg: any) {
+export function buildDetailedViewArea(x: number, y: number, weight: number, height: number, svg: any) {
     if (!svg.selectAll){
         svg = d3.select(svg)
     }
 
-    svg
-    .append("rect")
-    .attr("class", "click-blocker to-be-removed")
-    .attr("x", x) 
-    .attr("y", y) 
-    .attr("width", width) 
-    .attr("height", height) 
-    .style("fill", "transparent") 
-    .style("pointer-events", "all") 
-    .on("click", (event: any) => {
-        event.stopPropagation(); 
-        console.log("Click inside detailed view area; no global click.");
-    });
+    // svg
+    // .append("rect")
+    // .attr("class", "click-blocker to-be-removed")
+    // .attr("x", x) 
+    // .attr("y", y) 
+    // .attr("width", weight) 
+    // .attr("height", height) 
+    // .style("fill", "transparent") 
+    // .style("pointer-events", "all") 
+    // .on("click", (event: any) => {
+    //     event.stopPropagation(); 
+    //     console.log("Click inside detailed view area; no global click.");
+    // });
 }
 
 

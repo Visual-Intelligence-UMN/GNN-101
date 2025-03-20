@@ -680,6 +680,58 @@ export function featureVisClick(
                     event.stopPropagation();
                     const nodeIndex = Number(d3.select(this).attr("node"));
                     
+                    // Find the specific cell that was hovered
+                    const cellIndex = d3.select(event.target).attr("data-index");
+                    
+                    // Remove existing tooltips
+                    d3.selectAll(".multiplier-tooltip").remove();
+                    
+                    // Create tooltip
+                    const tooltip = d3.select(".mats")
+                        .append("g")
+                        .attr("class", "multiplier-tooltip procVis");
+                    
+                    // Get mouse position
+                    const [x, y] = d3.pointer(event);
+                    
+                    // Add tooltip background
+                    tooltip.append("rect")
+                        .attr("x", x + 10)
+                        .attr("y", y - 40)
+                        .attr("width", 60)
+                        .attr("height", 30)
+                        .attr("rx", 5)
+                        .attr("ry", 5)
+                        .style("fill", "white")
+                        .style("stroke", "black");
+                    
+                    // Add tooltip text
+                    tooltip.append("text")
+                        .attr("x", x + 20)
+                        .attr("y", y - 20)
+                        .text(() => {
+                            // Get the feature vector for this node
+                            let node_j = nodeIndex;
+                            let featureVector = featuresTable[layerID][node_j];
+                            
+                            // If cellIndex is available, return that specific value
+                            if (cellIndex !== null && cellIndex !== undefined && featureVector) {
+                                return `Value = ${featureVector[cellIndex].toFixed(0)}`;
+                            } else {
+                                // Fallback to showing the entire vector
+                                return `Value = [${featureVector.map((v: number) => v.toFixed(0)).join(", ")}]`;
+                            }
+                        })
+                        .style("font-size", "12px");
+                })
+                .on("mouseover", function(event, d) {
+                    if (!lock) return;
+                    
+                    event.stopPropagation();
+                    const nodeIndex = Number(d3.select(this).attr("node"));
+                    // Find the specific cell that was hovered
+                    const cellIndex = d3.select(event.target).attr("data-index");
+                    d3.selectAll(".multiplier-tooltip").remove();
                     // 找到当前节点在 adjList[node] 中的索引
                     const index = adjList[node].indexOf(nodeIndex);
                     // 使用索引获取对应的 multiplier value
