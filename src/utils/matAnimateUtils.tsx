@@ -1467,21 +1467,61 @@ export function drawBiasVector(
     layerID: number
 ) {
     let channels = featureChannels;
-    if (layerID == 2 && featureChannels == 4) channels = 2;
+    if (layerID === 2 && featureChannels === 4) channels = 2;
     for (let m = 0; m < channels; m++) {
+        let biasValue = layerBias[m];
         g.append("rect")
             .attr("x", coordFeatureVis[0] + rectW * m)
             .attr("y", coordFeatureVis[1] - rectH / 2)
             .attr("width", rectW)
             .attr("height", rectH)
-            .attr("fill", myColor(layerBias[m]))
+            .attr("fill", myColor(biasValue))
             .style("opacity", 1)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1)
-            .attr("class", "procVis bias");
+            .attr("class", "procVis bias")
+            .on("mouseover", function (this: SVGRectElement, event: MouseEvent) {
+                d3.select(this)
+                  .attr("stroke", "black")
+                  .attr("stroke-width", 3);
+                
+                const pointer = d3.pointer(event, g.node());
+                
+                const tooltip = g.append("g")
+                    .attr("class", "bias-tooltip");
+                
+                // 添加 tooltip 背景矩形
+                tooltip.append("rect")
+                    .attr("x", pointer[0] + 10)
+                    .attr("y", pointer[1] - 10)
+                    .attr("width", 80)
+                    .attr("height", 20)
+                    .attr("fill", "white")
+                    .attr("stroke", "black")
+                    .attr("rx", 3)
+                    .attr("ry", 3);
+                
+                tooltip.append("text")
+                    .attr("x", pointer[0] + 10 + 30)
+                    .attr("y", pointer[1] - 10 + 10)
+                    .attr("text-anchor", "middle")
+                    .attr("dominant-baseline", "middle")
+                    .style("font-size", "10px")
+                    .attr("fill", "black")
+                    .text("value:"+biasValue.toFixed(2));
+            })
+            .on("mouseout", function (this: SVGRectElement) {
+                // 恢复当前小格子的边框样式
+                d3.select(this)
+                  .attr("stroke", "gray")
+                  .attr("stroke-width", 0.1);
+                
+                // 移除 tooltip
+                g.selectAll("g.bias-tooltip").remove();
+            });
     }
 
-    //draw frame
+    // 绘制 bias vector 的外框
     g.append("rect")
         .attr("x", coordFeatureVis[0])
         .attr("y", coordFeatureVis[1] - rectH / 2)
@@ -1492,8 +1532,15 @@ export function drawBiasVector(
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("class", "procVis biasVector biasFrame");
-    const label = drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1] + rectH + 6, `Bias Vector: ${layerBias.length} x 1`, "procVis biasFrame");
-    // d3.selectAll(".biasVector").transition().duration(100).style("opacity", 1);
+
+    // 绘制说明标签
+    drawHintLabel(
+        g,
+        coordFeatureVis[0],
+        coordFeatureVis[1] + rectH + 6,
+        `Bias Vector: ${layerBias.length} x 1`,
+        "procVis biasFrame"
+    );
 }
 
 export function drawBiasPath(

@@ -1022,64 +1022,6 @@ export function featureVisClick(
     };
 }
 
-function drawInputAsCells(
-    gInput: d3.Selection<SVGGElement, unknown, null, undefined>,
-    featureVector: number[],
-    x: number,
-    y: number,
-    rectW: number,
-    rectH: number,
-    myColor: (d: number) => string
-  ): void {
-    gInput
-      .selectAll("rect.input-cell")
-      .data(featureVector)
-      .enter()
-      .append("rect")
-      .attr("class", "input-cell")
-      .attr("x", (_, i) => x + i * rectW)
-      .attr("y", y)
-      .attr("width", rectW)
-      .attr("height", rectH)
-      .attr("fill", d => myColor(d))
-      .attr("stroke", "gray")
-      .attr("stroke-width", 0.5)
-      .attr("data-index", (_, i) => i)
-      .on("mouseover", function(event, d) {
-        event.stopPropagation();
-        const cellIndex = +d3.select(this).attr("data-index");
-  
-        // 清除之前的 tooltip
-        d3.selectAll(".input-tooltip").remove();
-  
-        // 创建 tooltip
-        const tooltip = d3.select(".mats")
-          .append("g")
-          .attr("class", "input-tooltip procVis");
-  
-        const [mouseX, mouseY] = d3.pointer(event);
-  
-        tooltip.append("rect")
-          .attr("x", mouseX + 10)
-          .attr("y", mouseY - 40)
-          .attr("width", 60)
-          .attr("height", 30)
-          .attr("rx", 5)
-          .attr("ry", 5)
-          .style("fill", "white")
-          .style("stroke", "black");
-  
-        tooltip.append("text")
-          .attr("x", mouseX + 20)
-          .attr("y", mouseY - 20)
-          .style("font-size", "12px")
-          .text(() => `Value = ${featureVector[cellIndex]}`);
-      })
-      .on("mouseout", function() {
-        d3.selectAll(".input-tooltip").remove();
-      });
-  }  
-  
 export function outputVisClick(
     resultVis: any,
     one: any,
