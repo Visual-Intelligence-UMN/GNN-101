@@ -679,56 +679,6 @@ export function featureVisClick(
                     
                     event.stopPropagation();
                     const nodeIndex = Number(d3.select(this).attr("node"));
-                    
-                    // Find the specific cell that was hovered
-                    const cellIndex = d3.select(event.target).attr("data-index");
-                    
-                    // Remove existing tooltips
-                    d3.selectAll(".multiplier-tooltip").remove();
-                    
-                    // Create tooltip
-                    const tooltip = d3.select(".mats")
-                        .append("g")
-                        .attr("class", "multiplier-tooltip procVis");
-                    
-                    // Get mouse position
-                    const [x, y] = d3.pointer(event);
-                    
-                    // Add tooltip background
-                    tooltip.append("rect")
-                        .attr("x", x + 10)
-                        .attr("y", y - 40)
-                        .attr("width", 60)
-                        .attr("height", 30)
-                        .attr("rx", 5)
-                        .attr("ry", 5)
-                        .style("fill", "white")
-                        .style("stroke", "black");
-                    
-                    // Add tooltip text
-                    tooltip.append("text")
-                        .attr("x", x + 20)
-                        .attr("y", y - 20)
-                        .text(() => {
-                            // Get the feature vector for this node
-                            let node_j = nodeIndex;
-                            let featureVector = featuresTable[layerID][node_j];
-                            
-                            // If cellIndex is available, return that specific value
-                            if (cellIndex !== null && cellIndex !== undefined && featureVector) {
-                                return `Value = ${featureVector[cellIndex].toFixed(0)}`;
-                            } else {
-                                // Fallback to showing the entire vector
-                                return `Value = [${featureVector.map((v: number) => v.toFixed(0)).join(", ")}]`;
-                            }
-                        })
-                        .style("font-size", "12px");
-                })
-                .on("mouseover", function(event, d) {
-                    if (!lock) return;
-                    
-                    event.stopPropagation();
-                    const nodeIndex = Number(d3.select(this).attr("node"));
                     // Find the specific cell that was hovered
                     const cellIndex = d3.select(event.target).attr("data-index");
                     d3.selectAll(".multiplier-tooltip").remove();
@@ -1072,6 +1022,64 @@ export function featureVisClick(
     };
 }
 
+function drawInputAsCells(
+    gInput: d3.Selection<SVGGElement, unknown, null, undefined>,
+    featureVector: number[],
+    x: number,
+    y: number,
+    rectW: number,
+    rectH: number,
+    myColor: (d: number) => string
+  ): void {
+    gInput
+      .selectAll("rect.input-cell")
+      .data(featureVector)
+      .enter()
+      .append("rect")
+      .attr("class", "input-cell")
+      .attr("x", (_, i) => x + i * rectW)
+      .attr("y", y)
+      .attr("width", rectW)
+      .attr("height", rectH)
+      .attr("fill", d => myColor(d))
+      .attr("stroke", "gray")
+      .attr("stroke-width", 0.5)
+      .attr("data-index", (_, i) => i)
+      .on("mouseover", function(event, d) {
+        event.stopPropagation();
+        const cellIndex = +d3.select(this).attr("data-index");
+  
+        // 清除之前的 tooltip
+        d3.selectAll(".input-tooltip").remove();
+  
+        // 创建 tooltip
+        const tooltip = d3.select(".mats")
+          .append("g")
+          .attr("class", "input-tooltip procVis");
+  
+        const [mouseX, mouseY] = d3.pointer(event);
+  
+        tooltip.append("rect")
+          .attr("x", mouseX + 10)
+          .attr("y", mouseY - 40)
+          .attr("width", 60)
+          .attr("height", 30)
+          .attr("rx", 5)
+          .attr("ry", 5)
+          .style("fill", "white")
+          .style("stroke", "black");
+  
+        tooltip.append("text")
+          .attr("x", mouseX + 20)
+          .attr("y", mouseY - 20)
+          .style("font-size", "12px")
+          .text(() => `Value = ${featureVector[cellIndex]}`);
+      })
+      .on("mouseout", function() {
+        d3.selectAll(".input-tooltip").remove();
+      });
+  }  
+  
 export function outputVisClick(
     resultVis: any,
     one: any,
@@ -1496,6 +1504,7 @@ export function featureGATClick(
         );
         posList.push(c);
     }
+
     let curNode = featureVisTable[layerID + 1][node];
     curNode.style.opacity = "0.25"; //display current node
     d3.select(curNode).classed("cant-remove outputFeature", true);
