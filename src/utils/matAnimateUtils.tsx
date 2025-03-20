@@ -1291,114 +1291,7 @@ export function drawWeightMatrix(
     g: any,
     weightMatrixPostions: any
 ) {
-    //draw the connection
-
-    const len = weightMatrixPostions.length;
-    let btnPt: [number, number] = [btnX + 10, btnY - 15];
-    let wMatPt: [number, number] = [
-        (weightMatrixPostions[0][0][0] +
-            weightMatrixPostions[0][weightMatrixPostions[0].length - 1][0]) /
-        2,
-        weightMatrixPostions[0][0][1],
-    ];
-    if (curveDir == 1) {
-        wMatPt = [
-            (weightMatrixPostions[0][0][0] +
-                weightMatrixPostions[0][
-                weightMatrixPostions[0].length - 1
-                ][0]) /
-            2,
-            weightMatrixPostions[len - 1][0][1],
-        ];
-    }
-
-    const curve = d3.line().curve(d3.curveBasis);
-    const res = computeMidsVertical(btnPt, wMatPt);
-    const hpoint: [number, number] = res[0];
-    const lpoint: [number, number] = res[1];
-    if (curveDir == 1) {
-        let tlpoint: [number, number] = [lpoint[0], lpoint[1]];
-        let thpoint: [number, number] = [hpoint[0], hpoint[1]];
-        d3.select(".mats")
-            .append("path")
-            .attr("d", curve([wMatPt, tlpoint, thpoint, btnPt]))
-            .attr("stroke", "black")
-            .attr("opacity", 1)
-            .attr("fill", "none")
-            .attr("class", "procVis wMatLink")
-            .lower();
-    } else {
-        d3.select(".mats")
-            .append("path")
-            .attr("d", curve([btnPt, hpoint, lpoint, wMatPt]))
-            .attr("stroke", "black")
-            .attr("opacity", 1)
-            .attr("fill", "none")
-            .attr("class", "procVis wMatLink")
-            .lower();
-    }
-
-    //draw weight matrix
-    //positioning
-    let offsetH = curveDir * 50;
-    if (curveDir == 1)
-        offsetH = -1 * (curveDir * 50 + featureChannels * rectW + 100);
-    const matX = btnX;
-    const matY = btnY - offsetH;
-    const coefficient = 1;
-    //draw matrix
-    //const weightMat = math.transpose(weights[layerID]);
     let weightMat = weights[layerID];
-
-    //determine matrix shape mode
-    let flag = false;
-    if (
-        weightMat[0].length > weightMat.length ||
-        weightMat[0].length < weightMat.length
-    ) {
-        //weightMatrixPostions = transposeAnyMatrix(weightMatrixPostions);
-        flag = true;
-    }
-
-    const dimX = weightMat[0].length;
-    const dimY = weightMat.length;
-
-    //draw label hint
-    drawHintLabel(
-        g,
-        weightMatrixPostions[0][0][0],
-        weightMatrixPostions[0][0][1] - 12,
-        `Weight Matrix: ${dimY} x ${dimX}`,
-        "procVis weightMatrixText to-be-removed"
-    );
-
-    //flip
-    //  weightMat = flipVertically(weightMat);
-
-    // drawMatrixValid(Xt, startCoordList[0][0], startCoordList[0][1]+20, 10, 10)
-
-    if (weightMat[0].length == weightMat.length) {
-        weightMat = rotateMatrix(weightMat);
-
-        if (curveDir == 1) {
-            weightMat = rotateMatrix(weightMat);
-            weightMat = rotateMatrix(weightMat);
-            weightMat = flipVertically(weightMat);
-            weightMat = rotateMatrix(weightMat);
-        } else {
-            weightMat = rotateMatrix(weightMat);
-            weightMat = flipVertically(weightMat);
-        }
-    }
-    if (weightMat.length == 2 && weightMat[0].length == 4) {
-        weightMat = flipHorizontally(weightMat);
-        weightMat = flipVertically(weightMat);
-    }
-    if (weightMat.length == 7 && weightMat[0].length == 64) {
-        weightMat = flipHorizontally(weightMat);
-        weightMat = flipVertically(weightMat);
-    }
-
     g.append("rect")
         .attr("class", "weight-matrix-frame to-be-removed procVis")
         .attr("x", weightMatrixPostions[0][0][0])
@@ -1407,54 +1300,74 @@ export function drawWeightMatrix(
         .attr("height", rectW * weightMatrixPostions.length)
         .style("stroke", "black")
         .style("fill", "none")
-        .style("stroke-width", 2)
-
+        .style("stroke-width", 2);
     for (let i = 0; i < weightMatrixPostions[0].length; i++) {
-        let tempArr = [];
-        const columnG = g.append("g").attr("class", "procVis columnGroup").attr("id", `columnGroup-${i}`);
-        for (let j = 0; j < weightMatrixPostions.length; j++) {
-            //adjust the location if dimensions are different
-            if (j == 0) {
-                g.append("rect")
-                    .attr("x", weightMatrixPostions[j][i][0])
-                    .attr("y", weightMatrixPostions[j][i][1])
-                    .attr("width", rectW / coefficient)
-                    .attr("height", (rectW / coefficient) * weightMat.length)
-                    .attr("fill", "none")
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 0.5)
-                    .attr("opacity", 0)
-                    .attr("class", "columnUnit")
-                    .attr("id", `columnUnit-${i}`);
 
-            }
-            //select the weight based on the shape of the matrix
-            let colorVal = 0;
-            if (flag) {
-                colorVal = weightMat[weightMat.length - j - 1][i];
-            } else {
-                colorVal = weightMat[i][weightMat[0].length - j - 1];
-            }
-            if (weightMat[0].length == weightMat.length) {
-                colorVal = weightMat[j][i];
-            }
+        let colVals: number[] = [];
+
+        // 创建一个分组，专门存放本列所有小方格
+        const columnG = g.append("g")
+            .attr("class", "procVis columnGroup")
+            .attr("id", `columnGroup-${i}`);
+
+        for (let j = 0; j < weightMatrixPostions.length; j++) {
+            const colorVal = weightMat[j][i];
+            colVals.push(colorVal);
             columnG.append("rect")
                 .attr("x", weightMatrixPostions[j][i][0])
                 .attr("y", weightMatrixPostions[j][i][1])
-                .attr("width", rectW / coefficient)
-                .attr("height", rectW / coefficient)
+                .attr("width", rectW)
+                .attr("height", rectW)
                 .attr("fill", myColor(colorVal))
                 .attr("class", "weightUnit")
-                .attr("id", `weightUnit-${j}`);
-
-            tempArr.push([
-                matX + (j * rectW) / coefficient + rectW / (coefficient * 2),
-                matY + (i * rectW) / coefficient + rectW / (coefficient * 2),
-            ]);
+                .attr("id", `weightUnit-${j}-${i}`);
         }
-    }
 
+        columnG.datum({ colIndex: i, colValues: colVals });
+        columnG
+            .on("mouseover", function (event: MouseEvent, d: any) {
+
+                const bbox = columnG.node()!.getBBox();
+                const highlight = g.append("rect")
+                    .attr("class", "hover-highlight")
+                    .attr("x", bbox.x)
+                    .attr("y", bbox.y)
+                    .attr("width", bbox.width)
+                    .attr("height", bbox.height)
+                    .attr("fill", "none")
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 2);
+
+                const pointer = d3.pointer(event, g.node());
+                const tooltip = g.append("g")
+                    .attr("class", "col-tooltip");
+
+                tooltip.append("rect")
+                    .attr("x", pointer[0] + 10)
+                    .attr("y", pointer[1] - 10)
+                    .attr("width", 350)
+                    .attr("height", 30)
+                    .attr("fill", "white")
+                    .attr("stroke", "black");
+
+                tooltip.append("text")
+                    .attr("x", pointer[0] + 10 + 165)
+                    .attr("y", pointer[1] - 10 + 15)
+                    .attr("text-anchor", "middle")
+                    .attr("dominant-baseline", "middle")
+                    .style("font-size", "12px")
+                    .text(() => {
+                        const arrStr = d.colValues.map((val: number) => val.toFixed(2));
+                        return `Column ${d.colIndex}: [${arrStr.join(", ")}]`;
+                    });
+            })
+            .on("mouseout", function () {
+                g.selectAll(".hover-highlight").remove();
+                g.selectAll(".col-tooltip").remove();
+            });
+    }
 }
+
 
 export function drawBiasVector(
     g: any,
