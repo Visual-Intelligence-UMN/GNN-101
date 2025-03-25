@@ -442,7 +442,9 @@ export function featureVisClick(
         console.log("FeatureVisTable Element:", featureVisTable[layerID][cur]);
 
         d3.select(featureVisTable[layerID][cur]).classed("cant-remove inputFeature", true);
-
+        d3.select(featureVisTable[layerID][cur])
+        .selectAll("rect")
+        .classed("inputFeatureRect", true);
         //find position and save it
         let c = calculatePrevFeatureVisPos(
             featureVisTable,

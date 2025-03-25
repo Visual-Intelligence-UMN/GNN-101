@@ -1489,9 +1489,8 @@ export function drawBiasVector(
                 const tooltip = g.append("g")
                     .attr("class", "bias-tooltip");
                 
-                // 添加 tooltip 背景矩形
                 tooltip.append("rect")
-                    .attr("x", pointer[0] + 10)
+                    .attr("x", pointer[0] )
                     .attr("y", pointer[1] - 10)
                     .attr("width", 80)
                     .attr("height", 20)
@@ -1510,12 +1509,12 @@ export function drawBiasVector(
                     .text("value:"+biasValue.toFixed(2));
             })
             .on("mouseout", function (this: SVGRectElement) {
-                // 恢复当前小格子的边框样式
+
                 d3.select(this)
                   .attr("stroke", "gray")
                   .attr("stroke-width", 0.1);
                 
-                // 移除 tooltip
+
                 g.selectAll("g.bias-tooltip").remove();
             });
     }
@@ -1532,7 +1531,6 @@ export function drawBiasVector(
         .attr("stroke-width", 1)
         .attr("class", "procVis biasVector biasFrame");
 
-    // 绘制说明标签
     drawHintLabel(
         g,
         coordFeatureVis[0],
