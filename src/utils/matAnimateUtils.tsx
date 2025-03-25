@@ -926,13 +926,13 @@ export function drawSummationFeature(
           .select(".mats")
           .append("g")
           .attr("class", "summation-tooltip procVis");
-        // 添加 tooltip 背景
+
         const tooltipHeight = 20 + 15 * (adjList[node].length + 2);
         tooltip
             .append("rect")
             .attr("x", x + 10)
             .attr("y", y - 40)
-            .attr("width", 300) 
+            .attr("width", 200) 
             .attr("height", tooltipHeight)
             .attr("rx", 5)
             .attr("ry", 5)
@@ -956,8 +956,8 @@ export function drawSummationFeature(
         textData.push(`] = ${d.toFixed(3)}`);
         let textElement = tooltip
         .append("text")
-        .attr("x", x + 20)
-        .attr("y", y - 30)
+        .attr("x", x + 50)
+        .attr("y", y - 20)
         .style("font-size", "12px")
         .style("font-family", "monospace");
 
@@ -970,9 +970,7 @@ export function drawSummationFeature(
       });
       })
       .on("mouseout", function (this: SVGRectElement, event: any, d: number) {
-        // 恢复边框样式
         d3.select(this).attr("stroke", "gray").attr("stroke-width", 0.1);
-        // 移除 tooltip
         d3.selectAll(".summation-tooltip").remove();
       });
   
