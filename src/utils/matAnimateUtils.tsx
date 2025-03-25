@@ -1305,68 +1305,154 @@ export function drawWeightMatrix(
 
         let colVals: number[] = [];
 
-        // 创建一个分组，专门存放本列所有小方格
         const columnG = g.append("g")
             .attr("class", "procVis columnGroup")
             .attr("id", `columnGroup-${i}`);
 
-        for (let j = 0; j < weightMatrixPostions.length; j++) {
-            const colorVal = weightMat[j][i];
-            colVals.push(colorVal);
-            columnG.append("rect")
-                .attr("x", weightMatrixPostions[j][i][0])
-                .attr("y", weightMatrixPostions[j][i][1])
-                .attr("width", rectW)
-                .attr("height", rectW)
-                .attr("fill", myColor(colorVal))
-                .attr("class", "weightUnit")
-                .attr("id", `weightUnit-${j}-${i}`);
-        }
+            for (let i = 0; i < weightMatrixPostions[0].length; i++) {
+
+                let colVals: number[] = [];
+            
+                
+                const columnG = g.append("g")
+                    .attr("class", "procVis columnGroup")
+                    .attr("id", `columnGroup-${i}`);
+            
+                for (let j = 0; j < weightMatrixPostions.length; j++) {
+                    const colorVal = weightMat[j][i];
+                    colVals.push(colorVal);
+                    
+                    columnG.append("rect")
+                        .datum(colorVal)
+                        .attr("x", weightMatrixPostions[j][i][0])
+                        .attr("y", weightMatrixPostions[j][i][1])
+                        .attr("width", rectW)
+                        .attr("height", rectW)
+                        .attr("fill", myColor(colorVal))
+                        .attr("class", "weightUnit")
+                        .attr("id", `weightUnit-${j}-${i}`)
+                        
+                        .attr("data-orig-x", weightMatrixPostions[j][i][0])
+                        .attr("data-orig-y", weightMatrixPostions[j][i][1])
+                        .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
+                            event.stopPropagation();
+                            
+                            const origX = +d3.select(this).attr("data-orig-x");
+                            const origY = +d3.select(this).attr("data-orig-y");
+                          
+                            const newWidth = rectW * 3;
+                            const newHeight = rectW * 3;
+                            const deltaX = (newWidth - rectW) / 2;
+                            const deltaY = (newHeight - rectW) / 2;
+                            
+                            d3.select(this)
+                                .transition().duration(100)
+                                .attr("x", origX - deltaX)
+                                .attr("y", origY - deltaY)
+                                .attr("width", newWidth)
+                                .attr("height", newHeight)
+                                .attr("stroke", "black")
+                                .attr("stroke-width", 2);
+                                            
+                            const pointer = d3.pointer(event, g.node());
+                            
+                            const tooltip = g.append("g")
+                                .attr("class", "cell-tooltip procVis");
+                            tooltip.append("rect")
+                                .attr("x", pointer[0] + 10)
+                                .attr("y", pointer[1] - 20)
+                                .attr("width", 100)
+                                .attr("height", 25)
+                                .attr("rx", 5)
+                                .attr("ry", 5)
+                                .style("fill", "white")
+                                .style("stroke", "black");
+                            tooltip.append("text")
+                                .attr("x", pointer[0] + 60)
+                                .attr("y", pointer[1] - 7)
+                                .attr("text-anchor", "middle")
+                                .attr("dominant-baseline", "middle")
+                                .style("font-size", "12px")
+                                .text(`Value = ${d.toFixed(2)}`);
+                        })
+                        .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
+                            event.stopPropagation();
+                            const origX = +d3.select(this).attr("data-orig-x");
+                            const origY = +d3.select(this).attr("data-orig-y");
+                            const newWidth = rectW * 2;
+                            const newHeight = rectW * 2;
+                            const deltaX = (newWidth - rectW) / 2;
+                            const deltaY = (newHeight - rectW) / 2;
+                            
+                            d3.select(this)
+                              .transition().duration(100)
+                              .attr("x", origX - deltaX)
+                              .attr("y", origY - deltaY)
+                              .attr("width", newWidth)
+                              .attr("height", newHeight)
+                              .attr("stroke", "black")
+                              .attr("stroke-width", 2);
+                            
+                            const pointer = d3.pointer(event, g.node());
+                            
+                            const tooltip = g.append("g")
+                                .attr("class", "cell-tooltip procVis");
+                            tooltip.append("rect")
+                                .attr("x", pointer[0] + 10)
+                                .attr("y", pointer[1] - 20)
+                                .attr("width", 100)
+                                .attr("height", 25)
+                                .attr("rx", 5)
+                                .attr("ry", 5)
+                                .style("fill", "white")
+                                .style("stroke", "black");
+                            tooltip.append("text")
+                                .attr("x", pointer[0] + 60)
+                                .attr("y", pointer[1] - 7)
+                                .attr("text-anchor", "middle")
+                                .attr("dominant-baseline", "middle")
+                                .style("font-size", "12px")
+                                .text(`Value = ${d.toFixed(2)}`);
+                          })
+                          .on("mouseout", function (this: SVGRectElement, event: MouseEvent, d: number) {
+                            const origX = +d3.select(this).attr("data-orig-x");
+                            const origY = +d3.select(this).attr("data-orig-y");
+                            
+                            d3.select(this)
+                              .transition().duration(100)
+                              .attr("x", origX)
+                              .attr("y", origY)
+                              .attr("width", rectW)
+                              .attr("height", rectW)
+                              .attr("stroke", "none");
+                            
+                            g.selectAll(".cell-tooltip").remove();
+                          });
+                          
+                }
+            
+                columnG.datum({ colIndex: i, colValues: colVals });
+                columnG.on("mouseover", null)
+                       .on("mouseout", null);
+            }
 
         columnG.datum({ colIndex: i, colValues: colVals });
-        columnG
-            .on("mouseover", function (event: MouseEvent, d: any) {
 
-                const bbox = columnG.node()!.getBBox();
-                const highlight = g.append("rect")
-                    .attr("class", "hover-highlight")
-                    .attr("x", bbox.x)
-                    .attr("y", bbox.y)
-                    .attr("width", bbox.width)
-                    .attr("height", bbox.height)
-                    .attr("fill", "none")
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 2);
-
-                const pointer = d3.pointer(event, g.node());
-                const tooltip = g.append("g")
-                    .attr("class", "col-tooltip");
-
-                tooltip.append("rect")
-                    .attr("x", pointer[0] + 10)
-                    .attr("y", pointer[1] - 10)
-                    .attr("width", 350)
-                    .attr("height", 30)
-                    .attr("fill", "white")
-                    .attr("stroke", "black");
-
-                tooltip.append("text")
-                    .attr("x", pointer[0] + 10 + 165)
-                    .attr("y", pointer[1] - 10 + 15)
-                    .attr("text-anchor", "middle")
-                    .attr("dominant-baseline", "middle")
-                    .style("font-size", "12px")
-                    .text(() => {
-                        const arrStr = d.colValues.map((val: number) => val.toFixed(2));
-                        return `Column ${d.colIndex}: [${arrStr.join(", ")}]`;
-                    });
-            })
-            .on("mouseout", function () {
-                g.selectAll(".hover-highlight").remove();
-                g.selectAll(".col-tooltip").remove();
-            });
+        columnG.on("mouseover", null)
+               .on("mouseout", null);
     }
+    g.append("rect")
+        .attr("x", weightMatrixPostions[0][0][0])
+        .attr("y", weightMatrixPostions[0][0][1])
+        .attr("width", rectW * weightMatrixPostions[0].length)
+        .attr("height", rectW * weightMatrixPostions.length)
+        .style("stroke", "black")
+        .style("fill", "none")
+        .style("stroke-width", 2)
+        .attr("class", "weight-matrix-frame to-be-removed procVis");
+
 }
+
 
 
 export function drawBiasVector(

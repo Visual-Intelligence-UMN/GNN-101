@@ -672,10 +672,12 @@ export function featureVisClick(
             
             // 直接为输入特征添加交互
             d3.selectAll(".inputFeature")
+                .selectAll('rect')
                 .style("pointer-events", "all")
                 .style("cursor", "pointer")
                 .on("mouseover", function(event, d) {
                     if (!lock) return;
+                    console.info(this)
                     
                     event.stopPropagation();
                     const nodeIndex = Number(d3.select(this).attr("node"));
