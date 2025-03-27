@@ -790,6 +790,7 @@ export function featureVisualizer(
                         .attr("class", `node-features node-features-${node.graphIndex}-${node.id}`)
                         .attr("id", (d: any, i: number) => "output-layer-rect-" + i)
                         .style("fill", (d: number) => myColor(d))
+                        .style("fill", "coral")
                         .style("stroke-width", 0.1)
                         .style("stroke", "grey")
                         .style("opacity", 1);
@@ -809,6 +810,7 @@ export function featureVisualizer(
                         .attr("class", `node-features node-features-${node.graphIndex}-${node.id}`)
                         .attr("id", (d: any, i: number) => "conv" + graphIndex + "-layer-rect-" + i)
                         .style("fill", (d: number) => myColor(d))
+                        .style("fill", "coral")
                         .style("stroke-width", 0.1)
                         .style("stroke", "grey")
                         .style("opacity", 1);
@@ -977,6 +979,7 @@ export function featureVisualizer(
                         .attr("height", currRectHeight)
                         .attr("class", "node-features")
                         .style("fill", (d: number) => myColor(d))
+                        .style("fill", "coral")
                         .style("stroke-width", 0.1)
                         .style("stroke", "grey")
                         .style("visibility", "visible");

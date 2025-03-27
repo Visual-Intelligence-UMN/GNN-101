@@ -1137,6 +1137,7 @@ export function calculationVisualizer(
         .attr("width", prevRectHeight)
         .attr("height", rectWidth)
         .style("fill", (d: number) => myColor(d))
+        .style("fill", "coral")
         .style("stroke-width", 0.1)
         .attr("class", "aggregatedFeatureGroup to-be-removed procVis")
         .style("stroke", "grey")
@@ -2031,6 +2032,7 @@ export function calculationVisualizer(
         .attr("width", rectHeight)
         .attr("height", rectWidth)
         .style("fill", (d: number) => myColor(d))
+        .style("fill", "coral")
         .style("stroke-width", 0.1)
         .style("stroke", "grey")
         .attr("opacity", 0);
