@@ -1334,47 +1334,6 @@ export function drawWeightMatrix(
                         .attr("data-orig-y", weightMatrixPostions[j][i][1])
                         .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
                             event.stopPropagation();
-                            
-                            const origX = +d3.select(this).attr("data-orig-x");
-                            const origY = +d3.select(this).attr("data-orig-y");
-                          
-                            const newWidth = rectW * 3;
-                            const newHeight = rectW * 3;
-                            const deltaX = (newWidth - rectW) / 2;
-                            const deltaY = (newHeight - rectW) / 2;
-                            
-                            d3.select(this)
-                                .transition().duration(100)
-                                .attr("x", origX - deltaX)
-                                .attr("y", origY - deltaY)
-                                .attr("width", newWidth)
-                                .attr("height", newHeight)
-                                .attr("stroke", "black")
-                                .attr("stroke-width", 2);
-                                            
-                            const pointer = d3.pointer(event, g.node());
-                            
-                            const tooltip = g.append("g")
-                                .attr("class", "cell-tooltip procVis");
-                            tooltip.append("rect")
-                                .attr("x", pointer[0] + 10)
-                                .attr("y", pointer[1] - 20)
-                                .attr("width", 100)
-                                .attr("height", 25)
-                                .attr("rx", 5)
-                                .attr("ry", 5)
-                                .style("fill", "white")
-                                .style("stroke", "black");
-                            tooltip.append("text")
-                                .attr("x", pointer[0] + 60)
-                                .attr("y", pointer[1] - 7)
-                                .attr("text-anchor", "middle")
-                                .attr("dominant-baseline", "middle")
-                                .style("font-size", "12px")
-                                .text(`Value = ${d.toFixed(2)}`);
-                        })
-                        .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
-                            event.stopPropagation();
                             const origX = +d3.select(this).attr("data-orig-x");
                             const origY = +d3.select(this).attr("data-orig-y");
                             const newWidth = rectW * 2;
