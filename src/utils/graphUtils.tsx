@@ -1150,7 +1150,7 @@ export function calculationVisualizer(
             const tooltip = aggregatedFeatureGroup.append("g").attr("class", "agg-feature-tooltip");
             tooltip.append("rect")
                 .attr("x", pointer[0] - 20)
-                .attr("y", pointer[1] - 20)
+                .attr("y", pointer[1] - 30)
                 .attr("width", 60)
                 .attr("height", 20)
                 .attr("fill", "white")
@@ -1159,12 +1159,12 @@ export function calculationVisualizer(
                 .attr("ry", 3);
             tooltip.append("text")
                 .attr("x", pointer[0] - 20 + 30)
-                .attr("y", pointer[1] - 20 + 10)
+                .attr("y", pointer[1] - 30 + 10)
                 .attr("text-anchor", "middle")
                 .attr("dominant-baseline", "middle")
                 .style("font-size", "10px")
                 .attr("fill", "black")
-                .text("Value =" + d.toFixed(0));
+                .text("Value = " + d.toFixed(2));
             })
             .on("mouseout", function (this: SVGRectElement) {
             d3.select(this)
@@ -1432,7 +1432,7 @@ export function calculationVisualizer(
               .attr("dominant-baseline", "middle")
               .style("font-size", "10px")
               .attr("fill", "black")
-              .text("Value =" + d.toFixed(2));
+              .text("Value = " + d.toFixed(2));
           })
           .on("mouseout", function (this: SVGRectElement) {
             d3.select(this)
@@ -2088,7 +2088,7 @@ export function calculationVisualizer(
                 .attr("dominant-baseline", "middle")
                 .style("font-size", "10px")
                 .attr("fill", "black")
-                .text("Value =" + d.toFixed(2));
+                .text("Value = " + d.toFixed(2));
             })
         .on("mouseout", function (this: SVGRectElement) {
             d3.select(this)
