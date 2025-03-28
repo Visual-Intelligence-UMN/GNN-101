@@ -2062,10 +2062,40 @@ export function calculationVisualizer(
         .attr("width", rectHeight)
         .attr("height", rectWidth)
         .style("fill", (d: number) => myColor(d))
-        .style("fill", "coral")
+        // .style("fill", "coral")
         .style("stroke-width", 0.1)
         .style("stroke", "grey")
-        .attr("opacity", 0);
+        .attr("opacity", 0)
+        .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
+            d3.select(this)
+                .attr("stroke", "black")
+                .attr("stroke-width", 2);
+            const pointer = d3.pointer(event, outputGroup.node());
+            const tooltip = outputGroup.append("g").attr("class", "output-tooltip").raise();
+            tooltip.append("rect")
+                .attr("x", pointer[0] - 20)
+                .attr("y", pointer[1] - 30)
+                .attr("width", 60)
+                .attr("height", 20)
+                .attr("fill", "white")
+                .attr("stroke", "black")
+                .attr("rx", 3)
+                .attr("ry", 3);
+            tooltip.append("text")
+                .attr("x", pointer[0] - 20 + 30)
+                .attr("y", pointer[1] - 30 + 10)
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "middle")
+                .style("font-size", "10px")
+                .attr("fill", "black")
+                .text("Value =" + d.toFixed(2));
+            })
+        .on("mouseout", function (this: SVGRectElement) {
+            d3.select(this)
+                .attr("stroke", "grey")
+                .attr("stroke-width", 0.1);
+            outputGroup.selectAll(".output-tooltip").remove();
+        });
 
 
     const outputFrame = outputGroup.append("rect")
