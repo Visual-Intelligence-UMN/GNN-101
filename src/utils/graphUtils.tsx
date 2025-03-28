@@ -1145,10 +1145,9 @@ export function calculationVisualizer(
         .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
             d3.select(this)
                 .attr("stroke", "black")
-                .attr("stroke-width", 2)
-                .raise();
-            const pointer = d3.pointer(event, BiasGroup.node());
-            const tooltip = BiasGroup.append("g").attr("class", "bias-tooltip");
+                .attr("stroke-width", 2);
+            const pointer = d3.pointer(event, aggregatedFeatureGroup.node());
+            const tooltip = aggregatedFeatureGroup.append("g").attr("class", "agg-feature-tooltip");
             tooltip.append("rect")
                 .attr("x", pointer[0] - 20)
                 .attr("y", pointer[1] - 20)
@@ -1165,13 +1164,13 @@ export function calculationVisualizer(
                 .attr("dominant-baseline", "middle")
                 .style("font-size", "10px")
                 .attr("fill", "black")
-                .text("Value = " + d.toFixed(0));
+                .text("Value =" + d.toFixed(0));
             })
             .on("mouseout", function (this: SVGRectElement) {
             d3.select(this)
                 .attr("stroke", "grey")
                 .attr("stroke-width", 0.1);
-            BiasGroup.selectAll(".bias-tooltip").remove();
+            aggregatedFeatureGroup.selectAll(".agg-feature-tooltip").remove();
             });
         
     
