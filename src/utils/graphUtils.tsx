@@ -104,7 +104,7 @@ export function showFeature(node: any) {
             tooltip.append("rect")
                 .attr("x", x + 10)
                 .attr("y", y - 40)
-                .attr("width", 80)
+                .attr("width", 100)
                 .attr("height", 30)
                 .attr("rx", 5)
                 .attr("ry", 5)
@@ -117,7 +117,7 @@ export function showFeature(node: any) {
                 .attr("x", x + 20)
                 .attr("y", y - 20)
                 .text(() => {
-                    return `Value = ` + d.toFixed(0).toString();
+                    return `Value = ` + d.toFixed(2).toString();
                 })
                 .style("font-size", "12px")
                 .style("fill", "black")
@@ -160,7 +160,7 @@ export function showFeature(node: any) {
                     tooltip.append("rect")
                         .attr("x", x + 10)
                         .attr("y", y - 40)
-                        .attr("width", 80)
+                        .attr("width", 100)
                         .attr("height", 30)
                         .attr("rx", 5)
                         .attr("ry", 5)
@@ -173,7 +173,7 @@ export function showFeature(node: any) {
                         .attr("x", x + 20)
                         .attr("y", y - 20)
                         .text(() => {
-                            return `Value = ` + d.toFixed(0).toString();
+                            return `Value = ` + d.toFixed(2).toString();
                         })
                         .style("font-size", "12px")
                         .style("fill", "black")
