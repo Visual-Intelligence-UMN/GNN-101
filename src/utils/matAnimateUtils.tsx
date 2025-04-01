@@ -920,58 +920,81 @@ export function drawSummationFeature(
         const [x, y] = d3.pointer(event);
         
         const idx = +d3.select(this).attr("data-index");
-        d3.select(this).attr("stroke", "black").attr("stroke-width", 2);
+    
+        d3.select(this)
+          .attr("stroke", "black")
+          .attr("stroke-width", 2);
+    
         d3.selectAll(".summation-tooltip").remove();
-        const tooltip = d3
-          .select(".mats")
-          .append("g")
-          .attr("class", "summation-tooltip procVis");
-
+    
+        const tooltip = d3.select(".mats").append("g").attr("class", "summation-tooltip procVis");
         const tooltipHeight = 20 + 15 * (adjList[node].length + 2);
-        tooltip
-            .append("rect")
-            .attr("x", x + 10)
-            .attr("y", y - 40)
-            .attr("width", 200) 
-            .attr("height", tooltipHeight)
-            .attr("rx", 5)
-            .attr("ry", 5)
-            .style("fill", "white")
-            .style("stroke", "black");
+        tooltip.append("rect")
+          .attr("x", x + 10)
+          .attr("y", y - 40)
+          .attr("width", 200)
+          .attr("height", tooltipHeight)
+          .attr("rx", 5)
+          .attr("ry", 5)
+          .style("fill", "white")
+          .style("stroke", "black");
+    
         let steps = adjList[node].map((node_j: any) => {
-            let mulV = 1 / Math.sqrt(dList[node] * dList[node_j]);
-            // 获取邻居 node_j 对应的特征向量中的第 idx 个值
-            let featureValue = featuresTable[layerID][node_j][idx];
-            return `(${featureValue.toFixed(3)} × ${mulV.toFixed(3)})`;
+          let mulV = 1 / Math.sqrt(dList[node] * dList[node_j]);
+          let featureValue = featuresTable[layerID][node_j][idx];
+          return `(${featureValue.toFixed(3)} × ${mulV.toFixed(3)})`;
         });
         let textData: string[] = [];
         textData.push(`X[${idx}] = Σ [`);
-        steps.forEach((step:string, i:number) => {
-          if (i < steps.length - 1) {
-            textData.push(step + " +");
-          } else {
-            textData.push(step);
-          }
+        steps.forEach((step: string, i: number) => {
+          textData.push(i < steps.length - 1 ? step + " +" : step);
         });
         textData.push(`] = ${d.toFixed(3)}`);
-        let textElement = tooltip
-        .append("text")
-        .attr("x", x + 50)
-        .attr("y", y - 20)
-        .style("font-size", "12px")
-        .style("font-family", "monospace");
-
-      textData.forEach((line, i) => {
-        textElement
-          .append("tspan")
-          .attr("x", x + 20)
-          .attr("dy", i === 0 ? 0 : "1.2em")
-          .text(line);
-      });
+        let textElement = tooltip.append("text")
+          .attr("x", x + 50)
+          .attr("y", y - 20)
+          .style("font-size", "12px")
+          .style("font-family", "monospace");
+        textData.forEach((line, i) => {
+          textElement.append("tspan")
+            .attr("x", x + 20)
+            .attr("dy", i === 0 ? 0 : "1.2em")
+            .text(line);
+        });
+    
+        adjList[node].forEach((node_j: any) => {
+            d3.selectAll(".inputFeatureRect")
+              .filter(function() {
+                const cellIdx = d3.select(this).attr("data-index");
+                const cellNode = d3.select(this).attr("data-node");
+                return cellIdx === String(idx) && cellNode === String(node_j);
+              })
+              .attr("stroke", "black")
+              .attr("stroke-width", 2);
+    
+            d3.selectAll(".multiplier")
+              .filter(function() {
+                
+                const textNode = d3.select(this).attr("data-node");
+                return textNode === String(node_j);
+              })
+              .transition()
+              .duration(300)
+              .attr("font-size", "10px"); 
+          });
       })
       .on("mouseout", function (this: SVGRectElement, event: any, d: number) {
-        d3.select(this).attr("stroke", "gray").attr("stroke-width", 0.1);
+        d3.select(this)
+          .attr("stroke", "gray")
+          .attr("stroke-width", 0.1);
         d3.selectAll(".summation-tooltip").remove();
+        d3.selectAll(".inputFeatureRect")
+          .attr("stroke", "gray")
+          .attr("stroke-width", 0.5);
+        d3.selectAll(".multiplier")
+            .transition()
+            .duration(300)
+            .attr("font-size", "7.5px");
       });
   
     //draw frame
@@ -1069,6 +1092,7 @@ export function drawSummationFeature(
     for (let i = 0; i < posList.length; i++) {
       const res = computeMids(posList[i], coordFeatureVis);
       const hpoint = res[0];
+      const node_j = adjList[node][i];
       const lpoint = res[1];
   
       d3.select(".mats")
@@ -1092,7 +1116,8 @@ export function drawSummationFeature(
         .attr("text-anchor", "middle")
         .attr("font-size", 7.5)
         .attr("class", "procVis multiplier")
-        .attr("opacity", 1);
+        .attr("opacity", 1)
+        .attr("data-node", node_j);;
     }
     d3.selectAll(".summation").transition().duration(100).attr("opacity", 1);
     // d3.select(".aggregate").on("mouseover", function(){

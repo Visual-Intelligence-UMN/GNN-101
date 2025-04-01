@@ -450,7 +450,9 @@ export function featureVisClick(
         container.selectAll("rect")
         .data(featureVector)
         .attr("class", "cant-remove inputFeatureRect") 
-        .attr("data-index", (_: number, i: number) => i);
+        .attr("data-index", (_: number, i: number) => i)
+        .attr("data-node", () => cur);
+        
 
                 
         //find position and save it
