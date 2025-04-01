@@ -193,6 +193,137 @@ export function drawAniPath(
 
     d3.selectAll(".interactRect").style("pointer-events", "none");
 }
+/**
+ * 在 (x, y) 位置绘制一个“Matmul Visualization”风格的 Tooltip。
+ * @param x 鼠标或想放置的 X 坐标
+ * @param y 鼠标或想放置的 Y 坐标
+ * @param rowVector  行向量（如 [1, 0, 0, ...]）
+ * @param colVector  列向量（如 [0.02, 0.61, ...]）
+ * @param result     计算结果 (rowVector ⋅ colVector)
+ */
+export function showMatmulTooltip(
+    x: number,
+    y: number,
+    rowVector: number[],
+    colVector: number[],
+    result: number
+  ) {
+    const tooltipWidth = 300;
+    const tooltipHeight = 120;
+  
+    // 1. 在 .mats 容器里创建 tooltip group
+    const tooltip = d3.select(".mats")
+      .append("g")
+      .attr("class", "matmul-tooltip")
+      .style("filter", "drop-shadow(2px 2px 3px rgba(0,0,0,0.2))"); // 阴影
+  
+    // 2. 绘制 tooltip 背景
+    tooltip.append("rect")
+      .attr("x", x)
+      .attr("y", y)
+      .attr("width", tooltipWidth)
+      .attr("height", tooltipHeight)
+      .attr("rx", 10)  // 圆角
+      .attr("ry", 10)
+      .style("fill", "white")
+      .style("stroke", "black")
+      .style("stroke-width", 1);
+  
+    // 3. 标题
+    tooltip.append("text")
+      .text("Matmul Visualization")
+      .attr("x", x + 15)
+      .attr("y", y + 25)
+      .style("font-size", "16px")
+      .style("font-weight", "bold");
+  
+    // 4. 表达式区域
+    const exprGroup = tooltip.append("g")
+      .attr("transform", `translate(${x + 15}, ${y + 40})`);
+  
+    // 4.1 “dot(” 文本
+    exprGroup.append("text")
+      .text("dot(")
+      .style("font-size", "14px")
+      .attr("x", 0)
+      .attr("y", 0);
+  
+    // 4.2 绘制 rowVector
+    const rectSize = 10;
+    const vectorGroup = exprGroup.append("g")
+      .attr("transform", `translate(40, -10)`);
+  
+    vectorGroup.selectAll("rect")
+      .data(rowVector)
+      .enter()
+      .append("rect")
+      .attr("x", (_, i) => i * (rectSize + 1))
+      .attr("width", rectSize)
+      .attr("height", rectSize)
+      .style("fill", d => d > 0 ? "purple" : "#ccc")
+      .style("stroke", "black")
+      .style("stroke-width", 0.5);
+  
+    // 4.3 逗号
+    exprGroup.append("text")
+      .text(",")
+      .style("font-size", "14px")
+      .attr("x", 40 + rowVector.length * (rectSize + 1) + 5)
+      .attr("y", 0);
+  
+    // 4.4 绘制 colVector
+    const colGroup = exprGroup.append("g")
+      .attr("transform", `translate(${40 + rowVector.length * (rectSize + 1) + 15}, -10)`);
+  
+    colGroup.selectAll("rect")
+      .data(colVector)
+      .enter()
+      .append("rect")
+      .attr("y", (_, i) => i * (rectSize + 1))
+      .attr("width", rectSize)
+      .attr("height", rectSize)
+      .style("fill", d => d > 0.3 ? "purple" : (d > 0 ? "green" : "#ccc"))
+      .style("stroke", "black")
+      .style("stroke-width", 0.5);
+  
+    // 4.5 “)” 文本
+    const bracketX = 40 + rowVector.length * (rectSize + 1) + 15 + rectSize + 5;
+    exprGroup.append("text")
+      .text(")")
+      .style("font-size", "14px")
+      .attr("x", bracketX)
+      .attr("y", 0);
+  
+    // 4.6 “= ...” 文本
+    exprGroup.append("text")
+      .text(`= ${result.toFixed(3)}`)
+      .style("font-size", "14px")
+      .style("font-weight", "bold")
+      .attr("x", bracketX + 15)
+      .attr("y", 0);
+  
+    // 5. 详细过程：如 1×0.02 + 0×0.61 ...
+    const detailText = exprGroup.append("text")
+      .attr("x", 0)
+      .attr("y", 30)
+      .style("font-size", "12px");
+  
+    // 构造一个字符串，演示 rowVector[i] × colVector[i]
+    const steps = rowVector.map((rv, i) => `${rv.toFixed(2)}×${colVector[i].toFixed(2)}`);
+    const formulaStr = steps.join(" + ");
+  
+    detailText.append("tspan")
+      .text(`= ${formulaStr}`)
+      .attr("x", 0)
+      .attr("dy", "1.2em");
+  
+    detailText.append("tspan")
+      .text(`= ${result.toFixed(3)}`)
+      .attr("x", 0)
+      .attr("dy", "1.2em")
+      .style("font-weight", "bold");
+  }
+  
 
 export function drawMatrixWeight(
     Xt: any,
@@ -763,144 +894,230 @@ export function drawSummationFeature(
     posList: any,
     mulValues: any,
     curveDir: number,
-    adjList: any,  // ✅ 新增
-    dList: any,     // ✅ 新增
-    featuresTable: any, // ✅ 可能需要访问 featuresTable
-    layerID: number,  // ✅ 可能需要访问 layerID
-    node: number 
-) {
-    const g = g1.append("g").attr("class", "aggregatedFeatureGroup")
-    for (let m = 0; m < X.length; m++) {
-        g.append("rect")
-            .attr("x", coordFeatureVis[0] + w * m)
-            .attr("y", coordFeatureVis[1] - rectH / 2)
-            .attr("width", w)
-            .attr("height", rectH)
-            .attr("fill", myColor(X[m]))
-            .attr("opacity", 0)
-            .attr("stroke", "gray")
-            .attr("stroke-width", 0.1)
-            .attr("class", "procVis summation");
-    }
-
+    adjList: any,
+    dList: any,
+    featuresTable: any,
+    layerID: number,
+    node: number
+  ) {
+    const g = g1.append("g").attr("class", "aggregatedFeatureGroup");
+    g.selectAll("rect.summation-rect")
+      .data(X as number[])
+      .enter()
+      .append("rect")
+      .attr("x", (d: number, i: number) => coordFeatureVis[0] + w * i)
+      .attr("y", coordFeatureVis[1] - rectH / 2)
+      .attr("width", w)
+      .attr("height", rectH)
+      .attr("fill", (d: number) => myColor(d))
+      .attr("opacity", 1)
+      .attr("stroke", "gray")
+      .attr("stroke-width", 0.1)
+      .attr("class", "procVis summation-rect")
+      .attr("data-index", (d: number, i: number) => i)
+      .on("mouseover", function (this: SVGRectElement, event: any, d: number) {
+        event.stopPropagation();
+        const [x, y] = d3.pointer(event);
+        
+        const idx = +d3.select(this).attr("data-index");
+    
+        d3.select(this)
+          .attr("stroke", "black")
+          .attr("stroke-width", 2);
+    
+        d3.selectAll(".summation-tooltip").remove();
+    
+        const tooltip = d3.select(".mats").append("g").attr("class", "summation-tooltip procVis");
+        const tooltipHeight = 20 + 15 * (adjList[node].length + 2);
+        tooltip.append("rect")
+          .attr("x", x + 10)
+          .attr("y", y - 40)
+          .attr("width", 200)
+          .attr("height", tooltipHeight)
+          .attr("rx", 5)
+          .attr("ry", 5)
+          .style("fill", "white")
+          .style("stroke", "black");
+    
+        let steps = adjList[node].map((node_j: any) => {
+          let mulV = 1 / Math.sqrt(dList[node] * dList[node_j]);
+          let featureValue = featuresTable[layerID][node_j][idx];
+          return `(${featureValue.toFixed(3)} × ${mulV.toFixed(3)})`;
+        });
+        let textData: string[] = [];
+        textData.push(`X[${idx}] = Σ [`);
+        steps.forEach((step: string, i: number) => {
+          textData.push(i < steps.length - 1 ? step + " +" : step);
+        });
+        textData.push(`] = ${d.toFixed(3)}`);
+        let textElement = tooltip.append("text")
+          .attr("x", x + 50)
+          .attr("y", y - 20)
+          .style("font-size", "12px")
+          .style("font-family", "monospace");
+        textData.forEach((line, i) => {
+          textElement.append("tspan")
+            .attr("x", x + 20)
+            .attr("dy", i === 0 ? 0 : "1.2em")
+            .text(line);
+        });
+    
+        adjList[node].forEach((node_j: any) => {
+            d3.selectAll(".inputFeatureRect")
+              .filter(function() {
+                const cellIdx = d3.select(this).attr("data-index");
+                const cellNode = d3.select(this).attr("data-node");
+                return cellIdx === String(idx) && cellNode === String(node_j);
+              })
+              .attr("stroke", "black")
+              .attr("stroke-width", 2);
+    
+            d3.selectAll(".multiplier")
+              .filter(function() {
+                
+                const textNode = d3.select(this).attr("data-node");
+                return textNode === String(node_j);
+              })
+              .transition()
+              .duration(300)
+              .attr("font-size", "10px"); 
+          });
+      })
+      .on("mouseout", function (this: SVGRectElement, event: any, d: number) {
+        d3.select(this)
+          .attr("stroke", "gray")
+          .attr("stroke-width", 0.1);
+        d3.selectAll(".summation-tooltip").remove();
+        d3.selectAll(".inputFeatureRect")
+          .attr("stroke", "gray")
+          .attr("stroke-width", 0.5);
+        d3.selectAll(".multiplier")
+            .transition()
+            .duration(300)
+            .attr("font-size", "7.5px");
+      });
+  
     //draw frame
     g1.append("rect")
-        .attr("x", coordFeatureVis[0])
-        .attr("y", coordFeatureVis[1] - rectH / 2)
-        .attr("width", w * X.length)
-        .attr("height", rectH)
-        .attr("fill", "none")
-        .attr("opacity", 0)
-        .attr("stroke", "black")
-        .attr("stroke-width", 1)
-        .attr("class", "procVis summation");
-
+      .attr("x", coordFeatureVis[0])
+      .attr("y", coordFeatureVis[1] - rectH / 2)
+      .attr("width", w * X.length)
+      .attr("height", rectH)
+      .attr("fill", "none")
+      .attr("opacity", 0)
+      .attr("stroke", "black")
+      .attr("stroke-width", 1)
+      .attr("class", "procVis summation");
+  
     //draw label
     const dim = X.length;
-
+  
     //draw label
     drawHintLabel(
-        g1,
-        coordFeatureVis[0],
-        coordFeatureVis[1] + rectH * curveDir * 1.1,
-        `Vector Summation^T: 1 x ${dim}`,
-        "procVis"
+      g1,
+      coordFeatureVis[0],
+      coordFeatureVis[1] + rectH * curveDir * 1.1,
+      `Vector Summation^T: 1 x ${dim}`,
+      "procVis"
     );
-
+  
     // 给 Hint Label 添加鼠标交互
-    d3.select(".aggregatedFeatureGroup") // 选中 `drawHintLabel` 生成的文本
-        .style("pointer-events", "all")
-        .style("cursor", "pointer")
-        .on("mouseover", function(event) {
-            event.stopPropagation();
-            const [x, y] = d3.pointer(event);
-
-            // 创建 tooltip 容器
-            const tooltip = d3.select(".mats")
-                .append("g")
-                .attr("class", "multiplier-tooltip procVis");
-
-            // 添加 tooltip 背景矩形
-            tooltip.append("rect")
-                .attr("x", x + 10)
-                .attr("y", y - 40)
-                .attr("width", 400)
-                .attr("height", 100)
-                .attr("rx", 5)
-                .attr("ry", 5)
-                .style("fill", "white")
-                .style("stroke", "black");
-            
-            
-            tooltip.append("text")
-                .attr("x", x + 20)
-                .attr("y", y - 20)
-                .style("font-size", "12px")
-                .style("font-family", "monospace")
-                .selectAll("tspan")
-                .data(() => {
-                    let steps = [];
-
-                    for (let i = 0; i < adjList[node].length; i++) {
-                        let node_j = adjList[node][i];
-                        let mulV = 1 / Math.sqrt(dList[node] * dList[node_j]);
-                        const prepMat = [...featuresTable[layerID][node_j]];
-
-                        // 每步计算
-                        steps.push(`(${prepMat.map(v => v.toFixed(0)).join(", ")}) × ${mulV.toFixed(3)}`);
-                    }
-                    
-
-                    // 返回分行数据
-                    return [`= Σ [`, ...steps, `]`];
-                })
-                .enter()
-                .append("tspan")
-                .attr("x", x + 20) // 保持相同的 X 坐标，换行
-                .attr("dy", "1.2em") // 设置行间距
-                .text(d => d);
-            tooltip.append("text")
-                .attr("x", x + 20)
-                .attr("y", y - 20)
-                .text(`Value = [${X.map((v: number) => v.toFixed(3)).join(", ")}]`)  // ✅ 用反引号
-                .style("font-size", "12px");
-                
-            
-        })
-        .on("mouseout", function() {
-            // 移除 tooltip
-            d3.selectAll(".multiplier-tooltip").remove();
-        });
-
+    d3.select(".aggregatedFeatureGroup") 
+      .style("pointer-events", "all")
+      .style("cursor", "pointer")
+      .on("mouseover", function (event) {
+        event.stopPropagation();
+        const [x, y] = d3.pointer(event);
+        d3.selectAll(".matmul-tooltip").remove();
+  
+        
+        const tooltip = d3
+          .select(".mats")
+          .append("g")
+          .attr("class", "multiplier-tooltip procVis");
+  
+        tooltip
+          .append("rect")
+          .attr("x", x + 10)
+          .attr("y", y - 40)
+          .attr("width", 400)
+          .attr("height", 100)
+          .attr("rx", 5)
+          .attr("ry", 5)
+          .style("fill", "white")
+          .style("stroke", "black");
+  
+        tooltip
+          .append("text")
+          .attr("x", x + 20)
+          .attr("y", y - 20)
+          .style("font-size", "12px")
+          .style("font-family", "monospace")
+          .selectAll("tspan")
+          .data(() => {
+            let steps = [];
+  
+            for (let i = 0; i < adjList[node].length; i++) {
+              let node_j = adjList[node][i];
+              let mulV = 1 / Math.sqrt(dList[node] * dList[node_j]);
+              const prepMat = [...featuresTable[layerID][node_j]];
+  
+              steps.push(
+                `(${prepMat
+                  .map((v) => v.toFixed(0))
+                  .join(", ")}) × ${mulV.toFixed(3)}`
+              );
+            }
+  
+            return [`= Σ [`, ...steps, `]`];
+          })
+          .enter()
+          .append("tspan")
+          .attr("x", x + 20) 
+          .attr("dy", "1.2em")
+          .text((d) => d);
+        tooltip
+          .append("text")
+          .attr("x", x + 20)
+          .attr("y", y - 20)
+          .text(`Value = [${X.map((v: number) => v.toFixed(3)).join(", ")}]`) 
+          .style("font-size", "12px");
+      })
+      .on("mouseout", function () {
+        d3.selectAll(".multiplier-tooltip").remove();
+      });
+  
     //path connect - connect prev layer feature vis to intermediate feature vis
     const curve = d3.line().curve(d3.curveBasis);
     for (let i = 0; i < posList.length; i++) {
-        const res = computeMids(posList[i], coordFeatureVis);
-        const hpoint = res[0];
-        const lpoint = res[1];
-
-        d3.select(".mats")
-            .append("path")
-            .attr("d", curve([posList[i], hpoint, lpoint, coordFeatureVis]))
-            .attr("stroke", myColor(mulValues[i]))
-            .attr("opacity", 0)
-            .attr("fill", "none")
-            .attr("class", "procVis summation")
-            .attr("id", "procPath");
-
-        //draw multipliers
-        let x = (coordFeatureVis[0] - posList[i][0]) / 2 + posList[i][0];
-        let y = (coordFeatureVis[1] - posList[i][1]) / 2 + posList[i][1];
-
-        d3.select(".mats")
-            .append("text")
-            .text(mulValues[i].toFixed(2))
-            .attr("x", posList[i][0] + 7.5)
-            .attr("y", posList[i][1])
-            .attr("text-anchor", "middle")
-            .attr("font-size", 7.5)
-            .attr("class", "procVis multiplier")
-            .attr("opacity", 1);
+      const res = computeMids(posList[i], coordFeatureVis);
+      const hpoint = res[0];
+      const node_j = adjList[node][i];
+      const lpoint = res[1];
+  
+      d3.select(".mats")
+        .append("path")
+        .attr("d", curve([posList[i], hpoint, lpoint, coordFeatureVis]))
+        .attr("stroke", myColor(mulValues[i]))
+        .attr("opacity", 0)
+        .attr("fill", "none")
+        .attr("class", "procVis summation")
+        .attr("id", "procPath");
+  
+      //draw multipliers
+      let x = (coordFeatureVis[0] - posList[i][0]) / 2 + posList[i][0];
+      let y = (coordFeatureVis[1] - posList[i][1]) / 2 + posList[i][1];
+  
+      d3.select(".mats")
+        .append("text")
+        .text(mulValues[i].toFixed(2))
+        .attr("x", posList[i][0] + 7.5)
+        .attr("y", posList[i][1])
+        .attr("text-anchor", "middle")
+        .attr("font-size", 7.5)
+        .attr("class", "procVis multiplier")
+        .attr("opacity", 1)
+        .attr("data-node", node_j);;
     }
     d3.selectAll(".summation").transition().duration(100).attr("opacity", 1);
     // d3.select(".aggregate").on("mouseover", function(){
@@ -909,7 +1126,7 @@ export function drawSummationFeature(
     // d3.select(".aggregate").on("mouseout", function(){
     //     d3.selectAll(".multiplier").style("opacity", 0);
     // })
-}
+  }
 
 export function drawWeightsVector(
     g: any,
@@ -1096,171 +1313,198 @@ export function drawWeightMatrix(
     myColor: any,
     g: any,
     weightMatrixPostions: any
-) {
-    //draw the connection
-
+  ) {
     const len = weightMatrixPostions.length;
     let btnPt: [number, number] = [btnX + 10, btnY - 15];
     let wMatPt: [number, number] = [
-        (weightMatrixPostions[0][0][0] +
-            weightMatrixPostions[0][weightMatrixPostions[0].length - 1][0]) /
-        2,
-        weightMatrixPostions[0][0][1],
+      (weightMatrixPostions[0][0][0] +
+        weightMatrixPostions[0][weightMatrixPostions[0].length - 1][0]) / 2,
+      weightMatrixPostions[0][0][1],
     ];
     if (curveDir == 1) {
-        wMatPt = [
-            (weightMatrixPostions[0][0][0] +
-                weightMatrixPostions[0][
-                weightMatrixPostions[0].length - 1
-                ][0]) /
-            2,
-            weightMatrixPostions[len - 1][0][1],
-        ];
+      wMatPt = [
+        (weightMatrixPostions[0][0][0] +
+          weightMatrixPostions[0][weightMatrixPostions[0].length - 1][0]) / 2,
+        weightMatrixPostions[len - 1][0][1],
+      ];
     }
-
+  
     const curve = d3.line().curve(d3.curveBasis);
     const res = computeMidsVertical(btnPt, wMatPt);
     const hpoint: [number, number] = res[0];
     const lpoint: [number, number] = res[1];
+  
     if (curveDir == 1) {
-        let tlpoint: [number, number] = [lpoint[0], lpoint[1]];
-        let thpoint: [number, number] = [hpoint[0], hpoint[1]];
-        d3.select(".mats")
-            .append("path")
-            .attr("d", curve([wMatPt, tlpoint, thpoint, btnPt]))
-            .attr("stroke", "black")
-            .attr("opacity", 1)
-            .attr("fill", "none")
-            .attr("class", "procVis wMatLink")
-            .lower();
+      let tlpoint: [number, number] = [lpoint[0], lpoint[1]];
+      let thpoint: [number, number] = [hpoint[0], hpoint[1]];
+      d3.select(".mats")
+        .append("path")
+        .attr("d", curve([wMatPt, tlpoint, thpoint, btnPt]))
+        .attr("stroke", "black")
+        .attr("opacity", 1)
+        .attr("fill", "none")
+        .attr("class", "procVis wMatLink")
+        .lower();
     } else {
-        d3.select(".mats")
-            .append("path")
-            .attr("d", curve([btnPt, hpoint, lpoint, wMatPt]))
-            .attr("stroke", "black")
-            .attr("opacity", 1)
-            .attr("fill", "none")
-            .attr("class", "procVis wMatLink")
-            .lower();
+      d3.select(".mats")
+        .append("path")
+        .attr("d", curve([btnPt, hpoint, lpoint, wMatPt]))
+        .attr("stroke", "black")
+        .attr("opacity", 1)
+        .attr("fill", "none")
+        .attr("class", "procVis wMatLink")
+        .lower();
     }
-
-    //draw weight matrix
-    //positioning
-    let offsetH = curveDir * 50;
-    if (curveDir == 1)
-        offsetH = -1 * (curveDir * 50 + featureChannels * rectW + 100);
-    const matX = btnX;
-    const matY = btnY - offsetH;
-    const coefficient = 1;
-    //draw matrix
-    //const weightMat = math.transpose(weights[layerID]);
     let weightMat = weights[layerID];
-
-    //determine matrix shape mode
     let flag = false;
     if (
-        weightMat[0].length > weightMat.length ||
-        weightMat[0].length < weightMat.length
+      weightMat[0].length > weightMat.length ||
+      weightMat[0].length < weightMat.length
     ) {
-        //weightMatrixPostions = transposeAnyMatrix(weightMatrixPostions);
-        flag = true;
+      flag = true;
     }
+  
 
     const dimX = weightMat[0].length;
     const dimY = weightMat.length;
-
-    //draw label hint
-    drawHintLabel(
-        g,
-        weightMatrixPostions[0][0][0],
-        weightMatrixPostions[0][0][1] - 12,
-        `Weight Matrix: ${dimY} x ${dimX}`,
-        "procVis weightMatrixText to-be-removed"
-    );
-
-    //flip
-    //  weightMat = flipVertically(weightMat);
-
-    // drawMatrixValid(Xt, startCoordList[0][0], startCoordList[0][1]+20, 10, 10)
-
+  
     if (weightMat[0].length == weightMat.length) {
+      weightMat = rotateMatrix(weightMat);
+  
+      if (curveDir == 1) {
         weightMat = rotateMatrix(weightMat);
-
-        if (curveDir == 1) {
-            weightMat = rotateMatrix(weightMat);
-            weightMat = rotateMatrix(weightMat);
-            weightMat = flipVertically(weightMat);
-            weightMat = rotateMatrix(weightMat);
-        } else {
-            weightMat = rotateMatrix(weightMat);
-            weightMat = flipVertically(weightMat);
-        }
+        weightMat = rotateMatrix(weightMat);
+        weightMat = flipVertically(weightMat);
+        weightMat = rotateMatrix(weightMat);
+      } else {
+        weightMat = rotateMatrix(weightMat);
+        weightMat = flipVertically(weightMat);
+      }
     }
     if (weightMat.length == 2 && weightMat[0].length == 4) {
-        weightMat = flipHorizontally(weightMat);
-        weightMat = flipVertically(weightMat);
+      weightMat = flipHorizontally(weightMat);
+      weightMat = flipVertically(weightMat);
     }
     if (weightMat.length == 7 && weightMat[0].length == 64) {
-        weightMat = flipHorizontally(weightMat);
-        weightMat = flipVertically(weightMat);
+      weightMat = flipHorizontally(weightMat);
+      weightMat = flipVertically(weightMat);
     }
 
     g.append("rect")
-        .attr("class", "weight-matrix-frame to-be-removed procVis")
-        .attr("x", weightMatrixPostions[0][0][0])
-        .attr("y", weightMatrixPostions[0][0][1])
-        .attr("width", rectW * weightMatrixPostions[0].length)
-        .attr("height", rectW * weightMatrixPostions.length)
-        .style("stroke", "black")
-        .style("fill", "none")
-        .style("stroke-width", 2)
-
+      .attr("class", "weight-matrix-frame to-be-removed procVis")
+      .attr("x", weightMatrixPostions[0][0][0])
+      .attr("y", weightMatrixPostions[0][0][1])
+      .attr("width", rectW * weightMatrixPostions[0].length)
+      .attr("height", rectW * weightMatrixPostions.length)
+      .style("stroke", "black")
+      .style("fill", "none")
+      .style("stroke-width", 2);
+  
+    drawHintLabel(
+      g,
+      weightMatrixPostions[0][0][0],
+      weightMatrixPostions[0][0][1] - 12,
+      `Weight Matrix: ${dimY} x ${dimX}`,
+      "procVis weightMatrixText to-be-removed"
+    );
+  
+    
     for (let i = 0; i < weightMatrixPostions[0].length; i++) {
-        let tempArr = [];
-        const columnG = g.append("g").attr("class", "procVis columnGroup").attr("id", `columnGroup-${i}`);
-        for (let j = 0; j < weightMatrixPostions.length; j++) {
-            //adjust the location if dimensions are different
-            if (j == 0) {
-                g.append("rect")
-                    .attr("x", weightMatrixPostions[j][i][0])
-                    .attr("y", weightMatrixPostions[j][i][1])
-                    .attr("width", rectW / coefficient)
-                    .attr("height", (rectW / coefficient) * weightMat.length)
-                    .attr("fill", "none")
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 0.5)
-                    .attr("opacity", 0)
-                    .attr("class", "columnUnit")
-                    .attr("id", `columnUnit-${i}`);
-
-            }
-            //select the weight based on the shape of the matrix
-            let colorVal = 0;
-            if (flag) {
-                colorVal = weightMat[weightMat.length - j - 1][i];
-            } else {
-                colorVal = weightMat[i][weightMat[0].length - j - 1];
-            }
-            if (weightMat[0].length == weightMat.length) {
-                colorVal = weightMat[j][i];
-            }
-            columnG.append("rect")
-                .attr("x", weightMatrixPostions[j][i][0])
-                .attr("y", weightMatrixPostions[j][i][1])
-                .attr("width", rectW / coefficient)
-                .attr("height", rectW / coefficient)
-                .attr("fill", myColor(colorVal))
-                .attr("class", "weightUnit")
-                .attr("id", `weightUnit-${j}`);
-
-            tempArr.push([
-                matX + (j * rectW) / coefficient + rectW / (coefficient * 2),
-                matY + (i * rectW) / coefficient + rectW / (coefficient * 2),
-            ]);
+      
+      const columnG = g
+        .append("g")
+        .attr("class", "procVis columnGroup")
+        .attr("id", `columnGroup-${i}`);
+  
+      
+      for (let j = 0; j < weightMatrixPostions.length; j++) {
+       
+        let colorVal: number = 0;
+        if (flag) {
+          colorVal = weightMat[weightMat.length - j - 1][i];
+        } else {
+          colorVal = weightMat[i][weightMat[0].length - j - 1];
         }
+        
+        if (weightMat[0].length == weightMat.length) {
+          colorVal = weightMat[j][i];
+        }
+  
+        columnG
+          .append("rect")
+          .datum(colorVal) 
+          .attr("x", weightMatrixPostions[j][i][0])
+          .attr("y", weightMatrixPostions[j][i][1])
+          .attr("width", rectW)
+          .attr("height", rectW)
+          .attr("fill", myColor(colorVal))
+          .attr("class", "weightUnit")
+          .attr("id", `weightUnit-${j}-${i}`)
+          .attr("data-orig-x", weightMatrixPostions[j][i][0])
+          .attr("data-orig-y", weightMatrixPostions[j][i][1])
+          .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
+            event.stopPropagation();
+            const origX = +d3.select(this).attr("data-orig-x");
+            const origY = +d3.select(this).attr("data-orig-y");
+            
+           
+            const scale = 2;
+            const newWidth = rectW * scale;
+            const newHeight = rectW * scale;
+            const deltaX = (newWidth - rectW) / 2;
+            const deltaY = (newHeight - rectW) / 2;
+            
+            d3.select(this)
+              .transition()
+              .duration(100)
+              .attr("x", origX - deltaX)
+              .attr("y", origY - deltaY)
+              .attr("width", newWidth)
+              .attr("height", newHeight)
+              .attr("stroke", "black")
+              .attr("stroke-width", 2);
+            
+            const pointer = d3.pointer(event, g.node());
+            const tooltip = g.append("g")
+              .attr("class", "cell-tooltip procVis");
+            tooltip.append("rect")
+              .attr("x", pointer[0] + 10)
+              .attr("y", pointer[1] - 20)
+              .attr("width", 100)
+              .attr("height", 25)
+              .attr("rx", 5)
+              .attr("ry", 5)
+              .style("fill", "white")
+              .style("stroke", "black");
+            tooltip.append("text")
+              .attr("x", pointer[0] + 60)
+              .attr("y", pointer[1] - 7)
+              .attr("text-anchor", "middle")
+              .attr("dominant-baseline", "middle")
+              .style("font-size", "12px")
+              .text(`Value = ${d.toFixed(2)}`);
+          })
+          .on("mouseout", function (this: SVGRectElement, event: MouseEvent, d: number) {
+            const origX = +d3.select(this).attr("data-orig-x");
+            const origY = +d3.select(this).attr("data-orig-y");
+            
+            d3.select(this)
+              .transition()
+              .duration(100)
+              .attr("x", origX)
+              .attr("y", origY)
+              .attr("width", rectW)
+              .attr("height", rectW)
+              .attr("stroke", "none");
+            
+            g.selectAll(".cell-tooltip").remove();
+          });
+      }
     }
+  }
+  
 
-}
+
 
 export function drawBiasVector(
     g: any,
@@ -1273,21 +1517,60 @@ export function drawBiasVector(
     layerID: number
 ) {
     let channels = featureChannels;
-    if (layerID == 2 && featureChannels == 4) channels = 2;
+    if (layerID === 2 && featureChannels === 4) channels = 2;
     for (let m = 0; m < channels; m++) {
+        let biasValue = layerBias[m];
         g.append("rect")
             .attr("x", coordFeatureVis[0] + rectW * m)
             .attr("y", coordFeatureVis[1] - rectH / 2)
             .attr("width", rectW)
             .attr("height", rectH)
-            .attr("fill", myColor(layerBias[m]))
+            .attr("fill", myColor(biasValue))
             .style("opacity", 1)
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1)
-            .attr("class", "procVis bias");
+            .attr("class", "procVis bias")
+            .on("mouseover", function (this: SVGRectElement, event: MouseEvent) {
+                d3.select(this)
+                  .attr("stroke", "black")
+                  .attr("stroke-width", 3);
+                
+                const pointer = d3.pointer(event, g.node());
+                
+                const tooltip = g.append("g")
+                    .attr("class", "bias-tooltip");
+                
+                tooltip.append("rect")
+                    .attr("x", pointer[0] )
+                    .attr("y", pointer[1] - 10)
+                    .attr("width", 80)
+                    .attr("height", 20)
+                    .attr("fill", "white")
+                    .attr("stroke", "black")
+                    .attr("rx", 3)
+                    .attr("ry", 3);
+                
+                tooltip.append("text")
+                    .attr("x", pointer[0] + 10 + 30)
+                    .attr("y", pointer[1] - 10 + 10)
+                    .attr("text-anchor", "middle")
+                    .attr("dominant-baseline", "middle")
+                    .style("font-size", "10px")
+                    .attr("fill", "black")
+                    .text("value:"+biasValue.toFixed(2));
+            })
+            .on("mouseout", function (this: SVGRectElement) {
+
+                d3.select(this)
+                  .attr("stroke", "gray")
+                  .attr("stroke-width", 0.1);
+                
+
+                g.selectAll("g.bias-tooltip").remove();
+            });
     }
 
-    //draw frame
+    // 绘制 bias vector 的外框
     g.append("rect")
         .attr("x", coordFeatureVis[0])
         .attr("y", coordFeatureVis[1] - rectH / 2)
@@ -1298,8 +1581,14 @@ export function drawBiasVector(
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("class", "procVis biasVector biasFrame");
-    const label = drawHintLabel(g, coordFeatureVis[0], coordFeatureVis[1] + rectH + 6, `Bias Vector: ${layerBias.length} x 1`, "procVis biasFrame");
-    // d3.selectAll(".biasVector").transition().duration(100).style("opacity", 1);
+
+    drawHintLabel(
+        g,
+        coordFeatureVis[0],
+        coordFeatureVis[1] + rectH + 6,
+        `Bias Vector: ${layerBias.length} x 1`,
+        "procVis biasFrame"
+    );
 }
 
 export function drawBiasPath(
