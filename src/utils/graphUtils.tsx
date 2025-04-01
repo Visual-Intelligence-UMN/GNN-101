@@ -1139,41 +1139,67 @@ export function calculationVisualizer(
         .style("fill", (d: number) => myColor(d))
         // .style("fill", "coral")
         .style("stroke-width", 0.1)
-        .attr("class", "aggregatedFeatureGroup to-be-removed procVis")
+        .attr("class", "aggregatedFeatureGroup to-be-removed procVis agg-cell")
         .style("stroke", "grey")
-        .style("opacity", 0)
-        .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
-            d3.select(this)
-                .attr("stroke", "black")
-                .attr("stroke-width", 2);
-            const pointer = d3.pointer(event, aggregatedFeatureGroup.node());
-            const tooltip = aggregatedFeatureGroup.append("g").attr("class", "agg-feature-tooltip");
-            tooltip.append("rect")
-                .attr("x", pointer[0] - 20)
-                .attr("y", pointer[1] - 30)
-                .attr("width", 60)
-                .attr("height", 20)
-                .attr("fill", "white")
-                .attr("stroke", "black")
-                .attr("rx", 3)
-                .attr("ry", 3);
-            tooltip.append("text")
-                .attr("x", pointer[0] - 20 + 30)
-                .attr("y", pointer[1] - 30 + 10)
-                .attr("text-anchor", "middle")
-                .attr("dominant-baseline", "middle")
-                .style("font-size", "10px")
-                .attr("fill", "black")
-                .text("Value = " + d.toFixed(2));
-            })
-            .on("mouseout", function (this: SVGRectElement) {
-            d3.select(this)
-                .attr("stroke", "grey")
-                .attr("stroke-width", 0.1);
-            aggregatedFeatureGroup.selectAll(".agg-feature-tooltip").remove();
-            });
-        
+        .style("opacity", 0);
+
+        d3.selectAll<SVGRectElement, number>("rect.agg-cell")
+            .style("pointer-events", "all")
+            .style("cursor", "pointer")
+            .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
+                event.stopPropagation();
+                console.log("mouseover triggered on", this);
+                
+        // 高亮当前 cell
+        d3.select(this)
+        .style("stroke", "black")
+        .style("stroke-width", 2)
+        .raise();
     
+        d3.selectAll(".agg-tooltip").remove();
+    
+        const [mx, my] = d3.pointer(event, svg.node());
+        console.log("tooltip coordinates:", mx, my);
+    
+        const tooltip = svg
+            .append("g")
+            .attr("class", "multiplier-tooltip procVis")
+            .style("pointer-events", "none");
+  
+        tooltip.append("rect")
+            .attr("x", mx + 10)
+            .attr("y", my - 40)
+            .attr("width", 200)
+            .attr("height", 100)
+            .attr("rx", 5)
+            .attr("ry", 5)
+            .style("fill", "white")
+            .style("stroke", "black");
+
+
+        const textElement = tooltip.append("text")
+            .attr("x", mx + 20)
+            .attr("y", my - 30)
+            .style("font-size", "12px")
+            .style("font-family", "monospace")
+            .style("fill", "black");
+            
+        tooltip.append("text")
+            .attr("x", mx + 20)
+            .attr("y", my - 20)
+            .text(`Value = ${d.toFixed(3)}`)
+            .style("font-size", "12px")
+            .style("fill", "black");
+    })
+    .on("mouseout", function (this: SVGRectElement, event: MouseEvent) {
+        event.stopPropagation();
+        d3.selectAll(".multiplier-tooltip").remove();
+        d3.select(this)
+            .style("stroke", "grey")
+            .style("stroke-width", 0.1);
+    });
+
+      
 
     //draw label
     let text = `Vectors \nSummation^T:\n1x${aggregatedData.length}`
