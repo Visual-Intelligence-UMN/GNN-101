@@ -309,9 +309,11 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
         .style("opacity", 1);
 
     innerGroup.append("text")
-        .attr("x", 70 - 30 + 5)
+        .attr("x", 70 - 30 + 5 + 17)
         .attr("y", displayHeight - 10 - 2)
-        .text(roundToTwo(aggregatedData[0]))
+        .text(aggregatedData[0].toFixed(2))
+        .style("font-family", "monospace")
+        .attr("text-anchor", "end")
         .attr("class", "math-displayer")
         .attr("font-size", "7")
         .attr("fill", Math.abs(aggregatedData[0]) > 0.7 ? "white" : "black");
@@ -329,9 +331,11 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
         .style("opacity", 1);
 
     innerGroup.append("text")
-        .attr("x", 70 - 30 + 25 + 10 + 5)
+        .attr("x", 70 - 30 + 25 + 10 + 5 + 17)
         .attr("y", displayHeight - 10 - 2)
-        .text(roundToTwo(weights[index][0][i]))
+        .text(weights[index][0][i].toFixed(2))
+        .style("font-family", "monospace")
+        .attr("text-anchor", "end")
         .attr("class", "math-displayer")
         .attr("font-size", "7")
         .attr("fill", Math.abs(weights[index][0][1]) > 0.7 ? "white" : "black");
@@ -349,9 +353,11 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
         .style("opacity", 1);
 
     innerGroup.append("text")
-        .attr("x", 70 - 30 + 45 + 20 + 10)
+        .attr("x", 70 - 30 + 45 + 20 + 10 + 17)
         .attr("y", displayHeight - 10 - 2)
-        .text(roundToTwo(aggregatedData[1]))
+        .text(aggregatedData[1].toFixed(2))
+        .style("font-family", "monospace")
+        .attr("text-anchor", "end")
         .attr("class", "math-displayer")
         .attr("font-size", "7")
         .attr("fill", Math.abs(aggregatedData[1]) > 0.7 ? "white" : "black");
@@ -369,9 +375,11 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
         .style("opacity", 1);
 
     innerGroup.append("text")
-        .attr("x", 70 - 30 + 65 + 30 + 15)
+        .attr("x", 70 - 30 + 65 + 30 + 15 + 17)
         .attr("y", displayHeight - 10 - 2)
-        .text(roundToTwo(weights[index][1][i]))
+        .text(weights[index][1][i].toFixed(2))
+        .style("font-family", "monospace")
+        .attr("text-anchor", "end")
         .attr("class", "math-displayer")
         .attr("font-size", "7")
         .attr("fill", Math.abs(weights[index][1][i]) > 0.7 ? "white" : "black");
@@ -380,8 +388,8 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
     innerGroup.append("rect")
         .attr("x", 70 - 30 + 100 + 60 + 20)
         .attr("y", displayHeight - 10 - 9)
-        .attr("width", 14)
-        .attr("height", 14)
+        .attr("width", 17)
+        .attr("height", 17)
         .attr("class", `math-displayer`)
         .style("fill", myColor(calculatedData[i]))
         .style("stroke-width", 0.1)
@@ -389,9 +397,11 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
         .style("opacity", 1);
 
     innerGroup.append("text")
-        .attr("x", 70 - 30 + 100 + 60 + 20)
+        .attr("x", 70 - 30 + 100 + 60 + 20 + 17)
         .attr("y", displayHeight - 10 - 2)
-        .text(roundToTwo(calculatedData[i]))
+        .text(calculatedData[i].toFixed(2)) 
+        .style("font-family", "monospace")
+        .attr("text-anchor", "end")
         .attr("class", "math-displayer")
         .attr("font-size", "7")
         .attr("fill", Math.abs(calculatedData[i]) > 0.7 ? "white" : "black");
