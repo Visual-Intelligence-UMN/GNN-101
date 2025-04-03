@@ -1423,7 +1423,7 @@ export function calculationVisualizer(
             }, ${height / 5 + 100})`
         );
 
-    BiasGroup.selectAll("rect")
+        BiasGroup.selectAll("rect")
         .data(biasData)
         .enter()
         .append("rect")
@@ -1433,15 +1433,20 @@ export function calculationVisualizer(
         .attr("width", rectHeight)
         .attr("height", rectWidth)
         .style("fill", (d: number) => myColor(d))
-        .style("stroke-width", 0.1)
+        .style("stroke-width", "0.1px")
         .style("stroke", "grey")
         .style("opacity", 0)
+        .style("pointer-events", "all") 
         .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
             d3.select(this)
-              .attr("stroke", "black")
-              .attr("stroke-width", 2);
+              .style("stroke", "black")
+              .style("stroke-width", "1.5px")
+              .style("opacity", 1);
+              
             const pointer = d3.pointer(event, BiasGroup.node());
-            const tooltip = BiasGroup.append("g").attr("class", "bias-tooltip");
+            const tooltip = BiasGroup.append("g")
+                .attr("class", "bias-tooltip")
+                .style("pointer-events", "none");
             tooltip.append("rect")
               .attr("x", pointer[0] + 10)
               .attr("y", pointer[1] - 10)
@@ -1460,10 +1465,10 @@ export function calculationVisualizer(
               .attr("fill", "black")
               .text(d.toFixed(2));
           })
-          .on("mouseout", function (this: SVGRectElement) {
+        .on("mouseout", function (this: SVGRectElement) {
             d3.select(this)
-              .attr("stroke", "grey")
-              .attr("stroke-width", 0.1);
+              .style("stroke", "grey")
+              .style("stroke-width", "0.1px");
             BiasGroup.selectAll(".bias-tooltip").remove();
           });
           
