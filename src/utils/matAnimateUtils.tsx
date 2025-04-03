@@ -1538,12 +1538,13 @@ export function drawBiasVector(
                 const pointer = d3.pointer(event, g.node());
                 
                 const tooltip = g.append("g")
-                    .attr("class", "bias-tooltip");
+                    .attr("class", "bias-tooltip")
+                    .style("pointer-events", "none");
                 
                 tooltip.append("rect")
                     .attr("x", pointer[0] )
                     .attr("y", pointer[1] - 10)
-                    .attr("width", 80)
+                    .attr("width", 50)
                     .attr("height", 20)
                     .attr("fill", "white")
                     .attr("stroke", "black")
@@ -1551,13 +1552,13 @@ export function drawBiasVector(
                     .attr("ry", 3);
                 
                 tooltip.append("text")
-                    .attr("x", pointer[0] + 10 + 30)
+                    .attr("x", pointer[0] + 20 )
                     .attr("y", pointer[1] - 10 + 10)
                     .attr("text-anchor", "middle")
                     .attr("dominant-baseline", "middle")
                     .style("font-size", "10px")
                     .attr("fill", "black")
-                    .text("value:"+biasValue.toFixed(2));
+                    .text(biasValue.toFixed(2));
             })
             .on("mouseout", function (this: SVGRectElement) {
 

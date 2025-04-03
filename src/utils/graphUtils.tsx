@@ -1445,7 +1445,7 @@ export function calculationVisualizer(
             tooltip.append("rect")
               .attr("x", pointer[0] + 10)
               .attr("y", pointer[1] - 10)
-              .attr("width", 60)
+              .attr("width", 50)
               .attr("height", 20)
               .attr("fill", "white")
               .attr("stroke", "black")
@@ -1458,7 +1458,7 @@ export function calculationVisualizer(
               .attr("dominant-baseline", "middle")
               .style("font-size", "10px")
               .attr("fill", "black")
-              .text("Value = " + d.toFixed(2));
+              .text(d.toFixed(2));
           })
           .on("mouseout", function (this: SVGRectElement) {
             d3.select(this)
