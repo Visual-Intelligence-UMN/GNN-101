@@ -1300,7 +1300,6 @@ export function drawMathFormula(
     // flattenSVG(".mats");
 
 }
-
 export function drawWeightMatrix(
     btnX: number,
     btnY: number,
@@ -1318,13 +1317,15 @@ export function drawWeightMatrix(
     let btnPt: [number, number] = [btnX + 10, btnY - 15];
     let wMatPt: [number, number] = [
       (weightMatrixPostions[0][0][0] +
-        weightMatrixPostions[0][weightMatrixPostions[0].length - 1][0]) / 2,
+        weightMatrixPostions[0][weightMatrixPostions[0].length - 1][0]) /
+        2,
       weightMatrixPostions[0][0][1],
     ];
     if (curveDir == 1) {
       wMatPt = [
         (weightMatrixPostions[0][0][0] +
-          weightMatrixPostions[0][weightMatrixPostions[0].length - 1][0]) / 2,
+          weightMatrixPostions[0][weightMatrixPostions[0].length - 1][0]) /
+          2,
         weightMatrixPostions[len - 1][0][1],
       ];
     }
@@ -1364,7 +1365,6 @@ export function drawWeightMatrix(
       flag = true;
     }
   
-
     const dimX = weightMat[0].length;
     const dimY = weightMat.length;
   
@@ -1389,7 +1389,7 @@ export function drawWeightMatrix(
       weightMat = flipHorizontally(weightMat);
       weightMat = flipVertically(weightMat);
     }
-
+  
     g.append("rect")
       .attr("class", "weight-matrix-frame to-be-removed procVis")
       .attr("x", weightMatrixPostions[0][0][0])
@@ -1407,32 +1407,39 @@ export function drawWeightMatrix(
       `Weight Matrix: ${dimY} x ${dimX}`,
       "procVis weightMatrixText to-be-removed"
     );
-  
-    
+
     for (let i = 0; i < weightMatrixPostions[0].length; i++) {
-      
+
       const columnG = g
         .append("g")
         .attr("class", "procVis columnGroup")
         .attr("id", `columnGroup-${i}`);
   
-      
+      g.append("rect")
+        .attr("x", weightMatrixPostions[0][i][0])
+        .attr("y", weightMatrixPostions[0][i][1])
+        .attr("width", rectW)
+        .attr("height", rectW * weightMatrixPostions.length)
+        .attr("fill", "none")
+        .attr("stroke", "black")
+        .attr("stroke-width", 0.5)
+        .attr("opacity", 0)
+        .attr("class", "columnUnit")
+        .attr("id", `columnUnit-${i}`);
+  
       for (let j = 0; j < weightMatrixPostions.length; j++) {
-       
         let colorVal: number = 0;
         if (flag) {
           colorVal = weightMat[weightMat.length - j - 1][i];
         } else {
           colorVal = weightMat[i][weightMat[0].length - j - 1];
         }
-        
         if (weightMat[0].length == weightMat.length) {
           colorVal = weightMat[j][i];
         }
-  
         columnG
           .append("rect")
-          .datum(colorVal) 
+          .datum(colorVal)
           .attr("x", weightMatrixPostions[j][i][0])
           .attr("y", weightMatrixPostions[j][i][1])
           .attr("width", rectW)
@@ -1446,14 +1453,11 @@ export function drawWeightMatrix(
             event.stopPropagation();
             const origX = +d3.select(this).attr("data-orig-x");
             const origY = +d3.select(this).attr("data-orig-y");
-            
-           
             const scale = 2;
             const newWidth = rectW * scale;
             const newHeight = rectW * scale;
             const deltaX = (newWidth - rectW) / 2;
             const deltaY = (newHeight - rectW) / 2;
-            
             d3.select(this)
               .transition()
               .duration(100)
@@ -1463,10 +1467,8 @@ export function drawWeightMatrix(
               .attr("height", newHeight)
               .attr("stroke", "black")
               .attr("stroke-width", 2);
-            
             const pointer = d3.pointer(event, g.node());
-            const tooltip = g.append("g")
-              .attr("class", "cell-tooltip procVis");
+            const tooltip = g.append("g").attr("class", "cell-tooltip procVis");
             tooltip.append("rect")
               .attr("x", pointer[0] + 10)
               .attr("y", pointer[1] - 20)
@@ -1487,7 +1489,6 @@ export function drawWeightMatrix(
           .on("mouseout", function (this: SVGRectElement, event: MouseEvent, d: number) {
             const origX = +d3.select(this).attr("data-orig-x");
             const origY = +d3.select(this).attr("data-orig-y");
-            
             d3.select(this)
               .transition()
               .duration(100)
@@ -1496,13 +1497,31 @@ export function drawWeightMatrix(
               .attr("width", rectW)
               .attr("height", rectW)
               .attr("stroke", "none");
-            
             g.selectAll(".cell-tooltip").remove();
           });
       }
     }
-  }
+
+    function highlightWeightMatrixColumn(columnIndex: number, highlight: boolean) {
+      d3.select(`#columnUnit-${columnIndex}`)
+        .transition()
+        .duration(100)
+        .style("stroke", "black")
+        .style("stroke-width", highlight ? 2 : 0.5)
+        .style("opacity", highlight ? 1 : 0);
+    }
   
+    d3.selectAll<SVGRectElement, unknown>(".mul-result-cell")
+      .on("mouseover", function (this: SVGRectElement, event: MouseEvent, _d: any, i: number) {
+        event.stopPropagation();
+        highlightWeightMatrixColumn(i, true);
+      })
+      .on("mouseout", function (this: SVGRectElement, event: MouseEvent, _d: any, i: number) {
+        event.stopPropagation();
+        highlightWeightMatrixColumn(i, false);
+      });
+  }
+    
 
 
 

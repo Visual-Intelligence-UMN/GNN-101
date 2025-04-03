@@ -1148,7 +1148,6 @@ export function calculationVisualizer(
             .style("cursor", "pointer")
             .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
                 event.stopPropagation();
-                console.log("mouseover triggered on", this);
                 
         // 高亮当前 cell
         d3.select(this)
@@ -1159,7 +1158,7 @@ export function calculationVisualizer(
         d3.selectAll(".agg-tooltip").remove();
     
         const [mx, my] = d3.pointer(event, svg.node());
-        console.log("tooltip coordinates:", mx, my);
+        console.log("步骤", node.aggregationSteps);
     
         const tooltip = svg
             .append("g")
@@ -1176,18 +1175,12 @@ export function calculationVisualizer(
             .style("fill", "white")
             .style("stroke", "black");
 
-
-        const textElement = tooltip.append("text")
-            .attr("x", mx + 20)
-            .attr("y", my - 30)
-            .style("font-size", "12px")
-            .style("font-family", "monospace")
-            .style("fill", "black");
+        const detailText = node.aggregationSteps[0];
             
         tooltip.append("text")
             .attr("x", mx + 20)
             .attr("y", my - 20)
-            .text(`Value = ${d.toFixed(3)}`)
+            .text(d.toFixed(2))
             .style("font-size", "12px")
             .style("fill", "black");
     })

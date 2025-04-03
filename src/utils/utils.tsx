@@ -668,8 +668,35 @@ export function featureVisualizer(
                     })
                 }
             })
-            aggregatedDataMap = matrixMultiplication(normalizedAdjMatrix, featureMap)
-            calculatedDataMap = matrixMultiplication(aggregatedDataMap, currentWeights)
+            aggregatedDataMap = [];
+        for (let i = 0; i < nodes.length; i++) {
+            let aggFeatures: number[] = [];
+            let aggSteps: string[] = [];
+            
+            let featureDim = featureMap[0].length;
+            for (let d = 0; d < featureDim; d++) {
+                let sum = 0;
+                let stepStr = "";
+                
+                for (let k = 0; k < featureMap.length; k++) {
+                    const fVal = featureMap[k][d];
+                    
+                    const weightVal = normalizedAdjMatrix[i][k];
+                    sum += fVal * weightVal;
+                    const term = `(${fVal.toFixed(3)} x ${weightVal.toFixed(3)})`;
+                 
+                    stepStr += (k > 0 ? " + " : "") + term;
+                }
+                aggFeatures.push(sum);
+                aggSteps.push(`X[${d}] = Σ [ ${stepStr} ] = ${sum.toFixed(3)}`);
+            }
+            aggregatedDataMap.push(aggFeatures);
+
+            if (nodes[i]) {
+                nodes[i].aggregationSteps = aggSteps;
+            }
+        }
+        calculatedDataMap = matrixMultiplication(aggregatedDataMap, currentWeights);
 
         }
 
