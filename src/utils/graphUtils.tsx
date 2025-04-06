@@ -119,6 +119,7 @@ export function showFeature(node: any) {
                 .text(() => {
                     return `Value = ` + d.toFixed(2).toString();
                 })
+                .attr("font-family", "monospace")
                 .style("font-size", "12px")
                 .style("fill", "black")
                 .style("opacity", 1);
@@ -175,6 +176,7 @@ export function showFeature(node: any) {
                         .text(() => {
                             return `Value = ` + d.toFixed(2).toString();
                         })
+                        .attr("font-family", "monospace")
                         .style("font-size", "12px")
                         .style("fill", "black")
                         .style("opacity", 1);
@@ -1180,6 +1182,7 @@ export function calculationVisualizer(
         tooltip.append("text")
             .attr("x", mx + 20)
             .attr("y", my - 20)
+            .attr("font-family", "monospace")
             .text(d.toFixed(2))
             .style("font-size", "12px")
             .style("fill", "black");
@@ -1456,6 +1459,7 @@ export function calculationVisualizer(
               .attr("dominant-baseline", "middle")
               .style("font-size", "10px")
               .attr("fill", "black")
+              .attr("font-family", "monospace")
               .text(d.toFixed(2));
           })
         .on("mouseout", function (this: SVGRectElement) {
@@ -2112,6 +2116,7 @@ export function calculationVisualizer(
                 .attr("dominant-baseline", "middle")
                 .style("font-size", "10px")
                 .attr("fill", "black")
+                .attr("font-family", "monospace")
                 .text("Value = " + d.toFixed(2));
             })
         .on("mouseout", function (this: SVGRectElement) {

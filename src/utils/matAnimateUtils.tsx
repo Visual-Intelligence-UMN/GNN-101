@@ -1483,6 +1483,7 @@ export function drawWeightMatrix(
               .attr("y", pointer[1] - 7)
               .attr("text-anchor", "middle")
               .attr("dominant-baseline", "middle")
+              .attr("font-family", "monospace")
               .style("font-size", "12px")
               .text(`Value = ${d.toFixed(2)}`);
           })
