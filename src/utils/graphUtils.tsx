@@ -2111,13 +2111,14 @@ export function calculationVisualizer(
         .attr("height", rectWidth)
         .style("fill", (d: number) => myColor(d))
         // .style("fill", "coral")
-        .style("stroke-width", 0.1)
-        .style("stroke", "grey")
+        .attr("stroke-width", 0.1)
+        .attr("stroke", "grey")
         .attr("opacity", 0)
         .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
             d3.select(this)
                 .attr("stroke", "black")
-                .attr("stroke-width", 2);
+                .attr("stroke-width", 2)
+                .raise();
             const pointer = d3.pointer(event, outputGroup.node());
             const tooltip = outputGroup.append("g").attr("class", "output-tooltip").raise();
             tooltip.append("rect")
@@ -2142,7 +2143,8 @@ export function calculationVisualizer(
         .on("mouseout", function (this: SVGRectElement) {
             d3.select(this)
                 .attr("stroke", "grey")
-                .attr("stroke-width", 0.1);
+                .attr("stroke-width", 0.1)
+                .lower();
             outputGroup.selectAll(".output-tooltip").remove();
         });
 
