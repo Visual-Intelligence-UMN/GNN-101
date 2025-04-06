@@ -1184,55 +1184,57 @@ export function calculationVisualizer(
         .style("stroke", "grey")
         .style("opacity", 0);
 
+    setTimeout(() => {
         d3.selectAll<SVGRectElement, number>("rect.agg-cell")
-            .style("pointer-events", "all")
-            .style("cursor", "pointer")
-            .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
-                event.stopPropagation();
-                
-        // 高亮当前 cell
-        d3.select(this)
-        .style("stroke", "black")
-        .style("stroke-width", 2)
-        .raise();
-    
-        d3.selectAll(".agg-tooltip").remove();
-    
-        const [mx, my] = d3.pointer(event, svg.node());
-        console.log("步骤", node.aggregationSteps);
-    
-        const tooltip = svg
-            .append("g")
-            .attr("class", "multiplier-tooltip procVis")
-            .style("pointer-events", "none");
-  
-        tooltip.append("rect")
-            .attr("x", mx + 10)
-            .attr("y", my - 40)
-            .attr("width", 200)
-            .attr("height", 100)
-            .attr("rx", 5)
-            .attr("ry", 5)
-            .style("fill", "white")
-            .style("stroke", "black");
-
-        const detailText = node.aggregationSteps[0];
+        .style("pointer-events", "all")
+        .style("cursor", "pointer")
+        .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
+            event.stopPropagation();
             
-        tooltip.append("text")
-            .attr("x", mx + 20)
-            .attr("y", my - 20)
-            .attr("font-family", "monospace")
-            .text(d.toFixed(2))
-            .style("font-size", "12px")
-            .style("fill", "black");
-    })
-    .on("mouseout", function (this: SVGRectElement, event: MouseEvent) {
-        event.stopPropagation();
-        d3.selectAll(".multiplier-tooltip").remove();
-        d3.select(this)
-            .style("stroke", "grey")
-            .style("stroke-width", 0.1);
-    });
+            // 高亮当前 cell
+            d3.select(this)
+            .style("stroke", "black")
+            .style("stroke-width", 2)
+            .raise();
+        
+            d3.selectAll(".agg-tooltip").remove();
+        
+            const [mx, my] = d3.pointer(event, svg.node());
+            console.log("步骤", node.aggregationSteps);
+        
+            const tooltip = svg
+                .append("g")
+                .attr("class", "multiplier-tooltip procVis")
+                .style("pointer-events", "none");
+    
+            tooltip.append("rect")
+                .attr("x", mx + 10)
+                .attr("y", my - 40)
+                .attr("width", 200)
+                .attr("height", 100)
+                .attr("rx", 5)
+                .attr("ry", 5)
+                .style("fill", "white")
+                .style("stroke", "black");
+
+            const detailText = node.aggregationSteps[0];
+                
+            tooltip.append("text")
+                .attr("x", mx + 20)
+                .attr("y", my - 20)
+                .attr("font-family", "monospace")
+                .text(d.toFixed(2))
+                .style("font-size", "12px")
+                .style("fill", "black");
+        })
+        .on("mouseout", function (this: SVGRectElement, event: MouseEvent) {
+            event.stopPropagation();
+            d3.selectAll(".multiplier-tooltip").remove();
+            d3.select(this)
+                .style("stroke", "grey")
+                .style("stroke-width", 0.1);
+        });
+    }, 4500);
 
       
 
