@@ -82,6 +82,15 @@ export function showFeature(node: any) {
         node.featureGroup
         .selectAll("rect") // 选择所有的矩形元素
         .on("mouseover", function(this: SVGRectElement, event: MouseEvent, d: number) {
+            if ((function checkActive(el: any): boolean {
+                while (el) {
+                    if (d3.active(el)) return true;
+                    el = el.parentNode;
+                }
+                return false;
+            })(this)) {
+                return;
+            }
             console.log("@@@####");
             
             // 移除已存在的弹框
@@ -149,6 +158,16 @@ export function showFeature(node: any) {
                 n.featureGroup
                 .selectAll("rect") // 选择所有的矩形元素
                 .on("mouseover", function(this: SVGRectElement, event: MouseEvent, d: number) {
+                    if ((function checkActive(el: any): boolean {
+                        while (el) {
+                            if (d3.active(el)) return true;
+                            el = el.parentNode;
+                        }
+                        return false;
+                    })(this)) {
+                        return;
+                    }
+
                     console.log("@@@####");
                     
                     // 移除已存在的弹框
