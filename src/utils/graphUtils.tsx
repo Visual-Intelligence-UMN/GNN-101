@@ -2114,11 +2114,9 @@ export function calculationVisualizer(
 
 
     //draw label
-
-
-
-
-    outputGroup
+    //output timeout
+    setTimeout(() => {
+        outputGroup
         .selectAll("rect")
         .data(node.features)
         .enter()
@@ -2166,6 +2164,10 @@ export function calculationVisualizer(
                 .lower();
             outputGroup.selectAll(".output-tooltip").remove();
         });
+    }, 4500);
+
+
+
 
 
     const outputFrame = outputGroup.append("rect")
