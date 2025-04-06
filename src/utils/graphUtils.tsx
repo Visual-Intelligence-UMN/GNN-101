@@ -86,6 +86,12 @@ export function showFeature(node: any) {
             
             // 移除已存在的弹框
             d3.selectAll(".multiplier-tooltip").remove();
+
+            // 高亮当前 cell
+            d3.select(this)
+            .style("stroke", "black")
+            .style("stroke-width", 2)
+            .raise();
             
             // 获取 SVG 元素
             const svg = d3.select(node.featureGroup.node().closest("svg"));
@@ -124,12 +130,16 @@ export function showFeature(node: any) {
                 .style("fill", "black")
                 .style("opacity", 1);
             }
-        });
-
-        // 添加鼠标移出事件，移除弹框
-        node.featureGroup.on("mouseout", function() {
+        })
+        .on("mouseout", function(this: SVGRectElement, event: MouseEvent, d: number){
+            // 移除已存在的弹框
             d3.selectAll(".multiplier-tooltip").remove();
-        });
+            // 取消高亮当前 cell
+            d3.select(this)
+            .style("stroke", "grey")
+            .style("stroke-width", 0.1)
+            .lower();
+        })
     }
     if (node.relatedNodes) {
         node.relatedNodes.forEach((n: any) => {
@@ -143,6 +153,12 @@ export function showFeature(node: any) {
                     
                     // 移除已存在的弹框
                     d3.selectAll(".multiplier-tooltip").remove();
+                            d3.select(this)
+                    // 高亮当前 cell
+                    d3.select(this)
+                    .style("stroke", "black")
+                    .style("stroke-width", 2)
+                    .raise();
                     
                     // 获取 SVG 元素
                     const svg = d3.select(n.featureGroup.node().closest("svg"));
@@ -181,12 +197,16 @@ export function showFeature(node: any) {
                         .style("fill", "black")
                         .style("opacity", 1);
                     }
-                });
-
-                // 添加鼠标移出事件，移除弹框
-                n.featureGroup.on("mouseout", function() {
+                })
+                .on("mouseout", function(this: SVGRectElement, event: MouseEvent, d: number){
+                    // 移除已存在的弹框
                     d3.selectAll(".multiplier-tooltip").remove();
-                });
+                    // 取消高亮当前 cell
+                    d3.select(this)
+                    .style("stroke", "grey")
+                    .style("stroke-width", 0.1)
+                    .lower();
+                })
             }
         });
     }
