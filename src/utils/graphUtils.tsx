@@ -1510,7 +1510,7 @@ export function calculationVisualizer(
               .style("stroke-width", "0.1px");
             BiasGroup.selectAll(".bias-tooltip").remove();
           });
-    }, 4500)
+    }, 6000)
           
     
 
