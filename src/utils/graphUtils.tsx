@@ -1458,6 +1458,7 @@ export function calculationVisualizer(
             }, ${height / 5 + 100})`
         );
 
+    setTimeout(() => {
         BiasGroup.selectAll("rect")
         .data(biasData)
         .enter()
@@ -1507,6 +1508,7 @@ export function calculationVisualizer(
               .style("stroke-width", "0.1px");
             BiasGroup.selectAll(".bias-tooltip").remove();
           });
+    }, 4500)
           
     
 
