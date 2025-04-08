@@ -1483,6 +1483,7 @@ export function drawWeightMatrix(
               .attr("y", pointer[1] - 7)
               .attr("text-anchor", "middle")
               .attr("dominant-baseline", "middle")
+              .attr("font-family", "monospace")
               .style("font-size", "12px")
               .text(`Value = ${d.toFixed(2)}`);
           })
@@ -1552,7 +1553,8 @@ export function drawBiasVector(
             .on("mouseover", function (this: SVGRectElement, event: MouseEvent) {
                 d3.select(this)
                   .attr("stroke", "black")
-                  .attr("stroke-width", 3);
+                  .attr("stroke-width", 2)
+                  .raise();
                 
                 const pointer = d3.pointer(event, g.node());
                 
@@ -1583,7 +1585,8 @@ export function drawBiasVector(
 
                 d3.select(this)
                   .attr("stroke", "gray")
-                  .attr("stroke-width", 0.1);
+                  .attr("stroke-width", 0.1)
+                  .lower();
                 
 
                 g.selectAll("g.bias-tooltip").remove();

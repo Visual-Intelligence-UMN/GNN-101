@@ -265,6 +265,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
         .attr("x", 70 - 25)
         .attr("y", displayHeight - 65 - 12)
         .text("Matmul Visualization")
+        .attr("font-family", "monospace")
         .attr("class", "math-displayer")
         .attr("font-size", "20");
 
@@ -273,8 +274,9 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
         .attr("x", 70 - 35)
         .attr("y", displayHeight - 40)
         .attr("xml:space", "preserve")
-        .text("dot(           ,         )")
+        .text("dot(     ,    )")
         .attr("class", "math-displayer")
+        .attr("font-family", "monospace")
         .attr("font-size", "20");
 
 
