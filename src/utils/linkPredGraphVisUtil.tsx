@@ -227,7 +227,8 @@ export function linkPredFeatureVisualizer(
         .attr("class", `node-features-${node.graphIndex}-${node.id}`)
         .style("fill", "none")
         .style("stroke", "black")
-        .style("stroke-width", 1);
+        .style("stroke-width", 1)
+        .attr("data-index", (d:any, i:number) => i);
 
         const featureId = featureGroup.append("text")
           .attr("x", rectWidth / 2)
