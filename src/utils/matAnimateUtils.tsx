@@ -1157,7 +1157,40 @@ export function drawWeightsVector(
             .attr("stroke-width", 0.1)
             .attr("class", rectClass)
             .attr("rectID", m)
-            .attr("id", `weightRect${m}`);
+            .attr("id", `weightRect${m}`)
+            .style("pointer-events", "all")
+            .style("cursor", "pointer")
+            .on("mouseover", function(this: SVGRectElement, event: any) {
+                event.stopPropagation();
+                const [x, y] = d3.pointer(event);
+                d3.selectAll(".matmul-tooltip").remove();
+                
+                const tooltip = g
+                    .append("g")
+                    .attr("class", "matmul-tooltip procVis");
+                
+                tooltip
+                    .append("rect")
+                    .attr("x", x + 10)
+                    .attr("y", y - 40)
+                    .attr("width", 120)
+                    .attr("height", 30)
+                    .attr("rx", 5)
+                    .attr("ry", 5)
+                    .style("fill", "white")
+                    .style("stroke", "black");
+                
+                tooltip
+                    .append("text")
+                    .attr("x", x + 20)
+                    .attr("y", y - 20)
+                    .text(`Value: ${dummy[m].toFixed(2)}`)
+                    .style("font-size", "12px")
+                    .style("font-family", "monospace");
+            })
+            .on("mouseout", function() {
+                d3.selectAll(".matmul-tooltip").remove();
+            });
     }
     drawHintLabel(
         g,
