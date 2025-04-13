@@ -2165,8 +2165,8 @@ export function calculationVisualizer(
             outputGroup.raise();
             tooltip.append("rect")
                 .attr("x", pointer[0] - 20)
-                .attr("y", pointer[1] - 30)
-                .attr("width", 120)
+                .attr("y", pointer[1] - 35)
+                .attr("width", 130)
                 .attr("height", 30)
                 .attr("fill", "white")
                 .attr("stroke", "black")
