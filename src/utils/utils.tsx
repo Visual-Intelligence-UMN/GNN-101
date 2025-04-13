@@ -669,35 +669,43 @@ export function featureVisualizer(
                 }
             })
             aggregatedDataMap = [];
-        for (let i = 0; i < nodes.length; i++) {
-            let aggFeatures: number[] = [];
-            let aggSteps: string[] = [];
-            
-            let featureDim = featureMap[0].length;
-            for (let d = 0; d < featureDim; d++) {
-                let sum = 0;
-                let stepStr = "";
+            for (let i = 0; i < nodes.length; i++) {
+                let aggFeatures: number[] = [];
+                let aggSteps: string[] = [];
                 
-                for (let k = 0; k < featureMap.length; k++) {
-                    const fVal = featureMap[k][d];
+                let featureDim = featureMap[0].length;
+                for (let d = 0; d < featureDim; d++) {
+                    let sum = 0;
+                    let stepStr = "";
+                    let isFirstTerm = true;
                     
-                    const weightVal = normalizedAdjMatrix[i][k];
-                    sum += fVal * weightVal;
-                    const term = `(${fVal.toFixed(3)} x ${weightVal.toFixed(3)})`;
-                 
-                    stepStr += (k > 0 ? " + " : "") + term;
+                    for (let k = 0; k < featureMap.length; k++) {
+                        // Only include terms for nodes that are connected (have non-zero weights)
+                        if (normalizedAdjMatrix[i][k] !== 0) {
+                            const fVal = featureMap[k][d];
+                            const weightVal = normalizedAdjMatrix[i][k];
+                            
+                            sum += fVal * weightVal;
+                            const term = `(${fVal.toFixed(3)} × ${weightVal.toFixed(3)})`;
+                            
+                            // Add newline and plus sign for all terms except the first
+                            stepStr += (isFirstTerm ? "" : "\n+ ") + term;
+                            isFirstTerm = false;
+                        }
+                    }
+                    
+                    aggFeatures.push(sum);
+                    // Create the final step string
+                    aggSteps.push(`X[${d}] = Σ [\n${stepStr} \n] = ${sum.toFixed(3)}`);
                 }
-                aggFeatures.push(sum);
-                aggSteps.push(`X[${d}] = Σ [ ${stepStr} ] = ${sum.toFixed(3)}`);
+                
+                aggregatedDataMap.push(aggFeatures);
+                
+                if (nodes[i]) {
+                    nodes[i].aggregationSteps = aggSteps;
+                }
             }
-            aggregatedDataMap.push(aggFeatures);
-
-            if (nodes[i]) {
-                nodes[i].aggregationSteps = aggSteps;
-            }
-        }
-        calculatedDataMap = matrixMultiplication(aggregatedDataMap, currentWeights);
-
+            calculatedDataMap = matrixMultiplication(aggregatedDataMap, currentWeights);
         }
 
 

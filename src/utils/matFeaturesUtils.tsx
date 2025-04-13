@@ -396,18 +396,55 @@ export function drawSingleGCNConvFeature(
 
     //where we met encounter issue
     for (let m = 0; m < featureChannels; m++) {
+        const cellValue = nodeMat[m];
         const rect = g
             .append("rect")
             .attr("x", locations[i][0] + rectW * m)
             .attr("y", locations[i][1])
             .attr("width", rectW)
             .attr("height", rectH)
-            .attr("fill", myColor(nodeMat[m]))
+            .attr("fill", myColor(cellValue))
             .attr("opacity", 1)
             .attr("stroke", "gray")
-            .attr("stroke-width", 0.1);
-        //if it's the last layer, store rect into thirdGCN
-        if (k == 2 && m<featureChannels) {
+            .attr("stroke-width", 0.1)
+            .attr("data-value", cellValue.toString())
+            .on("mouseover", function(this: SVGRectElement, event: MouseEvent) {
+                d3.selectAll(".feature-tooltip").remove();
+                const container = d3.select(".mats");
+                const [x, y] = d3.pointer(event, container.node());
+                const tooltip = container
+                  .append("g")
+                  .attr("class", "feature-tooltip procVis");
+
+                tooltip.append("rect")
+                    .attr("x", x + 10)
+                    .attr("y", y - 28)
+                    .attr("width", 100)  
+                    .attr("height", 30) 
+                    .attr("rx", 5)
+                    .attr("ry", 5)
+                    .style("fill", "white")
+                    .style("stroke", "black");
+
+                tooltip.append("text")
+                    .attr("x", x + 20)
+                    .attr("y", y - 10)
+                    .style("font-size", "12px")
+                    .style("font-family", "monospace")
+                    .text(`Value = ${cellValue.toFixed(2)}`);
+
+                d3.select(this)
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 2);
+            })
+            .on("mouseout", function(this: SVGRectElement) {
+                d3.selectAll(".feature-tooltip").remove();
+                d3.select(this)
+                    .attr("stroke", "gray")
+                    .attr("stroke-width", 0.1);
+            });
+                
+        if (k == 2 && m < featureChannels) {
             thirdGCN[m].push(rect.node());
         }
     }
