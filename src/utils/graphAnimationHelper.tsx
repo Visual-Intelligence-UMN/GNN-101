@@ -481,18 +481,20 @@ export function graphVisDrawActivationExplanation(x:number, y:number, title:stri
         .attr("class", "math-displayer")
         .raise();
 
-    const titleYOffset = 10;
-    const titleXOffset = 50;
+    const titleYOffset = 20;
+    const titleXOffset = 95;
     svg
         .append("text")
         .attr("x", displayX + titleXOffset)
         .attr("y", displayY + titleYOffset)
         .text(title)
         .attr("class", "math-displayer")
-        .attr("font-size", titleYOffset)
+        .attr("font-size", "17px")
+        .attr("font-family", "monospace")
+        .attr("font-weight", "bold")
         .attr("fill", "black");
-    const eqXOffset = titleXOffset / 2;
-    const eqYOffset = titleYOffset * 2.5;
+    const eqXOffset = 25;
+    const eqYOffset = 40;
     const unitSize = eqXOffset / 3 + 3;
     const upperOffset = unitSize * 2;
     svg
@@ -501,7 +503,8 @@ export function graphVisDrawActivationExplanation(x:number, y:number, title:stri
         .attr("y", displayY + eqYOffset)
         .text(formula)
         .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
+        .attr("font-size", "17px")
+        .attr("font-family", "monospace")
         .attr("fill", "black");
     svg
         .append("text")
@@ -509,13 +512,14 @@ export function graphVisDrawActivationExplanation(x:number, y:number, title:stri
         .attr("y", displayY + eqYOffset + unitSize * 1.5)
         .text(description)
         .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
+        .attr("font-size", "17px")
+        .attr("font-family", "monospace")
         .attr("fill", "black");
 }
 
 export function graphVisDrawMatmulExplanation(x:number, y:number, title:string, description:string, svg: any){
     const displayW = 350;
-    const displayH = 50;
+    const displayH = 100;
 
     //find coordination for the math displayer first
     const displayX = x + 10;
