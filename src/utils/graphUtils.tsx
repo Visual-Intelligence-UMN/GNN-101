@@ -104,6 +104,7 @@ export function showFeature(node: any) {
             
             // 获取 SVG 元素
             const svg = d3.select(node.featureGroup.node().closest("svg"));
+            svg.raise();
             
             // 创建弹框
             if (node.features && d !== undefined && d !== null) {
@@ -119,7 +120,7 @@ export function showFeature(node: any) {
             tooltip.append("rect")
                 .attr("x", x + 10)
                 .attr("y", y - 40)
-                .attr("width", 100)
+                .attr("width", 130)
                 .attr("height", 30)
                 .attr("rx", 5)
                 .attr("ry", 5)
@@ -135,7 +136,7 @@ export function showFeature(node: any) {
                     return `Value = ` + d.toFixed(2).toString();
                 })
                 .attr("font-family", "monospace")
-                .style("font-size", "12px")
+                .style("font-size", "17px")
                 .style("fill", "black")
                 .style("opacity", 1);
             }
@@ -181,6 +182,7 @@ export function showFeature(node: any) {
                     
                     // 获取 SVG 元素
                     const svg = d3.select(n.featureGroup.node().closest("svg"));
+                    svg.raise();
                     
                     // 创建弹框
                     if (n.features && d !== undefined && d !== null) {
@@ -196,7 +198,7 @@ export function showFeature(node: any) {
                     tooltip.append("rect")
                         .attr("x", x + 10)
                         .attr("y", y - 40)
-                        .attr("width", 100)
+                        .attr("width", 130)
                         .attr("height", 30)
                         .attr("rx", 5)
                         .attr("ry", 5)
@@ -212,7 +214,7 @@ export function showFeature(node: any) {
                             return `Value = ` + d.toFixed(2).toString();
                         })
                         .attr("font-family", "monospace")
-                        .style("font-size", "12px")
+                        .style("font-size", "17px")
                         .style("fill", "black")
                         .style("opacity", 1);
                     }
@@ -1502,24 +1504,25 @@ export function calculationVisualizer(
             const tooltip = BiasGroup.append("g")
                 .attr("class", "bias-tooltip")
                 .style("pointer-events", "none");
+            BiasGroup.raise();
             tooltip.append("rect")
               .attr("x", pointer[0] + 10)
               .attr("y", pointer[1] - 10)
-              .attr("width", 50)
-              .attr("height", 20)
+              .attr("width", 130)
+              .attr("height", 30)
               .attr("fill", "white")
               .attr("stroke", "black")
               .attr("rx", 3)
               .attr("ry", 3);
             tooltip.append("text")
-              .attr("x", pointer[0] + 10 + 30)
-              .attr("y", pointer[1] - 10 + 10)
+              .attr("x", pointer[0] + 45 + 30)
+              .attr("y", pointer[1] - 3 + 10)
               .attr("text-anchor", "middle")
               .attr("dominant-baseline", "middle")
-              .style("font-size", "10px")
+              .style("font-size", "17px")
               .attr("fill", "black")
               .attr("font-family", "monospace")
-              .text(d.toFixed(2));
+              .text("Value = " + d.toFixed(2));
           })
         .on("mouseout", function (this: SVGRectElement) {
             d3.select(this)
@@ -2158,22 +2161,23 @@ export function calculationVisualizer(
                 .attr("stroke-width", 2)
                 .raise();
             const pointer = d3.pointer(event, outputGroup.node());
-            const tooltip = outputGroup.append("g").attr("class", "output-tooltip").raise();
+            const tooltip = outputGroup.append("g").attr("class", "output-tooltip");
+            outputGroup.raise();
             tooltip.append("rect")
                 .attr("x", pointer[0] - 20)
                 .attr("y", pointer[1] - 30)
-                .attr("width", 60)
-                .attr("height", 20)
+                .attr("width", 120)
+                .attr("height", 30)
                 .attr("fill", "white")
                 .attr("stroke", "black")
                 .attr("rx", 3)
                 .attr("ry", 3);
             tooltip.append("text")
-                .attr("x", pointer[0] - 20 + 30)
-                .attr("y", pointer[1] - 30 + 10)
+                .attr("x", pointer[0] + 10 + 30)
+                .attr("y", pointer[1] - 25 + 10)
                 .attr("text-anchor", "middle")
                 .attr("dominant-baseline", "middle")
-                .style("font-size", "10px")
+                .style("font-size", "17px")
                 .attr("fill", "black")
                 .attr("font-family", "monospace")
                 .text("Value = " + d.toFixed(2));
