@@ -1503,21 +1503,21 @@ export function drawWeightMatrix(
             const pointer = d3.pointer(event, g.node());
             const tooltip = g.append("g").attr("class", "cell-tooltip procVis");
             tooltip.append("rect")
-              .attr("x", pointer[0] + 10)
+              .attr("x", pointer[0] + 20)
               .attr("y", pointer[1] - 20)
-              .attr("width", 100)
-              .attr("height", 25)
+              .attr("width", 130)
+              .attr("height", 30)
               .attr("rx", 5)
               .attr("ry", 5)
               .style("fill", "white")
               .style("stroke", "black");
             tooltip.append("text")
-              .attr("x", pointer[0] + 60)
-              .attr("y", pointer[1] - 7)
+              .attr("x", pointer[0] + 85)
+              .attr("y", pointer[1] - 5)
               .attr("text-anchor", "middle")
               .attr("dominant-baseline", "middle")
               .attr("font-family", "monospace")
-              .style("font-size", "12px")
+              .style("font-size", "17px")
               .text(`Value = ${d.toFixed(2)}`);
           })
           .on("mouseout", function (this: SVGRectElement, event: MouseEvent, d: number) {
