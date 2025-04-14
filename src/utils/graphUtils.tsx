@@ -104,6 +104,7 @@ export function showFeature(node: any) {
             
             // 获取 SVG 元素
             const svg = d3.select(node.featureGroup.node().closest("svg"));
+            svg.raise();
             
             // 创建弹框
             if (node.features && d !== undefined && d !== null) {
@@ -119,7 +120,7 @@ export function showFeature(node: any) {
             tooltip.append("rect")
                 .attr("x", x + 10)
                 .attr("y", y - 40)
-                .attr("width", 100)
+                .attr("width", 130)
                 .attr("height", 30)
                 .attr("rx", 5)
                 .attr("ry", 5)
@@ -135,7 +136,7 @@ export function showFeature(node: any) {
                     return `Value = ` + d.toFixed(2).toString();
                 })
                 .attr("font-family", "monospace")
-                .style("font-size", "12px")
+                .style("font-size", "17px")
                 .style("fill", "black")
                 .style("opacity", 1);
             }
@@ -181,6 +182,7 @@ export function showFeature(node: any) {
                     
                     // 获取 SVG 元素
                     const svg = d3.select(n.featureGroup.node().closest("svg"));
+                    svg.raise();
                     
                     // 创建弹框
                     if (n.features && d !== undefined && d !== null) {
@@ -196,7 +198,7 @@ export function showFeature(node: any) {
                     tooltip.append("rect")
                         .attr("x", x + 10)
                         .attr("y", y - 40)
-                        .attr("width", 100)
+                        .attr("width", 130)
                         .attr("height", 30)
                         .attr("rx", 5)
                         .attr("ry", 5)
@@ -212,7 +214,7 @@ export function showFeature(node: any) {
                             return `Value = ` + d.toFixed(2).toString();
                         })
                         .attr("font-family", "monospace")
-                        .style("font-size", "12px")
+                        .style("font-size", "17px")
                         .style("fill", "black")
                         .style("opacity", 1);
                     }
@@ -507,13 +509,13 @@ export function outputVisualizer(
         .attr("transform", `translate(${endCoordList[0][0] - 90}, ${endCoordList[0][1] - 260})`);
 
 
-    let DisplayerWidth = 300; // Width of the graph-displayer
+    let DisplayerWidth = 350; // Width of the graph-displayer
     let DisplayHeight = 100;
 
     const graphDisplayer = g5
         .append("rect")
         .attr("x", (node.graphIndex - 2) * 1)
-        .attr("y", 0)
+        .attr("y", -15)
         .attr("width", DisplayerWidth)
         .attr("height", DisplayHeight)
         .attr("rx", 10)
@@ -767,8 +769,8 @@ export function outputVisualizer(
     }, 2000);
 
 
-    let rectL = 15;
-    let displayerWidth = 300; // Width of the graph-displayer
+    let rectL = 17;
+    let displayerWidth = 275; // Width of the graph-displayer
     let displayHeight = 100;
 
 
@@ -797,16 +799,18 @@ export function outputVisualizer(
                     .attr("class", "math-displayer")
                     .lower();
                 g5.append("text")
-                    .attr("x", 70)
-                    .attr("y", displayHeight - 40 + rectL / 2)
+                    .attr("x", 70 + 16)
+                    .attr("y", displayHeight - 40 + rectL / 2 + 2)
                     .text(roundToTwo(calculatedData[0]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5")
+                    .attr("text-anchor", "end")
+                    .attr("font-size", "7")
+                    .attr("font-family", "monospace")
                     .attr("fill", Math.abs(calculatedData[0]) > 0.7 ? "white" : "black");
                     
 
                 g5.append("rect")
-                    .attr("x", displayerWidth - 130)
+                    .attr("x", displayerWidth - 130 + 10)
                     .attr("y", displayHeight - 40)
                     .attr("width", rectL)
                     .attr("height", rectL)
@@ -815,15 +819,17 @@ export function outputVisualizer(
                     .attr("class", "math-displayer")
                     .lower();
                 g5.append("text")
-                    .attr("x", displayerWidth - 130)
-                    .attr("y", displayHeight - 40 + rectL / 2)
+                    .attr("x", displayerWidth - 130 + 16 + 10)
+                    .attr("y", displayHeight - 40 + rectL / 2 + 2)
                     .text(roundToTwo(calculatedData[1]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5")
+                    .attr("text-anchor", "end")
+                    .attr("font-size", "7")
+                    .attr("font-family", "monospace")
                     .attr("fill", Math.abs(calculatedData[1]) > 0.7 ? "white" : "black");
 
                 g5.append("rect")
-                    .attr("x", 100)
+                    .attr("x", 105)
                     .attr("y", 30)
                     .attr("width", rectL)
                     .attr("height", rectL)
@@ -832,59 +838,66 @@ export function outputVisualizer(
                     .attr("class", "math-displayer")
                     .lower();
                 g5.append("text")
-                    .attr("x", 100)
-                    .attr("y", 30 + rectL / 2)
+                    .attr("x", 105 + 16)
+                    .attr("y", 30 + rectL / 2 + 2)
                     .text(roundToTwo(calculatedData[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5")
+                    .attr("text-anchor", "end")
+                    .attr("font-size", "7")
+                    .attr("font-family", "monospace")
                     .attr("fill", Math.abs(calculatedData[i]) > 0.7 ? "white" : "black");
 
                 g5.append("text")
-                    .attr("x", displayerWidth / 2 - 50)
-                    .attr("y", displayHeight - 30)
+                    .attr("x", displayerWidth / 2 - 50 + 10)
+                    .attr("y", displayHeight - 30 + 5)
                     .text("+")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "12");
+                    .attr("font-size", "17px")
+                    .attr("font-family", "monospace");
 
                 g5.append("text")
-                    .attr("x", 100 - 25)
-                    .attr("y", 40)
+                    .attr("x", 100 - 25 - 10)
+                    .attr("y", 40 + 5)
                     .attr("xml:space", "preserve")
-                    .text("exp(        )")
+                    .text("exp(   )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "10");
+                    .attr("font-size", "17px")
+                    .attr("font-family", "monospace");
 
                 g5.append("text")
-                    .attr("x", 70 - 25)
-                    .attr("y", displayHeight - 30)
+                    .attr("x", 70 - 25 - 15)
+                    .attr("y", displayHeight - 30 + 5)
                     .attr("xml:space", "preserve")
-                    .text("exp(        )")
+                    .text("exp(   )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "10");
+                    .attr("font-size", "17px")
+                    .attr("font-family", "monospace");
 
                 g5.append("text")
-                    .attr("x", displayerWidth - 130 - 25)
-                    .attr("y", displayHeight - 30)
+                    .attr("x", displayerWidth - 130 - 25 - 15 + 10)
+                    .attr("y", displayHeight - 30 + 5)
                     .attr("xml:space", "preserve")
-                    .text("exp(        )")
+                    .text("exp(   )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "10");
+                    .attr("font-size", "17px")
+                    .attr("font-family", "monospace");
 
                 g5.append("line")
                     .attr("x1", 20)
-                    .attr("y1", 50)
+                    .attr("y1", 55)
                     .attr("x2", displayerWidth - 80)
-                    .attr("y2", 50)
+                    .attr("y2", 55)
                     .attr("stroke", "black")
                     .attr("class", "math-displayer")
-                    .attr("stroke-width", 1);
+                    .attr("stroke-width", 1.5);
 
                 g5.append("text")
-                    .attr("x", displayerWidth - 60)
-                    .attr("y", 55)
+                    .attr("x", displayerWidth - 70)
+                    .attr("y", 60)
                     .text("=")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "15");
+                    .attr("font-size", "17")
+                    .attr("font-family", "monospace");
 
                 g5.append("rect")
                     .attr("x", displayerWidth - 50)
@@ -896,20 +909,24 @@ export function outputVisualizer(
                     .attr("class", "math-displayer")
                     .lower();
                 g5.append("text")
-                    .attr("x", displayerWidth - 50)
-                    .attr("y", 45 + rectL / 2)
+                    .attr("x", displayerWidth - 50 + 16)
+                    .attr("y", 45 + rectL / 2 + 2)
                     .text(roundToTwo(node.features[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5")
+                    .attr("text-anchor", "end")
+                    .attr("font-size", "7")
+                    .attr("font-family", "monospace")
                     .attr("fill", Math.abs(node.features[i]) > 0.7 ? "white" : "black");
 
 
                 g5.append("text")
-                    .attr("x", 35)
+                    .attr("x", 15)
                     .attr("y", 10)
                     .text(`Softmax score for '${category}'`)
                     .attr("class", "math-displayer")
-                    .attr("font-size", "10")
+                    .attr("font-size", "20px")
+                    .attr("font-family", "monospace")
+                    .attr("font-weight", "bold")
 
 
             })
@@ -1204,6 +1221,14 @@ export function calculationVisualizer(
             
                 const [mx, my] = d3.pointer(event, svg.node());
                 console.log("步骤", node.aggregationSteps);
+
+                // Use the correct index to get the detail text
+                const detailText = node.aggregationSteps[index];
+                let calculatedHeight = 100;
+                if (detailText) {
+                    const lines = detailText.split('\n');
+                    calculatedHeight = lines.length * 20 + 20; // Adjust height based on number of lines
+                }
             
                 const tooltip = svg
                     .append("g")
@@ -1214,20 +1239,19 @@ export function calculationVisualizer(
                     .attr("x", mx + 10)
                     .attr("y", my - 40)
                     .attr("width", 200)
-                    .attr("height", 100)
+                    .attr("height", calculatedHeight)
                     .attr("rx", 5)
                     .attr("ry", 5)
                     .style("fill", "white")
                     .style("stroke", "black");
         
-                // Use the correct index to get the detail text
-                const detailText = node.aggregationSteps[index];
+
                     
                 const textElement = tooltip.append("text")
                     .attr("x", mx + 20)
                     .attr("y", my - 20)
                     .attr("font-family", "monospace")
-                    .style("font-size", "12px")
+                    .style("font-size", "17px")
                     .style("fill", "black");
 
                 // Split the text by newline and create tspan elements
@@ -1251,7 +1275,7 @@ export function calculationVisualizer(
                     .style("stroke", "grey")
                     .style("stroke-width", 0.1);
             });
-        }, 4500);
+        }, 6000);
 
       
 
@@ -1502,24 +1526,25 @@ export function calculationVisualizer(
             const tooltip = BiasGroup.append("g")
                 .attr("class", "bias-tooltip")
                 .style("pointer-events", "none");
+            BiasGroup.raise();
             tooltip.append("rect")
               .attr("x", pointer[0] + 10)
               .attr("y", pointer[1] - 10)
-              .attr("width", 50)
-              .attr("height", 20)
+              .attr("width", 130)
+              .attr("height", 30)
               .attr("fill", "white")
               .attr("stroke", "black")
               .attr("rx", 3)
               .attr("ry", 3);
             tooltip.append("text")
-              .attr("x", pointer[0] + 10 + 30)
-              .attr("y", pointer[1] - 10 + 10)
+              .attr("x", pointer[0] + 45 + 30)
+              .attr("y", pointer[1] - 3 + 10)
               .attr("text-anchor", "middle")
               .attr("dominant-baseline", "middle")
-              .style("font-size", "10px")
+              .style("font-size", "17px")
               .attr("fill", "black")
               .attr("font-family", "monospace")
-              .text(d.toFixed(2));
+              .text("Value = " + d.toFixed(2));
           })
         .on("mouseout", function (this: SVGRectElement) {
             d3.select(this)
@@ -2158,22 +2183,23 @@ export function calculationVisualizer(
                 .attr("stroke-width", 2)
                 .raise();
             const pointer = d3.pointer(event, outputGroup.node());
-            const tooltip = outputGroup.append("g").attr("class", "output-tooltip").raise();
+            const tooltip = outputGroup.append("g").attr("class", "output-tooltip");
+            outputGroup.raise();
             tooltip.append("rect")
                 .attr("x", pointer[0] - 20)
-                .attr("y", pointer[1] - 30)
-                .attr("width", 60)
-                .attr("height", 20)
+                .attr("y", pointer[1] - 35)
+                .attr("width", 130)
+                .attr("height", 30)
                 .attr("fill", "white")
                 .attr("stroke", "black")
                 .attr("rx", 3)
                 .attr("ry", 3);
             tooltip.append("text")
-                .attr("x", pointer[0] - 20 + 30)
-                .attr("y", pointer[1] - 30 + 10)
+                .attr("x", pointer[0] + 10 + 30)
+                .attr("y", pointer[1] - 25 + 10)
                 .attr("text-anchor", "middle")
                 .attr("dominant-baseline", "middle")
-                .style("font-size", "10px")
+                .style("font-size", "17px")
                 .attr("fill", "black")
                 .attr("font-family", "monospace")
                 .text("Value = " + d.toFixed(2));
@@ -2876,13 +2902,13 @@ export function fcLayerCalculationVisualizer(
 
     const g4 = svg
         .append("g")
-        .attr("transform", `translate(${moveToX - 700}, ${moveToY - 50})`);
+        .attr("transform", `translate(${moveToX - 700}, ${moveToY - 50}) scale(1.4)`);
 
     const displayer = g4
         .append("rect")
         .attr("x", 0)
         .attr("y", 0)
-        .attr("width", 300)
+        .attr("width", 400)
         .attr("height", 100)
         .attr("rx", 10)
         .attr("ry", 10)
@@ -2915,7 +2941,7 @@ export function fcLayerCalculationVisualizer(
             (i % Math.floor((displayerWidth - spacing) / (rectL + spacing))) *
             (rectL + spacing) +
             spacing +
-            20;
+            60;
         let y =
             Math.floor(
                 i /
@@ -2924,21 +2950,25 @@ export function fcLayerCalculationVisualizer(
                 )
             ) *
             (rectL + ySpacing) +
-            ySpacing;
+            ySpacing
+            + 10;
         numRect.push([x, y]);
     }
 
     let posNeed = [];
 
-    posNeed.push([40, 30]); // Adjust the x offset to space the textNeed elements
-    posNeed.push([265, 30]);
-    posNeed.push([270, 30]);
+    posNeed.push([40 + 20, 45]); // location of left parentheses
+    posNeed.push([265 + 35, 45]); // location of right parentheses
+    posNeed.push([270 + 40, 45]); // location of equal sign
 
     let posPlus = [];
     for (let i = 0; i < numRect.length; i++) {
-        let c = [numRect[i][0] + rectL, numRect[i][1] + rectL / 2 + 2];
+        let c = [numRect[i][0] + rectL - 10,
+                numRect[i][1] + rectL / 2 + 5];
         posPlus.push(c);
     }
+
+    rectL = 18;
 
     
 
@@ -3080,16 +3110,18 @@ function poolingLayerInteraction(
                 d3.selectAll(`#conv3-layer-rect-${i}`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
                 d3.select(".graph-displayer").attr("opacity", 1);
                 svg.append("text")
-                    .attr("x", 0)
-                    .attr("y", 30)
+                    .attr("x", 20)
+                    .attr("y", 45)
                     .text("Avg")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "12.5")
+                    .attr("font-size", "20px")
+                    .attr("font-family", "monospace")
+                    .attr("font-weight", "bold")
                     .attr("fill", "black");
 
                 for (let j = 0; j < node.relatedNodes.length; j++) {
                     svg.append("rect")
-                        .attr("x", numRect[j][0])
+                        .attr("x", numRect[j][0] - 17)
                         .attr("y", numRect[j][1])
                         .attr("width", rectL)
                         .attr("height", rectL)
@@ -3102,7 +3134,9 @@ function poolingLayerInteraction(
                         .attr("y", numRect[j][1] + rectL / 2)
                         .text(roundToTwo(node.relatedNodes[j].features[i]))
                         .attr("class", "math-displayer")
-                        .attr("font-size", "5")
+                        .attr("text-anchor", "end")
+                        .attr("font-size", "7px")
+                        .attr("font-family", "monospace")
                         .attr("fill", Math.abs(node.relatedNodes[j].features[i]) > 0.7 ? "white" : "black");
                 }
                 // append text
@@ -3114,7 +3148,8 @@ function poolingLayerInteraction(
                         .attr("y", posPlus[i][1])
                         .text("+")
                         .attr("class", "math-displayer")
-                        .attr("font-size", "10")
+                        .attr("font-size", "17px")
+                        .attr("font-family", "monospace")
                         .attr("fill", "black");
                 }
 
@@ -3125,13 +3160,15 @@ function poolingLayerInteraction(
                         .attr("y", posNeed[i][1])
                         .text(textNeed[i])
                         .attr("class", "math-displayer")
-                        .attr("font-size", "10")
+                        .attr("font-size", "17px")
+                        .attr("font-family", "monospace")
+                        .attr("font-weight", "bold")
                         .attr("fill", "black");
                 }
 
                 svg.append("rect")
-                    .attr("x", 280)
-                    .attr("y", 30 - rectL)
+                    .attr("x", 320 + 10)
+                    .attr("y", 50 - rectL)
                     .attr("width", rectL)
                     .attr("height", rectL)
                     .style("stroke", "black")
@@ -3140,11 +3177,13 @@ function poolingLayerInteraction(
                     .attr("class", "math-displayer")
                     .lower();
                 svg.append("text")
-                    .attr("x", 280)
-                    .attr("y", 30 - rectL / 2)
+                    .attr("x", 320 + 17 + 10)
+                    .attr("y", 50 - rectL / 2)
                     .text(roundToTwo(node.features[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5")
+                    .attr("text-anchor", "end")
+                    .attr("font-size", "7px")
+                    .attr("font-family", "monospace")
                     .attr("fill", Math.abs(node.features[i]) > 0.7 ? "white" : "black");
                     
             })

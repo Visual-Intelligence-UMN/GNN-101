@@ -928,7 +928,7 @@ export function drawSummationFeature(
         d3.selectAll(".summation-tooltip").remove();
     
         const tooltip = d3.select(".mats").append("g").attr("class", "summation-tooltip procVis");
-        const tooltipHeight = 20 + 15 * (adjList[node].length + 2);
+        const tooltipHeight = 20 + 20 * (adjList[node].length + 2);
         tooltip.append("rect")
           .attr("x", x + 10)
           .attr("y", y - 40)
@@ -953,7 +953,7 @@ export function drawSummationFeature(
         let textElement = tooltip.append("text")
           .attr("x", x + 50)
           .attr("y", y - 20)
-          .style("font-size", "12px")
+          .style("font-size", "17px")
           .style("font-family", "monospace");
         textData.forEach((line, i) => {
           textElement.append("tspan")
@@ -1503,21 +1503,21 @@ export function drawWeightMatrix(
             const pointer = d3.pointer(event, g.node());
             const tooltip = g.append("g").attr("class", "cell-tooltip procVis");
             tooltip.append("rect")
-              .attr("x", pointer[0] + 10)
+              .attr("x", pointer[0] + 20)
               .attr("y", pointer[1] - 20)
-              .attr("width", 100)
-              .attr("height", 25)
+              .attr("width", 130)
+              .attr("height", 30)
               .attr("rx", 5)
               .attr("ry", 5)
               .style("fill", "white")
               .style("stroke", "black");
             tooltip.append("text")
-              .attr("x", pointer[0] + 60)
-              .attr("y", pointer[1] - 7)
+              .attr("x", pointer[0] + 85)
+              .attr("y", pointer[1] - 5)
               .attr("text-anchor", "middle")
               .attr("dominant-baseline", "middle")
               .attr("font-family", "monospace")
-              .style("font-size", "12px")
+              .style("font-size", "17px")
               .text(`Value = ${d.toFixed(2)}`);
           })
           .on("mouseout", function (this: SVGRectElement, event: MouseEvent, d: number) {
@@ -1598,21 +1598,22 @@ export function drawBiasVector(
                 tooltip.append("rect")
                     .attr("x", pointer[0] )
                     .attr("y", pointer[1] - 10)
-                    .attr("width", 50)
-                    .attr("height", 20)
+                    .attr("width", 130)
+                    .attr("height", 30)
                     .attr("fill", "white")
                     .attr("stroke", "black")
                     .attr("rx", 3)
                     .attr("ry", 3);
                 
                 tooltip.append("text")
-                    .attr("x", pointer[0] + 20 )
-                    .attr("y", pointer[1] - 10 + 10)
+                    .attr("x", pointer[0] + 65)
+                    .attr("y", pointer[1] + 5)
                     .attr("text-anchor", "middle")
                     .attr("dominant-baseline", "middle")
-                    .style("font-size", "10px")
+                    .style("font-size", "17px")
+                    .attr("font-family", "monospace")
                     .attr("fill", "black")
-                    .text(biasValue.toFixed(2));
+                    .text(`Value = ` + biasValue.toFixed(2));
             })
             .on("mouseout", function (this: SVGRectElement) {
 
