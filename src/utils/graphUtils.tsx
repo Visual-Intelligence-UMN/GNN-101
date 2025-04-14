@@ -799,11 +799,13 @@ export function outputVisualizer(
                     .attr("class", "math-displayer")
                     .lower();
                 g5.append("text")
-                    .attr("x", 70)
-                    .attr("y", displayHeight - 40 + rectL / 2)
+                    .attr("x", 70 + 16)
+                    .attr("y", displayHeight - 40 + rectL / 2 + 2)
                     .text(roundToTwo(calculatedData[0]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5")
+                    .attr("text-anchor", "end")
+                    .attr("font-size", "7")
+                    .attr("font-family", "monospace")
                     .attr("fill", Math.abs(calculatedData[0]) > 0.7 ? "white" : "black");
                     
 
@@ -817,11 +819,13 @@ export function outputVisualizer(
                     .attr("class", "math-displayer")
                     .lower();
                 g5.append("text")
-                    .attr("x", displayerWidth - 130)
-                    .attr("y", displayHeight - 40 + rectL / 2)
+                    .attr("x", displayerWidth - 130 + 16)
+                    .attr("y", displayHeight - 40 + rectL / 2 + 2)
                     .text(roundToTwo(calculatedData[1]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5")
+                    .attr("text-anchor", "end")
+                    .attr("font-size", "7")
+                    .attr("font-family", "monospace")
                     .attr("fill", Math.abs(calculatedData[1]) > 0.7 ? "white" : "black");
 
                 g5.append("rect")
@@ -834,11 +838,13 @@ export function outputVisualizer(
                     .attr("class", "math-displayer")
                     .lower();
                 g5.append("text")
-                    .attr("x", 100)
-                    .attr("y", 30 + rectL / 2)
+                    .attr("x", 100 + 16)
+                    .attr("y", 30 + rectL / 2 + 2)
                     .text(roundToTwo(calculatedData[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5")
+                    .attr("text-anchor", "end")
+                    .attr("font-size", "7")
+                    .attr("font-family", "monospace")
                     .attr("fill", Math.abs(calculatedData[i]) > 0.7 ? "white" : "black");
 
                 g5.append("text")
@@ -898,11 +904,13 @@ export function outputVisualizer(
                     .attr("class", "math-displayer")
                     .lower();
                 g5.append("text")
-                    .attr("x", displayerWidth - 50)
-                    .attr("y", 45 + rectL / 2)
+                    .attr("x", displayerWidth - 50 + 16)
+                    .attr("y", 45 + rectL / 2 + 2)
                     .text(roundToTwo(node.features[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5")
+                    .attr("text-anchor", "end")
+                    .attr("font-size", "7")
+                    .attr("font-family", "monospace")
                     .attr("fill", Math.abs(node.features[i]) > 0.7 ? "white" : "black");
 
 
