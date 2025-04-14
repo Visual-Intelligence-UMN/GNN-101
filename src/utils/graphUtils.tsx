@@ -1206,6 +1206,14 @@ export function calculationVisualizer(
             
                 const [mx, my] = d3.pointer(event, svg.node());
                 console.log("步骤", node.aggregationSteps);
+
+                // Use the correct index to get the detail text
+                const detailText = node.aggregationSteps[index];
+                let calculatedHeight = 100;
+                if (detailText) {
+                    const lines = detailText.split('\n');
+                    calculatedHeight = lines.length * 20 + 20; // Adjust height based on number of lines
+                }
             
                 const tooltip = svg
                     .append("g")
@@ -1216,20 +1224,19 @@ export function calculationVisualizer(
                     .attr("x", mx + 10)
                     .attr("y", my - 40)
                     .attr("width", 200)
-                    .attr("height", 100)
+                    .attr("height", calculatedHeight)
                     .attr("rx", 5)
                     .attr("ry", 5)
                     .style("fill", "white")
                     .style("stroke", "black");
         
-                // Use the correct index to get the detail text
-                const detailText = node.aggregationSteps[index];
+
                     
                 const textElement = tooltip.append("text")
                     .attr("x", mx + 20)
                     .attr("y", my - 20)
                     .attr("font-family", "monospace")
-                    .style("font-size", "12px")
+                    .style("font-size", "17px")
                     .style("fill", "black");
 
                 // Split the text by newline and create tspan elements
@@ -1253,7 +1260,7 @@ export function calculationVisualizer(
                     .style("stroke", "grey")
                     .style("stroke-width", 0.1);
             });
-        }, 4500);
+        }, 6000);
 
       
 
