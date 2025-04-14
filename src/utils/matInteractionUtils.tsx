@@ -954,8 +954,8 @@ export function drawActivationExplanation(
     formula: string,
     description: string
 ) {
-    const displayW = 250;
-    const displayH = 75;
+    const displayW = 300;
+    const displayH = 80;
 
     //find coordination for the math displayer first
     const displayX = x + 10;
@@ -976,18 +976,21 @@ export function drawActivationExplanation(
         .attr("class", "math-displayer procVis to-be-removed")
         .raise();
 
-    const titleYOffset = 10;
-    const titleXOffset = 50;
+    const titleYOffset = 20;
+    const titleXOffset = 150;
     d3.select(".mats")
         .append("text")
         .attr("x", displayX + titleXOffset)
         .attr("y", displayY + titleYOffset)
         .text(title)
+        .attr("text-anchor", "middle")
         .attr("class", "math-displayer procVis to-be-removed")
-        .attr("font-size", titleYOffset)
+        .attr("font-size", "17px")
+        .attr("font-family", "monospace")
+        .attr("font-weight", "bold")
         .attr("fill", "black");
-    const eqXOffset = titleXOffset / 2;
-    const eqYOffset = titleYOffset * 2.5;
+    const eqXOffset = 40;
+    const eqYOffset = 45;
     const unitSize = eqXOffset / 3 + 3;
     const upperOffset = unitSize * 2;
     d3.select(".mats")
@@ -996,7 +999,8 @@ export function drawActivationExplanation(
         .attr("y", displayY + eqYOffset)
         .text(formula)
         .attr("class", "math-displayer procVis to-be-removed")
-        .attr("font-size", unitSize)
+        .attr("font-size", "17px")
+        .attr("font-family", "monospace")
         .attr("fill", "black");
     d3.select(".mats")
         .append("text")
@@ -1004,7 +1008,8 @@ export function drawActivationExplanation(
         .attr("y", displayY + eqYOffset + unitSize * 1.5)
         .text(description)
         .attr("class", "to-be-removed math-displayer procVis")
-        .attr("font-size", unitSize)
+        .attr("font-size", "17px")
+        .attr("font-family", "monospace")
         .attr("fill", "black");
 }
 
