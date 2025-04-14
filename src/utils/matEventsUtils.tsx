@@ -715,7 +715,7 @@ export function featureVisClick(
                   tooltip.append("text")
                     .attr("x", x + 20)
                     .attr("y", y - 20)
-                    .text(`value = ${d.toFixed(2)}`)
+                    .text(`Value = ${d.toFixed(2)}`)
                     .style("font-size", "17px")
                     .attr("font-family", "monospace");
                 })

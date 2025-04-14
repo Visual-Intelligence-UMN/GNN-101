@@ -1598,21 +1598,22 @@ export function drawBiasVector(
                 tooltip.append("rect")
                     .attr("x", pointer[0] )
                     .attr("y", pointer[1] - 10)
-                    .attr("width", 50)
-                    .attr("height", 20)
+                    .attr("width", 130)
+                    .attr("height", 30)
                     .attr("fill", "white")
                     .attr("stroke", "black")
                     .attr("rx", 3)
                     .attr("ry", 3);
                 
                 tooltip.append("text")
-                    .attr("x", pointer[0] + 20 )
-                    .attr("y", pointer[1] - 10 + 10)
+                    .attr("x", pointer[0] + 65)
+                    .attr("y", pointer[1] + 5)
                     .attr("text-anchor", "middle")
                     .attr("dominant-baseline", "middle")
-                    .style("font-size", "10px")
+                    .style("font-size", "17px")
+                    .attr("font-family", "monospace")
                     .attr("fill", "black")
-                    .text(biasValue.toFixed(2));
+                    .text(`Value = ` + biasValue.toFixed(2));
             })
             .on("mouseout", function (this: SVGRectElement) {
 
