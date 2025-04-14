@@ -2902,7 +2902,7 @@ export function fcLayerCalculationVisualizer(
 
     const g4 = svg
         .append("g")
-        .attr("transform", `translate(${moveToX - 700}, ${moveToY - 50})`);
+        .attr("transform", `translate(${moveToX - 700}, ${moveToY - 50}) scale(1.4)`);
 
     const displayer = g4
         .append("rect")
@@ -2965,6 +2965,8 @@ export function fcLayerCalculationVisualizer(
         let c = [numRect[i][0] + rectL, numRect[i][1] + rectL / 2 + 2];
         posPlus.push(c);
     }
+
+    rectL = 17;
 
     
 
@@ -3110,7 +3112,9 @@ function poolingLayerInteraction(
                     .attr("y", 30)
                     .text("Avg")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "12.5")
+                    .attr("font-size", "20px")
+                    .attr("font-family", "monospace")
+                    .attr("font-weight", "bold")
                     .attr("fill", "black");
 
                 for (let j = 0; j < node.relatedNodes.length; j++) {
@@ -3128,7 +3132,8 @@ function poolingLayerInteraction(
                         .attr("y", numRect[j][1] + rectL / 2)
                         .text(roundToTwo(node.relatedNodes[j].features[i]))
                         .attr("class", "math-displayer")
-                        .attr("font-size", "5")
+                        .attr("font-size", "7px")
+                        .attr("font-family", "monospace")
                         .attr("fill", Math.abs(node.relatedNodes[j].features[i]) > 0.7 ? "white" : "black");
                 }
                 // append text
@@ -3140,7 +3145,8 @@ function poolingLayerInteraction(
                         .attr("y", posPlus[i][1])
                         .text("+")
                         .attr("class", "math-displayer")
-                        .attr("font-size", "10")
+                        .attr("font-size", "17px")
+                        .attr("font-family", "monospace")
                         .attr("fill", "black");
                 }
 
@@ -3151,7 +3157,8 @@ function poolingLayerInteraction(
                         .attr("y", posNeed[i][1])
                         .text(textNeed[i])
                         .attr("class", "math-displayer")
-                        .attr("font-size", "10")
+                        .attr("font-size", "17px")
+                        .attr("font-family", "monospace")
                         .attr("fill", "black");
                 }
 
@@ -3170,7 +3177,8 @@ function poolingLayerInteraction(
                     .attr("y", 30 - rectL / 2)
                     .text(roundToTwo(node.features[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5")
+                    .attr("font-size", "7px")
+                    .attr("font-family", "monospace")
                     .attr("fill", Math.abs(node.features[i]) > 0.7 ? "white" : "black");
                     
             })
