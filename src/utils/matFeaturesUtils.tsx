@@ -417,9 +417,9 @@ export function drawSingleGCNConvFeature(
                   .attr("class", "feature-tooltip procVis");
 
                 tooltip.append("rect")
-                    .attr("x", x + 10)
-                    .attr("y", y - 28)
-                    .attr("width", 100)  
+                    .attr("x", x + 10 )
+                    .attr("y", y - 28 - 5)
+                    .attr("width", 130)  
                     .attr("height", 30) 
                     .attr("rx", 5)
                     .attr("ry", 5)
@@ -427,9 +427,9 @@ export function drawSingleGCNConvFeature(
                     .style("stroke", "black");
 
                 tooltip.append("text")
-                    .attr("x", x + 20)
+                    .attr("x", x + 15)
                     .attr("y", y - 10)
-                    .style("font-size", "12px")
+                    .style("font-size", "17px")
                     .style("font-family", "monospace")
                     .text(`Value = ${cellValue.toFixed(2)}`);
 
