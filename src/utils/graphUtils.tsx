@@ -2909,7 +2909,7 @@ export function fcLayerCalculationVisualizer(
         .attr("x", 0)
         .attr("y", 0)
         .attr("width", 400)
-        .attr("height", 80)
+        .attr("height", 100)
         .attr("rx", 10)
         .attr("ry", 10)
         .style("fill", "transparent")
@@ -2957,13 +2957,14 @@ export function fcLayerCalculationVisualizer(
 
     let posNeed = [];
 
-    posNeed.push([40, 30]); // Adjust the x offset to space the textNeed elements
-    posNeed.push([265, 30]);
-    posNeed.push([270, 30]);
+    posNeed.push([40 + 20, 45]); // location of left parentheses
+    posNeed.push([265 + 35, 45]); // location of right parentheses
+    posNeed.push([270 + 40, 45]); // location of equal sign
 
     let posPlus = [];
     for (let i = 0; i < numRect.length; i++) {
-        let c = [numRect[i][0] + rectL, numRect[i][1] + rectL / 2 + 2];
+        let c = [numRect[i][0] + rectL - 10,
+                numRect[i][1] + rectL / 2 + 5];
         posPlus.push(c);
     }
 
@@ -3161,11 +3162,12 @@ function poolingLayerInteraction(
                         .attr("class", "math-displayer")
                         .attr("font-size", "17px")
                         .attr("font-family", "monospace")
+                        .attr("font-weight", "bold")
                         .attr("fill", "black");
                 }
 
                 svg.append("rect")
-                    .attr("x", 320)
+                    .attr("x", 320 + 10)
                     .attr("y", 50 - rectL)
                     .attr("width", rectL)
                     .attr("height", rectL)
@@ -3175,7 +3177,7 @@ function poolingLayerInteraction(
                     .attr("class", "math-displayer")
                     .lower();
                 svg.append("text")
-                    .attr("x", 320 + 17)
+                    .attr("x", 320 + 17 + 10)
                     .attr("y", 50 - rectL / 2)
                     .text(roundToTwo(node.features[i]))
                     .attr("class", "math-displayer")
