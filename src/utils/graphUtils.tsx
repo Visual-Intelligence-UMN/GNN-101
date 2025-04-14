@@ -2941,7 +2941,7 @@ export function fcLayerCalculationVisualizer(
             (i % Math.floor((displayerWidth - spacing) / (rectL + spacing))) *
             (rectL + spacing) +
             spacing +
-            20;
+            60;
         let y =
             Math.floor(
                 i /
@@ -2950,7 +2950,8 @@ export function fcLayerCalculationVisualizer(
                 )
             ) *
             (rectL + ySpacing) +
-            ySpacing;
+            ySpacing
+            + 10;
         numRect.push([x, y]);
     }
 
@@ -3108,8 +3109,8 @@ function poolingLayerInteraction(
                 d3.selectAll(`#conv3-layer-rect-${i}`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
                 d3.select(".graph-displayer").attr("opacity", 1);
                 svg.append("text")
-                    .attr("x", 0)
-                    .attr("y", 30)
+                    .attr("x", 20)
+                    .attr("y", 45)
                     .text("Avg")
                     .attr("class", "math-displayer")
                     .attr("font-size", "20px")
@@ -3164,8 +3165,8 @@ function poolingLayerInteraction(
                 }
 
                 svg.append("rect")
-                    .attr("x", 280)
-                    .attr("y", 30 - rectL)
+                    .attr("x", 320)
+                    .attr("y", 50 - rectL)
                     .attr("width", rectL)
                     .attr("height", rectL)
                     .style("stroke", "black")
@@ -3174,8 +3175,8 @@ function poolingLayerInteraction(
                     .attr("class", "math-displayer")
                     .lower();
                 svg.append("text")
-                    .attr("x", 280 + 17)
-                    .attr("y", 30 - rectL / 2)
+                    .attr("x", 320 + 17)
+                    .attr("y", 50 - rectL / 2)
                     .text(roundToTwo(node.features[i]))
                     .attr("class", "math-displayer")
                     .attr("text-anchor", "end")
