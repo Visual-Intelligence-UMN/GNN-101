@@ -2908,8 +2908,8 @@ export function fcLayerCalculationVisualizer(
         .append("rect")
         .attr("x", 0)
         .attr("y", 0)
-        .attr("width", 300)
-        .attr("height", 100)
+        .attr("width", 400)
+        .attr("height", 80)
         .attr("rx", 10)
         .attr("ry", 10)
         .style("fill", "transparent")
@@ -2966,7 +2966,7 @@ export function fcLayerCalculationVisualizer(
         posPlus.push(c);
     }
 
-    rectL = 17;
+    rectL = 18;
 
     
 
@@ -3119,7 +3119,7 @@ function poolingLayerInteraction(
 
                 for (let j = 0; j < node.relatedNodes.length; j++) {
                     svg.append("rect")
-                        .attr("x", numRect[j][0])
+                        .attr("x", numRect[j][0] - 17)
                         .attr("y", numRect[j][1])
                         .attr("width", rectL)
                         .attr("height", rectL)
@@ -3132,6 +3132,7 @@ function poolingLayerInteraction(
                         .attr("y", numRect[j][1] + rectL / 2)
                         .text(roundToTwo(node.relatedNodes[j].features[i]))
                         .attr("class", "math-displayer")
+                        .attr("text-anchor", "end")
                         .attr("font-size", "7px")
                         .attr("font-family", "monospace")
                         .attr("fill", Math.abs(node.relatedNodes[j].features[i]) > 0.7 ? "white" : "black");
@@ -3173,10 +3174,11 @@ function poolingLayerInteraction(
                     .attr("class", "math-displayer")
                     .lower();
                 svg.append("text")
-                    .attr("x", 280)
+                    .attr("x", 280 + 17)
                     .attr("y", 30 - rectL / 2)
                     .text(roundToTwo(node.features[i]))
                     .attr("class", "math-displayer")
+                    .attr("text-anchor", "end")
                     .attr("font-size", "7px")
                     .attr("font-family", "monospace")
                     .attr("fill", Math.abs(node.features[i]) > 0.7 ? "white" : "black");
