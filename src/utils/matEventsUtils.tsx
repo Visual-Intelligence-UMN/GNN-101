@@ -705,7 +705,7 @@ export function featureVisClick(
                   tooltip.append("rect")
                     .attr("x", x + 10)
                     .attr("y", y - 40)
-                    .attr("width", 100)
+                    .attr("width", 130)
                     .attr("height", 30)
                     .attr("rx", 5)
                     .attr("ry", 5)
@@ -715,8 +715,9 @@ export function featureVisClick(
                   tooltip.append("text")
                     .attr("x", x + 20)
                     .attr("y", y - 20)
-                    .text(`value = ${d.toFixed(0)}`)
-                    .style("font-size", "12px");
+                    .text(`value = ${d.toFixed(2)}`)
+                    .style("font-size", "17px")
+                    .attr("font-family", "monospace");
                 })
                 .on("mouseout", function (this: SVGRectElement, event: MouseEvent, d: number) {
                   event.stopPropagation();
