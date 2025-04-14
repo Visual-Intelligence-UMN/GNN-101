@@ -509,13 +509,13 @@ export function outputVisualizer(
         .attr("transform", `translate(${endCoordList[0][0] - 90}, ${endCoordList[0][1] - 260})`);
 
 
-    let DisplayerWidth = 300; // Width of the graph-displayer
+    let DisplayerWidth = 350; // Width of the graph-displayer
     let DisplayHeight = 100;
 
     const graphDisplayer = g5
         .append("rect")
         .attr("x", (node.graphIndex - 2) * 1)
-        .attr("y", 0)
+        .attr("y", -15)
         .attr("width", DisplayerWidth)
         .attr("height", DisplayHeight)
         .attr("rx", 10)
@@ -769,8 +769,8 @@ export function outputVisualizer(
     }, 2000);
 
 
-    let rectL = 15;
-    let displayerWidth = 300; // Width of the graph-displayer
+    let rectL = 17;
+    let displayerWidth = 275; // Width of the graph-displayer
     let displayHeight = 100;
 
 
@@ -907,11 +907,13 @@ export function outputVisualizer(
 
 
                 g5.append("text")
-                    .attr("x", 35)
+                    .attr("x", 15)
                     .attr("y", 10)
                     .text(`Softmax score for '${category}'`)
                     .attr("class", "math-displayer")
-                    .attr("font-size", "10")
+                    .attr("font-size", "20px")
+                    .attr("font-family", "monospace")
+                    .attr("font-weight", "bold")
 
 
             })
