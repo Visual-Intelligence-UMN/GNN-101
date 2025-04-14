@@ -266,6 +266,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
         .attr("y", displayHeight - 65 - 12)
         .text("Matmul Visualization")
         .attr("font-family", "monospace")
+        .attr("font-weight", "bold")
         .attr("class", "math-displayer")
         .attr("font-size", "20");
 
