@@ -928,7 +928,7 @@ export function drawSummationFeature(
         d3.selectAll(".summation-tooltip").remove();
     
         const tooltip = d3.select(".mats").append("g").attr("class", "summation-tooltip procVis");
-        const tooltipHeight = 20 + 15 * (adjList[node].length + 2);
+        const tooltipHeight = 20 + 20 * (adjList[node].length + 2);
         tooltip.append("rect")
           .attr("x", x + 10)
           .attr("y", y - 40)
@@ -953,7 +953,7 @@ export function drawSummationFeature(
         let textElement = tooltip.append("text")
           .attr("x", x + 50)
           .attr("y", y - 20)
-          .style("font-size", "12px")
+          .style("font-size", "17px")
           .style("font-family", "monospace");
         textData.forEach((line, i) => {
           textElement.append("tspan")
