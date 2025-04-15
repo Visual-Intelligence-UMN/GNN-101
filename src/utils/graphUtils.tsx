@@ -1490,16 +1490,15 @@ export function calculationVisualizer(
 
 
     intermediateFeatureGroups.push(calculatedFeatureGroup);
-
     const BiasGroup = g3
-        .append("g")
-        .attr(
-            "transform",
-            `translate(${3.5 * offset +
-            node.relatedNodes[0].features.length * 2 * prevRectHeight +
-            100 + temp
-            }, ${height / 5 + 100})`
-        );
+    .append("g")
+    .attr(
+        "transform",
+        `translate(${3.5 * offset +
+        node.relatedNodes[0].features.length * 2 * prevRectHeight +
+        100 + temp
+        }, ${height / 5 + 100})`
+    );
 
     setTimeout(() => {
         BiasGroup.selectAll("rect")
@@ -1515,43 +1514,54 @@ export function calculationVisualizer(
         .style("stroke-width", "0.1px")
         .style("stroke", "grey")
         .style("opacity", 0)
-        .style("pointer-events", "all") 
+        .style("pointer-events", "all")
         .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
             d3.select(this)
-              .style("stroke", "black")
-              .style("stroke-width", "1.5px")
-              .style("opacity", 1);
-              
+            .style("stroke", "black")
+            .style("stroke-width", "1.5px")
+            .style("opacity", 1);
+            
+            const tooltipWidth = 130;
+            const tooltipHeight = 30;
+            const tooltipOffset = 15;
+            const horizontalOffset = 50;
+            
             const pointer = d3.pointer(event, BiasGroup.node());
+            
+            BiasGroup.selectAll("g.bias-tooltip").remove();
+            
             const tooltip = BiasGroup.append("g")
                 .attr("class", "bias-tooltip")
                 .style("pointer-events", "none");
-            BiasGroup.raise();
+
+            tooltip.raise();
+            
             tooltip.append("rect")
-              .attr("x", pointer[0] + 10)
-              .attr("y", pointer[1] - 10)
-              .attr("width", 130)
-              .attr("height", 30)
-              .attr("fill", "white")
-              .attr("stroke", "black")
-              .attr("rx", 3)
-              .attr("ry", 3);
+                .attr("x", pointer[0] - tooltipWidth / 2 + horizontalOffset)
+                .attr("y", pointer[1] - tooltipHeight - tooltipOffset)
+                .attr("width", tooltipWidth)
+                .attr("height", tooltipHeight)
+                .attr("fill", "white")
+                .attr("stroke", "black")
+                .attr("rx", 3)
+                .attr("ry", 3);
+            
             tooltip.append("text")
-              .attr("x", pointer[0] + 45 + 30)
-              .attr("y", pointer[1] - 3 + 10)
-              .attr("text-anchor", "middle")
-              .attr("dominant-baseline", "middle")
-              .style("font-size", "17px")
-              .attr("fill", "black")
-              .attr("font-family", "monospace")
-              .text("Value = " + d.toFixed(2));
-          })
+                .attr("x", pointer[0] + horizontalOffset)
+                .attr("y", pointer[1] - tooltipOffset - tooltipHeight/2)
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "middle")
+                .style("font-size", "17px")
+                .attr("font-family", "monospace")
+                .attr("fill", "black")
+                .text(`Value = ${d.toFixed(2)}`);
+        })
         .on("mouseout", function (this: SVGRectElement) {
             d3.select(this)
-              .style("stroke", "grey")
-              .style("stroke-width", "0.1px");
+            .style("stroke", "grey")
+            .style("stroke-width", "0.1px");
             BiasGroup.selectAll(".bias-tooltip").remove();
-          });
+        });
     }, 6000)
           
     
