@@ -658,7 +658,8 @@ export function outputVisualizer(
             displayHeight,
             mode
         );
-        hoverOverHandler(node, node.relatedNodes[0].features, calculatedData, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true);
+        const matmulGroup = g5.append("g").attr("transform", `translate(0, -15)`);
+        hoverOverHandler(node, node.relatedNodes[0].features, calculatedData, state, matmulGroup, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true);
         d3.selectAll(".displayer-group").attr("transform", `translate(${endCoordList[0][0] - 90}, ${endCoordList[0][1] - 260}) scale(1.5)`);
 
         let start_x = node.x + 170 - temp;
