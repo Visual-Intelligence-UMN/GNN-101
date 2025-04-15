@@ -1559,7 +1559,7 @@ export function drawWeightMatrix(
 
 
 
-export function drawBiasVector(
+  export function drawBiasVector(
     g: any,
     featureChannels: number,
     rectH: number,
@@ -1588,46 +1588,51 @@ export function drawBiasVector(
                   .attr("stroke", "black")
                   .attr("stroke-width", 2)
                   .raise();
+                const tooltipWidth = 130;
+                const tooltipHeight = 30;
+                const tooltipOffset = -45; 
+                const horizontalOffset = 80; 
                 
                 const pointer = d3.pointer(event, g.node());
+                
+                g.selectAll("g.bias-tooltip").remove();
                 
                 const tooltip = g.append("g")
                     .attr("class", "bias-tooltip")
                     .style("pointer-events", "none");
+                tooltip.raise();
                 
                 tooltip.append("rect")
-                    .attr("x", pointer[0] )
-                    .attr("y", pointer[1] - 10)
-                    .attr("width", 130)
-                    .attr("height", 30)
+                    .attr("x", pointer[0] - tooltipWidth / 2 + horizontalOffset)
+                    .attr("y", pointer[1] - tooltipHeight - tooltipOffset)
+                    .attr("width", tooltipWidth)
+                    .attr("height", tooltipHeight)
                     .attr("fill", "white")
                     .attr("stroke", "black")
                     .attr("rx", 3)
                     .attr("ry", 3);
                 
                 tooltip.append("text")
-                    .attr("x", pointer[0] + 65)
-                    .attr("y", pointer[1] + 5)
+                    .attr("x", pointer[0] + horizontalOffset)
+                    .attr("y", pointer[1] - tooltipOffset - tooltipHeight/2)
                     .attr("text-anchor", "middle")
                     .attr("dominant-baseline", "middle")
                     .style("font-size", "17px")
                     .attr("font-family", "monospace")
                     .attr("fill", "black")
-                    .text(`Value = ` + biasValue.toFixed(2));
+                    .text(`Value = ${biasValue.toFixed(2)}`);
             })
             .on("mouseout", function (this: SVGRectElement) {
-
                 d3.select(this)
                   .attr("stroke", "gray")
                   .attr("stroke-width", 0.1)
                   .lower();
                 
-
                 g.selectAll("g.bias-tooltip").remove();
             });
     }
-
-    // 绘制 bias vector 的外框
+    
+    // Draw bias vector border
     g.append("rect")
         .attr("x", coordFeatureVis[0])
         .attr("y", coordFeatureVis[1] - rectH / 2)
@@ -1638,7 +1643,7 @@ export function drawBiasVector(
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("class", "procVis biasVector biasFrame");
-
+    
     drawHintLabel(
         g,
         coordFeatureVis[0],
