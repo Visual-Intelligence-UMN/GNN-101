@@ -456,6 +456,7 @@ export function outputVisualizer(
         .attr("x", (d: number, i: number) => i * rectHeight + 5)
         .attr("y", -30)
         .attr("width", rectHeight)
+        .attr("height", rectWidth)
         .attr(
             "class",
             (d: number, i: number) => `calculatedFeatures${i} to-be-removed bias calculatedRect`
