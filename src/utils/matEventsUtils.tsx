@@ -745,7 +745,7 @@ export function featureVisClick(
                 "./assets/SVGs/matmul.svg",
                 drawLabel
             );
-            const hintLabel = drawHintLabel(g, btnX, btnY - 36, "Click for Animation", "procVis");
+            const hintLabel = drawHintLabel(g, btnX - 80, btnY - 56, "Click for Animation", "procVis");
             
             
 
