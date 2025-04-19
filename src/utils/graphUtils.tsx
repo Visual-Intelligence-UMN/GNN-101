@@ -1230,7 +1230,7 @@ export function calculationVisualizer(
                 let calculatedHeight = 100;
                 if (detailText) {
                     const lines = detailText.split('\n');
-                    calculatedHeight = lines.length * 35 + 20; // Adjust height based on number of lines
+                    calculatedHeight = lines.length * 30; // Adjust height based on number of lines
                 }
             
                 const tooltip = svg
@@ -1261,9 +1261,13 @@ export function calculationVisualizer(
                 if (detailText) {
                     const lines = detailText.split('\n');
                     const rectL = 25;
+                    const lastNum = Number(lines[lines.length - 1].match(/-?\d*\.?\d+/g));
+                    const balancedY = Array.isArray(lines) ? lines.length / 2 * 30 + my - 45 : my - 45;
+                    const lastHalfX = mx + 200
+                    // console.log("LastNum", lastNum);
                     tooltip.append("text")
                         .attr("x", mx + 20)
-                        .attr("y", my - 20)
+                        .attr("y", balancedY)
                         .attr("font-family", "monospace")
                         .style("font-size", "20px")
                         .style("fill", "black")
@@ -1273,7 +1277,7 @@ export function calculationVisualizer(
 
                     lines.forEach((line: any, i: number) => {
                         const numbers = line.match(/-?\d*\.?\d+/g);
-                        console.log("numbers", numbers);
+                        // console.log("numbers", numbers);
                 
                         if (numbers && numbers.length === 2) {
                             const value0 = Number(numbers[0]);
@@ -1346,14 +1350,33 @@ export function calculationVisualizer(
                         
                     });
                     tooltip.append("text")
-                    .attr("x", mx + 200)
-                    .attr("y", my - 20)
+                    .attr("x", lastHalfX)
+                    .attr("y", balancedY)
                     .attr("font-family", "monospace")
                     .style("font-size", "20px")
                     .style("fill", "black")
                     .text(") =")
                     .attr("class", "math-displayer")
                     .attr("font-weight", "bold");
+
+                    tooltip.append("rect")
+                    .attr("x", lastHalfX + 45)
+                    .attr("y", balancedY -(rectL / 2 + 2) - 5)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(lastNum))
+                    .attr("class", "math-displayer");
+            
+                tooltip.append("text")
+                    .attr("x", lastHalfX + 45 + rectL / 2)
+                    .attr("y", balancedY - 5)
+                    .text(roundToTwo(lastNum))
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "10px")
+                    .attr("font-family", "monospace")
+                    .attr("fill", Math.abs(lastNum) > 0.7 ? "white" : "black");
 
                 }
                 
