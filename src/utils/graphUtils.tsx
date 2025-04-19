@@ -1225,11 +1225,12 @@ export function calculationVisualizer(
                 console.log("步骤", node.aggregationSteps);
 
                 // Use the correct index to get the detail text
+                // aggregated-tooltip
                 const detailText = node.aggregationSteps[index];
                 let calculatedHeight = 100;
                 if (detailText) {
                     const lines = detailText.split('\n');
-                    calculatedHeight = lines.length * 20 + 20; // Adjust height based on number of lines
+                    calculatedHeight = lines.length * 35 + 20; // Adjust height based on number of lines
                 }
             
                 const tooltip = svg
@@ -1240,7 +1241,7 @@ export function calculationVisualizer(
                 tooltip.append("rect")
                     .attr("x", mx + 10)
                     .attr("y", my - 40)
-                    .attr("width", 200)
+                    .attr("width", 300)
                     .attr("height", calculatedHeight)
                     .attr("rx", 5)
                     .attr("ry", 5)
@@ -1249,25 +1250,69 @@ export function calculationVisualizer(
         
 
                     
-                const textElement = tooltip.append("text")
-                    .attr("x", mx + 20)
-                    .attr("y", my - 20)
-                    .attr("font-family", "monospace")
-                    .style("font-size", "17px")
-                    .style("fill", "black");
+                // const textElement = tooltip.append("text")
+                //     .attr("x", mx + 20)
+                //     .attr("y", my - 20)
+                //     .attr("font-family", "monospace")
+                //     .style("font-size", "17px")
+                //     .style("fill", "black");
 
                 // Split the text by newline and create tspan elements
                 if (detailText) {
                     const lines = detailText.split('\n');
-                    lines.forEach((line:any, i:number) => {
-                        textElement.append("tspan")
-                            .attr("x", mx + 20)
-                            .attr("dy", i === 0 ? 0 : "1.2em")
-                            .text(line);
+                    const rectL = 17;
+                    lines.forEach((line: any, i: number) => {
+                        const numbers = line.match(/-?\d*\.?\d+/g);
+                        console.log("numbers", numbers);
+                
+                        if (numbers && numbers.length === 2) {
+                            const value0 = Number(numbers[0]);
+                            const value1 = Number(numbers[1]);
+                        
+                            // Rectangle and text for numbers[0]
+                            tooltip.append("rect")
+                                .attr("x", mx + 50)
+                                .attr("y", i * 30 + my)
+                                .attr("width", rectL)
+                                .attr("height", rectL)
+                                .style("stroke", "black")
+                                .attr("fill", myColor(value0))
+                                .attr("class", "math-displayer");
+                        
+                            tooltip.append("text")
+                                .attr("x", mx + 50 + rectL / 2)
+                                .attr("y", i * 30 + my + rectL / 2 + 2)
+                                .text(roundToTwo(value0))
+                                .attr("class", "math-displayer")
+                                .attr("text-anchor", "middle")
+                                .attr("font-size", "7px")
+                                .attr("font-family", "monospace")
+                                .attr("fill", Math.abs(value0) > 0.7 ? "white" : "black");
+                        
+                            // Rectangle and text for numbers[1] (50px right)
+                            tooltip.append("rect")
+                                .attr("x", mx + 50 + 50)
+                                .attr("y", i * 30 + my)
+                                .attr("width", rectL)
+                                .attr("height", rectL)
+                                .style("stroke", "black")
+                                .attr("fill", myColor(value1))
+                                .attr("class", "math-displayer");
+                        
+                            tooltip.append("text")
+                                .attr("x", mx + 50 + 50 + rectL / 2)
+                                .attr("y", i * 30 + my + rectL / 2 + 2)
+                                .text(roundToTwo(value1))
+                                .attr("class", "math-displayer")
+                                .attr("text-anchor", "middle")
+                                .attr("font-size", "7px")
+                                .attr("font-family", "monospace")
+                                .attr("fill", Math.abs(value1) > 0.7 ? "white" : "black");
+                        }
+                        
                     });
-                } else {
-                    textElement.text(d.value.toFixed(2));
                 }
+                
                 
             })
             .on("mouseout", function (this: SVGRectElement, event: MouseEvent) {
