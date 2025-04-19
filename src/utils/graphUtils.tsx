@@ -623,7 +623,7 @@ export function outputVisualizer(
         .attr("y2", 7.5)
         .attr("stroke", "black")
         .attr("class", "to-be-removed softmax-component");
-        drawFunctionIcon([2 * rectHeight + 5 - moveOffset + 75, 7.5], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", outputGroup);
+        drawFunctionIcon([2 * rectHeight + 5 - moveOffset + 75, 7.5], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "eᶻⁱ / ∑ⱼ eᶻʲ", "Range: [0, 1]", outputGroup);
 
             
         d3.selectAll(".relu-icon").on("mouseover", function(event: any) {
@@ -631,7 +631,7 @@ export function outputVisualizer(
 
             graphVisDrawActivationExplanation(
                 x, y, "Softmax",
-                "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", outputGroup
+                "eᶻⁱ / ∑ⱼ eᶻʲ", "Range: [0, 1]", outputGroup
             );
         }).on("mouseout", function() {
             d3.selectAll(".math-displayer").remove();
@@ -3600,14 +3600,14 @@ export function nodeOutputVisualizer(
             .attr("opacity", 1)
             .lower();
 
-            drawFunctionIcon([end_x+170/2+40, end_y], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", svg);
+            drawFunctionIcon([end_x+170/2+40, end_y], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "eᶻⁱ / ∑ⱼ eᶻʲ", "Range: [0, 1]", svg);
             
             d3.selectAll(".relu-icon").on("mouseover", function() {
                 const [x, y] = d3.pointer(event);
 
                 graphVisDrawActivationExplanation(
                     x, y, "Softmax",
-                    "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", svg
+                    "eᶻⁱ / ∑ⱼ eᶻʲ", "Range: [0, 1]", svg
                 );
             }).on("mouseout", function() {
                 d3.selectAll(".math-displayer").remove();
