@@ -1260,7 +1260,17 @@ export function calculationVisualizer(
                 // Split the text by newline and create tspan elements
                 if (detailText) {
                     const lines = detailText.split('\n');
-                    const rectL = 17;
+                    const rectL = 25;
+                    tooltip.append("text")
+                        .attr("x", mx + 20)
+                        .attr("y", my - 20)
+                        .attr("font-family", "monospace")
+                        .style("font-size", "20px")
+                        .style("fill", "black")
+                        .text("Sum(")
+                        .attr("class", "math-displayer")
+                        .attr("font-weight", "bold");
+
                     lines.forEach((line: any, i: number) => {
                         const numbers = line.match(/-?\d*\.?\d+/g);
                         console.log("numbers", numbers);
@@ -1268,11 +1278,13 @@ export function calculationVisualizer(
                         if (numbers && numbers.length === 2) {
                             const value0 = Number(numbers[0]);
                             const value1 = Number(numbers[1]);
+                            const xOffset = mx + 80;          // Horizontal base position
+                            const yOffset = i * 30 + my - 45;      // Vertical position for this row
                         
                             // Rectangle and text for numbers[0]
                             tooltip.append("rect")
-                                .attr("x", mx + 50)
-                                .attr("y", i * 30 + my)
+                                .attr("x", xOffset)
+                                .attr("y", yOffset)
                                 .attr("width", rectL)
                                 .attr("height", rectL)
                                 .style("stroke", "black")
@@ -1280,19 +1292,19 @@ export function calculationVisualizer(
                                 .attr("class", "math-displayer");
                         
                             tooltip.append("text")
-                                .attr("x", mx + 50 + rectL / 2)
-                                .attr("y", i * 30 + my + rectL / 2 + 2)
+                                .attr("x", xOffset + rectL / 2)
+                                .attr("y", yOffset + rectL / 2 + 2)
                                 .text(roundToTwo(value0))
                                 .attr("class", "math-displayer")
                                 .attr("text-anchor", "middle")
-                                .attr("font-size", "7px")
+                                .attr("font-size", "10px")
                                 .attr("font-family", "monospace")
                                 .attr("fill", Math.abs(value0) > 0.7 ? "white" : "black");
                         
-                            // Rectangle and text for numbers[1] (50px right)
+                            // Rectangle and text for numbers[1], 50px to the right of xOffset
                             tooltip.append("rect")
-                                .attr("x", mx + 50 + 50)
-                                .attr("y", i * 30 + my)
+                                .attr("x", xOffset + 70)
+                                .attr("y", yOffset)
                                 .attr("width", rectL)
                                 .attr("height", rectL)
                                 .style("stroke", "black")
@@ -1300,17 +1312,49 @@ export function calculationVisualizer(
                                 .attr("class", "math-displayer");
                         
                             tooltip.append("text")
-                                .attr("x", mx + 50 + 50 + rectL / 2)
-                                .attr("y", i * 30 + my + rectL / 2 + 2)
+                                .attr("x", xOffset + 70 + rectL / 2)
+                                .attr("y", yOffset + rectL / 2 + 2)
                                 .text(roundToTwo(value1))
                                 .attr("class", "math-displayer")
                                 .attr("text-anchor", "middle")
-                                .attr("font-size", "7px")
+                                .attr("font-size", "10px")
                                 .attr("font-family", "monospace")
                                 .attr("fill", Math.abs(value1) > 0.7 ? "white" : "black");
+                        
+                            // Comma between the two
+                            tooltip.append("text")
+                                .attr("x", xOffset + rectL + 15)
+                                .attr("y", yOffset + rectL / 2 + 7)
+                                .text("X")
+                                .attr("class", "math-displayer")
+                                .attr("font-size", "17px")
+                                .attr("fill", "black");
+                            
+                            tooltip.append("text")
+                                .attr("x", xOffset + rectL + 75)
+                                .attr("y", yOffset + rectL / 2 + 7)
+                                .text(",")
+                                .attr("class", "math-displayer")
+                                .attr("font-family", "monospace")
+                                .attr("font-size", "17px")
+                                .attr("font-weight", "bold")
+                                .attr("fill", "black");
+                            
                         }
                         
+                        
+                        
                     });
+                    tooltip.append("text")
+                    .attr("x", mx + 200)
+                    .attr("y", my - 20)
+                    .attr("font-family", "monospace")
+                    .style("font-size", "20px")
+                    .style("fill", "black")
+                    .text(") =")
+                    .attr("class", "math-displayer")
+                    .attr("font-weight", "bold");
+
                 }
                 
                 
