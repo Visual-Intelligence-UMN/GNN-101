@@ -955,7 +955,7 @@ export function drawActivationExplanation(
     description: string
 ) {
     const displayW = 300;
-    const displayH = 80;
+    const displayH = 110;
 
     //find coordination for the math displayer first
     const displayX = x + 10;
@@ -990,7 +990,7 @@ export function drawActivationExplanation(
         .attr("font-weight", "bold")
         .attr("fill", "black");
     const eqXOffset = 40;
-    const eqYOffset = 45;
+    const eqYOffset = 55;
     const unitSize = eqXOffset / 3 + 3;
     const upperOffset = unitSize * 2;
     d3.select(".mats")
@@ -999,16 +999,16 @@ export function drawActivationExplanation(
         .attr("y", displayY + eqYOffset)
         .text(formula)
         .attr("class", "math-displayer procVis to-be-removed")
-        .attr("font-size", "17px")
+        .attr("font-size", "20px")
         .attr("font-family", "monospace")
         .attr("fill", "black");
     d3.select(".mats")
         .append("text")
         .attr("x", displayX + eqXOffset)
-        .attr("y", displayY + eqYOffset + unitSize * 1.5)
+        .attr("y", displayY + eqYOffset + 30)
         .text(description)
         .attr("class", "to-be-removed math-displayer procVis")
-        .attr("font-size", "17px")
+        .attr("font-size", "20px")
         .attr("font-family", "monospace")
         .attr("fill", "black");
 }
