@@ -3558,7 +3558,64 @@ export function nodeOutputVisualizer(
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 1)
         .style("stroke", "grey")
-        .style("opacity", 0);
+        .style("opacity", 0)
+        .style("pointer-events", "all") // Enable pointer events
+        .on("mouseover", function(this: SVGRectElement, event: MouseEvent, d: number) {
+            // Highlight the cell on hover
+            d3.select(this)
+                .style("stroke", "black")
+                .style("stroke-width", "1.5px");
+            
+            // Define tooltip dimensions
+            const tooltipWidth = 130;
+            const tooltipHeight = 30;
+            const tooltipOffset = 15;
+            
+            // Get pointer position relative to the BiasGroup
+            const pointer = d3.pointer(event, BiasGroup.node());
+            
+            // Remove any existing tooltips
+            BiasGroup.selectAll("g.bias-tooltip").remove();
+            
+            // Create tooltip group
+            const tooltip = BiasGroup.append("g")
+                .attr("class", "bias-tooltip")
+                .style("pointer-events", "none");
+            
+            // Bring tooltip to front
+            tooltip.raise();
+            
+            // Create tooltip background
+            tooltip.append("rect")
+                .attr("x", pointer[0] - tooltipWidth / 2)
+                .attr("y", pointer[1] - tooltipHeight - tooltipOffset)
+                .attr("width", tooltipWidth)
+                .attr("height", tooltipHeight)
+                .attr("fill", "white")
+                .attr("stroke", "black")
+                .attr("rx", 3)
+                .attr("ry", 3);
+            
+            // Add tooltip text
+            tooltip.append("text")
+                .attr("x", pointer[0])
+                .attr("y", pointer[1] - tooltipOffset - tooltipHeight/2)
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "middle")
+                .style("font-size", "14px")
+                .attr("font-family", "monospace")
+                .attr("fill", "black")
+                .text(`Value = ${d.toFixed(2)}`);
+        })
+        .on("mouseout", function(this: SVGRectElement) {
+            // Reset styling on mouseout
+            d3.select(this)
+                .style("stroke", "grey")
+                .style("stroke-width", "1px");
+            
+            // Remove tooltip
+            BiasGroup.selectAll(".bias-tooltip").remove();
+        });
 
     BiasGroup.append("text")
         .attr("x", 5)
@@ -3567,7 +3624,6 @@ export function nodeOutputVisualizer(
         .style("fill", "gray")
         .style("font-size", "17px")
         .attr("class", "bias to-be-removed")
-
         .style("opacity", 0);
 
 
