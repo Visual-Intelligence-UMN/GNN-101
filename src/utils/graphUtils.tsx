@@ -591,6 +591,8 @@ export function outputVisualizer(
 
 
 
+    // Modified bias vector code with tooltip functionality
+
     const BiasGroup = svg
         .append("g")
         .attr("transform", `translate(${node.x}, ${node.y - 90})`);
@@ -607,7 +609,53 @@ export function outputVisualizer(
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 1)
         .style("stroke", "grey")
-        .style("opacity", 0);
+        .style("opacity", 0)
+        .style("pointer-events", "all") 
+        .on("mouseover", function(this: SVGRectElement,event: MouseEvent, d: number) {
+        d3.select(this)
+            .style("stroke", "black")
+            .style("stroke-width", "1.5px");
+
+        const tooltipWidth = 130;
+        const tooltipHeight = 30;
+        const tooltipOffset = 15;
+        const pointer = d3.pointer(event, BiasGroup.node());
+        
+        BiasGroup.selectAll("g.bias-tooltip").remove();
+        
+        const tooltip = BiasGroup.append("g")
+            .attr("class", "bias-tooltip")
+            .style("pointer-events", "none");
+        
+        tooltip.raise();
+        
+        tooltip.append("rect")
+            .attr("x", pointer[0] - tooltipWidth / 2)
+            .attr("y", pointer[1] - tooltipHeight - tooltipOffset)
+            .attr("width", tooltipWidth)
+            .attr("height", tooltipHeight)
+            .attr("fill", "white")
+            .attr("stroke", "black")
+            .attr("rx", 3)
+            .attr("ry", 3);
+        
+        tooltip.append("text")
+            .attr("x", pointer[0])
+            .attr("y", pointer[1] - tooltipOffset - tooltipHeight/2)
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "middle")
+            .style("font-size", "14px")
+            .attr("font-family", "monospace")
+            .attr("fill", "black")
+            .text(`Value = ${d.toFixed(2)}`);
+        })
+        .on("mouseout", function(this: SVGRectElement) {
+    d3.select(this)
+        .style("stroke", "grey")
+        .style("stroke-width", "1px");
+    
+    BiasGroup.selectAll(".bias-tooltip").remove();
+    });
 
     BiasGroup.append("text")
         .attr("x", 5 - moveOffset)
