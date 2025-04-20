@@ -362,7 +362,7 @@ export function outputVisualizer(
                 // console.log("mouseover");
                 const tooltip = svg
                 .append("g")
-                .attr("class", "multiplier-tooltip procVis")
+                .attr("class", "pooling-tooltip procVis")
                 .style("pointer-events", "none");
             
                 const [x, y] = d3.pointer(event, svg.node());
@@ -391,6 +391,13 @@ export function outputVisualizer(
                     .style("opacity", 1);
                 }   
             )
+            .on("mouseout", function (this: SVGRectElement, event: MouseEvent, d: number) {
+                d3.selectAll(".pooling-tooltip").remove();
+                d3.select(this)
+                .style("stroke", "grey")
+                .style("stroke-width", 0.1)
+                .lower();
+            })
         }
 
         
@@ -585,7 +592,7 @@ export function outputVisualizer(
         .data(outputData)
         .enter()
         .append("rect")
-        .attr("class", "bias to-be-removed")
+        .attr("class", "bias to-be-removed last-layer-output")
         .attr("x", (d: any, i: number) => i * rectHeight + 5 - moveOffset)
         .attr("y", 0)
         .attr("width", rectHeight)
@@ -595,7 +602,50 @@ export function outputVisualizer(
         .style("stroke", "grey")
         .style("opacity", 0);
 
+        d3.selectAll(".last-layer-output")
+        .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
+            if (!state.isClicked) {
+                return;
+            }
+            // console.log("mouseover");
+            const tooltip = outputGroup
+            .append("g")
+            .attr("class", "pooling-tooltip procVis")
+            .style("pointer-events", "none");
+        
+            const [x, y] = d3.pointer(event, outputGroup.node());
 
+            tooltip.append("rect")
+                .attr("x", x + 10)
+                .attr("y", y - 40)
+                .attr("width", 145)
+                .attr("height", 30)
+                .attr("rx", 5)
+                .attr("ry", 5)
+                .style("fill", "white")
+                .style("stroke", "black")
+                .style("opacity", 1);
+            
+
+            tooltip.append("text")
+                .attr("x", x + 20)
+                .attr("y", y - 20)
+                .text(() => {
+                    return `Value = ` + d.toFixed(2).toString();
+                })
+                .attr("font-family", "monospace")
+                .style("font-size", "17px")
+                .style("fill", "black")
+                .style("opacity", 1);
+            }   
+        )
+        .on("mouseout", function (this: SVGRectElement, event: MouseEvent, d: number) {
+            d3.selectAll(".pooling-tooltip").remove();
+            d3.select(this)
+            .style("stroke", "grey")
+            .style("stroke-width", 0.1)
+            .lower();
+        })
         
 
        
@@ -624,7 +674,7 @@ export function outputVisualizer(
         .data(bias)
         .enter()
         .append("rect")
-        .attr("class", "bias to-be-removed")
+        .attr("class", "bias to-be-removed last-layer-bias")
         .attr("x", (d: any, i: number) => i * rectHeight + 5 - moveOffset)
         .attr("y", 0)
         .attr("width", rectHeight)
@@ -633,6 +683,52 @@ export function outputVisualizer(
         .style("stroke-width", 1)
         .style("stroke", "grey")
         .style("opacity", 0);
+
+    d3.selectAll(".last-layer-bias")
+        .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
+            if (!state.isClicked) {
+                return;
+            }
+            // console.log("mouseover");
+            const tooltip = BiasGroup
+            .append("g")
+            .attr("class", "pooling-tooltip procVis")
+            .style("pointer-events", "none");
+        
+            const [x, y] = d3.pointer(event, BiasGroup.node());
+
+            tooltip.append("rect")
+                .attr("x", x + 10)
+                .attr("y", y - 40)
+                .attr("width", 145)
+                .attr("height", 30)
+                .attr("rx", 5)
+                .attr("ry", 5)
+                .style("fill", "white")
+                .style("stroke", "black")
+                .style("opacity", 1);
+            
+
+            tooltip.append("text")
+                .attr("x", x + 20)
+                .attr("y", y - 20)
+                .text(() => {
+                    return `Value = ` + d.toFixed(2).toString();
+                })
+                .attr("font-family", "monospace")
+                .style("font-size", "17px")
+                .style("fill", "black")
+                .style("opacity", 1);
+            }   
+        )
+        .on("mouseout", function (this: SVGRectElement, event: MouseEvent, d: number) {
+            d3.selectAll(".pooling-tooltip").remove();
+            d3.select(this)
+            .style("stroke", "grey")
+            .style("stroke-width", 0.1)
+            .lower();
+        })
+
 
     BiasGroup.append("text")
         .attr("x", 5 - moveOffset)
