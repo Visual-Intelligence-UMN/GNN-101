@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { computeMids, computeMidsVertical } from "./matFeaturesUtils";
+import { computeMids, computeMidsVertical, markCellsConnectedToPath } from "./matFeaturesUtils";
 import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
 import {
     drawActivationExplanation,
@@ -1685,7 +1685,8 @@ export function drawFinalPath(
     res01: [number, number],
     nextCoord: [number, number],
     layerID: number,
-    featureChannels: number
+    featureChannels: number,
+    featureVisTable: any
 ) {
     if (layerID == 2 && featureChannels == 4) wmCoord[0] -= 15;
     if (layerID == 0 && featureChannels == 4) wmCoord[0] += 15;
@@ -1706,6 +1707,7 @@ export function drawFinalPath(
 
     d3.selectAll(".finalPath").transition().duration(100).attr("opacity", 1);
     d3.selectAll("#procPath").lower();
+    
 }
 
 export function drawReLU(
