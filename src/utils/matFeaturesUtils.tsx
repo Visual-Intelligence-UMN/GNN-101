@@ -409,6 +409,31 @@ export function drawSingleGCNConvFeature(
             .attr("stroke-width", 0.1)
             .attr("data-value", cellValue.toString())
             .on("mouseover", function(this: SVGRectElement, event: MouseEvent) {
+
+                // fix for the issue of tooltip not hiding when the corresponding rect has opacity < 0.5
+                const parentNode = this.parentNode as Element | null;
+                if (!parentNode) return;
+
+                const siblings = d3.select(parentNode).selectAll<SVGRectElement, unknown>("rect").nodes();
+
+                for (const sibling of siblings) {
+                  if (sibling === this) continue; // skip self
+
+                  const width = sibling?.getAttribute("width") ? parseFloat(sibling.getAttribute("width")!) : 0;
+                  const opacity = sibling?.style?.opacity
+                    ? parseFloat(sibling.style.opacity)
+                    : sibling?.getAttribute("opacity")
+                    ? parseFloat(sibling.getAttribute("opacity")!)
+                    : 1;
+                
+                  if (width > 100 && opacity < 0.5) {
+                    return; // Exit early if condition is met
+                  }
+                }
+                
+
+
+
                 d3.selectAll(".feature-tooltip").remove();
                 const container = d3.select(".mats");
                 const [x, y] = d3.pointer(event, container.node());
