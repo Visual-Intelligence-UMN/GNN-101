@@ -389,6 +389,58 @@ export function outputVisualizer(
         startCoordList.push(s);
     }
 
+    for (let i = 0; i < node.relatedNodes[0].features.length; i++) {
+        const value = node.relatedNodes[0].features[i];
+        d3.select(`#pooling-layer-rect-${i}`)
+            .attr("data-value", value)
+            .style("pointer-events", "all")
+            .style("cursor", "pointer")
+            .on("mouseover", function(event) {
+                event.stopPropagation();
+                d3.selectAll(".multiplier-tooltip").remove();
+                const value = d3.select(this).attr("data-value");
+                d3.select(this)
+                    .style("stroke", "black")
+                    .style("stroke-width", 2)
+                    .raise();
+                    
+                const svgNode = svg.node();
+                
+                const [mx, my] = d3.pointer(event, svgNode);
+                
+                const tip = svg.append("g")
+                    .attr("class", "multiplier-tooltip procVis")
+                    .style("pointer-events", "none");
+                    
+                tip.append("rect")
+                    .attr("x", mx + 10)
+                    .attr("y", my - 40)
+                    .attr("width", 130)
+                    .attr("height", 30)
+                    .attr("rx", 5)
+                    .attr("ry", 5)
+                    .style("fill", "white")
+                    .style("stroke", "black");
+                    
+                tip.append("text")
+                    .attr("x", mx + 20)
+                    .attr("y", my - 20)
+                    .attr("font-family", "monospace")
+                    .style("font-size", "14px")
+                    .style("fill", "black")
+                    .text(`Value = ${parseFloat(value).toFixed(2)}`);
+            })
+            .on("mouseout", function(event) {
+                event.stopPropagation();
+                
+                d3.selectAll(".multiplier-tooltip").remove();
+                d3.select(this)
+                    .style("stroke", "grey")
+                    .style("stroke-width", 0.1)
+                    .lower();
+            });
+    }
+
     // for (let i = 0; i < 64; i++) {
     //     let s: [number, number] = [
     //         node.graphIndex * offset +
