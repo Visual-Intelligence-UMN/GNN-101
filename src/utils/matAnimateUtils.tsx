@@ -19,6 +19,7 @@ import { drawHintLabel, drawMatrixValid, rotateMatrix } from "./matHelperUtils";
 import { off } from "node:process";
 import { computeAttnStep } from "./computationUtils";
 import { removeDuplicatesFromSubarrays, removeDuplicateSubarrays } from "./graphDataUtils";
+import { roundToTwo } from "@/components/WebUtils";
 
 interface Animation {
     func: () => void;
@@ -928,11 +929,11 @@ export function drawSummationFeature(
         d3.selectAll(".summation-tooltip").remove();
     
         const tooltip = d3.select(".mats").append("g").attr("class", "summation-tooltip procVis");
-        const tooltipHeight = 20 + 20 * (adjList[node].length + 2);
+        const tooltipHeight = 30 * (adjList[node].length + 2);
         tooltip.append("rect")
           .attr("x", x + 10)
           .attr("y", y - 40)
-          .attr("width", 200)
+          .attr("width", 300)
           .attr("height", tooltipHeight)
           .attr("rx", 5)
           .attr("ry", 5)
@@ -950,17 +951,144 @@ export function drawSummationFeature(
           textData.push(i < steps.length - 1 ? step + " +" : step);
         });
         textData.push(`] = ${d.toFixed(3)}`);
-        let textElement = tooltip.append("text")
-          .attr("x", x + 50)
-          .attr("y", y - 20)
-          .style("font-size", "17px")
-          .style("font-family", "monospace");
-        textData.forEach((line, i) => {
-          textElement.append("tspan")
-            .attr("x", x + 20)
-            .attr("dy", i === 0 ? 0 : "1.2em")
-            .text(line);
+        // let textElement = tooltip.append("text")
+        //   .attr("x", x + 50)
+        //   .attr("y", y - 20)
+        //   .style("font-size", "17px")
+        //   .style("font-family", "monospace");
+        // textData.forEach((line, i) => {
+        //   textElement.append("tspan")
+        //     .attr("x", x + 20)
+        //     .attr("dy", i === 0 ? 0 : "1.2em")
+        //     .text(line);
+        // });
+
+
+        const lines = textData;
+        const my = y;
+        const mx = x;
+        const rectL = 25;
+        const lastNum = Number(lines[lines.length - 1].match(/-?\d*\.?\d+/g));
+        const balancedY = Array.isArray(lines) ? lines.length / 2 * 30 + my - 45 : my - 45;
+        const lastHalfX = mx + 200
+        // console.log("LastNum", lastNum);
+        tooltip.append("text")
+            .attr("x", mx + 20)
+            .attr("y", balancedY)
+            .attr("font-family", "monospace")
+            .style("font-size", "20px")
+            .style("fill", "black")
+            .text("Sum(")
+            .attr("class", "math-displayer")
+            .attr("font-weight", "bold");
+
+        lines.forEach((line: any, i: number) => {
+            const numbers = line.match(/-?\d*\.?\d+/g);
+            // console.log("numbers", numbers);
+    
+            if (numbers && numbers.length === 2) {
+                const value0 = Number(numbers[0]);
+                const value1 = Number(numbers[1]);
+                const xOffset = mx + 80;          // Horizontal base position
+                const yOffset = i * 30 + my - 45;      // Vertical position for this row
+            
+                // Rectangle and text for numbers[0]
+                tooltip.append("rect")
+                    .attr("x", xOffset)
+                    .attr("y", yOffset)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(value0))
+                    .attr("class", "math-displayer");
+            
+                tooltip.append("text")
+                    .attr("x", xOffset + rectL / 2)
+                    .attr("y", yOffset + rectL / 2 + 2)
+                    .text(roundToTwo(value0))
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "10px")
+                    .attr("font-family", "monospace")
+                    .attr("fill", Math.abs(value0) > 0.7 ? "white" : "black");
+            
+                // Rectangle and text for numbers[1], 50px to the right of xOffset
+                tooltip.append("rect")
+                    .attr("x", xOffset + 70)
+                    .attr("y", yOffset)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(value1))
+                    .attr("class", "math-displayer");
+            
+                tooltip.append("text")
+                    .attr("x", xOffset + 70 + rectL / 2)
+                    .attr("y", yOffset + rectL / 2 + 2)
+                    .text(roundToTwo(value1))
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "10px")
+                    .attr("font-family", "monospace")
+                    .attr("fill", Math.abs(value1) > 0.7 ? "white" : "black");
+            
+                // Comma between the two
+                tooltip.append("text")
+                    .attr("x", xOffset + rectL + 15)
+                    .attr("y", yOffset + rectL / 2 + 7)
+                    .text("X")
+                    .attr("class", "math-displayer")
+                    .attr("font-size", "17px")
+                    .attr("fill", "black");
+                
+                tooltip.append("text")
+                    .attr("x", xOffset + rectL + 75)
+                    .attr("y", yOffset + rectL / 2 + 7)
+                    .text(",")
+                    .attr("class", "math-displayer")
+                    .attr("font-family", "monospace")
+                    .attr("font-size", "17px")
+                    .attr("font-weight", "bold")
+                    .attr("fill", "black");
+                
+            }
+            
+            
+            
         });
+        tooltip.append("text")
+        .attr("x", lastHalfX)
+        .attr("y", balancedY)
+        .attr("font-family", "monospace")
+        .style("font-size", "20px")
+        .style("fill", "black")
+        .text(") =")
+        .attr("class", "math-displayer")
+        .attr("font-weight", "bold");
+
+        tooltip.append("rect")
+        .attr("x", lastHalfX + 45)
+        .attr("y", balancedY -(rectL / 2 + 2) - 5)
+        .attr("width", rectL)
+        .attr("height", rectL)
+        .style("stroke", "black")
+        .attr("fill", myColor(lastNum))
+        .attr("class", "math-displayer");
+
+    tooltip.append("text")
+        .attr("x", lastHalfX + 45 + rectL / 2)
+        .attr("y", balancedY - 5)
+        .text(roundToTwo(lastNum))
+        .attr("class", "math-displayer")
+        .attr("text-anchor", "middle")
+        .attr("font-size", "10px")
+        .attr("font-family", "monospace")
+        .attr("fill", Math.abs(lastNum) > 0.7 ? "white" : "black");
+
+
+
+
+
     
         adjList[node].forEach((node_j: any) => {
             d3.selectAll(".inputFeatureRect")
