@@ -3559,9 +3559,8 @@ export function nodeOutputVisualizer(
         .style("stroke-width", 1)
         .style("stroke", "grey")
         .style("opacity", 0)
-        .style("pointer-events", "all") // Enable pointer events
+        .style("pointer-events", "all") 
         .on("mouseover", function(this: SVGRectElement, event: MouseEvent, d: number) {
-            // Highlight the cell on hover
             d3.select(this)
                 .style("stroke", "black")
                 .style("stroke-width", "1.5px");
