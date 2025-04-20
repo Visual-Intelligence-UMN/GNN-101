@@ -355,8 +355,42 @@ export function outputVisualizer(
     }
     for (let i = 0; i < node.relatedNodes[0].features.length; i++) {
         d3.select(`#pooling-layer-rect-${i}`)
-            .on("mouseover", function () {
-            })
+            .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
+                if (!state.isClicked) {
+                    return;
+                }
+                // console.log("mouseover");
+                const tooltip = svg
+                .append("g")
+                .attr("class", "multiplier-tooltip procVis")
+                .style("pointer-events", "none");
+            
+                const [x, y] = d3.pointer(event, svg.node());
+
+                tooltip.append("rect")
+                    .attr("x", x + 10)
+                    .attr("y", y - 40)
+                    .attr("width", 145)
+                    .attr("height", 30)
+                    .attr("rx", 5)
+                    .attr("ry", 5)
+                    .style("fill", "white")
+                    .style("stroke", "black")
+                    .style("opacity", 1);
+                
+
+                tooltip.append("text")
+                    .attr("x", x + 20)
+                    .attr("y", y - 20)
+                    .text(() => {
+                        return `Value = ` + d.toFixed(2).toString();
+                    })
+                    .attr("font-family", "monospace")
+                    .style("font-size", "17px")
+                    .style("fill", "black")
+                    .style("opacity", 1);
+                }   
+            )
         }
 
         
