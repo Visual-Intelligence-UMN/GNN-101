@@ -457,11 +457,11 @@ export function hoverOverHandler(node: any, aggregatedData: any, calculatedData:
 
 export function graphVisDrawActivationExplanation(x:number, y:number, title:string, formula:string, description:string, svg: any){
     const displayW = 250;
-    const displayH = 75;
+    const displayH = 100;
 
     //find coordination for the math displayer first
-    const displayX = x + 10;
-    const displayY = y - 10;
+    const displayX = x - 10;
+    const displayY = y + 30;
 
     if (!svg.selectAll) {
         svg = d3.selectAll(svg);
@@ -495,7 +495,7 @@ export function graphVisDrawActivationExplanation(x:number, y:number, title:stri
         .attr("font-weight", "bold")
         .attr("fill", "black");
     const eqXOffset = 25;
-    const eqYOffset = 40;
+    const eqYOffset = 50;
     const unitSize = eqXOffset / 3 + 3;
     const upperOffset = unitSize * 2;
     svg
@@ -504,16 +504,16 @@ export function graphVisDrawActivationExplanation(x:number, y:number, title:stri
         .attr("y", displayY + eqYOffset)
         .text(formula)
         .attr("class", "math-displayer")
-        .attr("font-size", "17px")
+        .attr("font-size", "20px")
         .attr("font-family", "monospace")
         .attr("fill", "black");
     svg
         .append("text")
         .attr("x", displayX + eqXOffset)
-        .attr("y", displayY + eqYOffset + unitSize * 1.5)
+        .attr("y", displayY + eqYOffset + 25)
         .text(description)
         .attr("class", "math-displayer")
-        .attr("font-size", "17px")
+        .attr("font-size", "20px")
         .attr("font-family", "monospace")
         .attr("fill", "black");
 }
