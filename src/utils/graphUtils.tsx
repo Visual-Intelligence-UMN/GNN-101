@@ -1232,7 +1232,8 @@ export function calculationVisualizer(
                 d3.selectAll(".multiplier-tooltip").remove();
                 d3.select(this)
                     .style("stroke", "grey")
-                    .style("stroke-width", 0.1);
+                    .style("stroke-width", 0.1)
+                    .lower();
             });
         }, 6000);
 
