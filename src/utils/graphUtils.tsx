@@ -76,158 +76,115 @@ export function scaleFeatureGroup(node: any, scale: number) {
 
 export function showFeature(node: any) {
     const scale = 1;
+
+    function isAnimated(el: any): boolean {
+        while (el) {
+            if (d3.active(el)) return true;
+            el = el.parentNode;
+        }
+        return false;
+    }
+
     if (node.featureGroup) {
         scaleFeatureGroup(node, scale);
-        // 添加触碰事件
-        node.featureGroup
-        .selectAll("rect") // 选择所有的矩形元素
-        .on("mouseover", function(this: SVGRectElement, event: MouseEvent, d: number) {
-            if ((function checkActive(el: any): boolean {
-                while (el) {
-                    if (d3.active(el)) return true;
-                    el = el.parentNode;
-                }
-                return false;
-            })(this)) {
-                return;
-            }
-            console.log("@@@####");
-            
-            // 移除已存在的弹框
-            d3.selectAll(".multiplier-tooltip").remove();
 
-            // 高亮当前 cell
-            d3.select(this)
-            .style("stroke", "black")
-            .style("stroke-width", 2)
-            .raise();
-            
-            // 获取 SVG 元素
-            const svg = d3.select(node.featureGroup.node().closest("svg"));
-            svg.raise();
-            
-            // 创建弹框
-            if (node.features && d !== undefined && d !== null) {
-            const tooltip = svg
-                .append("g")
-                .attr("class", "multiplier-tooltip procVis")
-                .style("pointer-events", "none");
-            
-            // 获取鼠标相对于 SVG 的位置
-            const [x, y] = d3.pointer(event, svg.node());
-            
-            // 添加弹框背景
-            tooltip.append("rect")
-                .attr("x", x + 10)
-                .attr("y", y - 40)
-                .attr("width", 130)
-                .attr("height", 30)
-                .attr("rx", 5)
-                .attr("ry", 5)
-                .style("fill", "white")
+        node.featureGroup
+          .selectAll("rect")
+          .filter((d: any) => d !== undefined)      
+          .on("mouseover", function(this: SVGRectElement, event: MouseEvent, d: number) {
+              if (isAnimated(this)) return;
+              d3.selectAll(".multiplier-tooltip").remove();
+
+              d3.select(this)
                 .style("stroke", "black")
-                .style("opacity", 1);
-            
-            // 添加文本
-            tooltip.append("text")
-                .attr("x", x + 20)
-                .attr("y", y - 20)
-                .text(() => {
-                    return `Value = ` + d.toFixed(2).toString();
-                })
-                .attr("font-family", "monospace")
-                .style("font-size", "17px")
-                .style("fill", "black")
-                .style("opacity", 1);
-            }
-        })
-        .on("mouseout", function(this: SVGRectElement, event: MouseEvent, d: number){
-            // 移除已存在的弹框
-            d3.selectAll(".multiplier-tooltip").remove();
-            // 取消高亮当前 cell
-            d3.select(this)
-            .style("stroke", "grey")
-            .style("stroke-width", 0.1)
-            .lower();
-        })
+                .style("stroke-width", 2)
+                .raise();
+
+              const svg = d3.select(node.featureGroup.node().closest("svg"));
+              svg.raise();
+
+              if (node.features && d != null) {
+                  const [x, y] = d3.pointer(event, svg.node());
+                  const tooltip = svg.append("g")
+                    .attr("class", "multiplier-tooltip procVis")
+                    .style("pointer-events", "none");
+
+                  tooltip.append("rect")
+                    .attr("x", x + 10).attr("y", y - 40)
+                    .attr("width", 130).attr("height", 30)
+                    .attr("rx", 5).attr("ry", 5)
+                    .style("fill", "white")
+                    .style("stroke", "black")
+                    .style("opacity", 1);
+
+                  tooltip.append("text")
+                    .attr("x", x + 20).attr("y", y - 20)
+                    .text(`Value = ${d.toFixed(2)}`)
+                    .attr("font-family", "monospace")
+                    .style("font-size", "17px")
+                    .style("fill", "black")
+                    .style("opacity", 1);
+              }
+          })
+          .on("mouseout", function(this: SVGRectElement, event: MouseEvent, d: number){
+              d3.selectAll(".multiplier-tooltip").remove();
+
+              d3.select(this)
+                .style("stroke", "grey")
+                .style("stroke-width", 0.1)
+                .lower();        
+          });
     }
+
     if (node.relatedNodes) {
         node.relatedNodes.forEach((n: any) => {
             if (n.featureGroup) {
                 scaleFeatureGroup(n, scale);
-                // 为相关节点也添加触碰事件
-                n.featureGroup
-                .selectAll("rect") // 选择所有的矩形元素
-                .on("mouseover", function(this: SVGRectElement, event: MouseEvent, d: number) {
-                    if ((function checkActive(el: any): boolean {
-                        while (el) {
-                            if (d3.active(el)) return true;
-                            el = el.parentNode;
-                        }
-                        return false;
-                    })(this)) {
-                        return;
-                    }
 
-                    console.log("@@@####");
-                    
-                    // 移除已存在的弹框
-                    d3.selectAll(".multiplier-tooltip").remove();
-                            d3.select(this)
-                    // 高亮当前 cell
-                    d3.select(this)
-                    .style("stroke", "black")
-                    .style("stroke-width", 2)
-                    .raise();
-                    
-                    // 获取 SVG 元素
-                    const svg = d3.select(n.featureGroup.node().closest("svg"));
-                    svg.raise();
-                    
-                    // 创建弹框
-                    if (n.features && d !== undefined && d !== null) {
-                    const tooltip = svg
-                        .append("g")
-                        .attr("class", "multiplier-tooltip procVis")
-                        .style("pointer-events", "none");
-                    
-                    // 获取鼠标相对于 SVG 的位置
-                    const [x, y] = d3.pointer(event, svg.node());
-                    
-                    // 添加弹框背景
-                    tooltip.append("rect")
-                        .attr("x", x + 10)
-                        .attr("y", y - 40)
-                        .attr("width", 130)
-                        .attr("height", 30)
-                        .attr("rx", 5)
-                        .attr("ry", 5)
-                        .style("fill", "white")
+                n.featureGroup
+                  .selectAll("rect")
+                  .filter((d: any) => d !== undefined)
+                  .on("mouseover", function(this: SVGRectElement, event: MouseEvent, d: number){
+                      if (isAnimated(this)) return;
+                      d3.selectAll(".multiplier-tooltip").remove();
+                      d3.select(this)
                         .style("stroke", "black")
-                        .style("opacity", 1);
-                    
-                    // 添加文本
-                    tooltip.append("text")
-                        .attr("x", x + 20)
-                        .attr("y", y - 20)
-                        .text(() => {
-                            return `Value = ` + d.toFixed(2).toString();
-                        })
-                        .attr("font-family", "monospace")
-                        .style("font-size", "17px")
-                        .style("fill", "black")
-                        .style("opacity", 1);
-                    }
-                })
-                .on("mouseout", function(this: SVGRectElement, event: MouseEvent, d: number){
-                    // 移除已存在的弹框
-                    d3.selectAll(".multiplier-tooltip").remove();
-                    // 取消高亮当前 cell
-                    d3.select(this)
-                    .style("stroke", "grey")
-                    .style("stroke-width", 0.1)
-                    .lower();
-                })
+                        .style("stroke-width", 2)
+                        .raise();
+
+                      const svg = d3.select(n.featureGroup.node().closest("svg"));
+                      svg.raise();
+
+                      if (n.features && d != null) {
+                          const [x, y] = d3.pointer(event, svg.node());
+                          const tip = svg.append("g")
+                            .attr("class", "multiplier-tooltip procVis")
+                            .style("pointer-events", "none");
+
+                          tip.append("rect")
+                            .attr("x", x + 10).attr("y", y - 40)
+                            .attr("width", 130).attr("height", 30)
+                            .attr("rx", 5).attr("ry", 5)
+                            .style("fill", "white")
+                            .style("stroke", "black")
+                            .style("opacity", 1);
+
+                          tip.append("text")
+                            .attr("x", x + 20).attr("y", y - 20)
+                            .text(`Value = ${d.toFixed(2)}`)
+                            .attr("font-family", "monospace")
+                            .style("font-size", "17px")
+                            .style("fill", "black")
+                            .style("opacity", 1);
+                      }
+                  })
+                  .on("mouseout", function(this: SVGRectElement, event: MouseEvent, d: number){
+                      d3.selectAll(".multiplier-tooltip").remove();
+                      d3.select(this)
+                        .style("stroke", "grey")
+                        .style("stroke-width", 0.1)
+                        .lower();
+                  });
             }
         });
     }
@@ -473,6 +430,58 @@ export function outputVisualizer(
         startCoordList.push(s);
     }
 
+    for (let i = 0; i < node.relatedNodes[0].features.length; i++) {
+        const value = node.relatedNodes[0].features[i];
+        d3.select(`#pooling-layer-rect-${i}`)
+            .attr("data-value", value)
+            .style("pointer-events", "all")
+            .style("cursor", "pointer")
+            .on("mouseover", function(event) {
+                event.stopPropagation();
+                d3.selectAll(".multiplier-tooltip").remove();
+                const value = d3.select(this).attr("data-value");
+                d3.select(this)
+                    .style("stroke", "black")
+                    .style("stroke-width", 2)
+                    .raise();
+                    
+                const svgNode = svg.node();
+                
+                const [mx, my] = d3.pointer(event, svgNode);
+                
+                const tip = svg.append("g")
+                    .attr("class", "multiplier-tooltip procVis")
+                    .style("pointer-events", "none");
+                    
+                tip.append("rect")
+                    .attr("x", mx + 10)
+                    .attr("y", my - 40)
+                    .attr("width", 130)
+                    .attr("height", 30)
+                    .attr("rx", 5)
+                    .attr("ry", 5)
+                    .style("fill", "white")
+                    .style("stroke", "black");
+                    
+                tip.append("text")
+                    .attr("x", mx + 20)
+                    .attr("y", my - 20)
+                    .attr("font-family", "monospace")
+                    .style("font-size", "14px")
+                    .style("fill", "black")
+                    .text(`Value = ${parseFloat(value).toFixed(2)}`);
+            })
+            .on("mouseout", function(event) {
+                event.stopPropagation();
+                
+                d3.selectAll(".multiplier-tooltip").remove();
+                d3.select(this)
+                    .style("stroke", "grey")
+                    .style("stroke-width", 0.1)
+                    .lower();
+            });
+    }
+
     // for (let i = 0; i < 64; i++) {
     //     let s: [number, number] = [
     //         node.graphIndex * offset +
@@ -600,59 +609,112 @@ export function outputVisualizer(
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 1)
         .style("stroke", "grey")
-        .style("opacity", 0);
+   
+        .style("opacity", 0)
+        .style("pointer-events", "all")
+      .on("mouseover", function(this: SVGRectElement, event: MouseEvent, d: number) {
+          if (!state.isClicked) return;
 
-        d3.selectAll(".last-layer-output")
-        .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
-            if (!state.isClicked) {
-                return;
-            }
-            // console.log("mouseover");
-            const tooltip = outputGroup
-            .append("g")
-            .attr("class", "pooling-tooltip procVis")
-            .style("pointer-events", "none");
-        
-            const [x, y] = d3.pointer(event, outputGroup.node());
+          // 移除所有旧 tooltip
+          outputGroup.selectAll(".output-tooltip, .pooling-tooltip").remove();
 
-            tooltip.append("rect")
-                .attr("x", x + 10)
-                .attr("y", y - 40)
-                .attr("width", 145)
-                .attr("height", 30)
-                .attr("rx", 5)
-                .attr("ry", 5)
-                .style("fill", "white")
-                .style("stroke", "black")
-                .style("opacity", 1);
-            
+          // 高亮当前 rect，并提到最上层
+          d3.select(this)
+            .style("stroke", "black")
+            .style("stroke-width", "1.5px")
+            .raise();
 
-            tooltip.append("text")
-                .attr("x", x + 20)
-                .attr("y", y - 20)
-                .text(() => {
-                    return `Value = ` + d.toFixed(2).toString();
-                })
-                .attr("font-family", "monospace")
-                .style("font-size", "17px")
-                .style("fill", "black")
-                .style("opacity", 1);
-            }   
-        )
-        .on("mouseout", function (this: SVGRectElement, event: MouseEvent, d: number) {
-            d3.selectAll(".pooling-tooltip").remove();
-            d3.select(this)
+          // 计算鼠标在 group 内的位置
+          const [mx, my] = d3.pointer(event, outputGroup.node());
+
+          // 新建 tooltip 容器
+          const tooltip = outputGroup.append("g")
+            .attr("class", "output-tooltip procVis")
+            .style("pointer-events", "none")
+            .raise();
+
+          // 背景框
+          tooltip.append("rect")
+            .attr("x", mx + 10)
+            .attr("y", my - 40)
+            .attr("width", 145)
+            .attr("height", 30)
+            .attr("rx", 5)
+            .attr("ry", 5)
+            .style("fill", "white")
+            .style("stroke", "black")
+            .style("opacity", 1);
+
+          // 文本
+          tooltip.append("text")
+            .attr("x", mx + 20)
+            .attr("y", my - 20)
+            .attr("font-family", "monospace")
+            .style("font-size", "17px")
+            .style("fill", "black")
+            .text(`Value = ${d.toFixed(2)}`);
+      })
+      .on("mouseout", function(this: SVGRectElement, event: MouseEvent) {
+          // 移除 tooltip
+          outputGroup.selectAll(".output-tooltip, .pooling-tooltip").remove();
+
+          // 恢复边框样式并下移至外框下面
+          d3.select(this)
             .style("stroke", "grey")
-            .style("stroke-width", 0.1)
+            .style("stroke-width", "1px")
             .lower();
+      });
+
+
+            d3.select(this)
+                .style("stroke", "black")
+                .style("stroke-width", "1.5px");
+            
+            const tooltipWidth = 130;
+            const tooltipHeight = 30;
+            const tooltipOffset = 15;
+            
+            const pointer = d3.pointer(event, outputGroup.node());
+            
+            outputGroup.selectAll("g.output-tooltip").remove();
+            
+            const tooltip = outputGroup.append("g")
+                .attr("class", "output-tooltip")
+                .style("pointer-events", "none");
+            
+            tooltip.raise();
+            
+            tooltip.append("rect")
+                .attr("x", pointer[0] - tooltipWidth / 2)
+                .attr("y", pointer[1] - tooltipHeight - tooltipOffset)
+                .attr("width", tooltipWidth)
+                .attr("height", tooltipHeight)
+                .attr("fill", "white")
+                .attr("stroke", "black")
+                .attr("rx", 3)
+                .attr("ry", 3);
+            
+            tooltip.append("text")
+                .attr("x", pointer[0])
+                .attr("y", pointer[1] - tooltipOffset - tooltipHeight/2)
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "middle")
+                .style("font-size", "14px")
+                .attr("font-family", "monospace")
+                .attr("fill", "black")
+                .text(`Value = ${d.toFixed(2)}`);
         })
-        
-
-       
-
-        
-
-        outputGroup
+        .on("mouseout", function(this: SVGRectElement) {
+            // Reset styling on mouseout
+            d3.select(this)
+                .style("stroke", "grey")
+                .style("stroke-width", "1px");
+            
+            // Remove tooltip
+            outputGroup.selectAll(".output-tooltip").remove();
+        });
+    
+    outputGroup
         .append("text")
         .attr("class", "bias to-be-removed")
         .attr("x", 100 - moveOffset)
@@ -665,6 +727,8 @@ export function outputVisualizer(
 
 
 
+
+    // Modified bias vector code with tooltip functionality
 
     const BiasGroup = svg
         .append("g")
@@ -682,7 +746,53 @@ export function outputVisualizer(
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 1)
         .style("stroke", "grey")
-        .style("opacity", 0);
+        .style("opacity", 0)
+        .style("pointer-events", "all") 
+        .on("mouseover", function(this: SVGRectElement,event: MouseEvent, d: number) {
+        d3.select(this)
+            .style("stroke", "black")
+            .style("stroke-width", "1.5px");
+
+        const tooltipWidth = 130;
+        const tooltipHeight = 30;
+        const tooltipOffset = 15;
+        const pointer = d3.pointer(event, BiasGroup.node());
+        
+        BiasGroup.selectAll("g.bias-tooltip").remove();
+        
+        const tooltip = BiasGroup.append("g")
+            .attr("class", "bias-tooltip")
+            .style("pointer-events", "none");
+        
+        tooltip.raise();
+        
+        tooltip.append("rect")
+            .attr("x", pointer[0] - tooltipWidth / 2)
+            .attr("y", pointer[1] - tooltipHeight - tooltipOffset)
+            .attr("width", tooltipWidth)
+            .attr("height", tooltipHeight)
+            .attr("fill", "white")
+            .attr("stroke", "black")
+            .attr("rx", 3)
+            .attr("ry", 3);
+        
+        tooltip.append("text")
+            .attr("x", pointer[0])
+            .attr("y", pointer[1] - tooltipOffset - tooltipHeight/2)
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "middle")
+            .style("font-size", "14px")
+            .attr("font-family", "monospace")
+            .attr("fill", "black")
+            .text(`Value = ${d.toFixed(2)}`);
+        })
+        .on("mouseout", function(this: SVGRectElement) {
+    d3.select(this)
+        .style("stroke", "grey")
+        .style("stroke-width", "1px");
+    
+    BiasGroup.selectAll(".bias-tooltip").remove();
+    });
 
     d3.selectAll(".last-layer-bias")
         .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
@@ -1517,7 +1627,8 @@ export function calculationVisualizer(
                 d3.selectAll(".multiplier-tooltip").remove();
                 d3.select(this)
                     .style("stroke", "grey")
-                    .style("stroke-width", 0.1);
+                    .style("stroke-width", 0.1)
+                    .lower();
             });
         }, 6000);
 
@@ -3668,19 +3779,66 @@ export function nodeOutputVisualizer(
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 1)
         .style("stroke", "grey")
-        .style("opacity", 0);
+        .style("opacity", 0)
+        .style("pointer-events", "all")
+        .on("mouseover", function(this:SVGRectElement, event: MouseEvent, d: number) {
 
+            d3.select(this)
+                .style("stroke", "black")
+                .style("stroke-width", "1.5px");
+            const tooltipWidth = 130;
+            const tooltipHeight = 30;
+            const tooltipOffset = 15;
+            
+            const pointer = d3.pointer(event, outputGroup.node());
+            
+            outputGroup.selectAll("g.output-tooltip").remove();
 
-
+            const tooltip = outputGroup.append("g")
+                .attr("class", "output-tooltip")
+                .style("pointer-events", "none");
+            
+ 
+            tooltip.raise();
+            
+            tooltip.append("rect")
+                .attr("x", pointer[0] - tooltipWidth / 2)
+                .attr("y", pointer[1] - tooltipHeight - tooltipOffset)
+                .attr("width", tooltipWidth)
+                .attr("height", tooltipHeight)
+                .attr("fill", "white")
+                .attr("stroke", "black")
+                .attr("rx", 3)
+                .attr("ry", 3);
+            
+            tooltip.append("text")
+                .attr("x", pointer[0])
+                .attr("y", pointer[1] - tooltipOffset - tooltipHeight/2)
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "middle")
+                .style("font-size", "14px")
+                .attr("font-family", "monospace")
+                .attr("fill", "black")
+                .text(`Value = ${d.toFixed(2)}`);
+        })
+        .on("mouseout", function(this:SVGRectElement) {
+            // Reset styling on mouseout
+            d3.select(this)
+                .style("stroke", "grey")
+                .style("stroke-width", "1px");
+            
+            // Remove tooltip
+            outputGroup.selectAll(".output-tooltip").remove();
+        });
+    
     outputGroup
-    .append("text")
-    .attr("class", "bias to-be-removed")
-    .attr("x", 130)
-    .attr("y", -20)
-    .style("fill", "grey")
-    .style("opacity", 0)
-    .text(`Final Output Vector: 1x${outputData.length}`);
-
+        .append("text")
+        .attr("class", "bias to-be-removed")
+        .attr("x", 130)
+        .attr("y", -20)
+        .style("fill", "grey")
+        .style("opacity", 0)
+        .text(`Final Output Vector: 1x${outputData.length}`);
 
 
     const BiasGroup = svg
@@ -3699,7 +3857,63 @@ export function nodeOutputVisualizer(
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 1)
         .style("stroke", "grey")
-        .style("opacity", 0);
+        .style("opacity", 0)
+        .style("pointer-events", "all") 
+        .on("mouseover", function(this: SVGRectElement, event: MouseEvent, d: number) {
+            d3.select(this)
+                .style("stroke", "black")
+                .style("stroke-width", "1.5px");
+            
+            // Define tooltip dimensions
+            const tooltipWidth = 130;
+            const tooltipHeight = 30;
+            const tooltipOffset = 15;
+            
+            // Get pointer position relative to the BiasGroup
+            const pointer = d3.pointer(event, BiasGroup.node());
+            
+            // Remove any existing tooltips
+            BiasGroup.selectAll("g.bias-tooltip").remove();
+            
+            // Create tooltip group
+            const tooltip = BiasGroup.append("g")
+                .attr("class", "bias-tooltip")
+                .style("pointer-events", "none");
+            
+            // Bring tooltip to front
+            tooltip.raise();
+            
+            // Create tooltip background
+            tooltip.append("rect")
+                .attr("x", pointer[0] - tooltipWidth / 2)
+                .attr("y", pointer[1] - tooltipHeight - tooltipOffset)
+                .attr("width", tooltipWidth)
+                .attr("height", tooltipHeight)
+                .attr("fill", "white")
+                .attr("stroke", "black")
+                .attr("rx", 3)
+                .attr("ry", 3);
+            
+            // Add tooltip text
+            tooltip.append("text")
+                .attr("x", pointer[0])
+                .attr("y", pointer[1] - tooltipOffset - tooltipHeight/2)
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "middle")
+                .style("font-size", "14px")
+                .attr("font-family", "monospace")
+                .attr("fill", "black")
+                .text(`Value = ${d.toFixed(2)}`);
+        })
+        .on("mouseout", function(this: SVGRectElement) {
+            // Reset styling on mouseout
+            d3.select(this)
+                .style("stroke", "grey")
+                .style("stroke-width", "1px");
+            
+            // Remove tooltip
+            BiasGroup.selectAll(".bias-tooltip").remove();
+        });
 
     BiasGroup.append("text")
         .attr("x", 5)
@@ -3708,7 +3922,6 @@ export function nodeOutputVisualizer(
         .style("fill", "gray")
         .style("font-size", "17px")
         .attr("class", "bias to-be-removed")
-
         .style("opacity", 0);
 
 

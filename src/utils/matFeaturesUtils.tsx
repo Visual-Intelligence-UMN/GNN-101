@@ -366,7 +366,20 @@ export function drawNodeFeatures(
     };
 }
 
-
+export function markCellsConnectedToPath(pathEndCoord: [number, number], featureVisTable: any) {
+    // Find cells that are at or near the path endpoint
+    const targetCells = d3.selectAll(".featureVis[layerID='3'] rect")
+        .filter(function() {
+            const cellX = parseFloat(d3.select(this).attr("x"));
+            const cellY = parseFloat(d3.select(this).attr("y"));
+            // Check if this cell is within some threshold of the path endpoint
+            return Math.abs(cellX - pathEndCoord[0]) < 10 && 
+                   Math.abs(cellY - pathEndCoord[1]) < 10;
+        });
+    
+    // Mark these cells
+    targetCells.attr("data-connected-to-path", "true");
+}
 export function drawSingleGCNConvFeature(
     layer:any,
     i:number,
