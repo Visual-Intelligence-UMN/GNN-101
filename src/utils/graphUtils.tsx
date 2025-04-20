@@ -312,7 +312,48 @@ export function outputVisualizer(
     }
     for (let i = 0; i < node.relatedNodes[0].features.length; i++) {
         d3.select(`#pooling-layer-rect-${i}`)
-            .on("mouseover", function () {
+            .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
+                if (!state.isClicked) {
+                    return;
+                }
+                // console.log("mouseover");
+                const tooltip = svg
+                .append("g")
+                .attr("class", "pooling-tooltip procVis")
+                .style("pointer-events", "none");
+            
+                const [x, y] = d3.pointer(event, svg.node());
+
+                tooltip.append("rect")
+                    .attr("x", x + 10)
+                    .attr("y", y - 40)
+                    .attr("width", 145)
+                    .attr("height", 30)
+                    .attr("rx", 5)
+                    .attr("ry", 5)
+                    .style("fill", "white")
+                    .style("stroke", "black")
+                    .style("opacity", 1);
+                
+
+                tooltip.append("text")
+                    .attr("x", x + 20)
+                    .attr("y", y - 20)
+                    .text(() => {
+                        return `Value = ` + d.toFixed(2).toString();
+                    })
+                    .attr("font-family", "monospace")
+                    .style("font-size", "17px")
+                    .style("fill", "black")
+                    .style("opacity", 1);
+                }   
+            )
+            .on("mouseout", function (this: SVGRectElement, event: MouseEvent, d: number) {
+                d3.selectAll(".pooling-tooltip").remove();
+                d3.select(this)
+                .style("stroke", "grey")
+                .style("stroke-width", 0.1)
+                .lower();
             })
         }
 
@@ -560,7 +601,7 @@ export function outputVisualizer(
         .data(outputData)
         .enter()
         .append("rect")
-        .attr("class", "bias to-be-removed")
+        .attr("class", "bias to-be-removed last-layer-output")
         .attr("x", (d: any, i: number) => i * rectHeight + 5 - moveOffset)
         .attr("y", 0)
         .attr("width", rectHeight)
@@ -568,9 +609,62 @@ export function outputVisualizer(
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 1)
         .style("stroke", "grey")
+   
         .style("opacity", 0)
         .style("pointer-events", "all")
-        .on("mouseover", function(this: SVGRectElement, event: MouseEvent, d: number) {
+      .on("mouseover", function(this: SVGRectElement, event: MouseEvent, d: number) {
+          if (!state.isClicked) return;
+
+          // 移除所有旧 tooltip
+          outputGroup.selectAll(".output-tooltip, .pooling-tooltip").remove();
+
+          // 高亮当前 rect，并提到最上层
+          d3.select(this)
+            .style("stroke", "black")
+            .style("stroke-width", "1.5px")
+            .raise();
+
+          // 计算鼠标在 group 内的位置
+          const [mx, my] = d3.pointer(event, outputGroup.node());
+
+          // 新建 tooltip 容器
+          const tooltip = outputGroup.append("g")
+            .attr("class", "output-tooltip procVis")
+            .style("pointer-events", "none")
+            .raise();
+
+          // 背景框
+          tooltip.append("rect")
+            .attr("x", mx + 10)
+            .attr("y", my - 40)
+            .attr("width", 145)
+            .attr("height", 30)
+            .attr("rx", 5)
+            .attr("ry", 5)
+            .style("fill", "white")
+            .style("stroke", "black")
+            .style("opacity", 1);
+
+          // 文本
+          tooltip.append("text")
+            .attr("x", mx + 20)
+            .attr("y", my - 20)
+            .attr("font-family", "monospace")
+            .style("font-size", "17px")
+            .style("fill", "black")
+            .text(`Value = ${d.toFixed(2)}`);
+      })
+      .on("mouseout", function(this: SVGRectElement, event: MouseEvent) {
+          // 移除 tooltip
+          outputGroup.selectAll(".output-tooltip, .pooling-tooltip").remove();
+
+          // 恢复边框样式并下移至外框下面
+          d3.select(this)
+            .style("stroke", "grey")
+            .style("stroke-width", "1px")
+            .lower();
+      });
+
 
             d3.select(this)
                 .style("stroke", "black")
@@ -644,7 +738,7 @@ export function outputVisualizer(
         .data(bias)
         .enter()
         .append("rect")
-        .attr("class", "bias to-be-removed")
+        .attr("class", "bias to-be-removed last-layer-bias")
         .attr("x", (d: any, i: number) => i * rectHeight + 5 - moveOffset)
         .attr("y", 0)
         .attr("width", rectHeight)
@@ -700,6 +794,52 @@ export function outputVisualizer(
     BiasGroup.selectAll(".bias-tooltip").remove();
     });
 
+    d3.selectAll(".last-layer-bias")
+        .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
+            if (!state.isClicked) {
+                return;
+            }
+            // console.log("mouseover");
+            const tooltip = BiasGroup
+            .append("g")
+            .attr("class", "pooling-tooltip procVis")
+            .style("pointer-events", "none");
+        
+            const [x, y] = d3.pointer(event, BiasGroup.node());
+
+            tooltip.append("rect")
+                .attr("x", x + 10)
+                .attr("y", y - 40)
+                .attr("width", 145)
+                .attr("height", 30)
+                .attr("rx", 5)
+                .attr("ry", 5)
+                .style("fill", "white")
+                .style("stroke", "black")
+                .style("opacity", 1);
+            
+
+            tooltip.append("text")
+                .attr("x", x + 20)
+                .attr("y", y - 20)
+                .text(() => {
+                    return `Value = ` + d.toFixed(2).toString();
+                })
+                .attr("font-family", "monospace")
+                .style("font-size", "17px")
+                .style("fill", "black")
+                .style("opacity", 1);
+            }   
+        )
+        .on("mouseout", function (this: SVGRectElement, event: MouseEvent, d: number) {
+            d3.selectAll(".pooling-tooltip").remove();
+            d3.select(this)
+            .style("stroke", "grey")
+            .style("stroke-width", 0.1)
+            .lower();
+        })
+
+
     BiasGroup.append("text")
         .attr("x", 5 - moveOffset)
         .attr("y", -20)
@@ -723,7 +863,7 @@ export function outputVisualizer(
         .attr("y2", 7.5)
         .attr("stroke", "black")
         .attr("class", "to-be-removed softmax-component");
-        drawFunctionIcon([2 * rectHeight + 5 - moveOffset + 75, 7.5], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", outputGroup);
+        drawFunctionIcon([2 * rectHeight + 5 - moveOffset + 75, 7.5], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "eᶻⁱ / ∑ⱼ eᶻʲ", "Range: [0, 1]", outputGroup);
 
             
         d3.selectAll(".relu-icon").on("mouseover", function(event: any) {
@@ -731,7 +871,7 @@ export function outputVisualizer(
 
             graphVisDrawActivationExplanation(
                 x, y, "Softmax",
-                "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", outputGroup
+                "eᶻⁱ / ∑ⱼ eᶻʲ", "Range: [0, 1]", outputGroup
             );
         }).on("mouseout", function() {
             d3.selectAll(".math-displayer").remove();
@@ -1325,11 +1465,12 @@ export function calculationVisualizer(
                 console.log("步骤", node.aggregationSteps);
 
                 // Use the correct index to get the detail text
+                // aggregated-tooltip
                 const detailText = node.aggregationSteps[index];
                 let calculatedHeight = 100;
                 if (detailText) {
                     const lines = detailText.split('\n');
-                    calculatedHeight = lines.length * 20 + 20; // Adjust height based on number of lines
+                    calculatedHeight = lines.length * 30; // Adjust height based on number of lines
                 }
             
                 const tooltip = svg
@@ -1340,7 +1481,7 @@ export function calculationVisualizer(
                 tooltip.append("rect")
                     .attr("x", mx + 10)
                     .attr("y", my - 40)
-                    .attr("width", 200)
+                    .attr("width", 300)
                     .attr("height", calculatedHeight)
                     .attr("rx", 5)
                     .attr("ry", 5)
@@ -1349,25 +1490,136 @@ export function calculationVisualizer(
         
 
                     
-                const textElement = tooltip.append("text")
-                    .attr("x", mx + 20)
-                    .attr("y", my - 20)
-                    .attr("font-family", "monospace")
-                    .style("font-size", "17px")
-                    .style("fill", "black");
+                // const textElement = tooltip.append("text")
+                //     .attr("x", mx + 20)
+                //     .attr("y", my - 20)
+                //     .attr("font-family", "monospace")
+                //     .style("font-size", "17px")
+                //     .style("fill", "black");
 
                 // Split the text by newline and create tspan elements
                 if (detailText) {
                     const lines = detailText.split('\n');
-                    lines.forEach((line:any, i:number) => {
-                        textElement.append("tspan")
-                            .attr("x", mx + 20)
-                            .attr("dy", i === 0 ? 0 : "1.2em")
-                            .text(line);
+                    const rectL = 25;
+                    const lastNum = Number(lines[lines.length - 1].match(/-?\d*\.?\d+/g));
+                    const balancedY = Array.isArray(lines) ? lines.length / 2 * 30 + my - 45 : my - 45;
+                    const lastHalfX = mx + 200
+                    // console.log("LastNum", lastNum);
+                    tooltip.append("text")
+                        .attr("x", mx + 20)
+                        .attr("y", balancedY)
+                        .attr("font-family", "monospace")
+                        .style("font-size", "20px")
+                        .style("fill", "black")
+                        .text("Sum(")
+                        .attr("class", "math-displayer")
+                        .attr("font-weight", "bold");
+
+                    lines.forEach((line: any, i: number) => {
+                        const numbers = line.match(/-?\d*\.?\d+/g);
+                        // console.log("numbers", numbers);
+                
+                        if (numbers && numbers.length === 2) {
+                            const value0 = Number(numbers[0]);
+                            const value1 = Number(numbers[1]);
+                            const xOffset = mx + 80;          // Horizontal base position
+                            const yOffset = i * 30 + my - 45;      // Vertical position for this row
+                        
+                            // Rectangle and text for numbers[0]
+                            tooltip.append("rect")
+                                .attr("x", xOffset)
+                                .attr("y", yOffset)
+                                .attr("width", rectL)
+                                .attr("height", rectL)
+                                .style("stroke", "black")
+                                .attr("fill", myColor(value0))
+                                .attr("class", "math-displayer");
+                        
+                            tooltip.append("text")
+                                .attr("x", xOffset + rectL / 2)
+                                .attr("y", yOffset + rectL / 2 + 2)
+                                .text(roundToTwo(value0))
+                                .attr("class", "math-displayer")
+                                .attr("text-anchor", "middle")
+                                .attr("font-size", "10px")
+                                .attr("font-family", "monospace")
+                                .attr("fill", Math.abs(value0) > 0.7 ? "white" : "black");
+                        
+                            // Rectangle and text for numbers[1], 50px to the right of xOffset
+                            tooltip.append("rect")
+                                .attr("x", xOffset + 70)
+                                .attr("y", yOffset)
+                                .attr("width", rectL)
+                                .attr("height", rectL)
+                                .style("stroke", "black")
+                                .attr("fill", myColor(value1))
+                                .attr("class", "math-displayer");
+                        
+                            tooltip.append("text")
+                                .attr("x", xOffset + 70 + rectL / 2)
+                                .attr("y", yOffset + rectL / 2 + 2)
+                                .text(roundToTwo(value1))
+                                .attr("class", "math-displayer")
+                                .attr("text-anchor", "middle")
+                                .attr("font-size", "10px")
+                                .attr("font-family", "monospace")
+                                .attr("fill", Math.abs(value1) > 0.7 ? "white" : "black");
+                        
+                            // Comma between the two
+                            tooltip.append("text")
+                                .attr("x", xOffset + rectL + 15)
+                                .attr("y", yOffset + rectL / 2 + 7)
+                                .text("X")
+                                .attr("class", "math-displayer")
+                                .attr("font-size", "17px")
+                                .attr("fill", "black");
+                            
+                            tooltip.append("text")
+                                .attr("x", xOffset + rectL + 75)
+                                .attr("y", yOffset + rectL / 2 + 7)
+                                .text(",")
+                                .attr("class", "math-displayer")
+                                .attr("font-family", "monospace")
+                                .attr("font-size", "17px")
+                                .attr("font-weight", "bold")
+                                .attr("fill", "black");
+                            
+                        }
+                        
+                        
+                        
                     });
-                } else {
-                    textElement.text(d.value.toFixed(2));
+                    tooltip.append("text")
+                    .attr("x", lastHalfX)
+                    .attr("y", balancedY)
+                    .attr("font-family", "monospace")
+                    .style("font-size", "20px")
+                    .style("fill", "black")
+                    .text(") =")
+                    .attr("class", "math-displayer")
+                    .attr("font-weight", "bold");
+
+                    tooltip.append("rect")
+                    .attr("x", lastHalfX + 45)
+                    .attr("y", balancedY -(rectL / 2 + 2) - 5)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(lastNum))
+                    .attr("class", "math-displayer");
+            
+                tooltip.append("text")
+                    .attr("x", lastHalfX + 45 + rectL / 2)
+                    .attr("y", balancedY - 5)
+                    .text(roundToTwo(lastNum))
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "10px")
+                    .attr("font-family", "monospace")
+                    .attr("fill", Math.abs(lastNum) > 0.7 ? "white" : "black");
+
                 }
+                
                 
             })
             .on("mouseout", function (this: SVGRectElement, event: MouseEvent) {
@@ -3803,14 +4055,14 @@ export function nodeOutputVisualizer(
             .attr("opacity", 1)
             .lower();
 
-            drawFunctionIcon([end_x+170/2+40, end_y], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", svg);
+            drawFunctionIcon([end_x+170/2+40, end_y], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "eᶻⁱ / ∑ⱼ eᶻʲ", "Range: [0, 1]", svg);
             
             d3.selectAll(".relu-icon").on("mouseover", function() {
                 const [x, y] = d3.pointer(event);
 
                 graphVisDrawActivationExplanation(
                     x, y, "Softmax",
-                    "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", svg
+                    "eᶻⁱ / ∑ⱼ eᶻʲ", "Range: [0, 1]", svg
                 );
             }).on("mouseout", function() {
                 d3.selectAll(".math-displayer").remove();

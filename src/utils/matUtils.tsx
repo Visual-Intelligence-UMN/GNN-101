@@ -900,7 +900,7 @@ export function visualizeNodeClassifierFeatures(
                     drawPathBtwOuputResult([endOutputCoord], startResultCoord); 
                     const iconX = (endOutputCoord[0] + startResultCoord[0]) / 2 + 75;
                     const iconY = endOutputCoord[1];
-                    drawFunctionIcon([iconX, iconY], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]");
+                    drawFunctionIcon([iconX, iconY], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "eᶻⁱ / ∑ⱼ eᶻʲ", "Range: [0, 1]");
 
                 }, delay: aniSec },
                 {
