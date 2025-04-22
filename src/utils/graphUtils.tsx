@@ -664,55 +664,6 @@ export function outputVisualizer(
             .style("stroke-width", "1px")
             .lower();
       });
-
-
-            d3.select(this)
-                .style("stroke", "black")
-                .style("stroke-width", "1.5px");
-            
-            const tooltipWidth = 130;
-            const tooltipHeight = 30;
-            const tooltipOffset = 15;
-            
-            const pointer = d3.pointer(event, outputGroup.node());
-            
-            outputGroup.selectAll("g.output-tooltip").remove();
-            
-            const tooltip = outputGroup.append("g")
-                .attr("class", "output-tooltip")
-                .style("pointer-events", "none");
-            
-            tooltip.raise();
-            
-            tooltip.append("rect")
-                .attr("x", pointer[0] - tooltipWidth / 2)
-                .attr("y", pointer[1] - tooltipHeight - tooltipOffset)
-                .attr("width", tooltipWidth)
-                .attr("height", tooltipHeight)
-                .attr("fill", "white")
-                .attr("stroke", "black")
-                .attr("rx", 3)
-                .attr("ry", 3);
-            
-            tooltip.append("text")
-                .attr("x", pointer[0])
-                .attr("y", pointer[1] - tooltipOffset - tooltipHeight/2)
-                .attr("text-anchor", "middle")
-                .attr("dominant-baseline", "middle")
-                .style("font-size", "14px")
-                .attr("font-family", "monospace")
-                .attr("fill", "black")
-                .text(`Value = ${d.toFixed(2)}`);
-        })
-        .on("mouseout", function(this: SVGRectElement) {
-            // Reset styling on mouseout
-            d3.select(this)
-                .style("stroke", "grey")
-                .style("stroke-width", "1px");
-            
-            // Remove tooltip
-            outputGroup.selectAll(".output-tooltip").remove();
-        });
     
     outputGroup
         .append("text")
