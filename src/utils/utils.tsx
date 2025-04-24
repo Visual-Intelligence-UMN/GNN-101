@@ -707,6 +707,10 @@ export function featureVisualizer(
             }
             calculatedDataMap = matrixMultiplication(aggregatedDataMap, currentWeights);
         }
+        for (let i = 0; i < nodes.length; i++) {
+            nodes[i].matmulResults = calculatedDataMap[i]; 
+            nodes[i].biases        = currentBias;
+        }
 
 
 
