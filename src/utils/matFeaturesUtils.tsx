@@ -366,7 +366,20 @@ export function drawNodeFeatures(
     };
 }
 
-
+export function markCellsConnectedToPath(pathEndCoord: [number, number], featureVisTable: any) {
+    // Find cells that are at or near the path endpoint
+    const targetCells = d3.selectAll(".featureVis[layerID='3'] rect")
+        .filter(function() {
+            const cellX = parseFloat(d3.select(this).attr("x"));
+            const cellY = parseFloat(d3.select(this).attr("y"));
+            // Check if this cell is within some threshold of the path endpoint
+            return Math.abs(cellX - pathEndCoord[0]) < 10 && 
+                   Math.abs(cellY - pathEndCoord[1]) < 10;
+        });
+    
+    // Mark these cells
+    targetCells.attr("data-connected-to-path", "true");
+}
 export function drawSingleGCNConvFeature(
     layer:any,
     i:number,
@@ -396,18 +409,80 @@ export function drawSingleGCNConvFeature(
 
     //where we met encounter issue
     for (let m = 0; m < featureChannels; m++) {
+        const cellValue = nodeMat[m];
         const rect = g
             .append("rect")
             .attr("x", locations[i][0] + rectW * m)
             .attr("y", locations[i][1])
             .attr("width", rectW)
             .attr("height", rectH)
-            .attr("fill", myColor(nodeMat[m]))
+            .attr("fill", myColor(cellValue))
             .attr("opacity", 1)
             .attr("stroke", "gray")
-            .attr("stroke-width", 0.1);
-        //if it's the last layer, store rect into thirdGCN
-        if (k == 2 && m<featureChannels) {
+            .attr("stroke-width", 0.1)
+            .attr("data-value", cellValue.toString())
+            .on("mouseover", function(this: SVGRectElement, event: MouseEvent) {
+
+                // fix for the issue of tooltip not hiding when the corresponding rect has opacity < 0.5
+                const parentNode = this.parentNode as Element | null;
+                if (!parentNode) return;
+
+                const siblings = d3.select(parentNode).selectAll<SVGRectElement, unknown>("rect").nodes();
+
+                for (const sibling of siblings) {
+                  if (sibling === this) continue; // skip self
+
+                  const width = sibling?.getAttribute("width") ? parseFloat(sibling.getAttribute("width")!) : 0;
+                  const opacity = sibling?.style?.opacity
+                    ? parseFloat(sibling.style.opacity)
+                    : sibling?.getAttribute("opacity")
+                    ? parseFloat(sibling.getAttribute("opacity")!)
+                    : 1;
+                
+                  if (width > 100 && opacity < 0.5) {
+                    return; // Exit early if condition is met
+                  }
+                }
+                
+
+
+
+                d3.selectAll(".feature-tooltip").remove();
+                const container = d3.select(".mats");
+                const [x, y] = d3.pointer(event, container.node());
+                const tooltip = container
+                  .append("g")
+                  .attr("class", "feature-tooltip procVis");
+
+                tooltip.append("rect")
+                    .attr("x", x + 10 )
+                    .attr("y", y - 28 - 5)
+                    .attr("width", 130)  
+                    .attr("height", 30) 
+                    .attr("rx", 5)
+                    .attr("ry", 5)
+                    .style("fill", "white")
+                    .style("stroke", "black");
+
+                tooltip.append("text")
+                    .attr("x", x + 15)
+                    .attr("y", y - 10)
+                    .style("font-size", "17px")
+                    .style("font-family", "monospace")
+                    .text(`Value = ${cellValue.toFixed(2)}`);
+
+                d3.select(this)
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 2);
+            })
+            .on("mouseout", function(this: SVGRectElement) {
+                d3.selectAll(".feature-tooltip").remove();
+                d3.select(this)
+                    .attr("stroke", "gray")
+                    .attr("stroke-width", 0.1);
+            });
+                
+        if (k == 2 && m < featureChannels) {
             thirdGCN[m].push(rect.node());
         }
     }

@@ -954,8 +954,8 @@ export function drawActivationExplanation(
     formula: string,
     description: string
 ) {
-    const displayW = 250;
-    const displayH = 75;
+    const displayW = 300;
+    const displayH = 110;
 
     //find coordination for the math displayer first
     const displayX = x + 10;
@@ -976,18 +976,21 @@ export function drawActivationExplanation(
         .attr("class", "math-displayer procVis to-be-removed")
         .raise();
 
-    const titleYOffset = 10;
-    const titleXOffset = 50;
+    const titleYOffset = 20;
+    const titleXOffset = 150;
     d3.select(".mats")
         .append("text")
         .attr("x", displayX + titleXOffset)
         .attr("y", displayY + titleYOffset)
         .text(title)
+        .attr("text-anchor", "middle")
         .attr("class", "math-displayer procVis to-be-removed")
-        .attr("font-size", titleYOffset)
+        .attr("font-size", "17px")
+        .attr("font-family", "monospace")
+        .attr("font-weight", "bold")
         .attr("fill", "black");
-    const eqXOffset = titleXOffset / 2;
-    const eqYOffset = titleYOffset * 2.5;
+    const eqXOffset = 40;
+    const eqYOffset = 55;
     const unitSize = eqXOffset / 3 + 3;
     const upperOffset = unitSize * 2;
     d3.select(".mats")
@@ -996,15 +999,17 @@ export function drawActivationExplanation(
         .attr("y", displayY + eqYOffset)
         .text(formula)
         .attr("class", "math-displayer procVis to-be-removed")
-        .attr("font-size", unitSize)
+        .attr("font-size", "20px")
+        .attr("font-family", "monospace")
         .attr("fill", "black");
     d3.select(".mats")
         .append("text")
         .attr("x", displayX + eqXOffset)
-        .attr("y", displayY + eqYOffset + unitSize * 1.5)
+        .attr("y", displayY + eqYOffset + 30)
         .text(description)
         .attr("class", "to-be-removed math-displayer procVis")
-        .attr("font-size", unitSize)
+        .attr("font-size", "20px")
+        .attr("font-family", "monospace")
         .attr("fill", "black");
 }
 
@@ -1014,12 +1019,12 @@ export function drawMatmulExplanation(
     title: string,
     description: string
 ) {
-    const displayW = 350;
+    const displayW = 600;
     const displayH = 50;
 
     //find coordination for the math displayer first
-    const displayX = x + 10;
-    const displayY = y - 10;
+    const displayX = x - 100;
+    const displayY = y - 100;
 
     //add displayer
     d3.select(".mats")
@@ -1036,19 +1041,21 @@ export function drawMatmulExplanation(
         .attr("class", "math-displayer procVis")
         .raise();
 
-    const titleYOffset = 10;
-    const titleXOffset = 50;
+    const titleYOffset = 20;
+    const titleXOffset = 200;
     d3.select(".mats")
         .append("text")
-        .attr("x", displayX + 100)
+        .attr("x", displayX + titleXOffset)
         .attr("y", displayY + titleYOffset)
         .text(title)
         .attr("class", "math-displayer procVis")
-        .attr("font-size", titleYOffset)
+        .attr("font-size", "17px")
+        .attr("font-family", "monospace")
+        .attr("font-weight", "bold")
         .attr("fill", "black")
         .raise();
-    const eqXOffset = titleXOffset / 2;
-    const eqYOffset = titleYOffset * 2.5;
+    const eqXOffset = 30;
+    const eqYOffset = 40;
     const unitSize = eqXOffset / 3 + 3;
     const upperOffset = unitSize * 2;
     d3.select(".mats")
@@ -1057,18 +1064,19 @@ export function drawMatmulExplanation(
         .attr("y", displayY + eqYOffset)
         .text(description)
         .attr("class", "math-displayer procVis")
-        .attr("font-size", unitSize)
+        .attr("font-size", "17px")
+        .attr("font-family", "monospace")
         .attr("fill", "black")
         .raise();
 }
 
 export function graphVisDrawMatmulExplanation(svg: any, x:number, y:number, title:string, description:string){
-    const displayW = 350;
+    const displayW = 600;
     const displayH = 50;
 
     //find coordination for the math displayer first
-    const displayX = x + 10;
-    const displayY = y - 10;
+    const displayX = x - 30;
+    const displayY = y - 20;
 
     //add displayer
     svg
@@ -1085,18 +1093,20 @@ export function graphVisDrawMatmulExplanation(svg: any, x:number, y:number, titl
         .attr("class", "math-displayer procVis")
         .raise();
 
-    const titleYOffset = 10;
-    const titleXOffset = 50;
+    const titleYOffset = 20;
+    const titleXOffset = 200;
     svg
         .append("text")
-        .attr("x", displayX + 100)
+        .attr("x", displayX + titleXOffset)
         .attr("y", displayY + titleYOffset)
         .text(title)
         .attr("class", "math-displayer procVis")
-        .attr("font-size", titleYOffset)
+        .attr("font-size", "17px")
+        .attr("font-family", "monospace")
+        .attr("font-weight", "bold")
         .attr("fill", "black").raise();
-    const eqXOffset = titleXOffset / 2;
-    const eqYOffset = titleYOffset * 2.5;
+    const eqXOffset = 30;
+    const eqYOffset = 40;
     const unitSize = eqXOffset / 3 + 3;
     const upperOffset = unitSize * 2;
     svg
@@ -1105,7 +1115,8 @@ export function graphVisDrawMatmulExplanation(svg: any, x:number, y:number, titl
         .attr("y", displayY + eqYOffset)
         .text(description)
         .attr("class", "math-displayer procVis")
-        .attr("font-size", unitSize)
+        .attr("font-size", "17px")
+        .attr("font-family", "monospace")
         .attr("fill", "black").raise();
 }
 

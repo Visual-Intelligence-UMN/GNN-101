@@ -668,9 +668,48 @@ export function featureVisualizer(
                     })
                 }
             })
-            aggregatedDataMap = matrixMultiplication(normalizedAdjMatrix, featureMap)
-            calculatedDataMap = matrixMultiplication(aggregatedDataMap, currentWeights)
-
+            aggregatedDataMap = [];
+            for (let i = 0; i < nodes.length; i++) {
+                let aggFeatures: number[] = [];
+                let aggSteps: string[] = [];
+                
+                let featureDim = featureMap[0].length;
+                for (let d = 0; d < featureDim; d++) {
+                    let sum = 0;
+                    let stepStr = "";
+                    let isFirstTerm = true;
+                    
+                    for (let k = 0; k < featureMap.length; k++) {
+                        // Only include terms for nodes that are connected (have non-zero weights)
+                        if (normalizedAdjMatrix[i][k] !== 0) {
+                            const fVal = featureMap[k][d];
+                            const weightVal = normalizedAdjMatrix[i][k];
+                            
+                            sum += fVal * weightVal;
+                            const term = `(${fVal.toFixed(3)} × ${weightVal.toFixed(3)})`;
+                            
+                            // Add newline and plus sign for all terms except the first
+                            stepStr += (isFirstTerm ? "" : "\n+ ") + term;
+                            isFirstTerm = false;
+                        }
+                    }
+                    
+                    aggFeatures.push(sum);
+                    // Create the final step string
+                    aggSteps.push(`X[${d}] = Σ [\n${stepStr} \n] = ${sum.toFixed(3)}`);
+                }
+                
+                aggregatedDataMap.push(aggFeatures);
+                
+                if (nodes[i]) {
+                    nodes[i].aggregationSteps = aggSteps;
+                }
+            }
+            calculatedDataMap = matrixMultiplication(aggregatedDataMap, currentWeights);
+        }
+        for (let i = 0; i < nodes.length; i++) {
+            nodes[i].matmulResults = calculatedDataMap[i]; 
+            nodes[i].biases        = currentBias;
         }
 
 
@@ -790,6 +829,7 @@ export function featureVisualizer(
                         .attr("class", `node-features node-features-${node.graphIndex}-${node.id}`)
                         .attr("id", (d: any, i: number) => "output-layer-rect-" + i)
                         .style("fill", (d: number) => myColor(d))
+                        // .style("fill", "coral")
                         .style("stroke-width", 0.1)
                         .style("stroke", "grey")
                         .style("opacity", 1);
@@ -809,6 +849,7 @@ export function featureVisualizer(
                         .attr("class", `node-features node-features-${node.graphIndex}-${node.id}`)
                         .attr("id", (d: any, i: number) => "conv" + graphIndex + "-layer-rect-" + i)
                         .style("fill", (d: number) => myColor(d))
+                        // .style("fill", "coral")
                         .style("stroke-width", 0.1)
                         .style("stroke", "grey")
                         .style("opacity", 1);
@@ -977,6 +1018,7 @@ export function featureVisualizer(
                         .attr("height", currRectHeight)
                         .attr("class", "node-features")
                         .style("fill", (d: number) => myColor(d))
+                        // .style("fill", "coral")
                         .style("stroke-width", 0.1)
                         .style("stroke", "grey")
                         .style("visibility", "visible");

@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { create, all, matrix, i, e } from "mathjs";
+import { create, all, matrix, i } from "mathjs";
 import { State, flipHorizontally, flipVertically, myColor } from "./utils";
 import { roundToTwo } from "@/components/WebUtils";
 
@@ -229,8 +229,8 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
     
     for (let j = 0; j < weightMat[i].length; j++) {
         innerGroup.append("rect")
-            .attr("x", 160)
-            .attr("y", 35 + wmRectL * j)
+            .attr("x", 150)
+            .attr("y", 40 + wmRectL * j)
             .attr("width", 7)
             .attr("height", wmRectL)
             .attr("fill", myColor(weightMat[i][j]))
@@ -265,6 +265,8 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
         .attr("x", 70 - 25)
         .attr("y", displayHeight - 65 - 12)
         .text("Matmul Visualization")
+        .attr("font-family", "monospace")
+        .attr("font-weight", "bold")
         .attr("class", "math-displayer")
         .attr("font-size", "20");
 
@@ -273,26 +275,26 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
         .attr("x", 70 - 35)
         .attr("y", displayHeight - 40)
         .attr("xml:space", "preserve")
-        .text("dot(           ,         )")
+        .text("dot(     ,    )")
         .attr("class", "math-displayer")
+        .attr("font-family", "monospace")
         .attr("font-size", "20");
 
-    const equationYOffest = -5;
-    const equationValueYOffest = 2.5;
+
     if (mode === 1 && node.graphIndex === 4) {
         innerGroup.append("text")
             .attr("x", 70 - 40)
-            .attr("y", displayHeight - 10 + equationYOffest + equationValueYOffest)
+            .attr("y", displayHeight - 10)
             .attr("xml:space", "preserve")
-            .text("=      x       +      x       ...   =     ")
+            .text("=      x       +      x        ...  =     ")
             .attr("class", "math-displayer")
             .attr("font-size", "15");
     } else {
         innerGroup.append("text")
             .attr("x", 70 - 40)
-            .attr("y", displayHeight - 10 + equationYOffest + equationValueYOffest)
+            .attr("y", displayHeight - 10)
             .attr("xml:space", "preserve")
-            .text("=      x       +      x       ···   =     ")
+            .text("=      x       +      x        ...  =     ")
             .attr("class", "math-displayer")
             .attr("font-size", "15");
     }
@@ -300,7 +302,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
     // 1
     innerGroup.append("rect")
         .attr("x", 70 - 30 + 5)
-        .attr("y", displayHeight - 10 - 9 + equationYOffest)
+        .attr("y", displayHeight - 10 - 9)
         .attr("width", 17)
         .attr("height", 17)
         .attr("class", `math-displayer`)
@@ -310,9 +312,11 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
         .style("opacity", 1);
 
     innerGroup.append("text")
-        .attr("x", 70 - 30 + 5)
-        .attr("y", displayHeight - 10 - 2 + equationYOffest + equationValueYOffest)
-        .text(roundToTwo(aggregatedData[0]))
+        .attr("x", 70 - 30 + 5 + 17)
+        .attr("y", displayHeight - 10 - 2)
+        .text(aggregatedData[0].toFixed(2))
+        .style("font-family", "monospace")
+        .attr("text-anchor", "end")
         .attr("class", "math-displayer")
         .attr("font-size", "7")
         .attr("fill", Math.abs(aggregatedData[0]) > 0.7 ? "white" : "black");
@@ -320,7 +324,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
     // 2
     innerGroup.append("rect")
         .attr("x", 70 - 30 + 25 + 10 + 5)
-        .attr("y", displayHeight - 10 - 9 + equationYOffest)
+        .attr("y", displayHeight - 10 - 9)
         .attr("width", 17)
         .attr("height", 17)
         .attr("class", `math-displayer`)
@@ -330,9 +334,11 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
         .style("opacity", 1);
 
     innerGroup.append("text")
-        .attr("x", 70 - 30 + 25 + 10 + 5)
-        .attr("y", displayHeight - 10 - 2 + equationYOffest + equationValueYOffest)
-        .text(roundToTwo(weights[index][0][i]))
+        .attr("x", 70 - 30 + 25 + 10 + 5 + 17)
+        .attr("y", displayHeight - 10 - 2)
+        .text(weights[index][0][i].toFixed(2))
+        .style("font-family", "monospace")
+        .attr("text-anchor", "end")
         .attr("class", "math-displayer")
         .attr("font-size", "7")
         .attr("fill", Math.abs(weights[index][0][1]) > 0.7 ? "white" : "black");
@@ -340,7 +346,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
     // 3
     innerGroup.append("rect")
         .attr("x", 70 - 30 + 45 + 20 + 10)
-        .attr("y", displayHeight - 10 - 9 + equationYOffest)
+        .attr("y", displayHeight - 10 - 9)
         .attr("width", 17)
         .attr("height", 17)
         .attr("class", `math-displayer`)
@@ -350,9 +356,11 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
         .style("opacity", 1);
 
     innerGroup.append("text")
-        .attr("x", 70 - 30 + 45 + 20 + 10)
-        .attr("y", displayHeight - 10 - 2 + equationYOffest + equationValueYOffest)
-        .text(roundToTwo(aggregatedData[1]))
+        .attr("x", 70 - 30 + 45 + 20 + 10 + 17)
+        .attr("y", displayHeight - 10 - 2)
+        .text(aggregatedData[1].toFixed(2))
+        .style("font-family", "monospace")
+        .attr("text-anchor", "end")
         .attr("class", "math-displayer")
         .attr("font-size", "7")
         .attr("fill", Math.abs(aggregatedData[1]) > 0.7 ? "white" : "black");
@@ -360,7 +368,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
     // 4
     innerGroup.append("rect")
         .attr("x", 70 - 30 + 65 + 30 + 15)
-        .attr("y", displayHeight - 10 - 9 + equationYOffest)
+        .attr("y", displayHeight - 10 - 9)
         .attr("width", 17)
         .attr("height", 17)
         .attr("class", `math-displayer`)
@@ -370,17 +378,19 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
         .style("opacity", 1);
 
     innerGroup.append("text")
-        .attr("x", 70 - 30 + 65 + 30 + 15)
-        .attr("y", displayHeight - 10 - 2 + equationYOffest + equationValueYOffest)
-        .text(roundToTwo(weights[index][1][i]))
+        .attr("x", 70 - 30 + 65 + 30 + 15 + 17)
+        .attr("y", displayHeight - 10 - 2)
+        .text(weights[index][1][i].toFixed(2))
+        .style("font-family", "monospace")
+        .attr("text-anchor", "end")
         .attr("class", "math-displayer")
         .attr("font-size", "7")
         .attr("fill", Math.abs(weights[index][1][i]) > 0.7 ? "white" : "black");
 
-    // 绘制输出数据的矩形和文本 
+    // 绘制输出数据的矩形和文本
     innerGroup.append("rect")
         .attr("x", 70 - 30 + 100 + 60 + 20)
-        .attr("y", displayHeight - 10 - 9 + equationYOffest)
+        .attr("y", displayHeight - 10 - 9)
         .attr("width", 17)
         .attr("height", 17)
         .attr("class", `math-displayer`)
@@ -390,9 +400,11 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
         .style("opacity", 1);
 
     innerGroup.append("text")
-        .attr("x", 70 - 30 + 100 + 60 + 20)
-        .attr("y", displayHeight - 10 - 2 + equationYOffest + equationValueYOffest)
-        .text(roundToTwo(calculatedData[i]))
+        .attr("x", 70 - 30 + 100 + 60 + 20 + 17)
+        .attr("y", displayHeight - 10 - 2)
+        .text(calculatedData[i].toFixed(2)) 
+        .style("font-family", "monospace")
+        .attr("text-anchor", "end")
         .attr("class", "math-displayer")
         .attr("font-size", "7")
         .attr("fill", Math.abs(calculatedData[i]) > 0.7 ? "white" : "black");
@@ -445,11 +457,11 @@ export function hoverOverHandler(node: any, aggregatedData: any, calculatedData:
 
 export function graphVisDrawActivationExplanation(x:number, y:number, title:string, formula:string, description:string, svg: any){
     const displayW = 250;
-    const displayH = 75;
+    const displayH = 100;
 
     //find coordination for the math displayer first
-    const displayX = x + 10;
-    const displayY = y - 10;
+    const displayX = x - 10;
+    const displayY = y + 30;
 
     if (!svg.selectAll) {
         svg = d3.selectAll(svg);
@@ -470,18 +482,20 @@ export function graphVisDrawActivationExplanation(x:number, y:number, title:stri
         .attr("class", "math-displayer")
         .raise();
 
-    const titleYOffset = 10;
-    const titleXOffset = 50;
+    const titleYOffset = 20;
+    const titleXOffset = 95;
     svg
         .append("text")
         .attr("x", displayX + titleXOffset)
         .attr("y", displayY + titleYOffset)
         .text(title)
         .attr("class", "math-displayer")
-        .attr("font-size", titleYOffset)
+        .attr("font-size", "17px")
+        .attr("font-family", "monospace")
+        .attr("font-weight", "bold")
         .attr("fill", "black");
-    const eqXOffset = titleXOffset / 2;
-    const eqYOffset = titleYOffset * 2.5;
+    const eqXOffset = 25;
+    const eqYOffset = 50;
     const unitSize = eqXOffset / 3 + 3;
     const upperOffset = unitSize * 2;
     svg
@@ -490,21 +504,23 @@ export function graphVisDrawActivationExplanation(x:number, y:number, title:stri
         .attr("y", displayY + eqYOffset)
         .text(formula)
         .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
+        .attr("font-size", "20px")
+        .attr("font-family", "monospace")
         .attr("fill", "black");
     svg
         .append("text")
         .attr("x", displayX + eqXOffset)
-        .attr("y", displayY + eqYOffset + unitSize * 1.5)
+        .attr("y", displayY + eqYOffset + 25)
         .text(description)
         .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
+        .attr("font-size", "20px")
+        .attr("font-family", "monospace")
         .attr("fill", "black");
 }
 
 export function graphVisDrawMatmulExplanation(x:number, y:number, title:string, description:string, svg: any){
     const displayW = 350;
-    const displayH = 50;
+    const displayH = 100;
 
     //find coordination for the math displayer first
     const displayX = x + 10;
