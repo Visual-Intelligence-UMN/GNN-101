@@ -822,7 +822,7 @@ export function outputVisualizer(
 
             graphVisDrawActivationExplanation(
                 x, y, "Softmax",
-                "eᶻⁱ / ∑ⱼ eᶻʲ", "Range: [0, 1]", outputGroup
+                "./assets/SVGs/softmax_formula.svg", "Range: [0, 1]", outputGroup
             );
         }).on("mouseout", function() {
             d3.selectAll(".math-displayer").remove();
