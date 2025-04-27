@@ -464,15 +464,19 @@ export function graphVisDrawActivationExplanation(
     description: string,
     svg: any
 ) {
-    const displayW = 250;
-    const displayH = 100;
-    const displayX = x - 10;
-    const displayY = y + 30;
-    const eqXOffset = 25;
-    const eqYOffset = 50;
+    let displayW = 280;
+    let displayH = 100;
+    let displayX = x - 10;
+    let displayY = y + 30;
+    let eqXOffset = 25;
+    let eqYOffset = 50;
 
     if (!svg.selectAll) {
         svg = d3.selectAll(svg);
+    }
+    if (formula.endsWith(".svg")) {
+        displayH += 80; // Adjust height for the formula SVG
+        eqYOffset += 80; // Adjust Y position for the formula SVG
     }
 
     // add background rect
@@ -497,7 +501,7 @@ export function graphVisDrawActivationExplanation(
         .attr("y", displayY + 20)
         .text(title)
         .attr("class", "math-displayer")
-        .attr("font-size", "17px")
+        .attr("font-size", "20px")
         .attr("font-family", "monospace")
         .attr("font-weight", "bold")
         .attr("fill", "black");
@@ -510,10 +514,11 @@ export function graphVisDrawActivationExplanation(
         injectSVG(
             formulaGroup,
             displayX + eqXOffset,
-            displayY + eqYOffset,
+            displayY + 40,
             formula,
             "math-displayer"
         );
+        
     } else {
         svg
             .append("text")
