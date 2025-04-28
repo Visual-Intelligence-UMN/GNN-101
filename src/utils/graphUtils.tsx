@@ -1417,7 +1417,8 @@ export function calculationVisualizer(
 
                 // Use the correct index to get the detail text
                 // aggregated-tooltip
-                const detailText = node.aggregationSteps[index];
+                const detailText = node.aggregationSteps ? node.aggregationSteps[index] : undefined;
+                if (!detailText) return;
                 let calculatedHeight = 100;
                 if (detailText) {
                     const lines = detailText.split('\n');
