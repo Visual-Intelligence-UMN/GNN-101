@@ -311,17 +311,17 @@ export function outputVisualizer(
         svg = d3.selectAll(svg);
     }
     for (let i = 0; i < node.relatedNodes[0].features.length; i++) {
-        d3.select(`#pooling-layer-rect-${i}`)
-            .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
+        d3.select<SVGRectElement, number>(`#pooling-layer-rect-${i}`)
+            .on("mouseover", function (event, d) {
+                const rect = this;
                 if (!state.isClicked) {
                     return;
                 }
-                // console.log("mouseover");
                 const tooltip = svg
-                .append("g")
-                .attr("class", "pooling-tooltip procVis")
-                .style("pointer-events", "none");
-            
+                    .append("g")
+                    .attr("class", "pooling-tooltip procVis")
+                    .style("pointer-events", "none");
+
                 const [x, y] = d3.pointer(event, svg.node());
 
                 tooltip.append("rect")
@@ -334,27 +334,24 @@ export function outputVisualizer(
                     .style("fill", "white")
                     .style("stroke", "black")
                     .style("opacity", 1);
-                
 
                 tooltip.append("text")
                     .attr("x", x + 20)
                     .attr("y", y - 20)
-                    .text(() => {
-                        return `Value = ` + d.toFixed(2).toString();
-                    })
+                    .text(`Value = ${d.toFixed(2)}`)
                     .attr("font-family", "monospace")
                     .style("font-size", "17px")
                     .style("fill", "black")
                     .style("opacity", 1);
-                }   
-            )
-            .on("mouseout", function (this: SVGRectElement, event: MouseEvent, d: number) {
+            })
+            .on("mouseout", function (event, d) {
                 d3.selectAll(".pooling-tooltip").remove();
                 d3.select(this)
-                .style("stroke", "grey")
-                .style("stroke-width", 0.1)
-                .lower();
-            })
+                    .style("stroke", "grey")
+                    .style("stroke-width", 0.1)
+                    .lower();
+            });
+
         }
 
         
@@ -746,7 +743,8 @@ export function outputVisualizer(
     });
 
     d3.selectAll(".last-layer-bias")
-        .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
+        .on("mouseover", function (event, d) {
+            const rect = this;
             if (!state.isClicked) {
                 return;
             }
@@ -774,7 +772,8 @@ export function outputVisualizer(
                 .attr("x", x + 20)
                 .attr("y", y - 20)
                 .text(() => {
-                    return `Value = ` + d.toFixed(2).toString();
+                    const value = d as number;
+                    return `Value = ${value.toFixed(2)}`;
                 })
                 .attr("font-family", "monospace")
                 .style("font-size", "17px")
@@ -782,7 +781,7 @@ export function outputVisualizer(
                 .style("opacity", 1);
             }   
         )
-        .on("mouseout", function (this: SVGRectElement, event: MouseEvent, d: number) {
+        .on("mouseout", function () {
             d3.selectAll(".pooling-tooltip").remove();
             d3.select(this)
             .style("stroke", "grey")
@@ -1395,7 +1394,7 @@ export function calculationVisualizer(
         .style("opacity", 0);
 
         setTimeout(() => {
-            d3.selectAll<SVGRectElement, number>("rect.agg-cell")
+            d3.selectAll<SVGRectElement, { value: number, index: number }>("rect.agg-cell")
             .style("pointer-events", "all")
             .style("cursor", "pointer")
             .on("mouseover", function (this: SVGRectElement, event: MouseEvent,d: {value: number, index: number}) {

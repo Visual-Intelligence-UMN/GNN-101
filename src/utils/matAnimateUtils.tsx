@@ -1674,14 +1674,21 @@ export function drawWeightMatrix(
     }
   
     d3.selectAll<SVGRectElement, unknown>(".mul-result-cell")
-      .on("mouseover", function (this: SVGRectElement, event: MouseEvent, _d: any, i: number) {
+        .on("mouseover", function (event, _d) {
         event.stopPropagation();
+        const rect = this as SVGRectElement;
+        const cells = d3.selectAll<SVGRectElement, unknown>(".mul-result-cell").nodes();
+        const i = cells.indexOf(rect);
         highlightWeightMatrixColumn(i, true);
-      })
-      .on("mouseout", function (this: SVGRectElement, event: MouseEvent, _d: any, i: number) {
+        })
+        .on("mouseout", function (event, _d) {
         event.stopPropagation();
+        const rect = this as SVGRectElement;
+        const cells = d3.selectAll<SVGRectElement, unknown>(".mul-result-cell").nodes();
+        const i = cells.indexOf(rect);
         highlightWeightMatrixColumn(i, false);
-      });
+        });
+  
   }
     
 

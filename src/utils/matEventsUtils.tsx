@@ -765,7 +765,8 @@ export function featureVisClick(
             
             
             drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels)
-            drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels)
+            drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels, featureVisTable)
+
             if((featureVisTable.length==4&&layerID==2)||
                 (oFeatureChannels==128&&layerID==1)){
                 //if it's the last layer, don't show the relu icon
@@ -1689,7 +1690,7 @@ export function featureGATClick(
         // {func: () => , delay: aniSec},
         {func: () => {
             drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels)
-            drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels)
+            drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels, featureVisTable)
             if((featureVisTable.length==4&&layerID==2)||
                 (oFeatureChannels==128&&layerID==1)){
                 //if it's the last layer, don't show the relu icon
@@ -2237,7 +2238,7 @@ export function featureSAGEClick(
         // {func: () => , delay: aniSec},
         {func: () => {
             drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels)
-            drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels)
+            drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels, featureVisTable)
             if((featureVisTable.length==4&&layerID==2)||
                 (oFeatureChannels==128&&layerID==1)){
                 //if it's the last layer, don't show the relu icon
