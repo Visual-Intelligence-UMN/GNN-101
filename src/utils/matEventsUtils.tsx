@@ -38,6 +38,11 @@ import path from "node:path/win32";
 import { computeAttentionCoefficient, meanAggregation, testCompute } from "./computationUtils";
 import { addExitBtn, buildDetailedViewArea } from "./graphUtils";
 
+
+export const matrixMultiplicationResults = {
+    dummy: {} as Record<number, number[]>,
+    bias: {} as Record<number, number[]>
+};
 //graph feature events interactions - mouseover
 export function oFeatureMouseOver(
     layerID: string,
@@ -521,6 +526,8 @@ export function featureVisClick(
     console.log("issue here", X,)
     const dummy: number[] = math.multiply(math.transpose(weights[layerID]), X);
     const Xt = math.transpose(weights[layerID]);
+    matrixMultiplicationResults.dummy[node] = dummy;
+   
 
     //drawMatrixValid(Xt, coordFeatureVis[0], coordFeatureVis[1]-75, 10, 10)
 
@@ -561,6 +568,7 @@ export function featureVisClick(
     //draw paths from intermediate result -> final result
     const layerBias = bias[layerID];
     coordFeatureVis2[1] += curveDir * 50;
+    matrixMultiplicationResults.bias[node] = layerBias;
 
     let coordFeatureVis2Copy = deepClone(coordFeatureVis2);
 

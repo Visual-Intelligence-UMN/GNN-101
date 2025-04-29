@@ -13,7 +13,7 @@ import { roundToTwo } from "../components/WebUtils";
 import { deprecate } from "util";
 import { injectSVG } from "./svgUtils";
 import { sigmoid } from "./linkPredictionUtils";
-
+import { matrixMultiplicationResults } from './matEventsUtils';
 //draw cross connections between feature visualizers for computational graph
 export function drawCrossConnectionForSubgraph(
     graph: any,
@@ -393,7 +393,9 @@ export function drawSingleGCNConvFeature(
     thirdGCN:any,
     frames:any,
     schemeLocations:any,
-    featureVisTable:any
+    featureVisTable:any,
+    dummy?: any,
+    bias?: any
 ){
     //const cate = get_category_node(features[i]) * 100;
     const g = layer
@@ -421,6 +423,7 @@ export function drawSingleGCNConvFeature(
             .attr("stroke", "gray")
             .attr("stroke-width", 0.1)
             .attr("data-value", cellValue.toString())
+            .attr("data-index", m.toString()) 
             .on("mouseover", function(this: SVGRectElement, event: MouseEvent) {
 
                 // fix for the issue of tooltip not hiding when the corresponding rect has opacity < 0.5
@@ -457,19 +460,29 @@ export function drawSingleGCNConvFeature(
                 tooltip.append("rect")
                     .attr("x", x + 10 )
                     .attr("y", y - 28 - 5)
-                    .attr("width", 130)  
-                    .attr("height", 30) 
+                    .attr("width", 300)  
+                    .attr("height", 40) 
                     .attr("rx", 5)
                     .attr("ry", 5)
                     .style("fill", "white")
                     .style("stroke", "black");
-
-                tooltip.append("text")
-                    .attr("x", x + 15)
-                    .attr("y", y - 10)
-                    .style("font-size", "17px")
-                    .style("font-family", "monospace")
-                    .text(`Value = ${cellValue.toFixed(2)}`);
+                    
+                    const dummy = matrixMultiplicationResults.dummy[i];
+                    const bias = matrixMultiplicationResults.bias[i];
+                    // console.log("dummy is" + dummy)
+                    // console.log("bias is"+bias)
+                    const featureIndex = parseInt(this.getAttribute("data-index") || "0");
+                    let matmulVal = dummy && featureIndex < dummy.length ? dummy[featureIndex].toFixed(2) : "--";
+                    let biasVal = bias && featureIndex < bias.length ? bias[featureIndex].toFixed(2) : "--";
+                
+                    
+                    tooltip.append("text")
+                        .attr("x", x + 15)
+                        .attr("y", y - 20)
+                        .style("font-size", "14px")
+                        .style("font-family", "monospace")
+                        .text(`ReLU(Matmul: ${matmulVal} + Bias: ${biasVal}) = ${cellValue.toFixed(2)}`);
+                
 
                 d3.select(this)
                     .attr("stroke", "black")
