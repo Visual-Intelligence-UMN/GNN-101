@@ -594,73 +594,84 @@ export function outputVisualizer(
         .append("g")
         .attr("transform", `translate(${node.x + 150}, ${node.y - 30})`);
 
-    outputGroup.selectAll("rect")
-        .data(outputData)
+        outputGroup.selectAll("rect")
+        .data(outputData.map((d, i) => ({value: d, index: i})))
         .enter()
         .append("rect")
         .attr("class", "bias to-be-removed last-layer-output")
-        .attr("x", (d: any, i: number) => i * rectHeight + 5 - moveOffset)
+        .attr("x", (datum: {value: number, index: number}, i: number) => i * rectHeight + 5 - moveOffset)
         .attr("y", 0)
         .attr("width", rectHeight)
         .attr("height", rectWidth)
-        .style("fill", (d: number) => myColor(d))
+        .style("fill", (datum: {value: number, index: number}) => myColor(datum.value))
         .style("stroke-width", 1)
         .style("stroke", "grey")
-   
         .style("opacity", 0)
         .style("pointer-events", "all")
-      .on("mouseover", function(this: SVGRectElement, event: MouseEvent, d: number) {
-          if (!state.isClicked) return;
+        .on("mouseover", function(this: SVGRectElement, event: MouseEvent, datum: {value: number, index: number}) {
+            if (!state.isClicked) return;
+            const d = datum.value;
+            const i = datum.index;
+            const matmulValue = calculatedData[i];
+            const biasValue = bias[i];
+    
+            // Remove any existing tooltips
+            outputGroup.selectAll(".output-tooltip, .pooling-tooltip").remove();
+    
+            // Highlight the current rectangle
+            d3.select(this)
+              .style("stroke", "black")
+              .style("stroke-width", "1.5px")
+              .raise();
+    
+            // Get mouse position in the group
+            const [mx, my] = d3.pointer(event, outputGroup.node());
+    
+            // Create tooltip container
+            const tooltip = outputGroup.append("g")
+              .attr("class", "output-tooltip procVis")
+              .style("pointer-events", "none")
+              .raise();
+    
 
-          // 移除所有旧 tooltip
-          outputGroup.selectAll(".output-tooltip, .pooling-tooltip").remove();
+            tooltip.append("rect")
+              .attr("x", mx + 10)
+              .attr("y", my + 10) 
+              .attr("width", 260)
+              .attr("height", 50)
+              .attr("rx", 5)
+              .attr("ry", 5)
+              .style("fill", "white")
+              .style("stroke", "black")
+              .style("opacity", 1);
+    
 
-          // 高亮当前 rect，并提到最上层
-          d3.select(this)
-            .style("stroke", "black")
-            .style("stroke-width", "1.5px")
-            .raise();
+            tooltip.append("text")
+              .attr("x", mx + 20)
+              .attr("y", my + 30)
+              .attr("font-family", "monospace")
+              .style("font-size", "14px")
+              .style("fill", "black")
+              .text(`Matmul: ${matmulValue.toFixed(2)} + Bias: ${biasValue.toFixed(2)}`);
+    
 
-          // 计算鼠标在 group 内的位置
-          const [mx, my] = d3.pointer(event, outputGroup.node());
-
-          // 新建 tooltip 容器
-          const tooltip = outputGroup.append("g")
-            .attr("class", "output-tooltip procVis")
-            .style("pointer-events", "none")
-            .raise();
-
-          // 背景框
-          tooltip.append("rect")
-            .attr("x", mx + 10)
-            .attr("y", my - 40)
-            .attr("width", 145)
-            .attr("height", 30)
-            .attr("rx", 5)
-            .attr("ry", 5)
-            .style("fill", "white")
-            .style("stroke", "black")
-            .style("opacity", 1);
-
-          // 文本
-          tooltip.append("text")
-            .attr("x", mx + 20)
-            .attr("y", my - 20)
-            .attr("font-family", "monospace")
-            .style("font-size", "17px")
-            .style("fill", "black")
-            .text(`Value = ${d.toFixed(2)}`);
-      })
-      .on("mouseout", function(this: SVGRectElement, event: MouseEvent) {
-          // 移除 tooltip
-          outputGroup.selectAll(".output-tooltip, .pooling-tooltip").remove();
-
-          // 恢复边框样式并下移至外框下面
-          d3.select(this)
-            .style("stroke", "grey")
-            .style("stroke-width", "1px")
-            .lower();
-      });
+            tooltip.append("text")
+              .attr("x", mx + 20)
+              .attr("y", my + 45) 
+              .attr("font-family", "monospace")
+              .style("font-size", "14px")
+              .style("fill", "black")
+              .text(`= ${d.toFixed(2)}`);
+        })
+        .on("mouseout", function(this: SVGRectElement, event: MouseEvent) {
+            
+            outputGroup.selectAll(".output-tooltip, .pooling-tooltip").remove();
+    
+            d3.select(this)
+              .style("stroke", "grey")
+              .style("stroke-width", "1px")
+              .lower();
+        });
     
     outputGroup
         .append("text")

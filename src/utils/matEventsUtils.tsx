@@ -1210,6 +1210,41 @@ export function outputVisClick(
         d3.select(".mats").style("pointer-events", "auto");
         d3.select(".switchBtn").style("pointer-events", "auto");
         d3.select(".switchBtn").style("opacity", 1);
+        d3.selectAll(".poolingRect")
+                .style("pointer-events", "auto")
+                .on("mouseover.tooltip", function(event) {
+                    const id = Number(d3.select(this).attr("id"));
+                    
+                    
+                    d3.selectAll(".pooling-tooltip").remove();
+                    //这里
+                    const container = d3.select(".mats");
+                    const [x, y] = d3.pointer(event, container.node());
+                    const tooltip = container
+                        .append("g")
+                        .attr("class", "pooling-tooltip procVis");
+                    
+                    tooltip.append("rect")
+                        .attr("x", x + 10)
+                        .attr("y", y - 40)
+                        .attr("width", 120)
+                        .attr("height", 30)
+                        .attr("rx", 5)
+                        .attr("ry", 5)
+                        .style("fill", "white")
+                        .style("stroke", "black");
+                    
+                    tooltip.append("text")
+                        .attr("x", x + 15)
+                        .attr("y", y - 20)
+                        .style("font-size", "14px")
+                        .style("font-family", "monospace")
+                        .text(`Value: ${poolingValues[id].toFixed(2)}`);
+                })
+                .on("mouseout.tooltip", function() {
+
+                    d3.selectAll(".pooling-tooltip").remove();
+                });
         }, delay:200}
     ]
 
