@@ -660,7 +660,8 @@ export function linkPredOutputVisualizer(
 
         graphVisDrawActivationExplanation(
             x, y, "Sigmoid",
-            "f(x) = 1/(1+e^(-x))", "Range: [0, 1]", svg
+            "./assets/SVGs/sigmoid_formula.svg",
+            "Range: [0, 1]", svg
         );
     }).on("mouseout", function() {
         d3.selectAll(".math-displayer").remove();

@@ -1934,8 +1934,8 @@ export function drawTanh(
             x,
             y,
             "Tanh Non-Linear Function",
-            "f(x) = (e^x - e^(-x)) / (e^x + e^(-x))",
-            "Range:  (-1 to 1)."
+            "./assets/SVGs/tanh_formula.svg",
+            "Range: (-1, 1)"
         );
     });
 

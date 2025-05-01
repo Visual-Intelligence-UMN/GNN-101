@@ -2337,8 +2337,8 @@ export function calculationVisualizer(
             let descirption = "Range:  [0 to Infinity)."
             if (mode === 1) {
                 text = "Tanh";
-                formular = "f(x) = (e^x - e^(-x)) / (e^x + e^(-x))";
-                descirption = "Range:  (-1 to 1)."
+                formular = "./assets/SVGs/tanh_formula.svg";
+                descirption = "Range: (-1, 1)"
 
 
             }

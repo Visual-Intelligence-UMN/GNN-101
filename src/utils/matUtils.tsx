@@ -1616,7 +1616,7 @@ export function visualizeLinkClassifierFeatures(
             const iconX = resultVisPos[0]+100;
             const iconY = resultVisPos[1]+5;
 
-            drawFunctionIcon([iconX, iconY], "./assets/SVGs/sigmoid.svg", "", "Sigmoid", "f(x) = 1/(1+e^(-x))", "Range: [0 to 1]");
+            drawFunctionIcon([iconX, iconY], "./assets/SVGs/sigmoid.svg", "", "Sigmoid", "./assets/SVGs/tanh_formula.svg", "Range: [0, 1]");
 
 
             g.append("text")
