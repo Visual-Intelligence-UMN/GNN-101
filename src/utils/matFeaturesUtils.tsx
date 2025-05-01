@@ -1592,18 +1592,7 @@ export function drawTwoLayers(one: any, final: any, myColor: any, featureChannel
         .attr("stroke", "black")
         .attr("opacity", 0.05)
         .attr("fill", "none")
-        .attr("class", "crossConnection");
-
-    d3.select(".mats")
-        .append("path")
-        .attr(
-            "d",
-            d3.line()([aOne[0], bOne[0]])
-        )
-        .attr("stroke", "black")
-        .attr("opacity", 0.05)
-        .attr("fill", "none")
-        .attr("class", "crossConnection")
+        .attr("class", "path1")
         .attr("id", "path1");
 
     //visualize the result
@@ -1874,16 +1863,6 @@ export function drawResultVisForLinkModel(
         .attr("fill", "none")
         .attr("layerID", 3)
         .attr("class", "pathsToResult crossConnection");
-
-    //visualize the result
-    aOne[0][0] += rectH * 2 + 102;
-    //drawPoints(".mats","red",aOne);
-    aOne[0][1] -= rectW / 2;
-
-
-    let cOne = deepClone(aOne);
-
-    return { locations: [aOne[0], cOne[0]], g: g, g1: null, fr1:fr1.node(), path1:path1.node() };
 }
 
 
