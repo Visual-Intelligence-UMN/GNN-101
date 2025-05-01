@@ -954,12 +954,18 @@ export function drawActivationExplanation(
     formula: string,
     description: string
 ) {
-    const displayW = 300;
-    const displayH = 110;
+    let displayW = 320;
+    let displayH = 100;
+    let eqXOffset = 40;
+    let eqYOffset = 55;
 
     //find coordination for the math displayer first
     const displayX = x + 10;
     const displayY = y - 10;
+    if (formula.endsWith(".svg")) {
+        displayH += 60; // Adjust height for the formula SVG
+        eqYOffset += 60; // Adjust Y position for the formula SVG
+    }
 
     //add displayer
     d3.select(".mats")
@@ -985,23 +991,40 @@ export function drawActivationExplanation(
         .text(title)
         .attr("text-anchor", "middle")
         .attr("class", "math-displayer procVis to-be-removed")
-        .attr("font-size", "17px")
+        .attr("font-size", "20px")
         .attr("font-family", "monospace")
         .attr("font-weight", "bold")
         .attr("fill", "black");
-    const eqXOffset = 40;
-    const eqYOffset = 55;
+
     const unitSize = eqXOffset / 3 + 3;
     const upperOffset = unitSize * 2;
-    d3.select(".mats")
-        .append("text")
-        .attr("x", displayX + eqXOffset)
-        .attr("y", displayY + eqYOffset)
-        .text(formula)
-        .attr("class", "math-displayer procVis to-be-removed")
-        .attr("font-size", "20px")
-        .attr("font-family", "monospace")
-        .attr("fill", "black");
+
+        // formula: SVG vs text
+        if (formula.endsWith(".svg")) {
+            const formulaGroup = d3.select(".mats")
+                .append("g")
+                .attr("class", "math-formula");
+            injectSVG(
+                formulaGroup,
+                displayX + eqXOffset,
+                displayY + 40,
+                formula,
+                "math-displayer"
+            );
+            
+        } else {
+            d3.select(".mats")
+                .append("text")
+                .attr("x", displayX + eqXOffset)
+                .attr("y", displayY + eqYOffset)
+                .text(formula)
+                .attr("class", "math-displayer")
+                .attr("font-size", "20px")
+                .attr("font-family", "monospace")
+                .attr("fill", "black");
+        }
+    
+    
     d3.select(".mats")
         .append("text")
         .attr("x", displayX + eqXOffset)

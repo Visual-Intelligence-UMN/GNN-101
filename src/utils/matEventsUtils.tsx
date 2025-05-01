@@ -1200,7 +1200,7 @@ export function outputVisClick(
             const iconX = endPt4[0]+(30+125)/2 + 25;
             const iconY = endPt4[1];
 
-            drawFunctionIcon([iconX, iconY], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "eᶻⁱ / ∑ⱼ eᶻʲ", "Range: [0, 1]");
+            drawFunctionIcon([iconX, iconY], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "./assets/SVGs/softmax_formula.svg", "Range: [0, 1]");
             
 
 

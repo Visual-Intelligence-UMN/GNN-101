@@ -425,10 +425,23 @@ export function drawSingleGCNConvFeature(
             .attr("data-value", cellValue.toString())
             .attr("data-index", m.toString()) 
             .on("mouseover", function(this: SVGRectElement, event: MouseEvent) {
+                // recursively find ancestor with class "featureVis"
+                let el: Element | null = this;
+                while (el && !el.classList.contains("featureVis")) {
+                    el = el.parentElement;
+                    // console.log(el);
+                }
+                if (el) {
+                    const op = parseFloat(window.getComputedStyle(el).opacity || "1");
+                    if (op < 0.5) {
+                        return;  // abort if that ancestor's opacity is below threshold
+                    }
+                }
 
                 // fix for the issue of tooltip not hiding when the corresponding rect has opacity < 0.5
                 const parentNode = this.parentNode as Element | null;
                 if (!parentNode) return;
+                
 
                 const siblings = d3.select(parentNode).selectAll<SVGRectElement, unknown>("rect").nodes();
 
@@ -1428,7 +1441,7 @@ export function drawPoolingVis(
 
     //do some transformations on the original locations
     for (let i = 0; i < oLocations.length; i++) {
-        oLocations[i][0] += rectW * featureChannels;
+        oLocations[i][0] += featureChannels * rectW;
         oLocations[i][1] += rectH / 2;
     }
     //drawPoints(".mats", "red", oLocations);
@@ -1440,12 +1453,14 @@ export function drawPoolingVis(
         const res = computeMids(oLocations[i], one[0]);
         const lpoint = res[0];
         const hpoint = res[1];
+
         const path = mats
             .append("path")
             .attr("d", curve([oLocations[i], lpoint, hpoint, one[0]]))
             .attr("stroke", "black")
             .attr("opacity", 0.05)
-            .attr("fill", "none").attr("class", "crossConnection");
+            .attr("fill", "none")
+            .attr("class", "crossConnection");
 
         paths.push(path.node());
     }
@@ -1577,8 +1592,20 @@ export function drawTwoLayers(one: any, final: any, myColor: any, featureChannel
         .attr("stroke", "black")
         .attr("opacity", 0.05)
         .attr("fill", "none")
-        .attr("class", "path1")
+        .attr("class", "crossConnection");
+
+    d3.select(".mats")
+        .append("path")
+        .attr(
+            "d",
+            d3.line()([aOne[0], bOne[0]])
+        )
+        .attr("stroke", "black")
+        .attr("opacity", 0.05)
+        .attr("fill", "none")
+        .attr("class", "crossConnection")
         .attr("id", "path1");
+
     //visualize the result
     aOne[0][0] += rectH * 2 + 102;
     //drawPoints(".mats","red",aOne);
@@ -1785,6 +1812,7 @@ export function drawResultVisForLinkModel(
         .text(trueProb.toFixed(2))
         .style("fill", "white")
         .style("font-size", "5px");
+
 //    }
 
     //add result label
@@ -1846,6 +1874,16 @@ export function drawResultVisForLinkModel(
         .attr("fill", "none")
         .attr("layerID", 3)
         .attr("class", "pathsToResult crossConnection");
+
+    //visualize the result
+    aOne[0][0] += rectH * 2 + 102;
+    //drawPoints(".mats","red",aOne);
+    aOne[0][1] -= rectW / 2;
+
+
+    let cOne = deepClone(aOne);
+
+    return { locations: [aOne[0], cOne[0]], g: g, g1: null, fr1:fr1.node(), path1:path1.node() };
 }
 
 

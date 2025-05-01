@@ -832,7 +832,7 @@ export function outputVisualizer(
 
             graphVisDrawActivationExplanation(
                 x, y, "Softmax",
-                "eᶻⁱ / ∑ⱼ eᶻʲ", "Range: [0, 1]", outputGroup
+                "./assets/SVGs/softmax_formula.svg", "Range: [0, 1]", outputGroup
             );
         }).on("mouseout", function() {
             d3.selectAll(".math-displayer").remove();
@@ -1427,7 +1427,8 @@ export function calculationVisualizer(
 
                 // Use the correct index to get the detail text
                 // aggregated-tooltip
-                const detailText = node.aggregationSteps[index];
+                const detailText = node.aggregationSteps ? node.aggregationSteps[index] : undefined;
+                if (!detailText) return;
                 let calculatedHeight = 100;
                 if (detailText) {
                     const lines = detailText.split('\n');
@@ -2519,50 +2520,178 @@ export function calculationVisualizer(
                   .attr("stroke-width", 2)
                   .raise();
               
-                const [mx, my] = d3.pointer(event, outputGroup.node());
+                let [mx, my] = d3.pointer(event, outputGroup.node());
               
                 // Get the corresponding matmul and bias values
-                let matmulStr = "N/A";
-                let biasStr = "N/A";
+                let matmulStr = 0;
+                let biasStr = 0;
                 
                 if (matmulArr && Array.isArray(matmulArr) && index < matmulArr.length) {
-                    matmulStr = matmulArr[index].toFixed(4);
+                    matmulStr = matmulArr[index].toFixed(2);
                 }
                 
                 if (biasArr && Array.isArray(biasArr) && index < biasArr.length) {
-                    biasStr = biasArr[index].toFixed(4);
+                    biasStr = biasArr[index].toFixed(2);
                 }
                 
                 const tooltipMsg = `ReLU(Matmul: ${matmulStr} + Bias: ${biasStr}) = ${d.toFixed(4)}`;
               
                 const padding = 8;
-                const fontSize = 14;
-                const rectW = 480;            
-                const rectH = fontSize + padding * 2;
-              
+                // const fontSize = 14;
+                const rectW = 400;            
+                const rectH = 120;
+                const rectL = 40;
+                mx = mx - rectW / 2;
+                my = my - rectH - padding;
+                
+                outputGroup.raise();
                 const tooltip = outputGroup.append("g")
                   .attr("class", "output-tooltip procVis")
                   .style("pointer-events", "none")  
                   .raise();
               
                 tooltip.append("rect")
-                  .attr("x", mx - rectW / 2)
-                  .attr("y", my - rectH - 12)
+                  .attr("x", mx)
+                  .attr("y", my)
                   .attr("width", rectW)
                   .attr("height", rectH)
                   .attr("rx", 5)
                   .attr("ry", 5)
                   .attr("fill", "white")
                   .attr("stroke", "black");
-              
+                
+                // Relu text
                 tooltip.append("text")
-                  .attr("x", mx)
-                  .attr("y", my - rectH / 2 - 12)
-                  .attr("text-anchor", "middle")
+                  .attr("x", mx + 20)
+                  .attr("y", my + 60)
+                  .attr("text-anchor", "left")
                   .attr("dominant-baseline", "middle")
-                  .style("font-size", `${fontSize}px`)
+                  .style("font-size", `30px`)
                   .attr("font-family", "monospace")
-                  .text(tooltipMsg);
+                  .attr("font-weight", "bold")
+                  .text("Relu(");
+
+                tooltip.append("text")
+                    .attr("x", mx + 10 + 170)
+                    .attr("y", my + 60)
+                    .attr("text-anchor", "left")
+                    .attr("dominant-baseline", "middle")
+                    .style("font-size", `30px`)
+                    .attr("font-family", "monospace")
+                    .attr("font-weight", "bold")
+                    .text("+");
+                
+
+                tooltip.append("text")
+                    .attr("x", mx + 10 + 275)
+                    .attr("y", my + 60)
+                    .attr("text-anchor", "left")
+                    .attr("dominant-baseline", "middle")
+                    .style("font-size", `30px`)
+                    .attr("font-family", "monospace")
+                    .attr("font-weight", "bold")
+                    .text(") =");
+
+                const matmulX = mx + 120;
+                const matmulY = my + 35;
+
+                tooltip.append("rect")
+                    .attr("x", matmulX)
+                    .attr("y", matmulY)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(matmulStr))
+                    .attr("class", "math-displayer");
+            
+                tooltip.append("text")
+                    .attr("x", matmulX + rectL / 2)
+                    .attr("y", matmulY + rectL / 2 + 2)
+                    .text(roundToTwo(matmulStr))
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "15px")
+                    .attr("font-family", "monospace")
+                    .attr("fill", Math.abs(matmulStr) > 0.7 ? "white" : "black");
+
+                tooltip.append("text")
+                    .attr("x", matmulX + rectL / 2)
+                    .attr("y", matmulY + rectL / 2 + 45)
+                    .text("Matmul")
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("fill", "grey")
+                    .attr("font-size", "20px")
+                    .attr("font-weight", "bold")
+                    .attr("font-family", "monospace");
+
+                const biasX = mx + 230;
+                const biasY = my + 35;
+
+                tooltip.append("rect")
+                    .attr("x", biasX)
+                    .attr("y", biasY)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(biasStr))
+                    .attr("class", "math-displayer");
+
+                tooltip.append("text")
+                    .attr("x", biasX + rectL / 2)
+                    .attr("y", biasY + rectL / 2 + 2)
+                    .text(roundToTwo(biasStr))
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "15px")
+                    .attr("font-family", "monospace")
+                    .attr("fill", Math.abs(biasStr) > 0.7 ? "white" : "black");
+                
+                tooltip.append("text")
+                .attr("x", biasX + rectL / 2)
+                .attr("y", biasY + rectL / 2 + 45)
+                .text("Bias")
+                .attr("class", "math-displayer")
+                .attr("text-anchor", "middle")
+                .attr("fill", "grey")
+                .attr("font-size", "20px")
+                .attr("font-weight", "bold")
+                .attr("font-family", "monospace");
+
+                const valueX = mx + 340;
+                const valueY = my + 35;
+
+                tooltip.append("rect")
+                    .attr("x", valueX)
+                    .attr("y", valueY)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(d))
+                    .attr("class", "math-displayer");
+
+                tooltip.append("text")
+                    .attr("x", valueX + rectL / 2)
+                    .attr("y", valueY + rectL / 2 + 2)
+                    .text(roundToTwo(d))
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "15px")
+                    .attr("font-family", "monospace")
+                    .attr("fill", Math.abs(d) > 0.7 ? "white" : "black");
+
+                tooltip.append("text")
+                    .attr("x", valueX + rectL / 2)
+                    .attr("y", valueY + rectL / 2 + 45)
+                    .text("Output")
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("fill", "grey")
+                    .attr("font-size", "20px")
+                    .attr("font-weight", "bold")
+                    .attr("font-family", "monospace");
+
+                                
             })
             .on("mouseout", function (this: SVGRectElement) {
                 d3.select(this)

@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 import { create, all, matrix, i } from "mathjs";
 import { State, flipHorizontally, flipVertically, myColor } from "./utils";
+import { injectSVG } from "@/utils/svgUtils";
 import { roundToTwo } from "@/components/WebUtils";
 
 
@@ -455,19 +456,30 @@ export function hoverOverHandler(node: any, aggregatedData: any, calculatedData:
     }
 }
 
-export function graphVisDrawActivationExplanation(x:number, y:number, title:string, formula:string, description:string, svg: any){
-    const displayW = 250;
-    const displayH = 100;
-
-    //find coordination for the math displayer first
-    const displayX = x - 10;
-    const displayY = y + 30;
+export function graphVisDrawActivationExplanation(
+    x: number,
+    y: number,
+    title: string,
+    formula: string,
+    description: string,
+    svg: any
+) {
+    let displayW = 280;
+    let displayH = 100;
+    let displayX = x - 10;
+    let displayY = y + 30;
+    let eqXOffset = 25;
+    let eqYOffset = 50;
 
     if (!svg.selectAll) {
         svg = d3.selectAll(svg);
     }
+    if (formula.endsWith(".svg")) {
+        displayH += 80; // Adjust height for the formula SVG
+        eqYOffset += 80; // Adjust Y position for the formula SVG
+    }
 
-    //add displayer
+    // add background rect
     svg
         .append("rect")
         .attr("x", displayX)
@@ -482,31 +494,44 @@ export function graphVisDrawActivationExplanation(x:number, y:number, title:stri
         .attr("class", "math-displayer")
         .raise();
 
-    const titleYOffset = 20;
-    const titleXOffset = 95;
+    // title
     svg
         .append("text")
-        .attr("x", displayX + titleXOffset)
-        .attr("y", displayY + titleYOffset)
+        .attr("x", displayX + 95)
+        .attr("y", displayY + 20)
         .text(title)
-        .attr("class", "math-displayer")
-        .attr("font-size", "17px")
-        .attr("font-family", "monospace")
-        .attr("font-weight", "bold")
-        .attr("fill", "black");
-    const eqXOffset = 25;
-    const eqYOffset = 50;
-    const unitSize = eqXOffset / 3 + 3;
-    const upperOffset = unitSize * 2;
-    svg
-        .append("text")
-        .attr("x", displayX + eqXOffset)
-        .attr("y", displayY + eqYOffset)
-        .text(formula)
         .attr("class", "math-displayer")
         .attr("font-size", "20px")
         .attr("font-family", "monospace")
+        .attr("font-weight", "bold")
         .attr("fill", "black");
+
+    // formula: SVG vs text
+    if (formula.endsWith(".svg")) {
+        const formulaGroup = svg
+            .append("g")
+            .attr("class", "math-formula");
+        injectSVG(
+            formulaGroup,
+            displayX + eqXOffset,
+            displayY + 40,
+            formula,
+            "math-displayer"
+        );
+        
+    } else {
+        svg
+            .append("text")
+            .attr("x", displayX + eqXOffset)
+            .attr("y", displayY + eqYOffset)
+            .text(formula)
+            .attr("class", "math-displayer")
+            .attr("font-size", "20px")
+            .attr("font-family", "monospace")
+            .attr("fill", "black");
+    }
+
+    // description
     svg
         .append("text")
         .attr("x", displayX + eqXOffset)
