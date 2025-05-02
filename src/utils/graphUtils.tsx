@@ -824,7 +824,7 @@ export function outputVisualizer(
         .attr("y2", 7.5)
         .attr("stroke", "black")
         .attr("class", "to-be-removed softmax-component");
-        drawFunctionIcon([2 * rectHeight + 5 - moveOffset + 75, 7.5], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "eᶻⁱ / ∑ⱼ eᶻʲ", "Range: [0, 1]", outputGroup);
+        drawFunctionIcon([2 * rectHeight + 5 - moveOffset + 75, 7.5], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "./assets/SVGs/softmax_formula.svg", "Range: [0, 1]", outputGroup);
 
             
         d3.selectAll(".relu-icon").on("mouseover", function(event: any) {
@@ -4186,7 +4186,7 @@ export function nodeOutputVisualizer(
 
                 graphVisDrawActivationExplanation(
                     x, y, "Softmax",
-                    "eᶻⁱ / ∑ⱼ eᶻʲ", "Range: [0, 1]", svg
+                    "./assets/SVGs/softmax_formula.svg", "Range: [0, 1]", svg
                 );
             }).on("mouseout", function() {
                 d3.selectAll(".math-displayer").remove();
