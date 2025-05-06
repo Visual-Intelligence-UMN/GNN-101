@@ -1818,7 +1818,7 @@ export function calculationVisualizer(
     );
 
     setTimeout(() => {
-        BiasGroup.selectAll("rect")
+        BiasGroup.selectAll(null)
         .data(biasData)
         .enter()
         .append("rect")
@@ -2495,7 +2495,7 @@ export function calculationVisualizer(
         console.log('node.biases        = ', node.biases);
         
         outputGroup
-            .selectAll("rect")
+            .selectAll(null)
             .data(node.features)
             .enter()
             .append("rect")
