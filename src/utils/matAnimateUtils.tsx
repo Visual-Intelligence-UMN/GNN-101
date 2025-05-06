@@ -1633,8 +1633,8 @@ export function drawWeightMatrix(
             tooltip.append("rect")
               .attr("x", pointer[0] + 20)
               .attr("y", pointer[1] - 20)
-              .attr("width", 130)
-              .attr("height", 30)
+              .attr("width", 150)
+              .attr("height", 35)
               .attr("rx", 5)
               .attr("ry", 5)
               .style("fill", "white")
@@ -1723,8 +1723,8 @@ export function drawWeightMatrix(
                   .attr("stroke", "black")
                   .attr("stroke-width", 2)
                   .raise();
-                const tooltipWidth = 130;
-                const tooltipHeight = 30;
+                const tooltipWidth = 150;
+                const tooltipHeight = 35;
                 const tooltipOffset = -45; 
                 const horizontalOffset = 80; 
                 
