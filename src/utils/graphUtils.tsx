@@ -610,6 +610,7 @@ export function outputVisualizer(
         .style("pointer-events", "all")
         .on("mouseover", function(this: SVGRectElement, event: MouseEvent, datum: {value: number, index: number}) {
             if (!state.isClicked) return;
+            outputGroup.raise();
             const d = datum.value;
             const i = datum.index;
             const matmulValue = calculatedData[i];

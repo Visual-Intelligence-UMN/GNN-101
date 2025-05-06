@@ -1719,6 +1719,7 @@ export function drawWeightMatrix(
             .attr("stroke-width", 0.1)
             .attr("class", "procVis bias")
             .on("mouseover", function (this: SVGRectElement, event: MouseEvent) {
+                d3.select(this.parentElement).raise();
                 d3.select(this)
                   .attr("stroke", "black")
                   .attr("stroke-width", 2)
