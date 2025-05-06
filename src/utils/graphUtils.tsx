@@ -4033,7 +4033,7 @@ export function nodeOutputVisualizer(
         .style("opacity", 0)
         .style("pointer-events", "all")
         .on("mouseover", function(this:SVGRectElement, event: MouseEvent, d: number) {
-
+            outputGroup.raise();
             d3.select(this)
                 .style("stroke", "black")
                 .style("stroke-width", "1.5px");
@@ -4111,6 +4111,7 @@ export function nodeOutputVisualizer(
         .style("opacity", 0)
         .style("pointer-events", "all") 
         .on("mouseover", function(this: SVGRectElement, event: MouseEvent, d: number) {
+            BiasGroup.raise();
             d3.select(this)
                 .style("stroke", "black")
                 .style("stroke-width", "1.5px");
