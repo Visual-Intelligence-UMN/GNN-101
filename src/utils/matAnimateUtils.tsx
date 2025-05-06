@@ -1301,8 +1301,8 @@ export function drawWeightsVector(
                     .append("rect")
                     .attr("x", x + 10)
                     .attr("y", y - 40)
-                    .attr("width", 120)
-                    .attr("height", 30)
+                    .attr("width", 150)
+                    .attr("height", 35)
                     .attr("rx", 5)
                     .attr("ry", 5)
                     .style("fill", "white")
@@ -1312,8 +1312,8 @@ export function drawWeightsVector(
                     .append("text")
                     .attr("x", x + 20)
                     .attr("y", y - 20)
-                    .text(`Value: ${dummy[m].toFixed(2)}`)
-                    .style("font-size", "12px")
+                    .text(`Value = ${dummy[m].toFixed(2)}`)
+                    .style("font-size", "17px")
                     .style("font-family", "monospace");
             })
             .on("mouseout", function() {

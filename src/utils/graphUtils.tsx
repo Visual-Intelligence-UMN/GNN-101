@@ -4179,7 +4179,7 @@ export function nodeOutputVisualizer(
             .attr("opacity", 1)
             .lower();
 
-            drawFunctionIcon([end_x+170/2+40, end_y], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "eᶻⁱ / ∑ⱼ eᶻʲ", "Range: [0, 1]", svg);
+            drawFunctionIcon([end_x+170/2+40, end_y], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "./assets/SVGs/softmax_formula.svg", "Range: [0, 1]", svg);
             
             d3.selectAll(".relu-icon").on("mouseover", function() {
                 const [x, y] = d3.pointer(event);
