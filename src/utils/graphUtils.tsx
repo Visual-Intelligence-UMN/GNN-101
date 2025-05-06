@@ -2534,7 +2534,7 @@ export function calculationVisualizer(
                     biasStr = biasArr[index].toFixed(2);
                 }
                 
-                const tooltipMsg = `ReLU(Matmul: ${matmulStr} + Bias: ${biasStr}) = ${d.toFixed(4)}`;
+                // const tooltipMsg = `ReLU(Matmul: ${matmulStr} + Bias: ${biasStr}) = ${d.toFixed(4)}`;
               
                 const padding = 8;
                 // const fontSize = 14;
