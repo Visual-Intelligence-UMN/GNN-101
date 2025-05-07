@@ -667,271 +667,235 @@ function determineColor(val: number) {
 }
 
 
+/**
+ * Draw a four-class soft-max tooltip for a **node-classifier**.
+ * The `<g>` stored in the variable **tooltip** is kept and reused; only its
+ * children are cleared/re-drawn, so the element itself “remains the same”.
+ */
 export function drawSoftmaxDisplayerNodeClassifier(
-    displayerPos: number[],
-    titles: string[],
-    rectID: number,
-    nthOutputVals: number[],
-    nthResult: number[],
-    myColor: any
-) {
-    //set-up the paramtere for the math displayer
-    const displayW = 350;
-    const displayH = 75;
-    const displayX = displayerPos[0];
-    const displayY = displayerPos[1];
-
-    //add displayer
-    const tooltip = d3.select(".mats").append("g");
-
-        tooltip.append("rect")
-        .attr("x", displayX)
-        .attr("y", displayY)
-        .attr("width", displayW)
-        .attr("height", displayH)
-        .attr("rx", 10)
-        .attr("ry", 10)
-        .style("fill", "white")
-        .style("stroke", "black")
-        .style("stroke-width", 2)
-        .attr("class", "math-displayer")
-        .raise();
-    //add contents into the math displayer
-    //add title
-    const titleYOffset = 10;
-    const titleXOffset = 50;
+    displayerPos: [number, number],   // [x, y] where the white panel should sit
+    titles: string[],                 // title per class
+    rectID: number,                   // index of the highlighted class
+    nthOutputVals: number[],          // raw logits (length ≥ 4)
+    nthResult: number[],              // softmax result (length ≥ 4)
+    myColor: (v: number) => string
+  ) {
+    /* ───────────────────────── 1.  layout & style constants ────────────────── */
+    const DISP_W = 550;
+    const DISP_H = 100;
+  
+    const RECT_EDGE  = 28;            // coloured square size (px)
+    const FONT_NUM   = 11;            // numbers inside squares
+    const FONT_TITLE = 18;            // bold panel title
+    const FONT_TXT   = 18;            // everything else (“exp(”, “+”, …)
+  
+    /* fine-tuning knobs (px) --------------------------------------------------- */
+    const expOffset_1 = 0;  // 1st denominator exp block
+    const expOffset_2 = 0;  // 2nd
+    const expOffset_3 = 0;  // 3rd
+    const expOffset_4 = 0;  // 4th
+    const expAdjust   = 0;  // add to each right parenthesis “)”
+    const rectAdjust  = 0;  // add to every coloured rect x-coord
+  
+    /* horizontal gaps (px) */
+    const GAP_EXP_RECT   = 45;        // “exp(” → rect
+    const GAP_RECT_PAREN = 5;        // rect  → “)”
+    const GAP_PLUS       = 10;        // “)”   → “+exp(”
+    const GAP_EQ         = 35;        // last “)” → “=”
+  
+    /* y positions inside the group */
+    const Y_TITLE    = 15;
+    const Y_NUMER    = 35 + 15;
+    const Y_LINE     = 50 + 5;
+    const Y_DENOM    = 65 + 20;
+    const Y_RES_RECT = 25 + 20;
+    const Y_RES_TEXT = Y_RES_RECT + RECT_EDGE / 2 + 1;
+  
+    /* ───────────────────────── 2.  create / reuse the group ─────────────────── */
+    const baseX = displayerPos[0];
+    const baseY = displayerPos[1];
+  
+    const tooltip = d3
+      .select(".mats")
+      .selectAll<SVGGElement, unknown>("g.node-tooltip")
+      .data([null])
+      .join("g")
+      .attr("class", "node-tooltip math-displayer")
+      .attr("transform", `translate(${baseX}, ${baseY})`);
+  
+    /* clear previous children but keep the same <g> element */
+    tooltip.selectAll("*").remove();
+  
+    /* background panel */
     tooltip
-        .append("text")
-        .attr("x", displayX + titleXOffset)
-        .attr("y", displayY + titleYOffset)
-        .text(titles[Number(rectID)])
-        .attr("class", "math-displayer")
-        .attr("font-size", titleYOffset)
-        .attr("fill", "black");
-    const eqXOffset = titleXOffset / 2;
-    const eqYOffset = titleYOffset * 2.5;
-    const unitSize = eqXOffset / 3 + 3;
-    const upperOffset = unitSize * 2;
+      .append("rect")
+      .attr("width", DISP_W)
+      .attr("height", DISP_H)
+      .attr("rx", 10)
+      .attr("ry", 10)
+      .style("fill", "white")
+      .style("stroke", "black")
+      .style("stroke-width", 2)
+      .lower();
+  
+    /* ───────────────────────── 3.  title ───────────────────────────────────── */
     tooltip
+      .append("text")
+      .attr("x", DISP_W / 2)
+      .attr("y", Y_TITLE)
+      .text(titles[rectID])
+      .attr("text-anchor", "middle")
+      .attr("font-family", "monospace")
+      .attr("font-size", FONT_TITLE)
+      .style("font-weight", "bold");
+  
+    /* helper: draw one exp-block, return x-tail */
+    const drawExpBlock = (
+      startX: number,
+      y: number,
+      value: number,
+      fill: string,
+      blkOffset: number
+    ): number => {
+      /* “exp(” */
+      tooltip
         .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 4 + upperOffset)
-        .attr("y", displayY + eqYOffset)
+        .attr("x", startX + blkOffset)
+        .attr("y", y - 5)
         .text("exp(")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-    tooltip
+        .attr("font-family", "monospace")
+        .attr("font-size", FONT_TXT);
+  
+      /* coloured rect */
+      const rectX = startX + blkOffset + GAP_EXP_RECT + rectAdjust;
+      tooltip
         .append("rect")
-        .attr("x", displayX + eqXOffset + unitSize * 6.5 + upperOffset)
-        .attr("y", displayY + eqYOffset - unitSize + 2)
-        .attr("width", unitSize)
-        .attr("height", unitSize)
-        .style("stroke", "black")
-        .attr("fill", myColor(nthOutputVals[Number(rectID)]))
-        .attr("class", "math-displayer")
-        .raise();
-    tooltip
+        .attr("x", rectX)
+        .attr("y", y - RECT_EDGE + 2)
+        .attr("width", RECT_EDGE)
+        .attr("height", RECT_EDGE)
+        .attr("fill", fill)
+        .attr("stroke", "black");
+  
+      /* number */
+      tooltip
         .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 6.5 + upperOffset)
-        .attr("y", displayY + eqYOffset - unitSize / 3)
-        .text(roundToTwo(nthOutputVals[Number(rectID)]))
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize / 2)
-        .attr("fill", determineColor(nthOutputVals[Number(rectID)]));
-    tooltip
+        .attr("x", rectX + RECT_EDGE / 2)
+        .attr("y", y - RECT_EDGE / 2 + 2)
+        .text(roundToTwo(value))
+        .attr("font-family", "monospace")
+        .attr("font-size", FONT_NUM)
+        .attr("text-anchor", "middle")
+        .attr("fill", Math.abs(value) > 0.7 ? "white" : "black");
+  
+      /* “)” */
+      const parenX = rectX + RECT_EDGE + GAP_RECT_PAREN + expAdjust;
+      tooltip
         .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 8 + upperOffset)
-        .attr("y", displayY + eqYOffset)
+        .attr("x", parenX)
+        .attr("y", y - 5)
         .text(")")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-    //draw fraction line
-    const startFLPt: [number, number] = [
-        displayX + eqXOffset / 2,
-        displayY + eqYOffset + unitSize,
-    ];
-    const endFLPt: [number, number] = [
-        displayX + eqXOffset + unitSize * 10,
-        displayY + eqYOffset + unitSize,
-    ];
-    const endPathPt: [number, number] = [
-        displayX + eqXOffset + unitSize * 19,
-        displayY + eqYOffset + unitSize,
-    ];
-    const path1 = tooltip
-        .append("path")
-        .attr("d", d3.line()([startFLPt, endPathPt]))
-        .attr("stroke", "black")
-        .attr("opacity", 1)
-        .attr("fill", "none")
-        .attr("class", "math-displayer");
+        .attr("font-family", "monospace")
+        .attr("font-size", FONT_TXT);
+  
+      return parenX; // tail for the caller
+    };
+  
+    /* ───────────────────────── 4.  numerator ───────────────────────────────── */
+    let tailX = drawExpBlock(
+      175,
+      Y_NUMER,
+      nthOutputVals[rectID],
+      myColor(nthOutputVals[rectID]),
+      0 /* numerator offset */
+    );
+  
+  
+    /* ───────────────────────── 5.  denominator (4 terms) ───────────────────── */
+    const offsets = [expOffset_1, expOffset_2, expOffset_3, expOffset_4];
+  
+    const denomStartX = 25;
+    tailX = denomStartX; // reset cursor for denominator
+  
+    nthOutputVals.slice(0, 4).forEach((val, i) => {
+      if (i !== 0) {
+        /* “+” between terms */
+        tooltip
+          .append("text")
+          .attr("x", tailX + GAP_PLUS)
+          .attr("y", Y_DENOM)
+          .text("+")
+          .attr("font-family", "monospace")
+          .attr("font-size", FONT_TXT);
+  
+        tailX += GAP_PLUS + FONT_TXT; // advance cursor past “+”
+      }
+  
+      tailX = drawExpBlock(
+        tailX,
+        Y_DENOM,
+        val,
+        myColor(val),
+        offsets[i] || 0
+      );
+    });
+  
+    /* denominator finished, draw fraction bar */
+    tooltip
+    .append("line")
+    .attr("x1", 10)
+    .attr("y1", Y_LINE)
+    .attr("x2", tailX + GAP_EQ - 5)
+    .attr("y2", Y_LINE)
+    .attr("stroke", "black")
+    .attr("stroke-width", 1.5);
 
-    //draw lower part
-    const offsetMul = 2;
+    /* ───────────────────────── 6.  “= result” ──────────────────────────────── */
     tooltip
-        .append("text")
-        .attr("x", displayX + eqXOffset)
-        .attr("y", displayY + eqYOffset * offsetMul)
-        .text("exp(")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
+      .append("text")
+      .attr("x", tailX + GAP_EQ)
+      .attr("y", Y_LINE)
+      .text("=")
+      .attr("font-family", "monospace")
+      .attr("font-size", FONT_TXT);
+  
+    const resRectX = tailX + GAP_EQ + FONT_TXT;
     tooltip
-        .append("rect")
-        .attr("x", displayX + eqXOffset + unitSize * 2.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
-        .attr("width", unitSize)
-        .attr("height", unitSize)
-        .style("stroke", "black")
-        .attr("fill", myColor(nthOutputVals[0]))
-        .attr("class", "math-displayer")
-        .raise();
+      .append("rect")
+      .attr("x", resRectX + rectAdjust)
+      .attr("y", Y_RES_RECT)
+      .attr("width", RECT_EDGE)
+      .attr("height", RECT_EDGE)
+      .attr("fill", myColor(nthResult[rectID]))
+      .attr("stroke", "black");
+  
     tooltip
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 2.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
-        .text(roundToTwo(nthOutputVals[0]))
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize / 2)
-        .attr("fill", determineColor(nthOutputVals[0]));
-    tooltip
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 4)
-        .attr("y", displayY + eqYOffset * offsetMul)
-        .text(")+exp(")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-    tooltip
-        .append("rect")
-        .attr("x", displayX + eqXOffset + unitSize * 7.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
-        .attr("width", unitSize)
-        .attr("height", unitSize)
-        .style("stroke", "black")
-        .attr("fill", myColor(nthOutputVals[1]))
-        .attr("class", "math-displayer")
-        .raise();
-    tooltip
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 7.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
-        .text(roundToTwo(nthOutputVals[1]))
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize / 2)
-        .attr("fill", determineColor(nthOutputVals[1]));
-
-    tooltip
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 9)
-        .attr("y", displayY + eqYOffset * offsetMul)
-        .text(")+exp(")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-    tooltip
-        .append("rect")
-        .attr("x", displayX + eqXOffset + unitSize * 12.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
-        .attr("width", unitSize)
-        .attr("height", unitSize)
-        .style("stroke", "black")
-        .attr("fill", myColor(nthOutputVals[2]))
-        .attr("class", "math-displayer")
-        .raise();
-    tooltip
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 12.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
-        .text(roundToTwo(nthOutputVals[2]))
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize / 2)
-        .attr("fill", determineColor(nthOutputVals[2]));    
-
-    tooltip
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 14)
-        .attr("y", displayY + eqYOffset * offsetMul)
-        .text(")+exp(")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-    tooltip
-        .append("rect")
-        .attr("x", displayX + eqXOffset + unitSize * 17.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
-        .attr("width", unitSize)
-        .attr("height", unitSize)
-        .style("stroke", "black")
-        .attr("fill", myColor(nthOutputVals[3]))
-        .attr("class", "math-displayer")
-        .raise();
-    tooltip
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 17.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
-        .text(roundToTwo(nthOutputVals[3]))
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize / 2)
-        .attr("fill", determineColor(nthOutputVals[3]));
-    tooltip
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 19)
-        .attr("y", displayY + eqYOffset * offsetMul)
-        .text(")")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-
-    //lower part finished
-    //eq sign and result
-    tooltip
-        .append("text")
-        .attr("x", endFLPt[0] + unitSize * 11)
-        .attr("y", endFLPt[1])
-        .text("=")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-    tooltip
-        .append("rect")
-        .attr("x", endFLPt[0] + unitSize * 12)
-        .attr("y", endFLPt[1] - unitSize)
-        .attr("width", unitSize)
-        .attr("height", unitSize)
-        .style("stroke", "black")
-        .attr("fill", myColor(nthResult[Number(rectID)]))
-        .attr("class", "math-displayer")
-        .raise();
-    let textColor = "white";
-    if (Math.abs(nthResult[Number(rectID)]) < 0.5) {
-        textColor = "black";
-    }
-    tooltip
-        .append("text")
-        .attr("x", endFLPt[0] + unitSize * 12)
-        .attr("y", endFLPt[1] - unitSize / 2)
-        .text(roundToTwo(nthResult[Number(rectID)]))
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize / 2)
-        .attr("fill", textColor);
-
+      .append("text")
+      .attr("x", resRectX + RECT_EDGE / 2 + rectAdjust)
+      .attr("y", Y_RES_TEXT)
+      .text(roundToTwo(nthResult[rectID]))
+      .attr("font-family", "monospace")
+      .attr("font-size", FONT_NUM)
+      .attr("text-anchor", "middle")
+      .attr(
+        "fill",
+        Math.abs(nthResult[rectID]) > 0.7 ? "white" : "black"
+      );
+  
+    /* ───────────────────────── 7.  optional scale for visibility ───────────── */
     const scaleFactor = 1.5;
-
-        // 获取 tooltip 元素的边界框
-        const bbox = tooltip.node()?.getBBox();
-
-        // 计算中心点
-        if(bbox!=undefined){
-            const centerX = bbox.x + bbox.width / 2;
-            const centerY = bbox.y + bbox.height / 2;
-
-            // 将缩放中心设置为元素的中心点
-            tooltip.attr('transform', `translate(${centerX}, ${centerY}) scale(${scaleFactor}) translate(${-centerX}, ${-centerY})`);
-
-        }
-}
+    const bbox = tooltip.node()?.getBBox();
+    if (bbox) {
+      const cx = bbox.x + bbox.width / 2;
+      const cy = bbox.y + bbox.height / 2;
+      const baseTransform = `translate(${baseX}, ${baseY})`;
+      tooltip.attr(
+        "transform",
+        `${baseTransform} translate(${cx}, ${cy}) scale(${scaleFactor}) translate(${-cx}, ${-cy})`
+      );
+    }
+  }
+  
 
 export function drawActivationExplanation(
     x: number,
