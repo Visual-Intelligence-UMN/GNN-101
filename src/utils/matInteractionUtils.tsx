@@ -444,232 +444,218 @@ export function drawEScoreEquation(
 
 export function drawSoftmaxDisplayer(
     pathMap: any,
-    endCoord: any,
+    endCoord: [number[], number[]],
     result: number[],
-    id: number,
-    myColor: any
-) {
+    id: 0 | 1,
+    myColor: (v: number) => string
+  ) {
+    /* ───── 1. highlight the active path ───── */
     pathMap[0][id]!.style.opacity = "1";
     pathMap[1][id]!.style.opacity = "1";
-
-    //set-up the paramtere for the math displayer
-    const displayW = 250;
-    const displayH = 75;
-
-    //find coordination for the math displayer first
-    const displayX = endCoord[1][0] + 30;
-    const displayY = endCoord[1][1] - (displayH + 50);
-
-    //add displayer
-
-
-    const displayer = d3.select(".mats").append("g")
-    
-    displayer
-        .append("rect")
-        .attr("x", displayX)
-        .attr("y", displayY)
-        .attr("width", displayW)
-        .attr("height", displayH)
-        .attr("rx", 10)
-        .attr("ry", 10)
-        .style("fill", "white")
-        .style("stroke", "black")
-        .style("stroke-width", 2)
+  
+    /* ───── 2. layout & style constants ───── */
+    const DISP_W = 350;
+    const DISP_H = 100;
+  
+    const RECT_EDGE  = 28;   // coloured square size
+    const FONT_NUM   = 11;   // monospace numbers in the squares
+    const FONT_TITLE = 18;   // bold title
+    const FONT_TXT   = 18;   // all other text
+  
+    /* fine-tuning knobs (px) */
+    const expOffset_1 = 50;
+    const expOffset_2 = 0;
+    const expOffset_3 = -10;
+    const expAdjust   = 0;   // tweaks “)” position
+    const rectAdjust  = 0;   // tweaks every coloured rect x-pos
+  
+    /* reusable horizontal gaps (px) */
+    const GAP_EXP_RECT   = 50;
+    const GAP_RECT_PAREN = 10;
+    const GAP_PLUS       = 20;
+    const GAP_EQ         = 35;
+  
+    /* y positions relative to the group */
+    const Y_TITLE    = 15 + 5;
+    const Y_NUMER    = 40 + 15;
+    const Y_LINE     = 55 + 5;
+    const Y_DENOM    = 70 + 20;
+    const Y_RES_RECT = 35 + 10;
+    const Y_RES_TEXT = Y_RES_RECT + RECT_EDGE / 2 + 1;
+  
+    /* ───── 3. place the displayer group once ───── */
+    const baseX = endCoord[1][0] + 30;
+    const baseY = endCoord[1][1] - (DISP_H + 50);
+  
+    const displayer =
+      d3
+        .select(".mats")
+        .selectAll<SVGGElement, unknown>("g.math-displayer") // reuse if already present
+        .data([null])
+        .join("g")
         .attr("class", "math-displayer")
-        .lower();
-
-    //data preparation and preprocessing
-    //model outputs and the values after softmax
-
+        .attr("transform", `translate(${baseX}, ${baseY})`);
+  
+    /* clear any previous children (keep the same <g>) */
+    displayer.selectAll("*").remove();
+  
+    /* background panel (kept at back) */
+    displayer
+      .append("rect")
+      .attr("width", DISP_W)
+      .attr("height", DISP_H)
+      .attr("rx", 10)
+      .attr("ry", 10)
+      .style("fill", "white")
+      .style("stroke", "black")
+      .style("stroke-width", 2)
+      .lower();
+  
+    /* ───── 4. prepare data ───── */
     const finalResult = softmax(result);
-
-    //title fetch
-    let title = "Softmax Score for 'Mutagenic'";
-    if (id == 0) {
-        title = "Softmax Score for 'Non-Mutagenic'";
-    }
-
-    //add contents into the math displayer
-    //add title
-    const titleYOffset = 10;
-    const titleXOffset = 50;
+    const title =
+      id === 0
+        ? "Softmax Score for 'Non-Mutagenic'"
+        : "Softmax Score for 'Mutagenic'";
+  
+    /* ───── 5. title ───── */
     displayer
+      .append("text")
+      .attr("x", 20)
+      .attr("y", Y_TITLE)
+      .text(title)
+      .attr("font-family", "monospace")
+      .attr("font-size", FONT_TITLE)
+      .style("font-weight", "bold");
+  
+    /* helper: draw one exp(value) block and return tail-x */
+    const drawExpBlock = (
+      startX: number,
+      y: number,
+      value: number,
+      fill: string,
+      blockOffset: number
+    ): number => {
+      /* “exp(” */
+      displayer
         .append("text")
-        .attr("x", displayX + titleXOffset)
-        .attr("y", displayY + titleYOffset)
-        .text(title)
-        .attr("class", "math-displayer")
-        .attr("font-size", titleYOffset)
-        .attr("fill", "black");
-    //add equation
-    //draw fraction
-    //upper part of the fraction
-    const eqXOffset = titleXOffset / 2;
-    const eqYOffset = titleYOffset * 2.5;
-    const unitSize = eqXOffset / 3 + 3;
-    const upperOffset = unitSize * 2;
-    displayer
-        .append("text")
-        .attr("x", displayX + eqXOffset + upperOffset)
-        .attr("y", displayY + eqYOffset)
+        .attr("x", startX + blockOffset)
+        .attr("y", y - 5)
         .text("exp(")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-    displayer
+        .attr("font-family", "monospace")
+        .attr("font-size", FONT_TXT);
+  
+      /* coloured rect */
+      const rectX = startX + blockOffset + GAP_EXP_RECT + rectAdjust;
+      displayer
         .append("rect")
-        .attr("x", displayX + eqXOffset + unitSize * 2.5 + upperOffset)
-        .attr("y", displayY + eqYOffset - unitSize + 2)
-        .attr("width", unitSize)
-        .attr("height", unitSize)
-        .style("stroke", "black")
-        .attr("fill", myColor(result[id]))
-        .attr("class", "math-displayer")
-        .raise();
-    displayer
+        .attr("x", rectX)
+        .attr("y", y - RECT_EDGE + 2)
+        .attr("width", RECT_EDGE)
+        .attr("height", RECT_EDGE)
+        .attr("fill", fill)
+        .attr("stroke", "black");
+  
+      /* number inside rect */
+      displayer
         .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 2.5 + upperOffset)
-        .attr("y", displayY + eqYOffset - unitSize / 3)
-        .text(roundToTwo(result[id]))
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize / 2)
-        .attr("fill", "white");
-    displayer
+        .attr("x", rectX + RECT_EDGE / 2)
+        .attr("y", y - RECT_EDGE / 2 + 2)
+        .text(roundToTwo(value))
+        .attr("font-family", "monospace")
+        .attr("font-size", FONT_NUM)
+        .attr("text-anchor", "middle")
+        .attr("fill", Math.abs(value) > 0.7 ? "white" : "black");
+  
+      /* right parenthesis “)” */
+      const parenX = rectX + RECT_EDGE + GAP_RECT_PAREN + expAdjust;
+      displayer
         .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 4 + upperOffset)
-        .attr("y", displayY + eqYOffset)
+        .attr("x", parenX)
+        .attr("y", y - 5)
         .text(")")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-    //upper part finished
-    //draw fraction line
-    const startFLPt: [number, number] = [
-        displayX + eqXOffset / 2,
-        displayY + eqYOffset + unitSize,
-    ];
-    const endFLPt: [number, number] = [
-        displayX + eqXOffset + unitSize * 10,
-        displayY + eqYOffset + unitSize,
-    ];
-    const path1 = displayer
-        .append("path")
-        .attr("d", d3.line()([startFLPt, endFLPt]))
-        .attr("stroke", "black")
-        .attr("opacity", 1)
-        .attr("fill", "none")
-        .attr("class", "math-displayer");
-    //draw lower part
-    const offsetMul = 2;
+        .attr("font-family", "monospace")
+        .attr("font-size", FONT_TXT);
+  
+      return parenX; // tail
+    };
+  
+    /* ───── 6. numerator ───── */
+    let tailX = drawExpBlock(25, Y_NUMER, result[id], myColor(result[id]), expOffset_1);
+  
+    /* fraction bar */
     displayer
-        .append("text")
-        .attr("x", displayX + eqXOffset)
-        .attr("y", displayY + eqYOffset * offsetMul)
-        .text("exp(")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
+      .append("line")
+      .attr("x1", 10)
+      .attr("y1", Y_LINE)
+      .attr("x2", DISP_W - 90)
+      .attr("y2", Y_LINE)
+      .attr("stroke", "black")
+      .attr("stroke-width", 1.5);
+  
+    /* ───── 7. denominator ───── */
+    tailX = drawExpBlock(25, Y_DENOM, result[0], myColor(result[0]), expOffset_2);
+  
+    /* “+” */
     displayer
-        .append("rect")
-        .attr("x", displayX + eqXOffset + unitSize * 2.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
-        .attr("width", unitSize)
-        .attr("height", unitSize)
-        .style("stroke", "black")
-        .attr("fill", myColor(result[0]))
-        .attr("class", "math-displayer")
-        .raise();
+      .append("text")
+      .attr("x", tailX + GAP_PLUS)
+      .attr("y", Y_DENOM - 5)
+      .text("+")
+      .attr("font-family", "monospace")
+      .attr("font-size", FONT_TXT);
+  
+    tailX = drawExpBlock(
+      tailX + GAP_PLUS*2 + FONT_TXT - 5,
+      Y_DENOM,
+      result[1],
+      myColor(result[1]),
+      expOffset_3
+    );
+  
+    /* ───── 8. equals & final result ───── */
     displayer
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 2.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
-        .text(roundToTwo(result[0]))
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize / 2)
-        .attr("fill", determineColor(result[0]));
+      .append("text")
+      .attr("x", tailX + GAP_EQ - 5)
+      .attr("y", Y_LINE + 5)
+      .text("=")
+      .attr("font-family", "monospace")
+      .attr("font-size", FONT_TXT);
+  
+    const resRectX = tailX + GAP_EQ + FONT_TXT;
     displayer
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 4)
-        .attr("y", displayY + eqYOffset * offsetMul)
-        .text(")+exp(")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
+      .append("rect")
+      .attr("x", resRectX + rectAdjust)
+      .attr("y", Y_RES_RECT)
+      .attr("width", RECT_EDGE)
+      .attr("height", RECT_EDGE)
+      .attr("fill", myColor(finalResult[id]))
+      .attr("stroke", "black");
+  
     displayer
-        .append("rect")
-        .attr("x", displayX + eqXOffset + unitSize * 7.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
-        .attr("width", unitSize)
-        .attr("height", unitSize)
-        .style("stroke", "black")
-        .attr("fill", myColor(result[1]))
-        .attr("class", "math-displayer")
-        .raise();
-    displayer
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 7.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
-        .text(roundToTwo(result[1]))
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize / 2)
-        .attr("fill", determineColor(result[1]));
-    displayer
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 9)
-        .attr("y", displayY + eqYOffset * offsetMul)
-        .text(")")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-    //lower part finished
-    //eq sign and result
-    displayer
-        .append("text")
-        .attr("x", endFLPt[0] + unitSize / 2)
-        .attr("y", endFLPt[1])
-        .text("=")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-    displayer
-        .append("rect")
-        .attr("x", endFLPt[0] + unitSize * 1.5)
-        .attr("y", endFLPt[1] - unitSize)
-        .attr("width", unitSize)
-        .attr("height", unitSize)
-        .style("stroke", "black")
-        .attr("fill", myColor(finalResult[id]))
-        .attr("class", "math-displayer")
-        .raise();
-    let textColor = "white";
-    if (Math.abs(finalResult[id]) < 0.5) {
-        textColor = "black";
-    }
-    displayer
-        .append("text")
-        .attr("x", endFLPt[0] + unitSize * 1.5)
-        .attr("y", endFLPt[1] - unitSize / 2)
-        .text(roundToTwo(finalResult[id]))
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize / 2)
-        .attr("fill", textColor);
-
+      .append("text")
+      .attr("x", resRectX + RECT_EDGE / 2 + rectAdjust)
+      .attr("y", Y_RES_TEXT)
+      .text(roundToTwo(finalResult[id]))
+      .attr("font-family", "monospace")
+      .attr("font-size", FONT_NUM)
+      .attr("text-anchor", "middle")
+      .attr("fill", Math.abs(finalResult[id]) > 0.7 ? "white" : "black");
+  
+    /* ───── 9. optional scale (compose with translation) ───── */
     const scaleFactor = 1.5;
-
-        // 获取 tooltip 元素的边界框
-        const bbox = displayer.node()?.getBBox();
-
-        // 计算中心点
-        if(bbox!=undefined){
-            const centerX = bbox.x + bbox.width / 2;
-            const centerY = bbox.y + bbox.height / 2;
-
-            // 将缩放中心设置为元素的中心点
-            displayer.attr('transform', `translate(${centerX}, ${centerY}) scale(${scaleFactor}) translate(${-centerX}, ${-centerY})`);
-
-        }
-}
+    const bbox = displayer.node()?.getBBox();
+    if (bbox) {
+      const cx = bbox.x + bbox.width / 2;
+      const cy = bbox.y + bbox.height / 2;
+      const baseTransform = `translate(${baseX}, ${baseY})`;
+      displayer.attr(
+        "transform",
+        `${baseTransform} translate(${cx}, ${cy}) scale(${scaleFactor}) translate(${-cx}, ${-cy})`
+      );
+    }
+  }
+  
 
 
 function determineColor(val: number) {
