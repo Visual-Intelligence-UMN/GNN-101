@@ -510,7 +510,7 @@ export function drawSingleGCNConvFeature(
                     .attr("y", my + 20)
                     .attr("font-size", `17px`)
                     .attr("font-family", "monospace")
-                    .text("Value = " + roundToTwo(d))
+                    .text("Value = " + d.toFixed(2));
 
                     return;
                 }
