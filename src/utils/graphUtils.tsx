@@ -4333,11 +4333,15 @@ export function nodeOutputVisualizer(
 
 
 
-    let rectL = 15;
-    let displayerWidth = 300; // Width of the graph-displayer
-    let displayHeight = 75;
+    let rectL = 25;
+    let displayerWidth = 350; // Width of the graph-displayer
+    let displayHeight = 100;
+    let yOffset = 5;
 
-
+    let expOffset_1 = 0; // bottom left
+    let expOffset_2 = -50; // bottom right
+    let expOffset_3 = 20; // top middle
+    let rightSideOffset = -50; // right side of the graph displayer
 
 
 
@@ -4364,8 +4368,8 @@ export function nodeOutputVisualizer(
                 d3.selectAll(".graph-displayer").attr("opacity", 1);
                 d3.selectAll(`.softmax${i}`).attr("opacity", 1);
                 g5.append("rect")
-                    .attr("x", 50)
-                    .attr("y", displayHeight - 40 + 20)
+                    .attr("x", 70 + expOffset_1)
+                    .attr("y", displayHeight - 40 + yOffset)
                     .attr("width", rectL)
                     .attr("height", rectL)
                     .style("stroke", "black")
@@ -4373,16 +4377,19 @@ export function nodeOutputVisualizer(
                     .attr("class", "math-displayer")
                     .lower();
                 g5.append("text")
-                    .attr("x", 50)
-                    .attr("y", displayHeight - 40 + rectL / 2 + 20)
+                    .attr("x", 70 + 16 + 7 + expOffset_1)
+                    .attr("y", displayHeight - 40 + rectL / 2 + 2 + yOffset)
                     .text(roundToTwo(calculatedData[0]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5")
+                    .attr("text-anchor", "end")
+                    .attr("font-size", "11px")
+                    .attr("font-family", "monospace")
                     .attr("fill", Math.abs(calculatedData[0]) > 0.7 ? "white" : "black");
+                    
 
                 g5.append("rect")
-                    .attr("x", 100)
-                    .attr("y", displayHeight - 40 + 20)
+                    .attr("x", displayerWidth - 130 + 10 + expOffset_2)
+                    .attr("y", displayHeight - 40 + yOffset)
                     .attr("width", rectL)
                     .attr("height", rectL)
                     .style("stroke", "black")
@@ -4390,50 +4397,18 @@ export function nodeOutputVisualizer(
                     .attr("class", "math-displayer")
                     .lower();
                 g5.append("text")
-                    .attr("x", 100)
-                    .attr("y", displayHeight - 40 + rectL / 2 + 20)
+                    .attr("x", displayerWidth - 130 + 16 + 10 + 7 + expOffset_2)
+                    .attr("y", displayHeight - 40 + rectL / 2 + 2 + yOffset)
                     .text(roundToTwo(calculatedData[1]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5")
+                    .attr("text-anchor", "end")
+                    .attr("font-size", "11px")
+                    .attr("font-family", "monospace")
                     .attr("fill", Math.abs(calculatedData[1]) > 0.7 ? "white" : "black");
 
                 g5.append("rect")
-                    .attr("x", displayerWidth - 150)
-                    .attr("y", displayHeight - 40 + 20)
-                    .attr("width", rectL)
-                    .attr("height", rectL)
-                    .style("stroke", "black")
-                    .attr("fill", myColor(calculatedData[2]))
-                    .attr("class", "math-displayer")
-                    .lower();
-                g5.append("text")
-                    .attr("x", displayerWidth - 150)
-                    .attr("y", displayHeight - 40 + rectL / 2 + 20)
-                    .text(roundToTwo(calculatedData[2]))
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "5")
-                    .attr("fill", Math.abs(calculatedData[2]) > 0.7 ? "white" : "black");
-
-                g5.append("rect")
-                    .attr("x", displayerWidth - 100)
-                    .attr("y", displayHeight - 40 + 20)
-                    .attr("width", rectL)
-                    .attr("height", rectL)
-                    .style("stroke", "black")
-                    .attr("fill", myColor(calculatedData[3]))
-                    .attr("class", "math-displayer")
-                    .lower();
-                g5.append("text")
-                    .attr("x", displayerWidth - 100)
-                    .attr("y", displayHeight - 40 + rectL / 2 + 20)
-                    .text(roundToTwo(calculatedData[3]))
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "5")
-                    .attr("fill", Math.abs(calculatedData[3]) > 0.7 ? "white" : "black");
-
-                g5.append("rect")
-                    .attr("x", 100)
-                    .attr("y", 10 + 20)
+                    .attr("x", 105 + expOffset_3)
+                    .attr("y", 30 + yOffset - 5)
                     .attr("width", rectL)
                     .attr("height", rectL)
                     .style("stroke", "black")
@@ -4441,93 +4416,70 @@ export function nodeOutputVisualizer(
                     .attr("class", "math-displayer")
                     .lower();
                 g5.append("text")
-                    .attr("x", 100)
-                    .attr("y", 10 + rectL / 2 + 20)
+                    .attr("x", 105 + 16 + 7 + expOffset_3)
+                    .attr("y", 30 + rectL / 2 + 2 + yOffset - 5)
                     .text(roundToTwo(calculatedData[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5")
+                    .attr("text-anchor", "end")
+                    .attr("font-size", "10px")
+                    .attr("font-family", "monospace")
                     .attr("fill", Math.abs(calculatedData[i]) > 0.7 ? "white" : "black");
 
                 g5.append("text")
-                    .attr("x", 100 - 27)
-                    .attr("y", displayHeight - 30 + 20)
+                    .attr("x", displayerWidth / 2 - 55)
+                    .attr("y", displayHeight - 30 + 5 + yOffset)
                     .text("+")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "12");
+                    .attr("font-size", "17px")
+                    .attr("font-family", "monospace");
 
                 g5.append("text")
-                    .attr("x", displayerWidth - 25 - 105)
-                    .attr("y", displayHeight - 30 + 20)
-                    .text("+")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "12");
-
-                g5.append("text")
-                    .attr("x", displayerWidth - 25 - 152)
-                    .attr("y", displayHeight - 30 + 20)
-                    .text("+")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "12");
-
-                g5.append("text")
-                    .attr("x", 100 - 20)
-                    .attr("y", 20 + 20)
+                    .attr("x", 100 - 25 - 10 + expOffset_3)
+                    .attr("y", 40 + 5 + yOffset - 5)
                     .attr("xml:space", "preserve")
-                    .text("exp(          )")
+                    .text("exp(    )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "8");
+                    .attr("font-size", "17px")
+                    .attr("font-family", "monospace");
 
                 g5.append("text")
-                    .attr("x", 50 - 20)
-                    .attr("y", displayHeight - 30 + 20)
+                    .attr("x", 70 - 25 - 15 + expOffset_1)
+                    .attr("y", displayHeight - 30 + 5 + yOffset)
                     .attr("xml:space", "preserve")
-                    .text("exp(            )")
+                    .text("exp(    )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "8");
+                    .attr("font-size", "17px")
+                    .attr("font-family", "monospace");
 
                 g5.append("text")
-                    .attr("x", displayerWidth - 150 - 20)
-                    .attr("y", displayHeight - 30 + 20)
+                    .attr("x", displayerWidth - 130 - 25 - 15 + 10 + expOffset_2)
+                    .attr("y", displayHeight - 30 + 5 + yOffset)
                     .attr("xml:space", "preserve")
-                    .text("exp(          )")
+                    .text("exp(    )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "8");
-
-                g5.append("text")
-                    .attr("x", displayerWidth - 100 - 20)
-                    .attr("y", displayHeight - 30 + 20)
-                    .attr("xml:space", "preserve")
-                    .text("exp(          )")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "8");
-
-                g5.append("text")
-                    .attr("x", 100 - 20)
-                    .attr("y", displayHeight - 30 + 20)
-                    .attr("xml:space", "preserve")
-                    .text("exp(        )")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "8");
+                    .attr("font-size", "17px")
+                    .attr("font-family", "monospace");
 
                 g5.append("line")
                     .attr("x1", 20)
-                    .attr("y1", 30 + 20)
-                    .attr("x2", displayerWidth - 80)
-                    .attr("y2", 30 + 20)
+                    .attr("y1", 55 + yOffset)
+                    .attr("x2", displayerWidth - 80 + rightSideOffset)
+                    .attr("y2", 55 + yOffset)
                     .attr("stroke", "black")
                     .attr("class", "math-displayer")
-                    .attr("stroke-width", 1);
+                    .attr("stroke-width", 1.5);
 
                 g5.append("text")
-                    .attr("x", displayerWidth - 60)
-                    .attr("y", 35 + 20)
+                    .attr("x", displayerWidth - 70 + rightSideOffset)
+                    .attr("y", 60 + yOffset)
                     .text("=")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "15")
+                    .attr("font-size", "17")
+                    .attr("font-family", "monospace");
 
                 g5.append("rect")
-                    .attr("x", displayerWidth - 50)
-                    .attr("y", 25 + 20)
+                    .attr("x", displayerWidth - 50 + rightSideOffset)
+                    .attr("y", 45 + yOffset)
                     .attr("width", rectL)
                     .attr("height", rectL)
                     .style("stroke", "black")
@@ -4535,21 +4487,24 @@ export function nodeOutputVisualizer(
                     .attr("class", "math-displayer")
                     .lower();
                 g5.append("text")
-                    .attr("x", displayerWidth - 50)
-                    .attr("y", 25 + rectL / 2 + 20)
+                    .attr("x", displayerWidth - 50 + 16 + 7 + rightSideOffset)
+                    .attr("y", 45 + rectL / 2 + 2 + yOffset)
                     .text(roundToTwo(node.features[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5")
+                    .attr("text-anchor", "end")
+                    .attr("font-size", "11px")
+                    .attr("font-family", "monospace")
                     .attr("fill", Math.abs(node.features[i]) > 0.7 ? "white" : "black");
 
 
-
                 g5.append("text")
-                    .attr("x", 35)
-                    .attr("y", 10)
+                    .attr("x", 20)
+                    .attr("y", 20)
                     .text(`Softmax score for '${category}'`)
                     .attr("class", "math-displayer")
-                    .attr("font-size", "10")
+                    .attr("font-size", "18px")
+                    .attr("font-family", "monospace")
+                    .attr("font-weight", "bold")
 
 
             })
