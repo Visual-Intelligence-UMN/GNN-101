@@ -3989,7 +3989,7 @@ export function nodeOutputVisualizer(
         RectL = 5
 
     }
-    let DisplayerWidth = 300; // Width of the graph-displayer
+    let DisplayerWidth = 550; // Width of the graph-displayer
     let DisplayHeight = 100;
 
     const graphDisplayer = g5
@@ -4000,7 +4000,7 @@ export function nodeOutputVisualizer(
         .attr("height", DisplayHeight)
         .attr("rx", 10)
         .attr("ry", 10)
-        .style("fill", "transparent")
+        .style("fill", "white")
         .style("stroke", "black")
         .style("stroke-width", 2)
         .attr("class", "graph-displayer to-be-removed")
@@ -4336,7 +4336,7 @@ export function nodeOutputVisualizer(
 
 
     let rectL = 28;
-    let displayerWidth = 350; // Width of the graph-displayer
+    let displayerWidth = 550; // Width of the graph-displayer
     let displayHeight = 100;
     let yOffset = 5;
 
@@ -4369,7 +4369,7 @@ export function nodeOutputVisualizer(
                         category = "Class D"
                         break;
                 }
-                d3.selectAll(".graph-displayer").attr("opacity", 1);
+                d3.selectAll(".graph-displayer").attr("opacity", 1).attr("background", "white");
                 d3.selectAll(`.softmax${i}`).attr("opacity", 1);
                 g5.append("rect")
                     .attr("x", 70 + expOffset_1 + rectOffset)
