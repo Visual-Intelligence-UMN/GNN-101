@@ -14,6 +14,7 @@ import { deprecate } from "util";
 import { injectSVG } from "./svgUtils";
 import { sigmoid } from "./linkPredictionUtils";
 import { matrixMultiplicationResults } from './matEventsUtils';
+import { re } from "mathjs";
 //draw cross connections between feature visualizers for computational graph
 export function drawCrossConnectionForSubgraph(
     graph: any,
@@ -475,19 +476,7 @@ export function drawSingleGCNConvFeature(
                 const rectW = 400;            
                 const rectH = 120;
                 const rectL = 40;
-                mx = mx - rectW / 2;
-                my = my - rectH - padding;
-
-                tooltip.append("rect")
-                    .attr("x", mx)
-                    .attr("y", my)
-                    .attr("width", rectW)  
-                    .attr("height", rectH) 
-                    .attr("rx", 5)
-                    .attr("ry", 5)
-                    .style("fill", "white")
-                    .style("stroke", "black");
-                    
+                  
                 const dummy = matrixMultiplicationResults.dummy[i];
                 const bias = matrixMultiplicationResults.bias[i];
                 // console.log("dummy is" + dummy)
@@ -496,10 +485,48 @@ export function drawSingleGCNConvFeature(
                 let matmulStr = dummy && featureIndex < dummy.length ? dummy[featureIndex].toFixed(2) : "--";
                 let biasStr = bias && featureIndex < bias.length ? bias[featureIndex].toFixed(2) : "--";
                 let d = cellValue;
+
                 
                 d3.select(this)
                     .attr("stroke", "black")
                     .attr("stroke-width", 2);
+
+                if (matmulStr == "--" || biasStr == "--") {
+                    mx += -40;
+                    my += -40;
+
+                    tooltip.append("rect")
+                    .attr("x", mx)
+                    .attr("y", my)
+                    .attr("width", 150)
+                    .attr("height", 35)
+                    .attr("rx", 5)
+                    .attr("ry", 5)
+                    .style("fill", "white")
+                    .style("stroke", "black");
+
+                    tooltip.append("text")
+                    .attr("x", mx + 20)
+                    .attr("y", my + 20)
+                    .attr("font-size", `17px`)
+                    .attr("font-family", "monospace")
+                    .text("Value = " + roundToTwo(d))
+
+                    return;
+                }
+                
+                mx = mx - rectW / 2;
+                my = my - rectH - padding;
+
+                tooltip.append("rect")
+                .attr("x", mx)
+                .attr("y", my)
+                .attr("width", rectW)  
+                .attr("height", rectH) 
+                .attr("rx", 5)
+                .attr("ry", 5)
+                .style("fill", "white")
+                .style("stroke", "black");
 
                 // Relu text
                 tooltip.append("text")
