@@ -1099,14 +1099,16 @@ export function outputVisualizer(
     }, 2000);
 
 
-    let rectL = 25;
+    let rectL = 28;
     let displayerWidth = 350; // Width of the graph-displayer
     let displayHeight = 100;
     let yOffset = -10;
 
+    // x coordinates offsets
     let expOffset_1 = 0; // bottom left
     let expOffset_2 = -20; // bottom right
     let expOffset_3 = 35; // top middle
+    let rectOffset = -3; // rect offset
 
 
     for (let i = 0; i < node.features.length; i++) {
@@ -1122,7 +1124,7 @@ export function outputVisualizer(
                 d3.selectAll(".graph-displayer").attr("opacity", 1);
                 d3.selectAll(`.softmax${i}`).attr("opacity", 1);
                 g5.append("rect")
-                    .attr("x", 70 + expOffset_1)
+                    .attr("x", 70 + expOffset_1 + rectOffset)
                     .attr("y", displayHeight - 40 + yOffset)
                     .attr("width", rectL)
                     .attr("height", rectL)
@@ -1142,7 +1144,7 @@ export function outputVisualizer(
                     
 
                 g5.append("rect")
-                    .attr("x", displayerWidth - 130 + 10 + expOffset_2)
+                    .attr("x", displayerWidth - 130 + 10 + expOffset_2 + rectOffset)
                     .attr("y", displayHeight - 40 + yOffset)
                     .attr("width", rectL)
                     .attr("height", rectL)
@@ -1161,7 +1163,7 @@ export function outputVisualizer(
                     .attr("fill", Math.abs(calculatedData[1]) > 0.7 ? "white" : "black");
 
                 g5.append("rect")
-                    .attr("x", 105 + expOffset_3)
+                    .attr("x", 105 + expOffset_3 + rectOffset)
                     .attr("y", 30 + yOffset - 5)
                     .attr("width", rectL)
                     .attr("height", rectL)
@@ -1232,7 +1234,7 @@ export function outputVisualizer(
                     .attr("font-family", "monospace");
 
                 g5.append("rect")
-                    .attr("x", displayerWidth - 50)
+                    .attr("x", displayerWidth - 50 + rectOffset) 
                     .attr("y", 45 + yOffset)
                     .attr("width", rectL)
                     .attr("height", rectL)
@@ -4333,15 +4335,17 @@ export function nodeOutputVisualizer(
 
 
 
-    let rectL = 25;
+    let rectL = 28;
     let displayerWidth = 350; // Width of the graph-displayer
     let displayHeight = 100;
     let yOffset = 5;
 
+    // x coordinates offsets
     let expOffset_1 = 0; // bottom left
     let expOffset_2 = -50; // bottom right
     let expOffset_3 = 20; // top middle
     let rightSideOffset = -50; // right side of the graph displayer
+    let rectOffset = -3; // offset for the rects
 
 
 
@@ -4368,7 +4372,7 @@ export function nodeOutputVisualizer(
                 d3.selectAll(".graph-displayer").attr("opacity", 1);
                 d3.selectAll(`.softmax${i}`).attr("opacity", 1);
                 g5.append("rect")
-                    .attr("x", 70 + expOffset_1)
+                    .attr("x", 70 + expOffset_1 + rectOffset)
                     .attr("y", displayHeight - 40 + yOffset)
                     .attr("width", rectL)
                     .attr("height", rectL)
@@ -4388,7 +4392,7 @@ export function nodeOutputVisualizer(
                     
 
                 g5.append("rect")
-                    .attr("x", displayerWidth - 130 + 10 + expOffset_2)
+                    .attr("x", displayerWidth - 130 + 10 + expOffset_2 + rectOffset)
                     .attr("y", displayHeight - 40 + yOffset)
                     .attr("width", rectL)
                     .attr("height", rectL)
@@ -4407,7 +4411,7 @@ export function nodeOutputVisualizer(
                     .attr("fill", Math.abs(calculatedData[1]) > 0.7 ? "white" : "black");
 
                 g5.append("rect")
-                    .attr("x", 105 + expOffset_3)
+                    .attr("x", 105 + expOffset_3 + rectOffset)
                     .attr("y", 30 + yOffset - 5)
                     .attr("width", rectL)
                     .attr("height", rectL)
@@ -4421,7 +4425,7 @@ export function nodeOutputVisualizer(
                     .text(roundToTwo(calculatedData[i]))
                     .attr("class", "math-displayer")
                     .attr("text-anchor", "end")
-                    .attr("font-size", "10px")
+                    .attr("font-size", "11px")
                     .attr("font-family", "monospace")
                     .attr("fill", Math.abs(calculatedData[i]) > 0.7 ? "white" : "black");
 
@@ -4478,7 +4482,7 @@ export function nodeOutputVisualizer(
                     .attr("font-family", "monospace");
 
                 g5.append("rect")
-                    .attr("x", displayerWidth - 50 + rightSideOffset)
+                    .attr("x", displayerWidth - 50 + rightSideOffset + rectOffset)
                     .attr("y", 45 + yOffset)
                     .attr("width", rectL)
                     .attr("height", rectL)
