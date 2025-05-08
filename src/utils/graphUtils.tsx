@@ -4330,197 +4330,159 @@ export function nodeOutputVisualizer(
     }, 2000);
 
 
+    /* ─────────────────────────  fixed constants  ───────────────────────── */
+    const rectL          = 28;
+    const displayerWidth = 550;
+    const displayHeight  = 100;
+    const yOffset        = 5;
 
+    /* ─────────────────────── helper: draw one exp-block ─────────────────── */
+    function drawExpBlock(
+    g: d3.Selection<SVGGElement, unknown, HTMLElement, any>,
+    baseX: number,        // anchor x (rough centre of the block)
+    baseY: number,        // baseline y for the “exp(    )”
+    value: number,        // value displayed inside the square
+    offsetX: number,      // extra horizontal offset for fine-tuning
+    rectAdj: number,      // extra tweak for the coloured square
+    colour: string
+    ) {
+    // “exp(    )” with spaces left for the rect
+    g.append("text")
+        .attr("x", baseX + offsetX - 40)
+        .attr("y", baseY - 15)
+        .text("exp(    )")
+        .attr("xml:space", "preserve")
+        .attr("class", "math-displayer")
+        .attr("font-size", "17px")
+        .attr("font-family", "monospace");
 
+    // coloured square
+    g.append("rect")
+        .attr("x", baseX + offsetX + rectAdj)
+        .attr("y", baseY - 40 + yOffset)
+        .attr("width", rectL)
+        .attr("height", rectL)
+        .attr("stroke", "black")
+        .attr("fill", colour)
+        .attr("class", "math-displayer");
 
+    // number inside
+    g.append("text")
+        .attr("x", baseX + offsetX + 16 + 7)
+        .attr("y", baseY - 40 + rectL / 2 + 2 + yOffset)
+        .text(value.toFixed(2))
+        .attr("class", "math-displayer")
+        .attr("text-anchor", "end")
+        .attr("font-size", "11px")
+        .attr("font-family", "monospace")
+        .attr("fill", Math.abs(value) > 0.7 ? "white" : "black");
+    }
 
-
-    let rectL = 28;
-    let displayerWidth = 550; // Width of the graph-displayer
-    let displayHeight = 100;
-    let yOffset = 5;
-
-    // x coordinates offsets
-    let expOffset_1 = 0; // bottom left
-    let expOffset_2 = -50; // bottom right
-    let expOffset_3 = 20; // top middle
-    let rightSideOffset = -50; // right side of the graph displayer
-    let rectOffset = -3; // offset for the rects
-
-
-
+/* ───────────────────── main drawing on mouse-over ───────────────────── */
     for (let i = 0; i < node.features.length; i++) {
-        d3.selectAll(`#output-layer-rect-${i}`)
-            .on("mouseover", function () {
+    d3.selectAll(`#output-layer-rect-${i}`).on("mouseover", function () {
+        if (!state.isClicked) return;
 
-                if (!state.isClicked) {
-                    return;
-                }
-                
-                let category = "Class A";
-                switch(i) {
-                    case 1: 
-                        category = "Class B";
-                        break;
-                    case 2: 
-                        category = "Class C"
-                        break;
-                    case 3:
-                        category = "Class D"
-                        break;
-                }
-                d3.selectAll(".graph-displayer").attr("opacity", 1).attr("background", "white");
-                d3.selectAll(`.softmax${i}`).attr("opacity", 1);
-                g5.append("rect")
-                    .attr("x", 70 + expOffset_1 + rectOffset)
-                    .attr("y", displayHeight - 40 + yOffset)
-                    .attr("width", rectL)
-                    .attr("height", rectL)
-                    .style("stroke", "black")
-                    .attr("fill", myColor(calculatedData[0]))
-                    .attr("class", "math-displayer")
-                    .lower();
-                g5.append("text")
-                    .attr("x", 70 + 16 + 7 + expOffset_1)
-                    .attr("y", displayHeight - 40 + rectL / 2 + 2 + yOffset)
-                    .text(roundToTwo(calculatedData[0]))
-                    .attr("class", "math-displayer")
-                    .attr("text-anchor", "end")
-                    .attr("font-size", "11px")
-                    .attr("font-family", "monospace")
-                    .attr("fill", Math.abs(calculatedData[0]) > 0.7 ? "white" : "black");
-                    
+        const category = ["Class A", "Class B", "Class C", "Class D"][i] ?? "Class";
 
-                g5.append("rect")
-                    .attr("x", displayerWidth - 130 + 10 + expOffset_2 + rectOffset)
-                    .attr("y", displayHeight - 40 + yOffset)
-                    .attr("width", rectL)
-                    .attr("height", rectL)
-                    .style("stroke", "black")
-                    .attr("fill", myColor(calculatedData[1]))
-                    .attr("class", "math-displayer")
-                    .lower();
-                g5.append("text")
-                    .attr("x", displayerWidth - 130 + 16 + 10 + 7 + expOffset_2)
-                    .attr("y", displayHeight - 40 + rectL / 2 + 2 + yOffset)
-                    .text(roundToTwo(calculatedData[1]))
-                    .attr("class", "math-displayer")
-                    .attr("text-anchor", "end")
-                    .attr("font-size", "11px")
-                    .attr("font-family", "monospace")
-                    .attr("fill", Math.abs(calculatedData[1]) > 0.7 ? "white" : "black");
+        // clear previous maths & show current layer
+        d3.selectAll(".graph-displayer").attr("opacity", 1).attr("background", "white");
+        d3.selectAll(`.softmax${i}`).attr("opacity", 1);
 
-                g5.append("rect")
-                    .attr("x", 105 + expOffset_3 + rectOffset)
-                    .attr("y", 30 + yOffset - 5)
-                    .attr("width", rectL)
-                    .attr("height", rectL)
-                    .style("stroke", "black")
-                    .attr("fill", myColor(calculatedData[i]))
-                    .attr("class", "math-displayer")
-                    .lower();
-                g5.append("text")
-                    .attr("x", 105 + 16 + 7 + expOffset_3)
-                    .attr("y", 30 + rectL / 2 + 2 + yOffset - 5)
-                    .text(roundToTwo(calculatedData[i]))
-                    .attr("class", "math-displayer")
-                    .attr("text-anchor", "end")
-                    .attr("font-size", "11px")
-                    .attr("font-family", "monospace")
-                    .attr("fill", Math.abs(calculatedData[i]) > 0.7 ? "white" : "black");
-
-                g5.append("text")
-                    .attr("x", displayerWidth / 2 - 55)
-                    .attr("y", displayHeight - 30 + 5 + yOffset)
-                    .text("+")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "17px")
-                    .attr("font-family", "monospace");
-
-                g5.append("text")
-                    .attr("x", 100 - 25 - 10 + expOffset_3)
-                    .attr("y", 40 + 5 + yOffset - 5)
-                    .attr("xml:space", "preserve")
-                    .text("exp(    )")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "17px")
-                    .attr("font-family", "monospace");
-
-                g5.append("text")
-                    .attr("x", 70 - 25 - 15 + expOffset_1)
-                    .attr("y", displayHeight - 30 + 5 + yOffset)
-                    .attr("xml:space", "preserve")
-                    .text("exp(    )")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "17px")
-                    .attr("font-family", "monospace");
-
-                g5.append("text")
-                    .attr("x", displayerWidth - 130 - 25 - 15 + 10 + expOffset_2)
-                    .attr("y", displayHeight - 30 + 5 + yOffset)
-                    .attr("xml:space", "preserve")
-                    .text("exp(    )")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "17px")
-                    .attr("font-family", "monospace");
-
-                g5.append("line")
-                    .attr("x1", 20)
-                    .attr("y1", 55 + yOffset)
-                    .attr("x2", displayerWidth - 80 + rightSideOffset)
-                    .attr("y2", 55 + yOffset)
-                    .attr("stroke", "black")
-                    .attr("class", "math-displayer")
-                    .attr("stroke-width", 1.5);
-
-                g5.append("text")
-                    .attr("x", displayerWidth - 70 + rightSideOffset)
-                    .attr("y", 60 + yOffset)
-                    .text("=")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "17")
-                    .attr("font-family", "monospace");
-
-                g5.append("rect")
-                    .attr("x", displayerWidth - 50 + rightSideOffset + rectOffset)
-                    .attr("y", 45 + yOffset)
-                    .attr("width", rectL)
-                    .attr("height", rectL)
-                    .style("stroke", "black")
-                    .attr("fill", myColor(node.features[i]))
-                    .attr("class", "math-displayer")
-                    .lower();
-                g5.append("text")
-                    .attr("x", displayerWidth - 50 + 16 + 7 + rightSideOffset)
-                    .attr("y", 45 + rectL / 2 + 2 + yOffset)
-                    .text(roundToTwo(node.features[i]))
-                    .attr("class", "math-displayer")
-                    .attr("text-anchor", "end")
-                    .attr("font-size", "11px")
-                    .attr("font-family", "monospace")
-                    .attr("fill", Math.abs(node.features[i]) > 0.7 ? "white" : "black");
+        /* ─── numerator (single exp-block) ─── */
+        drawExpBlock(
+        g5,
+        200,                       // base x
+        60 + yOffset,              // baseline y
+        calculatedData[i],
+        20,                        // numerOffset
+        -3,                        // rect adjustment
+        myColor(calculatedData[i])
+        );
 
 
-                g5.append("text")
-                    .attr("x", 20)
-                    .attr("y", 20)
-                    .text(`Softmax score for '${category}'`)
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "18px")
-                    .attr("font-family", "monospace")
-                    .attr("font-weight", "bold")
+        /* ─── denominator (four exp-blocks) ─── */
+        const baseY = displayHeight - 10 + yOffset + 5;   // shared baseline
+
+        drawExpBlock(g5,  70, baseY, calculatedData[0],   0, -3, myColor(calculatedData[0]));
+        g5.append("text").attr("x", 110).attr("y", displayHeight - 20 + yOffset).text("+")
+        .attr("class", "math-displayer").attr("font-size", "17px")
+        .attr("font-family", "monospace");
+
+        drawExpBlock(g5, 170, baseY, calculatedData[1],   0, -3, myColor(calculatedData[1]));
+        g5.append("text").attr("x", 210).attr("y", displayHeight - 20 + yOffset).text("+")
+        .attr("class", "math-displayer").attr("font-size", "17px")
+        .attr("font-family", "monospace");
+
+        drawExpBlock(g5, 270, baseY, calculatedData[2],   0, -3, myColor(calculatedData[2]));
+        g5.append("text").attr("x", 310).attr("y", displayHeight - 20 + yOffset).text("+")
+        .attr("class", "math-displayer").attr("font-size", "17px")
+        .attr("font-family", "monospace");
+
+        drawExpBlock(g5, 370, baseY, calculatedData[3],   0, -3, myColor(calculatedData[3]));
+
+        /* fraction line */
+        g5.append("line")
+        .attr("x1", 20)
+        .attr("y1", 55 + yOffset)
+        .attr("x2", displayerWidth - 130)  // 550 - 130 = 420
+        .attr("y2", 55 + yOffset)
+        .attr("stroke", "black")
+        .attr("class", "math-displayer")
+        .attr("stroke-width", 1.5);
+
+        /* equals sign and result */
+        g5.append("text")
+        .attr("x", displayerWidth - 120)   // 550 - 120 = 430
+        .attr("y", 60 + yOffset)
+        .text("=")
+        .attr("class", "math-displayer")
+        .attr("font-size", "17px")
+        .attr("font-family", "monospace");
+
+        // result square
+        g5.append("rect")
+        .attr("x", displayerWidth - 100)   // 550 - 100 = 450
+        .attr("y", 45 + yOffset)
+        .attr("width", rectL)
+        .attr("height", rectL)
+        .attr("stroke", "black")
+        .attr("fill", myColor(node.features[i]))
+        .attr("class", "math-displayer");
+
+        // result number
+        g5.append("text")
+        .attr("x", displayerWidth - 77)    // 450 + 16 + 7
+        .attr("y", 45 + rectL / 2 + 2 + yOffset)
+        .text(node.features[i].toFixed(2))
+        .attr("class", "math-displayer")
+        .attr("text-anchor", "end")
+        .attr("font-size", "11px")
+        .attr("font-family", "monospace")
+        .attr("fill", Math.abs(node.features[i]) > 0.7 ? "white" : "black");
+
+        /* title */
+        g5.append("text")
+        .attr("x", displayerWidth / 2)
+        .attr("y", 20)
+        .text(`Softmax score for '${category}'`)
+        .attr("class", "math-displayer")
+        .attr("text-anchor", "middle")
+        .attr("font-size", "18px")
+        .attr("font-family", "monospace")
+        .attr("font-weight", "bold");
+        })
 
 
-            })
-            .on("mouseout", function () {
-                if (!state.isClicked) {
-                    return;
-                }
-                d3.selectAll(".math-displayer").remove();
-                d3.selectAll(".graph-displayer").attr("opacity", 0);
-                d3.selectAll(".softmax").attr("opacity", 0.07);
-                d3.selectAll(`.softmax${i}`).attr("opacity", 0.07);
-            });
+        .on("mouseout", function () {
+            if (!state.isClicked) {
+                return;
+            }
+            d3.selectAll(".math-displayer").remove();
+            d3.selectAll(".graph-displayer").attr("opacity", 0);
+            d3.selectAll(".softmax").attr("opacity", 0.07);
+            d3.selectAll(`.softmax${i}`).attr("opacity", 0.07);
+        });
     }
 
 
