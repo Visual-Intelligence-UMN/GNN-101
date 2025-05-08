@@ -3989,7 +3989,7 @@ export function nodeOutputVisualizer(
         RectL = 5
 
     }
-    let DisplayerWidth = 550; // Width of the graph-displayer
+    let DisplayerWidth = 300; // Width of the graph-displayer
     let DisplayHeight = 100;
 
     const graphDisplayer = g5
@@ -4386,7 +4386,11 @@ export function nodeOutputVisualizer(
         const category = ["Class A", "Class B", "Class C", "Class D"][i] ?? "Class";
 
         // clear previous maths & show current layer
-        d3.selectAll(".graph-displayer").attr("opacity", 1).attr("background", "white");
+        d3.selectAll(".graph-displayer")
+        .style("transition", "none")
+        .style("animation",  "none")      
+        .attr("opacity", 1).attr("background", "white")
+        .attr("width", displayerWidth).attr("height", displayHeight);
         d3.selectAll(`.softmax${i}`).attr("opacity", 1);
 
         /* ─── numerator (single exp-block) ─── */
@@ -4479,7 +4483,7 @@ export function nodeOutputVisualizer(
                 return;
             }
             d3.selectAll(".math-displayer").remove();
-            d3.selectAll(".graph-displayer").attr("opacity", 0);
+            d3.selectAll(".graph-displayer").attr("opacity", 0).attr("width", 300).attr("height", 100);
             d3.selectAll(".softmax").attr("opacity", 0.07);
             d3.selectAll(`.softmax${i}`).attr("opacity", 0.07);
         });
