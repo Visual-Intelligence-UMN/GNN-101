@@ -305,8 +305,12 @@ export function linkPredFeatureVisualizer(
             //color schemes interaction logic
             hideAllLinks(allNodes);
 
-
+            for (let i = 0; i < nodes.length; i++) {
+              nodes[i].matmulResults = calculatedDataMap[i]; 
+              nodes[i].biases        = currentBias;
+            }
           
+            
             calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, allFeatureMap, svg, offset, height, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
           
 
