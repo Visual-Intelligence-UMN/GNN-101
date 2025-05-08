@@ -1690,6 +1690,7 @@ export function visualizeLinkClassifierFeatures(
                     .text(resultVal.toFixed(2))
                     .style("font-size", `${11 * SCALE}px`)
                     .attr("class", "math-displayer procVis")
+                    .attr("fill", resultVal > 0.5 ? "white" : "black")
                     .raise();
 
                     const h = (50 / 64) * SCALE;
