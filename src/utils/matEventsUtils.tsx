@@ -38,6 +38,11 @@ import path from "node:path/win32";
 import { computeAttentionCoefficient, meanAggregation, testCompute } from "./computationUtils";
 import { addExitBtn, buildDetailedViewArea } from "./graphUtils";
 
+
+export const matrixMultiplicationResults = {
+    dummy: {} as Record<number, number[]>,
+    bias: {} as Record<number, number[]>
+};
 //graph feature events interactions - mouseover
 export function oFeatureMouseOver(
     layerID: string,
@@ -521,6 +526,8 @@ export function featureVisClick(
     console.log("issue here", X,)
     const dummy: number[] = math.multiply(math.transpose(weights[layerID]), X);
     const Xt = math.transpose(weights[layerID]);
+    matrixMultiplicationResults.dummy[node] = dummy;
+   
 
     //drawMatrixValid(Xt, coordFeatureVis[0], coordFeatureVis[1]-75, 10, 10)
 
@@ -561,6 +568,7 @@ export function featureVisClick(
     //draw paths from intermediate result -> final result
     const layerBias = bias[layerID];
     coordFeatureVis2[1] += curveDir * 50;
+    matrixMultiplicationResults.bias[node] = layerBias;
 
     let coordFeatureVis2Copy = deepClone(coordFeatureVis2);
 
@@ -765,7 +773,8 @@ export function featureVisClick(
             
             
             drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels)
-            drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels)
+            drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels, featureVisTable)
+
             if((featureVisTable.length==4&&layerID==2)||
                 (oFeatureChannels==128&&layerID==1)){
                 //if it's the last layer, don't show the relu icon
@@ -1191,7 +1200,7 @@ export function outputVisClick(
             const iconX = endPt4[0]+(30+125)/2 + 25;
             const iconY = endPt4[1];
 
-            drawFunctionIcon([iconX, iconY], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "eᶻⁱ / ∑ⱼ eᶻʲ", "Range: [0, 1]");
+            drawFunctionIcon([iconX, iconY], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "./assets/SVGs/softmax_formula.svg", "Range: [0, 1]");
             
 
 
@@ -1201,6 +1210,41 @@ export function outputVisClick(
         d3.select(".mats").style("pointer-events", "auto");
         d3.select(".switchBtn").style("pointer-events", "auto");
         d3.select(".switchBtn").style("opacity", 1);
+        d3.selectAll(".poolingRect")
+                .style("pointer-events", "auto")
+                .on("mouseover.tooltip", function(event) {
+                    const id = Number(d3.select(this).attr("id"));
+                    
+                    
+                    d3.selectAll(".pooling-tooltip").remove();
+                    //这里
+                    const container = d3.select(".mats");
+                    const [x, y] = d3.pointer(event, container.node());
+                    const tooltip = container
+                        .append("g")
+                        .attr("class", "pooling-tooltip procVis");
+                    
+                    tooltip.append("rect")
+                        .attr("x", x + 10)
+                        .attr("y", y - 40)
+                        .attr("width", 120)
+                        .attr("height", 30)
+                        .attr("rx", 5)
+                        .attr("ry", 5)
+                        .style("fill", "white")
+                        .style("stroke", "black");
+                    
+                    tooltip.append("text")
+                        .attr("x", x + 15)
+                        .attr("y", y - 20)
+                        .style("font-size", "14px")
+                        .style("font-family", "monospace")
+                        .text(`Value: ${poolingValues[id].toFixed(2)}`);
+                })
+                .on("mouseout.tooltip", function() {
+
+                    d3.selectAll(".pooling-tooltip").remove();
+                });
         }, delay:200}
     ]
 
@@ -1689,7 +1733,7 @@ export function featureGATClick(
         // {func: () => , delay: aniSec},
         {func: () => {
             drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels)
-            drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels)
+            drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels, featureVisTable)
             if((featureVisTable.length==4&&layerID==2)||
                 (oFeatureChannels==128&&layerID==1)){
                 //if it's the last layer, don't show the relu icon
@@ -2237,7 +2281,7 @@ export function featureSAGEClick(
         // {func: () => , delay: aniSec},
         {func: () => {
             drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels)
-            drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels)
+            drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels, featureVisTable)
             if((featureVisTable.length==4&&layerID==2)||
                 (oFeatureChannels==128&&layerID==1)){
                 //if it's the last layer, don't show the relu icon
