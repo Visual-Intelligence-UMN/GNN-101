@@ -1301,8 +1301,8 @@ export function drawWeightsVector(
                     .append("rect")
                     .attr("x", x + 10)
                     .attr("y", y - 40)
-                    .attr("width", 120)
-                    .attr("height", 30)
+                    .attr("width", 150)
+                    .attr("height", 35)
                     .attr("rx", 5)
                     .attr("ry", 5)
                     .style("fill", "white")
@@ -1312,8 +1312,8 @@ export function drawWeightsVector(
                     .append("text")
                     .attr("x", x + 20)
                     .attr("y", y - 20)
-                    .text(`Value: ${dummy[m].toFixed(2)}`)
-                    .style("font-size", "12px")
+                    .text(`Value = ${dummy[m].toFixed(2)}`)
+                    .style("font-size", "17px")
                     .style("font-family", "monospace");
             })
             .on("mouseout", function() {
@@ -1633,8 +1633,8 @@ export function drawWeightMatrix(
             tooltip.append("rect")
               .attr("x", pointer[0] + 20)
               .attr("y", pointer[1] - 20)
-              .attr("width", 130)
-              .attr("height", 30)
+              .attr("width", 150)
+              .attr("height", 35)
               .attr("rx", 5)
               .attr("ry", 5)
               .style("fill", "white")
@@ -1719,12 +1719,13 @@ export function drawWeightMatrix(
             .attr("stroke-width", 0.1)
             .attr("class", "procVis bias")
             .on("mouseover", function (this: SVGRectElement, event: MouseEvent) {
+                d3.select(this.parentElement).raise();
                 d3.select(this)
                   .attr("stroke", "black")
                   .attr("stroke-width", 2)
                   .raise();
-                const tooltipWidth = 130;
-                const tooltipHeight = 30;
+                const tooltipWidth = 150;
+                const tooltipHeight = 35;
                 const tooltipOffset = -45; 
                 const horizontalOffset = 80; 
                 
@@ -1934,8 +1935,8 @@ export function drawTanh(
             x,
             y,
             "Tanh Non-Linear Function",
-            "f(x) = (e^x - e^(-x)) / (e^x + e^(-x))",
-            "Range:  (-1 to 1)."
+            "./assets/SVGs/tanh_formula.svg",
+            "Range: (-1, 1)"
         );
     });
 

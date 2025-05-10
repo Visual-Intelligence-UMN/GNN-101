@@ -305,8 +305,12 @@ export function linkPredFeatureVisualizer(
             //color schemes interaction logic
             hideAllLinks(allNodes);
 
-
+            for (let i = 0; i < nodes.length; i++) {
+              nodes[i].matmulResults = calculatedDataMap[i]; 
+              nodes[i].biases        = currentBias;
+            }
           
+            
             calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, allFeatureMap, svg, offset, height, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
           
 
@@ -660,7 +664,8 @@ export function linkPredOutputVisualizer(
 
         graphVisDrawActivationExplanation(
             x, y, "Sigmoid",
-            "f(x) = 1/(1+e^(-x))", "Range: [0, 1]", svg
+            "./assets/SVGs/sigmoid_formula.svg",
+            "Range: [0, 1]", svg
         );
     }).on("mouseout", function() {
         d3.selectAll(".math-displayer").remove();
