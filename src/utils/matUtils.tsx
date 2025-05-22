@@ -900,7 +900,7 @@ export function visualizeNodeClassifierFeatures(
                     drawPathBtwOuputResult([endOutputCoord], startResultCoord); 
                     const iconX = (endOutputCoord[0] + startResultCoord[0]) / 2 + 75;
                     const iconY = endOutputCoord[1];
-                    drawFunctionIcon([iconX, iconY], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "eᶻⁱ / ∑ⱼ eᶻʲ", "Range: [0, 1]");
+                    drawFunctionIcon([iconX, iconY], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "./assets/SVGs/softmax_formula.svg", "Range: [0, 1]");
 
                 }, delay: aniSec },
                 {
@@ -1616,7 +1616,7 @@ export function visualizeLinkClassifierFeatures(
             const iconX = resultVisPos[0]+100;
             const iconY = resultVisPos[1]+5;
 
-            drawFunctionIcon([iconX, iconY], "./assets/SVGs/sigmoid.svg", "", "Sigmoid", "f(x) = 1/(1+e^(-x))", "Range: [0 to 1]");
+            drawFunctionIcon([iconX, iconY], "./assets/SVGs/sigmoid.svg", "", "Sigmoid", "./assets/SVGs/sigmoid_formula.svg", "Range: [0, 1]");
 
 
             g.append("text")
@@ -1628,193 +1628,107 @@ export function visualizeLinkClassifierFeatures(
                 .style("font-size", "12px");
 
             //for testing
-            d3.select(".mats").selectAll(".dotProduct").on("mouseover", function(event){
-                //add dot product explanation there
+
+            
+
+            d3.select(".mats")
+                .selectAll(".dotProduct")
+                .on("mouseover", function (event) {
+                    const SCALE = 1.5;
+
                     const [x, y] = d3.pointer(event);
-                    const displayW = 250;
-                    const displayH = 100;
-
-                    //find coordination for the math displayer first
-                    const displayX = x + 10;
-                    const displayY = y - 10;
-
-                    //add displayer
-                    d3.select(".mats")
-                        .append("rect")
-                        .attr("x", displayX)
-                        .attr("y", displayY)
-                        .attr("width", displayW)
-                        .attr("height", displayH)
-                        .attr("rx", 10)
-                        .attr("ry", 10)
-                        .style("fill", "white")
-                        .style("stroke", "black")
-                        .style("stroke-width", 2)
-                        .attr("class", "math-displayer procVis")
-                        .raise();
-
-                    console.log("in!!!!");
+                    const displayW = 250 * SCALE;
+                    const displayH = 100 * SCALE;
+                    const displayX = x + 10 * SCALE;
+                    const displayY = y - 10 * SCALE;
 
                     d3.select(".mats")
-                        .append("text")
-                        .attr("x", displayX + 75)
-                        .attr("y", displayY + 20)
-                        .text("Dot Product")
-                        .style("font-size", "16px")
-                        .attr("class", "math-displayer procVis")
-                        .raise();
-                    
-                    d3.select(".mats")
-                        .append("text")
-                        .attr("x", displayX + 15)
-                        .attr("y", displayY + 50)
-                        .attr("xml:space", "preserve")
-                        .text("dot(               ,              )   =   ")
-                        .attr("class", "math-displayer procVis")
-                    
-                    d3.select(".mats")
-                        .append("rect")
-                        .attr("x", displayX + 15 + 235 - 45)
-                        .attr("y", displayY + 37.5)
-                        .attr("width", 15)
-                        .attr("height", 15)
-                        .attr("fill", myColor(resultVal))
-                        .attr("class", "math-displayer procVis");
-                    
-                    const feature1Pos = [
-                        displayX + 60,
-                        displayY + 20
-                    ];
-
-                    const h = 50/64;
-
-                    for(let i=0; i<featureInvolvedCOmputingA.length; i++){
-                        d3.select(".mats")
-                            .append("rect")
-                            .attr("x", feature1Pos[0] + 7.5)
-                            .attr("y", feature1Pos[1] + i*h)
-                            .attr("width", 7.5)
-                            .attr("height", h)
-                            .attr("fill", myColor(featureInvolvedCOmputingA[i]))
-                            .attr("class", "math-displayer procVis")
-                            .raise();
-                    }
-
-                    const feature2Pos = [
-                        displayX + 125,
-                        displayY + 37.5
-                    ];
-
-                    for(let i=0; i<featureInvolvedCOmputingB.length; i++){
-                        d3.select(".mats")
-                            .append("rect")
-                            .attr("x", feature2Pos[0] + i*h)
-                            .attr("y", feature2Pos[1] + 7.5)
-                            .attr("width", h)
-                            .attr("height", 7.5)
-                            .attr("fill", myColor(featureInvolvedCOmputingB[i]))
-                            .attr("class", "math-displayer procVis")
-                            .raise();
-                    }
-
-            });
-
-            d3.select(".mats").selectAll(".dotProduct").on("mouseout", function(event){
-                d3.selectAll(".math-displayer").remove();
-            });
-
-            //add sigmoid explanation
-            d3.select(".sigmoid").on("mouseover", function(event){
-                const [x, y] = d3.pointer(event);
-                const displayW = 250;
-                const displayH = 100;
-
-                //find coordination for the math displayer first
-                const displayX = x + 10;
-                const displayY = y - 10;
-
-                //add displayer
-                d3.select(".mats")
                     .append("rect")
                     .attr("x", displayX)
                     .attr("y", displayY)
                     .attr("width", displayW)
                     .attr("height", displayH)
-                    .attr("rx", 10)
-                    .attr("ry", 10)
+                    .attr("rx", 10 * SCALE)
+                    .attr("ry", 10 * SCALE)
                     .style("fill", "white")
                     .style("stroke", "black")
-                    .style("stroke-width", 2)
+                    .style("stroke-width", 2 * SCALE)
                     .attr("class", "math-displayer procVis")
                     .raise();
 
-                console.log("in!!!!");
-
-                d3.select(".mats")
+                    d3.select(".mats")
                     .append("text")
-                    .attr("x", displayX + 75)
-                    .attr("y", displayY + 20)
-                    .text("Sigmoid")
-                    .style("font-size", "16px")
+                    .attr("x", displayX + 75 * SCALE)
+                    .attr("y", displayY + 20 * SCALE)
+                    .text("Dot Product")
+                    .style("font-size", `${18 * SCALE}px`)
                     .attr("class", "math-displayer procVis")
                     .raise();
 
-
-                d3.select(".mats")
+                    d3.select(".mats")
                     .append("text")
-                    .attr("x", displayX + 50)
-                    .attr("y", displayY + 40)
+                    .attr("x", displayX + 15 * SCALE)
+                    .attr("y", displayY + 60 * SCALE)
                     .attr("xml:space", "preserve")
-                    .text("1")
-                    .attr("class", "math-displayer procVis")
-
-                d3.select(".mats").append("line")
-                    .attr("x1", displayX + 5)
-                    .attr("y1", displayY + 50)
-                    .attr("x2", displayX + 105)
-                    .attr("y2", displayY + 50)
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 1)
+                    .text("dot(            ,                )   =   ")
+                    .style("font-size", `${16 * SCALE}px`)
                     .attr("class", "math-displayer procVis");
 
-                d3.select(".mats")
-                    .append("text")
-                    .attr("x", displayX + 110)
-                    .attr("y", displayY + 50)
-                    .attr("xml:space", "preserve")
-                    .text("=")
-                    .attr("class", "math-displayer procVis")
-                
-                d3.select(".mats")
+                    d3.select(".mats")
                     .append("rect")
-                    .attr("x", displayX + 125)
-                    .attr("y", displayY + 35)
-                    .attr("width", 15)
-                    .attr("height", 15)
-                    .attr("fill", myColor(sigmoid(resultVal)))
-                    .attr("class", "math-displayer procVis");
-                
-                d3.select(".mats")
-                    .append("text")
-                    .attr("x", displayX + 5)
-                    .attr("y", displayY + 75)
-                    .attr("xml:space", "preserve")
-                    .text("1 + expr( -       )")
-                    .attr("class", "math-displayer procVis")
-
-                d3.select(".mats")
-                    .append("rect")
-                    .attr("x", displayX + 90)
-                    .attr("y", displayY + 65)
-                    .attr("width", 15)
-                    .attr("height", 15)
+                    .attr("x", displayX + (15 + 235 - 45) * SCALE)
+                    .attr("y", displayY + 37.5 * SCALE)
+                    .attr("width", 28 * SCALE)
+                    .attr("height", 28 * SCALE)
                     .attr("fill", myColor(resultVal))
                     .attr("class", "math-displayer procVis")
+
+                    d3.select(".mats")
+                    .append("text")
+                    .attr("x", displayX + (15 + 235 - 45) * SCALE + 5.5 * SCALE)
+                    .attr("y", displayY + 37.5 * SCALE + 20 * SCALE)
+                    .text(resultVal.toFixed(2))
+                    .style("font-size", `${11 * SCALE}px`)
+                    .attr("class", "math-displayer procVis")
+                    .attr("fill", resultVal > 0.5 ? "white" : "black")
+                    .raise();
+
+                    const h = (50 / 64) * SCALE;
+                    const feature1Pos = [displayX + 60 * SCALE, displayY + 30 * SCALE];
+
+                    for (let i = 0; i < featureInvolvedCOmputingA.length; i++) {
+                    d3.select(".mats")
+                        .append("rect")
+                        .attr("x", feature1Pos[0] + 7.5 * SCALE)
+                        .attr("y", feature1Pos[1] + i * h)
+                        .attr("width", 7.5 * SCALE)
+                        .attr("height", h)
+                        .attr("fill", myColor(featureInvolvedCOmputingA[i]))
+                        .attr("class", "math-displayer procVis")
+                        .raise();
+                    }
+
+                    const feature2Pos = [displayX + 115 * SCALE, displayY + 45 * SCALE];
+
+                    for (let i = 0; i < featureInvolvedCOmputingB.length; i++) {
+                    d3.select(".mats")
+                        .append("rect")
+                        .attr("x", feature2Pos[0] + i * h)
+                        .attr("y", feature2Pos[1] + 7.5 * SCALE)
+                        .attr("width", h)
+                        .attr("height", 7.5 * SCALE)
+                        .attr("fill", myColor(featureInvolvedCOmputingB[i]))
+                        .attr("class", "math-displayer procVis")
+                        .raise();
+                    }
+                });
+
+            d3.select(".mats")
+            .selectAll(".dotProduct")
+            .on("mouseout", function () {
+                d3.selectAll(".math-displayer").remove();
             });
 
-            d3.select(".sigmoid").on("mouseout", function(event){
-                d3.selectAll(".math-displayer").remove();
-            })
 
         }
     });
