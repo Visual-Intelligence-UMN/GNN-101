@@ -658,6 +658,7 @@ export function outputVisualizer(
             let matmulStr = matmulValue.toFixed(2);
             let biasStr = biasValue.toFixed(2);
 
+
                 // Relu text
                 tooltip.append("text")
                   .attr("x", mx + 20)
@@ -699,18 +700,18 @@ export function outputVisualizer(
                     .attr("width", rectL)
                     .attr("height", rectL)
                     .style("stroke", "black")
-                    .attr("fill", myColor(matmulStr))
+                    .attr("fill", myColor(matmulValue))
                     .attr("class", "math-displayer");
             
                 tooltip.append("text")
                     .attr("x", matmulX + rectL / 2)
                     .attr("y", matmulY + rectL / 2 + 2)
-                    .text(roundToTwo(matmulStr))
+                    .text(roundToTwo(matmulValue))
                     .attr("class", "math-displayer")
                     .attr("text-anchor", "middle")
                     .attr("font-size", "15px")
                     .attr("font-family", "monospace")
-                    .attr("fill", Math.abs(matmulStr) > 0.7 ? "white" : "black");
+                    .attr("fill", Math.abs(matmulValue) > 0.7 ? "white" : "black");
 
                 tooltip.append("text")
                     .attr("x", matmulX + rectL / 2)

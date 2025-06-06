@@ -1063,7 +1063,8 @@ export function visualizeNodeClassifierFeatures(
                             pathMap[i][rectID].style.opacity = "1";
                         }
                         //add math-displayer
-                        let displayerPos = [prevFeatureCoord[0] + 275, prevFeatureCoord[1] - curveDir * 100];
+              
+                        const displayerPos: [number, number] = [prevFeatureCoord[0] + 275, prevFeatureCoord[1] - curveDir * 100];
                         //     drawPoints(".mats", "red", [displayerPos]);
 
                         drawSoftmaxDisplayerNodeClassifier(displayerPos, titles, Number(rectID), nthOutputVals, nthResult, myColor);
