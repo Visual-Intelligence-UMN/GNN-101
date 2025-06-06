@@ -514,6 +514,9 @@ export function drawSingleGCNConvFeature(
 
                     return;
                 }
+                console.log("matmulStr is " + matmulStr);
+                let matmulValue = roundToTwo(parseFloat(matmulStr));
+                let biasValue = roundToTwo(parseFloat(biasStr));
                 
                 mx = mx - rectW / 2;
                 my = my - rectH - padding;
@@ -575,12 +578,12 @@ export function drawSingleGCNConvFeature(
                 tooltip.append("text")
                     .attr("x", matmulX + rectL / 2)
                     .attr("y", matmulY + rectL / 2 + 2)
-                    .text(roundToTwo(matmulStr))
+                    .text(roundToTwo(matmulValue))
                     .attr("class", "math-displayer")
                     .attr("text-anchor", "middle")
                     .attr("font-size", "15px")
                     .attr("font-family", "monospace")
-                    .attr("fill", Math.abs(matmulStr) > 0.7 ? "white" : "black");
+                    .attr("fill", Math.abs(matmulValue) > 0.7 ? "white" : "black");
 
                 tooltip.append("text")
                     .attr("x", matmulX + rectL / 2)
@@ -608,12 +611,12 @@ export function drawSingleGCNConvFeature(
                 tooltip.append("text")
                     .attr("x", biasX + rectL / 2)
                     .attr("y", biasY + rectL / 2 + 2)
-                    .text(roundToTwo(biasStr))
+                    .text(roundToTwo(biasValue))
                     .attr("class", "math-displayer")
                     .attr("text-anchor", "middle")
                     .attr("font-size", "15px")
                     .attr("font-family", "monospace")
-                    .attr("fill", Math.abs(biasStr) > 0.7 ? "white" : "black");
+                    .attr("fill", Math.abs(biasValue) > 0.7 ? "white" : "black");
                 
                 tooltip.append("text")
                 .attr("x", biasX + rectL / 2)

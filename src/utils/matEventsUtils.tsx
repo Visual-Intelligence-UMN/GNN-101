@@ -1292,7 +1292,12 @@ export function outputVisClick(
     .on("mouseover", function (event) {
         event.stopPropagation();
 
-        const id: number = Number(d3.select(this).attr("id"));
+        const rawId = d3.select(this).attr("id");
+        if (rawId !== "0" && rawId !== "1") {
+            throw new Error("Invalid result rect id: " + rawId);
+          }
+        const id: 0 | 1 = rawId === "0" ? 0 : 1;
+
         //here's the place to place the softmax displayer
         if(pathMap!=null)drawSoftmaxDisplayer(pathMap, endCoord, result, id, myColor);
     })
