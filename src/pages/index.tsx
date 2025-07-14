@@ -283,7 +283,7 @@ export default function Home() {
 
                                                 {graphEditorState && (
                                         <div>
-                                            <GraphEditor />
+                                            <GraphEditor onClose={() => setGraphEditorState(false)} />
                                         </div>
                                     )}
 
