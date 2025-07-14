@@ -107,7 +107,7 @@ export function visualizeGraphClassifierFeatures(
     const firstLayer = firstLayerPackage.firstLayer;
 
     //-----------------------------------GCNConv LAYERS-----------------------------------------------
-    const featureChannels = 64;
+    const featureChannels = 16;
 
     const GCNConvPackage = drawGCNConvGraphModel(
         conv1,

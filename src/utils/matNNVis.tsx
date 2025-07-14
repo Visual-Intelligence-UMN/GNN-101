@@ -75,9 +75,9 @@ async function initNodeClassifier(graph: any, features: any[][], intmData:any, g
         };
 
 
-        conv1 = splitIntoMatrices(intmData.conv1, 4);
-        conv2 = splitIntoMatrices(intmData.conv2, 4);
-        conv3 = splitIntoMatrices(intmData.conv3, 2);
+        conv1 = splitIntoMatrices(intmData.conv1, 16);
+        conv2 = splitIntoMatrices(intmData.conv2, 16);
+        conv3 = splitIntoMatrices(intmData.conv3, 16);
         result = intmData.result;
         final = splitIntoMatrices(intmData.final, 4);
     }
@@ -173,9 +173,9 @@ async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: str
         };
 
 
-        conv1 = splitIntoMatrices(intmData.conv1);
-        conv2 = splitIntoMatrices(intmData.conv2);
-        conv3 = splitIntoMatrices(intmData.conv3);
+        conv1 = splitIntoMatrices(intmData.conv1, 16);
+        conv2 = splitIntoMatrices(intmData.conv2, 16);
+        conv3 = splitIntoMatrices(intmData.conv3, 16);
         pooling = intmData.pooling;
         final = intmData.final;
     }
@@ -230,12 +230,15 @@ export async function visualizeGraphClassifier(setIsLoading:any, graph_path:stri
     try {
         setIsLoading(true);
         // Process data
+        console.log("matvis pipe 1", graph_path, intmData);
         const data = await load_json(graph_path);
+        console.log("matvis pipe 2", data);
         //node attributes extraction
         const nodeAttrs = getNodeAttributes(data);
         //accept the features from original json file
         const features = await get_features_origin(data);
         const processedData = await graph_to_matrix(data);
+        console.log("matvis pipe 3", features, nodeAttrs, processedData);
         // Initialize and run D3 visualization with processe  d data
         await initGraphClassifier(processedData, features, nodeAttrs, intmData, graph_path);
     } catch (error) {
@@ -356,8 +359,8 @@ async function initLinkClassifier(
         // };
 
         console.log("test len",intmData.prob_adj.length)
-        conv1 = splitIntoMatrices(intmData.conv1, 64);
-        conv2 = splitIntoMatrices(intmData.conv2, 64);
+        conv1 = splitIntoMatrices(intmData.conv1, 16);
+        conv2 = splitIntoMatrices(intmData.conv2, 16);
         prob_adj = splitIntoMatrices(intmData.prob_adj, Math.sqrt(intmData.prob_adj.length));
     }
 

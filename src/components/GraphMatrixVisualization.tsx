@@ -19,6 +19,7 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
   modelType 
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  console.log("GraphMatrixVisualization props:", { dataFile, hubNodeA, hubNodeB, modelType });
 
 
   const styles = `
@@ -120,8 +121,11 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
   useEffect(() => {
     const loadData = async () => {
       try {
+        console.log("Loading data from:", dataFile);
         const response = await fetch(dataFile);
+        console.log("Response status:", response);
         const data = await response.json();
+        console.log("Loaded data:", data);
         createVisualization(data);
       } catch (error) {
         console.error('Error loading data:', error);

@@ -45,7 +45,8 @@ export const linkList: { [k: string]: string } = {
 };
 
 export const modelList: { [k: string]: string } = {
-    "GCN - graph classification": "./gnn_model2.onnx",
+    // "GCN - graph classification": "./gnn_model2.onnx",
+    "GCN - graph classification": "./simulated_gcn_model.onnx",
     "GCN - node classification": "./gnn_node_model.onnx",
     "GCN - link prediction": "./gnn_link_model.onnx",
     "GAT - link prediction": "./gat_link_model.onnx",
@@ -68,13 +69,16 @@ export const modelTypeList: { [k: string]: string } = {
 
 const chemicalNames = ['C16NO2', 'C6FNO2', 'C7NO3']
 function graph_list_generate(namelist: string[]) {
-    let res: { [k: string]: string } = {};
+    let res: { [k: string]: string } = {"test":"./json_data/graphs/testing_graph.json"};
 
-    for (let i = 0; i < namelist.length; i++) {
-        res[`molecule_${chemicalNames[i]}`] = `./json_data/graphs/input_graph${i}.json`;
-    }
+    // for (let i = 0; i < namelist.length; i++) {
+    //     res[`molecule_${chemicalNames[i]}`] = `./json_data/graphs/input_graph${i}.json`;
+    // }
+
+    console.log("Generating graph list with chemical names:", res);
 
     return res;
+//    return {"test":"./json_data/graphs/testing_graph.json"};
 }
 export const graphList = graph_list_generate(chemicalNames)
 

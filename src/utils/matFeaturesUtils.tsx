@@ -408,11 +408,14 @@ export function drawSingleGCNConvFeature(
 
 
     //loop through each node
+    console.log("gcnFeature is ", gcnFeature);
     let nodeMat = gcnFeature[i];
 
     //where we met encounter issue
+    console.log("nodeMat is " + nodeMat);
     for (let m = 0; m < featureChannels; m++) {
         const cellValue = nodeMat[m];
+        console.log("cellValue is " + cellValue);
         const rect = g
             .append("rect")
             .attr("x", locations[i][0] + rectW * m)
@@ -769,6 +772,7 @@ export function drawGCNConvGraphModel(
     let paths: any;
     let resultVis = null;
     const gcnFeatures = [conv1, conv2, conv3];
+    console.log("all-gcnFeatures: ", gcnFeatures);
     //a table to save all rects in the last GCNConv layer
     let thirdGCN: any = Array.from({ length: featureChannels }, () => []);
 

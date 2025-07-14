@@ -429,12 +429,12 @@ export function loadWeights() {
     let weights: any = []; // DS to manage weights for each layer
     let bias: any = []; // DS to manage bias for each layer
 
-    const weightsJSON: any = require("../../public/weights.json");
+    const weightsJSON: any = require("../../public/simulated_gcn_model_weights.json");
 
     weights = [
-        weightsJSON["onnx::MatMul_311"],
-        weightsJSON["onnx::MatMul_314"],
-        weightsJSON["onnx::MatMul_317"],
+        weightsJSON["conv1.lin.weight"],
+        weightsJSON["conv2.lin.weight"],
+        weightsJSON["conv3.lin.weight"],
         weightsJSON["lin.weight"],
     ];
     bias = [

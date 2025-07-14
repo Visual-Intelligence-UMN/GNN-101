@@ -661,10 +661,12 @@ export function featureVisualizer(
             const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex);
 
             let featureMap: number[][] = []
+            console.log("nodesByIndex: ", nodesByIndex);
             nodesByIndex.forEach((nodes, index) => {
                 if (index === graphIndex - 1) {
                     nodes.forEach((n) => {
-                        featureMap.push(n.features)
+                        featureMap.push(n.features);
+                        console.log(`Prep-Feature-value-${index}: `, n.features);
                     })
                 }
             })
@@ -678,14 +680,18 @@ export function featureVisualizer(
                     let sum = 0;
                     let stepStr = "";
                     let isFirstTerm = true;
+
+                    console.log(`Calculating features for node ${i}, feature dimension ${d}`, normalizedAdjMatrix);
                     
                     for (let k = 0; k < featureMap.length; k++) {
                         // Only include terms for nodes that are connected (have non-zero weights)
+                        console.log(`Feature-value-${k}: `, featureMap[k])
                         if (normalizedAdjMatrix[i][k] !== 0) {
                             const fVal = featureMap[k][d];
                             const weightVal = normalizedAdjMatrix[i][k];
-                            
+                            console.log(`Feature-value-${i}-${k}: ${featureMap[k][d]}`)
                             sum += fVal * weightVal;
+                            console.log(`Node ${i}, Feature ${d}-${k}: ${fVal} * ${weightVal} = ${fVal * weightVal}`);
                             const term = `(${fVal.toFixed(3)} × ${weightVal.toFixed(3)})`;
                             
                             // Add newline and plus sign for all terms except the first
@@ -1522,6 +1528,7 @@ export function analyzeGraph(graphData: any) {
 
 export const graphPrediction = async (modelPath: string, graphPath: string) => {
 
+    console.log("graph pred pipe modelPath", modelPath, graphPath);
 
     const session = await loadModel(modelPath);
     const graphData: IGraphData = await load_json(graphPath);
@@ -1533,17 +1540,22 @@ export const graphPrediction = async (modelPath: string, graphPath: string) => {
         [graphData.x.length, graphData.x[0].length]
     );
 
+   console.log("graph pred pipe", graphData.edge_index.length, graphData.edge_index[0].length, session.inputNames);
+
     const edgeIndexTensor = new ort.Tensor(
-        "int32",
-        new Int32Array(graphData.edge_index.flat()),
+        "int64",
+        new BigInt64Array(graphData.edge_index.flat().map(BigInt)),
         [graphData.edge_index.length, graphData.edge_index[0].length]
     );
 
+    console.log("graph pred pipe edgeIndexTensor", edgeIndexTensor);
+
     const batchTensor = new ort.Tensor(
-        "int32",
-        new Int32Array(graphData.batch),
-        [graphData.batch.length]
-    );
+    "int64",
+    new BigInt64Array(graphData.batch.map(BigInt)),
+    [graphData.batch.length]
+);
+
 
     const outputMap = await session.run({
         x: xTensor,
@@ -1570,11 +1582,12 @@ export const graphPrediction = async (modelPath: string, graphPath: string) => {
 
 export const linkPrediction = async (modelPath: string, graphPath: string) => {
 
+    console.log("pred pipe modelPath", modelPath, graphPath);
 
     const session = await loadModel(modelPath);
     const graphData: IGraphData = await load_json(graphPath);
 
-
+    console.log("pred pipe graphData", graphData, session);
 
     // Convert `graphData` to tensor-like object expected by your ONNX model
     const xTensor = new ort.Tensor(
@@ -1592,6 +1605,9 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
     for (let i = 0; i < int32Array.length; i++) {
         bigInt64Array[i] = BigInt(int32Array[i]);
     }
+
+    console.log("pred pipe", graphData)
+
     let edgeIndexTensor = new ort.Tensor(
         "int64",
         bigInt64Array,
@@ -1600,6 +1616,8 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
             graphData.edge_index[0].length,
         ]
     );
+
+    console.log("edgeIndexTensor", edgeIndexTensor);
 
     const outputMap = await session.run({
         x: xTensor,
@@ -1762,6 +1780,7 @@ export function rotateMatrixCounterClockwise(matrix: number[][]): number[][] {
 
 export function loadNodesLocation(mode: number, path: string) {
 
+
     let data;
     if (mode === 0) {
         if (path === "0") data = require("../../public/json_data/node_location/nodes_data0.json");
@@ -1774,8 +1793,8 @@ export function loadNodesLocation(mode: number, path: string) {
         data = require("../../public/json_data/node_location/nodes_data_karate.json");
 
     }
-
-    return data;
+return require("../../public/json_data/node_location/nodes_data0.json");
+//    return data;
 }
 
 export function fetchSubGraphNodeLocation(index: number, innerComputationMode: string) {

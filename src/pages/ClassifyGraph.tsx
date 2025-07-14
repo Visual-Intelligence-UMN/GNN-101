@@ -47,11 +47,13 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
                 ({ prob, intmData } = await nodePrediction(modelPath, graphPath));
             } else if (modelPath == "./gnn_model2.onnx") {
                 ({ prob, intmData } = await graphPrediction(modelPath, graphPath));
-            } else {
+            } else if(modelPath == "./gnn_link_model.onnx") {
                 ({ prob, intmData } = await linkPrediction(
                     modelPath,
-                    "./json_data/links/twitch.json"
+                    "./json_data/links/twitch.json" // this is for twitch dataset originally
                 ));
+            } else {
+                ({ prob, intmData } = await graphPrediction(modelPath, graphPath));
             }
     
             setChangedG(false);

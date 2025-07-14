@@ -33,6 +33,7 @@ import {
 } from "../components/WebUtils";
 import { Footer, NavBar } from "../components/Surfaces";
 import { Inter } from "@next/font/google";
+import { GraphEditor } from "@/components/GraphEditor";
 
 export const inter = Inter({
     variable: "--font-inter",
@@ -63,7 +64,7 @@ export default function Home() {
     const [isLoading, setIsLoading] = useState(false);
     const [model, setModel] = useState("GCN - graph classification");
 
-    const initialMUTAGGraph = Object.keys(graphList)[2];
+    const initialMUTAGGraph = Object.keys(graphList)[0];
     const [selectedGraph, setSelectedGraph] = useState(initialMUTAGGraph);
     const introRef = useRef<Steps>(null);
     const [outputData, setOutputData] = useState(null);
@@ -74,6 +75,8 @@ export default function Home() {
     const [show, setShow] = useState(false);
     const [predicted, setPredicted] = useState(false);
     const [simulationLoading, setSimulation] = useState(false);
+
+    const [graphEditorState, setGraphEditorState] = useState(false);
 
     const [hubNodeA, setHubNodeA] = useState(241);
     const [hubNodeB, setHubNodeB] = useState(109);
@@ -102,6 +105,16 @@ export default function Home() {
         setProbabilities([]);
         setPredicted(false);
         setSimulation(false);
+    }
+
+    function handleGraphEditor(e: React.ChangeEvent<HTMLButtonElement>): void {
+        console.log("Graph editor button clicked");
+        if (graphEditorState) {
+            setGraphEditorState(false);
+        } else {
+            setGraphEditorState(true);
+        }
+
     }
 
     const startIntro = () => {
@@ -187,6 +200,7 @@ export default function Home() {
                                                 selectedOption={model}
                                                 handleChange={(e) => {
                                                     const newModel = e.target.value;
+                                                    console.log("Selected model:", newModel);
                                                     setModel(newModel);
                                                     setPredicted(false);
                                                     setSimulation(false);
@@ -257,8 +271,21 @@ export default function Home() {
                                                             OptionList={Object.keys(graphList)}
                                                             id="dataset-selector"
                                                         />
+                                                        <button 
+                                                            key={'graph-editor'}
+                                                            onClick={handleGraphEditor}
+                                                            className="ml-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                                                            >
+                                                                Open the Graph
+                                                            </button>
                                                     </>
                                                 )}
+
+                                                {/* {graphEditorState && (
+                                        <div>
+                                            <GraphEditor />
+                                        </div>
+                                    )} */}
 
                                                 {model.includes("node classification") && (
                                                     <span>
@@ -312,6 +339,8 @@ export default function Home() {
                                         </div>
                                     )}
 
+                                    
+
                                     {/* 在未预测时显示 Graph View 和 Matrix View */}
                                     {!predicted && (
                                         <div>
@@ -338,7 +367,7 @@ export default function Home() {
                                                                 ? nodeList[selectedGraph]
                                                                 : model.includes("link prediction")
                                                                 ? linkList[selectedGraph]
-                                                                : ""
+                                                                : "test-test"
                                                         }
                                                         hubNodeA={model.includes('link prediction') ? hubNodeA : undefined}
                                                         hubNodeB={model.includes('link prediction') ? hubNodeB : undefined}

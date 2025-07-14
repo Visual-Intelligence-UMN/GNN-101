@@ -50,6 +50,8 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
     const currentVisualizationId = useRef(0);
     const parse = typeof graph_path === 'string' ? graph_path.match(/(\d+)\.json$/) : null;
     const select = parse ? parse[1] : '';
+
+    console.log("vis selector", select)
     const location = loadNodesLocation(0, select);
 
 
@@ -91,6 +93,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             if (graph_path === "./json_data/graphs/input_graph0.json") {
                 injectSVG(gLabel, location[3].x - 1650 - 64 + offset, location[3].y - 120 - 64, "./assets/SVGs/interactionHint.svg", "hintLabel");
             } else {
+                console.log("location", location)
                 injectSVG(gLabel, location[0].x - 1650 - 64 + offset, location[0].y - 120 - 64, "./assets/SVGs/interactionHint.svg", "hintLabel");
             }
 
