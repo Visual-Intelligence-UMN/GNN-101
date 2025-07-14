@@ -33,7 +33,7 @@ import {
 } from "../components/WebUtils";
 import { Footer, NavBar } from "../components/Surfaces";
 import { Inter } from "@next/font/google";
-import { GraphEditor } from "@/components/GraphEditor";
+import GraphEditor from "@/components/GraphEditor";
 
 export const inter = Inter({
     variable: "--font-inter",
@@ -281,11 +281,11 @@ export default function Home() {
                                                     </>
                                                 )}
 
-                                                {/* {graphEditorState && (
+                                                {graphEditorState && (
                                         <div>
                                             <GraphEditor />
                                         </div>
-                                    )} */}
+                                    )}
 
                                                 {model.includes("node classification") && (
                                                     <span>

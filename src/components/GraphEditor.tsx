@@ -1,57 +1,41 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import Draggable from 'react-draggable';
+import React, { useEffect, useState } from "react";
+import Draggable from "react-draggable";
 
-export class GraphEditor extends React.Component {
+type Position = { x: number; y: number };
 
-  eventLogger = (e: MouseEvent, data: Object) => {
-    console.log('Event: ', e);
-    console.log('Data: ', data);
-  };
+export default function GraphEditor(): JSX.Element {
+  const [defaultPos, setDefaultPos] = useState<Position>({
+    x: 200 / 2.2,
+    y: 120,
+  });
 
-  handleStart = (e: any, data: any) => {
-    this.eventLogger(e, data);
-  };
+  useEffect(() => {
+    setDefaultPos({ x: window.innerWidth / 2.2, y: 120 });
+  }, []);
 
-  handleDrag = (e: any, data: any) => {
-    this.eventLogger(e, data);
-  };
+  return (
+    <div>
+      <p style={{ textAlign: "center" }}>Check the floating boxes</p>
 
-  handleStop = (e: any, data: any) => {
-    this.eventLogger(e, data);
-  };
-
-  render() {
-    return (
-      <Draggable
-        axis="x"
-        handle=".handle"
-        defaultPosition={{x: 0, y: 0}}
-        grid={[25, 25]}
-        scale={1}
-        onStart={this.handleStart}
-        onDrag={this.handleDrag}
-        onStop={this.handleStop}>
-        <div>
-          <div 
-            className="handle"
-            style={{
-                zIndex: 9999,
-                backgroundColor: 'white', 
-            }}
-          >
-                Drag from here
-            </div>
-          <div>This readme is really dragging on...</div>
+      <Draggable defaultPosition={defaultPos}>
+        <div
+          style={{
+            position: "fixed", 
+            cursor: "move",
+            zIndex: 10,
+            touchAction: "none",
+            padding: 10,
+            border: "solid 1px",
+            background: "white",
+          }}
+        >
+          👋 Drag me!
+          <div>
+          </div>
         </div>
       </Draggable>
-    );
-  }
+    </div>
+  );
 }
-
-
-
-
-
 
 

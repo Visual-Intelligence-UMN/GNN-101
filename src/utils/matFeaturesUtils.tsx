@@ -300,7 +300,7 @@ export function drawNodeFeatures(
 ) {
     //initial visualizer
     for (let i = 0; i < locations.length; i++) {
-        locations[i][0] += 25;
+        locations[i][0] += 50;
         locations[i][1] += 2;
     }
     //draw cross connections for features layer and first GCNConv layer
@@ -805,7 +805,7 @@ export function drawGCNConvGraphModel(
         addLayerName(
             locations,
             "GCNConv" + (k + 1),
-            100,
+            0,
             30,
             d3.select(`g#layerNum_${k + 1}`)
         );
