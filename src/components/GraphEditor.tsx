@@ -120,45 +120,77 @@ export default function GraphEditor({ onClose }: GraphEditorProps): JSX.Element 
         .attr("cx", (d: any) => d.x)
         .attr("cy", (d: any) => d.y)
         .on("click", function (event: MouseEvent, d: any) {
-          event.stopPropagation();
-          const clickedId = d.id;
+  event.stopPropagation();
+  const clickedId = d.id;
 
-          const isFirstSelected = selectedNodeRef.current === clickedId;
-          const isSecondSelected = secondSelectedNodeRef.current === clickedId;
+  const isFirstSelected = selectedNodeRef.current === clickedId;
+  const isSecondSelected = secondSelectedNodeRef.current === clickedId;
 
-          if (selectedNodeRef.current && secondSelectedNodeRef.current) {
-            d3.selectAll("circle").attr("stroke", "none");
-            selectedNodeRef.current = null;
-            secondSelectedNodeRef.current = null;
-            setSelectedNodeId(null);
-            setSecondSelectedNodeId(null);
-            selectionState.current = false;
-            return;
-          }
+  // 已选择两个节点，点击任意节点将清除状态
+  if (selectedNodeRef.current && secondSelectedNodeRef.current) {
+    d3.selectAll("circle").attr("stroke", "none");
+    selectedNodeRef.current = null;
+    secondSelectedNodeRef.current = null;
+    setSelectedNodeId(null);
+    setSecondSelectedNodeId(null);
+    selectionState.current = false;
+    return;
+  }
 
-          if (!selectionState.current) {
-            d3.select(this).attr("stroke", "black");
-            selectedNodeRef.current = clickedId;
-            setSelectedNodeId(clickedId);
-            selectionState.current = true;
-            return;
-          }
+  // 第一次选中
+  if (!selectionState.current) {
+    d3.select(this).attr("stroke", "black");
+    selectedNodeRef.current = clickedId;
+    setSelectedNodeId(clickedId);
+    selectionState.current = true;
+    return;
+  }
 
-          if (selectionState.current && !secondSelectedNodeRef.current && isFirstSelected) {
-            d3.select(this).attr("stroke", "none");
-            selectedNodeRef.current = null;
-            setSelectedNodeId(null);
-            selectionState.current = false;
-            return;
-          }
+  // 再次点击相同节点，取消选中
+  if (selectionState.current && !secondSelectedNodeRef.current && isFirstSelected) {
+    d3.select(this).attr("stroke", "none");
+    selectedNodeRef.current = null;
+    setSelectedNodeId(null);
+    selectionState.current = false;
+    return;
+  }
 
-          if (selectionState.current && !secondSelectedNodeRef.current && !isFirstSelected) {
-            d3.select(this).attr("stroke", "black");
-            secondSelectedNodeRef.current = clickedId;
-            setSecondSelectedNodeId(clickedId);
-            return;
-          }
-        });
+  // 选择第二个节点
+  if (selectionState.current && !secondSelectedNodeRef.current && !isFirstSelected) {
+    d3.select(this).attr("stroke", "black");
+    secondSelectedNodeRef.current = clickedId;
+    setSecondSelectedNodeId(clickedId);
+
+    const sourceId = selectedNodeRef.current!;
+    const targetId = secondSelectedNodeRef.current!;
+
+    // 判断是否已经连边
+    const alreadyLinked = linksRef.current.some(
+      (link: any) =>
+        (link.source.id === sourceId && link.target.id === targetId) ||
+        (link.source.id === targetId && link.target.id === sourceId)
+    );
+
+    if (alreadyLinked) {
+      // 若已连边则清除状态
+      d3.selectAll("circle").attr("stroke", "none");
+      selectedNodeRef.current = null;
+      secondSelectedNodeRef.current = null;
+      setSelectedNodeId(null);
+      setSecondSelectedNodeId(null);
+      selectionState.current = false;
+    } else {
+      // 否则添加边
+      linksRef.current.push({ source: sourceId, target: targetId, value: 1 });
+      const linkForce = simulationRef.current?.force("link") as d3.ForceLink<any, any>;
+linkForce?.links(linksRef.current); // 正确：更新边
+simulationRef.current?.alpha(0.5).restart(); // 重启模拟
+    }
+
+    return;
+  }
+});
+
     }
 
     function drag(simulation: any) {
