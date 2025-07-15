@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import Draggable from "react-draggable";
-import { processDataFromVisualizerToEditor } from "@/utils/graphEditorUtils";
+import { processDataFromEditorToVisualizer, processDataFromVisualizerToEditor } from "@/utils/graphEditorUtils";
 type Position = { x: number; y: number };
 interface GraphEditorProps {
     onClose: () => void;
@@ -25,6 +25,8 @@ export default function GraphEditor({
     const nodesRef = useRef<any[]>([]);
     const selectionState = useRef(false);
 
+    const datasetRef = useRef<any>({});
+
     // Sync state
     const selectedNodeRef = useRef<string | null>(null);
     const secondSelectedNodeRef = useRef<string | null>(null);
@@ -34,6 +36,12 @@ export default function GraphEditor({
     >(null);
 
     const selectedLinkRef = useRef<SVGLineElement | null>(null);
+
+    const getCurrentDataset = () => ({
+  nodes: nodesRef.current,
+  links: linksRef.current,
+});
+
 
     useEffect(() => {
         setDefaultPos({ x: window.innerWidth / 2.2, y: 150 });
@@ -51,22 +59,9 @@ fetch("/json_data/graphs/testing_graph.json")
     .then(res => res.json())
     .then(data => {
       console.log("Loaded graph:", data);
-        // const initialData = {
-        //     nodes: [
-        //         { id: "A", group: 1 },
-        //         { id: "B", group: 1 },
-        //         { id: "C", group: 2 },
-        //         { id: "D", group: 2 },
-        //     ],
-        //     links: [
-        //         { source: "A", target: "B", value: 1 },
-        //         { source: "A", target: "C", value: 2 },
-        //         { source: "B", target: "D", value: 1 },
-        //         { source: "C", target: "D", value: 3 },
-        //     ],
-        // };
 
         const initialData = processDataFromVisualizerToEditor(data);
+        datasetRef.current = initialData;
 
         const links = initialData.links.map((d) => Object.create(d));
         const nodes = initialData.nodes.map((d) => Object.create(d));
@@ -372,6 +367,14 @@ fetch("/json_data/graphs/testing_graph.json")
         sim.alpha(0.5).restart();
     };
 
+    const handleTransmitToMainVisualizer = () => {
+        const currentDataset = getCurrentDataset();
+
+        const dataReady = processDataFromEditorToVisualizer(currentDataset);
+        console.log("Transmitting data to main visualizer:", dataReady);
+
+    }
+
     return (
         <Draggable defaultPosition={defaultPos} handle=".header">
             <div
@@ -426,7 +429,10 @@ fetch("/json_data/graphs/testing_graph.json")
                             ? "Switch to Node Adding"
                             : "Switch to Edge Adding"}
                     </button>
-                    <button style={{ marginBottom: "10px" }}>
+                    <button
+                        onClick={handleTransmitToMainVisualizer}
+                        style={{ marginBottom: "10px" }}
+                    >
                         Send to Main Visualizer
                     </button>
                 </div>
