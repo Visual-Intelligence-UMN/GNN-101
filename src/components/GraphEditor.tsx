@@ -295,6 +295,71 @@ export default function GraphEditor({
             simulation.nodes(nodesRef.current);
             simulation.alpha(0.5).restart();
         }
+
+        // 键盘监听器：按下 "x" 删除当前选中边
+        // 键盘监听器：按下 "x" 删除选中边或选中节点
+const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === "x" || e.key === "X") {
+        // 删除选中边
+        if (selectedLinkRef.current) {
+            const linkEl = selectedLinkRef.current;
+            const linkDatum = d3.select(linkEl).datum() as any;
+
+            linksRef.current = linksRef.current.filter(
+                (l) =>
+                    !(
+                        (l.source.id === linkDatum.source.id &&
+                            l.target.id === linkDatum.target.id) ||
+                        (l.source.id === linkDatum.target.id &&
+                            l.target.id === linkDatum.source.id)
+                    )
+            );
+
+            selectedLinkRef.current = null;
+        }
+
+        // 删除选中节点及其连接边
+        if (selectedNodeRef.current) {
+            const nodeIdToDelete = selectedNodeRef.current;
+
+            // 删除节点
+            nodesRef.current = nodesRef.current.filter(
+                (n) => n.id !== nodeIdToDelete
+            );
+
+            // 删除与该节点相连的所有边
+            linksRef.current = linksRef.current.filter(
+                (l) =>
+                    l.source.id !== nodeIdToDelete &&
+                    l.target.id !== nodeIdToDelete
+            );
+
+            // 清除选中状态
+            d3.selectAll("circle").attr("stroke", "none");
+            selectedNodeRef.current = null;
+            secondSelectedNodeRef.current = null;
+            setSelectedNodeId(null);
+            setSecondSelectedNodeId(null);
+            selectionState.current = false;
+        }
+
+        // 更新 simulation
+        const linkForce = simulationRef.current?.force("link") as d3.ForceLink<any, any>;
+        linkForce?.links(linksRef.current);
+        simulationRef.current?.nodes(nodesRef.current);
+        simulationRef.current?.alpha(0.5).restart();
+    }
+};
+
+
+        // 添加监听器
+        window.addEventListener("keydown", handleKeyDown);
+
+        // 清理监听器
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+
     }, []);
 
     const handleToggleSimulation = () => {
