@@ -155,7 +155,6 @@ export default function GraphEditor({ onClose }: GraphEditorProps): JSX.Element 
     return;
   }
 
-  // 选择第二个节点
   if (selectionState.current && !secondSelectedNodeRef.current && !isFirstSelected) {
     d3.select(this).attr("stroke", "black");
     secondSelectedNodeRef.current = clickedId;
@@ -164,7 +163,6 @@ export default function GraphEditor({ onClose }: GraphEditorProps): JSX.Element 
     const sourceId = selectedNodeRef.current!;
     const targetId = secondSelectedNodeRef.current!;
 
-    // 判断是否已经连边
     const alreadyLinked = linksRef.current.some(
       (link: any) =>
         (link.source.id === sourceId && link.target.id === targetId) ||
@@ -172,7 +170,6 @@ export default function GraphEditor({ onClose }: GraphEditorProps): JSX.Element 
     );
 
     if (alreadyLinked) {
-      // 若已连边则清除状态
       d3.selectAll("circle").attr("stroke", "none");
       selectedNodeRef.current = null;
       secondSelectedNodeRef.current = null;
@@ -180,11 +177,10 @@ export default function GraphEditor({ onClose }: GraphEditorProps): JSX.Element 
       setSecondSelectedNodeId(null);
       selectionState.current = false;
     } else {
-      // 否则添加边
       linksRef.current.push({ source: sourceId, target: targetId, value: 1 });
       const linkForce = simulationRef.current?.force("link") as d3.ForceLink<any, any>;
-linkForce?.links(linksRef.current); // 正确：更新边
-simulationRef.current?.alpha(0.5).restart(); // 重启模拟
+        linkForce?.links(linksRef.current); 
+        simulationRef.current?.alpha(0.5).restart(); 
     }
 
     return;
