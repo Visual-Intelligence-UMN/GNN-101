@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import Draggable from "react-draggable";
-
+import { processDataFromVisualizerToEditor } from "@/utils/graphEditorUtils";
 type Position = { x: number; y: number };
 interface GraphEditorProps {
     onClose: () => void;
@@ -46,20 +46,27 @@ export default function GraphEditor({
         const height = 640;
         const color = d3.scaleOrdinal(d3.schemeTableau10);
 
-        const initialData = {
-            nodes: [
-                { id: "A", group: 1 },
-                { id: "B", group: 1 },
-                { id: "C", group: 2 },
-                { id: "D", group: 2 },
-            ],
-            links: [
-                { source: "A", target: "B", value: 1 },
-                { source: "A", target: "C", value: 2 },
-                { source: "B", target: "D", value: 1 },
-                { source: "C", target: "D", value: 3 },
-            ],
-        };
+        // const dataset = require("/json_data/graphs/testing_graph.json");
+fetch("/json_data/graphs/testing_graph.json")
+    .then(res => res.json())
+    .then(data => {
+      console.log("Loaded graph:", data);
+        // const initialData = {
+        //     nodes: [
+        //         { id: "A", group: 1 },
+        //         { id: "B", group: 1 },
+        //         { id: "C", group: 2 },
+        //         { id: "D", group: 2 },
+        //     ],
+        //     links: [
+        //         { source: "A", target: "B", value: 1 },
+        //         { source: "A", target: "C", value: 2 },
+        //         { source: "B", target: "D", value: 1 },
+        //         { source: "C", target: "D", value: 3 },
+        //     ],
+        // };
+
+        const initialData = processDataFromVisualizerToEditor(data);
 
         const links = initialData.links.map((d) => Object.create(d));
         const nodes = initialData.nodes.map((d) => Object.create(d));
@@ -343,6 +350,7 @@ export default function GraphEditor({
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
         };
+        });
     }, []);
 
     const handleToggleSimulation = () => {
