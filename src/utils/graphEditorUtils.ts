@@ -44,9 +44,11 @@ export function processDataFromEditorToVisualizer(input: {
 
   // 构造 edge_index
   const edge_index: number[][] = [[], []];
+  console.log("transmit pipe links", links);
   links.forEach(link => {
-    const sourceIdx = nodeIdToIndex.get(link.source)!;
-    const targetIdx = nodeIdToIndex.get(link.target)!;
+    const sourceIdx = link.source.index;
+    const targetIdx = link.target.index;
+    console.log("sourceIdx", sourceIdx, "targetIdx", targetIdx, "link", link);
     edge_index[0].push(sourceIdx);
     edge_index[1].push(targetIdx);
   });
