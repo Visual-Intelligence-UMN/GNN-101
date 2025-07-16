@@ -37,20 +37,20 @@ export const twitchNodeSelectionList = [
 ];
 
 export const nodeList: { [k: string]: string } = {
-    karate: "./json_data/nodes/karate_dataset1.json",
+    karate: "./json_data/graphs/testing_graph.json",
 };
 
 export const linkList: { [k: string]: string } = {
-    twitch_EN: "./json_data/links/twitch.json",
+    twitch_EN: "./json_data/graphs/testing_graph.json",
 };
 
 export const modelList: { [k: string]: string } = {
     // "GCN - graph classification": "./gnn_model2.onnx",
-    "GCN - graph classification": "./simulated_gcn_model.onnx",
-    "GCN - node classification": "./gnn_node_model.onnx",
-    "GCN - link prediction": "./gnn_link_model.onnx",
-    "GAT - link prediction": "./gat_link_model.onnx",
-    "GraphSAGE - link prediction": "./sage_link_model.onnx"
+    "GCN - graph classification": "./simulations/simulated_gcn_graph_model.onnx",
+    "GCN - node classification": "./simulations/simulated_gcn_node_model.onnx",
+    "GCN - link prediction": "./simulations/simulated_gcn_edge_model.onnx",
+    "GAT - link prediction": "./simulations/simulated_gat_edge_model.onnx",
+    "GraphSAGE - link prediction": "./simulations/simulated_sage_edge_model.onnx",
 };
 
 // export const modelGATList: { [k: string]: string } = {

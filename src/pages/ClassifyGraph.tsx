@@ -43,11 +43,11 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
             let intmData: IntmData | IntmDataNode | IntmDataLink;
             let prob: number[] | number[][] = [];
 
-            if (modelPath == "./gnn_node_model.onnx") {
+            if (modelPath.includes("node")) {
                 ({ prob, intmData } = await nodePrediction(modelPath, graphPath));
-            } else if (modelPath == "./gnn_model2.onnx") {
+            } else if (modelPath.includes("graph")) {
                 ({ prob, intmData } = await graphPrediction(modelPath, graphPath));
-            } else if(modelPath == "./gnn_link_model.onnx") {
+            } else if(modelPath.includes("edge")) {
                 ({ prob, intmData } = await linkPrediction(
                     modelPath,
                     "./json_data/links/twitch.json" // this is for twitch dataset originally

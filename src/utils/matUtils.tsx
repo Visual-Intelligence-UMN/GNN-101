@@ -437,7 +437,7 @@ export function visualizeNodeClassifierFeatures(
     const firstLayer = firstLayerPackage.firstLayer;
 
     //-----------------------------------GCNConv LAYERS-----------------------------------------------
-    const featureChannels = 4;
+    const featureChannels = 16;
 
     const GCNConvPackage = drawGCNConvNodeModel(
         conv1,

@@ -1608,13 +1608,10 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
 
     console.log("pred pipe", graphData)
 
-    let edgeIndexTensor = new ort.Tensor(
+    const edgeIndexTensor = new ort.Tensor(
         "int64",
-        bigInt64Array,
-        [
-            graphData.edge_index.length,
-            graphData.edge_index[0].length,
-        ]
+        new BigInt64Array(graphData.edge_index.flat().map(BigInt)),
+        [graphData.edge_index.length, graphData.edge_index[0].length]
     );
 
     console.log("edgeIndexTensor", edgeIndexTensor);
@@ -1627,22 +1624,16 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
 
     let conv1 = [];
     let conv2 = [];
+    let conv3 = [];
 
-    if (modelPath === "./gat_link_model.onnx") {
-        conv1 = outputMap.gat1.cpuData;
-        conv2 = outputMap.gat2.cpuData;
-        console.log("gat model", conv1, conv2);
-    } else if (modelPath === "./sage_link_model.onnx") {
-        conv1 = outputMap.sage1.cpuData;
-        conv2 = outputMap.sage2.cpuData;
-        console.log("sage model", conv1, conv2);
-    } else {
-        conv1 = outputMap.conv1.cpuData;
-        conv2 = outputMap.conv2.cpuData;
-    }
+    conv1 = outputMap.conv1.cpuData;
+    conv2 = outputMap.conv2.cpuData;
+    conv3 = outputMap.conv3.cpuData;
+
     const intmData: IntmDataLink = {
         conv1: conv1,
         conv2: conv2,
+        conv3: conv3,
         decode_mul: outputMap.decode_mul.cpuData,
         decode_sum: outputMap.decode_sum.cpuData,
         prob_adj: outputMap.prob_adj.cpuData,
@@ -1712,22 +1703,28 @@ export const nodePrediction = async (modelPath: string, graphPath: string): Prom
     for (let i = 0; i < int32Array.length; i++) {
         bigInt64Array[i] = BigInt(int32Array[i]);
     }
-    let edgeIndexTensor = new ort.Tensor(
+    const edgeIndexTensor = new ort.Tensor(
         "int64",
-        bigInt64Array,
-        [
-            graphData.edge_index.length,
-            graphData.edge_index[0].length,
-        ]
+        new BigInt64Array(graphData.edge_index.flat().map(BigInt)),
+        [graphData.edge_index.length, graphData.edge_index[0].length]
     );
 
+    const batchTensor = new ort.Tensor(
+    "int64",
+    new BigInt64Array(graphData.batch.map(BigInt)),
+    [graphData.batch.length]
+);
+
+console.log("model-input", session.inputNames); 
     const outputMap = await session.run({
         x: xTensor,
         edge_index: edgeIndexTensor,
+       // batch: batchTensor
     });
+    console.log("model-input", session.inputNames); 
     const outputTensor = outputMap.final;
 
-    const resultArray: number[][] = splitArray(outputTensor.cpuData, 4);
+    const resultArray: number[][] = splitArray(outputTensor.cpuData, 2);
 
     let prob: number[][] = [];
 

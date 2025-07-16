@@ -255,7 +255,7 @@ export async function visualizeNodeClassifier(setIsLoading:any, graph_path:strin
         // Process data
         const data = await load_json(graph_path);
         //training nodes
-        const trainingNodes = data.train_nodes;
+        const trainingNodes = [12, 1, 5, 3, 9];
         //accept the features from original json file
         const features = await get_features_origin(data);
         const processedData = await graph_to_matrix(data);
@@ -342,6 +342,7 @@ async function initLinkClassifier(
 
     let conv1: number[][] = [],
         conv2: number[][] = [],
+        conv3: number[][] = [],
         prob_adj:number[][] = [];
 
 
@@ -361,6 +362,7 @@ async function initLinkClassifier(
         console.log("test len",intmData.prob_adj.length)
         conv1 = splitIntoMatrices(intmData.conv1, 16);
         conv2 = splitIntoMatrices(intmData.conv2, 16);
+        conv3 = splitIntoMatrices(intmData.conv3, 16);
         prob_adj = splitIntoMatrices(intmData.prob_adj, Math.sqrt(intmData.prob_adj.length));
     }
 

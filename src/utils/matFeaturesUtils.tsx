@@ -1008,7 +1008,7 @@ export function drawGCNConvNodeModel(
         if(k==2){
             for (let i = 0; i < locations.length; i++) {
                 const sgfPack = drawSingleGCNConvFeature(
-                    layer, i, k, gcnFeature, 2, locations, 
+                    layer, i, k, gcnFeature, 16, locations, 
                     rectW, rectH, myColor, thirdGCN, frames,
                     schemeLocations, featureVisTable
                 );
