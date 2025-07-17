@@ -1099,6 +1099,7 @@ export function visualizeLinkClassifierFeatures(
     myColor: any,
     conv1: any,
     conv2: any,
+    conv3: any,
     probResult: number,
     graph: any,
     adjList: any,
@@ -1180,13 +1181,14 @@ export function visualizeLinkClassifierFeatures(
     console.log("paths for first layer", pathsForFisrtLayer);
 
     //-----------------------------------GCNConv LAYERS-----------------------------------------------
-    const featureChannels = 64;
+    const featureChannels = 16;
     
     // we need have the locations and indices of the nodes involved during the computation
 
     const GCNConvPackage = drawGCNConvLinkModel(
         conv1,
         conv2,
+        conv3,
         probResult, 
         locations,
         myColor,

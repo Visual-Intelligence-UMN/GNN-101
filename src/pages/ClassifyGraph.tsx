@@ -50,7 +50,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
             } else if(modelPath.includes("edge")) {
                 ({ prob, intmData } = await linkPrediction(
                     modelPath,
-                    "./json_data/links/twitch.json" // this is for twitch dataset originally
+                    "/json_data/graphs/testing_graph.json" // this is for twitch dataset originally
                 ));
             } else {
                 ({ prob, intmData } = await graphPrediction(modelPath, graphPath));

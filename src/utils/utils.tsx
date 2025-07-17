@@ -1595,6 +1595,11 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
         new Float32Array(graphData.x.flat()),
         [graphData.x.length, graphData.x[0].length]
     );
+const batchTensor = new ort.Tensor(
+    "int64",
+    new BigInt64Array(graphData.batch.map(BigInt)),
+    [graphData.batch.length] // 一维，形如 [14]
+);
 
     let int32Array = new Int32Array(
         graphData["edge_index"].flat()
@@ -1620,6 +1625,7 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
         x: xTensor,
         edge_index: edgeIndexTensor,
         edge_label_index: edgeIndexTensor,
+    //    batch: batchTensor
     });
 
     let conv1 = [];
@@ -1654,7 +1660,7 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
     const mat = graphToMatrix(graphData);
 
     const computationalGraph = constructComputationalGraph(
-        graphData, features, data.conv1Data, data.conv2Data, 241
+        graphData, features, data.conv1Data, data.conv2Data, 0
     );
     const nodesNeedConstruct = computationalGraph.getNodesAtHopLevel(2);
     const subgraph = extractSubgraph(mat, nodesNeedConstruct)

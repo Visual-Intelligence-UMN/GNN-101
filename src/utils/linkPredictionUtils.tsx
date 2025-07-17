@@ -54,7 +54,7 @@ export function constructComputationalGraph(
     //add the hubNode to the compuetGraph
     computeGraph.addNode(hubNode, 0, conv2[hubNode]);
 
-    console.log("neighborNode", adjList[hubNode]);
+    console.log("neighborNode", hubNode, adjList[hubNode]);
 
     // Compute second conv layer features and add to computeGraph
     for(let i = 0; i < adjList[hubNode].length; i++){
@@ -111,6 +111,10 @@ export function getNodeSet(
 
     let addedFeatureNodes: Set<number> = new Set();
     let addedConv1Nodes: Set<number> = new Set();
+    let addedConv2Nodes: Set<number> = new Set();
+
+    console.log("getNodeSet", hubNode, adjList, graph);
+
     for(let i = 0; i < adjList[hubNode].length; i++){
         const neighborNode = adjList[hubNode][i];
         console.log("add edge", hubNode, neighborNode);
@@ -133,9 +137,28 @@ export function getNodeSet(
         }
     }
 
+    for(let i = 0; i < adjList[hubNode].length; i++){
+        const node = adjList[hubNode][i];
+        console.log("neighborNode 2", adjList[node]);
+        for(let j = 0; j < adjList[node].length; j++){
+            const neighborNode = adjList[node][j];
+            for(let k = 0; k < adjList[neighborNode].length; k++){
+                console.log("neighborNode hop 2", neighborNode);
+                console.log("add edge hop 2", node, neighborNode);
+                const neighborNode2 = adjList[node][k];
+                if (!addedConv2Nodes.has(neighborNode2)) {
+                    addedConv2Nodes.add(neighborNode2);
+                }
+            }
+        }
+    }
+    
+    
+    const nodesNeedConstruct2:number[] = Array.from(addedConv2Nodes); //second conv
     const nodesNeedConstruct:number[] = Array.from(addedFeatureNodes); //feature nodes
     const nodesNeedConstruct1:number[] = Array.from(addedConv1Nodes); //first conv
-    const mergedNodes = [nodesNeedConstruct, nodesNeedConstruct1];
+    
+    const mergedNodes = [nodesNeedConstruct2, nodesNeedConstruct, nodesNeedConstruct1];
     //const subgraph = extractSubgraph(mat, nodesNeedConstruct);
 
     //basically, we generate a computational graph based on the input graph an-0d the features - computeGraph
@@ -143,6 +166,8 @@ export function getNodeSet(
     //we also need to construct a subgraph based on the nodes that we have added to the computeGraph - subgraph
     return mergedNodes;
 }
+
+
 
 type AdjacencyDict = { [key: string]: number[] };
 

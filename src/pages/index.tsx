@@ -78,8 +78,8 @@ export default function Home() {
 
     const [graphEditorState, setGraphEditorState] = useState(false);
 
-    const [hubNodeA, setHubNodeA] = useState(241);
-    const [hubNodeB, setHubNodeB] = useState(109);
+    const [hubNodeA, setHubNodeA] = useState(1);
+    const [hubNodeB, setHubNodeB] = useState(0);
 
     const [datasetIndex, setDatasetIndex] = useState(0);
 
@@ -209,13 +209,13 @@ export default function Home() {
                                                     if (newModel.includes("GAT")) {
                                                         setModelType("GAT");
                                                         setSelectedGraph("twitch_EN");
-                                                        setHubNodeA(194);
-                                                        setHubNodeB(590);
+                                                        setHubNodeA(1);
+                                                        setHubNodeB(0);
                                                     } else if (newModel.includes("GraphSAGE")) {
                                                         setModelType("GraphSAGE");
                                                         setSelectedGraph("twitch_EN");
-                                                        setHubNodeA(194);
-                                                        setHubNodeB(590);
+                                                        setHubNodeA(1);
+                                                        setHubNodeB(0);
                                                     } else if (newModel.includes("GCN")) {
                                                         setModelType("GCN");
                                                         if (newModel.includes("graph classification")) {
@@ -226,8 +226,8 @@ export default function Home() {
                                                             setSelectedGraph("karate");
                                                         } else if (newModel.includes("link prediction")) {
                                                             setSelectedGraph("twitch_EN");
-                                                            setHubNodeA(194);
-                                                            setHubNodeB(590);
+                                                            setHubNodeA(1);
+                                                            setHubNodeB(0);
                                                         }
                                                     }
                                                 }}
