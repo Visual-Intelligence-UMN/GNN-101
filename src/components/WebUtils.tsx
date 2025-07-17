@@ -797,7 +797,9 @@ export function visualizeMatrixBody(gridSize: number, graph: any, width: number,
 export function visualizeMatrix(
     path: string,
     isAttribute: boolean,
-    gridSize: number
+    gridSize: number,
+    simGraphData: any,
+    sandBoxMode: boolean = true
 ) {
     const init = async (graph: any, nodeAttrs: any) => {
         const margin = { top: 10, right: 80, bottom: 30, left: 80 };
@@ -812,7 +814,8 @@ export function visualizeMatrix(
         //const features = await get_features_origin(data);
 
         try {
-            const data = await load_json(path);
+            let data = simGraphData;
+            if(!sandBoxMode) data = await load_json(path);
             const nodeAttrs = getNodeAttributes(data);
             const features = await get_features_origin(data);
             const processedData = await graph_to_matrix(data);

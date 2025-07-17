@@ -1526,12 +1526,13 @@ export function analyzeGraph(graphData: any) {
     };
 }
 
-export const graphPrediction = async (modelPath: string, graphPath: string) => {
+export const graphPrediction = async (modelPath: string, graphPath: string, simGraphData:any, sandBoxMode = true) => {
 
     console.log("graph pred pipe modelPath", modelPath, graphPath);
 
     const session = await loadModel(modelPath);
-    const graphData: IGraphData = await load_json(graphPath);
+    let graphData: IGraphData = simGraphData;
+    if(!sandBoxMode)graphData = await load_json(graphPath);
 
     // Convert `graphData` to tensor-like object expected by your ONNX model
     const xTensor = new ort.Tensor(

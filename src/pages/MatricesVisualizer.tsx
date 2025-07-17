@@ -10,6 +10,8 @@ interface MatricesVisualizerProps {
     changed: boolean;
     predicted: boolean;
     selectedButtons: boolean[];
+    simGraphData: any;
+    sandBoxMode?: boolean; // whether the graph is simulated or not
 }
 
 const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
@@ -18,7 +20,9 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
     changed,
     predicted,
     selectedButtons,
-    onLoadComplete
+    onLoadComplete,
+    simGraphData,
+    sandBoxMode = true, // whether the graph is simulated or not
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -33,10 +37,10 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
 
     useEffect(() => {
         if ((intmData == null || changed) && !predicted) {
-            visualizeMatrix(graph_path, true, 400);
+            visualizeMatrix(graph_path, true, 400, simGraphData, sandBoxMode);
             onLoadComplete();
         } else {
-            visualizeGraphClassifier(setIsLoading, graph_path, intmData);
+            visualizeGraphClassifier(setIsLoading, graph_path, intmData, simGraphData, sandBoxMode);
             onLoadComplete();
         }
 

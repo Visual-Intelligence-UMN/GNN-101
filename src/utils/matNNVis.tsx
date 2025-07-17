@@ -135,7 +135,11 @@ async function initNodeClassifier(graph: any, features: any[][], intmData:any, g
 
 
 //----------------------function for visualizing graph classifier----------------------------
-async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: string[], intmData:any, graph_path:string)  {
+async function initGraphClassifier(
+    graph: any, 
+    features: any[][], 
+    nodeAttrs: string[], 
+    intmData:any, graph_path:string)  {
     let colorSchemeTable: any = null;
     //a data structure to record the link relationship
     //fill up the linkMap
@@ -226,12 +230,21 @@ async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: str
 };
 
 //Visualization Pipeline for Graph Classifier
-export async function visualizeGraphClassifier(setIsLoading:any, graph_path:string, intmData:any) {
+export async function visualizeGraphClassifier(
+    setIsLoading:any, 
+    graph_path:string, 
+    intmData:any,
+    simGraphData:any,
+    sandBoxMode:boolean
+) {
     try {
+        console.log("matvis pipe 0", simGraphData)
+        sandBoxMode = true;
         setIsLoading(true);
         // Process data
         console.log("matvis pipe 1", graph_path, intmData);
-        const data = await load_json(graph_path);
+        let data = simGraphData;
+        if(!sandBoxMode) data = await load_json(graph_path);
         console.log("matvis pipe 2", data);
         //node attributes extraction
         const nodeAttrs = getNodeAttributes(data);

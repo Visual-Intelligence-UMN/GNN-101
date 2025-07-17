@@ -366,6 +366,7 @@ export default function Home() {
                                                 onlyShownButton={true}
                                                 simulationLoading={simulationLoading}
                                                 setIsLoading={setIsLoading}
+                                                simGraphData={simGraphData}
                                             />
                                         </div>
                                     )}
@@ -469,6 +470,8 @@ export default function Home() {
                                                             predicted={predicted}
                                                             selectedButtons={selectedButtons}
                                                             onLoadComplete={() => setIsLoading(false)}
+                                                            simGraphData={simGraphData}
+                                                            
                                                         />
                                                     )
                                                 ) : model == "GCN - node classification" ? (

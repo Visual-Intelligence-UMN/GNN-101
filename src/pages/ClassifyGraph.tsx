@@ -15,6 +15,8 @@ interface ClassifyGraphProps {
     onlyShownButton?: boolean;
     simulationLoading: boolean;
     setIsLoading: (loading: boolean) => void;
+    simGraphData: any,
+    sandBoxMode?: boolean; // whether the graph is simulated or not
 }
 
 // parameter will be the user input for json file
@@ -29,7 +31,9 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
     setProbabilities,
     onlyShownButton = false,
     simulationLoading,
-    setIsLoading
+    setIsLoading,
+    simGraphData = {},
+    sandBoxMode = true, 
 }) => {
     let prob: number[] | number[][] = [];
     const classifyGraph = async () => {
@@ -46,14 +50,14 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
             if (modelPath.includes("node")) {
                 ({ prob, intmData } = await nodePrediction(modelPath, graphPath));
             } else if (modelPath.includes("graph")) {
-                ({ prob, intmData } = await graphPrediction(modelPath, graphPath));
+                ({ prob, intmData } = await graphPrediction(modelPath, graphPath, simGraphData));
             } else if(modelPath.includes("edge")) {
                 ({ prob, intmData } = await linkPrediction(
                     modelPath,
                     "/json_data/graphs/testing_graph.json" // this is for twitch dataset originally
                 ));
             } else {
-                ({ prob, intmData } = await graphPrediction(modelPath, graphPath));
+                ({ prob, intmData } = await graphPrediction(modelPath, graphPath, simGraphData));
             }
     
             setChangedG(false);
