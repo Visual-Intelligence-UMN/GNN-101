@@ -6,6 +6,8 @@ interface GraphMatrixVisualizationProps {
   hubNodeA?: number;
   hubNodeB?: number;
   modelType?: string;
+  simulatedGraphData?: any;
+  sandboxMode?: boolean;
 }
 
 const elementMap = {
@@ -16,10 +18,12 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
   dataFile, 
   hubNodeA, 
   hubNodeB,
-  modelType 
+  modelType,
+  simulatedGraphData,
+  sandboxMode =  true
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  console.log("GraphMatrixVisualization props:", { dataFile, hubNodeA, hubNodeB, modelType });
+  console.log("GraphMatrixVisualization props:", { dataFile, hubNodeA, hubNodeB, modelType, simulatedGraphData });
 
 
   const styles = `
@@ -121,12 +125,16 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
   useEffect(() => {
     const loadData = async () => {
       try {
+        if(!sandboxMode){
         console.log("Loading data from:", dataFile);
         const response = await fetch(dataFile);
         console.log("Response status:", response);
         const data = await response.json();
         console.log("Loaded data:", data);
         createVisualization(data);
+        } else {
+          createVisualization(simulatedGraphData);
+        }
       } catch (error) {
         console.error('Error loading data:', error);
       }
@@ -470,7 +478,7 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
     };
 
     loadData();
-  }, [dataFile, hubNodeA, hubNodeB, modelType]);
+  }, [dataFile, hubNodeA, hubNodeB, modelType, simulatedGraphData]);
 
   return (
     <>

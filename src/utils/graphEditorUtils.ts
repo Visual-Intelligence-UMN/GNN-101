@@ -27,46 +27,60 @@ export function processDataFromVisualizerToEditor(input: {
 
 export function processDataFromEditorToVisualizer(input: {
   nodes: { id: string; group: number }[];
-  links: { source: string; target: string; value: number }[];
+  links: { source: any; target: any; value: number }[];
 }) {
-  const { nodes, links } = input;
+  const edgeIndexPair1: number[] = [];
+  const edgeIndexPair2: number[] = [];
 
-  // 建立 id → index 的映射
-  const nodeIdToIndex = new Map<string, number>();
-  nodes.forEach((node, idx) => nodeIdToIndex.set(node.id, idx));
+  const pairSet = new Set<string>(); // 用 string 去重
+  const edgeAttr: number[][] = [];
 
-  // 构造 x 向量（每个节点一个长度为 5，值为 1 ~ 1.5 的向量）
-  const x = nodes.map(() =>
-    Array.from({ length: 5 }, () =>
-      +(1 + Math.random() * 0.5).toFixed(3)
-    )
-  );
+  for (let i = 0; i < input.links.length; i++) {
+    const link = input.links[i];
+    const source = link.source.index;
+    const target = link.target.index;
 
-  // 构造 edge_index
-  const edge_index: number[][] = [[], []];
-  console.log("transmit pipe links", links);
-  links.forEach(link => {
-    const sourceIdx = link.source.index;
-    const targetIdx = link.target.index;
-    console.log("sourceIdx", sourceIdx, "targetIdx", targetIdx, "link", link);
-    edge_index[0].push(sourceIdx);
-    edge_index[1].push(targetIdx);
-  });
+    // 正向边 key
+    const key1 = `${source},${target}`;
+    const key2 = `${target},${source}`;
 
-  // 构造 edge_attr（每条边一个长度为 4，值为 1~10 的整数向量）
-  const edge_attr = links.map(() =>
-    Array.from({ length: 4 }, () =>
-      Math.floor(1 + Math.random() * 10)
-    )
-  );
+    // 添加正向边
+    if (!pairSet.has(key1)) {
+      edgeIndexPair1.push(source);
+      edgeIndexPair2.push(target);
+      edgeAttr.push([link.value]);
+      pairSet.add(key1);
+    }
 
-  // 构造 batch 和 y
-  const batch = new Array(nodes.length).fill(0);
+    // 添加反向边
+    if (!pairSet.has(key2)) {
+      edgeIndexPair1.push(target);
+      edgeIndexPair2.push(source);
+      edgeAttr.push([link.value]); // 反向边 value 保持一致
+      pairSet.add(key2);
+    }
+  }
+
+  const node_num = input.nodes.length;
+  const x: number[][] = [];
+
+  for (let i = 0; i < node_num; i++) {
+    const row: number[] = [];
+    for (let j = 0; j < 5; j++) {
+      const val = Math.random() * 3 - 1.5;
+      row.push(val);
+    }
+    x.push(row);
+  }
+
   const y = [0];
+  const batch = Array(node_num).fill(0);
 
-  return { x, edge_index, edge_attr, y, batch };
+  return {
+    edge_index: [edgeIndexPair1, edgeIndexPair2],
+    edge_attr: edgeAttr,
+    x,
+    y,
+    batch
+  };
 }
-
-
-
-

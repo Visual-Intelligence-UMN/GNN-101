@@ -8,10 +8,15 @@ import {
 type Position = { x: number; y: number };
 interface GraphEditorProps {
     onClose: () => void;
+    simGraphData: any; 
+    handleSimulatedGraphChange?: (value: any) => void;
 }
 
 export default function GraphEditor({
     onClose,
+    simGraphData, 
+    handleSimulatedGraphChange,
+
 }: GraphEditorProps): JSX.Element {
     const [defaultPos, setDefaultPos] = useState<Position>({
         x: 200 / 2.2,
@@ -57,9 +62,7 @@ export default function GraphEditor({
         const color = d3.scaleOrdinal(d3.schemeTableau10);
 
         // const dataset = require("/json_data/graphs/testing_graph.json");
-        fetch("/json_data/graphs/testing_graph.json")
-            .then((res) => res.json())
-            .then((data) => {
+        let data = simGraphData;
                 console.log("Loaded graph:", data);
 
                 const initialData = processDataFromVisualizerToEditor(data);
@@ -305,6 +308,7 @@ export default function GraphEditor({
                         fx: x,
                         fy: y,
                     };
+                    console.log("Adding new node:", getCurrentDataset());
                     nodesRef.current.push(newNode);
                     simulation.nodes(nodesRef.current);
                     simulation.alpha(0.5).restart();
@@ -365,7 +369,6 @@ export default function GraphEditor({
                 return () => {
                     window.removeEventListener("keydown", handleKeyDown);
                 };
-            });
     }, []);
 
     const handleToggleSimulation = () => {
@@ -393,6 +396,9 @@ export default function GraphEditor({
         console.log("editor pipe", currentDataset);
 
         const dataReady = processDataFromEditorToVisualizer(currentDataset);
+        if (handleSimulatedGraphChange) {
+            handleSimulatedGraphChange(dataReady);
+        }
         console.log("Transmitting data to main visualizer:", dataReady);
     };
 

@@ -78,6 +78,10 @@ export default function Home() {
 
     const [graphEditorState, setGraphEditorState] = useState(false);
 
+    const [simGraphData, setSimGraphData] = useState({});
+  
+
+
     const [hubNodeA, setHubNodeA] = useState(1);
     const [hubNodeB, setHubNodeB] = useState(0);
 
@@ -98,6 +102,11 @@ export default function Home() {
     ]);
     const [probabilities, setProbabilities] = useState<number[] | number[][]>([]);
     const [showDatasetInfo, setShowDatasetInfo] = useState(false);
+
+    const handleSimulatedGraphChange = (value: any) => {
+    setSimGraphData(value);
+    console.log("Simulated graph data updated:", value, simGraphData);
+  };
 
     function handleGraphSelection(e: React.ChangeEvent<HTMLSelectElement>): void {
         setSelectedGraph(e.target.value);
@@ -128,9 +137,27 @@ export default function Home() {
     };
 
     useEffect(() => {
-        // Load resources
-        document.body.style.overflow = "hidden";
-    }, []);
+  console.log("simGraphData updated:", simGraphData);
+}, [simGraphData]);
+
+
+   useEffect(() => {
+  document.body.style.overflow = "hidden";
+
+  fetch("/json_data/graphs/testing_graph.json")
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error("Failed to load JSON");
+      }
+      return res.json();
+    })
+    .then((data) => {
+      setSimGraphData(data);
+    })
+    .catch((err) => {
+      console.error("Error loading JSON:", err);
+    });
+}, []);
 
     useEffect(() => {
         if (predicted && introRef.current) {
@@ -283,7 +310,11 @@ export default function Home() {
 
                                                 {graphEditorState && (
                                         <div>
-                                            <GraphEditor onClose={() => setGraphEditorState(false)} />
+                                            <GraphEditor 
+                                                onClose={() => setGraphEditorState(false)} 
+                                                simGraphData={simGraphData}
+                                                handleSimulatedGraphChange={handleSimulatedGraphChange}
+                                            />
                                         </div>
                                     )}
 
@@ -369,6 +400,7 @@ export default function Home() {
                                                                 ? linkList[selectedGraph]
                                                                 : "test-test"
                                                         }
+                                                        simulatedGraphData={simGraphData}
                                                         hubNodeA={model.includes('link prediction') ? hubNodeA : undefined}
                                                         hubNodeB={model.includes('link prediction') ? hubNodeB : undefined}
                                                         modelType={model}
