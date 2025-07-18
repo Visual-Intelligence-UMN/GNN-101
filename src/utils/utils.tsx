@@ -1526,7 +1526,12 @@ export function analyzeGraph(graphData: any) {
     };
 }
 
-export const graphPrediction = async (modelPath: string, graphPath: string, simGraphData:any, sandBoxMode = true) => {
+export const graphPrediction = async (
+    modelPath: string, 
+    graphPath: string, 
+    simGraphData:any, 
+    sandBoxMode = true
+) => {
 
     console.log("graph pred pipe modelPath", modelPath, graphPath);
 
@@ -1686,11 +1691,17 @@ type PredictionResult = {
     intmData: IntmData | IntmDataNode
 };
 
-export const nodePrediction = async (modelPath: string, graphPath: string): Promise<PredictionResult> => {
+export const nodePrediction = async (
+    modelPath: string, 
+    graphPath: string,
+    simGraphData: any,
+    sandBoxMode = true
+): Promise<PredictionResult> => {
 
 
     const session = await loadModel(modelPath);
-    const graphData: any = await load_json(graphPath);
+    let graphData: IGraphData = simGraphData;
+    if(!sandBoxMode)graphData = await load_json(graphPath);
 
 
 

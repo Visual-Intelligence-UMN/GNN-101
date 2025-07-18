@@ -48,7 +48,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
             let prob: number[] | number[][] = [];
 
             if (modelPath.includes("node")) {
-                ({ prob, intmData } = await nodePrediction(modelPath, graphPath));
+                ({ prob, intmData } = await nodePrediction(modelPath, graphPath, simGraphData));
             } else if (modelPath.includes("graph")) {
                 ({ prob, intmData } = await graphPrediction(modelPath, graphPath, simGraphData));
             } else if(modelPath.includes("edge")) {

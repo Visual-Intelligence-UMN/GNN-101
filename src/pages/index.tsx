@@ -30,6 +30,7 @@ import {
     NodeSelector,
     ArchitectureButtonChain,
     ColorLegend,
+    SandboxModeSelector,
 } from "../components/WebUtils";
 import { Footer, NavBar } from "../components/Surfaces";
 import { Inter } from "@next/font/google";
@@ -79,6 +80,7 @@ export default function Home() {
     const [graphEditorState, setGraphEditorState] = useState(false);
 
     const [simGraphData, setSimGraphData] = useState({});
+    const [sandBoxMode, setSandBoxMode] = useState(true);
   
 
 
@@ -171,6 +173,15 @@ export default function Home() {
         setProbabilities([]);
         setPredicted(false);
         setSimulation(false);
+    }
+
+    function handleSandboxModeSelection(e: React.ChangeEvent<HTMLSelectElement>): void {
+        if( e.target.value === "On") {
+            setSandBoxMode(true);
+        }
+        else {
+            setSandBoxMode(false);
+        }
     }
 
     return (
@@ -298,13 +309,11 @@ export default function Home() {
                                                             OptionList={Object.keys(graphList)}
                                                             id="dataset-selector"
                                                         />
-                                                        <button 
-                                                            key={'graph-editor'}
-                                                            onClick={handleGraphEditor}
-                                                            className="ml-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                                                            >
-                                                                Open the Graph
-                                                            </button>
+                                                        <SandboxModeSelector
+                                                            sandBoxMode={sandBoxMode}
+                                                            handleSandboxModeSelection={handleSandboxModeSelection}
+                                                            handleGraphEditor={handleGraphEditor}
+                                                        />
                                                     </>
                                                 )}
 
@@ -319,9 +328,16 @@ export default function Home() {
                                     )}
 
                                                 {model.includes("node classification") && (
+                                                    <>
                                                     <span>
                                                         Classify all nodes of the karate club network
                                                     </span>
+                                                    <SandboxModeSelector
+                                                        sandBoxMode={sandBoxMode}
+                                                        handleSandboxModeSelection={handleSandboxModeSelection}
+                                                        handleGraphEditor={handleGraphEditor}
+                                                    />
+                                                    </>
                                                 )}
 
                                                 {model.includes("link prediction") && (
@@ -341,6 +357,11 @@ export default function Home() {
                                                             dependNode={hubNodeA}
                                                             setSelectedNode={setHubNodeB}
                                                             handleChange={handleNodeSelection}
+                                                        />
+                                                        <SandboxModeSelector
+                                                            sandBoxMode={sandBoxMode}
+                                                            handleSandboxModeSelection={handleSandboxModeSelection}
+                                                            handleGraphEditor={handleGraphEditor}
                                                         />
                                                     </>
                                                 )}
@@ -486,6 +507,7 @@ export default function Home() {
                                                             setSimulation={setSimulation}
                                                             innerComputationMode={modelType}
                                                             onLoadComplete={() => setIsLoading(false)}
+
                                                         />
                                                     ) : (
                                                         <NodeMatricesVisualizer
@@ -495,6 +517,8 @@ export default function Home() {
                                                             predicted={predicted}
                                                             selectedButtons={selectedButtons}
                                                             onLoadComplete={() => setIsLoading(false)}
+                                                            simGraphData={simGraphData}
+                                                            sandBoxMode={sandBoxMode}
                                                         />
                                                     )
                                                 ) : isGraphView ? (

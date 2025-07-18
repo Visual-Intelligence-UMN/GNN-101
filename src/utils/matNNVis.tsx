@@ -86,7 +86,7 @@ async function initNodeClassifier(graph: any, features: any[][], intmData:any, g
 
     const gLen = graph.length;
 
-    const gridSize = 800;
+    const gridSize = 600;
     const margin = { top: 10, right: 80, bottom: 30, left: 80 };
     const width = 20 * gLen + 50 + 6 * 102 + 1200 * 2;
     const height = (gridSize + margin.top + margin.bottom) * 2;
@@ -262,13 +262,21 @@ export async function visualizeGraphClassifier(
 };
 
 //Visualization Pipeline for Node Classifier
-export async function visualizeNodeClassifier(setIsLoading:any, graph_path:string, intmData:any) {
+export async function visualizeNodeClassifier(
+    setIsLoading:any, 
+    graph_path:string, 
+    intmData:any,
+    simGraphData:any,
+    sandBoxMode:boolean
+) {
     try {
         setIsLoading(true);
         // Process data
-        const data = await load_json(graph_path);
+        let data = simGraphData;
+        if(!sandBoxMode) data = await load_json(graph_path);
+        console.log("matvis pipe 2 node", data, sandBoxMode);
         //training nodes
-        const trainingNodes = [12, 1, 5, 3, 9];
+        const trainingNodes = [1, 5, 3];
         //accept the features from original json file
         const features = await get_features_origin(data);
         const processedData = await graph_to_matrix(data);

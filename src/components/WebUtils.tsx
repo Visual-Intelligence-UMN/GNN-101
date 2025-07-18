@@ -282,6 +282,37 @@ export const Sidebar = () => {
     );
 };
 
+
+interface SandboxModeSelectorProps {
+    sandBoxMode: boolean;
+    handleSandboxModeSelection: any;
+    handleGraphEditor: any;
+}
+
+export const SandboxModeSelector: React.FC<SandboxModeSelectorProps> = ({
+    sandBoxMode,
+    handleSandboxModeSelection,
+    handleGraphEditor
+}) => {
+    return (
+        <>
+        <div className="m-1"> Sandbox Mode </div>
+        <Selector
+            selectedOption={sandBoxMode ? "On" : "Off"}
+            handleChange={handleSandboxModeSelection}
+            OptionList={["On", "Off"]}
+            id="dataset-selector"
+        />
+        {sandBoxMode && 
+            <button 
+                key={'graph-editor'}
+                onClick={handleGraphEditor}
+                className="ml-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >Open the Graph</button>}
+        </>
+    )
+}
+
 //graph selector
 interface SelectorProps {
     selectedOption: string;
