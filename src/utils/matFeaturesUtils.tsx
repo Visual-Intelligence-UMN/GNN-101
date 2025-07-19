@@ -1116,7 +1116,6 @@ export function drawGCNConvNodeModel(
 export function drawGCNConvLinkModel(
     conv1: any,
     conv2: any,
-    conv3: any,
     probResult: number, 
     locations: any,
     myColor: any,
@@ -1133,13 +1132,13 @@ export function drawGCNConvLinkModel(
 ) {
     //GCNCov Visualizer
     let paths: any;
-    const gcnFeatures = [conv1, conv2, conv3];
+    const gcnFeatures = [conv1, conv2];
 
 
     let location1:[number, number] = [0, 0];
             let location2:[number, number] = [0, 0];
 
-    for (let k = 0; k < 3; k++) {
+    for (let k = 0; k < 2; k++) {
         const rectH = 15;
         const rectW = 5;
         const layer = d3
@@ -1155,7 +1154,7 @@ export function drawGCNConvLinkModel(
             }
         }
 
-       //drawPoints(".mats", "red", [[locations[0][0], locations[0][1]]])
+       // drawPoints(".mats", "red", [[locations[0][0], locations[0][1]]])
 
         //draw hint label
         if(k==0){
@@ -1181,8 +1180,6 @@ export function drawGCNConvLinkModel(
 
         //drawPoints(".mats","red",locations);
         const gcnFeature = gcnFeatures[k];
-
-        console.log("debug modelvis", featureKeysEachLayer, featureKeys);
 
         for (let i = 0; i < locations.length; i++) {
             // a special checking here - to see if this node involved in the computation or not

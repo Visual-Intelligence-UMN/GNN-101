@@ -1099,7 +1099,6 @@ export function visualizeLinkClassifierFeatures(
     myColor: any,
     conv1: any,
     conv2: any,
-    conv3: any,
     probResult: number,
     graph: any,
     adjList: any,
@@ -1188,7 +1187,6 @@ export function visualizeLinkClassifierFeatures(
     const GCNConvPackage = drawGCNConvLinkModel(
         conv1,
         conv2,
-        conv3,
         probResult, 
         locations,
         myColor,

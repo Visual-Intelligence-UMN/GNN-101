@@ -9,7 +9,7 @@ import {
 } from "./matHelperUtils";
 import { computeMids } from "./matFeaturesUtils";
 import * as d3 from "d3";
-import { create, all } from "mathjs";
+import { create, all, size, multiply, transpose } from "mathjs";
 import {
     drawAniPath,
     drawBiasPath,
@@ -396,6 +396,22 @@ export function resultVisMouseEvent(
     }
 }
 
+function smartMultiply(W: number[][], X: number[] | number[][]): number[] | number[][] {
+  const wShape = size(W) as number[];
+  const xShape = size(X) as number[];
+
+  try {
+    return multiply(W, X);
+  } catch (err) {
+    try {
+      return multiply(transpose(W), X);
+    } catch (err2) {
+      throw new Error(`smartMultiply failed: shapes ${wShape} and ${xShape} are incompatible`);
+    }
+  }
+}
+
+
 export function featureVisClick(
     layerID: number,
     node: number,
@@ -524,7 +540,7 @@ export function featureVisClick(
         X = math.add(math.multiply(prepMat, mulV), X);
     }
     console.log("issue here", X, math.transpose(weights[layerID]))
-    const dummy: number[] = math.multiply(weights[layerID], X);
+    const dummy: number[] = smartMultiply(weights[layerID], X) as number[];
     const Xt = math.transpose(weights[layerID]);
     matrixMultiplicationResults.dummy[node] = dummy;
    

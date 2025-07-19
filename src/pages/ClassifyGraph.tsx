@@ -51,10 +51,10 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
                 ({ prob, intmData } = await nodePrediction(modelPath, graphPath, simGraphData));
             } else if (modelPath.includes("graph")) {
                 ({ prob, intmData } = await graphPrediction(modelPath, graphPath, simGraphData));
-            } else if(modelPath.includes("edge")) {
+            } else if(modelPath.includes("link")){
                 ({ prob, intmData } = await linkPrediction(
                     modelPath,
-                    "/json_data/graphs/testing_graph.json" // this is for twitch dataset originally
+                    "./json_data/links/twitch.json" // this is for twitch dataset originally
                 ));
             } else {
                 ({ prob, intmData } = await graphPrediction(modelPath, graphPath, simGraphData));
