@@ -20,8 +20,8 @@ import {
 import Sidebar from "./Sidebar";
 import styles from "./index.module.css";
 import * as d3 from "d3";
-import { Steps } from 'intro.js-react';
-import 'intro.js/introjs.css';
+import { Steps } from "intro.js-react";
+import "intro.js/introjs.css";
 
 import {
     Selector,
@@ -57,7 +57,9 @@ export const inter3 = Inter({
 const LoadingSpinner = () => (
     <div className="fixed top-0 left-0 w-full h-full flex flex-col items-center justify-center bg-white bg-opacity-75 z-50">
         <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
-        <p className="mt-4 text-gray-700 text-lg">Loading the visualization...</p>
+        <p className="mt-4 text-gray-700 text-lg">
+            Loading the visualization...
+        </p>
     </div>
 );
 
@@ -81,8 +83,6 @@ export default function Home() {
 
     const [simGraphData, setSimGraphData] = useState({});
     const [sandBoxMode, setSandBoxMode] = useState(true);
-  
-
 
     const [hubNodeA, setHubNodeA] = useState(241);
     const [hubNodeB, setHubNodeB] = useState(109);
@@ -91,8 +91,10 @@ export default function Home() {
 
     const [modelType, setModelType] = useState("GCN");
 
-// Intermediate output
-    const [intmData, setIntmData] = useState<IntmData | IntmDataNode | null>(null);
+    // Intermediate output
+    const [intmData, setIntmData] = useState<IntmData | IntmDataNode | null>(
+        null
+    );
     const [selectedButtons, setSelectedButtons] = useState([
         false,
         false,
@@ -102,15 +104,19 @@ export default function Home() {
         false,
         false,
     ]);
-    const [probabilities, setProbabilities] = useState<number[] | number[][]>([]);
+    const [probabilities, setProbabilities] = useState<number[] | number[][]>(
+        []
+    );
     const [showDatasetInfo, setShowDatasetInfo] = useState(false);
 
     const handleSimulatedGraphChange = (value: any) => {
-    setSimGraphData(value);
-    console.log("Simulated graph data updated:", value, simGraphData);
-  };
+        setSimGraphData(value);
+        console.log("Simulated graph data updated:", value, simGraphData);
+    };
 
-    function handleGraphSelection(e: React.ChangeEvent<HTMLSelectElement>): void {
+    function handleGraphSelection(
+        e: React.ChangeEvent<HTMLSelectElement>
+    ): void {
         setSelectedGraph(e.target.value);
         setChangedG(true);
         setProbabilities([]);
@@ -125,7 +131,6 @@ export default function Home() {
         } else {
             setGraphEditorState(true);
         }
-
     }
 
     const startIntro = () => {
@@ -139,27 +144,26 @@ export default function Home() {
     };
 
     useEffect(() => {
-  console.log("simGraphData updated:", simGraphData);
-}, [simGraphData]);
+        console.log("simGraphData updated:", simGraphData);
+    }, [simGraphData]);
 
+    useEffect(() => {
+        document.body.style.overflow = "hidden";
 
-   useEffect(() => {
-  document.body.style.overflow = "hidden";
-
-  fetch("/json_data/graphs/testing_graph.json")
-    .then((res) => {
-      if (!res.ok) {
-        throw new Error("Failed to load JSON");
-      }
-      return res.json();
-    })
-    .then((data) => {
-      setSimGraphData(data);
-    })
-    .catch((err) => {
-      console.error("Error loading JSON:", err);
-    });
-}, []);
+        fetch("/json_data/graphs/testing_graph.json")
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error("Failed to load JSON");
+                }
+                return res.json();
+            })
+            .then((data) => {
+                setSimGraphData(data);
+            })
+            .catch((err) => {
+                console.error("Error loading JSON:", err);
+            });
+    }, []);
 
     useEffect(() => {
         if (predicted && introRef.current) {
@@ -167,7 +171,9 @@ export default function Home() {
         }
     }, [predicted]);
 
-    function handleNodeSelection(e: React.ChangeEvent<HTMLSelectElement>): void {
+    function handleNodeSelection(
+        e: React.ChangeEvent<HTMLSelectElement>
+    ): void {
         // Handle node selection changes
         setChangedG(true);
         setProbabilities([]);
@@ -175,11 +181,12 @@ export default function Home() {
         setSimulation(false);
     }
 
-    function handleSandboxModeSelection(e: React.ChangeEvent<HTMLSelectElement>): void {
-        if( e.target.value === "On") {
+    function handleSandboxModeSelection(
+        e: React.ChangeEvent<HTMLSelectElement>
+    ): void {
+        if (e.target.value === "On") {
             setSandBoxMode(true);
-        }
-        else {
+        } else {
             setSandBoxMode(false);
         }
     }
@@ -190,10 +197,12 @@ export default function Home() {
                 enabled={true}
                 steps={INTRO_STEPS}
                 initialStep={0}
-                onExit={() => { }}
+                onExit={() => {}}
                 ref={introRef}
             />
-            {isLoading && model.includes("link prediction") && <LoadingSpinner />}
+            {isLoading && model.includes("link prediction") && (
+                <LoadingSpinner />
+            )}
             <main className={inter.className}>
                 <div className={inter2.className}>
                     {step === 0 && (
@@ -224,59 +233,103 @@ export default function Home() {
                                 />
                             </div>
 
-                            <div className={`${styles.rightContainer} col-span-3 ml-4`}>
+                            <div
+                                className={`${styles.rightContainer} col-span-3 ml-4`}
+                            >
                                 <div
                                     className="flex gap-x-2 items-center"
                                     style={{ paddingTop: "40px" }}
                                     id="model-selector"
                                 >
-                                    <h1 className="text-3xl min-w-48 font-black">GNN Model</h1>
+                                    <h1 className="text-3xl min-w-48 font-black">
+                                        GNN Model
+                                    </h1>
                                     <div className="flex flex-col space-y-4">
                                         <div className="flex flex-row">
-                                            <h2 className="text-xl mr-4">Model-Task</h2>
+                                            <h2 className="text-xl mr-4">
+                                                Model-Task
+                                            </h2>
                                             <Selector
                                                 selectedOption={model}
                                                 handleChange={(e) => {
-                                                    const newModel = e.target.value;
-                                                    console.log("Selected model:", newModel);
+                                                    const newModel =
+                                                        e.target.value;
+                                                    console.log(
+                                                        "Selected model:",
+                                                        newModel
+                                                    );
                                                     setModel(newModel);
                                                     setPredicted(false);
                                                     setSimulation(false);
                                                     setProbabilities([]);
                                                     setIntmData(null);
-                                                    if (newModel.includes("GAT")) {
+                                                    if (
+                                                        newModel.includes("GAT")
+                                                    ) {
                                                         setModelType("GAT");
-                                                        setSelectedGraph("twitch_EN");
+                                                        setSelectedGraph(
+                                                            "twitch_EN"
+                                                        );
                                                         setHubNodeA(194);
                                                         setHubNodeB(590);
-                                                    } else if (newModel.includes("GraphSAGE")) {
-                                                        setModelType("GraphSAGE");
-                                                        setSelectedGraph("twitch_EN");
+                                                    } else if (
+                                                        newModel.includes(
+                                                            "GraphSAGE"
+                                                        )
+                                                    ) {
+                                                        setModelType(
+                                                            "GraphSAGE"
+                                                        );
+                                                        setSelectedGraph(
+                                                            "twitch_EN"
+                                                        );
                                                         setHubNodeA(194);
                                                         setHubNodeB(590);
-                                                    } else if (newModel.includes("GCN")) {
+                                                    } else if (
+                                                        newModel.includes("GCN")
+                                                    ) {
                                                         setModelType("GCN");
-                                                        if (newModel.includes("graph classification")) {
-                                                            setSelectedGraph(initialMUTAGGraph);
-                                                        } else if (
-                                                            newModel.includes("node classification")
+                                                        if (
+                                                            newModel.includes(
+                                                                "graph classification"
+                                                            )
                                                         ) {
-                                                            setSelectedGraph("karate");
-                                                        } else if (newModel.includes("link prediction")) {
-                                                            setSelectedGraph("twitch_EN");
+                                                            setSelectedGraph(
+                                                                initialMUTAGGraph
+                                                            );
+                                                        } else if (
+                                                            newModel.includes(
+                                                                "node classification"
+                                                            )
+                                                        ) {
+                                                            setSelectedGraph(
+                                                                "karate"
+                                                            );
+                                                        } else if (
+                                                            newModel.includes(
+                                                                "link prediction"
+                                                            )
+                                                        ) {
+                                                            setSelectedGraph(
+                                                                "twitch_EN"
+                                                            );
                                                             setHubNodeA(194);
                                                             setHubNodeB(590);
                                                         }
                                                     }
                                                 }}
-                                                OptionList={Object.keys(modelList)}
+                                                OptionList={Object.keys(
+                                                    modelList
+                                                )}
                                                 id={""}
                                             />
                                         </div>
 
                                         <ArchitectureButtonChain
                                             selectedButtons={selectedButtons}
-                                            setSelectedButtons={setSelectedButtons}
+                                            setSelectedButtons={
+                                                setSelectedButtons
+                                            }
                                             predicted={predicted}
                                             selectedModel={model}
                                         />
@@ -290,78 +343,137 @@ export default function Home() {
                                         id="graph-selector"
                                         className="flex gap-x-4 items-center  mb-3 "
                                     >
-                                        <h1 className="text-3xl font-black min-w-48">Input Graph</h1>
-                                        <div
+                                        <h1 className="text-3xl font-black min-w-48">
+                                            Input Graph
+                                        </h1>
+                                        <div className="m-1"> Sandbox Mode </div>
+                                                <Selector
+                                                    selectedOption={sandBoxMode ? "On" : "Off"}
+                                                    handleChange={handleSandboxModeSelection}
+                                                    OptionList={["On", "Off"]}
+                                                    id="dataset-selector"
+                                                />
+                                        {sandBoxMode? <button 
+                                                            key={'graph-editor'}
+                                                            onClick={handleGraphEditor}
+                                                            className="ml-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                                                        >Open the Graph</button>: <div
                                             className={`flex-1 items-center gap-x-6 ${inter2.className}`}
                                             id="dataset-description"
                                         >
                                             {DatasetInfo[model]}
-                                        </div>
+                                        </div>}
                                         <div className="flex-1 items-center gap-x-4 text-xl">
                                             <div className={inter3.className}>
-                                                {model.includes("graph classification") && (
+                                                {model.includes(
+                                                    "graph classification"
+                                                ) && !sandBoxMode && (
                                                     <>
                                                         {" "}
-                                                        <div className="m-1"> Classify the graph of </div>
+                                                        <div className="m-1">
+                                                            {" "}
+                                                            Classify the graph
+                                                            of{" "}
+                                                        </div>
                                                         <Selector
-                                                            selectedOption={selectedGraph}
-                                                            handleChange={handleGraphSelection}
-                                                            OptionList={Object.keys(graphList)}
+                                                            selectedOption={
+                                                                selectedGraph
+                                                            }
+                                                            handleChange={
+                                                                handleGraphSelection
+                                                            }
+                                                            OptionList={Object.keys(
+                                                                graphList
+                                                            )}
                                                             id="dataset-selector"
                                                         />
-                                                        <SandboxModeSelector
-                                                            sandBoxMode={sandBoxMode}
-                                                            handleSandboxModeSelection={handleSandboxModeSelection}
-                                                            handleGraphEditor={handleGraphEditor}
-                                                        />
                                                     </>
                                                 )}
+                                                {model.includes(
+                                                    "node classification"
+                                                ) && !sandBoxMode && (
+                                                    <>
+                                                        <span>
+                                                            Classify all nodes
+                                                            of the karate club
+                                                            network
+                                                        </span>
+                                                    </>
+                                                )}
+
+                                                                                                        
 
                                                 {graphEditorState && (
-                                        <div>
-                                            <GraphEditor 
-                                                onClose={() => setGraphEditorState(false)} 
-                                                simGraphData={simGraphData}
-                                                handleSimulatedGraphChange={handleSimulatedGraphChange}
-                                            />
-                                        </div>
-                                    )}
-
-                                                {model.includes("node classification") && (
-                                                    <>
-                                                    <span>
-                                                        Classify all nodes of the karate club network
-                                                    </span>
-                                                    <SandboxModeSelector
-                                                        sandBoxMode={sandBoxMode}
-                                                        handleSandboxModeSelection={handleSandboxModeSelection}
-                                                        handleGraphEditor={handleGraphEditor}
-                                                    />
-                                                    </>
+                                                    <div>
+                                                        <GraphEditor
+                                                            onClose={() =>
+                                                                setGraphEditorState(
+                                                                    false
+                                                                )
+                                                            }
+                                                            simGraphData={
+                                                                simGraphData
+                                                            }
+                                                            handleSimulatedGraphChange={
+                                                                handleSimulatedGraphChange
+                                                            }
+                                                        />
+                                                    </div>
                                                 )}
 
-                                                {model.includes("link prediction") && (
+                                                
+
+                                                {model.includes(
+                                                    "link prediction"
+                                                ) && (
                                                     <>
-                                                        Predict whether there is a link <br /> from node{" "}
+                                                        Predict whether there is
+                                                        a link <br /> from node{" "}
                                                         <NodeSelector
-                                                            nodeList={midGraphNodeSelectionList}
-                                                            selectedNode={hubNodeA}
-                                                            dependNode={hubNodeB}
-                                                            setSelectedNode={setHubNodeA}
-                                                            handleChange={handleNodeSelection}
+                                                            nodeList={
+                                                                midGraphNodeSelectionList
+                                                            }
+                                                            selectedNode={
+                                                                hubNodeA
+                                                            }
+                                                            dependNode={
+                                                                hubNodeB
+                                                            }
+                                                            setSelectedNode={
+                                                                setHubNodeA
+                                                            }
+                                                            handleChange={
+                                                                handleNodeSelection
+                                                            }
                                                         />{" "}
                                                         to node{" "}
                                                         <NodeSelector
-                                                            nodeList={midGraphNodeSelectionList}
-                                                            selectedNode={hubNodeB}
-                                                            dependNode={hubNodeA}
-                                                            setSelectedNode={setHubNodeB}
-                                                            handleChange={handleNodeSelection}
+                                                            nodeList={
+                                                                midGraphNodeSelectionList
+                                                            }
+                                                            selectedNode={
+                                                                hubNodeB
+                                                            }
+                                                            dependNode={
+                                                                hubNodeA
+                                                            }
+                                                            setSelectedNode={
+                                                                setHubNodeB
+                                                            }
+                                                            handleChange={
+                                                                handleNodeSelection
+                                                            }
                                                         />
                                                         <SandboxModeSelector
-                                                            sandBoxMode={sandBoxMode}
-                                                            handleSandboxModeSelection={handleSandboxModeSelection}
-                                                            handleGraphEditor={handleGraphEditor}
+                                                            sandBoxMode={
+                                                                sandBoxMode
+                                                            }
+                                                            handleSandboxModeSelection={
+                                                                handleSandboxModeSelection
+                                                            }
+                                                            handleGraphEditor={
+                                                                handleGraphEditor
+                                                            }
                                                         />
                                                     </>
                                                 )}
@@ -373,9 +485,14 @@ export default function Home() {
                                         <div>
                                             <ClassifyGraph
                                                 graphPath={
-                                                    model == "GCN - graph classification"
-                                                        ? graphList[selectedGraph]
-                                                        : nodeList[selectedGraph]
+                                                    model ==
+                                                    "GCN - graph classification"
+                                                        ? graphList[
+                                                              selectedGraph
+                                                          ]
+                                                        : nodeList[
+                                                              selectedGraph
+                                                          ]
                                                 }
                                                 modelPath={modelList[model]}
                                                 setChangedG={setChangedG}
@@ -383,16 +500,18 @@ export default function Home() {
                                                 setPredicted={setPredicted}
                                                 predicted={predicted}
                                                 probabilities={probabilities}
-                                                setProbabilities={setProbabilities}
+                                                setProbabilities={
+                                                    setProbabilities
+                                                }
                                                 onlyShownButton={true}
-                                                simulationLoading={simulationLoading}
+                                                simulationLoading={
+                                                    simulationLoading
+                                                }
                                                 setIsLoading={setIsLoading}
                                                 simGraphData={simGraphData}
                                             />
                                         </div>
                                     )}
-
-                                    
 
                                     {/* 在未预测时显示 Graph View 和 Matrix View */}
                                     {!predicted && (
@@ -414,18 +533,45 @@ export default function Home() {
                                                 >
                                                     <GraphMatrixVisualization
                                                         dataFile={
-                                                            model.includes("graph classification")
-                                                                ? graphList[selectedGraph]
-                                                                : model.includes("node classification")
-                                                                ? nodeList[selectedGraph]
-                                                                : model.includes("link prediction")
-                                                                ? linkList[selectedGraph]
+                                                            model.includes(
+                                                                "graph classification"
+                                                            )
+                                                                ? graphList[
+                                                                      selectedGraph
+                                                                  ]
+                                                                : model.includes(
+                                                                      "node classification"
+                                                                  )
+                                                                ? nodeList[
+                                                                      selectedGraph
+                                                                  ]
+                                                                : model.includes(
+                                                                      "link prediction"
+                                                                  )
+                                                                ? linkList[
+                                                                      selectedGraph
+                                                                  ]
                                                                 : "test-test"
                                                         }
-                                                        simulatedGraphData={simGraphData}
-                                                        hubNodeA={model.includes('link prediction') ? hubNodeA : undefined}
-                                                        hubNodeB={model.includes('link prediction') ? hubNodeB : undefined}
+                                                        simulatedGraphData={
+                                                            simGraphData
+                                                        }
+                                                        hubNodeA={
+                                                            model.includes(
+                                                                "link prediction"
+                                                            )
+                                                                ? hubNodeA
+                                                                : undefined
+                                                        }
+                                                        hubNodeB={
+                                                            model.includes(
+                                                                "link prediction"
+                                                            )
+                                                                ? hubNodeB
+                                                                : undefined
+                                                        }
                                                         modelType={model}
+                                                        sandboxMode={sandBoxMode}
                                                     />
                                                 </div>
                                             </div>
@@ -440,24 +586,40 @@ export default function Home() {
                                             <div className="flex gap-x-4 items-center">
                                                 <div className="flex gap-x-4">
                                                     <h2 className="text-3xl font-black">
-                                                        Inner Model Visualization
+                                                        Inner Model
+                                                        Visualization
                                                     </h2>
                                                 </div>
                                                 <div className="flex gap-x-4">
                                                     <ViewSwitch
                                                         handleChange={() => {
                                                             setIsLoading(true);
-                                                            setIsGraphView(!isGraphView);
-                                                            setSimulation(false);
-                                                            d3.select(document).on("click", null);
+                                                            setIsGraphView(
+                                                                !isGraphView
+                                                            );
+                                                            setSimulation(
+                                                                false
+                                                            );
+                                                            d3.select(
+                                                                document
+                                                            ).on("click", null);
                                                             d3.select(".mats")
-                                                                .selectAll(".procVis")
+                                                                .selectAll(
+                                                                    ".procVis"
+                                                                )
                                                                 .remove();
                                                         }}
                                                         checked={isGraphView}
-                                                        labels={["Graph View", "Matrix View"]}
+                                                        labels={[
+                                                            "Graph View",
+                                                            "Matrix View",
+                                                        ]}
                                                     />
-                                                    <Hint text={"Change the view of GNN model"} />
+                                                    <Hint
+                                                        text={
+                                                            "Change the view of GNN model"
+                                                        }
+                                                    />
                                                 </div>
                                                 <div className="flex gap-x-4 colorLegend">
                                                     <ColorLegend />
@@ -465,87 +627,181 @@ export default function Home() {
                                             </div>
 
                                             {/* 根据 isGraphView 显示对应的视图 */}
-                                            <div className={styles.vizContainer}>
-                                                {model == "GCN - graph classification" ? (
+                                            <div
+                                                className={styles.vizContainer}
+                                            >
+                                                {model ==
+                                                "GCN - graph classification" ? (
                                                     isGraphView ? (
                                                         <GraphVisualizer
-                                                            graph_path={graphList[selectedGraph]}
+                                                            graph_path={
+                                                                graphList[
+                                                                    selectedGraph
+                                                                ]
+                                                            }
                                                             intmData={intmData}
                                                             changed={changedG}
-                                                            predicted={predicted}
-                                                            selectedButtons={selectedButtons}
-                                                            simulationLoading={simulationLoading}
-                                                            setSimulation={setSimulation}
-                                                            innerComputationMode={modelType}
+                                                            predicted={
+                                                                predicted
+                                                            }
+                                                            selectedButtons={
+                                                                selectedButtons
+                                                            }
+                                                            simulationLoading={
+                                                                simulationLoading
+                                                            }
+                                                            setSimulation={
+                                                                setSimulation
+                                                            }
+                                                            innerComputationMode={
+                                                                modelType
+                                                            }
                                                             onLoadComplete={() => {
-                                                                if (model.includes("link prediction")) {
-                                                                    setIsLoading(false);
+                                                                if (
+                                                                    model.includes(
+                                                                        "link prediction"
+                                                                    )
+                                                                ) {
+                                                                    setIsLoading(
+                                                                        false
+                                                                    );
                                                                 }
                                                             }}
                                                         />
                                                     ) : (
                                                         <MatricesVisualizer
-                                                            graph_path={graphList[selectedGraph]}
+                                                            graph_path={
+                                                                graphList[
+                                                                    selectedGraph
+                                                                ]
+                                                            }
                                                             intmData={intmData}
                                                             changed={changedG}
-                                                            predicted={predicted}
-                                                            selectedButtons={selectedButtons}
-                                                            onLoadComplete={() => setIsLoading(false)}
-                                                            simGraphData={simGraphData}
-                                                            
+                                                            predicted={
+                                                                predicted
+                                                            }
+                                                            selectedButtons={
+                                                                selectedButtons
+                                                            }
+                                                            onLoadComplete={() =>
+                                                                setIsLoading(
+                                                                    false
+                                                                )
+                                                            }
+                                                            simGraphData={
+                                                                simGraphData
+                                                            }
                                                         />
                                                     )
-                                                ) : model == "GCN - node classification" ? (
+                                                ) : model ==
+                                                  "GCN - node classification" ? (
                                                     isGraphView ? (
                                                         <NodeGraphVisualizer
-                                                            graph_path={nodeList[selectedGraph]}
+                                                            graph_path={
+                                                                nodeList[
+                                                                    selectedGraph
+                                                                ]
+                                                            }
                                                             intmData={intmData}
                                                             changed={changedG}
-                                                            predicted={predicted}
-                                                            selectedButtons={selectedButtons}
-                                                            simulationLoading={simulationLoading}
-                                                            setSimulation={setSimulation}
-                                                            innerComputationMode={modelType}
-                                                            onLoadComplete={() => setIsLoading(false)}
-
+                                                            predicted={
+                                                                predicted
+                                                            }
+                                                            selectedButtons={
+                                                                selectedButtons
+                                                            }
+                                                            simulationLoading={
+                                                                simulationLoading
+                                                            }
+                                                            setSimulation={
+                                                                setSimulation
+                                                            }
+                                                            innerComputationMode={
+                                                                modelType
+                                                            }
+                                                            onLoadComplete={() =>
+                                                                setIsLoading(
+                                                                    false
+                                                                )
+                                                            }
                                                         />
                                                     ) : (
                                                         <NodeMatricesVisualizer
-                                                            graph_path={nodeList[selectedGraph]}
+                                                            graph_path={
+                                                                nodeList[
+                                                                    selectedGraph
+                                                                ]
+                                                            }
                                                             intmData={intmData}
                                                             changed={changedG}
-                                                            predicted={predicted}
-                                                            selectedButtons={selectedButtons}
-                                                            onLoadComplete={() => setIsLoading(false)}
-                                                            simGraphData={simGraphData}
-                                                            sandBoxMode={sandBoxMode}
+                                                            predicted={
+                                                                predicted
+                                                            }
+                                                            selectedButtons={
+                                                                selectedButtons
+                                                            }
+                                                            onLoadComplete={() =>
+                                                                setIsLoading(
+                                                                    false
+                                                                )
+                                                            }
+                                                            simGraphData={
+                                                                simGraphData
+                                                            }
+                                                            sandBoxMode={
+                                                                sandBoxMode
+                                                            }
                                                         />
                                                     )
                                                 ) : isGraphView ? (
                                                     <LinkGraphVisualizer
-                                                        graph_path={linkList[selectedGraph]}
+                                                        graph_path={
+                                                            linkList[
+                                                                selectedGraph
+                                                            ]
+                                                        }
                                                         intmData={intmData}
                                                         changed={changedG}
                                                         predicted={predicted}
-                                                        selectedButtons={selectedButtons}
-                                                        simulationLoading={simulationLoading}
-                                                        setSimulation={setSimulation}
+                                                        selectedButtons={
+                                                            selectedButtons
+                                                        }
+                                                        simulationLoading={
+                                                            simulationLoading
+                                                        }
+                                                        setSimulation={
+                                                            setSimulation
+                                                        }
                                                         hubNodeA={hubNodeA}
                                                         hubNodeB={hubNodeB}
-                                                        innerComputationMode={modelType}
-                                                        onLoadComplete={() => setIsLoading(false)}
+                                                        innerComputationMode={
+                                                            modelType
+                                                        }
+                                                        onLoadComplete={() =>
+                                                            setIsLoading(false)
+                                                        }
                                                     />
                                                 ) : (
                                                     <LinkMatricesVisualizer
-                                                        graph_path={linkList[selectedGraph]}
+                                                        graph_path={
+                                                            linkList[
+                                                                selectedGraph
+                                                            ]
+                                                        }
                                                         intmData={intmData}
                                                         changed={changedG}
                                                         predicted={predicted}
-                                                        selectedButtons={selectedButtons}
+                                                        selectedButtons={
+                                                            selectedButtons
+                                                        }
                                                         hubNodeA={hubNodeA}
                                                         hubNodeB={hubNodeB}
-                                                        innerComputationMode={modelType}
-                                                        onLoadComplete={() => setIsLoading(false)}
+                                                        innerComputationMode={
+                                                            modelType
+                                                        }
+                                                        onLoadComplete={() =>
+                                                            setIsLoading(false)
+                                                        }
                                                     />
                                                 )}
                                             </div>
@@ -562,5 +818,3 @@ export default function Home() {
         </div>
     );
 }
-
-

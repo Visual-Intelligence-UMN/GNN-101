@@ -70,11 +70,11 @@ export const modelTypeList: { [k: string]: string } = {
 
 const chemicalNames = ['C16NO2', 'C6FNO2', 'C7NO3']
 function graph_list_generate(namelist: string[]) {
-    let res: { [k: string]: string } = {"test":"./json_data/graphs/testing_graph.json"};
+    let res: { [k: string]: string } = { };
 
-    // for (let i = 0; i < namelist.length; i++) {
-    //     res[`molecule_${chemicalNames[i]}`] = `./json_data/graphs/input_graph${i}.json`;
-    // }
+    for (let i = 0; i < namelist.length; i++) {
+        res[`molecule_${chemicalNames[i]}`] = `./json_data/graphs/input_graph${i}.json`;
+    }
 
     console.log("Generating graph list with chemical names:", res);
 
