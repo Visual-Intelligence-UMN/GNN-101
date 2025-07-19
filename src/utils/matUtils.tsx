@@ -94,7 +94,7 @@ export function visualizeGraphClassifierFeatures(
         frames,
         schemeLocations,
         featureVisTable,
-        7,
+        features[0].length,
         10,
         15,
         100
@@ -106,8 +106,10 @@ export function visualizeGraphClassifierFeatures(
     featureVisTable = firstLayerPackage.featureVisTable;
     const firstLayer = firstLayerPackage.firstLayer;
 
+    console.log("observe table", featureVisTable, features, conv1);
+
     //-----------------------------------GCNConv LAYERS-----------------------------------------------
-    const featureChannels = 16;
+    const featureChannels = conv1[0].length;
 
     const GCNConvPackage = drawGCNConvGraphModel(
         conv1,
@@ -424,7 +426,7 @@ export function visualizeNodeClassifierFeatures(
         frames,
         schemeLocations,
         featureVisTable,
-        34,
+        features[0].length,
         5,
         15,
         150
@@ -437,7 +439,7 @@ export function visualizeNodeClassifierFeatures(
     const firstLayer = firstLayerPackage.firstLayer;
 
     //-----------------------------------GCNConv LAYERS-----------------------------------------------
-    const featureChannels = 16;
+    const featureChannels = conv1[0].length;
 
     const GCNConvPackage = drawGCNConvNodeModel(
         conv1,
@@ -1159,7 +1161,7 @@ export function visualizeLinkClassifierFeatures(
         frames,
         schemeLocations,
         featureVisTable,
-        128,
+        features[0].length,
         2.5,
         15,
         150,
@@ -1180,7 +1182,7 @@ export function visualizeLinkClassifierFeatures(
     console.log("paths for first layer", pathsForFisrtLayer);
 
     //-----------------------------------GCNConv LAYERS-----------------------------------------------
-    const featureChannels = 16;
+    const featureChannels = conv1[0].length;
     
     // we need have the locations and indices of the nodes involved during the computation
 
