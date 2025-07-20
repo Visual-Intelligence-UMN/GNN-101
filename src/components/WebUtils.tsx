@@ -847,6 +847,7 @@ export function visualizeMatrix(
         try {
             let data = simGraphData;
             if(!sandBoxMode) data = await load_json(path);
+            console.log("viaMat data", data);
             const nodeAttrs = getNodeAttributes(data);
             const features = await get_features_origin(data);
             const processedData = await graph_to_matrix(data);

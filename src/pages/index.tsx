@@ -184,11 +184,13 @@ export default function Home() {
     function handleSandboxModeSelection(
         e: React.ChangeEvent<HTMLSelectElement>
     ): void {
+        console.log("Sandbox mode selection changed:", e.target.value);
         if (e.target.value === "On") {
             setSandBoxMode(true);
         } else {
             setSandBoxMode(false);
         }
+        console.log("Sandbox mode is now:", sandBoxMode);
     }
 
     return (

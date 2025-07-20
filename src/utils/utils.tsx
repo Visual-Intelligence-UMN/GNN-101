@@ -24,6 +24,7 @@ import { dataPreparationLinkPred, constructComputationalGraph } from "./linkPred
 import { extractSubgraph } from "./graphDataUtils";
 import { isValidNode } from "./GraphvislinkPredUtil";
 import { all, number } from "mathjs";
+import { simulatedModelList } from "./const";
 
 env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
@@ -1560,7 +1561,7 @@ export const graphPrediction = async (
     modelPath: string, 
     graphPath: string, 
     simGraphData:any, 
-    sandBoxMode = true
+    sandBoxMode: boolean
 ) => {
 
     console.log("graph pred pipe modelPath", modelPath, graphPath);
@@ -1568,6 +1569,8 @@ export const graphPrediction = async (
     const session = await loadModel(modelPath);
     let graphData: IGraphData = simGraphData;
     if(!sandBoxMode)graphData = await load_json(graphPath);
+
+    console.log("check graphData in pred engine", graphData, sandBoxMode);
 
     // Convert `graphData` to tensor-like object expected by your ONNX model
     const xTensor = new ort.Tensor(
@@ -1578,20 +1581,34 @@ export const graphPrediction = async (
 
    console.log("graph pred pipe", graphData.edge_index.length, graphData.edge_index[0].length, session.inputNames);
 
-    const edgeIndexTensor = new ort.Tensor(
+    let edgeIndexTensor:any = new ort.Tensor(
         "int64",
         new BigInt64Array(graphData.edge_index.flat().map(BigInt)),
         [graphData.edge_index.length, graphData.edge_index[0].length]
     );
 
+if(!sandBoxMode){
+    edgeIndexTensor = new ort.Tensor(
+        "int32",
+        new Int32Array(graphData.edge_index.flat()),
+        [graphData.edge_index.length, graphData.edge_index[0].length]
+    );
+}
+
     console.log("graph pred pipe edgeIndexTensor", edgeIndexTensor);
 
-    const batchTensor = new ort.Tensor(
+    let batchTensor:any = new ort.Tensor(
     "int64",
     new BigInt64Array(graphData.batch.map(BigInt)),
     [graphData.batch.length]
 );
-
+if(!sandBoxMode){
+    batchTensor = new ort.Tensor(
+        "int32",
+        new Int32Array(graphData.batch),
+        [graphData.batch.length]
+    );
+}
 
     const outputMap = await session.run({
         x: xTensor,

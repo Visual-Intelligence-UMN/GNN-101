@@ -408,14 +408,14 @@ export function drawSingleGCNConvFeature(
 
 
     //loop through each node
-    console.log("gcnFeature is ", gcnFeature);
+    //console.log("gcnFeature is ", gcnFeature);
     let nodeMat = gcnFeature[i];
 
     //where we met encounter issue
-    console.log("nodeMat is " + nodeMat);
+    //console.log("nodeMat is ", nodeMat);
     for (let m = 0; m < featureChannels; m++) {
         const cellValue = nodeMat[m];
-        console.log("cellValue is " + cellValue);
+        // console.log("cellValue is " + cellValue);
         const rect = g
             .append("rect")
             .attr("x", locations[i][0] + rectW * m)

@@ -20,7 +20,9 @@ import {
     get_cood_locations,
     HeatmapData,
     drawNodeAttributes,
-    getNodeAttributes
+    getNodeAttributes,
+    loadSimulatedModelWeights,
+    loadWeights
 } from "../utils/matHelperUtils";
 import { visualizeMatrixBody } from "../components/WebUtils";
 
@@ -139,7 +141,11 @@ async function initGraphClassifier(
     graph: any, 
     features: any[][], 
     nodeAttrs: string[], 
-    intmData:any, graph_path:string)  {
+    intmData:any, 
+    graph_path:string,
+    dim: number
+)  {
+    console.log("check intmdata", intmData);
     let colorSchemeTable: any = null;
     //a data structure to record the link relationship
     //fill up the linkMap
@@ -176,12 +182,16 @@ async function initGraphClassifier(
             final: finalMax,
         };
 
+        console.log("intm data before check", intmData.conv1, intmData.conv2, intmData.conv3, intmData.pooling, intmData.final, dim);
 
-        conv1 = splitIntoMatrices(intmData.conv1, 16);
-        conv2 = splitIntoMatrices(intmData.conv2, 16);
-        conv3 = splitIntoMatrices(intmData.conv3, 16);
+
+        conv1 = splitIntoMatrices(intmData.conv1, dim);
+        conv2 = splitIntoMatrices(intmData.conv2, dim);
+        conv3 = splitIntoMatrices(intmData.conv3, dim);
         pooling = intmData.pooling;
         final = intmData.final;
+
+        console.log("intm data after check", conv1, conv2, conv3, pooling, final);
     }
 
 
@@ -239,13 +249,19 @@ export async function visualizeGraphClassifier(
 ) {
     try {
         console.log("matvis pipe 0", simGraphData)
-        sandBoxMode = true;
         setIsLoading(true);
         // Process data
-        console.log("matvis pipe 1", graph_path, intmData);
+        console.log("matvis pipe 1", graph_path, intmData, sandBoxMode);
         let data = simGraphData;
-        if(!sandBoxMode) data = await load_json(graph_path);
+        let {weights, bias} = loadSimulatedModelWeights();
+        if(!sandBoxMode) {
+            ({weights, bias} = loadWeights());
+            data = await load_json(graph_path);
+            console.log("matvis pipe not sandbox", data);
+        }
         console.log("matvis pipe 2", data);
+        const dim = weights[1].length
+        console.log("dim", dim);
         //node attributes extraction
         const nodeAttrs = getNodeAttributes(data);
         //accept the features from original json file
@@ -253,7 +269,7 @@ export async function visualizeGraphClassifier(
         const processedData = await graph_to_matrix(data);
         console.log("matvis pipe 3", features, nodeAttrs, processedData);
         // Initialize and run D3 visualization with processe  d data
-        await initGraphClassifier(processedData, features, nodeAttrs, intmData, graph_path);
+        await initGraphClassifier(processedData, features, nodeAttrs, intmData, graph_path, dim);
     } catch (error) {
         console.error("Error in visualizeGNN:", error);
     } finally {
