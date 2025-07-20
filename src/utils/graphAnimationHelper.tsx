@@ -3,6 +3,7 @@ import { create, all, matrix, i } from "mathjs";
 import { State, flipHorizontally, flipVertically, myColor } from "./utils";
 import { injectSVG } from "@/utils/svgUtils";
 import { roundToTwo } from "@/components/WebUtils";
+import { start } from "node:repl";
 
 
 export function graphVisDrawMatrixWeight(
@@ -24,6 +25,20 @@ export function graphVisDrawMatrixWeight(
     }
 
     let flag = true;
+    console.log("graphVisDrawMatrixWeight:", {
+        node,
+        Xt,
+        startCoordList,
+        endCoordList,
+        curveDir,
+        currentStep,
+        myColor,
+        weightMatrixPostions,
+        featureChannels,
+        g,
+        mode,
+        id
+    });
 
 
     
@@ -54,7 +69,6 @@ export function graphVisDrawMatrixWeight(
         Xt = flipHorizontally(Xt);
     }
     if (mode === 0 && node.graphIndex === 5) {
-        console.log("AWF")
         Xt = flipHorizontally(Xt);
         Xt = flipVertically(Xt);
     }
@@ -62,6 +76,10 @@ export function graphVisDrawMatrixWeight(
     
 
     let Xv = Xt[currentStep];
+    console.log("Xvawd",Xv.length, Xv)
+    console.log("")
+    console.log("start",startCoordList)
+    console.log("end",endCoordList)
 
     
 
@@ -76,8 +94,7 @@ export function graphVisDrawMatrixWeight(
         if (mode === 1 && node.graphIndex === 4) {
             s1 = startCoordList[j]
         }
-     
-
+    
         let m1 = [0,0];
         // if(flag){
         //     m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
@@ -227,7 +244,8 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
         weightMat = weightMat.slice().reverse();
     }
 
-    
+    console.log("weightMat", weightMat)
+    console.log(i)
     for (let j = 0; j < weightMat[i].length; j++) {
         innerGroup.append("rect")
             .attr("x", 150)
@@ -413,10 +431,8 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
 
 
 export function hoverOverHandler(node: any, aggregatedData: any, calculatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], Xt: any, startCoordList: any, endCoordList: any, svg: any, mode: number, isOutput: boolean) {
-
-    
-
-    for (let i = 0; i < node.features.length; i++) {
+    console.log("node feature length", node.features.length)
+    for (let i = 0; i < calculatedData.length; i++) {
         d3.select(`.calculatedFeatures${i}`)
             .on("mouseover", function () {
                 if (!state.isClicked || state.isPlaying || state.isAnimating) {
@@ -424,20 +440,18 @@ export function hoverOverHandler(node: any, aggregatedData: any, calculatedData:
                 }
                 d3.selectAll(".weight-matrix-frame").style("opacity", 0).lower()
                 if (mode === 1 && node.graphIndex === 4) {
+     
+                    
                     graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, 1, i, myColor, weightsLocation, node.features.length, svg, mode)
                 }
                 else {
-                graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode)
+                    graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode)
                 }
                 d3.selectAll(".calculatedRect").style("opacity", 0.2)
                 d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1)
                 d3.selectAll(`#tempath${i}`).style("opacity", 1);
                 displayerHandler(node, aggregatedData, calculatedData, state, g, displayHeight, rectL, wmRectL, myColor, weights, index, weightsLocation, i, mode, isOutput)
-
-
-
-
-    })
+            })
             .on("mouseout", function () {
                 if (!state.isClicked || state.isPlaying || state.isAnimating) {
                     return;
@@ -449,9 +463,6 @@ export function hoverOverHandler(node: any, aggregatedData: any, calculatedData:
                 d3.selectAll(`#tempath${i}`).style("opacity", 0).raise();
                 d3.selectAll(".columnGroup").style("opacity", 1);
                 d3.selectAll(".calculatedRect").style("opacity", 1)
-
-                
-
             });
     }
 }

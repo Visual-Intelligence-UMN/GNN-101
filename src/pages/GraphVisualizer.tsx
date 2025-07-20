@@ -143,6 +143,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
                 let maxXDistance = 0;
                 let maxYDistance = 0;
+                console.log("data_graphvis", data)
                 let limitedNodes = data.nodes.slice(0, 17);
 
                 limitedNodes.forEach((node1: any) => {
@@ -297,12 +298,13 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
                         }
                     }
+                    console.log("WADAvalue", value)
                     data.nodes.forEach((node: any) => {
                         node.graphIndex = i;
                         if (value != null && i <= 4 && value instanceof Float32Array) {
                             node.features = value.subarray(
-                                64 * node.id,
-                                64 * (node.id + 1)
+                                16 * node.id,
+                                16 * (node.id + 1)
                             );
                         }
 
@@ -448,7 +450,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                             0
                         );
 
-                        // since in the featureVisualizer each node has its own svgElement, circles here are made transparent
+                        // since in the featureVisualizer each node has its own svgElement, circles here are made 
                         svg.selectAll("circle")
                             .attr("opacity", 0);
             
@@ -478,12 +480,14 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
         const runVisualization = async () => {
             if ((intmData == null || changed) && !predicted) {
+                console.log("Running visualization")
                 await visualizeGraph(graph_path, () => {
                     handleSimulationComplete(visualizationId);
                     onLoadComplete();
                 },
                     true, 0);
             } else {
+                console.log("Running visualization 2")
                 await visualizeGNN(4);
                 handleSimulationComplete(visualizationId);
                 onLoadComplete();
@@ -492,12 +496,17 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
 
         const visualizeGNN = async (num: number) => {
+            console.log("Running visualization 4")
             try {
                 setIsLoading(true);
+                console.log("Running visualization 5")
 
                 const processedData = await data_prep(graph_path);
+                console.log("Running visualization 6")
 
                 const graphsData = await prep_graphs(num, processedData);
+                console.log("graphsData", graphsData)
+                console.log("Running visualization 7")
                 // Initialize and run D3 visualization with processe  d data
                 await init(graphsData);
             } catch (error) {

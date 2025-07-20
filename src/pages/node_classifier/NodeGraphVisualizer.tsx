@@ -238,19 +238,20 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
             node.graphIndex = i;
             if (value != null && i <= 2 && value instanceof Float32Array) {
               node.features = value.subarray(
-                4 * node.id,
-                4 * (node.id + 1)
+                16 * node.id,
+                16 * (node.id + 1)
               );
             }
             if (value != null && i > 2 && i < 4 && value instanceof Float32Array) {
               node.features = value.subarray(
-                2 * node.id,
-                2 * (node.id + 1)
+                16 * node.id,
+                16 * (node.id + 1)
               );
             }
 
             if (value != null && i > 2 && i === 4) {
               node.features = value[node.id];
+              console.log("VAHWBDHJABWDIBAHIWJFBIA", value[node.id])
 
               
             }

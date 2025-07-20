@@ -605,6 +605,10 @@ export function featureVisualizer(
     innerComputationMode: string,
 ) {
     state.isClicked = false;
+    console.log("featureVisualizer")
+    console.log("graphs", graphs)
+    console.log("allNodes", allNodes)
+
 
 
     // 1. visualize feature
@@ -616,7 +620,13 @@ export function featureVisualizer(
         ({ weights, bias } = loadNodeWeights());
         convNum = 5
     }
+    console.log("VBAWUIBIAUWDB", weights)
 
+    weights[0] = transposeAnyMatrix(weights[0])
+    
+
+
+    console.log("weights", weights)
 
     const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex); //somehow doesn't include the node in the last layer
 
@@ -637,10 +647,7 @@ export function featureVisualizer(
             })
             allFeatureMap.push(featureMap)
         }
-        
-
     })
-
 
 
     nodesByIndex.forEach((nodes, graphIndex) => { // iterate through each graphs
@@ -657,7 +664,6 @@ export function featureVisualizer(
         if (graphs.length != 0 && graphIndex > 0 && graphIndex < (convNum)) {
             currentWeights = weights[graphIndex - 1];
             currentBias = bias[graphIndex - 1]
-
             const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex);
 
             let featureMap: number[][] = []
@@ -666,10 +672,10 @@ export function featureVisualizer(
                 if (index === graphIndex - 1) {
                     nodes.forEach((n) => {
                         featureMap.push(n.features);
-                        console.log(`Prep-Feature-value-${index}: `, n.features);
                     })
                 }
             })
+            console.log("featureMap", featureMap)
             aggregatedDataMap = [];
             for (let i = 0; i < nodes.length; i++) {
                 let aggFeatures: number[] = [];
@@ -681,19 +687,15 @@ export function featureVisualizer(
                     let stepStr = "";
                     let isFirstTerm = true;
 
-                    console.log(`Calculating features for node ${i}, feature dimension ${d}`, normalizedAdjMatrix);
+                    console.log(graphIndex)
                     
                     for (let k = 0; k < featureMap.length; k++) {
                         // Only include terms for nodes that are connected (have non-zero weights)
-                        console.log(`Feature-value-${k}: `, featureMap[k])
                         if (normalizedAdjMatrix[i][k] !== 0) {
                             const fVal = featureMap[k][d];
                             const weightVal = normalizedAdjMatrix[i][k];
-                            console.log(`Feature-value-${i}-${k}: ${featureMap[k][d]}`)
                             sum += fVal * weightVal;
-                            console.log(`Node ${i}, Feature ${d}-${k}: ${fVal} * ${weightVal} = ${fVal * weightVal}`);
                             const term = `(${fVal.toFixed(3)} × ${weightVal.toFixed(3)})`;
-                            
                             // Add newline and plus sign for all terms except the first
                             stepStr += (isFirstTerm ? "" : "\n+ ") + term;
                             isFirstTerm = false;
@@ -711,12 +713,15 @@ export function featureVisualizer(
                     nodes[i].aggregationSteps = aggSteps;
                 }
             }
+            console.log("components",aggregatedDataMap, currentWeights)
             calculatedDataMap = matrixMultiplication(aggregatedDataMap, currentWeights);
+
         }
         for (let i = 0; i < nodes.length; i++) {
             nodes[i].matmulResults = calculatedDataMap[i]; 
             nodes[i].biases        = currentBias;
         }
+        
 
 
 
@@ -730,6 +735,16 @@ export function featureVisualizer(
             .attr("layerNum", graphIndex)
             .attr("class", "layerVis")
             .attr("transform", `translate(${xOffset},10)`);
+            
+
+
+        console.log("calculatedDataMap", calculatedDataMap)
+        console.log("aggregatedDataMap", aggregatedDataMap)
+        console.log("currentWeights", currentWeights)
+        console.log("currentBias", currentBias)
+        console.log("normalizedAdjMatrix", normalizedAdjMatrix)
+         
+        console.log("allFeatureMap", allFeatureMap)
 
 
 
@@ -931,6 +946,7 @@ export function featureVisualizer(
                 });
 
 
+
                 //click logic
                 if (node.graphIndex != 0) {
                     nodeGroup.on("click", function (event: any) {
@@ -961,6 +977,7 @@ export function featureVisualizer(
                         if (mode === 1 && graphIndex === 4) {
                             nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, svg, mode)
                         } else {
+           
                             calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, allFeatureMap, svg, offset, height, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
                         };
 
