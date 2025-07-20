@@ -86,7 +86,7 @@ async function initNodeClassifier(graph: any, features: any[][], intmData:any, g
 
     const gLen = graph.length;
 
-    const gridSize = 800;
+    const gridSize = 600;
     const margin = { top: 10, right: 80, bottom: 30, left: 80 };
     const width = 20 * gLen + 50 + 6 * 102 + 1200 * 2;
     const height = (gridSize + margin.top + margin.bottom) * 2;
@@ -262,13 +262,21 @@ export async function visualizeGraphClassifier(
 };
 
 //Visualization Pipeline for Node Classifier
-export async function visualizeNodeClassifier(setIsLoading:any, graph_path:string, intmData:any) {
+export async function visualizeNodeClassifier(
+    setIsLoading:any, 
+    graph_path:string, 
+    intmData:any,
+    simGraphData:any,
+    sandBoxMode:boolean
+) {
     try {
         setIsLoading(true);
         // Process data
-        const data = await load_json(graph_path);
+        let data = simGraphData;
+        if(!sandBoxMode) data = await load_json(graph_path);
+        console.log("matvis pipe 2 node", data, sandBoxMode);
         //training nodes
-        const trainingNodes = [12, 1, 5, 3, 9];
+        const trainingNodes = [1, 5, 3];
         //accept the features from original json file
         const features = await get_features_origin(data);
         const processedData = await graph_to_matrix(data);
@@ -355,7 +363,6 @@ async function initLinkClassifier(
 
     let conv1: number[][] = [],
         conv2: number[][] = [],
-        conv3: number[][] = [],
         prob_adj:number[][] = [];
 
 
@@ -373,9 +380,8 @@ async function initLinkClassifier(
         // };
 
         console.log("test len",intmData.prob_adj.length)
-        conv1 = splitIntoMatrices(intmData.conv1, 16);
-        conv2 = splitIntoMatrices(intmData.conv2, 16);
-        conv3 = splitIntoMatrices(intmData.conv3, 16);
+        conv1 = splitIntoMatrices(intmData.conv1, 64);
+        conv2 = splitIntoMatrices(intmData.conv2, 64);
         prob_adj = splitIntoMatrices(intmData.prob_adj, Math.sqrt(intmData.prob_adj.length));
     }
 
@@ -426,32 +432,25 @@ async function initLinkClassifier(
     const setA = getNodeSet(LargeGraph, hubNodeA);
     const setB = getNodeSet(LargeGraph, hubNodeB);
 
-    console.log("debug seta setb", setA, setB);
-
     //get the set of nodes
     const featuresIndicesLayerOne:number[] = removeDuplicatesFromSubarrays([[...setA[0], ...setB[0]]])[0];
     const featuresIndicesLayerTwo:number[] = removeDuplicatesFromSubarrays([[...setA[1], ...setB[1]]])[0];
-    const featuresIndicesLayerThree:number[] = removeDuplicatesFromSubarrays([[...setA[2], ...setB[2]]])[0];
+
 
     const keysForEach = [
         featuresIndicesLayerOne.sort((a, b) => a - b), 
         featuresIndicesLayerTwo.sort((a, b) => a - b), 
-        featuresIndicesLayerThree.sort((a, b) => a - b),
         [hubNodeA, hubNodeB].sort((a, b) => a - b)
     ];
 
     //indexing the node/intermediate features by set
     let featuresLayerOne = [];
     let featuresLayerTwo = [];
-    let featuresLayerThree = [];
     for(let i = 0; i < featuresIndicesLayerOne.length; i++){
         featuresLayerOne.push({[featuresIndicesLayerOne[i]]:features[featuresIndicesLayerOne[i]]});
     }
     for(let i = 0; i < featuresIndicesLayerTwo.length; i++){
         featuresLayerTwo.push({[featuresIndicesLayerTwo[i]]:conv1[featuresIndicesLayerTwo[i]]});
-    }
-    for(let i = 0; i < featuresIndicesLayerThree.length; i++){
-        featuresLayerThree.push({[featuresIndicesLayerThree[i]]:conv2[featuresIndicesLayerThree[i]]});
     }
 
     //sort two features data tables
@@ -467,24 +466,18 @@ async function initLinkClassifier(
         return Number(keyA) - Number(keyB); 
     });
 
-    featuresLayerThree.sort((a, b) => {
-        let keyA = Object.keys(a)[0]; 
-        let keyB = Object.keys(b)[0]; 
-        return Number(keyA) - Number(keyB); 
-    });
-
     //get the feature from decoding phase z @ z.t() where z is the matrix from the conv2
-    let featuresLayerFour = [{[hubNodeA]:conv2[hubNodeA]}, {[hubNodeB]:conv2[hubNodeB]}];
+    let featuresLayerThree = [{[hubNodeA]:conv2[hubNodeA]}, {[hubNodeB]:conv2[hubNodeB]}];
     //sort the third data table
     if(hubNodeB<hubNodeA){
-        featuresLayerFour = [{[hubNodeB]:conv2[hubNodeB]}, {[hubNodeA]:conv2[hubNodeA]}];
+        featuresLayerThree = [{[hubNodeB]:conv2[hubNodeB]}, {[hubNodeA]:conv2[hubNodeA]}];
     }
 
     //get the final result from probability matrix
-    let featuresLayerFive = prob_adj[hubNodeA][hubNodeB];
+    let featuresLayerFour = prob_adj[hubNodeA][hubNodeB];
 
     //summarize them as a table
-    const featuresDataTable = [featuresLayerOne, featuresLayerTwo, featuresLayerThree, featuresLayerFour, featuresLayerFive];
+    const featuresDataTable = [featuresLayerOne, featuresLayerTwo, featuresLayerThree, featuresLayerFour];
     console.log("featuresDataTable", featuresDataTable);
 
     //feature value extractions
@@ -522,7 +515,7 @@ async function initLinkClassifier(
 
     const featuresManager = visualizeLinkClassifierFeatures(
         locations, featuresArray, myColor, 
-        conv1, conv2, conv3, prob_adj[hubNodeA][hubNodeB], graph, adjList, [], keys, 
+        conv1, conv2, prob_adj[hubNodeA][hubNodeB], graph, adjList, [], keys, 
         keysForEach, mergedNodes, innerComputationMode);
     
 
@@ -533,5 +526,3 @@ async function initLinkClassifier(
 
    // console.log("finished visulizing link classifier", conv1, conv2, decode_mul, decode_sum, prob_adj, locations);
 };
-
-

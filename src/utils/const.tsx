@@ -23,32 +23,35 @@ export const formulaTextClass: { [k: string]: string[] } = {
 }
 
 export const nodeSelectionList = [
-    1,2,3
+    148, 407, 79, 116, 994, 632, 71, 110, 420, 772, 394, 109, 241, 471
 ];
 
 export const midGraphNodeSelectionList = [
-    1,2,3
+    317, 784, 203, 651, 50, 70, 297, 696, 623, 590, 194
 ];
 
 export const twitchNodeSelectionList = [
-    1,2,3
+    194, 497, 567, 590, 1147, 1169, 1588, 1882, 
+    1906, 2369, 2779, 3649, 3728, 3797, 4591, 
+    4990, 5117, 6509
 ];
 
 export const nodeList: { [k: string]: string } = {
-    karate: "./json_data/graphs/testing_graph.json",
+    karate: "./json_data/karate_dataset1.json",
 };
 
 export const linkList: { [k: string]: string } = {
-    twitch_EN: "./json_data/graphs/testing_graph.json",
+    twitch_EN: "./json_data/links/twitch.json",
 };
 
 export const modelList: { [k: string]: string } = {
-    // "GCN - graph classification": "./gnn_model2.onnx",
-    "GCN - graph classification": "./simulations/simulated_gcn_graph_model.onnx",
-    "GCN - node classification": "./simulations/simulated_gcn_node_model.onnx",
-    "GCN - link prediction": "./simulations/simulated_gcn_edge_model.onnx",
-    "GAT - link prediction": "./simulations/simulated_gat_edge_model.onnx",
-    "GraphSAGE - link prediction": "./simulations/simulated_sage_edge_model.onnx",
+    "GCN - graph classification": "./simulated_gcn_model.onnx",
+    "GCN - node classification": "./gnn_node_model.onnx",
+    "GCN - graph classification - Simulated": "./simulations/simulated_gcn_graph_model.onnx",
+    "GCN - node classification - Simulated": "./simulations/simulated_gcn_node_model.onnx",
+    "GCN - link prediction": "./gnn_link_model.onnx",
+    "GAT - link prediction": "./gat_link_model.onnx",
+    "GraphSAGE - link prediction": "./sage_link_model.onnx"
 };
 
 // export const modelGATList: { [k: string]: string } = {
@@ -67,11 +70,11 @@ export const modelTypeList: { [k: string]: string } = {
 
 const chemicalNames = ['C16NO2', 'C6FNO2', 'C7NO3']
 function graph_list_generate(namelist: string[]) {
-    let res: { [k: string]: string } = {"test":"./json_data/graphs/testing_graph.json"};
+    let res: { [k: string]: string } = { };
 
-    // for (let i = 0; i < namelist.length; i++) {
-    //     res[`molecule_${chemicalNames[i]}`] = `./json_data/graphs/input_graph${i}.json`;
-    // }
+    for (let i = 0; i < namelist.length; i++) {
+        res[`molecule_${chemicalNames[i]}`] = `./json_data/graphs/input_graph${i}.json`;
+    }
 
     console.log("Generating graph list with chemical names:", res);
 

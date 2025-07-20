@@ -1543,7 +1543,12 @@ export function analyzeGraph(graphData: any) {
     };
 }
 
-export const graphPrediction = async (modelPath: string, graphPath: string, simGraphData:any, sandBoxMode = true) => {
+export const graphPrediction = async (
+    modelPath: string, 
+    graphPath: string, 
+    simGraphData:any, 
+    sandBoxMode = true
+) => {
 
     console.log("graph pred pipe modelPath", modelPath, graphPath);
 
@@ -1633,8 +1638,11 @@ const batchTensor = new ort.Tensor(
 
     const edgeIndexTensor = new ort.Tensor(
         "int64",
-        new BigInt64Array(graphData.edge_index.flat().map(BigInt)),
-        [graphData.edge_index.length, graphData.edge_index[0].length]
+        bigInt64Array,
+        [
+            graphData.edge_index.length,
+            graphData.edge_index[0].length,
+        ]
     );
 
     console.log("edgeIndexTensor", edgeIndexTensor);
@@ -1648,16 +1656,23 @@ const batchTensor = new ort.Tensor(
 
     let conv1 = [];
     let conv2 = [];
-    let conv3 = [];
 
-    conv1 = outputMap.conv1.cpuData;
-    conv2 = outputMap.conv2.cpuData;
-    conv3 = outputMap.conv3.cpuData;
+    if (modelPath === "./gat_link_model.onnx") {
+        conv1 = outputMap.gat1.cpuData;
+        conv2 = outputMap.gat2.cpuData;
+        console.log("gat model", conv1, conv2);
+    } else if (modelPath === "./sage_link_model.onnx") {
+        conv1 = outputMap.sage1.cpuData;
+        conv2 = outputMap.sage2.cpuData;
+        console.log("sage model", conv1, conv2);
+    } else {
+        conv1 = outputMap.conv1.cpuData;
+        conv2 = outputMap.conv2.cpuData;
+    }
 
     const intmData: IntmDataLink = {
         conv1: conv1,
         conv2: conv2,
-        conv3: conv3,
         decode_mul: outputMap.decode_mul.cpuData,
         decode_sum: outputMap.decode_sum.cpuData,
         prob_adj: outputMap.prob_adj.cpuData,
@@ -1703,11 +1718,17 @@ type PredictionResult = {
     intmData: IntmData | IntmDataNode
 };
 
-export const nodePrediction = async (modelPath: string, graphPath: string): Promise<PredictionResult> => {
+export const nodePrediction = async (
+    modelPath: string, 
+    graphPath: string,
+    simGraphData: any,
+    sandBoxMode = true
+): Promise<PredictionResult> => {
 
 
     const session = await loadModel(modelPath);
-    const graphData: any = await load_json(graphPath);
+    let graphData: IGraphData = simGraphData;
+    if(!sandBoxMode)graphData = await load_json(graphPath);
 
 
 

@@ -478,7 +478,7 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
     };
 
     loadData();
-  }, [dataFile, hubNodeA, hubNodeB, modelType, simulatedGraphData]);
+  }, [dataFile, hubNodeA, hubNodeB, modelType, simulatedGraphData, sandboxMode]);
 
   return (
     <>
