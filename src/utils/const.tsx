@@ -45,7 +45,7 @@ export const linkList: { [k: string]: string } = {
 };
 
 export const modelList: { [k: string]: string } = {
-    "GCN - graph classification": "./simulated_gcn_model.onnx",
+    "GCN - graph classification": "./gnn_model2.onnx",
     "GCN - node classification": "./gnn_node_model.onnx",
     "GCN - link prediction": "./gnn_link_model.onnx",
     "GAT - link prediction": "./gat_link_model.onnx",

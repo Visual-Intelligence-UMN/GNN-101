@@ -106,7 +106,7 @@ export function visualizeGraphClassifierFeatures(
     featureVisTable = firstLayerPackage.featureVisTable;
     const firstLayer = firstLayerPackage.firstLayer;
 
-    console.log("observe table", featureVisTable, features, conv1);
+    console.log("observe table", featureVisTable, features, conv1, conv2, conv3);
 
     //-----------------------------------GCNConv LAYERS-----------------------------------------------
     const featureChannels = conv1[0].length;

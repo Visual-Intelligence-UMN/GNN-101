@@ -17,7 +17,7 @@ interface ClassifyGraphProps {
     simulationLoading: boolean;
     setIsLoading: (loading: boolean) => void;
     simGraphData: any,
-    sandBoxMode?: boolean; // whether the graph is simulated or not
+    sandBoxMode: boolean; // whether the graph is simulated or not
 }
 
 // parameter will be the user input for json file
@@ -34,7 +34,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
     simulationLoading,
     setIsLoading,
     simGraphData = {},
-    sandBoxMode 
+    sandBoxMode
 }) => {
     let prob: number[] | number[][] = [];
     const classifyGraph = async () => {
@@ -53,7 +53,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
                 ({ prob, intmData } = await nodePrediction(modelPath, graphPath, simGraphData));
             } else if (modelPath.includes("graph")) {
                 if(sandBoxMode)modelPath = simulatedModelList["graph-task-simodel"];
-                ({ prob, intmData } = await graphPrediction(modelPath, graphPath, simGraphData));
+                ({ prob, intmData } = await graphPrediction(modelPath, graphPath, simGraphData, sandBoxMode));
             } else if(modelPath.includes("link")){
                 ({ prob, intmData } = await linkPrediction(
                     modelPath,
@@ -61,9 +61,11 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
                 ));
             } else {
                 if(sandBoxMode)modelPath = simulatedModelList["graph-task-simodel"];
-                ({ prob, intmData } = await graphPrediction(modelPath, graphPath, simGraphData));
+                ({ prob, intmData } = await graphPrediction(modelPath, graphPath, simGraphData, sandBoxMode));
             }
     
+            console.log("check intmData origin", intmData);
+
             setChangedG(false);
             setIntmData(intmData);
     
