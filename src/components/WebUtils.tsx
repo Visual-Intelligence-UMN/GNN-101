@@ -830,7 +830,7 @@ export function visualizeMatrix(
     isAttribute: boolean,
     gridSize: number,
     simGraphData: any,
-    sandBoxMode: boolean = true
+    sandBoxMode: boolean
 ) {
     const init = async (graph: any, nodeAttrs: any) => {
         const margin = { top: 10, right: 80, bottom: 30, left: 80 };

@@ -47,11 +47,15 @@ export const linkList: { [k: string]: string } = {
 export const modelList: { [k: string]: string } = {
     "GCN - graph classification": "./simulated_gcn_model.onnx",
     "GCN - node classification": "./gnn_node_model.onnx",
-    "GCN - graph classification - Simulated": "./simulations/simulated_gcn_graph_model.onnx",
-    "GCN - node classification - Simulated": "./simulations/simulated_gcn_node_model.onnx",
     "GCN - link prediction": "./gnn_link_model.onnx",
     "GAT - link prediction": "./gat_link_model.onnx",
     "GraphSAGE - link prediction": "./sage_link_model.onnx"
+};
+
+
+export const simulatedModelList: { [k: string]: string } = {
+    "graph-task-simodel": "./simulations/simulated_gcn_graph_model.onnx",
+    "node-task-simodel": "./simulations/simulated_gcn_node_model.onnx",
 };
 
 // export const modelGATList: { [k: string]: string } = {
