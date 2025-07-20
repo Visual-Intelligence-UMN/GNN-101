@@ -2,6 +2,7 @@ import React, { useState, ChangeEvent } from "react";
 import { graphPrediction, linkPrediction, nodePrediction } from "@/utils/utils";
 import { Hint, PredictionVisualizer } from "../components/WebUtils";
 import { IntmData, IntmDataLink, IntmDataNode } from "@/types";
+import { simulatedModelList } from "@/utils/const";
 
 interface ClassifyGraphProps {
     graphPath: string;
@@ -33,7 +34,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
     simulationLoading,
     setIsLoading,
     simGraphData = {},
-    sandBoxMode = true, 
+    sandBoxMode 
 }) => {
     let prob: number[] | number[][] = [];
     const classifyGraph = async () => {
@@ -48,8 +49,10 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
             let prob: number[] | number[][] = [];
 
             if (modelPath.includes("node")) {
+                if(sandBoxMode)modelPath = simulatedModelList["node-task-simodel"];
                 ({ prob, intmData } = await nodePrediction(modelPath, graphPath, simGraphData));
             } else if (modelPath.includes("graph")) {
+                if(sandBoxMode)modelPath = simulatedModelList["graph-task-simodel"];
                 ({ prob, intmData } = await graphPrediction(modelPath, graphPath, simGraphData));
             } else if(modelPath.includes("link")){
                 ({ prob, intmData } = await linkPrediction(
@@ -57,6 +60,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
                     "./json_data/links/twitch.json" // this is for twitch dataset originally
                 ));
             } else {
+                if(sandBoxMode)modelPath = simulatedModelList["graph-task-simodel"];
                 ({ prob, intmData } = await graphPrediction(modelPath, graphPath, simGraphData));
             }
     

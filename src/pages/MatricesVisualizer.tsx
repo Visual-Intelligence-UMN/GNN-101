@@ -22,7 +22,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
     selectedButtons,
     onLoadComplete,
     simGraphData,
-    sandBoxMode = true, // whether the graph is simulated or not
+    sandBoxMode // whether the graph is simulated or not
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -36,6 +36,7 @@ const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({
     }
 
     useEffect(() => {
+      console.log("MatricesVisualizer useEffect called", sandBoxMode);
         if ((intmData == null || changed) && !predicted) {
             visualizeMatrix(graph_path, true, 400, simGraphData, sandBoxMode);
             onLoadComplete();

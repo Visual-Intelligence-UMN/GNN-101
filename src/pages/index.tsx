@@ -691,6 +691,9 @@ export default function Home() {
                                                             simGraphData={
                                                                 simGraphData
                                                             }
+                                                            sandBoxMode={
+                                                                sandBoxMode
+                                                            }
                                                         />
                                                     )
                                                 ) : model ==
