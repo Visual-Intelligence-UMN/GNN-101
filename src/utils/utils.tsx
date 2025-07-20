@@ -356,7 +356,10 @@ export type LinkType = {
     type: string;
 };
 
+
+
 export async function data_prep(o_data: any) {
+    
 
 
     let final_data = {
@@ -381,8 +384,16 @@ export async function data_prep(o_data: any) {
         "0,0,0,1": "triple"
     }
 
+
     try {
-        var data = await load_json(o_data);
+        let data: any
+        if (typeof o_data === "string") {
+            console.log("load data from json file!", o_data)
+            data = await load_json(o_data);
+        } else {
+            console.log("using original data!")
+            data = o_data;
+        }
         var nodes = data.x;
         var edges = data.edge_index;
         var edge_attr = data.edge_attr;
@@ -479,14 +490,25 @@ export async function data_prep(o_data: any) {
 export async function prep_graphs(g_num: number, data: any) {
     var graphs = [];
 
-
-    for (var i = 0; i < g_num; i++) {
-        var graphData = {};
-        graphData = {
-            nodes: deepClone(data.nodes),
-            links: deepClone(data.links),
-        };
-        graphs.push(graphData);
+    if (data.nodes) {
+        for (var i = 0; i < g_num; i++) {
+            var graphData = {};
+            graphData = {
+                nodes: deepClone(data.nodes),
+                links: deepClone(data.links),
+            };
+            graphs.push(graphData);
+        }
+    } 
+    if (data.x) {
+        for (var i = 0; i < g_num; i++) {
+            var graphData = {};
+            graphData = {
+                nodes: deepClone(data.x),
+                links: deepClone(data.edge_attr),
+            };
+            graphs.push(graphData);
+        } 
     }
     for (var i = 0; i < 2; i++) {
         var node: NodeType = {
@@ -603,11 +625,12 @@ export function featureVisualizer(
     outputLayerRectHeight: number,
     mode: number,
     innerComputationMode: string,
+    sandBoxMode: boolean = false
 ) {
     state.isClicked = false;
     console.log("featureVisualizer")
-    console.log("graphs", graphs)
-    console.log("allNodes", allNodes)
+    console.log(graphs, allNodes)
+
 
 
 
@@ -620,13 +643,11 @@ export function featureVisualizer(
         ({ weights, bias } = loadNodeWeights());
         convNum = 5
     }
-    console.log("VBAWUIBIAUWDB", weights)
 
-    weights[0] = transposeAnyMatrix(weights[0])
+    if (sandBoxMode) {
+        weights[0] = transposeAnyMatrix(weights[0])
+    }
     
-
-
-    console.log("weights", weights)
 
     const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex); //somehow doesn't include the node in the last layer
 
@@ -687,7 +708,7 @@ export function featureVisualizer(
                     let stepStr = "";
                     let isFirstTerm = true;
 
-                    console.log(graphIndex)
+
                     
                     for (let k = 0; k < featureMap.length; k++) {
                         // Only include terms for nodes that are connected (have non-zero weights)
@@ -713,7 +734,6 @@ export function featureVisualizer(
                     nodes[i].aggregationSteps = aggSteps;
                 }
             }
-            console.log("components",aggregatedDataMap, currentWeights)
             calculatedDataMap = matrixMultiplication(aggregatedDataMap, currentWeights);
 
         }
@@ -738,13 +758,6 @@ export function featureVisualizer(
             
 
 
-        console.log("calculatedDataMap", calculatedDataMap)
-        console.log("aggregatedDataMap", aggregatedDataMap)
-        console.log("currentWeights", currentWeights)
-        console.log("currentBias", currentBias)
-        console.log("normalizedAdjMatrix", normalizedAdjMatrix)
-         
-        console.log("allFeatureMap", allFeatureMap)
 
 
 

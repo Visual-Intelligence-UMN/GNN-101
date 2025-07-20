@@ -667,6 +667,12 @@ export default function Home() {
                                                                     );
                                                                 }
                                                             }}
+                                                            simGraphData={
+                                                                simGraphData
+                                                            }
+                                                            sandBoxMode={
+                                                                sandBoxMode
+                                                            }
                                                         />
                                                     ) : (
                                                         <MatricesVisualizer
@@ -726,6 +732,12 @@ export default function Home() {
                                                                 setIsLoading(
                                                                     false
                                                                 )
+                                                            }
+                                                            simGraphData={
+                                                                simGraphData
+                                                            }
+                                                            sandBoxMode={
+                                                                sandBoxMode
                                                             }
                                                         />
                                                     ) : (

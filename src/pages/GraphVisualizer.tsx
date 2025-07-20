@@ -30,6 +30,8 @@ interface GraphVisualizerProps {
     simulationLoading: boolean;
     setSimulation: Function;
     innerComputationMode: string
+    simGraphData: any,
+    sandBoxMode: boolean,
 }
 
 const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
@@ -41,7 +43,9 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
     selectedButtons,
     simulationLoading,
     setSimulation,
-    innerComputationMode
+    innerComputationMode,
+    simGraphData,
+    sandBoxMode,
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -53,6 +57,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
     console.log("vis selector", select)
     const location = loadNodesLocation(0, select);
+    console.log("Use sandnox",sandBoxMode)
 
 
 
@@ -298,13 +303,18 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
                         }
                     }
-                    console.log("WADAvalue", value)
+                    console.log("Value", i, value)
+                    let feature_num: number = 64
+                    if (sandBoxMode) {
+                      feature_num =16
+                    }
+             
                     data.nodes.forEach((node: any) => {
                         node.graphIndex = i;
                         if (value != null && i <= 4 && value instanceof Float32Array) {
                             node.features = value.subarray(
-                                16 * node.id,
-                                16 * (node.id + 1)
+                                feature_num * node.id,
+                                feature_num * (node.id + 1)
                             );
                         }
 
@@ -415,7 +425,6 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                         .text(text)
                         .attr("font-weight", "normal")
                         .attr('opacity', 0.5);
-                    console.log("value", value)
                     const absMax = findAbsMax(value);
 
 
@@ -435,7 +444,6 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                     // colorSchemes.push(cst);
 
 
-                    
                     // doesn't show the text, need to be fixed 
                     if (i === graphs.length - 1) { // 6 layers in total, call the connect when reaching the last layer of convolutional layer.
                         connectCrossGraphNodes( // in this function the connection of last two layers will be drwan
@@ -458,7 +466,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
                         if (intmData) {
 
-                            featureVisualizer(svg, allNodes, offset, height, graphs, 700, 900, 600, 15, 10, 3, 20, 0, innerComputationMode); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
+                            featureVisualizer(svg, allNodes, offset, height, graphs, 700, 900, 600, 15, 10, 3, 20, 0, innerComputationMode, sandBoxMode); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
                             //function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, graphs: any[], moveOffset: number, fcLayerMoveOffset: number, rectWidth: number, firstLayerRectHeight: number, rectHeight: number, outputLayerRectHeight: number)
                         }
        
@@ -497,18 +505,24 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
         const visualizeGNN = async (num: number) => {
             console.log("Running visualization 4")
+        
             try {
-                setIsLoading(true);
-                console.log("Running visualization 5")
-
-                const processedData = await data_prep(graph_path);
-                console.log("Running visualization 6")
-
-                const graphsData = await prep_graphs(num, processedData);
-                console.log("graphsData", graphsData)
-                console.log("Running visualization 7")
-                // Initialize and run D3 visualization with processe  d data
-                await init(graphsData);
+                    setIsLoading(true);
+                    let graphsData
+                    if (!sandBoxMode) {
+                        console.log("raw data", graph_path)
+                        const processedData = await data_prep(graph_path);
+                        graphsData = await prep_graphs(num, processedData);
+            
+                    } else {
+                        console.log("raw data", simGraphData)
+                        const processedData = await data_prep(simGraphData);
+                        graphsData = await prep_graphs(num, processedData);
+         
+                    }
+                    // Initialize and run D3 visualization with processe  d data
+                    await init(graphsData);
+                
             } catch (error) {
                 console.error("Error in visualizeGNN:", error);
             } finally {
