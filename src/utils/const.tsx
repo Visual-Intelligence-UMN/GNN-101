@@ -37,7 +37,7 @@ export const twitchNodeSelectionList = [
 ];
 
 export const nodeList: { [k: string]: string } = {
-    karate: "./json_data/karate_dataset1.json",
+    karate: "./json_data/nodes/karate_dataset1.json",
 };
 
 export const linkList: { [k: string]: string } = {

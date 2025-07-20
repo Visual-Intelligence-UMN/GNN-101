@@ -24,6 +24,7 @@ import { dataPreparationLinkPred, constructComputationalGraph } from "./linkPred
 import { extractSubgraph } from "./graphDataUtils";
 import { isValidNode } from "./GraphvislinkPredUtil";
 import { all, number } from "mathjs";
+import { simulatedModelList } from "./const";
 
 env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
