@@ -1725,6 +1725,7 @@ export const nodePrediction = async (
     sandBoxMode: boolean
 ): Promise<PredictionResult> => {
 
+    console.log("node pred pipe modelPath", modelPath, graphPath, simGraphData);
 
     const session = await loadModel(modelPath);
     let graphData: IGraphData = simGraphData;

@@ -511,6 +511,7 @@ export default function Home() {
                                                 }
                                                 setIsLoading={setIsLoading}
                                                 simGraphData={simGraphData}
+                                                sandBoxMode={sandBoxMode}
                                             />
                                         </div>
                                     )}
