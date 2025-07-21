@@ -1,7 +1,7 @@
 // UTILS FILE BECAUSE WE HAVE SO MANY HELPER FUNCTIONS
 import * as d3 from "d3";
 
-import { loadNodeWeights, loadWeights } from "./matHelperUtils";
+import { loadNodeWeights, loadSimulatedModelWeights, loadWeights } from "./matHelperUtils";
 import * as ort from "onnxruntime-web";
 import { env } from "onnxruntime-web";
 import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature, outputVisualizer, scaleFeatureGroup, nodeOutputVisualizer } from "@/utils/graphUtils";
@@ -639,15 +639,22 @@ export function featureVisualizer(
     // 2. handle interaction event
     // 3. do the calculation for animation
     let convNum = 4;
-    let { weights, bias } = loadWeights();
-    if (mode === 1) {
-        ({ weights, bias } = loadNodeWeights());
-        convNum = 5
-    }
+    let weights:any, bias:any;
+    if (!sandBoxMode) {
+        ({ weights, bias } = loadWeights());
+        if (mode === 1) {
+            ({ weights, bias } = loadNodeWeights());
+            convNum = 5
+        }
+    } else {
+        ({ weights, bias } = loadSimulatedModelWeights());
+        if (mode === 1) {
+            convNum = 5
+        }
 
-    if (sandBoxMode) {
         weights[0] = transposeAnyMatrix(weights[0])
     }
+    
     
 
     const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex); //somehow doesn't include the node in the last layer
@@ -673,6 +680,7 @@ export function featureVisualizer(
 
 
     nodesByIndex.forEach((nodes, graphIndex) => { // iterate through each graphs
+        console.log(graphIndex)
 
 
         let aggregatedDataMap: any[] = [];
@@ -806,6 +814,7 @@ export function featureVisualizer(
                     .attr("opacity", 1)
                     .node(); // make the svgElement a DOM element (the original on method somehow doesn't work)
                 let name = "unknown";
+
                 if (mode === 1 && graphIndex === 4) {
 
                     if (node.features[0] > 0.5) {
@@ -822,6 +831,7 @@ export function featureVisualizer(
                     }
 
 
+
                     node.text = nodeGroup.append("text")
                         .attr("x", 0)
                         .attr("y", 0)
@@ -833,6 +843,7 @@ export function featureVisualizer(
                         .attr("opacity", 1);
 
                 }
+         
                 else if (graphIndex === 0) {
                     node.text = nodeGroup.append("text")
                         .attr("x", 0)
@@ -859,6 +870,7 @@ export function featureVisualizer(
 
                 const featureGroup = g2.append("g")
                     .attr("transform", `translate(${xPos - 7.5}, ${yPos})`);
+
 
                 if (mode === 1 && graphIndex === 4) {
                     featureGroup.selectAll("rect")
@@ -997,6 +1009,7 @@ export function featureVisualizer(
 
 
                         if (mode === 1 && graphIndex === 4) {
+                            console.log("into nodeoutputvis")
                             nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, svg, mode)
                         } else {
            
@@ -1877,8 +1890,8 @@ export function loadNodesLocation(mode: number, path: string) {
         data = require("../../public/json_data/node_location/nodes_data_karate.json");
 
     }
-return require("../../public/json_data/node_location/nodes_data0.json");
-//    return data;
+// return require("../../public/json_data/node_location/nodes_data0.json");
+   return data;
 }
 
 export function fetchSubGraphNodeLocation(index: number, innerComputationMode: string) {

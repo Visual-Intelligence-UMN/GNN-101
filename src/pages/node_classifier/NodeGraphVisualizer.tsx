@@ -131,6 +131,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
           labels.attr("opacity", 0);
           node.attr("opacity", 0)
         }
+        console.log("location", location)
         data.nodes.forEach((node: any, i: number) => {
 
           if (location[i.toString()]) {
@@ -238,11 +239,14 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
               value = intmData.final;
             }
           }
-          let feature_num_1: number = 16
-          let feature_num_2: number = 16
+          let feature_num_1: number = 4
+          let feature_num_2: number = 2
+          let feature_num_3: number = 2
           if (sandBoxMode) {
-            feature_num_1 = 4
-            feature_num_2 = 2
+         
+            feature_num_1 = 16
+            feature_num_2 = 16
+            feature_num_3 = 4
           }
           data.nodes.forEach((node: any) => {
             node.graphIndex = i;
@@ -260,16 +264,13 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
             }
 
             if (value != null && i > 2 && i === 4) {
-              node.features = value[node.id];
-              console.log("VAHWBDHJABWDIBAHIWJFBIA", value[node.id])
-
-              
+              node.features = value[node.id]; 
             }
 
             if (value != null && i > 2 && i === 5 && value instanceof Float32Array) {
               node.features = value.subarray(
-                4 * node.id,
-                4 * (node.id + 1)
+                feature_num_3 * node.id,
+                feature_num_3 * (node.id + 1)
               );
             }
 
@@ -389,7 +390,9 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
 
 
             if (intmData && intmData.final) {
-              featureVisualizer(svg, allNodes, offset, height, graphs, 1100, 600, 800, 15, 10, 20, 20, 1, innerComputationMode); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
+              console.log("the layer_num",i)
+
+              featureVisualizer(svg, allNodes, offset, height, graphs, 1100, 600, 800, 15, 10, 20, 20, 1, innerComputationMode, sandBoxMode); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
             }
 
           }
