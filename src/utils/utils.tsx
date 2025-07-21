@@ -357,7 +357,10 @@ export type LinkType = {
     type: string;
 };
 
+
+
 export async function data_prep(o_data: any) {
+    
 
 
     let final_data = {
@@ -382,8 +385,16 @@ export async function data_prep(o_data: any) {
         "0,0,0,1": "triple"
     }
 
+
     try {
-        var data = await load_json(o_data);
+        let data: any
+        if (typeof o_data === "string") {
+            console.log("load data from json file!", o_data)
+            data = await load_json(o_data);
+        } else {
+            console.log("using original data!")
+            data = o_data;
+        }
         var nodes = data.x;
         var edges = data.edge_index;
         var edge_attr = data.edge_attr;
@@ -480,14 +491,25 @@ export async function data_prep(o_data: any) {
 export async function prep_graphs(g_num: number, data: any) {
     var graphs = [];
 
-
-    for (var i = 0; i < g_num; i++) {
-        var graphData = {};
-        graphData = {
-            nodes: deepClone(data.nodes),
-            links: deepClone(data.links),
-        };
-        graphs.push(graphData);
+    if (data.nodes) {
+        for (var i = 0; i < g_num; i++) {
+            var graphData = {};
+            graphData = {
+                nodes: deepClone(data.nodes),
+                links: deepClone(data.links),
+            };
+            graphs.push(graphData);
+        }
+    } 
+    if (data.x) {
+        for (var i = 0; i < g_num; i++) {
+            var graphData = {};
+            graphData = {
+                nodes: deepClone(data.x),
+                links: deepClone(data.edge_attr),
+            };
+            graphs.push(graphData);
+        } 
     }
     for (var i = 0; i < 2; i++) {
         var node: NodeType = {
@@ -604,8 +626,13 @@ export function featureVisualizer(
     outputLayerRectHeight: number,
     mode: number,
     innerComputationMode: string,
+    sandBoxMode: boolean = false
 ) {
     state.isClicked = false;
+    console.log("featureVisualizer")
+    console.log(graphs, allNodes)
+
+
 
 
     // 1. visualize feature
@@ -618,6 +645,10 @@ export function featureVisualizer(
         convNum = 5
     }
 
+    if (sandBoxMode) {
+        weights[0] = transposeAnyMatrix(weights[0])
+    }
+    
 
     const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex); //somehow doesn't include the node in the last layer
 
@@ -638,10 +669,7 @@ export function featureVisualizer(
             })
             allFeatureMap.push(featureMap)
         }
-        
-
     })
-
 
 
     nodesByIndex.forEach((nodes, graphIndex) => { // iterate through each graphs
@@ -658,7 +686,6 @@ export function featureVisualizer(
         if (graphs.length != 0 && graphIndex > 0 && graphIndex < (convNum)) {
             currentWeights = weights[graphIndex - 1];
             currentBias = bias[graphIndex - 1]
-
             const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex);
 
             let featureMap: number[][] = []
@@ -667,10 +694,10 @@ export function featureVisualizer(
                 if (index === graphIndex - 1) {
                     nodes.forEach((n) => {
                         featureMap.push(n.features);
-                        console.log(`Prep-Feature-value-${index}: `, n.features);
                     })
                 }
             })
+            console.log("featureMap", featureMap)
             aggregatedDataMap = [];
             for (let i = 0; i < nodes.length; i++) {
                 let aggFeatures: number[] = [];
@@ -681,6 +708,7 @@ export function featureVisualizer(
                     let sum = 0;
                     let stepStr = "";
                     let isFirstTerm = true;
+
 
                     // console.log(`tures for node ${i}, feature dimension ${d}`, normalizedAdjMatrix);
                     
@@ -693,8 +721,11 @@ export function featureVisualizer(
                            // console.log(`Feature-value-${i}-${k}: ${featureMap[k][d]}`)
                             sum += fVal * weightVal;
                             // console.log(`Node ${i}, Feature ${d}-${k}: ${fVal} * ${weightVal} = ${fVal * weightVal}`);
+
+
+                    
+
                             const term = `(${fVal.toFixed(3)} × ${weightVal.toFixed(3)})`;
-                            
                             // Add newline and plus sign for all terms except the first
                             stepStr += (isFirstTerm ? "" : "\n+ ") + term;
                             isFirstTerm = false;
@@ -713,11 +744,13 @@ export function featureVisualizer(
                 }
             }
             calculatedDataMap = matrixMultiplication(aggregatedDataMap, currentWeights);
+
         }
         for (let i = 0; i < nodes.length; i++) {
             nodes[i].matmulResults = calculatedDataMap[i]; 
             nodes[i].biases        = currentBias;
         }
+        
 
 
 
@@ -731,6 +764,9 @@ export function featureVisualizer(
             .attr("layerNum", graphIndex)
             .attr("class", "layerVis")
             .attr("transform", `translate(${xOffset},10)`);
+            
+
+
 
 
 
@@ -932,6 +968,7 @@ export function featureVisualizer(
                 });
 
 
+
                 //click logic
                 if (node.graphIndex != 0) {
                     nodeGroup.on("click", function (event: any) {
@@ -962,6 +999,7 @@ export function featureVisualizer(
                         if (mode === 1 && graphIndex === 4) {
                             nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, svg, mode)
                         } else {
+           
                             calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, allFeatureMap, svg, offset, height, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
                         };
 

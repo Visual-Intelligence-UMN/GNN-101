@@ -48,6 +48,8 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
             let intmData: IntmData | IntmDataNode | IntmDataLink;
             let prob: number[] | number[][] = [];
 
+            console.log("inference parameters:", sandBoxMode, modelPath, graphPath)
+
             if (modelPath.includes("node")) {
                 if(sandBoxMode)modelPath = simulatedModelList["node-task-simodel"];
                 console.log("node pred pipe modelPath - 0", modelPath, graphPath, simGraphData, sandBoxMode);

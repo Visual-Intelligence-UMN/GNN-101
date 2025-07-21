@@ -28,7 +28,9 @@ interface NodeGraphVisualizerProps {
   simulationLoading: boolean;
   setSimulation: Function;
   innerComputationMode: string,
-  onLoadComplete: () => void;
+  onLoadComplete: () => void,
+  simGraphData: any,
+  sandBoxMode: boolean;
 }
 
 const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
@@ -40,7 +42,9 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
   simulationLoading,
   setSimulation,
   innerComputationMode,
-  onLoadComplete
+  onLoadComplete,
+  simGraphData,
+  sandBoxMode
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -234,23 +238,30 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
               value = intmData.final;
             }
           }
+          let feature_num_1: number = 16
+          let feature_num_2: number = 16
+          if (sandBoxMode) {
+            feature_num_1 = 4
+            feature_num_2 = 2
+          }
           data.nodes.forEach((node: any) => {
             node.graphIndex = i;
             if (value != null && i <= 2 && value instanceof Float32Array) {
               node.features = value.subarray(
-                4 * node.id,
-                4 * (node.id + 1)
+                feature_num_1 * node.id,
+                feature_num_1 * (node.id + 1)
               );
             }
             if (value != null && i > 2 && i < 4 && value instanceof Float32Array) {
               node.features = value.subarray(
-                2 * node.id,
-                2 * (node.id + 1)
+                feature_num_2 * node.id,
+                feature_num_2 * (node.id + 1)
               );
             }
 
             if (value != null && i > 2 && i === 4) {
               node.features = value[node.id];
+              console.log("VAHWBDHJABWDIBAHIWJFBIA", value[node.id])
 
               
             }
@@ -415,9 +426,14 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
         setIsLoading(true);
         // Process data
 
-        const processedData = await data_prep(graph_path);
-
-        const graphsData = await prep_graphs(num, processedData);
+        let graphsData
+        if (!sandBoxMode) {
+            const processedData = await data_prep(graph_path);
+            graphsData = await prep_graphs(num, processedData);
+        } else {
+            const processedData = await data_prep(simGraphData);
+            graphsData = await prep_graphs(num, processedData);
+        }
    
         // Initialize and run D3 visualization with processe  d data
         await init(graphsData);

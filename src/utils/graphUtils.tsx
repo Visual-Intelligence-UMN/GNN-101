@@ -7,6 +7,7 @@ import {
     handleClickEvent,
     myColor,
     state,
+    transposeAnyMatrix,
 } from "./utils";
 import { roundToTwo } from "../components/WebUtils";
 import { drawHintLabel, loadWeights } from "./matHelperUtils";
@@ -530,6 +531,7 @@ export function outputVisualizer(
         let s: [number, number] = [node.x + 20 + i * rectHeight - temp, node.y - 15];
         endCoordList.push(s);
     }
+
     const math = create(all, {});
     const wMat = math.transpose(allWeights[3]);
     let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1], -1, rectHeight / 3, node.features.length, [wMat], 0);
@@ -575,13 +577,7 @@ export function outputVisualizer(
         .attr("opacity", 0)
         .lower();
 
-        const Xt = weights;
-
-   
-
-
-   
-
+        const Xt = math.transpose(weights);
 
     let outputData = [];
     for (let i = 0; i < calculatedData.length; i++) {
@@ -1453,7 +1449,6 @@ export function calculationVisualizer(
         n.featureGroup.attr("class", "procVis original-features")
         }
     })
-    
 
 
     let biasData = bias;
@@ -1468,7 +1463,6 @@ export function calculationVisualizer(
 
     d3.selectAll(".to-be-removed").remove();
     buildDetailedViewArea(node.x, 0, 1500, 1000, g3)
-
 
 
     let startCoordList: any[] = [];
@@ -1801,6 +1795,7 @@ export function calculationVisualizer(
 
     const calculatedData = calculatedDataMap[node.id];
 
+
     const calculatedFeatureGroup = g3
         .append("g")
         .attr(
@@ -1878,7 +1873,9 @@ export function calculationVisualizer(
         .style("stroke-width", 1)
         .style("opacity", 0);
 
-        for (let i = 0; i < node.features.length; i++) {
+
+    console.log("DAWD", calculatedData)
+    for (let i = 0; i < calculatedData.length; i++) {
         let s: [number, number] = [
             node.graphIndex * offset +
             i * rectHeight +
@@ -1888,6 +1885,8 @@ export function calculationVisualizer(
         ];
         endCoordList.push(s);
     }
+    console.log("VAWDHUI", endCoordList)
+
 
     let matrixRectSize = rectHeight;
     if (mode === 1 && node.graphIndex === 1) {
@@ -1903,6 +1902,7 @@ export function calculationVisualizer(
     if (node.graphIndex === 1) {
         Xt = math.transpose(Xt);
     }
+
 
     
 
@@ -2928,7 +2928,7 @@ export function calculationVisualizer(
             d3.selectAll(".intermediate-path").remove();
             handleClickEvent(svg, node, event, moveOffset, allNodes, convNum, mode, state);
     
-            
+
             }
         });
 
@@ -3024,12 +3024,12 @@ function weightAnimation(
     let i = 0;
 
 
-    let endNumber = 64;
+    let endNumber = 16;
     if (node.graphIndex === 5) {
         endNumber = 2;
     }
     if (mode === 1) {
-        endNumber = 4
+        endNumber = 16
         if (node.graphIndex === 3) {  //need to alter
             endNumber = 2
 
@@ -3403,9 +3403,8 @@ export function matrixMultiplication(matrix_a: any[], matrix_b: any[]) {
     const colsB = matrix_b[0].length;
 
     if (colsA !== rowsB) {
-
-
-
+        console.log("colsA", colsA)
+        console.log("rowsB", rowsB)
         return [];
     }
 
@@ -3842,6 +3841,7 @@ export function nodeOutputVisualizer(
 
     showFeature(node)
     let weights = allWeights[3]
+
     let intervalID = 0;
     state.isClicked = true;
 
@@ -3891,7 +3891,7 @@ export function nodeOutputVisualizer(
     let temp = 350;
 
     let calculatedData: number[] = [];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 2; i++) {
         let data = 0;
         for (let j = 0; j < node.relatedNodes[0].features.length; j++) {
             data += weights[i][j] * node.relatedNodes[0].features[j];
@@ -3901,7 +3901,7 @@ export function nodeOutputVisualizer(
 
 
     let startCoordList = [];
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 16; i++) { // need to make it adaptable
         let s: [number, number] = [
             xPos - temp - moveOffset
             + prevRectHeight * i - 215,
@@ -3953,7 +3953,7 @@ export function nodeOutputVisualizer(
 
     let endCoordList = [];
 
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 2; i++) {
         let s: [number, number] = [xPos - moveOffset + 20 + i * rectHeight - temp, node.y - 15];
         endCoordList.push(s);
     }
@@ -4338,46 +4338,7 @@ export function nodeOutputVisualizer(
     const yOffset        = 5;
 
     /* ─────────────────────── helper: draw one exp-block ─────────────────── */
-    function drawExpBlock(
-    g: d3.Selection<SVGGElement, unknown, HTMLElement, any>,
-    baseX: number,        // anchor x (rough centre of the block)
-    baseY: number,        // baseline y for the “exp(    )”
-    value: number,        // value displayed inside the square
-    offsetX: number,      // extra horizontal offset for fine-tuning
-    rectAdj: number,      // extra tweak for the coloured square
-    colour: string
-    ) {
-    // “exp(    )” with spaces left for the rect
-    g.append("text")
-        .attr("x", baseX + offsetX - 40)
-        .attr("y", baseY - 15)
-        .text("exp(    )")
-        .attr("xml:space", "preserve")
-        .attr("class", "math-displayer")
-        .attr("font-size", "17px")
-        .attr("font-family", "monospace");
 
-    // coloured square
-    g.append("rect")
-        .attr("x", baseX + offsetX + rectAdj)
-        .attr("y", baseY - 40 + yOffset)
-        .attr("width", rectL)
-        .attr("height", rectL)
-        .attr("stroke", "black")
-        .attr("fill", colour)
-        .attr("class", "math-displayer");
-
-    // number inside
-    g.append("text")
-        .attr("x", baseX + offsetX + 16 + 7)
-        .attr("y", baseY - 40 + rectL / 2 + 2 + yOffset)
-        .text(value.toFixed(2))
-        .attr("class", "math-displayer")
-        .attr("text-anchor", "end")
-        .attr("font-size", "11px")
-        .attr("font-family", "monospace")
-        .attr("fill", Math.abs(value) > 0.7 ? "white" : "black");
-    }
 
 /* ───────────────────── main drawing on mouse-over ───────────────────── */
     for (let i = 0; i < node.features.length; i++) {
@@ -4395,36 +4356,44 @@ export function nodeOutputVisualizer(
         d3.selectAll(`.softmax${i}`).attr("opacity", 1);
 
         /* ─── numerator (single exp-block) ─── */
+        console.log(calculatedData)
+        console.log("DVALUE", calculatedData[i])
+        console.log(i)
+        let value: number = Number(calculatedData[i])
+        console.log(typeof calculatedData[i])
+        console.log("value", value)
         drawExpBlock(
         g5,
         200,                       // base x
         60 + yOffset,              // baseline y
-        calculatedData[i],
+        value,
         20,                        // numerOffset
         -3,                        // rect adjustment
-        myColor(calculatedData[i])
+        myColor(calculatedData[i]),
+        yOffset,
+        rectL
         );
 
 
         /* ─── denominator (four exp-blocks) ─── */
         const baseY = displayHeight - 10 + yOffset + 5;   // shared baseline
 
-        drawExpBlock(g5,  70, baseY, calculatedData[0],   0, -3, myColor(calculatedData[0]));
+        drawExpBlock(g5,  70, baseY, calculatedData[0],   0, -3, myColor(calculatedData[0]), yOffset, rectL);
         g5.append("text").attr("x", 110).attr("y", displayHeight - 20 + yOffset).text("+")
         .attr("class", "math-displayer").attr("font-size", "17px")
         .attr("font-family", "monospace");
 
-        drawExpBlock(g5, 170, baseY, calculatedData[1],   0, -3, myColor(calculatedData[1]));
+        drawExpBlock(g5, 170, baseY, calculatedData[1],   0, -3, myColor(calculatedData[1]), yOffset, rectL);
         g5.append("text").attr("x", 210).attr("y", displayHeight - 20 + yOffset).text("+")
         .attr("class", "math-displayer").attr("font-size", "17px")
         .attr("font-family", "monospace");
 
-        drawExpBlock(g5, 270, baseY, calculatedData[2],   0, -3, myColor(calculatedData[2]));
-        g5.append("text").attr("x", 310).attr("y", displayHeight - 20 + yOffset).text("+")
-        .attr("class", "math-displayer").attr("font-size", "17px")
-        .attr("font-family", "monospace");
+        // drawExpBlock(g5, 270, baseY, calculatedData[2],   0, -3, myColor(calculatedData[2]), yOffset, rectL);
+        // g5.append("text").attr("x", 310).attr("y", displayHeight - 20 + yOffset).text("+")
+        // .attr("class", "math-displayer").attr("font-size", "17px")
+        // .attr("font-family", "monospace");
 
-        drawExpBlock(g5, 370, baseY, calculatedData[3],   0, -3, myColor(calculatedData[3]));
+        // drawExpBlock(g5, 370, baseY, calculatedData[3],   0, -3, myColor(calculatedData[3]), yOffset, rectL);
 
         /* fraction line */
         g5.append("line")
@@ -4572,3 +4541,49 @@ export function nodeOutputVisualizer(
 
 
 }
+
+
+function drawExpBlock(
+    g: d3.Selection<SVGGElement, unknown, HTMLElement, any>,
+    baseX: number,        // anchor x (rough centre of the block)
+    baseY: number,        // baseline y for the “exp(    )”
+    value: number,        // value displayed inside the square
+    offsetX: number,      // extra horizontal offset for fine-tuning
+    rectAdj: number,      // extra tweak for the coloured square
+    colour: string,
+    yOffset: number,
+    rectL: number
+    ) {
+    // “exp(    )” with spaces left for the rect
+
+    console.log(typeof value, value)
+    g.append("text")
+        .attr("x", baseX + offsetX - 40)
+        .attr("y", baseY - 15)
+        .text("exp(    )")
+        .attr("xml:space", "preserve")
+        .attr("class", "math-displayer")
+        .attr("font-size", "17px")
+        .attr("font-family", "monospace");
+
+    // coloured square
+    g.append("rect")
+        .attr("x", baseX + offsetX + rectAdj)
+        .attr("y", baseY - 40 + yOffset)
+        .attr("width", rectL)
+        .attr("height", rectL)
+        .attr("stroke", "black")
+        .attr("fill", colour)
+        .attr("class", "math-displayer");
+
+    // number inside
+    g.append("text")
+        .attr("x", baseX + offsetX + 16 + 7)
+        .attr("y", baseY - 40 + rectL / 2 + 2 + yOffset)
+        .text(value.toFixed(2))
+        .attr("class", "math-displayer")
+        .attr("text-anchor", "end")
+        .attr("font-size", "11px")
+        .attr("font-family", "monospace")
+        .attr("fill", Math.abs(value) > 0.7 ? "white" : "black");
+    }
