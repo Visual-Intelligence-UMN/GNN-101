@@ -2,6 +2,7 @@ import React, { useState, ChangeEvent } from "react";
 import { graphPrediction, linkPrediction, nodePrediction } from "@/utils/utils";
 import { Hint, PredictionVisualizer } from "../components/WebUtils";
 import { IntmData, IntmDataLink, IntmDataNode } from "@/types";
+import { simulatedModelList } from "@/utils/const";
 
 interface ClassifyGraphProps {
     graphPath: string;
@@ -14,6 +15,9 @@ interface ClassifyGraphProps {
     setProbabilities: (prob: number[] | number[][]) => void;
     onlyShownButton?: boolean;
     simulationLoading: boolean;
+    setIsLoading: (loading: boolean) => void;
+    simGraphData: any,
+    sandBoxMode: boolean; // whether the graph is simulated or not
 }
 
 // parameter will be the user input for json file
@@ -28,41 +32,59 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
     setProbabilities,
     onlyShownButton = false,
     simulationLoading,
+    setIsLoading,
+    simGraphData = {},
+    sandBoxMode
 }) => {
     let prob: number[] | number[][] = [];
     const classifyGraph = async () => {
-        setPredicted(true);
+        try {
+            setIsLoading(true); // 开始加载
+            setPredicted(true);
 
         //	const { prob, intmData } = await graphPrediction(modelPath, graphPath);
 
 
-        let intmData: IntmData | IntmDataNode | IntmDataLink;
+            let intmData: IntmData | IntmDataNode | IntmDataLink;
+            let prob: number[] | number[][] = [];
 
-        if (modelPath == "./gnn_node_model.onnx")
-            ({ prob, intmData } = await nodePrediction(modelPath, graphPath));
-        else if (modelPath == "./gnn_model2.onnx")
-            ({ prob, intmData } = await graphPrediction(modelPath, graphPath));
-        else
-            ({ prob, intmData } = await linkPrediction(
-                modelPath,
-                "./json_data/links/twitch.json"
-            ));
+            console.log("inference parameters:", sandBoxMode, modelPath, graphPath)
 
-        setChangedG(false);
-        setIntmData(intmData);
+            if (modelPath.includes("node")) {
+                if(sandBoxMode)modelPath = simulatedModelList["node-task-simodel"];
+                console.log("node pred pipe modelPath - 0", modelPath, graphPath, simGraphData, sandBoxMode);
+                ({ prob, intmData } = await nodePrediction(modelPath, graphPath, simGraphData, sandBoxMode));
+            } else if (modelPath.includes("graph")) {
+                if(sandBoxMode)modelPath = simulatedModelList["graph-task-simodel"];
+                ({ prob, intmData } = await graphPrediction(modelPath, graphPath, simGraphData, sandBoxMode));
+            } else if(modelPath.includes("link")){
+                ({ prob, intmData } = await linkPrediction(
+                    modelPath,
+                    "./json_data/links/twitch.json" // this is for twitch dataset originally
+                ));
+            } else {
+                if(sandBoxMode)modelPath = simulatedModelList["graph-task-simodel"];
+                ({ prob, intmData } = await graphPrediction(modelPath, graphPath, simGraphData, sandBoxMode));
+            }
+    
+            console.log("check intmData origin", intmData);
 
-
-
-        if (Array.isArray(prob[0])) {
-            setProbabilities(prob as number[][]);
-            console.log("prob 1", probabilities);
-        } else {
-            setProbabilities(prob as number[]);
-            console.log("prob 2", probabilities);
+            setChangedG(false);
+            setIntmData(intmData);
+    
+            if (Array.isArray(prob[0])) {
+                setProbabilities(prob as number[][]);
+            } else {
+                setProbabilities(prob as number[]);
+            }
+    
+            console.log("Prediction results:", prob);
+        } catch (error) {
+            console.error("Prediction error:", error);
+        } finally {
+            setIsLoading(false); // 加载完成
         }
-        console.log("check in prediction", prob, probabilities);
-    };
-
+    };    
     const prediction = !predicted ? (
         onlyShownButton ? (
             <button

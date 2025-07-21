@@ -1,7 +1,7 @@
 // UTILS FILE BECAUSE WE HAVE SO MANY HELPER FUNCTIONS
 import * as d3 from "d3";
 
-import { loadNodeWeights, loadWeights } from "./matHelperUtils";
+import { loadNodeWeights, loadSimulatedModelWeights, loadWeights } from "./matHelperUtils";
 import * as ort from "onnxruntime-web";
 import { env } from "onnxruntime-web";
 import { aggregationCalculator, fcLayerCalculationVisualizer, matrixMultiplication, showFeature, outputVisualizer, scaleFeatureGroup, nodeOutputVisualizer } from "@/utils/graphUtils";
@@ -24,6 +24,7 @@ import { dataPreparationLinkPred, constructComputationalGraph } from "./linkPred
 import { extractSubgraph } from "./graphDataUtils";
 import { isValidNode } from "./GraphvislinkPredUtil";
 import { all, number } from "mathjs";
+import { simulatedModelList } from "./const";
 
 env.wasm.wasmPaths = {
     "ort-wasm-simd.wasm": "./ort-wasm-simd.wasm",
@@ -356,7 +357,10 @@ export type LinkType = {
     type: string;
 };
 
+
+
 export async function data_prep(o_data: any) {
+    
 
 
     let final_data = {
@@ -381,8 +385,16 @@ export async function data_prep(o_data: any) {
         "0,0,0,1": "triple"
     }
 
+
     try {
-        var data = await load_json(o_data);
+        let data: any
+        if (typeof o_data === "string") {
+            console.log("load data from json file!", o_data)
+            data = await load_json(o_data);
+        } else {
+            console.log("using original data!")
+            data = o_data;
+        }
         var nodes = data.x;
         var edges = data.edge_index;
         var edge_attr = data.edge_attr;
@@ -479,14 +491,25 @@ export async function data_prep(o_data: any) {
 export async function prep_graphs(g_num: number, data: any) {
     var graphs = [];
 
-
-    for (var i = 0; i < g_num; i++) {
-        var graphData = {};
-        graphData = {
-            nodes: deepClone(data.nodes),
-            links: deepClone(data.links),
-        };
-        graphs.push(graphData);
+    if (data.nodes) {
+        for (var i = 0; i < g_num; i++) {
+            var graphData = {};
+            graphData = {
+                nodes: deepClone(data.nodes),
+                links: deepClone(data.links),
+            };
+            graphs.push(graphData);
+        }
+    } 
+    if (data.x) {
+        for (var i = 0; i < g_num; i++) {
+            var graphData = {};
+            graphData = {
+                nodes: deepClone(data.x),
+                links: deepClone(data.edge_attr),
+            };
+            graphs.push(graphData);
+        } 
     }
     for (var i = 0; i < 2; i++) {
         var node: NodeType = {
@@ -603,20 +626,36 @@ export function featureVisualizer(
     outputLayerRectHeight: number,
     mode: number,
     innerComputationMode: string,
+    sandBoxMode: boolean = false
 ) {
     state.isClicked = false;
+    console.log("featureVisualizer")
+    console.log(graphs, allNodes)
+
+
 
 
     // 1. visualize feature
     // 2. handle interaction event
     // 3. do the calculation for animation
     let convNum = 4;
-    let { weights, bias } = loadWeights();
-    if (mode === 1) {
-        ({ weights, bias } = loadNodeWeights());
-        convNum = 5
-    }
+    let weights:any, bias:any;
+    if (!sandBoxMode) {
+        ({ weights, bias } = loadWeights());
+        if (mode === 1) {
+            ({ weights, bias } = loadNodeWeights());
+            convNum = 5
+        }
+    } else {
+        ({ weights, bias } = loadSimulatedModelWeights());
+        if (mode === 1) {
+            convNum = 5
+        }
 
+        weights[0] = transposeAnyMatrix(weights[0])
+    }
+    
+    
 
     const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex); //somehow doesn't include the node in the last layer
 
@@ -637,13 +676,11 @@ export function featureVisualizer(
             })
             allFeatureMap.push(featureMap)
         }
-        
-
     })
 
 
-
     nodesByIndex.forEach((nodes, graphIndex) => { // iterate through each graphs
+        console.log(graphIndex)
 
 
         let aggregatedDataMap: any[] = [];
@@ -657,21 +694,71 @@ export function featureVisualizer(
         if (graphs.length != 0 && graphIndex > 0 && graphIndex < (convNum)) {
             currentWeights = weights[graphIndex - 1];
             currentBias = bias[graphIndex - 1]
-
             const nodesByIndex = d3.group(allNodes, (d: any) => d.graphIndex);
 
             let featureMap: number[][] = []
+            console.log("nodesByIndex: ", nodesByIndex);
             nodesByIndex.forEach((nodes, index) => {
                 if (index === graphIndex - 1) {
                     nodes.forEach((n) => {
-                        featureMap.push(n.features)
+                        featureMap.push(n.features);
                     })
                 }
             })
-            aggregatedDataMap = matrixMultiplication(normalizedAdjMatrix, featureMap)
-            calculatedDataMap = matrixMultiplication(aggregatedDataMap, currentWeights)
+            console.log("featureMap", featureMap)
+            aggregatedDataMap = [];
+            for (let i = 0; i < nodes.length; i++) {
+                let aggFeatures: number[] = [];
+                let aggSteps: string[] = [];
+                
+                let featureDim = featureMap[0].length;
+                for (let d = 0; d < featureDim; d++) {
+                    let sum = 0;
+                    let stepStr = "";
+                    let isFirstTerm = true;
+
+
+                    // console.log(`tures for node ${i}, feature dimension ${d}`, normalizedAdjMatrix);
+                    
+                    for (let k = 0; k < featureMap.length; k++) {
+                        // Only include terms for nodes that are connected (have non-zero weights)
+                        // console.log(`Feature-value-${k}: `, featureMap[k])
+                        if (normalizedAdjMatrix[i][k] !== 0) {
+                            const fVal = featureMap[k][d];
+                            const weightVal = normalizedAdjMatrix[i][k];
+                           // console.log(`Feature-value-${i}-${k}: ${featureMap[k][d]}`)
+                            sum += fVal * weightVal;
+                            // console.log(`Node ${i}, Feature ${d}-${k}: ${fVal} * ${weightVal} = ${fVal * weightVal}`);
+
+
+                    
+
+                            const term = `(${fVal.toFixed(3)} × ${weightVal.toFixed(3)})`;
+                            // Add newline and plus sign for all terms except the first
+                            stepStr += (isFirstTerm ? "" : "\n+ ") + term;
+                            isFirstTerm = false;
+                        }
+                    }
+                    
+                    aggFeatures.push(sum);
+                    // Create the final step string
+                    aggSteps.push(`X[${d}] = Σ [\n${stepStr} \n] = ${sum.toFixed(3)}`);
+                }
+                
+                aggregatedDataMap.push(aggFeatures);
+                
+                if (nodes[i]) {
+                    nodes[i].aggregationSteps = aggSteps;
+                }
+            }
+            calculatedDataMap = matrixMultiplication(aggregatedDataMap, currentWeights);
 
         }
+        for (let i = 0; i < nodes.length; i++) {
+            nodes[i].matmulResults = calculatedDataMap[i]; 
+            nodes[i].biases        = currentBias;
+        }
+        
 
 
 
@@ -685,6 +772,9 @@ export function featureVisualizer(
             .attr("layerNum", graphIndex)
             .attr("class", "layerVis")
             .attr("transform", `translate(${xOffset},10)`);
+            
+
+
 
 
 
@@ -724,6 +814,7 @@ export function featureVisualizer(
                     .attr("opacity", 1)
                     .node(); // make the svgElement a DOM element (the original on method somehow doesn't work)
                 let name = "unknown";
+
                 if (mode === 1 && graphIndex === 4) {
 
                     if (node.features[0] > 0.5) {
@@ -740,6 +831,7 @@ export function featureVisualizer(
                     }
 
 
+
                     node.text = nodeGroup.append("text")
                         .attr("x", 0)
                         .attr("y", 0)
@@ -751,6 +843,7 @@ export function featureVisualizer(
                         .attr("opacity", 1);
 
                 }
+         
                 else if (graphIndex === 0) {
                     node.text = nodeGroup.append("text")
                         .attr("x", 0)
@@ -778,6 +871,7 @@ export function featureVisualizer(
                 const featureGroup = g2.append("g")
                     .attr("transform", `translate(${xPos - 7.5}, ${yPos})`);
 
+
                 if (mode === 1 && graphIndex === 4) {
                     featureGroup.selectAll("rect")
                         .data(features)
@@ -790,6 +884,7 @@ export function featureVisualizer(
                         .attr("class", `node-features node-features-${node.graphIndex}-${node.id}`)
                         .attr("id", (d: any, i: number) => "output-layer-rect-" + i)
                         .style("fill", (d: number) => myColor(d))
+                        // .style("fill", "coral")
                         .style("stroke-width", 0.1)
                         .style("stroke", "grey")
                         .style("opacity", 1);
@@ -809,6 +904,7 @@ export function featureVisualizer(
                         .attr("class", `node-features node-features-${node.graphIndex}-${node.id}`)
                         .attr("id", (d: any, i: number) => "conv" + graphIndex + "-layer-rect-" + i)
                         .style("fill", (d: number) => myColor(d))
+                        // .style("fill", "coral")
                         .style("stroke-width", 0.1)
                         .style("stroke", "grey")
                         .style("opacity", 1);
@@ -884,6 +980,7 @@ export function featureVisualizer(
                 });
 
 
+
                 //click logic
                 if (node.graphIndex != 0) {
                     nodeGroup.on("click", function (event: any) {
@@ -912,8 +1009,10 @@ export function featureVisualizer(
 
 
                         if (mode === 1 && graphIndex === 4) {
+                            console.log("into nodeoutputvis")
                             nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, svg, mode)
                         } else {
+           
                             calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, allFeatureMap, svg, offset, height, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
                         };
 
@@ -977,6 +1076,7 @@ export function featureVisualizer(
                         .attr("height", currRectHeight)
                         .attr("class", "node-features")
                         .style("fill", (d: number) => myColor(d))
+                        // .style("fill", "coral")
                         .style("stroke-width", 0.1)
                         .style("stroke", "grey")
                         .style("visibility", "visible");
@@ -1478,11 +1578,20 @@ export function analyzeGraph(graphData: any) {
     };
 }
 
-export const graphPrediction = async (modelPath: string, graphPath: string) => {
+export const graphPrediction = async (
+    modelPath: string, 
+    graphPath: string, 
+    simGraphData:any, 
+    sandBoxMode: boolean
+) => {
 
+    console.log("graph pred pipe modelPath", modelPath, graphPath);
 
     const session = await loadModel(modelPath);
-    const graphData: IGraphData = await load_json(graphPath);
+    let graphData: IGraphData = simGraphData;
+    if(!sandBoxMode)graphData = await load_json(graphPath);
+
+    console.log("check graphData in pred engine", graphData, sandBoxMode);
 
     // Convert `graphData` to tensor-like object expected by your ONNX model
     const xTensor = new ort.Tensor(
@@ -1491,17 +1600,36 @@ export const graphPrediction = async (modelPath: string, graphPath: string) => {
         [graphData.x.length, graphData.x[0].length]
     );
 
-    const edgeIndexTensor = new ort.Tensor(
+   console.log("graph pred pipe", graphData.edge_index.length, graphData.edge_index[0].length, session.inputNames);
+
+    let edgeIndexTensor:any = new ort.Tensor(
+        "int64",
+        new BigInt64Array(graphData.edge_index.flat().map(BigInt)),
+        [graphData.edge_index.length, graphData.edge_index[0].length]
+    );
+
+if(!sandBoxMode){
+    edgeIndexTensor = new ort.Tensor(
         "int32",
         new Int32Array(graphData.edge_index.flat()),
         [graphData.edge_index.length, graphData.edge_index[0].length]
     );
+}
 
-    const batchTensor = new ort.Tensor(
+    console.log("graph pred pipe edgeIndexTensor", edgeIndexTensor);
+
+    let batchTensor:any = new ort.Tensor(
+    "int64",
+    new BigInt64Array(graphData.batch.map(BigInt)),
+    [graphData.batch.length]
+);
+if(!sandBoxMode){
+    batchTensor = new ort.Tensor(
         "int32",
         new Int32Array(graphData.batch),
         [graphData.batch.length]
     );
+}
 
     const outputMap = await session.run({
         x: xTensor,
@@ -1528,11 +1656,12 @@ export const graphPrediction = async (modelPath: string, graphPath: string) => {
 
 export const linkPrediction = async (modelPath: string, graphPath: string) => {
 
+    console.log("pred pipe modelPath", modelPath, graphPath);
 
     const session = await loadModel(modelPath);
     const graphData: IGraphData = await load_json(graphPath);
 
-
+    console.log("pred pipe graphData", graphData, session);
 
     // Convert `graphData` to tensor-like object expected by your ONNX model
     const xTensor = new ort.Tensor(
@@ -1540,6 +1669,11 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
         new Float32Array(graphData.x.flat()),
         [graphData.x.length, graphData.x[0].length]
     );
+const batchTensor = new ort.Tensor(
+    "int64",
+    new BigInt64Array(graphData.batch.map(BigInt)),
+    [graphData.batch.length] // 一维，形如 [14]
+);
 
     let int32Array = new Int32Array(
         graphData["edge_index"].flat()
@@ -1550,7 +1684,10 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
     for (let i = 0; i < int32Array.length; i++) {
         bigInt64Array[i] = BigInt(int32Array[i]);
     }
-    let edgeIndexTensor = new ort.Tensor(
+
+    console.log("pred pipe", graphData)
+
+    const edgeIndexTensor = new ort.Tensor(
         "int64",
         bigInt64Array,
         [
@@ -1559,10 +1696,13 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
         ]
     );
 
+    console.log("edgeIndexTensor", edgeIndexTensor);
+
     const outputMap = await session.run({
         x: xTensor,
         edge_index: edgeIndexTensor,
         edge_label_index: edgeIndexTensor,
+    //    batch: batchTensor
     });
 
     let conv1 = [];
@@ -1580,6 +1720,7 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
         conv1 = outputMap.conv1.cpuData;
         conv2 = outputMap.conv2.cpuData;
     }
+
     const intmData: IntmDataLink = {
         conv1: conv1,
         conv2: conv2,
@@ -1603,7 +1744,7 @@ export const linkPrediction = async (modelPath: string, graphPath: string) => {
     const mat = graphToMatrix(graphData);
 
     const computationalGraph = constructComputationalGraph(
-        graphData, features, data.conv1Data, data.conv2Data, 241
+        graphData, features, data.conv1Data, data.conv2Data, 0
     );
     const nodesNeedConstruct = computationalGraph.getNodesAtHopLevel(2);
     const subgraph = extractSubgraph(mat, nodesNeedConstruct)
@@ -1628,11 +1769,18 @@ type PredictionResult = {
     intmData: IntmData | IntmDataNode
 };
 
-export const nodePrediction = async (modelPath: string, graphPath: string): Promise<PredictionResult> => {
+export const nodePrediction = async (
+    modelPath: string, 
+    graphPath: string,
+    simGraphData: any,
+    sandBoxMode: boolean
+): Promise<PredictionResult> => {
 
+    console.log("node pred pipe modelPath", modelPath, graphPath, simGraphData);
 
     const session = await loadModel(modelPath);
-    const graphData: any = await load_json(graphPath);
+    let graphData: IGraphData = simGraphData;
+    if(!sandBoxMode)graphData = await load_json(graphPath);
 
 
 
@@ -1654,20 +1802,29 @@ export const nodePrediction = async (modelPath: string, graphPath: string): Prom
     }
     let edgeIndexTensor = new ort.Tensor(
         "int64",
-        bigInt64Array,
-        [
-            graphData.edge_index.length,
-            graphData.edge_index[0].length,
-        ]
+        new BigInt64Array(graphData.edge_index.flat().map(BigInt)),
+        [graphData.edge_index.length, graphData.edge_index[0].length]
     );
 
+    if(!sandBoxMode){
+        
+    }
+
+    const batchTensor = new ort.Tensor(
+    "int64",
+    new BigInt64Array(graphData.batch.map(BigInt)),
+    [graphData.batch.length]
+);
+
+console.log("model-input", session.inputNames); 
     const outputMap = await session.run({
         x: xTensor,
-        edge_index: edgeIndexTensor,
+        edge_index: edgeIndexTensor
     });
+    console.log("model-input", session.inputNames); 
     const outputTensor = outputMap.final;
 
-    const resultArray: number[][] = splitArray(outputTensor.cpuData, 4);
+    const resultArray: number[][] = splitArray(outputTensor.cpuData, 2);
 
     let prob: number[][] = [];
 
@@ -1720,6 +1877,7 @@ export function rotateMatrixCounterClockwise(matrix: number[][]): number[][] {
 
 export function loadNodesLocation(mode: number, path: string) {
 
+
     let data;
     if (mode === 0) {
         if (path === "0") data = require("../../public/json_data/node_location/nodes_data0.json");
@@ -1732,8 +1890,8 @@ export function loadNodesLocation(mode: number, path: string) {
         data = require("../../public/json_data/node_location/nodes_data_karate.json");
 
     }
-
-    return data;
+// return require("../../public/json_data/node_location/nodes_data0.json");
+   return data;
 }
 
 export function fetchSubGraphNodeLocation(index: number, innerComputationMode: string) {

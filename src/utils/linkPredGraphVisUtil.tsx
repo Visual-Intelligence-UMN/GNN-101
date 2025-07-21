@@ -210,7 +210,7 @@ export function linkPredFeatureVisualizer(
           .attr("y", (d: any, i: number) => i * currRectHeight)
           .attr("width", rectWidth)
           .attr("height", currRectHeight)
-          .attr("class", `node-features node-features-${node.graphIndex}-${node.id}`)
+          .attr("class", `-features node-features-${node.graphIndex}-${node.id}`)
           .attr("id", (d: any, i: number) => "conv" + graphIndex + "-layer-rect-" + i) 
           .style("fill", (d: number) => myColor(d))
           .style("stroke-width", 0.1)
@@ -227,7 +227,8 @@ export function linkPredFeatureVisualizer(
         .attr("class", `node-features-${node.graphIndex}-${node.id}`)
         .style("fill", "none")
         .style("stroke", "black")
-        .style("stroke-width", 1);
+        .style("stroke-width", 1)
+        .attr("data-index", (d:any, i:number) => i);
 
         const featureId = featureGroup.append("text")
           .attr("x", rectWidth / 2)
@@ -304,8 +305,12 @@ export function linkPredFeatureVisualizer(
             //color schemes interaction logic
             hideAllLinks(allNodes);
 
-
+            for (let i = 0; i < nodes.length; i++) {
+              nodes[i].matmulResults = calculatedDataMap[i]; 
+              nodes[i].biases        = currentBias;
+            }
           
+            
             calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, allFeatureMap, svg, offset, height, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
           
 
@@ -659,7 +664,8 @@ export function linkPredOutputVisualizer(
 
         graphVisDrawActivationExplanation(
             x, y, "Sigmoid",
-            "f(x) = 1/(1+e^(-x))", "Range: [0, 1]", svg
+            "./assets/SVGs/sigmoid_formula.svg",
+            "Range: [0, 1]", svg
         );
     }).on("mouseout", function() {
         d3.selectAll(".math-displayer").remove();

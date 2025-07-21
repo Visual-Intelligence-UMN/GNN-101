@@ -54,7 +54,7 @@ export function constructComputationalGraph(
     //add the hubNode to the compuetGraph
     computeGraph.addNode(hubNode, 0, conv2[hubNode]);
 
-    console.log("neighborNode", adjList[hubNode]);
+    console.log("neighborNode", hubNode, adjList[hubNode]);
 
     // Compute second conv layer features and add to computeGraph
     for(let i = 0; i < adjList[hubNode].length; i++){
@@ -73,13 +73,13 @@ export function constructComputationalGraph(
     // Compute features of nodes involved and add to computeGraph
     for(let i = 0; i < adjList[hubNode].length; i++){
         const node = adjList[hubNode][i];
-        console.log("neighborNode 2", adjList[node]);
+        // console.log("neighborNode 2", adjList[node]);
         for(let j = 0; j < adjList[node].length; j++){
             const neighborNode = adjList[node][j];
-            console.log("neighborNode hop 2", neighborNode);
+            // console.log("neighborNode hop 2", neighborNode);
             computeGraph.addNode(neighborNode, 2, features[neighborNode]);
             computeGraph.addEdge(node, 1, neighborNode, 2);
-            console.log("add edge hop 2", node, neighborNode);
+            // console.log("add edge hop 2", node, neighborNode);
             if (!addedFeatureNodes.has(neighborNode)) {
                 addedFeatureNodes.add(neighborNode);            
             }
@@ -143,6 +143,9 @@ export function getNodeSet(
     //we also need to construct a subgraph based on the nodes that we have added to the computeGraph - subgraph
     return mergedNodes;
 }
+
+
+
 
 type AdjacencyDict = { [key: string]: number[] };
 

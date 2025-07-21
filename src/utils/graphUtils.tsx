@@ -7,6 +7,7 @@ import {
     handleClickEvent,
     myColor,
     state,
+    transposeAnyMatrix,
 } from "./utils";
 import { roundToTwo } from "../components/WebUtils";
 import { drawHintLabel, loadWeights } from "./matHelperUtils";
@@ -76,15 +77,115 @@ export function scaleFeatureGroup(node: any, scale: number) {
 
 export function showFeature(node: any) {
     const scale = 1;
-    if (node.featureGroup) {
 
-        scaleFeatureGroup(node, scale);
+    function isAnimated(el: any): boolean {
+        while (el) {
+            if (d3.active(el)) return true;
+            el = el.parentNode;
+        }
+        return false;
     }
-    if (node.relatedNodes) {
 
+    if (node.featureGroup) {
+        scaleFeatureGroup(node, scale);
+
+        node.featureGroup
+          .selectAll("rect")
+          .filter((d: any) => d !== undefined)      
+          .on("mouseover", function(this: SVGRectElement, event: MouseEvent, d: number) {
+              if (isAnimated(this)) return;
+              d3.selectAll(".multiplier-tooltip").remove();
+
+              d3.select(this)
+                .style("stroke", "black")
+                .style("stroke-width", 2)
+                .raise();
+
+              const svg = d3.select(node.featureGroup.node().closest("svg"));
+              svg.raise();
+
+              if (node.features && d != null) {
+                  const [x, y] = d3.pointer(event, svg.node());
+                  const tooltip = svg.append("g")
+                    .attr("class", "multiplier-tooltip procVis")
+                    .style("pointer-events", "none");
+
+                  tooltip.append("rect")
+                    .attr("x", x + 10).attr("y", y - 40)
+                    .attr("width", 150).attr("height", 35)
+                    .attr("rx", 5).attr("ry", 5)
+                    .style("fill", "white")
+                    .style("stroke", "black")
+                    .style("opacity", 1);
+
+                  tooltip.append("text")
+                    .attr("x", x + 20).attr("y", y - 20)
+                    .text(`Value = ${d.toFixed(2)}`)
+                    .attr("font-family", "monospace")
+                    .style("font-size", "17px")
+                    .style("fill", "black")
+                    .style("opacity", 1);
+              }
+          })
+          .on("mouseout", function(this: SVGRectElement, event: MouseEvent, d: number){
+              d3.selectAll(".multiplier-tooltip").remove();
+
+              d3.select(this)
+                .style("stroke", "grey")
+                .style("stroke-width", 0.1)
+                .lower();        
+          });
+    }
+
+    if (node.relatedNodes) {
         node.relatedNodes.forEach((n: any) => {
             if (n.featureGroup) {
                 scaleFeatureGroup(n, scale);
+
+                n.featureGroup
+                  .selectAll("rect")
+                  .filter((d: any) => d !== undefined)
+                  .on("mouseover", function(this: SVGRectElement, event: MouseEvent, d: number){
+                      if (isAnimated(this)) return;
+                      d3.selectAll(".multiplier-tooltip").remove();
+                      d3.select(this)
+                        .style("stroke", "black")
+                        .style("stroke-width", 2)
+                        .raise();
+
+                      const svg = d3.select(n.featureGroup.node().closest("svg"));
+                      svg.raise();
+
+                      if (n.features && d != null) {
+                          const [x, y] = d3.pointer(event, svg.node());
+                          const tip = svg.append("g")
+                            .attr("class", "multiplier-tooltip procVis")
+                            .style("pointer-events", "none");
+
+                          tip.append("rect")
+                            .attr("x", x + 10).attr("y", y - 40)
+                            .attr("width", 150).attr("height", 35)
+                            .attr("rx", 5).attr("ry", 5)
+                            .style("fill", "white")
+                            .style("stroke", "black")
+                            .style("opacity", 1);
+
+                          tip.append("text")
+                            .attr("x", x + 20).attr("y", y - 20)
+                            .text(`Value = ${d.toFixed(2)}`)
+                            .attr("font-family", "monospace")
+                            .style("font-size", "17px")
+                            .style("fill", "black")
+                            .style("opacity", 1);
+                      }
+                  })
+                  .on("mouseout", function(this: SVGRectElement, event: MouseEvent, d: number){
+                      d3.selectAll(".multiplier-tooltip").remove();
+                      d3.select(this)
+                        .style("stroke", "grey")
+                        .style("stroke-width", 0.1)
+                        .lower();
+                  });
             }
         });
     }
@@ -211,9 +312,47 @@ export function outputVisualizer(
         svg = d3.selectAll(svg);
     }
     for (let i = 0; i < node.relatedNodes[0].features.length; i++) {
-        d3.select(`#pooling-layer-rect-${i}`)
-            .on("mouseover", function () {
+        d3.select<SVGRectElement, number>(`#pooling-layer-rect-${i}`)
+            .on("mouseover", function (event, d) {
+                const rect = this;
+                if (!state.isClicked) {
+                    return;
+                }
+                const tooltip = svg
+                    .append("g")
+                    .attr("class", "pooling-tooltip procVis")
+                    .style("pointer-events", "none");
+
+                const [x, y] = d3.pointer(event, svg.node());
+
+                tooltip.append("rect")
+                    .attr("x", x + 10)
+                    .attr("y", y - 40)
+                    .attr("width", 150)
+                    .attr("height", 35)
+                    .attr("rx", 5)
+                    .attr("ry", 5)
+                    .style("fill", "white")
+                    .style("stroke", "black")
+                    .style("opacity", 1);
+
+                tooltip.append("text")
+                    .attr("x", x + 20)
+                    .attr("y", y - 20)
+                    .text(`Value = ${d.toFixed(2)}`)
+                    .attr("font-family", "monospace")
+                    .style("font-size", "17px")
+                    .style("fill", "black")
+                    .style("opacity", 1);
             })
+            .on("mouseout", function (event, d) {
+                d3.selectAll(".pooling-tooltip").remove();
+                d3.select(this)
+                    .style("stroke", "grey")
+                    .style("stroke-width", 0.1)
+                    .lower();
+            });
+
         }
 
         
@@ -289,6 +428,58 @@ export function outputVisualizer(
         startCoordList.push(s);
     }
 
+    for (let i = 0; i < node.relatedNodes[0].features.length; i++) {
+        const value = node.relatedNodes[0].features[i];
+        d3.select(`#pooling-layer-rect-${i}`)
+            .attr("data-value", value)
+            .style("pointer-events", "all")
+            .style("cursor", "pointer")
+            .on("mouseover", function(event) {
+                event.stopPropagation();
+                d3.selectAll(".multiplier-tooltip").remove();
+                const value = d3.select(this).attr("data-value");
+                d3.select(this)
+                    .style("stroke", "black")
+                    .style("stroke-width", 2)
+                    .raise();
+                    
+                const svgNode = svg.node();
+                
+                const [mx, my] = d3.pointer(event, svgNode);
+                
+                const tip = svg.append("g")
+                    .attr("class", "multiplier-tooltip procVis")
+                    .style("pointer-events", "none");
+                    
+                tip.append("rect")
+                    .attr("x", mx + 10)
+                    .attr("y", my - 40)
+                    .attr("width", 150)
+                    .attr("height", 35)
+                    .attr("rx", 5)
+                    .attr("ry", 5)
+                    .style("fill", "white")
+                    .style("stroke", "black");
+                    
+                tip.append("text")
+                    .attr("x", mx + 20)
+                    .attr("y", my - 20)
+                    .attr("font-family", "monospace")
+                    .style("font-size", "17px")
+                    .style("fill", "black")
+                    .text(`Value = ${parseFloat(value).toFixed(2)}`);
+            })
+            .on("mouseout", function(event) {
+                event.stopPropagation();
+                
+                d3.selectAll(".multiplier-tooltip").remove();
+                d3.select(this)
+                    .style("stroke", "grey")
+                    .style("stroke-width", 0.1)
+                    .lower();
+            });
+    }
+
     // for (let i = 0; i < 64; i++) {
     //     let s: [number, number] = [
     //         node.graphIndex * offset +
@@ -340,6 +531,7 @@ export function outputVisualizer(
         let s: [number, number] = [node.x + 20 + i * rectHeight - temp, node.y - 15];
         endCoordList.push(s);
     }
+
     const math = create(all, {});
     const wMat = math.transpose(allWeights[3]);
     let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1], -1, rectHeight / 3, node.features.length, [wMat], 0);
@@ -367,13 +559,13 @@ export function outputVisualizer(
         .attr("transform", `translate(${endCoordList[0][0] - 90}, ${endCoordList[0][1] - 260})`);
 
 
-    let DisplayerWidth = 300; // Width of the graph-displayer
+    let DisplayerWidth = 350; // Width of the graph-displayer
     let DisplayHeight = 100;
 
     const graphDisplayer = g5
         .append("rect")
         .attr("x", (node.graphIndex - 2) * 1)
-        .attr("y", 0)
+        .attr("y", -15)
         .attr("width", DisplayerWidth)
         .attr("height", DisplayHeight)
         .attr("rx", 10)
@@ -385,13 +577,7 @@ export function outputVisualizer(
         .attr("opacity", 0)
         .lower();
 
-        const Xt = weights;
-
-   
-
-
-   
-
+        const Xt = math.transpose(weights);
 
     let outputData = [];
     for (let i = 0; i < calculatedData.length; i++) {
@@ -404,28 +590,214 @@ export function outputVisualizer(
         .append("g")
         .attr("transform", `translate(${node.x + 150}, ${node.y - 30})`);
 
-    outputGroup.selectAll("rect")
-        .data(outputData)
+        outputGroup.selectAll("rect")
+        .data(outputData.map((d, i) => ({value: d, index: i})))
         .enter()
         .append("rect")
-        .attr("class", "bias to-be-removed")
-        .attr("x", (d: any, i: number) => i * rectHeight + 5 - moveOffset)
+        .attr("class", "bias to-be-removed last-layer-output")
+        .attr("x", (datum: {value: number, index: number}, i: number) => i * rectHeight + 5 - moveOffset)
         .attr("y", 0)
         .attr("width", rectHeight)
         .attr("height", rectWidth)
-        .style("fill", (d: number) => myColor(d))
+        .style("fill", (datum: {value: number, index: number}) => myColor(datum.value))
         .style("stroke-width", 1)
         .style("stroke", "grey")
-        .style("opacity", 0);
+        .style("opacity", 0)
+        .style("pointer-events", "all")
+        .on("mouseover", function(this: SVGRectElement, event: MouseEvent, datum: {value: number, index: number}) {
+            if (!state.isClicked) return;
+            outputGroup.raise();
+            const d = datum.value;
+            const i = datum.index;
+            const matmulValue = calculatedData[i];
+            const biasValue = bias[i];
+    
+            // Remove any existing tooltips
+            outputGroup.selectAll(".output-tooltip, .pooling-tooltip").remove();
+    
+            // Highlight the current rectangle
+            d3.select(this)
+              .style("stroke", "black")
+              .style("stroke-width", "1.5px")
+              .raise();
+    
+            // Get mouse position in the group
+            let [mx, my] = d3.pointer(event, outputGroup.node());
+
+            const padding = 8;
+            // const fontSize = 14;
+            const rectW = 400;            
+            const rectH = 120;
+            const rectL = 40;
+            mx = mx - rectW / 2;
+            my = my - rectH - 50;
+    
+            // Create tooltip container
+            outputGroup.raise();
+            const tooltip = outputGroup.append("g")
+              .attr("class", "output-tooltip procVis")
+              .style("pointer-events", "none")
+              .raise();
+    
+
+            tooltip.append("rect")
+              .attr("x", mx + 10)
+              .attr("y", my + 10) 
+              .attr("width", rectW)
+              .attr("height", rectH)
+              .attr("rx", 5)
+              .attr("ry", 5)
+              .style("fill", "white")
+              .style("stroke", "black")
+              .style("opacity", 1);
+    
+            let matmulStr = matmulValue.toFixed(2);
+            let biasStr = biasValue.toFixed(2);
 
 
-        
+                // Relu text
+                tooltip.append("text")
+                  .attr("x", mx + 20)
+                  .attr("y", my + 60)
+                  .attr("text-anchor", "left")
+                  .attr("dominant-baseline", "middle")
+                  .style("font-size", `30px`)
+                  .attr("font-family", "monospace")
+                  .attr("font-weight", "bold")
+                  .text("Relu(");
 
-       
+                tooltip.append("text")
+                    .attr("x", mx + 10 + 170)
+                    .attr("y", my + 60)
+                    .attr("text-anchor", "left")
+                    .attr("dominant-baseline", "middle")
+                    .style("font-size", `30px`)
+                    .attr("font-family", "monospace")
+                    .attr("font-weight", "bold")
+                    .text("+");
+                
 
-        
+                tooltip.append("text")
+                    .attr("x", mx + 10 + 275)
+                    .attr("y", my + 60)
+                    .attr("text-anchor", "left")
+                    .attr("dominant-baseline", "middle")
+                    .style("font-size", `30px`)
+                    .attr("font-family", "monospace")
+                    .attr("font-weight", "bold")
+                    .text(") =");
 
-        outputGroup
+                const matmulX = mx + 120;
+                const matmulY = my + 35;
+
+                tooltip.append("rect")
+                    .attr("x", matmulX)
+                    .attr("y", matmulY)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(matmulValue))
+                    .attr("class", "math-displayer");
+            
+                tooltip.append("text")
+                    .attr("x", matmulX + rectL / 2)
+                    .attr("y", matmulY + rectL / 2 + 2)
+                    .text(roundToTwo(matmulValue))
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "15px")
+                    .attr("font-family", "monospace")
+                    .attr("fill", Math.abs(matmulValue) > 0.7 ? "white" : "black");
+
+                tooltip.append("text")
+                    .attr("x", matmulX + rectL / 2)
+                    .attr("y", matmulY + rectL / 2 + 45)
+                    .text("Matmul")
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("fill", "grey")
+                    .attr("font-size", "20px")
+                    .attr("font-weight", "bold")
+                    .attr("font-family", "monospace");
+
+                const biasX = mx + 230;
+                const biasY = my + 35;
+
+                tooltip.append("rect")
+                    .attr("x", biasX)
+                    .attr("y", biasY)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(biasStr))
+                    .attr("class", "math-displayer");
+
+                tooltip.append("text")
+                    .attr("x", biasX + rectL / 2)
+                    .attr("y", biasY + rectL / 2 + 2)
+                    .text(roundToTwo(biasStr))
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "15px")
+                    .attr("font-family", "monospace")
+                    .attr("fill", Math.abs(biasStr) > 0.7 ? "white" : "black");
+                
+                tooltip.append("text")
+                .attr("x", biasX + rectL / 2)
+                .attr("y", biasY + rectL / 2 + 45)
+                .text("Bias")
+                .attr("class", "math-displayer")
+                .attr("text-anchor", "middle")
+                .attr("fill", "grey")
+                .attr("font-size", "20px")
+                .attr("font-weight", "bold")
+                .attr("font-family", "monospace");
+
+                const valueX = mx + 340;
+                const valueY = my + 35;
+
+                tooltip.append("rect")
+                    .attr("x", valueX)
+                    .attr("y", valueY)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(d))
+                    .attr("class", "math-displayer");
+
+                tooltip.append("text")
+                    .attr("x", valueX + rectL / 2)
+                    .attr("y", valueY + rectL / 2 + 2)
+                    .text(roundToTwo(d))
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "15px")
+                    .attr("font-family", "monospace")
+                    .attr("fill", Math.abs(d) > 0.7 ? "white" : "black");
+
+                tooltip.append("text")
+                    .attr("x", valueX + rectL / 2)
+                    .attr("y", valueY + rectL / 2 + 45)
+                    .text("Output")
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("fill", "grey")
+                    .attr("font-size", "20px")
+                    .attr("font-weight", "bold")
+                    .attr("font-family", "monospace");
+
+        })
+        .on("mouseout", function(this: SVGRectElement, event: MouseEvent) {
+            
+            outputGroup.selectAll(".output-tooltip, .pooling-tooltip").remove();
+    
+            d3.select(this)
+              .style("stroke", "grey")
+              .style("stroke-width", "1px")
+              .lower();
+        });
+    
+    outputGroup
         .append("text")
         .attr("class", "bias to-be-removed")
         .attr("x", 100 - moveOffset)
@@ -439,6 +811,8 @@ export function outputVisualizer(
 
 
 
+    // Modified bias vector code with tooltip functionality
+
     const BiasGroup = svg
         .append("g")
         .attr("transform", `translate(${node.x}, ${node.y - 90})`);
@@ -447,7 +821,7 @@ export function outputVisualizer(
         .data(bias)
         .enter()
         .append("rect")
-        .attr("class", "bias to-be-removed")
+        .attr("class", "bias to-be-removed last-layer-bias")
         .attr("x", (d: any, i: number) => i * rectHeight + 5 - moveOffset)
         .attr("y", 0)
         .attr("width", rectHeight)
@@ -455,7 +829,101 @@ export function outputVisualizer(
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 1)
         .style("stroke", "grey")
-        .style("opacity", 0);
+        .style("opacity", 0)
+        .style("pointer-events", "all") 
+        .on("mouseover", function(this: SVGRectElement,event: MouseEvent, d: number) {
+        d3.select(this)
+            .style("stroke", "black")
+            .style("stroke-width", "1.5px");
+
+        const tooltipWidth = 130;
+        const tooltipHeight = 30;
+        const tooltipOffset = 15;
+        const pointer = d3.pointer(event, BiasGroup.node());
+        
+        BiasGroup.selectAll("g.bias-tooltip").remove();
+        
+        const tooltip = BiasGroup.append("g")
+            .attr("class", "bias-tooltip")
+            .style("pointer-events", "none");
+        
+        tooltip.raise();
+        
+        tooltip.append("rect")
+            .attr("x", pointer[0] - tooltipWidth / 2)
+            .attr("y", pointer[1] - tooltipHeight - tooltipOffset)
+            .attr("width", 150)
+            .attr("height", 35)
+            .attr("fill", "white")
+            .attr("stroke", "black")
+            .attr("rx", 3)
+            .attr("ry", 3);
+        
+        tooltip.append("text")
+            .attr("x", pointer[0])
+            .attr("y", pointer[1] - tooltipOffset - tooltipHeight/2)
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "middle")
+            .style("font-size", "17px")
+            .attr("font-family", "monospace")
+            .attr("fill", "black")
+            .text(`Value = ${d.toFixed(2)}`);
+        })
+        .on("mouseout", function(this: SVGRectElement) {
+    d3.select(this)
+        .style("stroke", "grey")
+        .style("stroke-width", "1px");
+    
+    BiasGroup.selectAll(".bias-tooltip").remove();
+    });
+
+    d3.selectAll(".last-layer-bias")
+        .on("mouseover", function (event, d) {
+            const rect = this;
+            if (!state.isClicked) {
+                return;
+            }
+            // console.log("mouseover");
+            const tooltip = BiasGroup
+            .append("g")
+            .attr("class", "pooling-tooltip procVis")
+            .style("pointer-events", "none");
+        
+            const [x, y] = d3.pointer(event, BiasGroup.node());
+
+            tooltip.append("rect")
+                .attr("x", x + 10)
+                .attr("y", y - 40)
+                .attr("width", 150)
+                .attr("height", 35)
+                .attr("rx", 5)
+                .attr("ry", 5)
+                .style("fill", "white")
+                .style("stroke", "black")
+                .style("opacity", 1);
+            
+
+            tooltip.append("text")
+                .attr("x", x + 20)
+                .attr("y", y - 20)
+                .text(() => {
+                    const value = d as number;
+                    return `Value = ${value.toFixed(2)}`;
+                })
+                .attr("font-family", "monospace")
+                .style("font-size", "17px")
+                .style("fill", "black")
+                .style("opacity", 1);
+            }   
+        )
+        .on("mouseout", function () {
+            d3.selectAll(".pooling-tooltip").remove();
+            d3.select(this)
+            .style("stroke", "grey")
+            .style("stroke-width", 0.1)
+            .lower();
+        })
+
 
     BiasGroup.append("text")
         .attr("x", 5 - moveOffset)
@@ -480,7 +948,7 @@ export function outputVisualizer(
         .attr("y2", 7.5)
         .attr("stroke", "black")
         .attr("class", "to-be-removed softmax-component");
-        drawFunctionIcon([2 * rectHeight + 5 - moveOffset + 75, 7.5], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", outputGroup);
+        drawFunctionIcon([2 * rectHeight + 5 - moveOffset + 75, 7.5], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "./assets/SVGs/softmax_formula.svg", "Range: [0, 1]", outputGroup);
 
             
         d3.selectAll(".relu-icon").on("mouseover", function(event: any) {
@@ -488,7 +956,7 @@ export function outputVisualizer(
 
             graphVisDrawActivationExplanation(
                 x, y, "Softmax",
-                "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", outputGroup
+                "./assets/SVGs/softmax_formula.svg", "Range: [0, 1]", outputGroup
             );
         }).on("mouseout", function() {
             d3.selectAll(".math-displayer").remove();
@@ -515,7 +983,8 @@ export function outputVisualizer(
             displayHeight,
             mode
         );
-        hoverOverHandler(node, node.relatedNodes[0].features, calculatedData, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true);
+        const matmulGroup = g5.append("g").attr("transform", `translate(0, -15)`);
+        hoverOverHandler(node, node.relatedNodes[0].features, calculatedData, state, matmulGroup, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true);
         d3.selectAll(".displayer-group").attr("transform", `translate(${endCoordList[0][0] - 90}, ${endCoordList[0][1] - 260}) scale(1.5)`);
 
         let start_x = node.x + 170 - temp;
@@ -627,12 +1096,16 @@ export function outputVisualizer(
     }, 2000);
 
 
-    let rectL = 15;
-    let displayerWidth = 300; // Width of the graph-displayer
+    let rectL = 28;
+    let displayerWidth = 350; // Width of the graph-displayer
     let displayHeight = 100;
+    let yOffset = -10;
 
-
-
+    // x coordinates offsets
+    let expOffset_1 = 0; // bottom left
+    let expOffset_2 = -20; // bottom right
+    let expOffset_3 = 35; // top middle
+    let rectOffset = -3; // rect offset
 
 
     for (let i = 0; i < node.features.length; i++) {
@@ -648,8 +1121,8 @@ export function outputVisualizer(
                 d3.selectAll(".graph-displayer").attr("opacity", 1);
                 d3.selectAll(`.softmax${i}`).attr("opacity", 1);
                 g5.append("rect")
-                    .attr("x", 70)
-                    .attr("y", displayHeight - 40)
+                    .attr("x", 70 + expOffset_1 + rectOffset)
+                    .attr("y", displayHeight - 40 + yOffset)
                     .attr("width", rectL)
                     .attr("height", rectL)
                     .style("stroke", "black")
@@ -657,17 +1130,19 @@ export function outputVisualizer(
                     .attr("class", "math-displayer")
                     .lower();
                 g5.append("text")
-                    .attr("x", 70)
-                    .attr("y", displayHeight - 40 + rectL / 2)
+                    .attr("x", 70 + 16 + 7 + expOffset_1)
+                    .attr("y", displayHeight - 40 + rectL / 2 + 2 + yOffset)
                     .text(roundToTwo(calculatedData[0]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5")
+                    .attr("text-anchor", "end")
+                    .attr("font-size", "11px")
+                    .attr("font-family", "monospace")
                     .attr("fill", Math.abs(calculatedData[0]) > 0.7 ? "white" : "black");
                     
 
                 g5.append("rect")
-                    .attr("x", displayerWidth - 130)
-                    .attr("y", displayHeight - 40)
+                    .attr("x", displayerWidth - 130 + 10 + expOffset_2 + rectOffset)
+                    .attr("y", displayHeight - 40 + yOffset)
                     .attr("width", rectL)
                     .attr("height", rectL)
                     .style("stroke", "black")
@@ -675,16 +1150,18 @@ export function outputVisualizer(
                     .attr("class", "math-displayer")
                     .lower();
                 g5.append("text")
-                    .attr("x", displayerWidth - 130)
-                    .attr("y", displayHeight - 40 + rectL / 2)
+                    .attr("x", displayerWidth - 130 + 16 + 10 + 7 + expOffset_2)
+                    .attr("y", displayHeight - 40 + rectL / 2 + 2 + yOffset)
                     .text(roundToTwo(calculatedData[1]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5")
+                    .attr("text-anchor", "end")
+                    .attr("font-size", "11px")
+                    .attr("font-family", "monospace")
                     .attr("fill", Math.abs(calculatedData[1]) > 0.7 ? "white" : "black");
 
                 g5.append("rect")
-                    .attr("x", 100)
-                    .attr("y", 30)
+                    .attr("x", 105 + expOffset_3 + rectOffset)
+                    .attr("y", 30 + yOffset - 5)
                     .attr("width", rectL)
                     .attr("height", rectL)
                     .style("stroke", "black")
@@ -692,63 +1169,70 @@ export function outputVisualizer(
                     .attr("class", "math-displayer")
                     .lower();
                 g5.append("text")
-                    .attr("x", 100)
-                    .attr("y", 30 + rectL / 2)
+                    .attr("x", 105 + 16 + 7 + expOffset_3)
+                    .attr("y", 30 + rectL / 2 + 2 + yOffset - 5)
                     .text(roundToTwo(calculatedData[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5")
+                    .attr("text-anchor", "end")
+                    .attr("font-size", "11px")
+                    .attr("font-family", "monospace")
                     .attr("fill", Math.abs(calculatedData[i]) > 0.7 ? "white" : "black");
 
                 g5.append("text")
-                    .attr("x", displayerWidth / 2 - 50)
-                    .attr("y", displayHeight - 30)
+                    .attr("x", displayerWidth / 2 - 50 + 10)
+                    .attr("y", displayHeight - 30 + 5 + yOffset)
                     .text("+")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "12");
+                    .attr("font-size", "17px")
+                    .attr("font-family", "monospace");
 
                 g5.append("text")
-                    .attr("x", 100 - 25)
-                    .attr("y", 40)
+                    .attr("x", 100 - 25 - 10 + expOffset_3)
+                    .attr("y", 40 + 5 + yOffset - 5)
                     .attr("xml:space", "preserve")
-                    .text("exp(        )")
+                    .text("exp(    )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "10");
+                    .attr("font-size", "17px")
+                    .attr("font-family", "monospace");
 
                 g5.append("text")
-                    .attr("x", 70 - 25)
-                    .attr("y", displayHeight - 30)
+                    .attr("x", 70 - 25 - 15 + expOffset_1)
+                    .attr("y", displayHeight - 30 + 5 + yOffset)
                     .attr("xml:space", "preserve")
-                    .text("exp(        )")
+                    .text("exp(    )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "10");
+                    .attr("font-size", "17px")
+                    .attr("font-family", "monospace");
 
                 g5.append("text")
-                    .attr("x", displayerWidth - 130 - 25)
-                    .attr("y", displayHeight - 30)
+                    .attr("x", displayerWidth - 130 - 25 - 15 + 10 + expOffset_2)
+                    .attr("y", displayHeight - 30 + 5 + yOffset)
                     .attr("xml:space", "preserve")
-                    .text("exp(        )")
+                    .text("exp(    )")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "10");
+                    .attr("font-size", "17px")
+                    .attr("font-family", "monospace");
 
                 g5.append("line")
                     .attr("x1", 20)
-                    .attr("y1", 50)
+                    .attr("y1", 55 + yOffset)
                     .attr("x2", displayerWidth - 80)
-                    .attr("y2", 50)
+                    .attr("y2", 55 + yOffset)
                     .attr("stroke", "black")
                     .attr("class", "math-displayer")
-                    .attr("stroke-width", 1);
+                    .attr("stroke-width", 1.5);
 
                 g5.append("text")
-                    .attr("x", displayerWidth - 60)
-                    .attr("y", 55)
+                    .attr("x", displayerWidth - 70)
+                    .attr("y", 60 + yOffset)
                     .text("=")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "15");
+                    .attr("font-size", "17")
+                    .attr("font-family", "monospace");
 
                 g5.append("rect")
-                    .attr("x", displayerWidth - 50)
-                    .attr("y", 45)
+                    .attr("x", displayerWidth - 50 + rectOffset) 
+                    .attr("y", 45 + yOffset)
                     .attr("width", rectL)
                     .attr("height", rectL)
                     .style("stroke", "black")
@@ -756,20 +1240,24 @@ export function outputVisualizer(
                     .attr("class", "math-displayer")
                     .lower();
                 g5.append("text")
-                    .attr("x", displayerWidth - 50)
-                    .attr("y", 45 + rectL / 2)
+                    .attr("x", displayerWidth - 50 + 16 + 7)
+                    .attr("y", 45 + rectL / 2 + 2 + yOffset)
                     .text(roundToTwo(node.features[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5")
+                    .attr("text-anchor", "end")
+                    .attr("font-size", "11px")
+                    .attr("font-family", "monospace")
                     .attr("fill", Math.abs(node.features[i]) > 0.7 ? "white" : "black");
 
 
                 g5.append("text")
-                    .attr("x", 35)
+                    .attr("x", 20)
                     .attr("y", 10)
                     .text(`Softmax score for '${category}'`)
                     .attr("class", "math-displayer")
-                    .attr("font-size", "10")
+                    .attr("font-size", "18px")
+                    .attr("font-family", "monospace")
+                    .attr("font-weight", "bold")
 
 
             })
@@ -894,24 +1382,24 @@ export function addExitBtn(x: number, y: number, svg: any) {
 
 }
 
-export function buildDetailedViewArea(x: number, y: number, width: number, height: number, svg: any) {
+export function buildDetailedViewArea(x: number, y: number, weight: number, height: number, svg: any) {
     if (!svg.selectAll){
         svg = d3.select(svg)
     }
 
-    svg
-    .append("rect")
-    .attr("class", "click-blocker to-be-removed")
-    .attr("x", x) 
-    .attr("y", y) 
-    .attr("width", width) 
-    .attr("height", height) 
-    .style("fill", "transparent") 
-    .style("pointer-events", "all") 
-    .on("click", (event: any) => {
-        event.stopPropagation(); 
-        console.log("Click inside detailed view area; no global click.");
-    });
+    // svg
+    // .append("rect")
+    // .attr("class", "click-blocker to-be-removed")
+    // .attr("x", x) 
+    // .attr("y", y) 
+    // .attr("width", weight) 
+    // .attr("height", height) 
+    // .style("fill", "transparent") 
+    // .style("pointer-events", "all") 
+    // .on("click", (event: any) => {
+    //     event.stopPropagation(); 
+    //     console.log("Click inside detailed view area; no global click.");
+    // });
 }
 
 
@@ -961,7 +1449,6 @@ export function calculationVisualizer(
         n.featureGroup.attr("class", "procVis original-features")
         }
     })
-    
 
 
     let biasData = bias;
@@ -976,7 +1463,6 @@ export function calculationVisualizer(
 
     d3.selectAll(".to-be-removed").remove();
     buildDetailedViewArea(node.x, 0, 1500, 1000, g3)
-
 
 
     let startCoordList: any[] = [];
@@ -1030,20 +1516,211 @@ export function calculationVisualizer(
 
         aggregatedFeatureGroup
         .selectAll("rect")
-        .data(aggregatedData)
+        .data(aggregatedData.map((d:number, i:number) => ({value: d, index: i})))
         .enter()
         .append("rect")
         .attr("x", (d: any, i: number) => i * prevRectHeight)
         .attr("y", 0)
         .attr("width", prevRectHeight)
         .attr("height", rectWidth)
-        .style("fill", (d: number) => myColor(d))
+        .style("fill", (d:any) => myColor(d.value))
+        // .style("fill", "coral")
         .style("stroke-width", 0.1)
-        .attr("class", "aggregatedFeatureGroup to-be-removed procVis")
+        .attr("class", "aggregatedFeatureGroup to-be-removed procVis agg-cell")
         .style("stroke", "grey")
-        .style("opacity", 0)
+        .style("opacity", 0);
+
+        setTimeout(() => {
+            d3.selectAll<SVGRectElement, { value: number, index: number }>("rect.agg-cell")
+            .style("pointer-events", "all")
+            .style("cursor", "pointer")
+            .on("mouseover", function (this: SVGRectElement, event: MouseEvent,d: {value: number, index: number}) {
+                event.stopPropagation();
+                
+                // Get the index of the current element
+                const index = d.index;
+                
+                // Highlight current cell
+                d3.select(this)
+                .style("stroke", "black")
+                .style("stroke-width", 2)
+                .raise();
+            
+                d3.selectAll(".multiplier-tooltip").remove();
+            
+                const [mx, my] = d3.pointer(event, svg.node());
+                console.log("步骤", node.aggregationSteps);
+
+                // Use the correct index to get the detail text
+                // aggregated-tooltip
+                const detailText = node.aggregationSteps ? node.aggregationSteps[index] : undefined;
+                if (!detailText) return;
+                let calculatedHeight = 100;
+                if (detailText) {
+                    const lines = detailText.split('\n');
+                    calculatedHeight = lines.length * 30; // Adjust height based on number of lines
+                }
+            
+                const tooltip = svg
+                    .append("g")
+                    .attr("class", "multiplier-tooltip procVis")
+                    .style("pointer-events", "none");
         
-    
+                tooltip.append("rect")
+                    .attr("x", mx + 10)
+                    .attr("y", my - 40)
+                    .attr("width", 300)
+                    .attr("height", calculatedHeight)
+                    .attr("rx", 5)
+                    .attr("ry", 5)
+                    .style("fill", "white")
+                    .style("stroke", "black");
+        
+
+                    
+                // const textElement = tooltip.append("text")
+                //     .attr("x", mx + 20)
+                //     .attr("y", my - 20)
+                //     .attr("font-family", "monospace")
+                //     .style("font-size", "17px")
+                //     .style("fill", "black");
+
+                // Split the text by newline and create tspan elements
+                if (detailText) {
+                    const lines = detailText.split('\n');
+                    const rectL = 25;
+                    const lastNum = Number(lines[lines.length - 1].match(/-?\d*\.?\d+/g));
+                    const balancedY = Array.isArray(lines) ? lines.length / 2 * 30 + my - 45 : my - 45;
+                    const lastHalfX = mx + 200
+                    // console.log("LastNum", lastNum);
+                    tooltip.append("text")
+                        .attr("x", mx + 20)
+                        .attr("y", balancedY)
+                        .attr("font-family", "monospace")
+                        .style("font-size", "20px")
+                        .style("fill", "black")
+                        .text("Sum(")
+                        .attr("class", "math-displayer")
+                        .attr("font-weight", "bold");
+
+                    lines.forEach((line: any, i: number) => {
+                        const numbers = line.match(/-?\d*\.?\d+/g);
+                        // console.log("numbers", numbers);
+                
+                        if (numbers && numbers.length === 2) {
+                            const value0 = Number(numbers[0]);
+                            const value1 = Number(numbers[1]);
+                            const xOffset = mx + 80;          // Horizontal base position
+                            const yOffset = i * 30 + my - 45;      // Vertical position for this row
+                        
+                            // Rectangle and text for numbers[0]
+                            tooltip.append("rect")
+                                .attr("x", xOffset)
+                                .attr("y", yOffset)
+                                .attr("width", rectL)
+                                .attr("height", rectL)
+                                .style("stroke", "black")
+                                .attr("fill", myColor(value0))
+                                .attr("class", "math-displayer");
+                        
+                            tooltip.append("text")
+                                .attr("x", xOffset + rectL / 2)
+                                .attr("y", yOffset + rectL / 2 + 2)
+                                .text(roundToTwo(value0))
+                                .attr("class", "math-displayer")
+                                .attr("text-anchor", "middle")
+                                .attr("font-size", "10px")
+                                .attr("font-family", "monospace")
+                                .attr("fill", Math.abs(value0) > 0.7 ? "white" : "black");
+                        
+                            // Rectangle and text for numbers[1], 50px to the right of xOffset
+                            tooltip.append("rect")
+                                .attr("x", xOffset + 70)
+                                .attr("y", yOffset)
+                                .attr("width", rectL)
+                                .attr("height", rectL)
+                                .style("stroke", "black")
+                                .attr("fill", myColor(value1))
+                                .attr("class", "math-displayer");
+                        
+                            tooltip.append("text")
+                                .attr("x", xOffset + 70 + rectL / 2)
+                                .attr("y", yOffset + rectL / 2 + 2)
+                                .text(roundToTwo(value1))
+                                .attr("class", "math-displayer")
+                                .attr("text-anchor", "middle")
+                                .attr("font-size", "10px")
+                                .attr("font-family", "monospace")
+                                .attr("fill", Math.abs(value1) > 0.7 ? "white" : "black");
+                        
+                            // Comma between the two
+                            tooltip.append("text")
+                                .attr("x", xOffset + rectL + 15)
+                                .attr("y", yOffset + rectL / 2 + 7)
+                                .text("X")
+                                .attr("class", "math-displayer")
+                                .attr("font-size", "17px")
+                                .attr("fill", "black");
+                            
+                            tooltip.append("text")
+                                .attr("x", xOffset + rectL + 75)
+                                .attr("y", yOffset + rectL / 2 + 7)
+                                .text(",")
+                                .attr("class", "math-displayer")
+                                .attr("font-family", "monospace")
+                                .attr("font-size", "17px")
+                                .attr("font-weight", "bold")
+                                .attr("fill", "black");
+                            
+                        }
+                        
+                        
+                        
+                    });
+                    tooltip.append("text")
+                    .attr("x", lastHalfX)
+                    .attr("y", balancedY)
+                    .attr("font-family", "monospace")
+                    .style("font-size", "20px")
+                    .style("fill", "black")
+                    .text(") =")
+                    .attr("class", "math-displayer")
+                    .attr("font-weight", "bold");
+
+                    tooltip.append("rect")
+                    .attr("x", lastHalfX + 45)
+                    .attr("y", balancedY -(rectL / 2 + 2) - 5)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(lastNum))
+                    .attr("class", "math-displayer");
+            
+                tooltip.append("text")
+                    .attr("x", lastHalfX + 45 + rectL / 2)
+                    .attr("y", balancedY - 5)
+                    .text(roundToTwo(lastNum))
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "10px")
+                    .attr("font-family", "monospace")
+                    .attr("fill", Math.abs(lastNum) > 0.7 ? "white" : "black");
+
+                }
+                
+                
+            })
+            .on("mouseout", function (this: SVGRectElement, event: MouseEvent) {
+                event.stopPropagation();
+                d3.selectAll(".multiplier-tooltip").remove();
+                d3.select(this)
+                    .style("stroke", "grey")
+                    .style("stroke-width", 0.1)
+                    .lower();
+            });
+        }, 6000);
+
+      
 
     //draw label
     let text = `Vectors \nSummation^T:\n1x${aggregatedData.length}`
@@ -1117,6 +1794,7 @@ export function calculationVisualizer(
     intermediateFeatureGroups.push(aggregatedFeatureGroup);
 
     const calculatedData = calculatedDataMap[node.id];
+
 
     const calculatedFeatureGroup = g3
         .append("g")
@@ -1195,7 +1873,9 @@ export function calculationVisualizer(
         .style("stroke-width", 1)
         .style("opacity", 0);
 
-        for (let i = 0; i < node.features.length; i++) {
+
+    console.log("DAWD", calculatedData)
+    for (let i = 0; i < calculatedData.length; i++) {
         let s: [number, number] = [
             node.graphIndex * offset +
             i * rectHeight +
@@ -1205,6 +1885,8 @@ export function calculationVisualizer(
         ];
         endCoordList.push(s);
     }
+    console.log("VAWDHUI", endCoordList)
+
 
     let matrixRectSize = rectHeight;
     if (mode === 1 && node.graphIndex === 1) {
@@ -1220,6 +1902,7 @@ export function calculationVisualizer(
     if (node.graphIndex === 1) {
         Xt = math.transpose(Xt);
     }
+
 
     
 
@@ -1256,18 +1939,18 @@ export function calculationVisualizer(
 
 
     intermediateFeatureGroups.push(calculatedFeatureGroup);
-
     const BiasGroup = g3
-        .append("g")
-        .attr(
-            "transform",
-            `translate(${3.5 * offset +
-            node.relatedNodes[0].features.length * 2 * prevRectHeight +
-            100 + temp
-            }, ${height / 5 + 100})`
-        );
+    .append("g")
+    .attr(
+        "transform",
+        `translate(${3.5 * offset +
+        node.relatedNodes[0].features.length * 2 * prevRectHeight +
+        100 + temp
+        }, ${height / 5 + 100})`
+    );
 
-    BiasGroup.selectAll("rect")
+    setTimeout(() => {
+        BiasGroup.selectAll(null)
         .data(biasData)
         .enter()
         .append("rect")
@@ -1277,9 +1960,59 @@ export function calculationVisualizer(
         .attr("width", rectHeight)
         .attr("height", rectWidth)
         .style("fill", (d: number) => myColor(d))
-        .style("stroke-width", 0.1)
+        .style("stroke-width", "0.1px")
         .style("stroke", "grey")
-        .style("opacity", 0);
+        .style("opacity", 0)
+        .style("pointer-events", "all")
+        .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
+            d3.select(this)
+            .style("stroke", "black")
+            .style("stroke-width", "1.5px")
+            .style("opacity", 1);
+            
+            const tooltipWidth = 130;
+            const tooltipHeight = 30;
+            const tooltipOffset = 15;
+            const horizontalOffset = 50;
+            
+            const pointer = d3.pointer(event, BiasGroup.node());
+            
+            BiasGroup.selectAll("g.bias-tooltip").remove();
+            
+            const tooltip = BiasGroup.append("g")
+                .attr("class", "bias-tooltip")
+                .style("pointer-events", "none");
+
+            tooltip.raise();
+            
+            tooltip.append("rect")
+                .attr("x", pointer[0] - tooltipWidth / 2 + horizontalOffset)
+                .attr("y", pointer[1] - tooltipHeight - tooltipOffset)
+                .attr("width", 150)
+                .attr("height", 35)
+                .attr("fill", "white")
+                .attr("stroke", "black")
+                .attr("rx", 3)
+                .attr("ry", 3);
+            
+            tooltip.append("text")
+                .attr("x", pointer[0] + horizontalOffset)
+                .attr("y", pointer[1] - tooltipOffset - tooltipHeight/2)
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "middle")
+                .style("font-size", "17px")
+                .attr("font-family", "monospace")
+                .attr("fill", "black")
+                .text(`Value = ${d.toFixed(2)}`);
+        })
+        .on("mouseout", function (this: SVGRectElement) {
+            d3.select(this)
+            .style("stroke", "grey")
+            .style("stroke-width", "0.1px");
+            BiasGroup.selectAll(".bias-tooltip").remove();
+        });
+    }, 6000)
+          
     
 
     //draw label
@@ -1736,8 +2469,8 @@ export function calculationVisualizer(
             let descirption = "Range:  [0 to Infinity)."
             if (mode === 1) {
                 text = "Tanh";
-                formular = "f(x) = (e^x - e^(-x)) / (e^x + e^(-x))";
-                descirption = "Range:  (-1 to 1)."
+                formular = "./assets/SVGs/tanh_formula.svg";
+                descirption = "Range: (-1, 1)"
 
 
             }
@@ -1886,24 +2619,223 @@ export function calculationVisualizer(
 
 
     //draw label
+    //output timeout
+    setTimeout(() => {
+        const matmulArr = node.matmulResults;
+        const biasArr = node.biases;
+        console.log('node.matmulResults = ', node.matmulResults);
+        console.log('node.biases        = ', node.biases);
+        
+        outputGroup
+            .selectAll(null)
+            .data(node.features)
+            .enter()
+            .append("rect")
+            .attr("class", "relu phase3 to-be-removed procVis")
+            .attr("x", (d: any, i: number) => i * rectHeight)
+            .attr("y", 0)
+            .attr("width", rectHeight)
+            .attr("height", rectWidth)
+            .style("fill", (d: number) => myColor(d))
+            // .style("fill", "coral")
+            .attr("stroke-width", 0.1)
+            .attr("stroke", "grey")
+            .attr("opacity", 0)
+            .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
+                const xPosition = parseFloat(d3.select(this).attr("x"));
+                const index = Math.round(xPosition / rectHeight);
+                console.log("Hovering index:", index);
+                console.log("Value at this index:", d);
+                
+                d3.select(this)
+                  .attr("stroke", "black")
+                  .attr("stroke-width", 2)
+                  .raise();
+              
+                let [mx, my] = d3.pointer(event, outputGroup.node());
+              
+                // Get the corresponding matmul and bias values
+                let matmulStr = 0;
+                let biasStr = 0;
+                
+                if (matmulArr && Array.isArray(matmulArr) && index < matmulArr.length) {
+                    matmulStr = matmulArr[index].toFixed(2);
+                }
+                
+                if (biasArr && Array.isArray(biasArr) && index < biasArr.length) {
+                    biasStr = biasArr[index].toFixed(2);
+                }
+                
+                // const tooltipMsg = `ReLU(Matmul: ${matmulStr} + Bias: ${biasStr}) = ${d.toFixed(4)}`;
+              
+                const padding = 8;
+                // const fontSize = 14;
+                const rectW = 400;            
+                const rectH = 120;
+                const rectL = 40;
+                mx = mx - rectW / 2;
+                my = my - rectH - padding;
+                
+                outputGroup.raise();
+                const tooltip = outputGroup.append("g")
+                  .attr("class", "output-tooltip procVis")
+                  .style("pointer-events", "none")  
+                  .raise();
+              
+                tooltip.append("rect")
+                  .attr("x", mx)
+                  .attr("y", my)
+                  .attr("width", rectW)
+                  .attr("height", rectH)
+                  .attr("rx", 5)
+                  .attr("ry", 5)
+                  .attr("fill", "white")
+                  .attr("stroke", "black");
+                
+                // Relu text
+                tooltip.append("text")
+                  .attr("x", mx + 20)
+                  .attr("y", my + 60)
+                  .attr("text-anchor", "left")
+                  .attr("dominant-baseline", "middle")
+                  .style("font-size", `30px`)
+                  .attr("font-family", "monospace")
+                  .attr("font-weight", "bold")
+                  .text("Relu(");
+
+                tooltip.append("text")
+                    .attr("x", mx + 10 + 170)
+                    .attr("y", my + 60)
+                    .attr("text-anchor", "left")
+                    .attr("dominant-baseline", "middle")
+                    .style("font-size", `30px`)
+                    .attr("font-family", "monospace")
+                    .attr("font-weight", "bold")
+                    .text("+");
+                
+
+                tooltip.append("text")
+                    .attr("x", mx + 10 + 275)
+                    .attr("y", my + 60)
+                    .attr("text-anchor", "left")
+                    .attr("dominant-baseline", "middle")
+                    .style("font-size", `30px`)
+                    .attr("font-family", "monospace")
+                    .attr("font-weight", "bold")
+                    .text(") =");
+
+                const matmulX = mx + 120;
+                const matmulY = my + 35;
+
+                tooltip.append("rect")
+                    .attr("x", matmulX)
+                    .attr("y", matmulY)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(matmulStr))
+                    .attr("class", "math-displayer");
+            
+                tooltip.append("text")
+                    .attr("x", matmulX + rectL / 2)
+                    .attr("y", matmulY + rectL / 2 + 2)
+                    .text(roundToTwo(matmulStr))
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "15px")
+                    .attr("font-family", "monospace")
+                    .attr("fill", Math.abs(matmulStr) > 0.7 ? "white" : "black");
+
+                tooltip.append("text")
+                    .attr("x", matmulX + rectL / 2)
+                    .attr("y", matmulY + rectL / 2 + 45)
+                    .text("Matmul")
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("fill", "grey")
+                    .attr("font-size", "20px")
+                    .attr("font-weight", "bold")
+                    .attr("font-family", "monospace");
+
+                const biasX = mx + 230;
+                const biasY = my + 35;
+
+                tooltip.append("rect")
+                    .attr("x", biasX)
+                    .attr("y", biasY)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(biasStr))
+                    .attr("class", "math-displayer");
+
+                tooltip.append("text")
+                    .attr("x", biasX + rectL / 2)
+                    .attr("y", biasY + rectL / 2 + 2)
+                    .text(roundToTwo(biasStr))
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "15px")
+                    .attr("font-family", "monospace")
+                    .attr("fill", Math.abs(biasStr) > 0.7 ? "white" : "black");
+                
+                tooltip.append("text")
+                .attr("x", biasX + rectL / 2)
+                .attr("y", biasY + rectL / 2 + 45)
+                .text("Bias")
+                .attr("class", "math-displayer")
+                .attr("text-anchor", "middle")
+                .attr("fill", "grey")
+                .attr("font-size", "20px")
+                .attr("font-weight", "bold")
+                .attr("font-family", "monospace");
+
+                const valueX = mx + 340;
+                const valueY = my + 35;
+
+                tooltip.append("rect")
+                    .attr("x", valueX)
+                    .attr("y", valueY)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(d))
+                    .attr("class", "math-displayer");
+
+                tooltip.append("text")
+                    .attr("x", valueX + rectL / 2)
+                    .attr("y", valueY + rectL / 2 + 2)
+                    .text(roundToTwo(d))
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "15px")
+                    .attr("font-family", "monospace")
+                    .attr("fill", Math.abs(d) > 0.7 ? "white" : "black");
+
+                tooltip.append("text")
+                    .attr("x", valueX + rectL / 2)
+                    .attr("y", valueY + rectL / 2 + 45)
+                    .text("Output")
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("fill", "grey")
+                    .attr("font-size", "20px")
+                    .attr("font-weight", "bold")
+                    .attr("font-family", "monospace");
+
+                                
+            })
+            .on("mouseout", function (this: SVGRectElement) {
+                d3.select(this)
+                  .attr("stroke", "grey")
+                  .attr("stroke-width", 0.1)
+                  .lower();
+                outputGroup.selectAll(".output-tooltip").remove();
+            });          
+    }, 4500);
 
 
 
-
-    outputGroup
-        .selectAll("rect")
-        .data(node.features)
-        .enter()
-        .append("rect")
-        .attr("class", "relu phase3 to-be-removed procVis")
-        .attr("x", (d: any, i: number) => i * rectHeight)
-        .attr("y", 0)
-        .attr("width", rectHeight)
-        .attr("height", rectWidth)
-        .style("fill", (d: number) => myColor(d))
-        .style("stroke-width", 0.1)
-        .style("stroke", "grey")
-        .attr("opacity", 0);
 
 
     const outputFrame = outputGroup.append("rect")
@@ -1996,7 +2928,7 @@ export function calculationVisualizer(
             d3.selectAll(".intermediate-path").remove();
             handleClickEvent(svg, node, event, moveOffset, allNodes, convNum, mode, state);
     
-            
+
             }
         });
 
@@ -2092,12 +3024,12 @@ function weightAnimation(
     let i = 0;
 
 
-    let endNumber = 64;
+    let endNumber = 16;
     if (node.graphIndex === 5) {
         endNumber = 2;
     }
     if (mode === 1) {
-        endNumber = 4
+        endNumber = 16
         if (node.graphIndex === 3) {  //need to alter
             endNumber = 2
 
@@ -2471,9 +3403,8 @@ export function matrixMultiplication(matrix_a: any[], matrix_b: any[]) {
     const colsB = matrix_b[0].length;
 
     if (colsA !== rowsB) {
-
-
-
+        console.log("colsA", colsA)
+        console.log("rowsB", rowsB)
         return [];
     }
 
@@ -2591,13 +3522,13 @@ export function fcLayerCalculationVisualizer(
 
     const g4 = svg
         .append("g")
-        .attr("transform", `translate(${moveToX - 700}, ${moveToY - 50})`);
+        .attr("transform", `translate(${moveToX - 700}, ${moveToY - 50}) scale(1.4)`);
 
     const displayer = g4
         .append("rect")
         .attr("x", 0)
         .attr("y", 0)
-        .attr("width", 300)
+        .attr("width", 400)
         .attr("height", 100)
         .attr("rx", 10)
         .attr("ry", 10)
@@ -2630,7 +3561,7 @@ export function fcLayerCalculationVisualizer(
             (i % Math.floor((displayerWidth - spacing) / (rectL + spacing))) *
             (rectL + spacing) +
             spacing +
-            20;
+            60;
         let y =
             Math.floor(
                 i /
@@ -2639,21 +3570,25 @@ export function fcLayerCalculationVisualizer(
                 )
             ) *
             (rectL + ySpacing) +
-            ySpacing;
+            ySpacing
+            + 10;
         numRect.push([x, y]);
     }
 
     let posNeed = [];
 
-    posNeed.push([40, 30]); // Adjust the x offset to space the textNeed elements
-    posNeed.push([265, 30]);
-    posNeed.push([270, 30]);
+    posNeed.push([40 + 20, 45]); // location of left parentheses
+    posNeed.push([265 + 35, 45]); // location of right parentheses
+    posNeed.push([270 + 40, 45]); // location of equal sign
 
     let posPlus = [];
     for (let i = 0; i < numRect.length; i++) {
-        let c = [numRect[i][0] + rectL, numRect[i][1] + rectL / 2 + 2];
+        let c = [numRect[i][0] + rectL - 10,
+                numRect[i][1] + rectL / 2 + 5];
         posPlus.push(c);
     }
+
+    rectL = 18;
 
     
 
@@ -2795,16 +3730,18 @@ function poolingLayerInteraction(
                 d3.selectAll(`#conv3-layer-rect-${i}`).style("opacity", 1).style("stroke", "black").style("stroke-width", 1);
                 d3.select(".graph-displayer").attr("opacity", 1);
                 svg.append("text")
-                    .attr("x", 0)
-                    .attr("y", 30)
+                    .attr("x", 20)
+                    .attr("y", 45)
                     .text("Avg")
                     .attr("class", "math-displayer")
-                    .attr("font-size", "12.5")
+                    .attr("font-size", "20px")
+                    .attr("font-family", "monospace")
+                    .attr("font-weight", "bold")
                     .attr("fill", "black");
 
                 for (let j = 0; j < node.relatedNodes.length; j++) {
                     svg.append("rect")
-                        .attr("x", numRect[j][0])
+                        .attr("x", numRect[j][0] - 17)
                         .attr("y", numRect[j][1])
                         .attr("width", rectL)
                         .attr("height", rectL)
@@ -2817,7 +3754,9 @@ function poolingLayerInteraction(
                         .attr("y", numRect[j][1] + rectL / 2)
                         .text(roundToTwo(node.relatedNodes[j].features[i]))
                         .attr("class", "math-displayer")
-                        .attr("font-size", "5")
+                        .attr("text-anchor", "end")
+                        .attr("font-size", "7px")
+                        .attr("font-family", "monospace")
                         .attr("fill", Math.abs(node.relatedNodes[j].features[i]) > 0.7 ? "white" : "black");
                 }
                 // append text
@@ -2829,7 +3768,8 @@ function poolingLayerInteraction(
                         .attr("y", posPlus[i][1])
                         .text("+")
                         .attr("class", "math-displayer")
-                        .attr("font-size", "10")
+                        .attr("font-size", "17px")
+                        .attr("font-family", "monospace")
                         .attr("fill", "black");
                 }
 
@@ -2840,13 +3780,15 @@ function poolingLayerInteraction(
                         .attr("y", posNeed[i][1])
                         .text(textNeed[i])
                         .attr("class", "math-displayer")
-                        .attr("font-size", "10")
+                        .attr("font-size", "17px")
+                        .attr("font-family", "monospace")
+                        .attr("font-weight", "bold")
                         .attr("fill", "black");
                 }
 
                 svg.append("rect")
-                    .attr("x", 280)
-                    .attr("y", 30 - rectL)
+                    .attr("x", 320 + 10)
+                    .attr("y", 50 - rectL)
                     .attr("width", rectL)
                     .attr("height", rectL)
                     .style("stroke", "black")
@@ -2855,11 +3797,13 @@ function poolingLayerInteraction(
                     .attr("class", "math-displayer")
                     .lower();
                 svg.append("text")
-                    .attr("x", 280)
-                    .attr("y", 30 - rectL / 2)
+                    .attr("x", 320 + 17 + 10)
+                    .attr("y", 50 - rectL / 2)
                     .text(roundToTwo(node.features[i]))
                     .attr("class", "math-displayer")
-                    .attr("font-size", "5")
+                    .attr("text-anchor", "end")
+                    .attr("font-size", "7px")
+                    .attr("font-family", "monospace")
                     .attr("fill", Math.abs(node.features[i]) > 0.7 ? "white" : "black");
                     
             })
@@ -2897,6 +3841,7 @@ export function nodeOutputVisualizer(
 
     showFeature(node)
     let weights = allWeights[3]
+
     let intervalID = 0;
     state.isClicked = true;
 
@@ -2946,7 +3891,7 @@ export function nodeOutputVisualizer(
     let temp = 350;
 
     let calculatedData: number[] = [];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 2; i++) {
         let data = 0;
         for (let j = 0; j < node.relatedNodes[0].features.length; j++) {
             data += weights[i][j] * node.relatedNodes[0].features[j];
@@ -2956,7 +3901,7 @@ export function nodeOutputVisualizer(
 
 
     let startCoordList = [];
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 16; i++) { // need to make it adaptable
         let s: [number, number] = [
             xPos - temp - moveOffset
             + prevRectHeight * i - 215,
@@ -3008,7 +3953,7 @@ export function nodeOutputVisualizer(
 
     let endCoordList = [];
 
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 2; i++) {
         let s: [number, number] = [xPos - moveOffset + 20 + i * rectHeight - temp, node.y - 15];
         endCoordList.push(s);
     }
@@ -3056,7 +4001,7 @@ export function nodeOutputVisualizer(
         .attr("height", DisplayHeight)
         .attr("rx", 10)
         .attr("ry", 10)
-        .style("fill", "transparent")
+        .style("fill", "white")
         .style("stroke", "black")
         .style("stroke-width", 2)
         .attr("class", "graph-displayer to-be-removed")
@@ -3090,19 +4035,66 @@ export function nodeOutputVisualizer(
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 1)
         .style("stroke", "grey")
-        .style("opacity", 0);
+        .style("opacity", 0)
+        .style("pointer-events", "all")
+        .on("mouseover", function(this:SVGRectElement, event: MouseEvent, d: number) {
+            outputGroup.raise();
+            d3.select(this)
+                .style("stroke", "black")
+                .style("stroke-width", "1.5px");
+            const tooltipWidth = 130;
+            const tooltipHeight = 30;
+            const tooltipOffset = 15;
+            
+            const pointer = d3.pointer(event, outputGroup.node());
+            
+            outputGroup.selectAll("g.output-tooltip").remove();
 
-
-
+            const tooltip = outputGroup.append("g")
+                .attr("class", "output-tooltip")
+                .style("pointer-events", "none");
+            
+ 
+            tooltip.raise();
+            
+            tooltip.append("rect")
+                .attr("x", pointer[0] - tooltipWidth / 2)
+                .attr("y", pointer[1] - tooltipHeight - tooltipOffset)
+                .attr("width", 150)
+                .attr("height", 35)
+                .attr("fill", "white")
+                .attr("stroke", "black")
+                .attr("rx", 3)
+                .attr("ry", 3);
+            
+            tooltip.append("text")
+                .attr("x", pointer[0])
+                .attr("y", pointer[1] - tooltipOffset - tooltipHeight/2)
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "middle")
+                .style("font-size", "17px")
+                .attr("font-family", "monospace")
+                .attr("fill", "black")
+                .text(`Value = ${d.toFixed(2)}`);
+        })
+        .on("mouseout", function(this:SVGRectElement) {
+            // Reset styling on mouseout
+            d3.select(this)
+                .style("stroke", "grey")
+                .style("stroke-width", "1px");
+            
+            // Remove tooltip
+            outputGroup.selectAll(".output-tooltip").remove();
+        });
+    
     outputGroup
-    .append("text")
-    .attr("class", "bias to-be-removed")
-    .attr("x", 130)
-    .attr("y", -20)
-    .style("fill", "grey")
-    .style("opacity", 0)
-    .text(`Final Output Vector: 1x${outputData.length}`);
-
+        .append("text")
+        .attr("class", "bias to-be-removed")
+        .attr("x", 130)
+        .attr("y", -20)
+        .style("fill", "grey")
+        .style("opacity", 0)
+        .text(`Final Output Vector: 1x${outputData.length}`);
 
 
     const BiasGroup = svg
@@ -3121,7 +4113,64 @@ export function nodeOutputVisualizer(
         .style("fill", (d: number) => myColor(d))
         .style("stroke-width", 1)
         .style("stroke", "grey")
-        .style("opacity", 0);
+        .style("opacity", 0)
+        .style("pointer-events", "all") 
+        .on("mouseover", function(this: SVGRectElement, event: MouseEvent, d: number) {
+            BiasGroup.raise();
+            d3.select(this)
+                .style("stroke", "black")
+                .style("stroke-width", "1.5px");
+            
+            // Define tooltip dimensions
+            const tooltipWidth = 130;
+            const tooltipHeight = 30;
+            const tooltipOffset = 15;
+            
+            // Get pointer position relative to the BiasGroup
+            const pointer = d3.pointer(event, BiasGroup.node());
+            
+            // Remove any existing tooltips
+            BiasGroup.selectAll("g.bias-tooltip").remove();
+            
+            // Create tooltip group
+            const tooltip = BiasGroup.append("g")
+                .attr("class", "bias-tooltip")
+                .style("pointer-events", "none");
+            
+            // Bring tooltip to front
+            tooltip.raise();
+            
+            // Create tooltip background
+            tooltip.append("rect")
+                .attr("x", pointer[0] - tooltipWidth / 2)
+                .attr("y", pointer[1] - tooltipHeight - tooltipOffset)
+                .attr("width", 150)
+                .attr("height", 35)
+                .attr("fill", "white")
+                .attr("stroke", "black")
+                .attr("rx", 3)
+                .attr("ry", 3);
+            
+            // Add tooltip text
+            tooltip.append("text")
+                .attr("x", pointer[0])
+                .attr("y", pointer[1] - tooltipOffset - tooltipHeight/2)
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "middle")
+                .style("font-size", "17px")
+                .attr("font-family", "monospace")
+                .attr("fill", "black")
+                .text(`Value = ${d.toFixed(2)}`);
+        })
+        .on("mouseout", function(this: SVGRectElement) {
+            // Reset styling on mouseout
+            d3.select(this)
+                .style("stroke", "grey")
+                .style("stroke-width", "1px");
+            
+            // Remove tooltip
+            BiasGroup.selectAll(".bias-tooltip").remove();
+        });
 
     BiasGroup.append("text")
         .attr("x", 5)
@@ -3130,7 +4179,6 @@ export function nodeOutputVisualizer(
         .style("fill", "gray")
         .style("font-size", "17px")
         .attr("class", "bias to-be-removed")
-
         .style("opacity", 0);
 
 
@@ -3264,14 +4312,14 @@ export function nodeOutputVisualizer(
             .attr("opacity", 1)
             .lower();
 
-            drawFunctionIcon([end_x+170/2+40, end_y], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", svg);
+            drawFunctionIcon([end_x+170/2+40, end_y], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "./assets/SVGs/softmax_formula.svg", "Range: [0, 1]", svg);
             
             d3.selectAll(".relu-icon").on("mouseover", function() {
                 const [x, y] = d3.pointer(event);
 
                 graphVisDrawActivationExplanation(
                     x, y, "Softmax",
-                    "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]", svg
+                    "./assets/SVGs/softmax_formula.svg", "Range: [0, 1]", svg
                 );
             }).on("mouseout", function() {
                 d3.selectAll(".math-displayer").remove();
@@ -3283,240 +4331,132 @@ export function nodeOutputVisualizer(
     }, 2000);
 
 
+    /* ─────────────────────────  fixed constants  ───────────────────────── */
+    const rectL          = 28;
+    const displayerWidth = 550;
+    const displayHeight  = 100;
+    const yOffset        = 5;
+
+    /* ─────────────────────── helper: draw one exp-block ─────────────────── */
 
 
-
-
-
-    let rectL = 15;
-    let displayerWidth = 300; // Width of the graph-displayer
-    let displayHeight = 75;
-
-
-
-
-
+/* ───────────────────── main drawing on mouse-over ───────────────────── */
     for (let i = 0; i < node.features.length; i++) {
-        d3.selectAll(`#output-layer-rect-${i}`)
-            .on("mouseover", function () {
+    d3.selectAll(`#output-layer-rect-${i}`).on("mouseover", function () {
+        if (!state.isClicked) return;
 
-                if (!state.isClicked) {
-                    return;
-                }
-                
-                let category = "Class A";
-                switch(i) {
-                    case 1: 
-                        category = "Class B";
-                        break;
-                    case 2: 
-                        category = "Class C"
-                        break;
-                    case 3:
-                        category = "Class D"
-                        break;
-                }
-                d3.selectAll(".graph-displayer").attr("opacity", 1);
-                d3.selectAll(`.softmax${i}`).attr("opacity", 1);
-                g5.append("rect")
-                    .attr("x", 50)
-                    .attr("y", displayHeight - 40 + 20)
-                    .attr("width", rectL)
-                    .attr("height", rectL)
-                    .style("stroke", "black")
-                    .attr("fill", myColor(calculatedData[0]))
-                    .attr("class", "math-displayer")
-                    .lower();
-                g5.append("text")
-                    .attr("x", 50)
-                    .attr("y", displayHeight - 40 + rectL / 2 + 20)
-                    .text(roundToTwo(calculatedData[0]))
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "5")
-                    .attr("fill", Math.abs(calculatedData[0]) > 0.7 ? "white" : "black");
+        const category = ["Class A", "Class B", "Class C", "Class D"][i] ?? "Class";
 
-                g5.append("rect")
-                    .attr("x", 100)
-                    .attr("y", displayHeight - 40 + 20)
-                    .attr("width", rectL)
-                    .attr("height", rectL)
-                    .style("stroke", "black")
-                    .attr("fill", myColor(calculatedData[1]))
-                    .attr("class", "math-displayer")
-                    .lower();
-                g5.append("text")
-                    .attr("x", 100)
-                    .attr("y", displayHeight - 40 + rectL / 2 + 20)
-                    .text(roundToTwo(calculatedData[1]))
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "5")
-                    .attr("fill", Math.abs(calculatedData[1]) > 0.7 ? "white" : "black");
+        // clear previous maths & show current layer
+        d3.selectAll(".graph-displayer")
+        .style("transition", "none")
+        .style("animation",  "none")      
+        .attr("opacity", 1).attr("background", "white")
+        .attr("width", displayerWidth).attr("height", displayHeight);
+        d3.selectAll(`.softmax${i}`).attr("opacity", 1);
 
-                g5.append("rect")
-                    .attr("x", displayerWidth - 150)
-                    .attr("y", displayHeight - 40 + 20)
-                    .attr("width", rectL)
-                    .attr("height", rectL)
-                    .style("stroke", "black")
-                    .attr("fill", myColor(calculatedData[2]))
-                    .attr("class", "math-displayer")
-                    .lower();
-                g5.append("text")
-                    .attr("x", displayerWidth - 150)
-                    .attr("y", displayHeight - 40 + rectL / 2 + 20)
-                    .text(roundToTwo(calculatedData[2]))
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "5")
-                    .attr("fill", Math.abs(calculatedData[2]) > 0.7 ? "white" : "black");
-
-                g5.append("rect")
-                    .attr("x", displayerWidth - 100)
-                    .attr("y", displayHeight - 40 + 20)
-                    .attr("width", rectL)
-                    .attr("height", rectL)
-                    .style("stroke", "black")
-                    .attr("fill", myColor(calculatedData[3]))
-                    .attr("class", "math-displayer")
-                    .lower();
-                g5.append("text")
-                    .attr("x", displayerWidth - 100)
-                    .attr("y", displayHeight - 40 + rectL / 2 + 20)
-                    .text(roundToTwo(calculatedData[3]))
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "5")
-                    .attr("fill", Math.abs(calculatedData[3]) > 0.7 ? "white" : "black");
-
-                g5.append("rect")
-                    .attr("x", 100)
-                    .attr("y", 10 + 20)
-                    .attr("width", rectL)
-                    .attr("height", rectL)
-                    .style("stroke", "black")
-                    .attr("fill", myColor(calculatedData[i]))
-                    .attr("class", "math-displayer")
-                    .lower();
-                g5.append("text")
-                    .attr("x", 100)
-                    .attr("y", 10 + rectL / 2 + 20)
-                    .text(roundToTwo(calculatedData[i]))
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "5")
-                    .attr("fill", Math.abs(calculatedData[i]) > 0.7 ? "white" : "black");
-
-                g5.append("text")
-                    .attr("x", 100 - 27)
-                    .attr("y", displayHeight - 30 + 20)
-                    .text("+")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "12");
-
-                g5.append("text")
-                    .attr("x", displayerWidth - 25 - 105)
-                    .attr("y", displayHeight - 30 + 20)
-                    .text("+")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "12");
-
-                g5.append("text")
-                    .attr("x", displayerWidth - 25 - 152)
-                    .attr("y", displayHeight - 30 + 20)
-                    .text("+")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "12");
-
-                g5.append("text")
-                    .attr("x", 100 - 20)
-                    .attr("y", 20 + 20)
-                    .attr("xml:space", "preserve")
-                    .text("exp(          )")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "8");
-
-                g5.append("text")
-                    .attr("x", 50 - 20)
-                    .attr("y", displayHeight - 30 + 20)
-                    .attr("xml:space", "preserve")
-                    .text("exp(            )")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "8");
-
-                g5.append("text")
-                    .attr("x", displayerWidth - 150 - 20)
-                    .attr("y", displayHeight - 30 + 20)
-                    .attr("xml:space", "preserve")
-                    .text("exp(          )")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "8");
-
-                g5.append("text")
-                    .attr("x", displayerWidth - 100 - 20)
-                    .attr("y", displayHeight - 30 + 20)
-                    .attr("xml:space", "preserve")
-                    .text("exp(          )")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "8");
-
-                g5.append("text")
-                    .attr("x", 100 - 20)
-                    .attr("y", displayHeight - 30 + 20)
-                    .attr("xml:space", "preserve")
-                    .text("exp(        )")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "8");
-
-                g5.append("line")
-                    .attr("x1", 20)
-                    .attr("y1", 30 + 20)
-                    .attr("x2", displayerWidth - 80)
-                    .attr("y2", 30 + 20)
-                    .attr("stroke", "black")
-                    .attr("class", "math-displayer")
-                    .attr("stroke-width", 1);
-
-                g5.append("text")
-                    .attr("x", displayerWidth - 60)
-                    .attr("y", 35 + 20)
-                    .text("=")
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "15")
-
-                g5.append("rect")
-                    .attr("x", displayerWidth - 50)
-                    .attr("y", 25 + 20)
-                    .attr("width", rectL)
-                    .attr("height", rectL)
-                    .style("stroke", "black")
-                    .attr("fill", myColor(node.features[i]))
-                    .attr("class", "math-displayer")
-                    .lower();
-                g5.append("text")
-                    .attr("x", displayerWidth - 50)
-                    .attr("y", 25 + rectL / 2 + 20)
-                    .text(roundToTwo(node.features[i]))
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "5")
-                    .attr("fill", Math.abs(node.features[i]) > 0.7 ? "white" : "black");
+        /* ─── numerator (single exp-block) ─── */
+        console.log(calculatedData)
+        console.log("DVALUE", calculatedData[i])
+        console.log(i)
+        let value: number = Number(calculatedData[i])
+        console.log(typeof calculatedData[i])
+        console.log("value", value)
+        drawExpBlock(
+        g5,
+        200,                       // base x
+        60 + yOffset,              // baseline y
+        value,
+        20,                        // numerOffset
+        -3,                        // rect adjustment
+        myColor(calculatedData[i]),
+        yOffset,
+        rectL
+        );
 
 
+        /* ─── denominator (four exp-blocks) ─── */
+        const baseY = displayHeight - 10 + yOffset + 5;   // shared baseline
 
-                g5.append("text")
-                    .attr("x", 35)
-                    .attr("y", 10)
-                    .text(`Softmax score for '${category}'`)
-                    .attr("class", "math-displayer")
-                    .attr("font-size", "10")
+        drawExpBlock(g5,  70, baseY, calculatedData[0],   0, -3, myColor(calculatedData[0]), yOffset, rectL);
+        g5.append("text").attr("x", 110).attr("y", displayHeight - 20 + yOffset).text("+")
+        .attr("class", "math-displayer").attr("font-size", "17px")
+        .attr("font-family", "monospace");
+
+        drawExpBlock(g5, 170, baseY, calculatedData[1],   0, -3, myColor(calculatedData[1]), yOffset, rectL);
+        g5.append("text").attr("x", 210).attr("y", displayHeight - 20 + yOffset).text("+")
+        .attr("class", "math-displayer").attr("font-size", "17px")
+        .attr("font-family", "monospace");
+
+        // drawExpBlock(g5, 270, baseY, calculatedData[2],   0, -3, myColor(calculatedData[2]), yOffset, rectL);
+        // g5.append("text").attr("x", 310).attr("y", displayHeight - 20 + yOffset).text("+")
+        // .attr("class", "math-displayer").attr("font-size", "17px")
+        // .attr("font-family", "monospace");
+
+        // drawExpBlock(g5, 370, baseY, calculatedData[3],   0, -3, myColor(calculatedData[3]), yOffset, rectL);
+
+        /* fraction line */
+        g5.append("line")
+        .attr("x1", 20)
+        .attr("y1", 55 + yOffset)
+        .attr("x2", displayerWidth - 130)  // 550 - 130 = 420
+        .attr("y2", 55 + yOffset)
+        .attr("stroke", "black")
+        .attr("class", "math-displayer")
+        .attr("stroke-width", 1.5);
+
+        /* equals sign and result */
+        g5.append("text")
+        .attr("x", displayerWidth - 120)   // 550 - 120 = 430
+        .attr("y", 60 + yOffset)
+        .text("=")
+        .attr("class", "math-displayer")
+        .attr("font-size", "17px")
+        .attr("font-family", "monospace");
+
+        // result square
+        g5.append("rect")
+        .attr("x", displayerWidth - 100)   // 550 - 100 = 450
+        .attr("y", 45 + yOffset)
+        .attr("width", rectL)
+        .attr("height", rectL)
+        .attr("stroke", "black")
+        .attr("fill", myColor(node.features[i]))
+        .attr("class", "math-displayer");
+
+        // result number
+        g5.append("text")
+        .attr("x", displayerWidth - 77)    // 450 + 16 + 7
+        .attr("y", 45 + rectL / 2 + 2 + yOffset)
+        .text(node.features[i].toFixed(2))
+        .attr("class", "math-displayer")
+        .attr("text-anchor", "end")
+        .attr("font-size", "11px")
+        .attr("font-family", "monospace")
+        .attr("fill", Math.abs(node.features[i]) > 0.7 ? "white" : "black");
+
+        /* title */
+        g5.append("text")
+        .attr("x", displayerWidth / 2)
+        .attr("y", 20)
+        .text(`Softmax score for '${category}'`)
+        .attr("class", "math-displayer")
+        .attr("text-anchor", "middle")
+        .attr("font-size", "18px")
+        .attr("font-family", "monospace")
+        .attr("font-weight", "bold");
+        })
 
 
-            })
-            .on("mouseout", function () {
-                if (!state.isClicked) {
-                    return;
-                }
-                d3.selectAll(".math-displayer").remove();
-                d3.selectAll(".graph-displayer").attr("opacity", 0);
-                d3.selectAll(".softmax").attr("opacity", 0.07);
-                d3.selectAll(`.softmax${i}`).attr("opacity", 0.07);
-            });
+        .on("mouseout", function () {
+            if (!state.isClicked) {
+                return;
+            }
+            d3.selectAll(".math-displayer").remove();
+            d3.selectAll(".graph-displayer").attr("opacity", 0).attr("width", 300).attr("height", 100);
+            d3.selectAll(".softmax").attr("opacity", 0.07);
+            d3.selectAll(`.softmax${i}`).attr("opacity", 0.07);
+        });
     }
 
 
@@ -3601,3 +4541,49 @@ export function nodeOutputVisualizer(
 
 
 }
+
+
+function drawExpBlock(
+    g: d3.Selection<SVGGElement, unknown, HTMLElement, any>,
+    baseX: number,        // anchor x (rough centre of the block)
+    baseY: number,        // baseline y for the “exp(    )”
+    value: number,        // value displayed inside the square
+    offsetX: number,      // extra horizontal offset for fine-tuning
+    rectAdj: number,      // extra tweak for the coloured square
+    colour: string,
+    yOffset: number,
+    rectL: number
+    ) {
+    // “exp(    )” with spaces left for the rect
+
+    console.log(typeof value, value)
+    g.append("text")
+        .attr("x", baseX + offsetX - 40)
+        .attr("y", baseY - 15)
+        .text("exp(    )")
+        .attr("xml:space", "preserve")
+        .attr("class", "math-displayer")
+        .attr("font-size", "17px")
+        .attr("font-family", "monospace");
+
+    // coloured square
+    g.append("rect")
+        .attr("x", baseX + offsetX + rectAdj)
+        .attr("y", baseY - 40 + yOffset)
+        .attr("width", rectL)
+        .attr("height", rectL)
+        .attr("stroke", "black")
+        .attr("fill", colour)
+        .attr("class", "math-displayer");
+
+    // number inside
+    g.append("text")
+        .attr("x", baseX + offsetX + 16 + 7)
+        .attr("y", baseY - 40 + rectL / 2 + 2 + yOffset)
+        .text(value.toFixed(2))
+        .attr("class", "math-displayer")
+        .attr("text-anchor", "end")
+        .attr("font-size", "11px")
+        .attr("font-family", "monospace")
+        .attr("fill", Math.abs(value) > 0.7 ? "white" : "black");
+    }

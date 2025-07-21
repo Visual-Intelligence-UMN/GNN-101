@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { gcd } from "mathjs";
+import { gcd, re } from "mathjs";
 import { formulaClass, formulaTextClass } from "./const";
 import { drawHintLabel } from "./matHelperUtils";
 
@@ -98,7 +98,7 @@ export function injectSVG(g:any, x: number, y: number, SVGPath:string, svgClass:
     g.selectAll("*").remove();
     d3.xml(SVGPath).then(function(data) {
         let play;
- 
+        if (g.node() == null) return;
         play = g!.node()!.appendChild(data.documentElement)
         d3.select(play).attr("x", x).attr("y", y).attr("class", svgClass)
        

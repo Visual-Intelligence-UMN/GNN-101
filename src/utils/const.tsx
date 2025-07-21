@@ -52,6 +52,12 @@ export const modelList: { [k: string]: string } = {
     "GraphSAGE - link prediction": "./sage_link_model.onnx"
 };
 
+
+export const simulatedModelList: { [k: string]: string } = {
+    "graph-task-simodel": "./simulations/simulated_gcn_graph_model.onnx",
+    "node-task-simodel": "./simulations/simulated_gcn_node_model.onnx",
+};
+
 // export const modelGATList: { [k: string]: string } = {
 //   "GAT link classification": "./gat_link_model.onnx"
 // };
@@ -68,13 +74,16 @@ export const modelTypeList: { [k: string]: string } = {
 
 const chemicalNames = ['C16NO2', 'C6FNO2', 'C7NO3']
 function graph_list_generate(namelist: string[]) {
-    let res: { [k: string]: string } = {};
+    let res: { [k: string]: string } = { };
 
     for (let i = 0; i < namelist.length; i++) {
         res[`molecule_${chemicalNames[i]}`] = `./json_data/graphs/input_graph${i}.json`;
     }
 
+    console.log("Generating graph list with chemical names:", res);
+
     return res;
+//    return {"test":"./json_data/graphs/testing_graph.json"};
 }
 export const graphList = graph_list_generate(chemicalNames)
 

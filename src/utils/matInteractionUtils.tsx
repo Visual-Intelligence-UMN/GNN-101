@@ -444,232 +444,218 @@ export function drawEScoreEquation(
 
 export function drawSoftmaxDisplayer(
     pathMap: any,
-    endCoord: any,
+    endCoord: [number[], number[]],
     result: number[],
-    id: number,
-    myColor: any
-) {
+    id: 0 | 1,
+    myColor: (v: number) => string
+  ) {
+    /* ───── 1. highlight the active path ───── */
     pathMap[0][id]!.style.opacity = "1";
     pathMap[1][id]!.style.opacity = "1";
-
-    //set-up the paramtere for the math displayer
-    const displayW = 250;
-    const displayH = 75;
-
-    //find coordination for the math displayer first
-    const displayX = endCoord[1][0] + 30;
-    const displayY = endCoord[1][1] - (displayH + 50);
-
-    //add displayer
-
-
-    const displayer = d3.select(".mats").append("g")
-    
-    displayer
-        .append("rect")
-        .attr("x", displayX)
-        .attr("y", displayY)
-        .attr("width", displayW)
-        .attr("height", displayH)
-        .attr("rx", 10)
-        .attr("ry", 10)
-        .style("fill", "white")
-        .style("stroke", "black")
-        .style("stroke-width", 2)
+  
+    /* ───── 2. layout & style constants ───── */
+    const DISP_W = 350;
+    const DISP_H = 100;
+  
+    const RECT_EDGE  = 28;   // coloured square size
+    const FONT_NUM   = 11;   // monospace numbers in the squares
+    const FONT_TITLE = 18;   // bold title
+    const FONT_TXT   = 18;   // all other text
+  
+    /* fine-tuning knobs (px) */
+    const expOffset_1 = 50;
+    const expOffset_2 = 0;
+    const expOffset_3 = -10;
+    const expAdjust   = 0;   // tweaks “)” position
+    const rectAdjust  = 0;   // tweaks every coloured rect x-pos
+  
+    /* reusable horizontal gaps (px) */
+    const GAP_EXP_RECT   = 50;
+    const GAP_RECT_PAREN = 10;
+    const GAP_PLUS       = 20;
+    const GAP_EQ         = 35;
+  
+    /* y positions relative to the group */
+    const Y_TITLE    = 15 + 5;
+    const Y_NUMER    = 40 + 15;
+    const Y_LINE     = 55 + 5;
+    const Y_DENOM    = 70 + 20;
+    const Y_RES_RECT = 35 + 10;
+    const Y_RES_TEXT = Y_RES_RECT + RECT_EDGE / 2 + 1;
+  
+    /* ───── 3. place the displayer group once ───── */
+    const baseX = endCoord[1][0] + 30;
+    const baseY = endCoord[1][1] - (DISP_H + 50);
+  
+    const displayer =
+      d3
+        .select(".mats")
+        .selectAll<SVGGElement, unknown>("g.math-displayer") // reuse if already present
+        .data([null])
+        .join("g")
         .attr("class", "math-displayer")
-        .lower();
-
-    //data preparation and preprocessing
-    //model outputs and the values after softmax
-
+        .attr("transform", `translate(${baseX}, ${baseY})`);
+  
+    /* clear any previous children (keep the same <g>) */
+    displayer.selectAll("*").remove();
+  
+    /* background panel (kept at back) */
+    displayer
+      .append("rect")
+      .attr("width", DISP_W)
+      .attr("height", DISP_H)
+      .attr("rx", 10)
+      .attr("ry", 10)
+      .style("fill", "white")
+      .style("stroke", "black")
+      .style("stroke-width", 2)
+      .lower();
+  
+    /* ───── 4. prepare data ───── */
     const finalResult = softmax(result);
-
-    //title fetch
-    let title = "Softmax Score for 'Mutagenic'";
-    if (id == 0) {
-        title = "Softmax Score for 'Non-Mutagenic'";
-    }
-
-    //add contents into the math displayer
-    //add title
-    const titleYOffset = 10;
-    const titleXOffset = 50;
+    const title =
+      id === 0
+        ? "Softmax Score for 'Non-Mutagenic'"
+        : "Softmax Score for 'Mutagenic'";
+  
+    /* ───── 5. title ───── */
     displayer
+      .append("text")
+      .attr("x", 20)
+      .attr("y", Y_TITLE)
+      .text(title)
+      .attr("font-family", "monospace")
+      .attr("font-size", FONT_TITLE)
+      .style("font-weight", "bold");
+  
+    /* helper: draw one exp(value) block and return tail-x */
+    const drawExpBlock = (
+      startX: number,
+      y: number,
+      value: number,
+      fill: string,
+      blockOffset: number
+    ): number => {
+      /* “exp(” */
+      displayer
         .append("text")
-        .attr("x", displayX + titleXOffset)
-        .attr("y", displayY + titleYOffset)
-        .text(title)
-        .attr("class", "math-displayer")
-        .attr("font-size", titleYOffset)
-        .attr("fill", "black");
-    //add equation
-    //draw fraction
-    //upper part of the fraction
-    const eqXOffset = titleXOffset / 2;
-    const eqYOffset = titleYOffset * 2.5;
-    const unitSize = eqXOffset / 3 + 3;
-    const upperOffset = unitSize * 2;
-    displayer
-        .append("text")
-        .attr("x", displayX + eqXOffset + upperOffset)
-        .attr("y", displayY + eqYOffset)
+        .attr("x", startX + blockOffset)
+        .attr("y", y - 5)
         .text("exp(")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-    displayer
+        .attr("font-family", "monospace")
+        .attr("font-size", FONT_TXT);
+  
+      /* coloured rect */
+      const rectX = startX + blockOffset + GAP_EXP_RECT + rectAdjust;
+      displayer
         .append("rect")
-        .attr("x", displayX + eqXOffset + unitSize * 2.5 + upperOffset)
-        .attr("y", displayY + eqYOffset - unitSize + 2)
-        .attr("width", unitSize)
-        .attr("height", unitSize)
-        .style("stroke", "black")
-        .attr("fill", myColor(result[id]))
-        .attr("class", "math-displayer")
-        .raise();
-    displayer
+        .attr("x", rectX)
+        .attr("y", y - RECT_EDGE + 2)
+        .attr("width", RECT_EDGE)
+        .attr("height", RECT_EDGE)
+        .attr("fill", fill)
+        .attr("stroke", "black");
+  
+      /* number inside rect */
+      displayer
         .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 2.5 + upperOffset)
-        .attr("y", displayY + eqYOffset - unitSize / 3)
-        .text(roundToTwo(result[id]))
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize / 2)
-        .attr("fill", "white");
-    displayer
+        .attr("x", rectX + RECT_EDGE / 2)
+        .attr("y", y - RECT_EDGE / 2 + 2)
+        .text(roundToTwo(value))
+        .attr("font-family", "monospace")
+        .attr("font-size", FONT_NUM)
+        .attr("text-anchor", "middle")
+        .attr("fill", Math.abs(value) > 0.7 ? "white" : "black");
+  
+      /* right parenthesis “)” */
+      const parenX = rectX + RECT_EDGE + GAP_RECT_PAREN + expAdjust;
+      displayer
         .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 4 + upperOffset)
-        .attr("y", displayY + eqYOffset)
+        .attr("x", parenX)
+        .attr("y", y - 5)
         .text(")")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-    //upper part finished
-    //draw fraction line
-    const startFLPt: [number, number] = [
-        displayX + eqXOffset / 2,
-        displayY + eqYOffset + unitSize,
-    ];
-    const endFLPt: [number, number] = [
-        displayX + eqXOffset + unitSize * 10,
-        displayY + eqYOffset + unitSize,
-    ];
-    const path1 = displayer
-        .append("path")
-        .attr("d", d3.line()([startFLPt, endFLPt]))
-        .attr("stroke", "black")
-        .attr("opacity", 1)
-        .attr("fill", "none")
-        .attr("class", "math-displayer");
-    //draw lower part
-    const offsetMul = 2;
+        .attr("font-family", "monospace")
+        .attr("font-size", FONT_TXT);
+  
+      return parenX; // tail
+    };
+  
+    /* ───── 6. numerator ───── */
+    let tailX = drawExpBlock(25, Y_NUMER, result[id], myColor(result[id]), expOffset_1);
+  
+    /* fraction bar */
     displayer
-        .append("text")
-        .attr("x", displayX + eqXOffset)
-        .attr("y", displayY + eqYOffset * offsetMul)
-        .text("exp(")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
+      .append("line")
+      .attr("x1", 10)
+      .attr("y1", Y_LINE)
+      .attr("x2", DISP_W - 90)
+      .attr("y2", Y_LINE)
+      .attr("stroke", "black")
+      .attr("stroke-width", 1.5);
+  
+    /* ───── 7. denominator ───── */
+    tailX = drawExpBlock(25, Y_DENOM, result[0], myColor(result[0]), expOffset_2);
+  
+    /* “+” */
     displayer
-        .append("rect")
-        .attr("x", displayX + eqXOffset + unitSize * 2.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
-        .attr("width", unitSize)
-        .attr("height", unitSize)
-        .style("stroke", "black")
-        .attr("fill", myColor(result[0]))
-        .attr("class", "math-displayer")
-        .raise();
+      .append("text")
+      .attr("x", tailX + GAP_PLUS)
+      .attr("y", Y_DENOM - 5)
+      .text("+")
+      .attr("font-family", "monospace")
+      .attr("font-size", FONT_TXT);
+  
+    tailX = drawExpBlock(
+      tailX + GAP_PLUS*2 + FONT_TXT - 5,
+      Y_DENOM,
+      result[1],
+      myColor(result[1]),
+      expOffset_3
+    );
+  
+    /* ───── 8. equals & final result ───── */
     displayer
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 2.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
-        .text(roundToTwo(result[0]))
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize / 2)
-        .attr("fill", determineColor(result[0]));
+      .append("text")
+      .attr("x", tailX + GAP_EQ - 5)
+      .attr("y", Y_LINE + 5)
+      .text("=")
+      .attr("font-family", "monospace")
+      .attr("font-size", FONT_TXT);
+  
+    const resRectX = tailX + GAP_EQ + FONT_TXT;
     displayer
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 4)
-        .attr("y", displayY + eqYOffset * offsetMul)
-        .text(")+exp(")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
+      .append("rect")
+      .attr("x", resRectX + rectAdjust)
+      .attr("y", Y_RES_RECT)
+      .attr("width", RECT_EDGE)
+      .attr("height", RECT_EDGE)
+      .attr("fill", myColor(finalResult[id]))
+      .attr("stroke", "black");
+  
     displayer
-        .append("rect")
-        .attr("x", displayX + eqXOffset + unitSize * 7.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
-        .attr("width", unitSize)
-        .attr("height", unitSize)
-        .style("stroke", "black")
-        .attr("fill", myColor(result[1]))
-        .attr("class", "math-displayer")
-        .raise();
-    displayer
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 7.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
-        .text(roundToTwo(result[1]))
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize / 2)
-        .attr("fill", determineColor(result[1]));
-    displayer
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 9)
-        .attr("y", displayY + eqYOffset * offsetMul)
-        .text(")")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-    //lower part finished
-    //eq sign and result
-    displayer
-        .append("text")
-        .attr("x", endFLPt[0] + unitSize / 2)
-        .attr("y", endFLPt[1])
-        .text("=")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-    displayer
-        .append("rect")
-        .attr("x", endFLPt[0] + unitSize * 1.5)
-        .attr("y", endFLPt[1] - unitSize)
-        .attr("width", unitSize)
-        .attr("height", unitSize)
-        .style("stroke", "black")
-        .attr("fill", myColor(finalResult[id]))
-        .attr("class", "math-displayer")
-        .raise();
-    let textColor = "white";
-    if (Math.abs(finalResult[id]) < 0.5) {
-        textColor = "black";
-    }
-    displayer
-        .append("text")
-        .attr("x", endFLPt[0] + unitSize * 1.5)
-        .attr("y", endFLPt[1] - unitSize / 2)
-        .text(roundToTwo(finalResult[id]))
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize / 2)
-        .attr("fill", textColor);
-
+      .append("text")
+      .attr("x", resRectX + RECT_EDGE / 2 + rectAdjust)
+      .attr("y", Y_RES_TEXT)
+      .text(roundToTwo(finalResult[id]))
+      .attr("font-family", "monospace")
+      .attr("font-size", FONT_NUM)
+      .attr("text-anchor", "middle")
+      .attr("fill", Math.abs(finalResult[id]) > 0.7 ? "white" : "black");
+  
+    /* ───── 9. optional scale (compose with translation) ───── */
     const scaleFactor = 1.5;
-
-        // 获取 tooltip 元素的边界框
-        const bbox = displayer.node()?.getBBox();
-
-        // 计算中心点
-        if(bbox!=undefined){
-            const centerX = bbox.x + bbox.width / 2;
-            const centerY = bbox.y + bbox.height / 2;
-
-            // 将缩放中心设置为元素的中心点
-            displayer.attr('transform', `translate(${centerX}, ${centerY}) scale(${scaleFactor}) translate(${-centerX}, ${-centerY})`);
-
-        }
-}
+    const bbox = displayer.node()?.getBBox();
+    if (bbox) {
+      const cx = bbox.x + bbox.width / 2;
+      const cy = bbox.y + bbox.height / 2;
+      const baseTransform = `translate(${baseX}, ${baseY})`;
+      displayer.attr(
+        "transform",
+        `${baseTransform} translate(${cx}, ${cy}) scale(${scaleFactor}) translate(${-cx}, ${-cy})`
+      );
+    }
+  }
+  
 
 
 function determineColor(val: number) {
@@ -681,271 +667,235 @@ function determineColor(val: number) {
 }
 
 
+/**
+ * Draw a four-class soft-max tooltip for a **node-classifier**.
+ * The `<g>` stored in the variable **tooltip** is kept and reused; only its
+ * children are cleared/re-drawn, so the element itself “remains the same”.
+ */
 export function drawSoftmaxDisplayerNodeClassifier(
-    displayerPos: number[],
-    titles: string[],
-    rectID: number,
-    nthOutputVals: number[],
-    nthResult: number[],
-    myColor: any
-) {
-    //set-up the paramtere for the math displayer
-    const displayW = 350;
-    const displayH = 75;
-    const displayX = displayerPos[0];
-    const displayY = displayerPos[1];
-
-    //add displayer
-    const tooltip = d3.select(".mats").append("g");
-
-        tooltip.append("rect")
-        .attr("x", displayX)
-        .attr("y", displayY)
-        .attr("width", displayW)
-        .attr("height", displayH)
-        .attr("rx", 10)
-        .attr("ry", 10)
-        .style("fill", "white")
-        .style("stroke", "black")
-        .style("stroke-width", 2)
-        .attr("class", "math-displayer")
-        .raise();
-    //add contents into the math displayer
-    //add title
-    const titleYOffset = 10;
-    const titleXOffset = 50;
+    displayerPos: [number, number],   // [x, y] where the white panel should sit
+    titles: string[],                 // title per class
+    rectID: number,                   // index of the highlighted class
+    nthOutputVals: number[],          // raw logits (length ≥ 4)
+    nthResult: number[],              // softmax result (length ≥ 4)
+    myColor: (v: number) => string
+  ) {
+    /* ───────────────────────── 1.  layout & style constants ────────────────── */
+    const DISP_W = 550;
+    const DISP_H = 100;
+  
+    const RECT_EDGE  = 28;            // coloured square size (px)
+    const FONT_NUM   = 11;            // numbers inside squares
+    const FONT_TITLE = 18;            // bold panel title
+    const FONT_TXT   = 18;            // everything else (“exp(”, “+”, …)
+  
+    /* fine-tuning knobs (px) --------------------------------------------------- */
+    const expOffset_1 = 0;  // 1st denominator exp block
+    const expOffset_2 = 0;  // 2nd
+    const expOffset_3 = 0;  // 3rd
+    const expOffset_4 = 0;  // 4th
+    const expAdjust   = 0;  // add to each right parenthesis “)”
+    const rectAdjust  = 0;  // add to every coloured rect x-coord
+  
+    /* horizontal gaps (px) */
+    const GAP_EXP_RECT   = 45;        // “exp(” → rect
+    const GAP_RECT_PAREN = 5;        // rect  → “)”
+    const GAP_PLUS       = 10;        // “)”   → “+exp(”
+    const GAP_EQ         = 35;        // last “)” → “=”
+  
+    /* y positions inside the group */
+    const Y_TITLE    = 15;
+    const Y_NUMER    = 35 + 15;
+    const Y_LINE     = 50 + 5;
+    const Y_DENOM    = 65 + 20;
+    const Y_RES_RECT = 25 + 20;
+    const Y_RES_TEXT = Y_RES_RECT + RECT_EDGE / 2 + 1;
+  
+    /* ───────────────────────── 2.  create / reuse the group ─────────────────── */
+    const baseX = displayerPos[0];
+    const baseY = displayerPos[1];
+  
+    const tooltip = d3
+      .select(".mats")
+      .selectAll<SVGGElement, unknown>("g.node-tooltip")
+      .data([null])
+      .join("g")
+      .attr("class", "node-tooltip math-displayer")
+      .attr("transform", `translate(${baseX}, ${baseY})`);
+  
+    /* clear previous children but keep the same <g> element */
+    tooltip.selectAll("*").remove();
+  
+    /* background panel */
     tooltip
-        .append("text")
-        .attr("x", displayX + titleXOffset)
-        .attr("y", displayY + titleYOffset)
-        .text(titles[Number(rectID)])
-        .attr("class", "math-displayer")
-        .attr("font-size", titleYOffset)
-        .attr("fill", "black");
-    const eqXOffset = titleXOffset / 2;
-    const eqYOffset = titleYOffset * 2.5;
-    const unitSize = eqXOffset / 3 + 3;
-    const upperOffset = unitSize * 2;
+      .append("rect")
+      .attr("width", DISP_W)
+      .attr("height", DISP_H)
+      .attr("rx", 10)
+      .attr("ry", 10)
+      .style("fill", "white")
+      .style("stroke", "black")
+      .style("stroke-width", 2)
+      .lower();
+  
+    /* ───────────────────────── 3.  title ───────────────────────────────────── */
     tooltip
+      .append("text")
+      .attr("x", DISP_W / 2)
+      .attr("y", Y_TITLE)
+      .text(titles[rectID])
+      .attr("text-anchor", "middle")
+      .attr("font-family", "monospace")
+      .attr("font-size", FONT_TITLE)
+      .style("font-weight", "bold");
+  
+    /* helper: draw one exp-block, return x-tail */
+    const drawExpBlock = (
+      startX: number,
+      y: number,
+      value: number,
+      fill: string,
+      blkOffset: number
+    ): number => {
+      /* “exp(” */
+      tooltip
         .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 4 + upperOffset)
-        .attr("y", displayY + eqYOffset)
+        .attr("x", startX + blkOffset)
+        .attr("y", y - 5)
         .text("exp(")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-    tooltip
+        .attr("font-family", "monospace")
+        .attr("font-size", FONT_TXT);
+  
+      /* coloured rect */
+      const rectX = startX + blkOffset + GAP_EXP_RECT + rectAdjust;
+      tooltip
         .append("rect")
-        .attr("x", displayX + eqXOffset + unitSize * 6.5 + upperOffset)
-        .attr("y", displayY + eqYOffset - unitSize + 2)
-        .attr("width", unitSize)
-        .attr("height", unitSize)
-        .style("stroke", "black")
-        .attr("fill", myColor(nthOutputVals[Number(rectID)]))
-        .attr("class", "math-displayer")
-        .raise();
-    tooltip
+        .attr("x", rectX)
+        .attr("y", y - RECT_EDGE + 2)
+        .attr("width", RECT_EDGE)
+        .attr("height", RECT_EDGE)
+        .attr("fill", fill)
+        .attr("stroke", "black");
+  
+      /* number */
+      tooltip
         .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 6.5 + upperOffset)
-        .attr("y", displayY + eqYOffset - unitSize / 3)
-        .text(roundToTwo(nthOutputVals[Number(rectID)]))
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize / 2)
-        .attr("fill", determineColor(nthOutputVals[Number(rectID)]));
-    tooltip
+        .attr("x", rectX + RECT_EDGE / 2)
+        .attr("y", y - RECT_EDGE / 2 + 2)
+        .text(roundToTwo(value))
+        .attr("font-family", "monospace")
+        .attr("font-size", FONT_NUM)
+        .attr("text-anchor", "middle")
+        .attr("fill", Math.abs(value) > 0.7 ? "white" : "black");
+  
+      /* “)” */
+      const parenX = rectX + RECT_EDGE + GAP_RECT_PAREN + expAdjust;
+      tooltip
         .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 8 + upperOffset)
-        .attr("y", displayY + eqYOffset)
+        .attr("x", parenX)
+        .attr("y", y - 5)
         .text(")")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-    //draw fraction line
-    const startFLPt: [number, number] = [
-        displayX + eqXOffset / 2,
-        displayY + eqYOffset + unitSize,
-    ];
-    const endFLPt: [number, number] = [
-        displayX + eqXOffset + unitSize * 10,
-        displayY + eqYOffset + unitSize,
-    ];
-    const endPathPt: [number, number] = [
-        displayX + eqXOffset + unitSize * 19,
-        displayY + eqYOffset + unitSize,
-    ];
-    const path1 = tooltip
-        .append("path")
-        .attr("d", d3.line()([startFLPt, endPathPt]))
-        .attr("stroke", "black")
-        .attr("opacity", 1)
-        .attr("fill", "none")
-        .attr("class", "math-displayer");
+        .attr("font-family", "monospace")
+        .attr("font-size", FONT_TXT);
+  
+      return parenX; // tail for the caller
+    };
+  
+    /* ───────────────────────── 4.  numerator ───────────────────────────────── */
+    let tailX = drawExpBlock(
+      175,
+      Y_NUMER,
+      nthOutputVals[rectID],
+      myColor(nthOutputVals[rectID]),
+      0 /* numerator offset */
+    );
+  
+  
+    /* ───────────────────────── 5.  denominator (4 terms) ───────────────────── */
+    const offsets = [expOffset_1, expOffset_2, expOffset_3, expOffset_4];
+  
+    const denomStartX = 25;
+    tailX = denomStartX; // reset cursor for denominator
+  
+    nthOutputVals.slice(0, 4).forEach((val, i) => {
+      if (i !== 0) {
+        /* “+” between terms */
+        tooltip
+          .append("text")
+          .attr("x", tailX + GAP_PLUS)
+          .attr("y", Y_DENOM)
+          .text("+")
+          .attr("font-family", "monospace")
+          .attr("font-size", FONT_TXT);
+  
+        tailX += GAP_PLUS + FONT_TXT; // advance cursor past “+”
+      }
+  
+      tailX = drawExpBlock(
+        tailX,
+        Y_DENOM,
+        val,
+        myColor(val),
+        offsets[i] || 0
+      );
+    });
+  
+    /* denominator finished, draw fraction bar */
+    tooltip
+    .append("line")
+    .attr("x1", 10)
+    .attr("y1", Y_LINE)
+    .attr("x2", tailX + GAP_EQ - 5)
+    .attr("y2", Y_LINE)
+    .attr("stroke", "black")
+    .attr("stroke-width", 1.5);
 
-    //draw lower part
-    const offsetMul = 2;
+    /* ───────────────────────── 6.  “= result” ──────────────────────────────── */
     tooltip
-        .append("text")
-        .attr("x", displayX + eqXOffset)
-        .attr("y", displayY + eqYOffset * offsetMul)
-        .text("exp(")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
+      .append("text")
+      .attr("x", tailX + GAP_EQ)
+      .attr("y", Y_LINE)
+      .text("=")
+      .attr("font-family", "monospace")
+      .attr("font-size", FONT_TXT);
+  
+    const resRectX = tailX + GAP_EQ + FONT_TXT;
     tooltip
-        .append("rect")
-        .attr("x", displayX + eqXOffset + unitSize * 2.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
-        .attr("width", unitSize)
-        .attr("height", unitSize)
-        .style("stroke", "black")
-        .attr("fill", myColor(nthOutputVals[0]))
-        .attr("class", "math-displayer")
-        .raise();
+      .append("rect")
+      .attr("x", resRectX + rectAdjust)
+      .attr("y", Y_RES_RECT)
+      .attr("width", RECT_EDGE)
+      .attr("height", RECT_EDGE)
+      .attr("fill", myColor(nthResult[rectID]))
+      .attr("stroke", "black");
+  
     tooltip
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 2.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
-        .text(roundToTwo(nthOutputVals[0]))
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize / 2)
-        .attr("fill", determineColor(nthOutputVals[0]));
-    tooltip
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 4)
-        .attr("y", displayY + eqYOffset * offsetMul)
-        .text(")+exp(")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-    tooltip
-        .append("rect")
-        .attr("x", displayX + eqXOffset + unitSize * 7.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
-        .attr("width", unitSize)
-        .attr("height", unitSize)
-        .style("stroke", "black")
-        .attr("fill", myColor(nthOutputVals[1]))
-        .attr("class", "math-displayer")
-        .raise();
-    tooltip
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 7.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
-        .text(roundToTwo(nthOutputVals[1]))
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize / 2)
-        .attr("fill", determineColor(nthOutputVals[1]));
-
-    tooltip
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 9)
-        .attr("y", displayY + eqYOffset * offsetMul)
-        .text(")+exp(")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-    tooltip
-        .append("rect")
-        .attr("x", displayX + eqXOffset + unitSize * 12.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
-        .attr("width", unitSize)
-        .attr("height", unitSize)
-        .style("stroke", "black")
-        .attr("fill", myColor(nthOutputVals[2]))
-        .attr("class", "math-displayer")
-        .raise();
-    tooltip
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 12.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
-        .text(roundToTwo(nthOutputVals[2]))
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize / 2)
-        .attr("fill", determineColor(nthOutputVals[2]));    
-
-    tooltip
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 14)
-        .attr("y", displayY + eqYOffset * offsetMul)
-        .text(")+exp(")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-    tooltip
-        .append("rect")
-        .attr("x", displayX + eqXOffset + unitSize * 17.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize + 2)
-        .attr("width", unitSize)
-        .attr("height", unitSize)
-        .style("stroke", "black")
-        .attr("fill", myColor(nthOutputVals[3]))
-        .attr("class", "math-displayer")
-        .raise();
-    tooltip
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 17.5)
-        .attr("y", displayY + eqYOffset * offsetMul - unitSize / 3)
-        .text(roundToTwo(nthOutputVals[3]))
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize / 2)
-        .attr("fill", determineColor(nthOutputVals[3]));
-    tooltip
-        .append("text")
-        .attr("x", displayX + eqXOffset + unitSize * 19)
-        .attr("y", displayY + eqYOffset * offsetMul)
-        .text(")")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-
-    //lower part finished
-    //eq sign and result
-    tooltip
-        .append("text")
-        .attr("x", endFLPt[0] + unitSize * 11)
-        .attr("y", endFLPt[1])
-        .text("=")
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-    tooltip
-        .append("rect")
-        .attr("x", endFLPt[0] + unitSize * 12)
-        .attr("y", endFLPt[1] - unitSize)
-        .attr("width", unitSize)
-        .attr("height", unitSize)
-        .style("stroke", "black")
-        .attr("fill", myColor(nthResult[Number(rectID)]))
-        .attr("class", "math-displayer")
-        .raise();
-    let textColor = "white";
-    if (Math.abs(nthResult[Number(rectID)]) < 0.5) {
-        textColor = "black";
-    }
-    tooltip
-        .append("text")
-        .attr("x", endFLPt[0] + unitSize * 12)
-        .attr("y", endFLPt[1] - unitSize / 2)
-        .text(roundToTwo(nthResult[Number(rectID)]))
-        .attr("class", "math-displayer")
-        .attr("font-size", unitSize / 2)
-        .attr("fill", textColor);
-
+      .append("text")
+      .attr("x", resRectX + RECT_EDGE / 2 + rectAdjust)
+      .attr("y", Y_RES_TEXT)
+      .text(roundToTwo(nthResult[rectID]))
+      .attr("font-family", "monospace")
+      .attr("font-size", FONT_NUM)
+      .attr("text-anchor", "middle")
+      .attr(
+        "fill",
+        Math.abs(nthResult[rectID]) > 0.7 ? "white" : "black"
+      );
+  
+    /* ───────────────────────── 7.  optional scale for visibility ───────────── */
     const scaleFactor = 1.5;
-
-        // 获取 tooltip 元素的边界框
-        const bbox = tooltip.node()?.getBBox();
-
-        // 计算中心点
-        if(bbox!=undefined){
-            const centerX = bbox.x + bbox.width / 2;
-            const centerY = bbox.y + bbox.height / 2;
-
-            // 将缩放中心设置为元素的中心点
-            tooltip.attr('transform', `translate(${centerX}, ${centerY}) scale(${scaleFactor}) translate(${-centerX}, ${-centerY})`);
-
-        }
-}
+    const bbox = tooltip.node()?.getBBox();
+    if (bbox) {
+      const cx = bbox.x + bbox.width / 2;
+      const cy = bbox.y + bbox.height / 2;
+      const baseTransform = `translate(${baseX}, ${baseY})`;
+      tooltip.attr(
+        "transform",
+        `${baseTransform} translate(${cx}, ${cy}) scale(${scaleFactor}) translate(${-cx}, ${-cy})`
+      );
+    }
+  }
+  
 
 export function drawActivationExplanation(
     x: number,
@@ -954,12 +904,18 @@ export function drawActivationExplanation(
     formula: string,
     description: string
 ) {
-    const displayW = 250;
-    const displayH = 75;
+    let displayW = 320;
+    let displayH = 100;
+    let eqXOffset = 40;
+    let eqYOffset = 55;
 
     //find coordination for the math displayer first
     const displayX = x + 10;
     const displayY = y - 10;
+    if (formula.endsWith(".svg")) {
+        displayH += 60; // Adjust height for the formula SVG
+        eqYOffset += 60; // Adjust Y position for the formula SVG
+    }
 
     //add displayer
     d3.select(".mats")
@@ -976,35 +932,57 @@ export function drawActivationExplanation(
         .attr("class", "math-displayer procVis to-be-removed")
         .raise();
 
-    const titleYOffset = 10;
-    const titleXOffset = 50;
+    const titleYOffset = 20;
+    const titleXOffset = 150;
     d3.select(".mats")
         .append("text")
         .attr("x", displayX + titleXOffset)
         .attr("y", displayY + titleYOffset)
         .text(title)
+        .attr("text-anchor", "middle")
         .attr("class", "math-displayer procVis to-be-removed")
-        .attr("font-size", titleYOffset)
+        .attr("font-size", "20px")
+        .attr("font-family", "monospace")
+        .attr("font-weight", "bold")
         .attr("fill", "black");
-    const eqXOffset = titleXOffset / 2;
-    const eqYOffset = titleYOffset * 2.5;
+
     const unitSize = eqXOffset / 3 + 3;
     const upperOffset = unitSize * 2;
+
+        // formula: SVG vs text
+        if (formula.endsWith(".svg")) {
+            const formulaGroup = d3.select(".mats")
+                .append("g")
+                .attr("class", "math-formula");
+            injectSVG(
+                formulaGroup,
+                displayX + eqXOffset,
+                displayY + 40,
+                formula,
+                "math-displayer"
+            );
+            
+        } else {
+            d3.select(".mats")
+                .append("text")
+                .attr("x", displayX + eqXOffset)
+                .attr("y", displayY + eqYOffset)
+                .text(formula)
+                .attr("class", "math-displayer")
+                .attr("font-size", "20px")
+                .attr("font-family", "monospace")
+                .attr("fill", "black");
+        }
+    
+    
     d3.select(".mats")
         .append("text")
         .attr("x", displayX + eqXOffset)
-        .attr("y", displayY + eqYOffset)
-        .text(formula)
-        .attr("class", "math-displayer procVis to-be-removed")
-        .attr("font-size", unitSize)
-        .attr("fill", "black");
-    d3.select(".mats")
-        .append("text")
-        .attr("x", displayX + eqXOffset)
-        .attr("y", displayY + eqYOffset + unitSize * 1.5)
+        .attr("y", displayY + eqYOffset + 30)
         .text(description)
         .attr("class", "to-be-removed math-displayer procVis")
-        .attr("font-size", unitSize)
+        .attr("font-size", "20px")
+        .attr("font-family", "monospace")
         .attr("fill", "black");
 }
 
@@ -1014,12 +992,12 @@ export function drawMatmulExplanation(
     title: string,
     description: string
 ) {
-    const displayW = 350;
+    const displayW = 600;
     const displayH = 50;
 
     //find coordination for the math displayer first
-    const displayX = x + 10;
-    const displayY = y - 10;
+    const displayX = x - 100;
+    const displayY = y - 100;
 
     //add displayer
     d3.select(".mats")
@@ -1036,19 +1014,21 @@ export function drawMatmulExplanation(
         .attr("class", "math-displayer procVis")
         .raise();
 
-    const titleYOffset = 10;
-    const titleXOffset = 50;
+    const titleYOffset = 20;
+    const titleXOffset = 200;
     d3.select(".mats")
         .append("text")
-        .attr("x", displayX + 100)
+        .attr("x", displayX + titleXOffset)
         .attr("y", displayY + titleYOffset)
         .text(title)
         .attr("class", "math-displayer procVis")
-        .attr("font-size", titleYOffset)
+        .attr("font-size", "17px")
+        .attr("font-family", "monospace")
+        .attr("font-weight", "bold")
         .attr("fill", "black")
         .raise();
-    const eqXOffset = titleXOffset / 2;
-    const eqYOffset = titleYOffset * 2.5;
+    const eqXOffset = 30;
+    const eqYOffset = 40;
     const unitSize = eqXOffset / 3 + 3;
     const upperOffset = unitSize * 2;
     d3.select(".mats")
@@ -1057,18 +1037,19 @@ export function drawMatmulExplanation(
         .attr("y", displayY + eqYOffset)
         .text(description)
         .attr("class", "math-displayer procVis")
-        .attr("font-size", unitSize)
+        .attr("font-size", "17px")
+        .attr("font-family", "monospace")
         .attr("fill", "black")
         .raise();
 }
 
 export function graphVisDrawMatmulExplanation(svg: any, x:number, y:number, title:string, description:string){
-    const displayW = 350;
+    const displayW = 600;
     const displayH = 50;
 
     //find coordination for the math displayer first
-    const displayX = x + 10;
-    const displayY = y - 10;
+    const displayX = x - 30;
+    const displayY = y - 20;
 
     //add displayer
     svg
@@ -1085,18 +1066,20 @@ export function graphVisDrawMatmulExplanation(svg: any, x:number, y:number, titl
         .attr("class", "math-displayer procVis")
         .raise();
 
-    const titleYOffset = 10;
-    const titleXOffset = 50;
+    const titleYOffset = 20;
+    const titleXOffset = 200;
     svg
         .append("text")
-        .attr("x", displayX + 100)
+        .attr("x", displayX + titleXOffset)
         .attr("y", displayY + titleYOffset)
         .text(title)
         .attr("class", "math-displayer procVis")
-        .attr("font-size", titleYOffset)
+        .attr("font-size", "17px")
+        .attr("font-family", "monospace")
+        .attr("font-weight", "bold")
         .attr("fill", "black").raise();
-    const eqXOffset = titleXOffset / 2;
-    const eqYOffset = titleYOffset * 2.5;
+    const eqXOffset = 30;
+    const eqYOffset = 40;
     const unitSize = eqXOffset / 3 + 3;
     const upperOffset = unitSize * 2;
     svg
@@ -1105,7 +1088,8 @@ export function graphVisDrawMatmulExplanation(svg: any, x:number, y:number, titl
         .attr("y", displayY + eqYOffset)
         .text(description)
         .attr("class", "math-displayer procVis")
-        .attr("font-size", unitSize)
+        .attr("font-size", "17px")
+        .attr("font-family", "monospace")
         .attr("fill", "black").raise();
 }
 
@@ -1138,7 +1122,7 @@ export function drawDotProduct(
             aggregatedVector[1],
             weightVector[1]
         ];
-        let operators = ["x", "+", "  x", "          ......    = "];
+        let operators = ["x", "  +", "   x", "      ···    = "];
 
         if(weightVector.length==2&&aggregatedVector.length==2){
             operators[3] = "           =";
@@ -1147,7 +1131,8 @@ export function drawDotProduct(
         //matmul-displayer interaction
         let displayerOffset = -150;
         if(curveDir==1)displayerOffset = 100;
-        let displayerX = coordFeatureVis[0];
+        let globalXOffest = 20;
+        let displayerX = coordFeatureVis[0] + globalXOffest;
         let displayerY = coordFeatureVis[1] + displayerOffset + 20;
 
     const displayW = 300;
@@ -1161,7 +1146,7 @@ export function drawDotProduct(
 
         tooltip
             .append("rect")
-            .attr("x", displayerX)
+            .attr("x", displayerX - globalXOffest)
             .attr("y", displayerY - 10)
             .attr("y", displayerY - 10)
             .attr("width", displayW)
@@ -1178,20 +1163,19 @@ export function drawDotProduct(
         const titleXOffset = 50;
         tooltip
             .append("text")
-            .attr("x", displayerX + titleXOffset)
-            .attr("y", displayerY + titleYOffset)
+            .attr("x", displayerX + titleXOffset - globalXOffest)
+            .attr("y", displayerY + titleYOffset * 3)
             .text("Matmul Visualization")
             .attr("class", "matmul-displayer procVis")
-            .attr("font-size", titleYOffset*2)
-            .attr("font-size", titleYOffset*2)
+            .attr("font-size", 20)
             .attr("fill", "black");
         
         const vectorLength = displayH - titleYOffset;
         
-        let h = vectorLength / aggregatedVector.length;
-        let h2 = vectorLength / weightVector.length;
-        let w = 11.25;
-        if(h>vectorLength / weightVector.length)h = vectorLength / weightVector.length;
+        let h = vectorLength / aggregatedVector.length * 0.75;
+        let h2 = vectorLength / weightVector.length * 0.75;
+        let w = 14;
+        if(h>vectorLength / weightVector.length)h = h2
 
 
 
@@ -1205,8 +1189,7 @@ export function drawDotProduct(
             .attr("y", displayerY + vectorLength/2 + 3)
             .text("dot(")
             .attr("class", "matmul-displayer procVis")
-            .attr("font-size", titleYOffset*2)
-            .attr("font-size", titleYOffset*2)
+            .attr("font-size", 20)
             .attr("fill", "black");
 
         tooltip
@@ -1215,8 +1198,7 @@ export function drawDotProduct(
             .attr("y", displayerY + vectorLength/2 + 3)
             .text(",")
             .attr("class", "matmul-displayer procVis")
-            .attr("font-size", titleYOffset*2)
-            .attr("font-size", titleYOffset*2)
+            .attr("font-size", 20)
             .attr("fill", "black");
         
         tooltip
@@ -1225,18 +1207,16 @@ export function drawDotProduct(
             .attr("y", displayerY + vectorLength/2 + 3)
             .text(")")
             .attr("class", "matmul-displayer procVis")
-            .attr("font-size", titleYOffset*2)
-            .attr("font-size", titleYOffset*2)
+            .attr("font-size", 20)
             .attr("fill", "black");
 
         tooltip
             .append("text")
-            .attr("x", displayerX + 3)
-            .attr("y", displayerY + vectorLength/2 + 20)
+            .attr("x", displayerX -5)
+            .attr("y", displayerY + vectorLength/2 + 25)
             .text("=")
             .attr("class", "matmul-displayer procVis")
-            .attr("font-size", titleYOffset*2)
-            .attr("font-size", titleYOffset*2)
+            .attr("font-size", 15)
             .attr("fill", "black");
 
         for(let i=0; i<dataSamples.length; i++){
@@ -1246,7 +1226,8 @@ export function drawDotProduct(
                 .attr("y", displayerY + vectorLength/2 + 20 - unitSize)
                 .attr("width", unitSize*2.5)
                 .attr("height", unitSize*2.5)
-                .style("stroke", "black")
+                .style("stroke", "grey")
+                .style("stroke-width", 0.1)
                 .attr("fill", myColor(dataSamples[i]))
                 .attr("class", "matmul-displayer procVis")
                 .raise();
@@ -1268,9 +1249,9 @@ export function drawDotProduct(
             const text = tooltip
             .append("text").attr("xml:space", "preserve")
             .attr("x", displayerX + 3 + unitSize*(i+1) + 25*(i+1))
-            .attr("y", displayerY + vectorLength/2 + 20 )
+            .attr("y", displayerY + vectorLength/2 + 25 )
             .text(operators[i])
-            .attr("font-size", unitSize*1.25)
+            .attr("font-size", 15)
             .attr("class", "matmul-displayer procVis")
             .raise();
             if(i==operators.length-1){
@@ -1284,7 +1265,8 @@ export function drawDotProduct(
             .attr("y", displayerY + vectorLength/2 + 20 - unitSize)
             .attr("width", unitSize*2.5)
             .attr("height", unitSize*2.5)
-            .style("stroke", "black")
+            .style("stroke", "grey")
+            .style("stroke-width", 0.1)
             .attr("fill", myColor(currentVal))
             .attr("class", "matmul-displayer procVis")
             .raise();
@@ -1298,7 +1280,6 @@ export function drawDotProduct(
                 .text(roundToTwo(currentVal))
                 .attr("class", "matmul-displayer procVis")
                 .attr("font-size", unitSize * 0.9)
-                .attr("font-size", unitSize * 0.9)
                 .attr("fill", color);
         
         
@@ -1306,10 +1287,12 @@ export function drawDotProduct(
         for(let i=0; i<aggregatedVector.length; i++){
             tooltip
                 .append("rect")
-                .attr("x", displayerX + eqXOffset+i*h/2)
-                .attr("y", displayerY + vectorLength/2)
+                .attr("x", displayerX + eqXOffset * 2 + i*h/2)
+                .attr("y", displayerY + eqYOffset * -0.5 + vectorLength/2)
                 .attr("width", h/2)
                 .attr("height", w/2)
+                .attr("stroke", "gray")
+                .attr("stroke-width", 0.1)
                 .attr("fill", myColor(aggregatedVector[i]))
                 .attr("class", "procVis matmul-displayer").raise();
         }
@@ -1318,38 +1301,15 @@ export function drawDotProduct(
         for(let i=0; i<weightVector.length; i++){
             tooltip
                 .append("rect")
-                .attr("x", displayerX + eqXOffset * 5)
-                .attr("x", displayerX + eqXOffset * 5)
-                .attr("y", displayerY + eqYOffset + i*h2/2)
+                .attr("x", displayerX + eqXOffset * 5.5)
+                .attr("y", displayerY + eqYOffset * 1.5 + i*h2/2)
                 .attr("width", w/2)
                 .attr("height", h2/2)
+                .attr("stroke", "gray")
+                .attr("stroke-width", 0.1)
                 .attr("fill", myColor(weightVector[i]))
                 .attr("class", "procVis matmul-displayer").raise();
         }
-
-        //draw franes
-        tooltip
-            .append("rect")
-            .attr("x", displayerX + eqXOffset)
-            .attr("y", displayerY + vectorLength/2)
-            .attr("width", h/2 * aggregatedVector.length)
-            .attr("height", w/2)
-            .attr("fill", "none")
-            .attr("class", "procVis matmul-displayer")
-            .attr("stroke", "black")
-            .raise();
-
-            tooltip
-            .append("rect")
-            .attr("x", displayerX + eqXOffset * 5)
-            .attr("x", displayerX + eqXOffset * 5)
-            .attr("y", displayerY + eqYOffset)
-            .attr("width", w/2)
-            .attr("height", h2/2 * weightVector.length)
-            .attr("fill", "none")
-            .attr("class", "procVis matmul-displayer")
-            .attr("stroke", "black")
-            .raise();
 
            // 定义缩放比例
         const scaleFactor = 1.5;

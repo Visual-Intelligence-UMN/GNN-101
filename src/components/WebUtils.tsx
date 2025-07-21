@@ -282,6 +282,37 @@ export const Sidebar = () => {
     );
 };
 
+
+interface SandboxModeSelectorProps {
+    sandBoxMode: boolean;
+    handleSandboxModeSelection: any;
+    handleGraphEditor: any;
+}
+
+export const SandboxModeSelector: React.FC<SandboxModeSelectorProps> = ({
+    sandBoxMode,
+    handleSandboxModeSelection,
+    handleGraphEditor
+}) => {
+    return (
+        <>
+        <div className="m-1"> Sandbox Mode </div>
+        <Selector
+            selectedOption={sandBoxMode ? "On" : "Off"}
+            handleChange={handleSandboxModeSelection}
+            OptionList={["On", "Off"]}
+            id="dataset-selector"
+        />
+        {sandBoxMode && 
+            <button 
+                key={'graph-editor'}
+                onClick={handleGraphEditor}
+                className="ml-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >Open the Graph</button>}
+        </>
+    )
+}
+
 //graph selector
 interface SelectorProps {
     selectedOption: string;
@@ -797,7 +828,9 @@ export function visualizeMatrixBody(gridSize: number, graph: any, width: number,
 export function visualizeMatrix(
     path: string,
     isAttribute: boolean,
-    gridSize: number
+    gridSize: number,
+    simGraphData: any,
+    sandBoxMode: boolean
 ) {
     const init = async (graph: any, nodeAttrs: any) => {
         const margin = { top: 10, right: 80, bottom: 30, left: 80 };
@@ -812,7 +845,9 @@ export function visualizeMatrix(
         //const features = await get_features_origin(data);
 
         try {
-            const data = await load_json(path);
+            let data = simGraphData;
+            if(!sandBoxMode) data = await load_json(path);
+            console.log("viaMat data", data);
             const nodeAttrs = getNodeAttributes(data);
             const features = await get_features_origin(data);
             const processedData = await graph_to_matrix(data);

@@ -9,7 +9,7 @@ import {
 } from "./matHelperUtils";
 import { computeMids } from "./matFeaturesUtils";
 import * as d3 from "d3";
-import { create, all } from "mathjs";
+import { create, all, size, multiply, transpose } from "mathjs";
 import {
     drawAniPath,
     drawBiasPath,
@@ -38,6 +38,11 @@ import path from "node:path/win32";
 import { computeAttentionCoefficient, meanAggregation, testCompute } from "./computationUtils";
 import { addExitBtn, buildDetailedViewArea } from "./graphUtils";
 
+
+export const matrixMultiplicationResults = {
+    dummy: {} as Record<number, number[]>,
+    bias: {} as Record<number, number[]>
+};
 //graph feature events interactions - mouseover
 export function oFeatureMouseOver(
     layerID: string,
@@ -391,6 +396,22 @@ export function resultVisMouseEvent(
     }
 }
 
+function smartMultiply(W: number[][], X: number[] | number[][]): number[] | number[][] {
+  const wShape = size(W) as number[];
+  const xShape = size(X) as number[];
+
+  try {
+    return multiply(W, X);
+  } catch (err) {
+    try {
+      return multiply(transpose(W), X);
+    } catch (err2) {
+      throw new Error(`smartMultiply failed: shapes ${wShape} and ${xShape} are incompatible`);
+    }
+  }
+}
+
+
 export function featureVisClick(
     layerID: number,
     node: number,
@@ -435,13 +456,26 @@ export function featureVisClick(
     //choose the right feature viusualizers to display
     let posList = []; //a list to manage all position from the previous layer feature vis
     let neighbors = adjList[node];
+    let featuresTable = [features, conv1, conv2];
     for (let i = 0; i < neighbors.length; i++) {
         //display pre layer
         let cur = neighbors[i];
         featureVisTable[layerID][cur].style.opacity = "1";
+        console.log("FeatureVisTable Element:", featureVisTable[layerID][cur]);
 
         d3.select(featureVisTable[layerID][cur]).classed("cant-remove inputFeature", true);
 
+        const container = d3.select(featureVisTable[layerID][cur]);
+
+        const featureVector = featuresTable[layerID][cur] as number[];
+        container.selectAll("rect")
+        .data(featureVector)
+        .attr("class", "cant-remove inputFeatureRect") 
+        .attr("data-index", (_: number, i: number) => i)
+        .attr("data-node", () => cur);
+        
+
+                
         //find position and save it
         let c = calculatePrevFeatureVisPos(
             featureVisTable,
@@ -489,7 +523,7 @@ export function featureVisClick(
     }
     //compute x
     const math = create(all, {});
-    let featuresTable = [features, conv1, conv2];
+    
     let X = new Array(featuresTable[layerID][node].length).fill(0);
     let mulValues = []; //an array to store all multiplier values
     for (let i = 0; i < adjList[node].length; i++) {
@@ -497,6 +531,7 @@ export function featureVisClick(
         let node_i = node;
         let node_j = adjList[node_i][i];
         let mulV = 1 / Math.sqrt(dList[node_i] * dList[node_j]);
+        console.log(`@@@@ Node ${node_i} to ${node_j} multiplier value:`, mulV);
         mulValues.push(mulV);
         //compute x'
 
@@ -504,9 +539,11 @@ export function featureVisClick(
         let matA = math.matrix(prepMat);
         X = math.add(math.multiply(prepMat, mulV), X);
     }
-    console.log("issue here", X,)
-    const dummy: number[] = math.multiply(math.transpose(weights[layerID]), X);
+    console.log("issue here", X, math.transpose(weights[layerID]))
+    const dummy: number[] = smartMultiply(weights[layerID], X) as number[];
     const Xt = math.transpose(weights[layerID]);
+    matrixMultiplicationResults.dummy[node] = dummy;
+   
 
     //drawMatrixValid(Xt, coordFeatureVis[0], coordFeatureVis[1]-75, 10, 10)
 
@@ -547,6 +584,7 @@ export function featureVisClick(
     //draw paths from intermediate result -> final result
     const layerBias = bias[layerID];
     coordFeatureVis2[1] += curveDir * 50;
+    matrixMultiplicationResults.bias[node] = layerBias;
 
     let coordFeatureVis2Copy = deepClone(coordFeatureVis2);
 
@@ -662,8 +700,59 @@ export function featureVisClick(
 
     let animateSeqAfterPath: any = [
         {func: () => {
-            buildDetailedViewArea(c[0], c[1]-300, 1000, 1000, g)
-            drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir)
+            drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir,adjList, dList, featuresTable, layerID, node)
+            
+
+            d3.selectAll("#procPath")
+                .attr("class", "procVis summation connection-path");
+            
+                d3.selectAll<SVGRectElement, number>(".inputFeatureRect")
+                .style("pointer-events", "all")
+                .style("cursor", "pointer")
+                .on("mouseover", function (this: SVGRectElement, event: MouseEvent, d: number) {
+                  event.stopPropagation();
+                  
+                  d3.select(this)
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 2)
+                    .raise();
+                  
+                  d3.selectAll(".multiplier-tooltip").remove();
+                  
+                  const [x, y] = d3.pointer(event, document.querySelector(".mats"));
+
+                  const tooltip = d3.select(".mats")
+                    .append("g")
+                    .attr("class", "multiplier-tooltip procVis");
+                  
+                  
+                  tooltip.append("rect")
+                    .attr("x", x + 10)
+                    .attr("y", y - 40)
+                    .attr("width", 150)
+                    .attr("height", 35)
+                    .attr("rx", 5)
+                    .attr("ry", 5)
+                    .style("fill", "white")
+                    .style("stroke", "black");
+                  
+                  tooltip.append("text")
+                    .attr("x", x + 20)
+                    .attr("y", y - 20)
+                    .text(`Value = ${d.toFixed(2)}`)
+                    .style("font-size", "17px")
+                    .attr("font-family", "monospace");
+                })
+                .on("mouseout", function (this: SVGRectElement, event: MouseEvent, d: number) {
+                  event.stopPropagation();
+                  d3.select(this)
+                    .attr("stroke", "gray")
+                    .attr("stroke-width", 0.5);
+                  
+                  d3.selectAll(".multiplier-tooltip").remove();
+                });
+              
+            d3.selectAll(".connection-path").lower();
             
             d3.select(".ctrlBtn").style("pointer-events", "none");
             console.log("switchbtn", d3.select("div.switchBtn"));
@@ -680,7 +769,9 @@ export function featureVisClick(
                 "./assets/SVGs/matmul.svg",
                 drawLabel
             );
-            //drawHintLabel(g, btnX, btnY - 36, "Click for Animation", "procVis");
+            const hintLabel = drawHintLabel(g, btnX - 80, btnY - 56, "Click for Animation", "procVis");
+            
+            
 
             
             
@@ -698,7 +789,8 @@ export function featureVisClick(
             
             
             drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels)
-            drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels)
+            drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels, featureVisTable)
+
             if((featureVisTable.length==4&&layerID==2)||
                 (oFeatureChannels==128&&layerID==1)){
                 //if it's the last layer, don't show the relu icon
@@ -1124,7 +1216,7 @@ export function outputVisClick(
             const iconX = endPt4[0]+(30+125)/2 + 25;
             const iconY = endPt4[1];
 
-            drawFunctionIcon([iconX, iconY], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "e^{z_i}/\\sum_{j} e^{z_j}", "Range: [0, 1]");
+            drawFunctionIcon([iconX, iconY], "./assets/SVGs/softmax.svg", "Softmax", "Softmax", "./assets/SVGs/softmax_formula.svg", "Range: [0, 1]");
             
 
 
@@ -1134,6 +1226,41 @@ export function outputVisClick(
         d3.select(".mats").style("pointer-events", "auto");
         d3.select(".switchBtn").style("pointer-events", "auto");
         d3.select(".switchBtn").style("opacity", 1);
+        d3.selectAll(".poolingRect")
+                .style("pointer-events", "auto")
+                .on("mouseover.tooltip", function(event) {
+                    const id = Number(d3.select(this).attr("id"));
+                    
+                    
+                    d3.selectAll(".pooling-tooltip").remove();
+                    //这里
+                    const container = d3.select(".mats");
+                    const [x, y] = d3.pointer(event, container.node());
+                    const tooltip = container
+                        .append("g")
+                        .attr("class", "pooling-tooltip procVis");
+                    
+                    tooltip.append("rect")
+                        .attr("x", x + 10)
+                        .attr("y", y - 40)
+                        .attr("width", 120)
+                        .attr("height", 30)
+                        .attr("rx", 5)
+                        .attr("ry", 5)
+                        .style("fill", "white")
+                        .style("stroke", "black");
+                    
+                    tooltip.append("text")
+                        .attr("x", x + 15)
+                        .attr("y", y - 20)
+                        .style("font-size", "14px")
+                        .style("font-family", "monospace")
+                        .text(`Value: ${poolingValues[id].toFixed(2)}`);
+                })
+                .on("mouseout.tooltip", function() {
+
+                    d3.selectAll(".pooling-tooltip").remove();
+                });
         }, delay:200}
     ]
 
@@ -1181,7 +1308,12 @@ export function outputVisClick(
     .on("mouseover", function (event) {
         event.stopPropagation();
 
-        const id: number = Number(d3.select(this).attr("id"));
+        const rawId = d3.select(this).attr("id");
+        if (rawId !== "0" && rawId !== "1") {
+            throw new Error("Invalid result rect id: " + rawId);
+          }
+        const id: 0 | 1 = rawId === "0" ? 0 : 1;
+
         //here's the place to place the softmax displayer
         if(pathMap!=null)drawSoftmaxDisplayer(pathMap, endCoord, result, id, myColor);
     })
@@ -1346,6 +1478,7 @@ export function featureGATClick(
         );
         posList.push(c);
     }
+
     let curNode = featureVisTable[layerID + 1][node];
     curNode.style.opacity = "0.25"; //display current node
     d3.select(curNode).classed("cant-remove outputFeature", true);
@@ -1621,7 +1754,7 @@ export function featureGATClick(
         // {func: () => , delay: aniSec},
         {func: () => {
             drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels)
-            drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels)
+            drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels, featureVisTable)
             if((featureVisTable.length==4&&layerID==2)||
                 (oFeatureChannels==128&&layerID==1)){
                 //if it's the last layer, don't show the relu icon
@@ -2169,7 +2302,7 @@ export function featureSAGEClick(
         // {func: () => , delay: aniSec},
         {func: () => {
             drawBiasPath(biasCoord, res10, res11, nextCoord, layerID, featureChannels)
-            drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels)
+            drawFinalPath(wmCoord, res00, res01, nextCoord, layerID, featureChannels, featureVisTable)
             if((featureVisTable.length==4&&layerID==2)||
                 (oFeatureChannels==128&&layerID==1)){
                 //if it's the last layer, don't show the relu icon

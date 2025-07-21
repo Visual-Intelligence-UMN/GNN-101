@@ -13,7 +13,8 @@ import { roundToTwo } from "../components/WebUtils";
 import { deprecate } from "util";
 import { injectSVG } from "./svgUtils";
 import { sigmoid } from "./linkPredictionUtils";
-
+import { matrixMultiplicationResults } from './matEventsUtils';
+import { re } from "mathjs";
 //draw cross connections between feature visualizers for computational graph
 export function drawCrossConnectionForSubgraph(
     graph: any,
@@ -279,6 +280,8 @@ export function drawMatrixPreparation(graph: any, locations: any, gridSize:numbe
         matFrames.push(r.node() as SVGElement);
     }
 
+    console.log("frame data", locations, colLocations, rowHeight, gridSize)
+
     return { colFrames: colFrames, matFrames: matFrames };
 }
 
@@ -299,7 +302,7 @@ export function drawNodeFeatures(
 ) {
     //initial visualizer
     for (let i = 0; i < locations.length; i++) {
-        locations[i][0] += 25;
+        locations[i][0] += 50;
         locations[i][1] += 2;
     }
     //draw cross connections for features layer and first GCNConv layer
@@ -366,7 +369,20 @@ export function drawNodeFeatures(
     };
 }
 
-
+export function markCellsConnectedToPath(pathEndCoord: [number, number], featureVisTable: any) {
+    // Find cells that are at or near the path endpoint
+    const targetCells = d3.selectAll(".featureVis[layerID='3'] rect")
+        .filter(function() {
+            const cellX = parseFloat(d3.select(this).attr("x"));
+            const cellY = parseFloat(d3.select(this).attr("y"));
+            // Check if this cell is within some threshold of the path endpoint
+            return Math.abs(cellX - pathEndCoord[0]) < 10 && 
+                   Math.abs(cellY - pathEndCoord[1]) < 10;
+        });
+    
+    // Mark these cells
+    targetCells.attr("data-connected-to-path", "true");
+}
 export function drawSingleGCNConvFeature(
     layer:any,
     i:number,
@@ -380,7 +396,9 @@ export function drawSingleGCNConvFeature(
     thirdGCN:any,
     frames:any,
     schemeLocations:any,
-    featureVisTable:any
+    featureVisTable:any,
+    dummy?: any,
+    bias?: any
 ){
     //const cate = get_category_node(features[i]) * 100;
     const g = layer
@@ -392,22 +410,273 @@ export function drawSingleGCNConvFeature(
 
 
     //loop through each node
+    //console.log("gcnFeature is ", gcnFeature);
     let nodeMat = gcnFeature[i];
 
     //where we met encounter issue
+    //console.log("nodeMat is ", nodeMat);
     for (let m = 0; m < featureChannels; m++) {
+        const cellValue = nodeMat[m];
+        // console.log("cellValue is " + cellValue);
         const rect = g
             .append("rect")
             .attr("x", locations[i][0] + rectW * m)
             .attr("y", locations[i][1])
             .attr("width", rectW)
             .attr("height", rectH)
-            .attr("fill", myColor(nodeMat[m]))
+            .attr("fill", myColor(cellValue))
             .attr("opacity", 1)
             .attr("stroke", "gray")
-            .attr("stroke-width", 0.1);
-        //if it's the last layer, store rect into thirdGCN
-        if (k == 2 && m<featureChannels) {
+            .attr("stroke-width", 0.1)
+            .attr("data-value", cellValue.toString())
+            .attr("data-index", m.toString()) 
+            .on("mouseover", function(this: SVGRectElement, event: MouseEvent) {
+                // recursively find ancestor with class "featureVis"
+                let el: Element | null = this;
+                while (el && !el.classList.contains("featureVis")) {
+                    el = el.parentElement;
+                    // console.log(el);
+                }
+                if (el) {
+                    const op = parseFloat(window.getComputedStyle(el).opacity || "1");
+                    if (op < 0.5) {
+                        return;  // abort if that ancestor's opacity is below threshold
+                    }
+                }
+
+                // fix for the issue of tooltip not hiding when the corresponding rect has opacity < 0.5
+                const parentNode = this.parentNode as Element | null;
+                if (!parentNode) return;
+                
+
+                const siblings = d3.select(parentNode).selectAll<SVGRectElement, unknown>("rect").nodes();
+
+                for (const sibling of siblings) {
+                  if (sibling === this) continue; // skip self
+
+                  const width = sibling?.getAttribute("width") ? parseFloat(sibling.getAttribute("width")!) : 0;
+                  const opacity = sibling?.style?.opacity
+                    ? parseFloat(sibling.style.opacity)
+                    : sibling?.getAttribute("opacity")
+                    ? parseFloat(sibling.getAttribute("opacity")!)
+                    : 1;
+                
+                  if (width > 100 && opacity < 0.5) {
+                    return; // Exit early if condition is met
+                  }
+                }
+                
+
+
+
+                d3.selectAll(".feature-tooltip").remove();
+                const container = d3.select(".mats");
+                let [mx, my] = d3.pointer(event, container.node());
+                const tooltip = container
+                  .append("g")
+                  .attr("class", "feature-tooltip procVis");
+
+                const padding = 8;
+                // const fontSize = 14;
+                const rectW = 400;            
+                const rectH = 120;
+                const rectL = 40;
+                  
+                const dummy = matrixMultiplicationResults.dummy[i];
+                const bias = matrixMultiplicationResults.bias[i];
+                // console.log("dummy is" + dummy)
+                // console.log("bias is"+bias)
+                const featureIndex = parseInt(this.getAttribute("data-index") || "0");
+                let matmulStr = dummy && featureIndex < dummy.length ? dummy[featureIndex].toFixed(2) : "--";
+                let biasStr = bias && featureIndex < bias.length ? bias[featureIndex].toFixed(2) : "--";
+                let d = cellValue;
+
+                
+                d3.select(this)
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 2);
+
+                if (matmulStr == "--" || biasStr == "--") {
+                    mx += -40;
+                    my += -40;
+
+                    tooltip.append("rect")
+                    .attr("x", mx)
+                    .attr("y", my)
+                    .attr("width", 150)
+                    .attr("height", 35)
+                    .attr("rx", 5)
+                    .attr("ry", 5)
+                    .style("fill", "white")
+                    .style("stroke", "black");
+
+                    tooltip.append("text")
+                    .attr("x", mx + 20)
+                    .attr("y", my + 20)
+                    .attr("font-size", `17px`)
+                    .attr("font-family", "monospace")
+                    .text("Value = " + d.toFixed(2));
+
+                    return;
+                }
+                console.log("matmulStr is " + matmulStr);
+                let matmulValue = roundToTwo(parseFloat(matmulStr));
+                let biasValue = roundToTwo(parseFloat(biasStr));
+                
+                mx = mx - rectW / 2;
+                my = my - rectH - padding;
+
+                tooltip.append("rect")
+                .attr("x", mx)
+                .attr("y", my)
+                .attr("width", rectW)  
+                .attr("height", rectH) 
+                .attr("rx", 5)
+                .attr("ry", 5)
+                .style("fill", "white")
+                .style("stroke", "black");
+
+                // Relu text
+                tooltip.append("text")
+                  .attr("x", mx + 20)
+                  .attr("y", my + 60)
+                  .attr("text-anchor", "left")
+                  .attr("dominant-baseline", "middle")
+                  .style("font-size", `30px`)
+                  .attr("font-family", "monospace")
+                  .attr("font-weight", "bold")
+                  .text("Relu(");
+
+                tooltip.append("text")
+                    .attr("x", mx + 10 + 170)
+                    .attr("y", my + 60)
+                    .attr("text-anchor", "left")
+                    .attr("dominant-baseline", "middle")
+                    .style("font-size", `30px`)
+                    .attr("font-family", "monospace")
+                    .attr("font-weight", "bold")
+                    .text("+");
+                
+
+                tooltip.append("text")
+                    .attr("x", mx + 10 + 275)
+                    .attr("y", my + 60)
+                    .attr("text-anchor", "left")
+                    .attr("dominant-baseline", "middle")
+                    .style("font-size", `30px`)
+                    .attr("font-family", "monospace")
+                    .attr("font-weight", "bold")
+                    .text(") =");
+
+                const matmulX = mx + 120;
+                const matmulY = my + 35;
+
+                tooltip.append("rect")
+                    .attr("x", matmulX)
+                    .attr("y", matmulY)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(matmulStr))
+                    .attr("class", "math-displayer");
+            
+                tooltip.append("text")
+                    .attr("x", matmulX + rectL / 2)
+                    .attr("y", matmulY + rectL / 2 + 2)
+                    .text(roundToTwo(matmulValue))
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "15px")
+                    .attr("font-family", "monospace")
+                    .attr("fill", Math.abs(matmulValue) > 0.7 ? "white" : "black");
+
+                tooltip.append("text")
+                    .attr("x", matmulX + rectL / 2)
+                    .attr("y", matmulY + rectL / 2 + 45)
+                    .text("Matmul")
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("fill", "grey")
+                    .attr("font-size", "20px")
+                    .attr("font-weight", "bold")
+                    .attr("font-family", "monospace");
+
+                const biasX = mx + 230;
+                const biasY = my + 35;
+
+                tooltip.append("rect")
+                    .attr("x", biasX)
+                    .attr("y", biasY)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(biasStr))
+                    .attr("class", "math-displayer");
+
+                tooltip.append("text")
+                    .attr("x", biasX + rectL / 2)
+                    .attr("y", biasY + rectL / 2 + 2)
+                    .text(roundToTwo(biasValue))
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "15px")
+                    .attr("font-family", "monospace")
+                    .attr("fill", Math.abs(biasValue) > 0.7 ? "white" : "black");
+                
+                tooltip.append("text")
+                .attr("x", biasX + rectL / 2)
+                .attr("y", biasY + rectL / 2 + 45)
+                .text("Bias")
+                .attr("class", "math-displayer")
+                .attr("text-anchor", "middle")
+                .attr("fill", "grey")
+                .attr("font-size", "20px")
+                .attr("font-weight", "bold")
+                .attr("font-family", "monospace");
+
+                const valueX = mx + 340;
+                const valueY = my + 35;
+
+                tooltip.append("rect")
+                    .attr("x", valueX)
+                    .attr("y", valueY)
+                    .attr("width", rectL)
+                    .attr("height", rectL)
+                    .style("stroke", "black")
+                    .attr("fill", myColor(d))
+                    .attr("class", "math-displayer");
+
+                tooltip.append("text")
+                    .attr("x", valueX + rectL / 2)
+                    .attr("y", valueY + rectL / 2 + 2)
+                    .text(roundToTwo(d))
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "15px")
+                    .attr("font-family", "monospace")
+                    .attr("fill", Math.abs(d) > 0.7 ? "white" : "black");
+
+                tooltip.append("text")
+                    .attr("x", valueX + rectL / 2)
+                    .attr("y", valueY + rectL / 2 + 45)
+                    .text("Output")
+                    .attr("class", "math-displayer")
+                    .attr("text-anchor", "middle")
+                    .attr("fill", "grey")
+                    .attr("font-size", "20px")
+                    .attr("font-weight", "bold")
+                    .attr("font-family", "monospace");
+
+                
+            })
+            .on("mouseout", function(this: SVGRectElement) {
+                d3.selectAll(".feature-tooltip").remove();
+                d3.select(this)
+                    .attr("stroke", "gray")
+                    .attr("stroke-width", 0.1);
+            });
+                
+        if (k == 2 && m < featureChannels) {
             thirdGCN[m].push(rect.node());
         }
     }
@@ -505,6 +774,7 @@ export function drawGCNConvGraphModel(
     let paths: any;
     let resultVis = null;
     const gcnFeatures = [conv1, conv2, conv3];
+    console.log("all-gcnFeatures: ", gcnFeatures);
     //a table to save all rects in the last GCNConv layer
     let thirdGCN: any = Array.from({ length: featureChannels }, () => []);
 
@@ -537,7 +807,7 @@ export function drawGCNConvGraphModel(
         addLayerName(
             locations,
             "GCNConv" + (k + 1),
-            100,
+            0,
             30,
             d3.select(`g#layerNum_${k + 1}`)
         );
@@ -691,7 +961,9 @@ export function drawGCNConvNodeModel(
     firstLayer: any,
     maxVals: any,
     featureChannels: number,
-    trainingNodes: number[]
+    trainingNodes: number[],
+    dimensions: number[],
+    sandBoxMode: boolean
 ) {
     //GCNCov Visualizer
     let paths: any;
@@ -715,7 +987,10 @@ export function drawGCNConvNodeModel(
             if (k != 0) {
                 locations[i][0] += rectW * featureChannels + 150;
             } else {
-                locations[i][0] += 34 * 5 + 150;
+                
+                if(!sandBoxMode)locations[i][0] += 34 * 5 + 150;
+                else locations[i][0] += 7 * rectW + 100 + 25;
+                console.log("first layout layout ", sandBoxMode, locations[i][0]);
             }
         }
 
@@ -740,7 +1015,7 @@ export function drawGCNConvNodeModel(
         if(k==2){
             for (let i = 0; i < locations.length; i++) {
                 const sgfPack = drawSingleGCNConvFeature(
-                    layer, i, k, gcnFeature, 2, locations, 
+                    layer, i, k, gcnFeature, dimensions[k], locations, 
                     rectW, rectH, myColor, thirdGCN, frames,
                     schemeLocations, featureVisTable
                 );
@@ -1340,7 +1615,7 @@ export function drawPoolingVis(
 
     //do some transformations on the original locations
     for (let i = 0; i < oLocations.length; i++) {
-        oLocations[i][0] += rectW * featureChannels;
+        oLocations[i][0] += featureChannels * rectW;
         oLocations[i][1] += rectH / 2;
     }
     //drawPoints(".mats", "red", oLocations);
@@ -1352,12 +1627,14 @@ export function drawPoolingVis(
         const res = computeMids(oLocations[i], one[0]);
         const lpoint = res[0];
         const hpoint = res[1];
+
         const path = mats
             .append("path")
             .attr("d", curve([oLocations[i], lpoint, hpoint, one[0]]))
             .attr("stroke", "black")
             .attr("opacity", 0.05)
-            .attr("fill", "none").attr("class", "crossConnection");
+            .attr("fill", "none")
+            .attr("class", "crossConnection");
 
         paths.push(path.node());
     }
@@ -1491,6 +1768,7 @@ export function drawTwoLayers(one: any, final: any, myColor: any, featureChannel
         .attr("fill", "none")
         .attr("class", "path1")
         .attr("id", "path1");
+
     //visualize the result
     aOne[0][0] += rectH * 2 + 102;
     //drawPoints(".mats","red",aOne);
@@ -1697,6 +1975,7 @@ export function drawResultVisForLinkModel(
         .text(trueProb.toFixed(2))
         .style("fill", "white")
         .style("font-size", "5px");
+
 //    }
 
     //add result label
