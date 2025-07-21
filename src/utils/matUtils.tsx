@@ -456,7 +456,8 @@ export function visualizeNodeClassifierFeatures(
         firstLayer,
         maxVals,
         featureChannels,
-        trainingNodes
+        trainingNodes,
+        [conv1[0].length, conv2[0].length, conv3[0].length, result[0].length]
     );
     locations = GCNConvPackage.locations;
     frames = GCNConvPackage.frames;

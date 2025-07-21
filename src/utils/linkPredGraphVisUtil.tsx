@@ -210,7 +210,7 @@ export function linkPredFeatureVisualizer(
           .attr("y", (d: any, i: number) => i * currRectHeight)
           .attr("width", rectWidth)
           .attr("height", currRectHeight)
-          .attr("class", `node-features node-features-${node.graphIndex}-${node.id}`)
+          .attr("class", `-features node-features-${node.graphIndex}-${node.id}`)
           .attr("id", (d: any, i: number) => "conv" + graphIndex + "-layer-rect-" + i) 
           .style("fill", (d: number) => myColor(d))
           .style("stroke-width", 0.1)

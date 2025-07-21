@@ -959,7 +959,8 @@ export function drawGCNConvNodeModel(
     firstLayer: any,
     maxVals: any,
     featureChannels: number,
-    trainingNodes: number[]
+    trainingNodes: number[],
+    dimensions: number[]
 ) {
     //GCNCov Visualizer
     let paths: any;
@@ -1008,7 +1009,7 @@ export function drawGCNConvNodeModel(
         if(k==2){
             for (let i = 0; i < locations.length; i++) {
                 const sgfPack = drawSingleGCNConvFeature(
-                    layer, i, k, gcnFeature, 16, locations, 
+                    layer, i, k, gcnFeature, dimensions[k], locations, 
                     rectW, rectH, myColor, thirdGCN, frames,
                     schemeLocations, featureVisTable
                 );
