@@ -191,6 +191,7 @@ export default function Home() {
             setSandBoxMode(false);
         }
         console.log("Sandbox mode is now:", sandBoxMode);
+        setPredicted(false);
     }
 
     return (
