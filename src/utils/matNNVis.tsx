@@ -109,7 +109,7 @@ async function initNodeClassifier(
         ({ gridSize, margin, width, height } = layoutParameters);
     }
 
-    console.log("matrix layout", gridSize, margin, width, height);
+    console.log("matrix layout", gridSize, margin, width, height, sandBoxMode);
 
     let locations: number[][] = [];
     d3.select("#matvis").selectAll("*").remove();

@@ -414,9 +414,9 @@ export function visualizeNodeClassifierFeatures(
 
 
     //--------------------------------DRAW FRAMES--------------------------------
-    let prepParam = 800;
+    let prepParam = 600;
     if(sandBoxMode)prepParam = 400;
-    console.log("matrix frames layout param", prepParam);
+    console.log("matrix frames layout param", prepParam, sandBoxMode);
     const framePackage = drawMatrixPreparation(graph, locations, prepParam);
     let colFrames: SVGElement[] = framePackage.colFrames; //a
     let matFrames: SVGElement[] = framePackage.matFrames; //a

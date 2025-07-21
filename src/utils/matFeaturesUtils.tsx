@@ -280,6 +280,8 @@ export function drawMatrixPreparation(graph: any, locations: any, gridSize:numbe
         matFrames.push(r.node() as SVGElement);
     }
 
+    console.log("frame data", locations, colLocations, rowHeight, gridSize)
+
     return { colFrames: colFrames, matFrames: matFrames };
 }
 
@@ -987,6 +989,7 @@ export function drawGCNConvNodeModel(
             } else {
                 locations[i][0] += 7 * rectW + 100 + 25;
                 if(!sandBoxMode)locations[i][0] += 34 * 5 + 150;
+                console.log("first layout layout ", sandBoxMode, locations[i][0]);
             }
         }
 
