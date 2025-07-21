@@ -372,7 +372,8 @@ export function visualizeNodeClassifierFeatures(
     graph: any,
     adjList: any,
     maxVals: any,
-    trainingNodes: number[]
+    trainingNodes: number[],
+    sandBoxMode: boolean
 ) {
     //--------------------------------DATA PREP MANAGEMENT--------------------------------
     let intervalID: any = null; // to manage animation controls
@@ -413,7 +414,10 @@ export function visualizeNodeClassifierFeatures(
 
 
     //--------------------------------DRAW FRAMES--------------------------------
-    const framePackage = drawMatrixPreparation(graph, locations, 800);
+    let prepParam = 800;
+    if(sandBoxMode)prepParam = 400;
+    console.log("matrix frames layout param", prepParam);
+    const framePackage = drawMatrixPreparation(graph, locations, prepParam);
     let colFrames: SVGElement[] = framePackage.colFrames; //a
     let matFrames: SVGElement[] = framePackage.matFrames; //a
 
@@ -457,7 +461,8 @@ export function visualizeNodeClassifierFeatures(
         maxVals,
         featureChannels,
         trainingNodes,
-        [conv1[0].length, conv2[0].length, conv3[0].length, result[0].length]
+        [conv1[0].length, conv2[0].length, conv3[0].length, result[0].length],
+        sandBoxMode
     );
     locations = GCNConvPackage.locations;
     frames = GCNConvPackage.frames;

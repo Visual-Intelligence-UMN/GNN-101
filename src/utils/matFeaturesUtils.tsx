@@ -960,7 +960,8 @@ export function drawGCNConvNodeModel(
     maxVals: any,
     featureChannels: number,
     trainingNodes: number[],
-    dimensions: number[]
+    dimensions: number[],
+    sandBoxMode: boolean
 ) {
     //GCNCov Visualizer
     let paths: any;
@@ -984,7 +985,8 @@ export function drawGCNConvNodeModel(
             if (k != 0) {
                 locations[i][0] += rectW * featureChannels + 150;
             } else {
-                locations[i][0] += 34 * 5 + 150;
+                locations[i][0] += 7 * rectW + 100 + 25;
+                if(!sandBoxMode)locations[i][0] += 34 * 5 + 150;
             }
         }
 

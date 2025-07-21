@@ -31,6 +31,7 @@ import { myColor } from "../utils/utils";
 import { convertToAdjacencyMatrix, getNodeSet } from "./linkPredictionUtils";
 import { extractSubgraph, removeDuplicatesFromSubarrays } from "./graphDataUtils";
 import { decode } from "punycode";
+import { useSimulatedMatrixLayout } from "./matVisUtils";
 
 //find absolute max value in an 1d array
 export function findAbsMax(arr: number[]) {
@@ -48,7 +49,8 @@ async function initNodeClassifier(
     intmData:any, 
     graph_path:string, 
     trainingNodes: number[],
-    dimensions: number[]
+    dimensions: number[],
+    sandBoxMode:boolean
 )  {
 
     let colorSchemeTable: any = null;
@@ -98,10 +100,16 @@ async function initNodeClassifier(
 
     const gLen = graph.length;
 
-    const gridSize = 600;
-    const margin = { top: 10, right: 80, bottom: 30, left: 80 };
-    const width = 20 * gLen + 50 + 6 * 102 + 1200 * 2;
-    const height = (gridSize + margin.top + margin.bottom) * 2;
+    let gridSize = 600;
+    let margin = { top: 10, right: 80, bottom: 30, left: 80 };
+    let width = 20 * gLen + 50 + 6 * 102 + 1200 * 2;
+    let height = (gridSize + margin.top + margin.bottom) * 2;
+    if(sandBoxMode){
+        const layoutParameters = useSimulatedMatrixLayout(graph);
+        ({ gridSize, margin, width, height } = layoutParameters);
+    }
+
+    console.log("matrix layout", gridSize, margin, width, height);
 
     let locations: number[][] = [];
     d3.select("#matvis").selectAll("*").remove();
@@ -128,7 +136,8 @@ async function initNodeClassifier(
         graph,
         adjList,
         colorSchemeTable,
-        trainingNodes
+        trainingNodes,
+        sandBoxMode
     );
     // drawNodeAttributes(nodeAttrs, graph, 50);
 
@@ -208,12 +217,8 @@ async function initGraphClassifier(
 
 
     let allNodes: any[] = [];
-    const gLen = graph.length;
-
-    const gridSize = 400;
-    const margin = { top: 10, right: 80, bottom: 30, left: 80 };
-    const width = 20 * gLen + 50 + 6 * 102 + 1200 * 2;
-    const height = (gridSize + margin.top + margin.bottom) * 2;
+    const layoutParameters = useSimulatedMatrixLayout(graph);
+    const { gridSize, margin, width, height } = layoutParameters;
 
     let locations: number[][] = [];
     d3.select("#matvis").selectAll("*").remove();
@@ -318,7 +323,7 @@ export async function visualizeNodeClassifier(
         const features = await get_features_origin(data);
         const processedData = await graph_to_matrix(data);
         // Initialize and run D3 visualization with processe  d data
-        await initNodeClassifier(processedData, features, intmData, graph_path, trainingNodes, dimensions);
+        await initNodeClassifier(processedData, features, intmData, graph_path, trainingNodes, dimensions, sandBoxMode);
     } catch (error) {
         console.error("Error in visualizeGNN:", error);
     } finally {
