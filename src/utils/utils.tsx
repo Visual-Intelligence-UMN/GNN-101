@@ -710,13 +710,21 @@ export function featureVisualizer(
                     let isFirstTerm = true;
 
 
+                    // console.log(`tures for node ${i}, feature dimension ${d}`, normalizedAdjMatrix);
                     
                     for (let k = 0; k < featureMap.length; k++) {
                         // Only include terms for nodes that are connected (have non-zero weights)
+                        // console.log(`Feature-value-${k}: `, featureMap[k])
                         if (normalizedAdjMatrix[i][k] !== 0) {
                             const fVal = featureMap[k][d];
                             const weightVal = normalizedAdjMatrix[i][k];
+                           // console.log(`Feature-value-${i}-${k}: ${featureMap[k][d]}`)
                             sum += fVal * weightVal;
+                            // console.log(`Node ${i}, Feature ${d}-${k}: ${fVal} * ${weightVal} = ${fVal * weightVal}`);
+
+
+                    
+
                             const term = `(${fVal.toFixed(3)} × ${weightVal.toFixed(3)})`;
                             // Add newline and plus sign for all terms except the first
                             stepStr += (isFirstTerm ? "" : "\n+ ") + term;
@@ -1752,9 +1760,10 @@ export const nodePrediction = async (
     modelPath: string, 
     graphPath: string,
     simGraphData: any,
-    sandBoxMode = true
+    sandBoxMode: boolean
 ): Promise<PredictionResult> => {
 
+    console.log("node pred pipe modelPath", modelPath, graphPath, simGraphData);
 
     const session = await loadModel(modelPath);
     let graphData: IGraphData = simGraphData;
@@ -1778,11 +1787,15 @@ export const nodePrediction = async (
     for (let i = 0; i < int32Array.length; i++) {
         bigInt64Array[i] = BigInt(int32Array[i]);
     }
-    const edgeIndexTensor = new ort.Tensor(
+    let edgeIndexTensor = new ort.Tensor(
         "int64",
         new BigInt64Array(graphData.edge_index.flat().map(BigInt)),
         [graphData.edge_index.length, graphData.edge_index[0].length]
     );
+
+    if(!sandBoxMode){
+        
+    }
 
     const batchTensor = new ort.Tensor(
     "int64",
@@ -1793,8 +1806,7 @@ export const nodePrediction = async (
 console.log("model-input", session.inputNames); 
     const outputMap = await session.run({
         x: xTensor,
-        edge_index: edgeIndexTensor,
-       // batch: batchTensor
+        edge_index: edgeIndexTensor
     });
     console.log("model-input", session.inputNames); 
     const outputTensor = outputMap.final;

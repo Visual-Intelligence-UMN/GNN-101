@@ -52,7 +52,8 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
 
             if (modelPath.includes("node")) {
                 if(sandBoxMode)modelPath = simulatedModelList["node-task-simodel"];
-                ({ prob, intmData } = await nodePrediction(modelPath, graphPath, simGraphData));
+                console.log("node pred pipe modelPath - 0", modelPath, graphPath, simGraphData, sandBoxMode);
+                ({ prob, intmData } = await nodePrediction(modelPath, graphPath, simGraphData, sandBoxMode));
             } else if (modelPath.includes("graph")) {
                 if(sandBoxMode)modelPath = simulatedModelList["graph-task-simodel"];
                 ({ prob, intmData } = await graphPrediction(modelPath, graphPath, simGraphData, sandBoxMode));

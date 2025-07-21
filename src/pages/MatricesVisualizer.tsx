@@ -11,7 +11,7 @@ interface MatricesVisualizerProps {
     predicted: boolean;
     selectedButtons: boolean[];
     simGraphData: any;
-    sandBoxMode?: boolean; // whether the graph is simulated or not
+    sandBoxMode: boolean; // whether the graph is simulated or not
 }
 
 const MatricesVisualizer: React.FC<MatricesVisualizerProps> = ({

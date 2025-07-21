@@ -191,6 +191,7 @@ export default function Home() {
             setSandBoxMode(false);
         }
         console.log("Sandbox mode is now:", sandBoxMode);
+        setPredicted(false);
     }
 
     return (
@@ -511,6 +512,7 @@ export default function Home() {
                                                 }
                                                 setIsLoading={setIsLoading}
                                                 simGraphData={simGraphData}
+                                                sandBoxMode={sandBoxMode}
                                             />
                                         </div>
                                     )}
