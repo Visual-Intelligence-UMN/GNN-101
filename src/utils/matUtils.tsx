@@ -58,6 +58,8 @@ export function visualizeGraphClassifierFeatures(
         dataPackage = loadSimulatedModelWeights();
     }
 
+    console.log("inside visualizer graph", dataPackage);
+
     const weights = dataPackage["weights"];
     const bias = dataPackage["bias"];
 
