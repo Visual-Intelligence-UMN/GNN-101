@@ -649,6 +649,18 @@ export function visualizeNodeClassifierFeatures(
             //translate each layer
             const layerID = Number(d3.select(this).attr("layerID")) - 1;
             const node = Number(d3.select(this).attr("node"));
+            let p1 = 10;
+            let p2 = 90;
+            let p3 = 34;
+            let p4 = 5;
+            let p5 = 'tanh';
+            if (sandBoxMode){
+                p1 = 5;
+                p2 = 150;
+                p3 = 3;
+                p4 = 10;
+                p5 = 'relu';
+            }
             const featureVisPack = featureVisClick(
                 layerID,
                 node,
@@ -665,11 +677,7 @@ export function visualizeNodeClassifierFeatures(
                 setIntervalID,
                 featureChannels,
                 15,
-                10,
-                90,
-                34,
-                5,
-                "tanh"
+                p1,p2,p3,p4,p5
             );
             // update variables
             recordLayerID = featureVisPack.recordLayerID;
