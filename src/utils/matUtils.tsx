@@ -1,4 +1,4 @@
-import { calculatePrevFeatureVisPos, loadLinkGATWeights, loadLinkWeights, loadNodeWeights, loadWeights, translateLayers } from "./matHelperUtils";
+import { calculatePrevFeatureVisPos, loadLinkGATWeights, loadLinkWeights, loadNodeWeights, loadSimulatedModelWeights, loadWeights, translateLayers } from "./matHelperUtils";
 import {
     drawMatrixPreparation,
     drawNodeFeatures,
@@ -43,7 +43,8 @@ export function visualizeGraphClassifierFeatures(
     final: any,
     graph: any,
     adjList: any,
-    maxVals: any
+    maxVals: any,
+    sandboxMode: boolean
 ) {
     //--------------------------------DATA PREP MANAGEMENT--------------------------------
     let intervalID: any = null; // to manage animation controls
@@ -52,7 +53,10 @@ export function visualizeGraphClassifierFeatures(
     let outputVis = null; //to manage model output
     let resultVis: any = null; //tp manage result visualizer
     //load weights and bias
-    const dataPackage = loadWeights();
+    let dataPackage = loadWeights();
+    if(sandboxMode) {
+        dataPackage = loadSimulatedModelWeights();
+    }
 
     const weights = dataPackage["weights"];
     const bias = dataPackage["bias"];
@@ -382,7 +386,10 @@ export function visualizeNodeClassifierFeatures(
     let outputVis = null; //to manage model output
     let resultVis: any = null; //tp manage result visualizer
     //load weights and bias
-    const dataPackage = loadNodeWeights();
+    let dataPackage = loadNodeWeights();
+    if(sandBoxMode) {
+        dataPackage = loadSimulatedModelWeights();
+    }
 
     const weights = dataPackage["weights"];
     const bias = dataPackage["bias"];

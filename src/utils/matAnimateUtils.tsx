@@ -367,6 +367,8 @@ export function drawMatrixWeight(
 
     // Xt = flipVertically(Xt);
 
+    // adjust matrix value alignment for simulated models
+
     //adjust matrix value alignment for GCNConv - square weight matri
     if (Xt[0].length == Xt.length) {
         Xt = rotateMatrixCounterClockwise(Xt);
