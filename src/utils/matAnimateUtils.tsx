@@ -360,6 +360,13 @@ export function drawMatrixWeight(
     //     const math = create(all, {});
     //     Xt = math.transpose(Xt);
     // }
+
+    console.log("draw matrix weight - Xt", Xt, weightMatrixPostions);
+
+    if(weightMatrixPostions.length == 2 && weightMatrixPostions[0].length == 16) {
+
+    }
+
     if (
         weightMatrixPostions.length == 4 &&
         weightMatrixPostions[0].length == 2
@@ -412,6 +419,8 @@ export function drawMatrixWeight(
         let m1 = [0, 0];
 
         let changed = false;
+
+        
 
         if (
             weightMatrixPostions.length == 4 &&
@@ -508,6 +517,15 @@ export function drawMatrixWeight(
                         weightMatrixPostions.length - 1 - j
                         ][currentStep];
             }
+        }
+
+        if(weightMatrixPostions.length == 16 && weightMatrixPostions[0].length == 2) {
+if (curveDir == -1) m1 = weightMatrixPostions[
+                        weightMatrixPostions.length - 1 - j
+                        ][currentStep];
+                else
+                    m1 = weightMatrixPostions[j][currentStep];
+console.log("signal 5");
         }
 
         let controlPoint1 = [s1[0], m1[1]];

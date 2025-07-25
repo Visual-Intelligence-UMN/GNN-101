@@ -21,7 +21,8 @@ import {
     resultRectMouseout,
     resultVisMouseEvent,
     featureGATClick,
-    featureSAGEClick
+    featureSAGEClick,
+    smartMultiply
 } from "./matEventsUtils";
 import { deepClone, drawPoints } from "./utils";
 import { AnimationController, computeMatrixLocations, drawAniPath, drawBiasPath, drawBiasVector, drawFunctionIcon, drawPathBtwOuputResult, drawPathInteractiveComponents, drawWeightMatrix, drawWeightsVector } from "./matAnimateUtils";
@@ -351,7 +352,8 @@ export function visualizeGraphClassifierFeatures(
                         final,
                         myColor,
                         featureChannels,
-                        pooling
+                        pooling,
+                        dataPackage
                     );
                     //update variables
                     resultVis = outputVisPack.resultVis;
@@ -829,7 +831,11 @@ export function visualizeNodeClassifierFeatures(
             ];
 
             //data preparation<- weights, final outputs, softmax values in paths
-            const modelParams = loadNodeWeights();
+            let modelParams = loadNodeWeights();
+            if(sandBoxMode) {
+                modelParams = loadSimulatedModelWeights();
+            }
+            console.log("in result vis modelParams", modelParams);
             const linBias = modelParams["bias"][3]; //bias vector
             const matMulWeights = modelParams["weights"][3]; // weights for matrix multiplication
             const nthOutputVals = final[node];
@@ -837,8 +843,8 @@ export function visualizeNodeClassifierFeatures(
             //the vector after matrix multiplication - before adding the bias
             const math = create(all, {});
             const prevCon3Val: number[] = [conv3[node][0], conv3[node][1]];
-            const vectorAfterMul = math.multiply(prevCon3Val, math.transpose(matMulWeights));
-
+            // const vectorAfterMul = math.multiply(prevCon3Val, math.transpose(matMulWeights));
+            const vectorAfterMul = smartMultiply(math.transpose(matMulWeights), prevCon3Val);
 
             //visualization <- replace this by animation sequence
             const g = d3.select(".mats");
