@@ -338,7 +338,7 @@ export function drawMatrixWeight(
     id: string = "tempath",
     mode: string = "normal"
 ) {
-    console.log("draw matrix weight", Xt);
+    console.log("draw matrix weight", Xt, startCoordList);
     let flag = true;
 
     
@@ -398,6 +398,10 @@ export function drawMatrixWeight(
         Xt = rotateAnyMatrix(Xt);
         
     }
+
+    // if(Xt.length === 4 && Xt[0].length === 16){
+    //     Xt = rotateAnyMatrix(Xt);
+    // }
 
     //drawMatrixValid(Xt, startCoordList[0][0], startCoordList[0][1]+20,\ 10, 10)
 
@@ -479,6 +483,20 @@ export function drawMatrixWeight(
 
             console.log("signal 3", curveDir);
             changed = true;
+        }
+
+        if(weightMatrixPostions.length == 16 && weightMatrixPostions[0].length == 4){
+            console.log("inside aaa", weightMatrixPostions[currentStep])
+            console.log("signal 6");
+            if(curveDir == -1) {
+                m1 =
+                        weightMatrixPostions[currentStep][weightMatrixPostions.length - 1 - j];
+            } else {
+                m1 =
+                        weightMatrixPostions[currentStep][
+                        weightMatrixPostions.length - 1 - j
+                        ];
+            }
         }
 
         if (!changed) {
@@ -744,7 +762,6 @@ export function drawAttentions(
             if (d3.select(this).classed("attnTargetE")) {
                 jthIndexElement = lgIndices[ithIdx][1];
                 console.log("jthIndexElement", jthIndexElement, ithIdx, lgIndices);
-
             }
             drawEScoreEquation(lgIndices, eDisplayer, jthIndexElement, dX, dY, dstVector, srcVector, myColor, inputVector, layerID);
         });
@@ -1296,6 +1313,7 @@ export function drawWeightsVector(
     rectClass: string = "procVis removeRect wRect interactRect",
     labelName = `Matmul Result: ${dummy.length} x 1`
 ) {
+    console.log("draw matrix weight - 0", startCoordList);
     for (let m = 0; m < dummy.length; m++) {
         g.append("rect")
             .attr("x", coordFeatureVis[0] + rectW * m)

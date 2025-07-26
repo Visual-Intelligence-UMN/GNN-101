@@ -31,6 +31,7 @@ import { roundToTwo } from "../components/WebUtils";
 import { drawMatmulExplanation, drawSoftmaxDisplayerNodeClassifier } from "./matInteractionUtils";
 import { create, all } from "mathjs";
 import { sigmoid } from "./linkPredictionUtils";
+import { start } from "node:repl";
 
 //Graph Classifier： features visualization pipeline: draw all feature visualizers for original features and GCNConv
 export function visualizeGraphClassifierFeatures(
@@ -802,10 +803,21 @@ export function visualizeNodeClassifierFeatures(
             const yForPathAni = prevFeatureCoord[1] - curveDir * 7.5;
             //following position computations will be based on the value of curveDir for dynamic adjustment
             //find the coordinates for arcs animation
-            let startPathCoords: number[][] = [
-                [prevFeatureCoord[0] - 5, prevFeatureCoord[1] - curveDir * 7.5],
-                [prevFeatureCoord[0] - 15, prevFeatureCoord[1] - curveDir * 7.5]
-            ]; //compute the starting positions of the paths animation
+            // let startPathCoords: number[][] = [
+            //     [prevFeatureCoord[0] - 5, prevFeatureCoord[1] - curveDir * 7.5],
+            //     [prevFeatureCoord[0] - 15, prevFeatureCoord[1] - curveDir * 7.5]
+            // ]; //compute the starting positions of the paths animation
+            let startPathCoords: number[][] = [];
+            console.log("conv3", conv3[0]);
+            for(let i=0; i<conv3[0].length; i++){
+                startPathCoords.push(
+                    [
+                        prevFeatureCoord[0] - 5 - i * 10,
+                        prevFeatureCoord[1] - curveDir * 7.5
+                    ]
+                )
+            }
+            drawPoints(".mats", "red", startPathCoords);
             let endPathCoords: number[][] = [
                 [outputCoord[0] + 5, yForPathAni],
                 [outputCoord[0] + 15, yForPathAni],
@@ -896,6 +908,7 @@ export function visualizeNodeClassifierFeatures(
 
 
             const wMat = math.transpose(modelParams.weights[3]);
+            console.log("wMat", wMat, modelParams.weights[3]);
 
             let weightMatrixPostions: any = computeMatrixLocations(btnX + 15, btnY + 30, curveDir, 15, featureChannels, [wMat], 0);
 
