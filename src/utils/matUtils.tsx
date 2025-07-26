@@ -816,8 +816,11 @@ export function visualizeNodeClassifierFeatures(
                         prevFeatureCoord[1] - curveDir * 7.5
                     ]
                 )
+                if(sandBoxMode){
+                    startPathCoords[i][0] += 70
+                }
             }
-            drawPoints(".mats", "red", startPathCoords);
+            // drawPoints(".mats", "red", startPathCoords);
             let endPathCoords: number[][] = [
                 [outputCoord[0] + 5, yForPathAni],
                 [outputCoord[0] + 15, yForPathAni],

@@ -488,6 +488,7 @@ export function drawMatrixWeight(
         if(weightMatrixPostions.length == 16 && weightMatrixPostions[0].length == 4){
             console.log("inside aaa", weightMatrixPostions[currentStep])
             console.log("signal 6");
+            
             if(curveDir == -1) {
                 m1 =
                         weightMatrixPostions[currentStep][weightMatrixPostions.length - 1 - j];
