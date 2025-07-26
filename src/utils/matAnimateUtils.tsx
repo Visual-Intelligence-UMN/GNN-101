@@ -485,20 +485,7 @@ export function drawMatrixWeight(
             changed = true;
         }
 
-        if(weightMatrixPostions.length == 16 && weightMatrixPostions[0].length == 4){
-            console.log("inside aaa", weightMatrixPostions[currentStep])
-            console.log("signal 6");
-            
-            if(curveDir == -1) {
-                m1 =
-                        weightMatrixPostions[currentStep][weightMatrixPostions.length - 1 - j];
-            } else {
-                m1 =
-                        weightMatrixPostions[currentStep][
-                        weightMatrixPostions.length - 1 - j
-                        ];
-            }
-        }
+        
 
         if (!changed) {
             if (
@@ -545,6 +532,23 @@ if (curveDir == -1) m1 = weightMatrixPostions[
                 else
                     m1 = weightMatrixPostions[j][currentStep];
 console.log("signal 5");
+        }
+
+        if(weightMatrixPostions.length == 16 && weightMatrixPostions[0].length == 4){
+            console.log("inside aaa", weightMatrixPostions[currentStep])
+            console.log("signal 6");
+            
+if (curveDir == -1) {
+    m1 = weightMatrixPostions[
+                        j
+                        ][currentStep];
+                    console.log("signal 6-1");
+                    }
+                else
+                    {
+                        m1 = weightMatrixPostions[j][currentStep];
+                        console.log("signal 6-2");
+                    }
         }
 
         let controlPoint1 = [s1[0], m1[1]];

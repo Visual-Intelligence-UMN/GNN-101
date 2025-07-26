@@ -767,7 +767,7 @@ export function visualizeNodeClassifierFeatures(
 
             //do a curveDir test for the direction of arcs and bias vector
             let curveDir = 1;
-            if (node < 17) curveDir = -1;
+            if (node < (conv1.length/2)) curveDir = -1;
 
             //find the position for the bias vector <- we use this positio to compute the position for bias vector
             //coordinate for model output <- the position for model output feature visualizer
@@ -872,12 +872,12 @@ export function visualizeNodeClassifierFeatures(
 
             //draw softmax
             let clockwise = 0;
-            if (node < 17) clockwise = 1;
+            if (node < conv1.length/2) clockwise = 1;
 
             //smart ui detections & transparent
 
             //transparent prevLayer(featureVisTable[3]) && curLayer(featureVisTable[4])
-            if (node < 17) {
+            if (node < conv1.length/2) {
                 //process prevLayer
                 featureVisTable[3][node + 1].style.opacity = "0";
                 featureVisTable[3][node + 2].style.opacity = "0";
