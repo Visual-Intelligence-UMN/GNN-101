@@ -396,7 +396,7 @@ export function resultVisMouseEvent(
     }
 }
 
-function smartMultiply(W: number[][], X: number[] | number[][]): number[] | number[][] {
+export function smartMultiply(W: number[][], X: number[] | number[][]): number[] | number[][] {
   const wShape = size(W) as number[];
   const xShape = size(X) as number[];
 
@@ -1020,7 +1020,8 @@ export function outputVisClick(
     result: any,
     myColor: any,
     featureChannels: number,
-    poolingValues: number[]
+    poolingValues: number[],
+    modelParams: any
 ) {
     d3.select(".switchBtn").style("pointer-events", "none");
     d3.select(".switchBtn").style("opacity", 0.3);
@@ -1045,7 +1046,7 @@ export function outputVisClick(
 
     poolingPt[0][0] += featureChannels*1.5;
 
-    const modelParams = loadWeights();
+    // const modelParams = loadWeights();
 
     poolingPt[0][1] += 10;
     one = deepClone(poolingPt);

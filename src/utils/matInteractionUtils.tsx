@@ -1111,8 +1111,13 @@ export function drawDotProduct(
     const math = create(all, {});
     let currentVal = dummy[Number(rectID)];
     let aggregatedVector: number[] = X;
+    
+    console.log("Xv inside", Xv);
+    
     let transposedXv = math.transpose(Xv);
-    transposedXv = flipVertically(transposedXv);
+    if(Xv.length === 16 && Xv[0].length === 5){
+        transposedXv = math.transpose(transposedXv);
+    }
     let weightVector: number[] = transposedXv[Number(rectID)];
 
         //first few data points for example

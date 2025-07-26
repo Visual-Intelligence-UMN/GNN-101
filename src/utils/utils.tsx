@@ -1811,12 +1811,12 @@ export const nodePrediction = async (
     }
 
     const batchTensor = new ort.Tensor(
-    "int64",
-    new BigInt64Array(graphData.batch.map(BigInt)),
-    [graphData.batch.length]
-);
+        "int64",
+        new BigInt64Array(graphData.batch.map(BigInt)),
+        [graphData.batch.length]
+    );
 
-console.log("model-input", session.inputNames); 
+console.log("model-output", session);
     const outputMap = await session.run({
         x: xTensor,
         edge_index: edgeIndexTensor

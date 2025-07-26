@@ -383,12 +383,15 @@ export function loadNodeWeights() {
     return { weights: weights, bias: bias };
 }
 
-export function loadSimulatedModelWeights(){
+export function loadSimulatedModelWeights(type: string = "graph") {
     // weights data preparation
     let weights: any = []; // DS to manage weights for each layer
     let bias: any = []; // DS to manage bias for each layer
 
-    const weightsJSON: any = require("../../public/simulations/simulated_gcn_graph_model_weights.json");
+    let weightsJSON: any = require("../../public/simulations/simulated_gcn_graph_model_weights.json");
+    if(type == "node") {
+        weightsJSON = require("../../public/simulations/simulated_gcn_node_model_weights.json");
+    }
 
     weights = [
         weightsJSON["conv1.lin.weight"],
@@ -498,5 +501,25 @@ export function rotateMatrix(matrix: number[][]): number[][] {
     return rotatedMatrix;
 }
 
+export function rotateAnyMatrix(matrix: number[][]): number[][] {
+    const m = matrix.length;
+    if (m === 0) return [];
+
+    const n = matrix[0].length;
+
+    if (!matrix.every(row => row.length === n)) {
+        throw new Error("All rows must have the same number of columns");
+    }
+
+    const rotated: number[][] = Array.from({ length: n }, () => Array(m));
+
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+            rotated[j][m - 1 - i] = matrix[i][j];
+        }
+    }
+
+    return rotated;
+}
 
 

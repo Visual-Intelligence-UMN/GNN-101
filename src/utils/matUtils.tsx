@@ -1,4 +1,4 @@
-import { calculatePrevFeatureVisPos, loadLinkGATWeights, loadLinkWeights, loadNodeWeights, loadWeights, translateLayers } from "./matHelperUtils";
+import { calculatePrevFeatureVisPos, loadLinkGATWeights, loadLinkWeights, loadNodeWeights, loadSimulatedModelWeights, loadWeights, translateLayers } from "./matHelperUtils";
 import {
     drawMatrixPreparation,
     drawNodeFeatures,
@@ -21,7 +21,8 @@ import {
     resultRectMouseout,
     resultVisMouseEvent,
     featureGATClick,
-    featureSAGEClick
+    featureSAGEClick,
+    smartMultiply
 } from "./matEventsUtils";
 import { deepClone, drawPoints } from "./utils";
 import { AnimationController, computeMatrixLocations, drawAniPath, drawBiasPath, drawBiasVector, drawFunctionIcon, drawPathBtwOuputResult, drawPathInteractiveComponents, drawWeightMatrix, drawWeightsVector } from "./matAnimateUtils";
@@ -43,7 +44,8 @@ export function visualizeGraphClassifierFeatures(
     final: any,
     graph: any,
     adjList: any,
-    maxVals: any
+    maxVals: any,
+    sandboxMode: boolean
 ) {
     //--------------------------------DATA PREP MANAGEMENT--------------------------------
     let intervalID: any = null; // to manage animation controls
@@ -52,7 +54,12 @@ export function visualizeGraphClassifierFeatures(
     let outputVis = null; //to manage model output
     let resultVis: any = null; //tp manage result visualizer
     //load weights and bias
-    const dataPackage = loadWeights();
+    let dataPackage = loadWeights();
+    if(sandboxMode) {
+        dataPackage = loadSimulatedModelWeights();
+    }
+
+    console.log("inside visualizer graph", dataPackage);
 
     const weights = dataPackage["weights"];
     const bias = dataPackage["bias"];
@@ -345,7 +352,8 @@ export function visualizeGraphClassifierFeatures(
                         final,
                         myColor,
                         featureChannels,
-                        pooling
+                        pooling,
+                        dataPackage
                     );
                     //update variables
                     resultVis = outputVisPack.resultVis;
@@ -382,7 +390,10 @@ export function visualizeNodeClassifierFeatures(
     let outputVis = null; //to manage model output
     let resultVis: any = null; //tp manage result visualizer
     //load weights and bias
-    const dataPackage = loadNodeWeights();
+    let dataPackage = loadNodeWeights();
+    if(sandBoxMode) {
+        dataPackage = loadSimulatedModelWeights("node");
+    }
 
     const weights = dataPackage["weights"];
     const bias = dataPackage["bias"];
@@ -640,6 +651,18 @@ export function visualizeNodeClassifierFeatures(
             //translate each layer
             const layerID = Number(d3.select(this).attr("layerID")) - 1;
             const node = Number(d3.select(this).attr("node"));
+            let p1 = 10;
+            let p2 = 90;
+            let p3 = 34;
+            let p4 = 5;
+            let p5 = 'tanh';
+            if (sandBoxMode){
+                p1 = 5;
+                p2 = 150;
+                p3 = 3;
+                p4 = 10;
+                p5 = 'relu';
+            }
             const featureVisPack = featureVisClick(
                 layerID,
                 node,
@@ -656,11 +679,7 @@ export function visualizeNodeClassifierFeatures(
                 setIntervalID,
                 featureChannels,
                 15,
-                10,
-                90,
-                34,
-                5,
-                "tanh"
+                p1,p2,p3,p4,p5
             );
             // update variables
             recordLayerID = featureVisPack.recordLayerID;
@@ -812,16 +831,23 @@ export function visualizeNodeClassifierFeatures(
             ];
 
             //data preparation<- weights, final outputs, softmax values in paths
-            const modelParams = loadNodeWeights();
+            let modelParams = loadNodeWeights();
+            if(sandBoxMode) {
+                modelParams = loadSimulatedModelWeights("node");
+            }
+            console.log("in result vis modelParams", modelParams);
             const linBias = modelParams["bias"][3]; //bias vector
             const matMulWeights = modelParams["weights"][3]; // weights for matrix multiplication
             const nthOutputVals = final[node];
 
             //the vector after matrix multiplication - before adding the bias
             const math = create(all, {});
-            const prevCon3Val: number[] = [conv3[node][0], conv3[node][1]];
-            const vectorAfterMul = math.multiply(prevCon3Val, math.transpose(matMulWeights));
-
+            // const prevCon3Val: number[] = [conv3[node][0], conv3[node][1]];
+            const prevCon3Val: number[] = Array.from(conv3[node]);
+            // const vectorAfterMul = math.multiply(prevCon3Val, math.transpose(matMulWeights));
+            console.log("vector before mat mul", prevCon3Val, math.transpose(matMulWeights));
+            const vectorAfterMul = smartMultiply(math.transpose(matMulWeights), prevCon3Val);
+            console.log("vector after mat mul", vectorAfterMul, prevCon3Val, math.transpose(matMulWeights));
 
             //visualization <- replace this by animation sequence
             const g = d3.select(".mats");
