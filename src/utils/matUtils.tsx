@@ -392,7 +392,7 @@ export function visualizeNodeClassifierFeatures(
     //load weights and bias
     let dataPackage = loadNodeWeights();
     if(sandBoxMode) {
-        dataPackage = loadSimulatedModelWeights();
+        dataPackage = loadSimulatedModelWeights("node");
     }
 
     const weights = dataPackage["weights"];
@@ -833,7 +833,7 @@ export function visualizeNodeClassifierFeatures(
             //data preparation<- weights, final outputs, softmax values in paths
             let modelParams = loadNodeWeights();
             if(sandBoxMode) {
-                modelParams = loadSimulatedModelWeights();
+                modelParams = loadSimulatedModelWeights("node");
             }
             console.log("in result vis modelParams", modelParams);
             const linBias = modelParams["bias"][3]; //bias vector
@@ -842,9 +842,12 @@ export function visualizeNodeClassifierFeatures(
 
             //the vector after matrix multiplication - before adding the bias
             const math = create(all, {});
-            const prevCon3Val: number[] = [conv3[node][0], conv3[node][1]];
+            // const prevCon3Val: number[] = [conv3[node][0], conv3[node][1]];
+            const prevCon3Val: number[] = Array.from(conv3[node]);
             // const vectorAfterMul = math.multiply(prevCon3Val, math.transpose(matMulWeights));
+            console.log("vector before mat mul", prevCon3Val, math.transpose(matMulWeights));
             const vectorAfterMul = smartMultiply(math.transpose(matMulWeights), prevCon3Val);
+            console.log("vector after mat mul", vectorAfterMul, prevCon3Val, math.transpose(matMulWeights));
 
             //visualization <- replace this by animation sequence
             const g = d3.select(".mats");

@@ -315,7 +315,7 @@ export async function visualizeNodeClassifier(
         // Process data
         let data = simGraphData;
         if(!sandBoxMode) data = await load_json(graph_path);
-        let {weights, bias} = loadSimulatedModelWeights();
+        let {weights, bias} = loadSimulatedModelWeights("node");
         if(!sandBoxMode) {
             ({weights, bias} = loadNodeWeights());
             data = await load_json(graph_path);
@@ -328,6 +328,7 @@ export async function visualizeNodeClassifier(
             const dim = bias[i].length;
             dimensions.push(dim);
         }
+        console.log("dimensions", dimensions);
         const trainingNodes = [1, 5, 3];
         //accept the features from original json file
         const features = await get_features_origin(data);
