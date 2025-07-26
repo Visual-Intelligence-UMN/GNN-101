@@ -27,7 +27,7 @@ import {
 import { deepClone, drawPoints } from "./utils";
 import { AnimationController, computeMatrixLocations, drawAniPath, drawBiasPath, drawBiasVector, drawFunctionIcon, drawPathBtwOuputResult, drawPathInteractiveComponents, drawWeightMatrix, drawWeightsVector } from "./matAnimateUtils";
 import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
-import { roundToTwo } from "../components/WebUtils";
+import { roundToTwo, SandboxModeSelector } from "../components/WebUtils";
 import { drawMatmulExplanation, drawSoftmaxDisplayerNodeClassifier } from "./matInteractionUtils";
 import { create, all } from "mathjs";
 import { sigmoid } from "./linkPredictionUtils";
@@ -203,7 +203,8 @@ export function visualizeGraphClassifierFeatures(
                 poolingVis,
                 featureChannels,
                 100,
-                []
+                [],
+                sandboxMode
             );
             //update variables
             dview = recoverPackage.dview;
@@ -354,7 +355,8 @@ export function visualizeGraphClassifierFeatures(
                         myColor,
                         featureChannels,
                         pooling,
-                        dataPackage
+                        dataPackage,
+                        sandboxMode
                     );
                     //update variables
                     resultVis = outputVisPack.resultVis;
@@ -600,7 +602,8 @@ export function visualizeNodeClassifierFeatures(
                 poolingVis,
                 featureChannels,
                 90,
-                resultLabelsList
+                resultLabelsList,
+                sandBoxMode
             );
             //update variables
             dview = recoverPackage.dview;
@@ -726,8 +729,8 @@ export function visualizeNodeClassifierFeatures(
             //------------------the actual interaction codes part --------------------------------
             const layerID = 3;
             const node = Number(d3.select(this).attr("node"));
-            translateLayers(3, 250);
-
+            if(!sandBoxMode)translateLayers(3, 250);
+            else translateLayers(3, 325);
 
             //choose the right color schemes to display
 
@@ -1353,7 +1356,8 @@ export function visualizeLinkClassifierFeatures(
                 poolingVis,
                 featureChannels,
                 90,
-                []
+                [],
+                true
             );
             //update variables
             dview = recoverPackage.dview;
