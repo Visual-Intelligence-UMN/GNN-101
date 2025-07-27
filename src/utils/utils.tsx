@@ -1005,10 +1005,10 @@ export function featureVisualizer(
 
                         if (mode === 1 && graphIndex === 4) {
                             console.log("into nodeoutputvis")
-                            nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, svg, mode)
+                            nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, svg, mode, sandBoxMode)
                         } else {
            
-                            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, allFeatureMap, svg, offset, height, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
+                            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, allFeatureMap, svg, offset, height, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode, sandBoxMode);
                         };
 
 
@@ -1173,11 +1173,11 @@ export function featureVisualizer(
                         } // to make sure relatedNodes is not null
                         showFeature(node);
                         if (node.graphIndex === 4) {
-                            fcLayerCalculationVisualizer(node, allNodes, relatedNodes, offset, height, currMoveOffset, node.graphIndex, g2, state, currRectHeight, convNum, svg, mode);
+                            fcLayerCalculationVisualizer(node, allNodes, relatedNodes, offset, height, currMoveOffset, node.graphIndex, g2, state, currRectHeight, convNum, svg, mode, sandBoxMode);
                         }
                         if (node.graphIndex === 5) {
 
-                            outputVisualizer(node, allNodes, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, convNum, svg, mode)
+                            outputVisualizer(node, allNodes, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, convNum, svg, mode, sandBoxMode)
                         }
 
                         reduceNodeOpacity(allNodes, relatedNodes, node);
@@ -1819,7 +1819,7 @@ console.log("model-output", session);
     console.log("model-input", session.inputNames); 
     const outputTensor = outputMap.final;
 
-    const resultArray: number[][] = splitArray(outputTensor.cpuData, 4);
+    const resultArray: number[][] = splitArray(outputTensor.cpuData, 2);
 
     let prob: number[][] = [];
 
