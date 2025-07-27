@@ -156,10 +156,10 @@ export default function Home() {
     useEffect(() => {
         document.body.style.overflow = "hidden";
 
-        fetch("/json_data/graphs/testing_graph.json")
+        fetch("./json_data/graphs/testing_graph.json")
             .then((res) => {
                 if (!res.ok) {
-                    throw new Error("Failed to load JSON");
+                    throw new Error("Failed to load simgraph JSON");
                 }
                 return res.json();
             })
@@ -167,7 +167,7 @@ export default function Home() {
                 setSimGraphData(data);
             })
             .catch((err) => {
-                console.error("Error loading JSON:", err);
+                console.error("Error loading simgraph JSON:", err);
             });
     }, []);
 
