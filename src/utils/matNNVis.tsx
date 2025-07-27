@@ -31,7 +31,7 @@ import { myColor } from "../utils/utils";
 import { convertToAdjacencyMatrix, getNodeSet } from "./linkPredictionUtils";
 import { extractSubgraph, removeDuplicatesFromSubarrays } from "./graphDataUtils";
 import { decode } from "punycode";
-import { useSimulatedMatrixLayout } from "./matVisUtils";
+import { prepSimulatedMatrixLayout } from "./matVisUtils";
 
 //find absolute max value in an 1d array
 export function findAbsMax(arr: number[]) {
@@ -105,7 +105,7 @@ async function initNodeClassifier(
     let width = 20 * gLen + 50 + 6 * 102 + 1200 * 2;
     let height = (gridSize + margin.top + margin.bottom) * 2;
     if(sandBoxMode){
-        const layoutParameters = useSimulatedMatrixLayout(graph);
+        const layoutParameters = prepSimulatedMatrixLayout(graph);
         ({ gridSize, margin, width, height } = layoutParameters);
     }
 
@@ -218,7 +218,7 @@ async function initGraphClassifier(
 
 
     let allNodes: any[] = [];
-    const layoutParameters = useSimulatedMatrixLayout(graph);
+    const layoutParameters = prepSimulatedMatrixLayout(graph);
     const { gridSize, margin, width, height } = layoutParameters;
 
     let locations: number[][] = [];

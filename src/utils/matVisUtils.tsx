@@ -1,4 +1,4 @@
-export function useSimulatedMatrixLayout(graph: any){
+export function prepSimulatedMatrixLayout(graph: any){
     const gLen = graph.length;
     const gridSize = 400;
     const margin = { top: 10, right: 80, bottom: 30, left: 80 };
