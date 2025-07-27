@@ -355,7 +355,7 @@ export default function Home() {
                                         <h1 className="text-3xl font-black min-w-48">
                                             Input Graph
                                         </h1>
-                                        <div className="m-1"> Sandbox Mode </div>
+                                        {!model.includes("link") && <div><div className="m-1"> Sandbox Mode </div>
                                                 <Selector
                                                     selectedOption={sandBoxMode ? "On" : "Off"}
                                                     handleChange={handleSandboxModeSelection}
@@ -371,7 +371,7 @@ export default function Home() {
                                             id="dataset-description"
                                         >
                                             {DatasetInfo[model]}
-                                        </div>}
+                                        </div>}</div>}
                                         <div className="flex-1 items-center gap-x-4 text-xl">
                                             <div className={inter3.className}>
                                                 {model.includes(
@@ -474,17 +474,6 @@ export default function Home() {
                                                             }
                                                             handleChange={
                                                                 handleNodeSelection
-                                                            }
-                                                        />
-                                                        <SandboxModeSelector
-                                                            sandBoxMode={
-                                                                sandBoxMode
-                                                            }
-                                                            handleSandboxModeSelection={
-                                                                handleSandboxModeSelection
-                                                            }
-                                                            handleGraphEditor={
-                                                                handleGraphEditor
                                                             }
                                                         />
                                                     </>

@@ -1819,7 +1819,7 @@ console.log("model-output", session);
     console.log("model-input", session.inputNames); 
     const outputTensor = outputMap.final;
 
-    const resultArray: number[][] = splitArray(outputTensor.cpuData, 2);
+    const resultArray: number[][] = splitArray(outputTensor.cpuData, 4);
 
     let prob: number[][] = [];
 

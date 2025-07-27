@@ -27,10 +27,11 @@ import {
 import { deepClone, drawPoints } from "./utils";
 import { AnimationController, computeMatrixLocations, drawAniPath, drawBiasPath, drawBiasVector, drawFunctionIcon, drawPathBtwOuputResult, drawPathInteractiveComponents, drawWeightMatrix, drawWeightsVector } from "./matAnimateUtils";
 import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
-import { roundToTwo } from "../components/WebUtils";
+import { roundToTwo, SandboxModeSelector } from "../components/WebUtils";
 import { drawMatmulExplanation, drawSoftmaxDisplayerNodeClassifier } from "./matInteractionUtils";
 import { create, all } from "mathjs";
 import { sigmoid } from "./linkPredictionUtils";
+import { start } from "node:repl";
 
 //Graph Classifier： features visualization pipeline: draw all feature visualizers for original features and GCNConv
 export function visualizeGraphClassifierFeatures(
@@ -202,7 +203,8 @@ export function visualizeGraphClassifierFeatures(
                 poolingVis,
                 featureChannels,
                 100,
-                []
+                [],
+                sandboxMode
             );
             //update variables
             dview = recoverPackage.dview;
@@ -353,7 +355,8 @@ export function visualizeGraphClassifierFeatures(
                         myColor,
                         featureChannels,
                         pooling,
-                        dataPackage
+                        dataPackage,
+                        sandboxMode
                     );
                     //update variables
                     resultVis = outputVisPack.resultVis;
@@ -599,7 +602,8 @@ export function visualizeNodeClassifierFeatures(
                 poolingVis,
                 featureChannels,
                 90,
-                resultLabelsList
+                resultLabelsList,
+                sandBoxMode
             );
             //update variables
             dview = recoverPackage.dview;
@@ -725,8 +729,8 @@ export function visualizeNodeClassifierFeatures(
             //------------------the actual interaction codes part --------------------------------
             const layerID = 3;
             const node = Number(d3.select(this).attr("node"));
-            translateLayers(3, 250);
-
+            if(!sandBoxMode)translateLayers(3, 250);
+            else translateLayers(3, 325);
 
             //choose the right color schemes to display
 
@@ -766,7 +770,7 @@ export function visualizeNodeClassifierFeatures(
 
             //do a curveDir test for the direction of arcs and bias vector
             let curveDir = 1;
-            if (node < 17) curveDir = -1;
+            if (node < (conv1.length/2)) curveDir = -1;
 
             //find the position for the bias vector <- we use this positio to compute the position for bias vector
             //coordinate for model output <- the position for model output feature visualizer
@@ -802,10 +806,24 @@ export function visualizeNodeClassifierFeatures(
             const yForPathAni = prevFeatureCoord[1] - curveDir * 7.5;
             //following position computations will be based on the value of curveDir for dynamic adjustment
             //find the coordinates for arcs animation
-            let startPathCoords: number[][] = [
-                [prevFeatureCoord[0] - 5, prevFeatureCoord[1] - curveDir * 7.5],
-                [prevFeatureCoord[0] - 15, prevFeatureCoord[1] - curveDir * 7.5]
-            ]; //compute the starting positions of the paths animation
+            // let startPathCoords: number[][] = [
+            //     [prevFeatureCoord[0] - 5, prevFeatureCoord[1] - curveDir * 7.5],
+            //     [prevFeatureCoord[0] - 15, prevFeatureCoord[1] - curveDir * 7.5]
+            // ]; //compute the starting positions of the paths animation
+            let startPathCoords: number[][] = [];
+            console.log("conv3", conv3[0]);
+            for(let i=0; i<conv3[0].length; i++){
+                startPathCoords.push(
+                    [
+                        prevFeatureCoord[0] - 5 - i * 10,
+                        prevFeatureCoord[1] - curveDir * 7.5
+                    ]
+                )
+                if(sandBoxMode){
+                    startPathCoords[i][0] += 70
+                }
+            }
+            // drawPoints(".mats", "red", startPathCoords);
             let endPathCoords: number[][] = [
                 [outputCoord[0] + 5, yForPathAni],
                 [outputCoord[0] + 15, yForPathAni],
@@ -857,12 +875,12 @@ export function visualizeNodeClassifierFeatures(
 
             //draw softmax
             let clockwise = 0;
-            if (node < 17) clockwise = 1;
+            if (node < conv1.length/2) clockwise = 1;
 
             //smart ui detections & transparent
 
             //transparent prevLayer(featureVisTable[3]) && curLayer(featureVisTable[4])
-            if (node < 17) {
+            if (node < conv1.length/2) {
                 //process prevLayer
                 featureVisTable[3][node + 1].style.opacity = "0";
                 featureVisTable[3][node + 2].style.opacity = "0";
@@ -896,6 +914,7 @@ export function visualizeNodeClassifierFeatures(
 
 
             const wMat = math.transpose(modelParams.weights[3]);
+            console.log("wMat", wMat, modelParams.weights[3]);
 
             let weightMatrixPostions: any = computeMatrixLocations(btnX + 15, btnY + 30, curveDir, 15, featureChannels, [wMat], 0);
 
@@ -1337,7 +1356,8 @@ export function visualizeLinkClassifierFeatures(
                 poolingVis,
                 featureChannels,
                 90,
-                []
+                [],
+                true
             );
             //update variables
             dview = recoverPackage.dview;

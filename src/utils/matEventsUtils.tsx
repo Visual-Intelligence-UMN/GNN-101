@@ -37,6 +37,7 @@ import { drawMatmulExplanation, drawSoftmaxDisplayer } from "./matInteractionUti
 import path from "node:path/win32";
 import { computeAttentionCoefficient, meanAggregation, testCompute } from "./computationUtils";
 import { addExitBtn, buildDetailedViewArea } from "./graphUtils";
+import { transformSync } from "next/dist/build/swc";
 
 
 export const matrixMultiplicationResults = {
@@ -120,7 +121,8 @@ export function detailedViewRecovery(
     poolingVis: any,
     featureChannels: number,
     gap:number,
-    resultLabelsList:any
+    resultLabelsList:any,
+    sandBoxMode: boolean
 ) {
     //remove temp classes
     d3.select(".switchBtn").style("pointer-events", "auto");
@@ -179,10 +181,11 @@ export function detailedViewRecovery(
         resultLabelsList.forEach((element:any) => {
             element.style.fill = "gray";
         });
-        translateLayers(3, -250);
-
+        if(!sandBoxMode)translateLayers(3, -250);
+        else translateLayers(3, -325);
     }else{
-        translateLayers(4, -300);
+        if(!sandBoxMode)translateLayers(4, -300);
+        else translateLayers(4, -350);
     }
 
     d3.selectAll("path.crossConnection").style("opacity", 0.05);
@@ -1021,7 +1024,8 @@ export function outputVisClick(
     myColor: any,
     featureChannels: number,
     poolingValues: number[],
-    modelParams: any
+    modelParams: any,
+    sandboxMode: boolean
 ) {
     d3.select(".switchBtn").style("pointer-events", "none");
     d3.select(".switchBtn").style("opacity", 0.3);
@@ -1065,8 +1069,8 @@ export function outputVisClick(
     resultVis?.style("opacity", 0.2);
     //translate each layer
     const layerID = 4;
-    translateLayers(layerID, 300);
-
+    if(!sandboxMode)translateLayers(layerID, 300);
+    else translateLayers(layerID, 350);
     d3.select(".hintLabel").style("opacity", 0);
 
     //locations calculation
