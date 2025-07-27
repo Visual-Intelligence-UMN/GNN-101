@@ -10,6 +10,8 @@ interface NodeMatricesVisualizerProps {
     predicted: boolean;
     selectedButtons: boolean[];
     onLoadComplete: () => void;
+    simGraphData: any;
+    sandBoxMode: boolean;
 }
 
 const NodeMatricesVisualizer: React.FC<NodeMatricesVisualizerProps> = ({
@@ -18,7 +20,9 @@ const NodeMatricesVisualizer: React.FC<NodeMatricesVisualizerProps> = ({
     changed,
     predicted,
     selectedButtons,
-    onLoadComplete
+    onLoadComplete,
+    simGraphData,
+    sandBoxMode = true, // whether the graph is simulated or not
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -33,10 +37,10 @@ const NodeMatricesVisualizer: React.FC<NodeMatricesVisualizerProps> = ({
 
     useEffect(() => {
         if ((intmData == null || changed) && !predicted) {
-            visualizeMatrix(graph_path, false, 800);
+            visualizeMatrix(graph_path, false, 800, simGraphData, sandBoxMode);
             onLoadComplete();
         } else {
-           visualizeNodeClassifier(setIsLoading, graph_path, intmData);
+           visualizeNodeClassifier(setIsLoading, graph_path, intmData, simGraphData, sandBoxMode);
            onLoadComplete();
         }
 

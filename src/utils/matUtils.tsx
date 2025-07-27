@@ -1,4 +1,4 @@
-import { calculatePrevFeatureVisPos, loadLinkGATWeights, loadLinkWeights, loadNodeWeights, loadWeights, translateLayers } from "./matHelperUtils";
+import { calculatePrevFeatureVisPos, loadLinkGATWeights, loadLinkWeights, loadNodeWeights, loadSimulatedModelWeights, loadWeights, translateLayers } from "./matHelperUtils";
 import {
     drawMatrixPreparation,
     drawNodeFeatures,
@@ -21,15 +21,17 @@ import {
     resultRectMouseout,
     resultVisMouseEvent,
     featureGATClick,
-    featureSAGEClick
+    featureSAGEClick,
+    smartMultiply
 } from "./matEventsUtils";
 import { deepClone, drawPoints } from "./utils";
 import { AnimationController, computeMatrixLocations, drawAniPath, drawBiasPath, drawBiasVector, drawFunctionIcon, drawPathBtwOuputResult, drawPathInteractiveComponents, drawWeightMatrix, drawWeightsVector } from "./matAnimateUtils";
 import { injectPlayButtonSVG, injectSVG } from "./svgUtils";
-import { roundToTwo } from "../components/WebUtils";
+import { roundToTwo, SandboxModeSelector } from "../components/WebUtils";
 import { drawMatmulExplanation, drawSoftmaxDisplayerNodeClassifier } from "./matInteractionUtils";
 import { create, all } from "mathjs";
 import { sigmoid } from "./linkPredictionUtils";
+import { start } from "node:repl";
 
 //Graph Classifier： features visualization pipeline: draw all feature visualizers for original features and GCNConv
 export function visualizeGraphClassifierFeatures(
@@ -43,7 +45,8 @@ export function visualizeGraphClassifierFeatures(
     final: any,
     graph: any,
     adjList: any,
-    maxVals: any
+    maxVals: any,
+    sandboxMode: boolean
 ) {
     //--------------------------------DATA PREP MANAGEMENT--------------------------------
     let intervalID: any = null; // to manage animation controls
@@ -52,7 +55,12 @@ export function visualizeGraphClassifierFeatures(
     let outputVis = null; //to manage model output
     let resultVis: any = null; //tp manage result visualizer
     //load weights and bias
-    const dataPackage = loadWeights();
+    let dataPackage = loadWeights();
+    if(sandboxMode) {
+        dataPackage = loadSimulatedModelWeights();
+    }
+
+    console.log("inside visualizer graph", dataPackage);
 
     const weights = dataPackage["weights"];
     const bias = dataPackage["bias"];
@@ -94,7 +102,7 @@ export function visualizeGraphClassifierFeatures(
         frames,
         schemeLocations,
         featureVisTable,
-        7,
+        features[0].length,
         10,
         15,
         100
@@ -106,8 +114,10 @@ export function visualizeGraphClassifierFeatures(
     featureVisTable = firstLayerPackage.featureVisTable;
     const firstLayer = firstLayerPackage.firstLayer;
 
+    console.log("observe table", featureVisTable, features, conv1, conv2, conv3);
+
     //-----------------------------------GCNConv LAYERS-----------------------------------------------
-    const featureChannels = 64;
+    const featureChannels = conv1[0].length;
 
     const GCNConvPackage = drawGCNConvGraphModel(
         conv1,
@@ -193,7 +203,8 @@ export function visualizeGraphClassifierFeatures(
                 poolingVis,
                 featureChannels,
                 100,
-                []
+                [],
+                sandboxMode
             );
             //update variables
             dview = recoverPackage.dview;
@@ -343,7 +354,9 @@ export function visualizeGraphClassifierFeatures(
                         final,
                         myColor,
                         featureChannels,
-                        pooling
+                        pooling,
+                        dataPackage,
+                        sandboxMode
                     );
                     //update variables
                     resultVis = outputVisPack.resultVis;
@@ -370,7 +383,8 @@ export function visualizeNodeClassifierFeatures(
     graph: any,
     adjList: any,
     maxVals: any,
-    trainingNodes: number[]
+    trainingNodes: number[],
+    sandBoxMode: boolean
 ) {
     //--------------------------------DATA PREP MANAGEMENT--------------------------------
     let intervalID: any = null; // to manage animation controls
@@ -379,7 +393,10 @@ export function visualizeNodeClassifierFeatures(
     let outputVis = null; //to manage model output
     let resultVis: any = null; //tp manage result visualizer
     //load weights and bias
-    const dataPackage = loadNodeWeights();
+    let dataPackage = loadNodeWeights();
+    if(sandBoxMode) {
+        dataPackage = loadSimulatedModelWeights("node");
+    }
 
     const weights = dataPackage["weights"];
     const bias = dataPackage["bias"];
@@ -411,7 +428,10 @@ export function visualizeNodeClassifierFeatures(
 
 
     //--------------------------------DRAW FRAMES--------------------------------
-    const framePackage = drawMatrixPreparation(graph, locations, 800);
+    let prepParam = 600;
+    if(sandBoxMode)prepParam = 400;
+    console.log("matrix frames layout param", prepParam, sandBoxMode);
+    const framePackage = drawMatrixPreparation(graph, locations, prepParam);
     let colFrames: SVGElement[] = framePackage.colFrames; //a
     let matFrames: SVGElement[] = framePackage.matFrames; //a
 
@@ -424,7 +444,7 @@ export function visualizeNodeClassifierFeatures(
         frames,
         schemeLocations,
         featureVisTable,
-        34,
+        features[0].length,
         5,
         15,
         150
@@ -437,7 +457,7 @@ export function visualizeNodeClassifierFeatures(
     const firstLayer = firstLayerPackage.firstLayer;
 
     //-----------------------------------GCNConv LAYERS-----------------------------------------------
-    const featureChannels = 4;
+    const featureChannels = conv1[0].length;
 
     const GCNConvPackage = drawGCNConvNodeModel(
         conv1,
@@ -454,7 +474,9 @@ export function visualizeNodeClassifierFeatures(
         firstLayer,
         maxVals,
         featureChannels,
-        trainingNodes
+        trainingNodes,
+        [conv1[0].length, conv2[0].length, conv3[0].length, result[0].length],
+        sandBoxMode
     );
     locations = GCNConvPackage.locations;
     frames = GCNConvPackage.frames;
@@ -580,7 +602,8 @@ export function visualizeNodeClassifierFeatures(
                 poolingVis,
                 featureChannels,
                 90,
-                resultLabelsList
+                resultLabelsList,
+                sandBoxMode,"node"
             );
             //update variables
             dview = recoverPackage.dview;
@@ -632,6 +655,18 @@ export function visualizeNodeClassifierFeatures(
             //translate each layer
             const layerID = Number(d3.select(this).attr("layerID")) - 1;
             const node = Number(d3.select(this).attr("node"));
+            let p1 = 10;
+            let p2 = 90;
+            let p3 = 34;
+            let p4 = 5;
+            let p5 = 'tanh';
+            if (sandBoxMode){
+                p1 = 5;
+                p2 = 150;
+                p3 = 3;
+                p4 = 10;
+                p5 = 'relu';
+            }
             const featureVisPack = featureVisClick(
                 layerID,
                 node,
@@ -648,11 +683,7 @@ export function visualizeNodeClassifierFeatures(
                 setIntervalID,
                 featureChannels,
                 15,
-                10,
-                90,
-                34,
-                5,
-                "tanh"
+                p1,p2,p3,p4,p5
             );
             // update variables
             recordLayerID = featureVisPack.recordLayerID;
@@ -698,8 +729,8 @@ export function visualizeNodeClassifierFeatures(
             //------------------the actual interaction codes part --------------------------------
             const layerID = 3;
             const node = Number(d3.select(this).attr("node"));
-            translateLayers(3, 250);
-
+            if(!sandBoxMode)translateLayers(3, 250);
+            else translateLayers(3, 325);
 
             //choose the right color schemes to display
 
@@ -739,7 +770,7 @@ export function visualizeNodeClassifierFeatures(
 
             //do a curveDir test for the direction of arcs and bias vector
             let curveDir = 1;
-            if (node < 17) curveDir = -1;
+            if (node < (conv1.length/2)) curveDir = -1;
 
             //find the position for the bias vector <- we use this positio to compute the position for bias vector
             //coordinate for model output <- the position for model output feature visualizer
@@ -775,10 +806,24 @@ export function visualizeNodeClassifierFeatures(
             const yForPathAni = prevFeatureCoord[1] - curveDir * 7.5;
             //following position computations will be based on the value of curveDir for dynamic adjustment
             //find the coordinates for arcs animation
-            let startPathCoords: number[][] = [
-                [prevFeatureCoord[0] - 5, prevFeatureCoord[1] - curveDir * 7.5],
-                [prevFeatureCoord[0] - 15, prevFeatureCoord[1] - curveDir * 7.5]
-            ]; //compute the starting positions of the paths animation
+            // let startPathCoords: number[][] = [
+            //     [prevFeatureCoord[0] - 5, prevFeatureCoord[1] - curveDir * 7.5],
+            //     [prevFeatureCoord[0] - 15, prevFeatureCoord[1] - curveDir * 7.5]
+            // ]; //compute the starting positions of the paths animation
+            let startPathCoords: number[][] = [];
+            console.log("conv3", conv3[0]);
+            for(let i=0; i<conv3[0].length; i++){
+                startPathCoords.push(
+                    [
+                        prevFeatureCoord[0] - 5 - i * 10,
+                        prevFeatureCoord[1] - curveDir * 7.5
+                    ]
+                )
+                if(sandBoxMode){
+                    startPathCoords[i][0] += 70
+                }
+            }
+            // drawPoints(".mats", "red", startPathCoords);
             let endPathCoords: number[][] = [
                 [outputCoord[0] + 5, yForPathAni],
                 [outputCoord[0] + 15, yForPathAni],
@@ -804,16 +849,23 @@ export function visualizeNodeClassifierFeatures(
             ];
 
             //data preparation<- weights, final outputs, softmax values in paths
-            const modelParams = loadNodeWeights();
+            let modelParams = loadNodeWeights();
+            if(sandBoxMode) {
+                modelParams = loadSimulatedModelWeights("node");
+            }
+            console.log("in result vis modelParams", modelParams);
             const linBias = modelParams["bias"][3]; //bias vector
             const matMulWeights = modelParams["weights"][3]; // weights for matrix multiplication
             const nthOutputVals = final[node];
 
             //the vector after matrix multiplication - before adding the bias
             const math = create(all, {});
-            const prevCon3Val: number[] = [conv3[node][0], conv3[node][1]];
-            const vectorAfterMul = math.multiply(prevCon3Val, math.transpose(matMulWeights));
-
+            // const prevCon3Val: number[] = [conv3[node][0], conv3[node][1]];
+            const prevCon3Val: number[] = Array.from(conv3[node]);
+            // const vectorAfterMul = math.multiply(prevCon3Val, math.transpose(matMulWeights));
+            console.log("vector before mat mul", prevCon3Val, math.transpose(matMulWeights));
+            const vectorAfterMul = smartMultiply(math.transpose(matMulWeights), prevCon3Val);
+            console.log("vector after mat mul", vectorAfterMul, prevCon3Val, math.transpose(matMulWeights));
 
             //visualization <- replace this by animation sequence
             const g = d3.select(".mats");
@@ -823,12 +875,12 @@ export function visualizeNodeClassifierFeatures(
 
             //draw softmax
             let clockwise = 0;
-            if (node < 17) clockwise = 1;
+            if (node < conv1.length/2) clockwise = 1;
 
             //smart ui detections & transparent
 
             //transparent prevLayer(featureVisTable[3]) && curLayer(featureVisTable[4])
-            if (node < 17) {
+            if (node < conv1.length/2) {
                 //process prevLayer
                 featureVisTable[3][node + 1].style.opacity = "0";
                 featureVisTable[3][node + 2].style.opacity = "0";
@@ -862,6 +914,7 @@ export function visualizeNodeClassifierFeatures(
 
 
             const wMat = math.transpose(modelParams.weights[3]);
+            console.log("wMat", wMat, modelParams.weights[3]);
 
             let weightMatrixPostions: any = computeMatrixLocations(btnX + 15, btnY + 30, curveDir, 15, featureChannels, [wMat], 0);
 
@@ -1159,7 +1212,7 @@ export function visualizeLinkClassifierFeatures(
         frames,
         schemeLocations,
         featureVisTable,
-        128,
+        features[0].length,
         2.5,
         15,
         150,
@@ -1180,7 +1233,7 @@ export function visualizeLinkClassifierFeatures(
     console.log("paths for first layer", pathsForFisrtLayer);
 
     //-----------------------------------GCNConv LAYERS-----------------------------------------------
-    const featureChannels = 64;
+    const featureChannels = conv1[0].length;
     
     // we need have the locations and indices of the nodes involved during the computation
 
@@ -1303,7 +1356,8 @@ export function visualizeLinkClassifierFeatures(
                 poolingVis,
                 featureChannels,
                 90,
-                []
+                [],
+                true
             );
             //update variables
             dview = recoverPackage.dview;

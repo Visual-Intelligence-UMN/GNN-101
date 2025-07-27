@@ -30,6 +30,9 @@ interface GraphVisualizerProps {
     simulationLoading: boolean;
     setSimulation: Function;
     innerComputationMode: string
+    simGraphData: any,
+    sandBoxMode: boolean,
+    nodePositions?: { id: string; x: number; y: number }[];
 }
 
 const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
@@ -41,7 +44,10 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
     selectedButtons,
     simulationLoading,
     setSimulation,
-    innerComputationMode
+    innerComputationMode,
+    simGraphData,
+    sandBoxMode,
+    nodePositions,
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -50,7 +56,12 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
     const currentVisualizationId = useRef(0);
     const parse = typeof graph_path === 'string' ? graph_path.match(/(\d+)\.json$/) : null;
     const select = parse ? parse[1] : '';
+    
+    console.log("vis selector", select)
     const location = loadNodesLocation(0, select);
+    console.log("original location", location)
+    console.log("passed in location", nodePositions)
+    console.log("Use sandnox",sandBoxMode)
 
 
 
@@ -91,6 +102,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
             if (graph_path === "./json_data/graphs/input_graph0.json") {
                 injectSVG(gLabel, location[3].x - 1650 - 64 + offset, location[3].y - 120 - 64, "./assets/SVGs/interactionHint.svg", "hintLabel");
             } else {
+                console.log("location", location)
                 injectSVG(gLabel, location[0].x - 1650 - 64 + offset, location[0].y - 120 - 64, "./assets/SVGs/interactionHint.svg", "hintLabel");
             }
 
@@ -140,6 +152,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
                 let maxXDistance = 0;
                 let maxYDistance = 0;
+                console.log("data_graphvis", data)
                 let limitedNodes = data.nodes.slice(0, 17);
 
                 limitedNodes.forEach((node1: any) => {
@@ -166,15 +179,30 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                 let centerY = (point1.y + point3.y) / 2;
                 if (i < 4) {
                     data.nodes.forEach((node: any, j: number) => {
-                        if (location[i.toString()]) {
+                        if (sandBoxMode && nodePositions && nodePositions.length > 0) {
+                            console.log("IN1")
+                            const editorNode = nodePositions
+                            if (editorNode.length != 0) {
+                                console.log("IN2")
+                                node.x = editorNode[node.id].x + 1500;
+                                node.y = editorNode[node.id].y ;
+                            } else {
+                                console.log("IN3")
+                                node.x = Math.random() * width;
+                                node.y = Math.random() * height;
+                            }
+                        } else if (location[i.toString()]) {
+                            console.log("IN4")
                             node.x = location[j.toString()].x;
                             node.y = location[j.toString()].y;
                         } else {
+                            console.log("IN5")
                             node.x = Math.random() * width;
                             node.y = Math.random() * height;
                         }
                     });
                     data.nodes.forEach((node1: any) => {
+                        console.log("IN6")
                         initialCoords[node1.id] = {
                             x: node1.x,
                             y: node1.y,
@@ -294,12 +322,18 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
                         }
                     }
+                    console.log("Value", i, value)
+                    let feature_num: number = 64
+                    if (sandBoxMode) {
+                      feature_num =16
+                    }
+             
                     data.nodes.forEach((node: any) => {
                         node.graphIndex = i;
                         if (value != null && i <= 4 && value instanceof Float32Array) {
                             node.features = value.subarray(
-                                64 * node.id,
-                                64 * (node.id + 1)
+                                feature_num * node.id,
+                                feature_num * (node.id + 1)
                             );
                         }
 
@@ -410,7 +444,6 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                         .text(text)
                         .attr("font-weight", "normal")
                         .attr('opacity', 0.5);
-                    console.log("value", value)
                     const absMax = findAbsMax(value);
 
 
@@ -430,7 +463,6 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                     // colorSchemes.push(cst);
 
 
-                    
                     // doesn't show the text, need to be fixed 
                     if (i === graphs.length - 1) { // 6 layers in total, call the connect when reaching the last layer of convolutional layer.
                         connectCrossGraphNodes( // in this function the connection of last two layers will be drwan
@@ -445,15 +477,26 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                             0
                         );
 
-                        // since in the featureVisualizer each node has its own svgElement, circles here are made transparent
+                        // since in the featureVisualizer each node has its own svgElement, circles here are made 
                         svg.selectAll("circle")
                             .attr("opacity", 0);
             
           
 
                         if (intmData) {
+                            let firstLayerMoveOffset = 700
+                            let moveOffset = 900
+                            let fcLayerMoveOffset = 600
+                            let rectWidth = 15
+                            let firstLayerRectHeight = 10
+                            let rectHeight = 3
+                            let outputLayerRectHeight = 20
+                            if (sandBoxMode) {
+                                rectHeight = 12
+                            }
 
-                            featureVisualizer(svg, allNodes, offset, height, graphs, 700, 900, 600, 15, 10, 3, 20, 0, innerComputationMode); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
+
+                            featureVisualizer(svg, allNodes, offset, height, graphs, firstLayerMoveOffset, moveOffset, fcLayerMoveOffset, rectWidth, firstLayerRectHeight, rectHeight, outputLayerRectHeight, 0, innerComputationMode, sandBoxMode); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
                             //function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, graphs: any[], moveOffset: number, fcLayerMoveOffset: number, rectWidth: number, firstLayerRectHeight: number, rectHeight: number, outputLayerRectHeight: number)
                         }
        
@@ -475,12 +518,15 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
         const runVisualization = async () => {
             if ((intmData == null || changed) && !predicted) {
+                console.log("Running visualization")
                 await visualizeGraph(graph_path, () => {
                     handleSimulationComplete(visualizationId);
                     onLoadComplete();
+                    nodePositions=nodePositions
                 },
                     true, 0);
             } else {
+                console.log("Running visualization 2")
                 await visualizeGNN(4);
                 handleSimulationComplete(visualizationId);
                 onLoadComplete();
@@ -489,14 +535,25 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
 
 
         const visualizeGNN = async (num: number) => {
+            console.log("Running visualization 4")
+        
             try {
-                setIsLoading(true);
-
-                const processedData = await data_prep(graph_path);
-
-                const graphsData = await prep_graphs(num, processedData);
-                // Initialize and run D3 visualization with processe  d data
-                await init(graphsData);
+                    setIsLoading(true);
+                    let graphsData
+                    if (!sandBoxMode) {
+                        console.log("raw data", graph_path)
+                        const processedData = await data_prep(graph_path);
+                        graphsData = await prep_graphs(num, processedData);
+            
+                    } else {
+                        console.log("raw data", simGraphData)
+                        const processedData = await data_prep(simGraphData);
+                        graphsData = await prep_graphs(num, processedData);
+         
+                    }
+                    // Initialize and run D3 visualization with processe  d data
+                    await init(graphsData);
+                
             } catch (error) {
                 console.error("Error in visualizeGNN:", error);
             } finally {

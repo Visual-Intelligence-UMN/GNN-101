@@ -367,7 +367,7 @@ export function loadNodeWeights() {
 
 
 
-    weights = [
+   weights = [
         weightsJSON["onnx::MatMul_271"],
         weightsJSON["onnx::MatMul_274"],
         weightsJSON["onnx::MatMul_277"],
@@ -378,6 +378,32 @@ export function loadNodeWeights() {
         weightsJSON["conv2.bias"],
         weightsJSON["conv3.bias"],
         weightsJSON["classifier.bias"],
+    ];
+
+    return { weights: weights, bias: bias };
+}
+
+export function loadSimulatedModelWeights(type: string = "graph") {
+    // weights data preparation
+    let weights: any = []; // DS to manage weights for each layer
+    let bias: any = []; // DS to manage bias for each layer
+
+    let weightsJSON: any = require("../../public/simulations/simulated_gcn_graph_model_weights.json");
+    if(type == "node") {
+        weightsJSON = require("../../public/simulations/simulated_gcn_node_model_weights.json");
+    }
+
+    weights = [
+        weightsJSON["conv1.lin.weight"],
+        weightsJSON["conv2.lin.weight"],
+        weightsJSON["conv3.lin.weight"],
+        weightsJSON["lin.weight"],
+    ];
+    bias = [
+        weightsJSON["conv1.bias"],
+        weightsJSON["conv2.bias"],
+        weightsJSON["conv3.bias"],
+        weightsJSON["lin.bias"],
     ];
 
     return { weights: weights, bias: bias };
@@ -475,5 +501,25 @@ export function rotateMatrix(matrix: number[][]): number[][] {
     return rotatedMatrix;
 }
 
+export function rotateAnyMatrix(matrix: number[][]): number[][] {
+    const m = matrix.length;
+    if (m === 0) return [];
+
+    const n = matrix[0].length;
+
+    if (!matrix.every(row => row.length === n)) {
+        throw new Error("All rows must have the same number of columns");
+    }
+
+    const rotated: number[][] = Array.from({ length: n }, () => Array(m));
+
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+            rotated[j][m - 1 - i] = matrix[i][j];
+        }
+    }
+
+    return rotated;
+}
 
 

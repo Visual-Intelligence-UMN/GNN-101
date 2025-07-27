@@ -280,6 +280,8 @@ export function drawMatrixPreparation(graph: any, locations: any, gridSize:numbe
         matFrames.push(r.node() as SVGElement);
     }
 
+    console.log("frame data", locations, colLocations, rowHeight, gridSize)
+
     return { colFrames: colFrames, matFrames: matFrames };
 }
 
@@ -300,7 +302,7 @@ export function drawNodeFeatures(
 ) {
     //initial visualizer
     for (let i = 0; i < locations.length; i++) {
-        locations[i][0] += 25;
+        locations[i][0] += 50;
         locations[i][1] += 2;
     }
     //draw cross connections for features layer and first GCNConv layer
@@ -408,11 +410,14 @@ export function drawSingleGCNConvFeature(
 
 
     //loop through each node
+    //console.log("gcnFeature is ", gcnFeature);
     let nodeMat = gcnFeature[i];
 
     //where we met encounter issue
+    //console.log("nodeMat is ", nodeMat);
     for (let m = 0; m < featureChannels; m++) {
         const cellValue = nodeMat[m];
+        // console.log("cellValue is " + cellValue);
         const rect = g
             .append("rect")
             .attr("x", locations[i][0] + rectW * m)
@@ -769,6 +774,7 @@ export function drawGCNConvGraphModel(
     let paths: any;
     let resultVis = null;
     const gcnFeatures = [conv1, conv2, conv3];
+    console.log("all-gcnFeatures: ", gcnFeatures);
     //a table to save all rects in the last GCNConv layer
     let thirdGCN: any = Array.from({ length: featureChannels }, () => []);
 
@@ -801,7 +807,7 @@ export function drawGCNConvGraphModel(
         addLayerName(
             locations,
             "GCNConv" + (k + 1),
-            100,
+            0,
             30,
             d3.select(`g#layerNum_${k + 1}`)
         );
@@ -955,7 +961,9 @@ export function drawGCNConvNodeModel(
     firstLayer: any,
     maxVals: any,
     featureChannels: number,
-    trainingNodes: number[]
+    trainingNodes: number[],
+    dimensions: number[],
+    sandBoxMode: boolean
 ) {
     //GCNCov Visualizer
     let paths: any;
@@ -979,7 +987,10 @@ export function drawGCNConvNodeModel(
             if (k != 0) {
                 locations[i][0] += rectW * featureChannels + 150;
             } else {
-                locations[i][0] += 34 * 5 + 150;
+                
+                if(!sandBoxMode)locations[i][0] += 34 * 5 + 150;
+                else locations[i][0] += 7 * rectW + 100 + 25;
+                console.log("first layout layout ", sandBoxMode, locations[i][0]);
             }
         }
 
@@ -1004,7 +1015,7 @@ export function drawGCNConvNodeModel(
         if(k==2){
             for (let i = 0; i < locations.length; i++) {
                 const sgfPack = drawSingleGCNConvFeature(
-                    layer, i, k, gcnFeature, 2, locations, 
+                    layer, i, k, gcnFeature, dimensions[k], locations, 
                     rectW, rectH, myColor, thirdGCN, frames,
                     schemeLocations, featureVisTable
                 );

@@ -3,6 +3,9 @@
   overflow-y: auto;
 }
 
+
+
+
 .rightContainer {
   display: flex;
   flex-direction: column;

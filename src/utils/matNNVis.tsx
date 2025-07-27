@@ -20,7 +20,10 @@ import {
     get_cood_locations,
     HeatmapData,
     drawNodeAttributes,
-    getNodeAttributes
+    getNodeAttributes,
+    loadSimulatedModelWeights,
+    loadWeights,
+    loadNodeWeights
 } from "../utils/matHelperUtils";
 import { visualizeMatrixBody } from "../components/WebUtils";
 
@@ -28,6 +31,7 @@ import { myColor } from "../utils/utils";
 import { convertToAdjacencyMatrix, getNodeSet } from "./linkPredictionUtils";
 import { extractSubgraph, removeDuplicatesFromSubarrays } from "./graphDataUtils";
 import { decode } from "punycode";
+import { useSimulatedMatrixLayout } from "./matVisUtils";
 
 //find absolute max value in an 1d array
 export function findAbsMax(arr: number[]) {
@@ -39,7 +43,15 @@ export function findAbsMax(arr: number[]) {
 
 
 //----------------------function for visualizing node classifier----------------------------
-async function initNodeClassifier(graph: any, features: any[][], intmData:any, graph_path:string, trainingNodes: number[])  {
+async function initNodeClassifier(
+    graph: any, 
+    features: any[][], 
+    intmData:any, 
+    graph_path:string, 
+    trainingNodes: number[],
+    dimensions: number[],
+    sandBoxMode:boolean
+)  {
 
     let colorSchemeTable: any = null;
     //a data structure to record the link relationship
@@ -75,21 +87,29 @@ async function initNodeClassifier(graph: any, features: any[][], intmData:any, g
         };
 
 
-        conv1 = splitIntoMatrices(intmData.conv1, 4);
-        conv2 = splitIntoMatrices(intmData.conv2, 4);
-        conv3 = splitIntoMatrices(intmData.conv3, 2);
+        conv1 = splitIntoMatrices(intmData.conv1, dimensions[0]);
+        conv2 = splitIntoMatrices(intmData.conv2, dimensions[1]);
+        conv3 = splitIntoMatrices(intmData.conv3, dimensions[2]);
         result = intmData.result;
-        final = splitIntoMatrices(intmData.final, 4);
+        final = splitIntoMatrices(intmData.final, dimensions[3]);
+
+        console.log("intm data after check - node", conv1, conv2, conv3, result, final, dimensions);
     }
 
 
 
     const gLen = graph.length;
 
-    const gridSize = 800;
-    const margin = { top: 10, right: 80, bottom: 30, left: 80 };
-    const width = 20 * gLen + 50 + 6 * 102 + 1200 * 2;
-    const height = (gridSize + margin.top + margin.bottom) * 2;
+    let gridSize = 600;
+    let margin = { top: 10, right: 80, bottom: 30, left: 80 };
+    let width = 20 * gLen + 50 + 6 * 102 + 1200 * 2;
+    let height = (gridSize + margin.top + margin.bottom) * 2;
+    if(sandBoxMode){
+        const layoutParameters = useSimulatedMatrixLayout(graph);
+        ({ gridSize, margin, width, height } = layoutParameters);
+    }
+
+    console.log("matrix layout", gridSize, margin, width, height, sandBoxMode);
 
     let locations: number[][] = [];
     d3.select("#matvis").selectAll("*").remove();
@@ -116,7 +136,8 @@ async function initNodeClassifier(graph: any, features: any[][], intmData:any, g
         graph,
         adjList,
         colorSchemeTable,
-        trainingNodes
+        trainingNodes,
+        sandBoxMode
     );
     // drawNodeAttributes(nodeAttrs, graph, 50);
 
@@ -135,7 +156,16 @@ async function initNodeClassifier(graph: any, features: any[][], intmData:any, g
 
 
 //----------------------function for visualizing graph classifier----------------------------
-async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: string[], intmData:any, graph_path:string)  {
+async function initGraphClassifier(
+    graph: any, 
+    features: any[][], 
+    nodeAttrs: string[], 
+    intmData:any, 
+    graph_path:string,
+    dim: number,
+    sandBoxMode:boolean
+)  {
+    console.log("check intmdata", intmData);
     let colorSchemeTable: any = null;
     //a data structure to record the link relationship
     //fill up the linkMap
@@ -172,24 +202,24 @@ async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: str
             final: finalMax,
         };
 
+        console.log("intm data before check", intmData.conv1, intmData.conv2, intmData.conv3, intmData.pooling, intmData.final, dim);
 
-        conv1 = splitIntoMatrices(intmData.conv1);
-        conv2 = splitIntoMatrices(intmData.conv2);
-        conv3 = splitIntoMatrices(intmData.conv3);
+
+        conv1 = splitIntoMatrices(intmData.conv1, dim);
+        conv2 = splitIntoMatrices(intmData.conv2, dim);
+        conv3 = splitIntoMatrices(intmData.conv3, dim);
         pooling = intmData.pooling;
         final = intmData.final;
+
+        console.log("intm data after check", conv1, conv2, conv3, pooling, final);
     }
 
 
 
 
     let allNodes: any[] = [];
-    const gLen = graph.length;
-
-    const gridSize = 400;
-    const margin = { top: 10, right: 80, bottom: 30, left: 80 };
-    const width = 20 * gLen + 50 + 6 * 102 + 1200 * 2;
-    const height = (gridSize + margin.top + margin.bottom) * 2;
+    const layoutParameters = useSimulatedMatrixLayout(graph);
+    const { gridSize, margin, width, height } = layoutParameters;
 
     let locations: number[][] = [];
     d3.select("#matvis").selectAll("*").remove();
@@ -215,7 +245,8 @@ async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: str
         final,
         graph,
         adjList,
-        colorSchemeTable
+        colorSchemeTable,
+        sandBoxMode
     );
     drawNodeAttributes(nodeAttrs, graph, 150);
     
@@ -226,18 +257,44 @@ async function initGraphClassifier(graph: any, features: any[][], nodeAttrs: str
 };
 
 //Visualization Pipeline for Graph Classifier
-export async function visualizeGraphClassifier(setIsLoading:any, graph_path:string, intmData:any) {
+export async function visualizeGraphClassifier(
+    setIsLoading:any, 
+    graph_path:string, 
+    intmData:any,
+    simGraphData:any,
+    sandBoxMode:boolean
+) {
     try {
+        console.log("matvis pipe 0", simGraphData)
         setIsLoading(true);
         // Process data
-        const data = await load_json(graph_path);
+        console.log("matvis pipe 1", graph_path, intmData, sandBoxMode);
+        let data = simGraphData;
+        let {weights, bias} = loadSimulatedModelWeights();
+        if(!sandBoxMode) {
+            ({weights, bias} = loadWeights());
+            data = await load_json(graph_path);
+            console.log("matvis pipe not sandbox", data);
+        }
+        console.log("matvis pipe 2", data);
+        const dim = weights[1].length
+        console.log("dim", dim);
         //node attributes extraction
         const nodeAttrs = getNodeAttributes(data);
         //accept the features from original json file
         const features = await get_features_origin(data);
         const processedData = await graph_to_matrix(data);
+        console.log("matvis pipe 3", features, nodeAttrs, processedData);
         // Initialize and run D3 visualization with processe  d data
-        await initGraphClassifier(processedData, features, nodeAttrs, intmData, graph_path);
+        await initGraphClassifier(
+            processedData, 
+            features, 
+            nodeAttrs, 
+            intmData, 
+            graph_path, 
+            dim,
+            sandBoxMode
+        );
     } catch (error) {
         console.error("Error in visualizeGNN:", error);
     } finally {
@@ -246,18 +303,38 @@ export async function visualizeGraphClassifier(setIsLoading:any, graph_path:stri
 };
 
 //Visualization Pipeline for Node Classifier
-export async function visualizeNodeClassifier(setIsLoading:any, graph_path:string, intmData:any) {
+export async function visualizeNodeClassifier(
+    setIsLoading:any, 
+    graph_path:string, 
+    intmData:any,
+    simGraphData:any,
+    sandBoxMode:boolean // no dim data
+) {
     try {
         setIsLoading(true);
         // Process data
-        const data = await load_json(graph_path);
+        let data = simGraphData;
+        if(!sandBoxMode) data = await load_json(graph_path);
+        let {weights, bias} = loadSimulatedModelWeights("node");
+        if(!sandBoxMode) {
+            ({weights, bias} = loadNodeWeights());
+            data = await load_json(graph_path);
+            console.log("matvis pipe not sandbox", data);
+        }
+        console.log("matvis pipe 2 node", data, sandBoxMode);
         //training nodes
-        const trainingNodes = data.train_nodes;
+        let dimensions = [];
+        for(let i = 0; i<bias.length; i++){
+            const dim = bias[i].length;
+            dimensions.push(dim);
+        }
+        console.log("dimensions", dimensions);
+        const trainingNodes = [1, 5, 3];
         //accept the features from original json file
         const features = await get_features_origin(data);
         const processedData = await graph_to_matrix(data);
         // Initialize and run D3 visualization with processe  d data
-        await initNodeClassifier(processedData, features, intmData, graph_path, trainingNodes);
+        await initNodeClassifier(processedData, features, intmData, graph_path, trainingNodes, dimensions, sandBoxMode);
     } catch (error) {
         console.error("Error in visualizeGNN:", error);
     } finally {
@@ -502,5 +579,3 @@ async function initLinkClassifier(
 
    // console.log("finished visulizing link classifier", conv1, conv2, decode_mul, decode_sum, prob_adj, locations);
 };
-
-

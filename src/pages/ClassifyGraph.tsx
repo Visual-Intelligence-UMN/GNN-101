@@ -2,6 +2,7 @@ import React, { useState, ChangeEvent } from "react";
 import { graphPrediction, linkPrediction, nodePrediction } from "@/utils/utils";
 import { Hint, PredictionVisualizer } from "../components/WebUtils";
 import { IntmData, IntmDataLink, IntmDataNode } from "@/types";
+import { simulatedModelList } from "@/utils/const";
 
 interface ClassifyGraphProps {
     graphPath: string;
@@ -15,6 +16,8 @@ interface ClassifyGraphProps {
     onlyShownButton?: boolean;
     simulationLoading: boolean;
     setIsLoading: (loading: boolean) => void;
+    simGraphData: any,
+    sandBoxMode: boolean; // whether the graph is simulated or not
 }
 
 // parameter will be the user input for json file
@@ -29,7 +32,9 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
     setProbabilities,
     onlyShownButton = false,
     simulationLoading,
-    setIsLoading
+    setIsLoading,
+    simGraphData = {},
+    sandBoxMode
 }) => {
     let prob: number[] | number[][] = [];
     const classifyGraph = async () => {
@@ -43,17 +48,27 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
             let intmData: IntmData | IntmDataNode | IntmDataLink;
             let prob: number[] | number[][] = [];
 
-            if (modelPath == "./gnn_node_model.onnx") {
-                ({ prob, intmData } = await nodePrediction(modelPath, graphPath));
-            } else if (modelPath == "./gnn_model2.onnx") {
-                ({ prob, intmData } = await graphPrediction(modelPath, graphPath));
-            } else {
+            console.log("inference parameters:", sandBoxMode, modelPath, graphPath)
+
+            if (modelPath.includes("node")) {
+                if(sandBoxMode)modelPath = simulatedModelList["node-task-simodel"];
+                console.log("node pred pipe modelPath - 0", modelPath, graphPath, simGraphData, sandBoxMode);
+                ({ prob, intmData } = await nodePrediction(modelPath, graphPath, simGraphData, sandBoxMode));
+            } else if (modelPath.includes("graph")) {
+                if(sandBoxMode)modelPath = simulatedModelList["graph-task-simodel"];
+                ({ prob, intmData } = await graphPrediction(modelPath, graphPath, simGraphData, sandBoxMode));
+            } else if(modelPath.includes("link")){
                 ({ prob, intmData } = await linkPrediction(
                     modelPath,
-                    "./json_data/links/twitch.json"
+                    "./json_data/links/twitch.json" // this is for twitch dataset originally
                 ));
+            } else {
+                if(sandBoxMode)modelPath = simulatedModelList["graph-task-simodel"];
+                ({ prob, intmData } = await graphPrediction(modelPath, graphPath, simGraphData, sandBoxMode));
             }
     
+            console.log("check intmData origin", intmData);
+
             setChangedG(false);
             setIntmData(intmData);
     

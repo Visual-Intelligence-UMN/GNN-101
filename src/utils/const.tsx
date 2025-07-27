@@ -31,9 +31,7 @@ export const midGraphNodeSelectionList = [
 ];
 
 export const twitchNodeSelectionList = [
-    194, 497, 567, 590, 1147, 1169, 1588, 1882, 
-    1906, 2369, 2779, 3649, 3728, 3797, 4591, 
-    4990, 5117, 6509
+148, 407, 79, 116, 994, 632, 71, 110, 420, 772, 394, 109, 241, 471
 ];
 
 export const nodeList: { [k: string]: string } = {
@@ -52,6 +50,12 @@ export const modelList: { [k: string]: string } = {
     "GraphSAGE - link prediction": "./sage_link_model.onnx"
 };
 
+
+export const simulatedModelList: { [k: string]: string } = {
+    "graph-task-simodel": "./simulations/simulated_gcn_graph_model.onnx",
+    "node-task-simodel": "./simulations/simulated_gcn_node_model.onnx",
+};
+
 // export const modelGATList: { [k: string]: string } = {
 //   "GAT link classification": "./gat_link_model.onnx"
 // };
@@ -68,15 +72,18 @@ export const modelTypeList: { [k: string]: string } = {
 
 const chemicalNames = ['C16NO2', 'C6FNO2', 'C7NO3']
 function graph_list_generate(namelist: string[]) {
-    let res: { [k: string]: string } = {};
+    let res: { [k: string]: string } = { };
 
     for (let i = 0; i < namelist.length; i++) {
         res[`molecule_${chemicalNames[i]}`] = `./json_data/graphs/input_graph${i}.json`;
     }
 
+    console.log("Generating graph list with chemical names:", res);
+
     return res;
 }
-export const graphList = graph_list_generate(chemicalNames)
+
+export const graphList = graph_list_generate(chemicalNames);
 
 export const MUTAG_INFO = <p>Each graph in the <a className={`underline ${inter3.className}`} href="https://huggingface.co/datasets/graphs-datasets/MUTAG" target="__blank">MUTAG dataset</a> represents a chemical compound. Nodes are atoms and edges are bonds between atoms.
     The task is to predict whether a molecule is mutagenic on Salmonella typhimuriumor or not (i.e., can cause genetic mutations in this bacterium or not).

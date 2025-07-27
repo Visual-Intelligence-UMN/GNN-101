@@ -9,7 +9,7 @@ import {
 } from "./matHelperUtils";
 import { computeMids } from "./matFeaturesUtils";
 import * as d3 from "d3";
-import { create, all } from "mathjs";
+import { create, all, size, multiply, transpose } from "mathjs";
 import {
     drawAniPath,
     drawBiasPath,
@@ -37,6 +37,7 @@ import { drawMatmulExplanation, drawSoftmaxDisplayer } from "./matInteractionUti
 import path from "node:path/win32";
 import { computeAttentionCoefficient, meanAggregation, testCompute } from "./computationUtils";
 import { addExitBtn, buildDetailedViewArea } from "./graphUtils";
+import { transformSync } from "next/dist/build/swc";
 
 
 export const matrixMultiplicationResults = {
@@ -120,7 +121,9 @@ export function detailedViewRecovery(
     poolingVis: any,
     featureChannels: number,
     gap:number,
-    resultLabelsList:any
+    resultLabelsList:any,
+    sandBoxMode: boolean,
+    task:string = "normal"
 ) {
     //remove temp classes
     d3.select(".switchBtn").style("pointer-events", "auto");
@@ -152,7 +155,14 @@ export function detailedViewRecovery(
     setTimeout(()=>{
     //recover layers positions
     if (transState == "GCNConv") {
-        if (recordLayerID >= 0) {
+        if(recordLayerID >= 0 && sandBoxMode && task == "node"){
+            translateLayers(
+                recordLayerID,
+                -620
+            );
+            recordLayerID = -1;
+        }
+        else if (recordLayerID >= 0) {
             translateLayers(
                 recordLayerID,
                 -((gap+2) * 3 + 5 * featureChannels * 2)
@@ -179,10 +189,11 @@ export function detailedViewRecovery(
         resultLabelsList.forEach((element:any) => {
             element.style.fill = "gray";
         });
-        translateLayers(3, -250);
-
+        if(!sandBoxMode)translateLayers(3, -250);
+        else translateLayers(3, -325);
     }else{
-        translateLayers(4, -300);
+        if(!sandBoxMode)translateLayers(4, -300);
+        else translateLayers(4, -350);
     }
 
     d3.selectAll("path.crossConnection").style("opacity", 0.05);
@@ -396,6 +407,22 @@ export function resultVisMouseEvent(
     }
 }
 
+export function smartMultiply(W: number[][], X: number[] | number[][]): number[] | number[][] {
+  const wShape = size(W) as number[];
+  const xShape = size(X) as number[];
+
+  try {
+    return multiply(W, X);
+  } catch (err) {
+    try {
+      return multiply(transpose(W), X);
+    } catch (err2) {
+      throw new Error(`smartMultiply failed: shapes ${wShape} and ${xShape} are incompatible`);
+    }
+  }
+}
+
+
 export function featureVisClick(
     layerID: number,
     node: number,
@@ -523,8 +550,8 @@ export function featureVisClick(
         let matA = math.matrix(prepMat);
         X = math.add(math.multiply(prepMat, mulV), X);
     }
-    console.log("issue here", X,)
-    const dummy: number[] = math.multiply(math.transpose(weights[layerID]), X);
+    console.log("issue here", X, math.transpose(weights[layerID]))
+    const dummy: number[] = smartMultiply(weights[layerID], X) as number[];
     const Xt = math.transpose(weights[layerID]);
     matrixMultiplicationResults.dummy[node] = dummy;
    
@@ -1004,7 +1031,9 @@ export function outputVisClick(
     result: any,
     myColor: any,
     featureChannels: number,
-    poolingValues: number[]
+    poolingValues: number[],
+    modelParams: any,
+    sandboxMode: boolean
 ) {
     d3.select(".switchBtn").style("pointer-events", "none");
     d3.select(".switchBtn").style("opacity", 0.3);
@@ -1029,7 +1058,7 @@ export function outputVisClick(
 
     poolingPt[0][0] += featureChannels*1.5;
 
-    const modelParams = loadWeights();
+    // const modelParams = loadWeights();
 
     poolingPt[0][1] += 10;
     one = deepClone(poolingPt);
@@ -1048,8 +1077,8 @@ export function outputVisClick(
     resultVis?.style("opacity", 0.2);
     //translate each layer
     const layerID = 4;
-    translateLayers(layerID, 300);
-
+    if(!sandboxMode)translateLayers(layerID, 300);
+    else translateLayers(layerID, 350);
     d3.select(".hintLabel").style("opacity", 0);
 
     //locations calculation
