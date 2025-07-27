@@ -603,7 +603,7 @@ export function visualizeNodeClassifierFeatures(
                 featureChannels,
                 90,
                 resultLabelsList,
-                sandBoxMode
+                sandBoxMode,"node"
             );
             //update variables
             dview = recoverPackage.dview;

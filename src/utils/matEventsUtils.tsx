@@ -122,7 +122,8 @@ export function detailedViewRecovery(
     featureChannels: number,
     gap:number,
     resultLabelsList:any,
-    sandBoxMode: boolean
+    sandBoxMode: boolean,
+    task:string = "normal"
 ) {
     //remove temp classes
     d3.select(".switchBtn").style("pointer-events", "auto");
@@ -154,7 +155,14 @@ export function detailedViewRecovery(
     setTimeout(()=>{
     //recover layers positions
     if (transState == "GCNConv") {
-        if (recordLayerID >= 0) {
+        if(recordLayerID >= 0 && sandBoxMode && task == "node"){
+            translateLayers(
+                recordLayerID,
+                -620
+            );
+            recordLayerID = -1;
+        }
+        else if (recordLayerID >= 0) {
             translateLayers(
                 recordLayerID,
                 -((gap+2) * 3 + 5 * featureChannels * 2)
