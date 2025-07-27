@@ -32,6 +32,7 @@ interface GraphVisualizerProps {
     innerComputationMode: string
     simGraphData: any,
     sandBoxMode: boolean,
+    nodePositions?: { id: string; x: number; y: number }[];
 }
 
 const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
@@ -46,6 +47,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
     innerComputationMode,
     simGraphData,
     sandBoxMode,
+    nodePositions,
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -54,9 +56,11 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
     const currentVisualizationId = useRef(0);
     const parse = typeof graph_path === 'string' ? graph_path.match(/(\d+)\.json$/) : null;
     const select = parse ? parse[1] : '';
-
+    
     console.log("vis selector", select)
     const location = loadNodesLocation(0, select);
+    console.log("original location", location)
+    console.log("passed in location", nodePositions)
     console.log("Use sandnox",sandBoxMode)
 
 
@@ -175,15 +179,30 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                 let centerY = (point1.y + point3.y) / 2;
                 if (i < 4) {
                     data.nodes.forEach((node: any, j: number) => {
-                        if (location[i.toString()]) {
+                        if (sandBoxMode && nodePositions && nodePositions.length > 0) {
+                            console.log("IN1")
+                            const editorNode = nodePositions
+                            if (editorNode.length != 0) {
+                                console.log("IN2")
+                                node.x = editorNode[node.id].x + 1500;
+                                node.y = editorNode[node.id].y ;
+                            } else {
+                                console.log("IN3")
+                                node.x = Math.random() * width;
+                                node.y = Math.random() * height;
+                            }
+                        } else if (location[i.toString()]) {
+                            console.log("IN4")
                             node.x = location[j.toString()].x;
                             node.y = location[j.toString()].y;
                         } else {
+                            console.log("IN5")
                             node.x = Math.random() * width;
                             node.y = Math.random() * height;
                         }
                     });
                     data.nodes.forEach((node1: any) => {
+                        console.log("IN6")
                         initialCoords[node1.id] = {
                             x: node1.x,
                             y: node1.y,
@@ -465,8 +484,19 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
           
 
                         if (intmData) {
+                            let firstLayerMoveOffset = 700
+                            let moveOffset = 900
+                            let fcLayerMoveOffset = 600
+                            let rectWidth = 15
+                            let firstLayerRectHeight = 10
+                            let rectHeight = 3
+                            let outputLayerRectHeight = 20
+                            if (sandBoxMode) {
+                                rectHeight = 12
+                            }
 
-                            featureVisualizer(svg, allNodes, offset, height, graphs, 700, 900, 600, 15, 10, 3, 20, 0, innerComputationMode, sandBoxMode); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
+
+                            featureVisualizer(svg, allNodes, offset, height, graphs, firstLayerMoveOffset, moveOffset, fcLayerMoveOffset, rectWidth, firstLayerRectHeight, rectHeight, outputLayerRectHeight, 0, innerComputationMode, sandBoxMode); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
                             //function featureVisualizer(svg: any, allNodes: any[], offset: number, height: number, graphs: any[], moveOffset: number, fcLayerMoveOffset: number, rectWidth: number, firstLayerRectHeight: number, rectHeight: number, outputLayerRectHeight: number)
                         }
        
@@ -492,6 +522,7 @@ const GraphVisualizer: React.FC<GraphVisualizerProps> = ({
                 await visualizeGraph(graph_path, () => {
                     handleSimulationComplete(visualizationId);
                     onLoadComplete();
+                    nodePositions=nodePositions
                 },
                     true, 0);
             } else {

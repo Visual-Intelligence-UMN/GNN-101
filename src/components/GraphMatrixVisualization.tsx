@@ -8,6 +8,8 @@ interface GraphMatrixVisualizationProps {
   modelType?: string;
   simulatedGraphData?: any;
   sandboxMode?: boolean;
+  nodePositions?: { id: string; x: number; y: number }[];
+  onNodePositionChange?: (positions: { id: string; x: number; y: number }[]) => void;
 }
 
 const elementMap = {
@@ -20,7 +22,9 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
   hubNodeB,
   modelType,
   simulatedGraphData,
-  sandboxMode =  true
+  sandboxMode =  true,
+  nodePositions,
+  onNodePositionChange
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   console.log("GraphMatrixVisualization props:", { dataFile, hubNodeA, hubNodeB, modelType, simulatedGraphData });
@@ -231,71 +235,204 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
 
       const graphSvg = graphSvgRoot.append("g");
 
-      // 放大比例
       const scaleFactor = 1.4;
       const centerX = (width - 2 * padding) / 2;
       const centerY = (height - 2 * padding) / 2;
       graphSvg.attr("transform", `translate(${padding + centerX * (1 - scaleFactor)},${padding + centerY * (1 - scaleFactor)}) scale(${scaleFactor})`);
+      const filteredLinks = data.edge_index[0].reduce((acc: any[], sourceId: number, i: number) => {
+        const targetId = data.edge_index[1][i];
 
-      const filteredLinks = data.edge_index[0].reduce((acc: any[], source: number, i: number) => {
-        const target = data.edge_index[1][i];
+        const sourceNode = nodes[sourceId];
+        const targetNode = nodes[targetId];
+
+        if (!sourceNode || !targetNode) return acc;
+
         if (isTwitchData && modelType?.includes('link prediction')) {
-          if (processedNodes.includes(source) && processedNodes.includes(target)) {
+          if (processedNodes.includes(sourceId) && processedNodes.includes(targetId)) {
             acc.push({
-              source,
-              target,
+              source: sourceNode,
+              target: targetNode,
               attr: data.edge_attr ? data.edge_attr[i] : null
             });
           }
         } else {
           acc.push({
-            source,
-            target,
+            source: sourceNode,
+            target: targetNode,
             attr: data.edge_attr ? data.edge_attr[i] : null
           });
         }
+
         return acc;
       }, []);
 
       console.log("Processed Nodes:", processedNodes);
       console.log("Filtered Links:", filteredLinks);
 
-      const simulation = d3.forceSimulation(nodes)
-        .force("link", d3.forceLink(filteredLinks)
-          .id((d: any) => d.id)
-          .distance(80))
-        .force("charge", d3.forceManyBody().strength(-200))
-        .force("center", d3.forceCenter((width - 2 * padding) / 2, (height - 2 * padding) / 2))
-        .force("x", d3.forceX((width - 2 * padding) / 2).strength(0.1))
-        .force("y", d3.forceY((height - 2 * padding) / 2).strength(0.1));
+      let simulation: d3.Simulation<any, undefined> | undefined;
+      let graphLinks: any;
+      let nodeGroups: any;
+      let graphNodes: any;
+      let nodeLabels: any;
 
-      const graphLinks = graphSvg.append("g")
-        .selectAll("line")
-        .data(filteredLinks)
-        .enter()
-        .append("line")
-        .attr("class", "link");
+      if (nodePositions && nodePositions.length > 0) {
+        console.log("nodelocation")
+        nodes.forEach((node: any) => {
+          const fixedPos = nodePositions[node.id];
+          if (fixedPos) {
+            node.x = fixedPos.x;
+            node.y = fixedPos.y;
+          } else {
+            // Assign a default position if not found in nodePositions
+            // This prevents 'undefined' errors if nodePositions is incomplete
+            node.x = (width - 2 * padding) / 2;
+            node.y = (height - 2 * padding) / 2;
+            console.warn(`Node ${node.id} not found in nodePositions, assigning default center.`);
+          }
+        });
+        console.log("Using fixed node positions:", nodes);
 
-      const nodeGroups = graphSvg.append("g")
-        .selectAll("g")
-        .data(nodes)
-        .enter()
-        .append("g");
+        // Apply fixed positions directly to graph elements
+        console.log("New", nodes)
+        
+        graphLinks = graphSvg.append("g")
+          .selectAll("line")
+          .data(filteredLinks)
+          .enter()
+          .append("line")
+          .attr("class", "link")
+          .attr("x1", (d: any) => nodes.find((n: any) => n.id === d.source.id)?.x || 0)
+          .attr("y1", (d: any) => nodes.find((n: any) => n.id === d.source.id)?.y || 0)
+          .attr("x2", (d: any) => nodes.find((n: any) => n.id === d.target.id)?.x || 0)
+          .attr("y2", (d: any) => nodes.find((n: any) => n.id === d.target.id)?.y || 0)
+          .style("stroke", function (d: any) {
+                            return d.type === "aromatic" ? "purple" : "#aaa";
+                        });
 
-      const graphNodes = nodeGroups
-        .append("circle")
-        .attr("class", "node")
-        .attr("r", 12);
+        nodeGroups = graphSvg.append("g")
+          .selectAll("g")
+          .data(nodes)
+          .enter()
+          .append("g")
+          .attr("transform", (d: any) => `translate(${d.x},${d.y})`);
 
-      const nodeLabels = nodeGroups
-        .append("text")
-        .attr("class", "node-label")
-        .text((d: any) => d.element);
+        graphNodes = nodeGroups
+          .append("circle")
+          .attr("class", "node")
+          .attr("r", 12);
+
+        nodeLabels = nodeGroups
+          .append("text")
+          .attr("class", "node-label")
+          .text((d: any) => d.element);
+
+        const drag = d3.drag<SVGCircleElement, any>()
+          .on("start", (event, d) => {
+            if (!event.active) simulation?.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+          })
+          .on("drag", (event, d) => {
+            d.fx = event.x;
+            d.fy = event.y;
+          })
+          .on("end", (event, d) => {
+            if (!event.active) simulation?.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+            if (onNodePositionChange) {
+              onNodePositionChange(nodes.map((n: any) => ({ id: n.id.toString(), x: n.x, y: n.y })));
+            }
+          });
+
+        nodeGroups.call(drag);
+
+      } else {
+        console.log("no nodelocation")
+        // Fallback to force simulation
+        simulation = d3.forceSimulation(nodes)
+          .force("link", d3.forceLink(filteredLinks)
+            .id((d: any) => d.id)
+            .distance(80))
+          .force("charge", d3.forceManyBody().strength(-200))
+          .force("center", d3.forceCenter((width - 2 * padding) / 2, (height - 2 * padding) / 2))
+          .force("x", d3.forceX((width - 2 * padding) / 2).strength(0.1))
+          .force("y", d3.forceY((height - 2 * padding) / 2).strength(0.1))
+          .on("end", () => {
+            if (onNodePositionChange) {
+              const positionMap: { [id: string]: { x: number; y: number } } = {};
+              nodes.forEach((node: any) => {
+                positionMap[node.id] = { x: node.x, y: node.y };
+              });
+              onNodePositionChange(nodes.map((n: any) => ({ id: n.id.toString(), x: n.x, y: n.y })));
+            }
+          });
+        
+        console.log("Using force simulation for node positions.");
+
+        graphLinks = graphSvg.append("g")
+          .selectAll("line")
+          .data(filteredLinks)
+          .enter()
+          .append("line")
+          .attr("class", "link");
+
+        nodeGroups = graphSvg.append("g")
+          .selectAll("g")
+          .data(nodes)
+          .enter()
+          .append("g");
+
+        graphNodes = nodeGroups
+          .append("circle")
+          .attr("class", "node")
+          .attr("r", 12);
+
+        nodeLabels = nodeGroups
+          .append("text")
+          .attr("class", "node-label")
+          .text((d: any) => d.element);
+
+        const drag = d3.drag<SVGCircleElement, any>()
+          .on("start", (event, d) => {
+            if (!event.active) simulation?.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+          })
+          .on("drag", (event, d) => {
+            d.fx = event.x;
+            d.fy = event.y;
+          })
+          .on("end", (event, d) => {
+            if (!event.active) simulation?.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+            if (onNodePositionChange) {
+              onNodePositionChange(nodes.map((n: any) => ({ id: n.id.toString(), x: n.x, y: n.y })));
+            }
+          });
+
+        nodeGroups.call(drag);
+
+        simulation.on("tick", () => {
+          graphLinks
+            .attr("x1", (d: any) => d.source.x)
+            .attr("y1", (d: any) => d.source.y)
+            .attr("x2", (d: any) => d.target.x)
+            .attr("y2", (d: any) => d.target.y)
+            .style("stroke", function (d: any) {
+                             return d.type === "aromatic" ? "purple" : "#aaa";
+                         });
+
+          nodeGroups
+            .attr("transform", (d: any) => `translate(${d.x},${d.y})`);
+        });
+      }
 
       const numNodes = nodes.length;
       const matrix = Array(numNodes).fill(null)
         .map(() => Array(numNodes).fill(0));
-
+      console.log("VAUWF",filteredLinks)
       filteredLinks.forEach((link: any) => {
         const sourceIndex = nodes.findIndex((n: any) => n.id === link.source.id);
         const targetIndex = nodes.findIndex((n: any) => n.id === link.target.id);
@@ -311,6 +448,7 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
       ) * 0.9;
 
       const matrixG = matrixSvg.append("g");
+      console.log("MATRIX", matrix)
 
       const rows = matrixG.selectAll("g")
         .data(matrix)
@@ -351,26 +489,15 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
         .attr("dominant-baseline", "middle")
         .text((d: any) => d.id);
 
-      simulation.on("tick", () => {
-        graphLinks
-          .attr("x1", (d: any) => d.source.x)
-          .attr("y1", (d: any) => d.source.y)
-          .attr("x2", (d: any) => d.target.x)
-          .attr("y2", (d: any) => d.target.y);
-
-        nodeGroups
-          .attr("transform", (d: any) => `translate(${d.x},${d.y})`);
-      });
-
       const highlightConnection = (event: any, d: any) => {
-        const isGraphNodeHover = event.currentTarget.tagName === "circle"; 
-        const isGraphEdgeHover = event.currentTarget.tagName === "line";   
+        const isGraphNodeHover = event.currentTarget.tagName === "circle";
+        const isGraphEdgeHover = event.currentTarget.tagName === "line";
       
         if (isGraphNodeHover) {
           const nodeId = d.id;
       
           graphNodes.classed("highlighted", (n: any) => n.id === nodeId);
-          graphLinks.classed("highlighted", false); 
+    
       
           matrixCells.classed("highlighted", (cell: any) => {
             const columnIndex = nodes.findIndex((n: any) => n.id === nodeId);
@@ -397,7 +524,7 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
             );
           });
         }
-      };      
+      };
 
       const highlightMatrixCell = (event: any, d: any) => {
         if (d.value === 0) return;
@@ -444,7 +571,7 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
       .attr("text-anchor", "middle")
       .text((d: any) => d.id)
       .on("mouseover", function (event, d) {
-        const index = nodes.indexOf(d);   
+        const index = nodes.indexOf(d);
         highlightMatrixLabel(index);
       })
       .on("mouseout", unhighlightAll);
@@ -461,7 +588,7 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
       .attr("dominant-baseline", "middle")
       .text((d: any) => d.id)
       .on("mouseover", function (event, d) {
-        const index = nodes.indexOf(d);   
+        const index = nodes.indexOf(d);
         highlightMatrixLabel(index);
       })
       .on("mouseout", unhighlightAll);
@@ -478,7 +605,7 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
     };
 
     loadData();
-  }, [dataFile, hubNodeA, hubNodeB, modelType, simulatedGraphData, sandboxMode]);
+  }, [dataFile, hubNodeA, hubNodeB, modelType, simulatedGraphData, sandboxMode, nodePositions]);
 
   return (
     <>

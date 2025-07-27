@@ -527,7 +527,8 @@ export function visualizeGraph(
     path: string,
     onComplete: () => void,
     isAttribute: boolean,
-    mode: number
+    mode: number,
+    nodePositions?: { id: string; x: number; y: number }[]
 ): Promise<void> {
     return new Promise<void>((resolve) => {
         const init = async (data: any) => {
@@ -585,8 +586,10 @@ export function visualizeGraph(
 
 
             data.nodes.forEach((node: any, i: number) => {
-
-                if (location[i.toString()]) {
+                if (nodePositions && nodePositions[node.id]) {
+                    node.x = nodePositions[node.id].x;
+                    node.y = nodePositions[node.id].y;
+                } else if (location[i.toString()]) {
                     node.x = location[i.toString()].x;
                     node.y = location[i.toString()].y;
                 } else {

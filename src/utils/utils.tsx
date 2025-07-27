@@ -758,10 +758,7 @@ export function featureVisualizer(
             nodes[i].matmulResults = calculatedDataMap[i]; 
             nodes[i].biases        = currentBias;
         }
-        
-
-
-
+    
 
         let xOffset = (graphIndex - 2.5) * offset;
         if (graphIndex >= 4 && mode === 0) {
@@ -888,8 +885,6 @@ export function featureVisualizer(
                         .style("stroke-width", 0.1)
                         .style("stroke", "grey")
                         .style("opacity", 1);
-
-
 
 
                 } else {
@@ -1058,7 +1053,7 @@ export function featureVisualizer(
                         currRectHeight = outputLayerRectHeight;
                         rectName = "output";
                     }
-                    let prevRectHeight = 3;
+                    let prevRectHeight = rectHeight;
                     let groupCentralHeight = currRectHeight * features.length / 2;
                     let yOffset = groupCentralHeight - (height / 5);
 

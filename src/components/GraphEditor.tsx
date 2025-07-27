@@ -8,15 +8,16 @@ import {
 type Position = { x: number; y: number };
 interface GraphEditorProps {
     onClose: () => void;
-    simGraphData: any; 
+    simGraphData: any;
     handleSimulatedGraphChange?: (value: any) => void;
+    onNodePositionsChange?: (nodePositions: { id: string; x: number; y: number }[]) => void;
 }
 
 export default function GraphEditor({
     onClose,
     simGraphData, 
     handleSimulatedGraphChange,
-
+    onNodePositionsChange,
 }: GraphEditorProps): JSX.Element {
     const [defaultPos, setDefaultPos] = useState<Position>({
         x: 200 / 2.2,
@@ -82,7 +83,7 @@ export default function GraphEditor({
                             .id((d: any) => d.id)
                             .distance(100)
                     )
-                    .force("charge", d3.forceManyBody())
+                    .force("charge", d3.forceManyBody().strength(-100))
                     .force("center", d3.forceCenter(width / 2, height / 2))
                     .on("tick", ticked);
 
@@ -267,6 +268,9 @@ export default function GraphEditor({
                                 return;
                             }
                         });
+                    if (onNodePositionsChange) {
+                        onNodePositionsChange(nodesRef.current.map(node => ({ id: node.id, x: node.x, y: node.y })));
+                    }
                 }
 
                 function drag(simulation: any) {
@@ -312,6 +316,9 @@ export default function GraphEditor({
                     nodesRef.current.push(newNode);
                     simulation.nodes(nodesRef.current);
                     simulation.alpha(0.5).restart();
+                    if (onNodePositionsChange) {
+                        onNodePositionsChange(nodesRef.current.map(node => ({ id: node.id, x: node.x, y: node.y })));
+                    }
                 }
 
                 const handleKeyDown = (e: KeyboardEvent) => {
@@ -361,6 +368,9 @@ export default function GraphEditor({
                         linkForce?.links(linksRef.current);
                         simulationRef.current?.nodes(nodesRef.current);
                         simulationRef.current?.alpha(0.5).restart();
+                        if (onNodePositionsChange) {
+                            onNodePositionsChange(nodesRef.current.map(node => ({ id: node.id, x: node.x, y: node.y })));
+                        }
                     }
                 };
 
@@ -382,7 +392,11 @@ export default function GraphEditor({
             sim.force(
                 "link",
                 d3.forceLink(linksRef.current).id((d: any) => d.id)
-            ).force("charge", d3.forceManyBody());
+                   
+                            .id((d: any) => d.id)
+                            .distance(100)
+                    
+            ).force("charge", d3.forceManyBody().strength(-100));
         }
 
         isRunningRef.current = !isRunningRef.current;

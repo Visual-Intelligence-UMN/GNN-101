@@ -9,7 +9,7 @@ import {
     state,
     transposeAnyMatrix,
 } from "./utils";
-import { roundToTwo } from "../components/WebUtils";
+import { roundToTwo, SandboxModeSelector } from "../components/WebUtils";
 import { drawHintLabel, loadWeights } from "./matHelperUtils";
 import * as math from "mathjs";
 import { create, all, matrix } from "mathjs";
@@ -292,7 +292,8 @@ export function outputVisualizer(
     rectWidth: number,
     convNum: number,
     originalSvg: any,
-    mode: number
+    mode: number,
+    sandBoxMode: boolean = false
 
 ) {
 
@@ -417,7 +418,7 @@ export function outputVisualizer(
 
 
     let startCoordList = [];
-    for (let i = 0; i < 64; i++) {
+    for (let i = 0; i < node.relatedNodes[0].features.length; i++) {
         let s: [number, number] = [
             node.x +
             prevRectHeight * i -
@@ -533,8 +534,12 @@ export function outputVisualizer(
     }
 
     const math = create(all, {});
-    const wMat = math.transpose(allWeights[3]);
+    let wMat = math.transpose(allWeights[3]);
+
     let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1], -1, rectHeight / 3, node.features.length, [wMat], 0);
+    console.log("DAWD", wMat, startCoordList)
+    // startCoordList = startCoordList.reverse()
+
 
 
     setTimeout(() => {
@@ -981,7 +986,8 @@ export function outputVisualizer(
             allWeights,
             g5,
             displayHeight,
-            mode
+            mode,
+            sandBoxMode
         );
         const matmulGroup = g5.append("g").attr("transform", `translate(0, -15)`);
         hoverOverHandler(node, node.relatedNodes[0].features, calculatedData, state, matmulGroup, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true);
@@ -1422,7 +1428,8 @@ export function calculationVisualizer(
     rectWidth: number,
     state: State,
     mode: number,
-    innerComputationMode: string
+    innerComputationMode: string,
+    sandboxMode: boolean = false
 ) {
 
 
@@ -2423,7 +2430,8 @@ export function calculationVisualizer(
                             weights,
                             g4,
                             displayHeight,
-                            mode
+                            mode,
+                            sandboxMode
                         );
                 
  
@@ -3012,7 +3020,8 @@ function weightAnimation(
     allWeights: number[][][],
     displayerSVG: any,
     displayerHeight: number,
-    mode: number
+    mode: number,
+    sandBoxMode: boolean = false
 ) {
 
 
@@ -3022,19 +3031,34 @@ function weightAnimation(
     }
 
     let i = 0;
+    let endNumber: number = weightsLocation[0].length
+    // if (mode === 0) {
+    //     if (!sandBoxMode) {
+    //         endNumber = 64;
+    //         if (node.graphIndex === 5) {
+    //             endNumber = 2;
+    //         }
+    //     } else {
+    //         endNumber = 16;
+    //         if (node.graphIndex === 5) {
+    //             endNumber = 2;
+    //         }
+    //     }
+    // }
+    // else if (mode === 1) {
+    //     if (!sandBoxMode) {
+    //         endNumber = 4
+    //     }
+    //     else {
+    //         endNumber = 16
+    //     }
+    //     if (node.graphIndex === 3) {  //need to alter
+    //         endNumber = 2
 
+    //     }
+    // }
 
-    let endNumber = 16;
-    if (node.graphIndex === 5) {
-        endNumber = 2;
-    }
-    if (mode === 1) {
-        endNumber = 16
-        if (node.graphIndex === 3) {  //need to alter
-            endNumber = 2
-
-        }
-    }
+    console.log("FAUE", endNumber)
     let temp = 0;
     if (mode === 1) {
         temp = 50
@@ -3230,7 +3254,9 @@ function weightAnimation(
                     setTimeout(() => {
               
    
-            
+                        let fix = 2.5
+                        if (mode === 2)
+                            fix = 3.5
 
                         d3.selectAll(".output")
                             .transition()
@@ -3239,7 +3265,7 @@ function weightAnimation(
                             .attr("opacity", 1)
                             .attr(
                                 "transform",
-                                `translate(${node.featureGroupLocation.xPos - 2.5 * offset + (moveOffset - node.features.length * rectHeight - node.relatedNodes[0].features.length *
+                                `translate(${node.featureGroupLocation.xPos - fix * offset + (moveOffset - node.features.length * rectHeight - node.relatedNodes[0].features.length *
                                     2 * prevRectHeight) - 180 + 12.5 - temp
                                 }, ${node.featureGroupLocation.yPos -
                                 height / 5 -
@@ -3488,7 +3514,8 @@ export function fcLayerCalculationVisualizer(
     rectHeight: number,
     convNum: number,
     originalSvg: any,
-    mode: number
+    mode: number,
+    sandBoxMode: boolean = false
 ) {
 
 
@@ -3835,7 +3862,8 @@ export function nodeOutputVisualizer(
     rectHeight: number,
     rectWidth: number,
     originalSvg: any,
-    mode: number
+    mode: number,
+    sandBoxMode: boolean = false
 
 ) {
 
@@ -3909,6 +3937,9 @@ export function nodeOutputVisualizer(
         ];
         startCoordList.push(s);
     }
+    // startCoordList = startCoordList.reverse()
+
+
     svg.append("text")
     .attr("class", "bias to-be-removed")
     .attr("x", (node.graphIndex - 2.5) * offset - 180)
@@ -4206,7 +4237,8 @@ export function nodeOutputVisualizer(
             allWeights,
             g5,
             displayHeight,
-            mode
+            mode,
+            sandBoxMode
         );
         hoverOverHandler(node, node.relatedNodes[0].features, calculatedData, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true)
         d3.selectAll(".displayer-group").attr("transform", `translate(${endCoordList[0][0]}, ${endCoordList[0][1] - 230}) scale(1.5)`);
