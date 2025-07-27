@@ -135,6 +135,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
         }
         console.log("location", location)
         data.nodes.forEach((node: any, i: number) => {
+          node.name = node.id
           if (sandBoxMode && nodePositions) {
             const editorNode = nodePositions[node.id];
             if (editorNode) {

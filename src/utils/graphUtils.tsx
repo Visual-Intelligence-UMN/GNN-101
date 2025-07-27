@@ -3896,11 +3896,11 @@ export function nodeOutputVisualizer(
     d3.selectAll(".node-features-Copy").style("visibility", "visible").lower();
 
     //color schemes interaction
-    let xPos = (node.graphIndex) * offset - 250;
+    let xPos = (node.graphIndex) * offset - 300;
     let yPos = node.y - 15
     let originalCoordinates = moveFeatures(
         node.relatedNodes,
-        xPos,
+        xPos - 200,
         yPos - 100
     );
     const featureGroupCopy = svg.append("g")
@@ -3918,8 +3918,10 @@ export function nodeOutputVisualizer(
 
     let temp = 350;
 
+
     let calculatedData: number[] = [];
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < node.features.length; i++) {
+        console.log("weights_l", weights, i, node.features.length)
         let data = 0;
         for (let j = 0; j < node.relatedNodes[0].features.length; j++) {
             data += weights[i][j] * node.relatedNodes[0].features[j];
@@ -3932,7 +3934,7 @@ export function nodeOutputVisualizer(
     for (let i = 0; i < 16; i++) { // need to make it adaptable
         let s: [number, number] = [
             xPos - temp - moveOffset
-            + prevRectHeight * i - 215,
+            + prevRectHeight * i - 415,
             node.y - 15,
         ];
         startCoordList.push(s);
@@ -3984,7 +3986,7 @@ export function nodeOutputVisualizer(
 
     let endCoordList = [];
 
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < node.features.length; i++) {
         let s: [number, number] = [xPos - moveOffset + 20 + i * rectHeight - temp, node.y - 15];
         endCoordList.push(s);
     }

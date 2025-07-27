@@ -555,6 +555,11 @@ export default function Home() {
                                                                   ]
                                                                 : "test-test"
                                                         }
+                                                        graph_path={
+                                                                graphList[
+                                                                    selectedGraph
+                                                                ]
+                                                            }
                                                         simulatedGraphData={
                                                             simGraphData
                                                         }

@@ -647,8 +647,11 @@ export function featureVisualizer(
             convNum = 5
         }
     } else {
-        ({ weights, bias } = loadSimulatedModelWeights());
-        if (mode === 1) {
+        if (mode === 0) {
+            ({ weights, bias } = loadSimulatedModelWeights());
+        }
+        else if (mode === 1) {
+            ({ weights, bias } = loadSimulatedModelWeights("node"))
             convNum = 5
         }
 
@@ -812,20 +815,13 @@ export function featureVisualizer(
                     .node(); // make the svgElement a DOM element (the original on method somehow doesn't work)
                 let name = "unknown";
 
+
                 if (mode === 1 && graphIndex === 4) {
 
-                    if (node.features[0] > 0.5) {
-                        name = "A"
-                    }
-                    if (node.features[1] > 0.5) {
-                        name = "B"
-                    }
-                    if (node.features[2] > 0.5) {
-                        name = "C"
-                    }
-                    if (node.features[3] > 0.5) {
-                        name = "D"
-                    }
+                    const classLabels = ["A", "B", "C", "D"];
+                    const maxIdx = findMaxIndex(node.features.map(Number));
+                    name = classLabels[maxIdx];
+                    console.log("Node class name:", name, node.features);
 
 
 
@@ -842,6 +838,9 @@ export function featureVisualizer(
                 }
          
                 else if (graphIndex === 0) {
+                    if (sandBoxMode) {
+                        node.name = node.id
+                    }
                     node.text = nodeGroup.append("text")
                         .attr("x", 0)
                         .attr("y", 0)
@@ -936,6 +935,7 @@ export function featureVisualizer(
                 if (graphIndex === 1) {
                     prevRectHeight = firstLayerRectHeight;
                     currMoveOffset = firstLayerMoveOffset
+
                 } else {
                     prevRectHeight = rectHeight;
                 }
@@ -1819,7 +1819,7 @@ console.log("model-output", session);
     console.log("model-input", session.inputNames); 
     const outputTensor = outputMap.final;
 
-    const resultArray: number[][] = splitArray(outputTensor.cpuData, 2);
+    const resultArray: number[][] = splitArray(outputTensor.cpuData, 4);
 
     let prob: number[][] = [];
 

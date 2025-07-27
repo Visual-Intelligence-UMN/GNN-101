@@ -1,8 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
+import { loadNodeWeights } from '@/utils/matHelperUtils';
+import { loadNodesLocation } from '@/utils/utils';
 
 interface GraphMatrixVisualizationProps {
   dataFile: string;
+  graph_path: string;
   hubNodeA?: number;
   hubNodeB?: number;
   modelType?: string;
@@ -18,6 +21,7 @@ const elementMap = {
 
 const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({ 
   dataFile, 
+  graph_path,
   hubNodeA, 
   hubNodeB,
   modelType,
@@ -28,6 +32,37 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   console.log("GraphMatrixVisualization props:", { dataFile, hubNodeA, hubNodeB, modelType, simulatedGraphData });
+  const parse = typeof graph_path === 'string' ? graph_path.match(/(\d+)\.json$/) : null;
+  let select = parse ? parse[1] : '';
+  
+  let mode: number = 0
+  if (modelType?.includes('link prediction')) {
+    console.log("THIS IS LINK MODE!!!")
+    mode = 2
+  }
+  if (modelType?.includes('node')) {
+    console.log("THIS IS NODE MODE!!!")
+    mode = 1
+    select = "0"
+  }
+  if (modelType?.includes('graph')) {
+    console.log("THIS IS GRAPH MODE!!!")
+    mode = 0
+  }
+
+  if (!sandboxMode) {
+    console.log("VNAUWN",mode, select)
+    const nodePositionsDic = loadNodesLocation(mode, select)
+    nodePositions = nodePositionsDic
+      ? Object.entries(nodePositionsDic).map(([id, pos]) => ({
+          id,
+          x: (pos as { x: number; y: number }).x - 1500,
+          y: (pos as { x: number; y: number }).y 
+        }))
+      : [];
+
+  }
+  console.log("BUAIWDGFUIAGFWUIGBFIWAYUH", nodePositions)
 
 
   const styles = `
@@ -213,7 +248,10 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
 
       const nodes = processedNodes.map((nodeId: number) => {
         let label = nodeId.toString();
-        if (!isTwitchData) {
+        if (sandboxMode || !modelType?.includes('node prediction')) {
+          label = nodeId.toString();
+        } else {if (!isTwitchData) {
+          console.log(sandboxMode, modelType, modelType?.includes('node prediction'))
           const features = data.x[nodeId];
           const idx = Array.isArray(features) ? features.indexOf(1) : -1;
           if (idx !== -1 && elementMap[idx as keyof typeof elementMap]) {
@@ -225,6 +263,7 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
             label = data.y[nodeId];
           }
         }
+      }
         return {
           id: nodeId,
           element: label,
@@ -274,7 +313,7 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
       let nodeGroups: any;
       let graphNodes: any;
       let nodeLabels: any;
-
+      console.log("AUEFJBHUIOABGHWFUIOGHAWUIFH", nodePositions, nodePositions && nodePositions.length > 0)
       if (nodePositions && nodePositions.length > 0) {
         console.log("nodelocation")
         nodes.forEach((node: any) => {
@@ -358,15 +397,7 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
           .force("center", d3.forceCenter((width - 2 * padding) / 2, (height - 2 * padding) / 2))
           .force("x", d3.forceX((width - 2 * padding) / 2).strength(0.1))
           .force("y", d3.forceY((height - 2 * padding) / 2).strength(0.1))
-          .on("end", () => {
-            if (onNodePositionChange) {
-              const positionMap: { [id: string]: { x: number; y: number } } = {};
-              nodes.forEach((node: any) => {
-                positionMap[node.id] = { x: node.x, y: node.y };
-              });
-              onNodePositionChange(nodes.map((n: any) => ({ id: n.id.toString(), x: n.x, y: n.y })));
-            }
-          });
+          ;
         
         console.log("Using force simulation for node positions.");
 
@@ -407,9 +438,6 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
             if (!event.active) simulation?.alphaTarget(0);
             d.fx = null;
             d.fy = null;
-            if (onNodePositionChange) {
-              onNodePositionChange(nodes.map((n: any) => ({ id: n.id.toString(), x: n.x, y: n.y })));
-            }
           });
 
         nodeGroups.call(drag);
@@ -426,13 +454,16 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
 
           nodeGroups
             .attr("transform", (d: any) => `translate(${d.x},${d.y})`);
+          
+          if (onNodePositionChange) {
+            onNodePositionChange(nodes.map((n: any) => ({ id: n.id.toString(), x: n.x, y: n.y })));
+          }
         });
       }
 
       const numNodes = nodes.length;
       const matrix = Array(numNodes).fill(null)
         .map(() => Array(numNodes).fill(0));
-      console.log("VAUWF",filteredLinks)
       filteredLinks.forEach((link: any) => {
         const sourceIndex = nodes.findIndex((n: any) => n.id === link.source.id);
         const targetIndex = nodes.findIndex((n: any) => n.id === link.target.id);
