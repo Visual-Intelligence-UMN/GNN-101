@@ -15,7 +15,7 @@ import {
     rotateMatrixCounterClockwise,
     transposeAnyMatrix,
 } from "./utils";
-import { drawHintLabel, drawMatrixValid, rotateMatrix } from "./matHelperUtils";
+import { drawHintLabel, drawMatrixValid, rotateAnyMatrix, rotateMatrix } from "./matHelperUtils";
 import { off } from "node:process";
 import { computeAttnStep } from "./computationUtils";
 import { removeDuplicatesFromSubarrays, removeDuplicateSubarrays } from "./graphDataUtils";
@@ -338,7 +338,10 @@ export function drawMatrixWeight(
     id: string = "tempath",
     mode: string = "normal"
 ) {
+    console.log("draw matrix weight", Xt, startCoordList);
     let flag = true;
+
+    
 
     if (
         Xt[0].length != Xt.length &&
@@ -357,6 +360,13 @@ export function drawMatrixWeight(
     //     const math = create(all, {});
     //     Xt = math.transpose(Xt);
     // }
+
+    console.log("draw matrix weight - Xt", Xt, weightMatrixPostions);
+
+    if(weightMatrixPostions.length == 2 && weightMatrixPostions[0].length == 16) {
+
+    }
+
     if (
         weightMatrixPostions.length == 4 &&
         weightMatrixPostions[0].length == 2
@@ -366,6 +376,8 @@ export function drawMatrixWeight(
     }
 
     // Xt = flipVertically(Xt);
+
+    // adjust matrix value alignment for simulated models
 
     //adjust matrix value alignment for GCNConv - square weight matri
     if (Xt[0].length == Xt.length) {
@@ -382,10 +394,22 @@ export function drawMatrixWeight(
         Xt = flipVertically(Xt);
         Xt = flipHorizontally(Xt);
     }
+    if (Xt.length == 5 && Xt[0].length == 16) {
+        Xt = rotateAnyMatrix(Xt);
+        
+    }
 
-    //drawMatrixValid(Xt, startCoordList[0][0], startCoordList[0][1]+20, 10, 10)
+    // if(Xt.length === 4 && Xt[0].length === 16){
+    //     Xt = rotateAnyMatrix(Xt);
+    // }
+
+    //drawMatrixValid(Xt, startCoordList[0][0], startCoordList[0][1]+20,\ 10, 10)
+
+    
 
     let Xv = Xt[currentStep];
+
+    console.log("draw matrix weight - Xv", Xt, Xv, weightMatrixPostions);
 
     for (let j = 0; j < Xv.length; j++) {
         let s1 = startCoordList[j];
@@ -397,28 +421,15 @@ export function drawMatrixWeight(
         }
 
         let m1 = [0, 0];
-        // if(flag){
-        //     m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
-
-        // }else{
-        //     m1 = weightMatrixPostions[currentStep][weightMatrixPostions[0].length-1-j];
-        // }
-
-        // if(Xt[0].length==64 && Xt.length==2){
-        //     m1 = weightMatrixPostions[currentStep][j];
-        // }else{
-        //     m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
-        // }
 
         let changed = false;
+
+        
 
         if (
             weightMatrixPostions.length == 4 &&
             weightMatrixPostions[0].length == 2
         ) {
-            // if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
-            // else m1 = weightMatrixPostions[j][currentStep]
-
             m1 =
                 weightMatrixPostions[weightMatrixPostions.length - 1 - j][
                 currentStep
@@ -431,9 +442,6 @@ export function drawMatrixWeight(
             weightMatrixPostions.length == 2 &&
             weightMatrixPostions[0].length == 4
         ) {
-            // if(curveDir==-1)m1 = weightMatrixPostions[j][currentStep]
-            // else m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
-
             m1 = weightMatrixPostions[j][currentStep];
 
             changed = true;
@@ -456,9 +464,6 @@ export function drawMatrixWeight(
             (Xt[0].length == 34 && Xt.length == 4) ||
             (Xt.length == 34 && Xt[0].length == 4)
         ) {
-            // if(curveDir==-1)m1 = weightMatrixPostions[weightMatrixPostions.length-1-j][currentStep]
-            // else m1 = weightMatrixPostions[j][currentStep]
-
             m1 =
                 weightMatrixPostions[weightMatrixPostions.length - 1 - j][
                 currentStep
@@ -479,6 +484,8 @@ export function drawMatrixWeight(
             console.log("signal 3", curveDir);
             changed = true;
         }
+
+        
 
         if (!changed) {
             if (
@@ -503,6 +510,45 @@ export function drawMatrixWeight(
 
                 console.log("signal 2");
             }
+        }
+
+        if(Xt.length == 16 && Xt[0].length == 5) {
+            console.log("signal 4");
+            if(curveDir == -1) {
+                m1 =
+                        weightMatrixPostions[weightMatrixPostions.length - 1 - j][currentStep];
+            } else {
+                m1 =
+                        weightMatrixPostions[
+                        weightMatrixPostions.length - 1 - j
+                        ][currentStep];
+            }
+        }
+
+        if(weightMatrixPostions.length == 16 && weightMatrixPostions[0].length == 2) {
+if (curveDir == -1) m1 = weightMatrixPostions[
+                        weightMatrixPostions.length - 1 - j
+                        ][currentStep];
+                else
+                    m1 = weightMatrixPostions[j][currentStep];
+console.log("signal 5");
+        }
+
+        if(weightMatrixPostions.length == 16 && weightMatrixPostions[0].length == 4){
+            console.log("inside aaa", weightMatrixPostions[currentStep])
+            console.log("signal 6");
+            
+if (curveDir == -1) {
+    m1 = weightMatrixPostions[
+                        j
+                        ][currentStep];
+                    console.log("signal 6-1");
+                    }
+                else
+                    {
+                        m1 = weightMatrixPostions[j][currentStep];
+                        console.log("signal 6-2");
+                    }
         }
 
         let controlPoint1 = [s1[0], m1[1]];
@@ -721,7 +767,6 @@ export function drawAttentions(
             if (d3.select(this).classed("attnTargetE")) {
                 jthIndexElement = lgIndices[ithIdx][1];
                 console.log("jthIndexElement", jthIndexElement, ithIdx, lgIndices);
-
             }
             drawEScoreEquation(lgIndices, eDisplayer, jthIndexElement, dX, dY, dstVector, srcVector, myColor, inputVector, layerID);
         });
@@ -1273,6 +1318,7 @@ export function drawWeightsVector(
     rectClass: string = "procVis removeRect wRect interactRect",
     labelName = `Matmul Result: ${dummy.length} x 1`
 ) {
+    console.log("draw matrix weight - 0", startCoordList);
     for (let m = 0; m < dummy.length; m++) {
         g.append("rect")
             .attr("x", coordFeatureVis[0] + rectW * m)
@@ -1429,6 +1475,11 @@ export function computeMatrixLocations(
 
     //if(weightMat[0].length>weightMat.length || weightMat[0].length<weightMat.length)weightMat = math.transpose(weights[layerID]);
 
+    if(weightMat.length == 16&& weightMat[0].length == 5){
+        weightMat = rotateAnyMatrix(weightMat);
+        console.log("inside compute pos weightMat", weightMat);
+    }
+
     for (let i = 0; i < weightMat.length; i++) {
         let tempArr = [];
         for (let j = 0; j < weightMat[i].length; j++) {
@@ -1474,6 +1525,7 @@ export function drawWeightMatrix(
     g: any,
     weightMatrixPostions: any
   ) {
+    console.log("inside weight matrix", weights);
     const len = weightMatrixPostions.length;
     let btnPt: [number, number] = [btnX + 10, btnY - 15];
     let wMatPt: [number, number] = [
@@ -1550,6 +1602,10 @@ export function drawWeightMatrix(
       weightMat = flipHorizontally(weightMat);
       weightMat = flipVertically(weightMat);
     }
+    if(weightMat.length == 16&& weightMat[0].length == 5){
+        weightMat = rotateAnyMatrix(weightMat);
+    }
+
   
     g.append("rect")
       .attr("class", "weight-matrix-frame to-be-removed procVis")

@@ -647,8 +647,11 @@ export function featureVisualizer(
             convNum = 5
         }
     } else {
-        ({ weights, bias } = loadSimulatedModelWeights());
-        if (mode === 1) {
+        if (mode === 0) {
+            ({ weights, bias } = loadSimulatedModelWeights());
+        }
+        else if (mode === 1) {
+            ({ weights, bias } = loadSimulatedModelWeights("node"))
             convNum = 5
         }
 
@@ -758,10 +761,7 @@ export function featureVisualizer(
             nodes[i].matmulResults = calculatedDataMap[i]; 
             nodes[i].biases        = currentBias;
         }
-        
-
-
-
+    
 
         let xOffset = (graphIndex - 2.5) * offset;
         if (graphIndex >= 4 && mode === 0) {
@@ -815,20 +815,13 @@ export function featureVisualizer(
                     .node(); // make the svgElement a DOM element (the original on method somehow doesn't work)
                 let name = "unknown";
 
+
                 if (mode === 1 && graphIndex === 4) {
 
-                    if (node.features[0] > 0.5) {
-                        name = "A"
-                    }
-                    if (node.features[1] > 0.5) {
-                        name = "B"
-                    }
-                    if (node.features[2] > 0.5) {
-                        name = "C"
-                    }
-                    if (node.features[3] > 0.5) {
-                        name = "D"
-                    }
+                    const classLabels = ["A", "B", "C", "D"];
+                    const maxIdx = findMaxIndex(node.features.map(Number));
+                    name = classLabels[maxIdx];
+                    console.log("Node class name:", name, node.features);
 
 
 
@@ -845,6 +838,9 @@ export function featureVisualizer(
                 }
          
                 else if (graphIndex === 0) {
+                    if (sandBoxMode) {
+                        node.name = node.id
+                    }
                     node.text = nodeGroup.append("text")
                         .attr("x", 0)
                         .attr("y", 0)
@@ -888,8 +884,6 @@ export function featureVisualizer(
                         .style("stroke-width", 0.1)
                         .style("stroke", "grey")
                         .style("opacity", 1);
-
-
 
 
                 } else {
@@ -941,6 +935,7 @@ export function featureVisualizer(
                 if (graphIndex === 1) {
                     prevRectHeight = firstLayerRectHeight;
                     currMoveOffset = firstLayerMoveOffset
+
                 } else {
                     prevRectHeight = rectHeight;
                 }
@@ -1010,10 +1005,10 @@ export function featureVisualizer(
 
                         if (mode === 1 && graphIndex === 4) {
                             console.log("into nodeoutputvis")
-                            nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, svg, mode)
+                            nodeOutputVisualizer(node, allNodes, weights, bias[3], g2, offset, convNum, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, svg, mode, sandBoxMode)
                         } else {
            
-                            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, allFeatureMap, svg, offset, height, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode);
+                            calculationVisualizer(node, allNodes, weights, currentBias, normalizedAdjMatrix, aggregatedDataMap, calculatedDataMap, allFeatureMap, svg, offset, height, convNum, currMoveOffset, prevRectHeight, rectHeight, rectWidth, state, mode, innerComputationMode, sandBoxMode);
                         };
 
 
@@ -1058,7 +1053,7 @@ export function featureVisualizer(
                         currRectHeight = outputLayerRectHeight;
                         rectName = "output";
                     }
-                    let prevRectHeight = 3;
+                    let prevRectHeight = rectHeight;
                     let groupCentralHeight = currRectHeight * features.length / 2;
                     let yOffset = groupCentralHeight - (height / 5);
 
@@ -1178,11 +1173,11 @@ export function featureVisualizer(
                         } // to make sure relatedNodes is not null
                         showFeature(node);
                         if (node.graphIndex === 4) {
-                            fcLayerCalculationVisualizer(node, allNodes, relatedNodes, offset, height, currMoveOffset, node.graphIndex, g2, state, currRectHeight, convNum, svg, mode);
+                            fcLayerCalculationVisualizer(node, allNodes, relatedNodes, offset, height, currMoveOffset, node.graphIndex, g2, state, currRectHeight, convNum, svg, mode, sandBoxMode);
                         }
                         if (node.graphIndex === 5) {
 
-                            outputVisualizer(node, allNodes, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, convNum, svg, mode)
+                            outputVisualizer(node, allNodes, weights, bias[3], g2, offset, state.isClicked, currMoveOffset, height, prevRectHeight, currRectHeight, rectWidth, convNum, svg, mode, sandBoxMode)
                         }
 
                         reduceNodeOpacity(allNodes, relatedNodes, node);
@@ -1811,12 +1806,12 @@ export const nodePrediction = async (
     }
 
     const batchTensor = new ort.Tensor(
-    "int64",
-    new BigInt64Array(graphData.batch.map(BigInt)),
-    [graphData.batch.length]
-);
+        "int64",
+        new BigInt64Array(graphData.batch.map(BigInt)),
+        [graphData.batch.length]
+    );
 
-console.log("model-input", session.inputNames); 
+console.log("model-output", session);
     const outputMap = await session.run({
         x: xTensor,
         edge_index: edgeIndexTensor
@@ -1824,7 +1819,7 @@ console.log("model-input", session.inputNames);
     console.log("model-input", session.inputNames); 
     const outputTensor = outputMap.final;
 
-    const resultArray: number[][] = splitArray(outputTensor.cpuData, 2);
+    const resultArray: number[][] = splitArray(outputTensor.cpuData, 4);
 
     let prob: number[][] = [];
 

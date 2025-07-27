@@ -31,6 +31,7 @@ interface NodeGraphVisualizerProps {
   onLoadComplete: () => void,
   simGraphData: any,
   sandBoxMode: boolean;
+  nodePositions?: { id: string; x: number; y: number }[];
 }
 
 const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
@@ -44,7 +45,8 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
   innerComputationMode,
   onLoadComplete,
   simGraphData,
-  sandBoxMode
+  sandBoxMode,
+  nodePositions
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -133,8 +135,17 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
         }
         console.log("location", location)
         data.nodes.forEach((node: any, i: number) => {
-
-          if (location[i.toString()]) {
+          node.name = node.id
+          if (sandBoxMode && nodePositions) {
+            const editorNode = nodePositions[node.id];
+            if (editorNode) {
+              node.x = editorNode.x + 1500;
+              node.y = editorNode.y;
+            } else {
+              node.x = Math.random() * width;
+              node.y = Math.random() * height;
+            }
+          } else if (location[i.toString()]) {
             node.x = location[i.toString()].x;
             node.y = location[i.toString()].y;
           } else {
@@ -241,7 +252,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
           }
           let feature_num_1: number = 4
           let feature_num_2: number = 2
-          let feature_num_3: number = 2
+          let feature_num_3: number = 4
           if (sandBoxMode) {
          
             feature_num_1 = 16
@@ -391,8 +402,21 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
 
             if (intmData && intmData.final) {
               console.log("the layer_num",i)
+              let firstLayerMoveOffset = 1100
+              let moveOffset = 700
+              let fcLayerMoveOffset = 800
+              let rectWidth = 15
+              let firstLayerRectHeight = 10
+              let rectHeight = 20
+              let outputLayerRectHeight = 20
+              if (sandBoxMode) {
+                firstLayerMoveOffset = 900
+                moveOffset = 1100
+                rectHeight = 12
 
-              featureVisualizer(svg, allNodes, offset, height, graphs, 1100, 600, 800, 15, 10, 20, 20, 1, innerComputationMode, sandBoxMode); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
+              }
+
+              featureVisualizer(svg, allNodes, offset, height, graphs, firstLayerMoveOffset, moveOffset, fcLayerMoveOffset, rectWidth, firstLayerRectHeight, rectHeight, outputLayerRectHeight, 1, innerComputationMode, sandBoxMode); // pass in the finaldata because nodeByIndex doesn't include nodes from the last layer
             }
 
           }
@@ -415,6 +439,7 @@ const NodeGraphVisualizer: React.FC<NodeGraphVisualizerProps> = ({
         await visualizeGraph(graph_path,() => {
           handleSimulationComplete(visualizationId)
           onLoadComplete();
+          nodePositions=nodePositions
         },false, 1);
       } else {
        await visualizeGNN(5);

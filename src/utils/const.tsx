@@ -31,9 +31,7 @@ export const midGraphNodeSelectionList = [
 ];
 
 export const twitchNodeSelectionList = [
-    194, 497, 567, 590, 1147, 1169, 1588, 1882, 
-    1906, 2369, 2779, 3649, 3728, 3797, 4591, 
-    4990, 5117, 6509
+148, 407, 79, 116, 994, 632, 71, 110, 420, 772, 394, 109, 241, 471
 ];
 
 export const nodeList: { [k: string]: string } = {
@@ -83,9 +81,9 @@ function graph_list_generate(namelist: string[]) {
     console.log("Generating graph list with chemical names:", res);
 
     return res;
-//    return {"test":"./json_data/graphs/testing_graph.json"};
 }
-export const graphList = graph_list_generate(chemicalNames)
+
+export const graphList = graph_list_generate(chemicalNames);
 
 export const MUTAG_INFO = <p>Each graph in the <a className={`underline ${inter3.className}`} href="https://huggingface.co/datasets/graphs-datasets/MUTAG" target="__blank">MUTAG dataset</a> represents a chemical compound. Nodes are atoms and edges are bonds between atoms.
     The task is to predict whether a molecule is mutagenic on Salmonella typhimuriumor or not (i.e., can cause genetic mutations in this bacterium or not).

@@ -82,6 +82,7 @@ export default function Home() {
     const [graphEditorState, setGraphEditorState] = useState(false);
 
     const [simGraphData, setSimGraphData] = useState({});
+    const [nodePositions, setNodePositions] = useState<any[]>([]);
     const [sandBoxMode, setSandBoxMode] = useState(true);
 
     const [hubNodeA, setHubNodeA] = useState(241);
@@ -114,6 +115,11 @@ export default function Home() {
         console.log("Simulated graph data updated:", value, simGraphData);
     };
 
+    const handleNodePositionsChange = (positions: { id: string; x: number; y: number }[]) => {
+        setNodePositions(positions);
+        console.log("Node positions updated:", positions);
+    };
+
     function handleGraphSelection(
         e: React.ChangeEvent<HTMLSelectElement>
     ): void {
@@ -124,7 +130,7 @@ export default function Home() {
         setSimulation(false);
     }
 
-    function handleGraphEditor(e: React.ChangeEvent<HTMLButtonElement>): void {
+    function handleGraphEditor(e: React.MouseEvent<HTMLButtonElement>): void {
         console.log("Graph editor button clicked");
         if (graphEditorState) {
             setGraphEditorState(false);
@@ -349,7 +355,7 @@ export default function Home() {
                                         <h1 className="text-3xl font-black min-w-48">
                                             Input Graph
                                         </h1>
-                                        <div className="m-1"> Sandbox Mode </div>
+                                        {!model.includes("link") && <div><div className="m-1"> Sandbox Mode </div>
                                                 <Selector
                                                     selectedOption={sandBoxMode ? "On" : "Off"}
                                                     handleChange={handleSandboxModeSelection}
@@ -365,7 +371,7 @@ export default function Home() {
                                             id="dataset-description"
                                         >
                                             {DatasetInfo[model]}
-                                        </div>}
+                                        </div>}</div>}
                                         <div className="flex-1 items-center gap-x-4 text-xl">
                                             <div className={inter3.className}>
                                                 {model.includes(
@@ -420,6 +426,9 @@ export default function Home() {
                                                             handleSimulatedGraphChange={
                                                                 handleSimulatedGraphChange
                                                             }
+                                                            onNodePositionsChange={
+                                                                handleNodePositionsChange
+                                                            }
                                                         />
                                                     </div>
                                                 )}
@@ -465,17 +474,6 @@ export default function Home() {
                                                             }
                                                             handleChange={
                                                                 handleNodeSelection
-                                                            }
-                                                        />
-                                                        <SandboxModeSelector
-                                                            sandBoxMode={
-                                                                sandBoxMode
-                                                            }
-                                                            handleSandboxModeSelection={
-                                                                handleSandboxModeSelection
-                                                            }
-                                                            handleGraphEditor={
-                                                                handleGraphEditor
                                                             }
                                                         />
                                                     </>
@@ -557,6 +555,11 @@ export default function Home() {
                                                                   ]
                                                                 : "test-test"
                                                         }
+                                                        graph_path={
+                                                                graphList[
+                                                                    selectedGraph
+                                                                ]
+                                                            }
                                                         simulatedGraphData={
                                                             simGraphData
                                                         }
@@ -576,6 +579,8 @@ export default function Home() {
                                                         }
                                                         modelType={model}
                                                         sandboxMode={sandBoxMode}
+                                                        nodePositions={nodePositions}
+                                                        onNodePositionChange={handleNodePositionsChange}
                                                     />
                                                 </div>
                                             </div>
@@ -677,6 +682,7 @@ export default function Home() {
                                                             sandBoxMode={
                                                                 sandBoxMode
                                                             }
+                                                            nodePositions={nodePositions}
                                                         />
                                                     ) : (
                                                         <MatricesVisualizer
@@ -743,6 +749,7 @@ export default function Home() {
                                                             sandBoxMode={
                                                                 sandBoxMode
                                                             }
+                                                            nodePositions={nodePositions}
                                                         />
                                                     ) : (
                                                         <NodeMatricesVisualizer

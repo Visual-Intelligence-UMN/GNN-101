@@ -162,7 +162,8 @@ async function initGraphClassifier(
     nodeAttrs: string[], 
     intmData:any, 
     graph_path:string,
-    dim: number
+    dim: number,
+    sandBoxMode:boolean
 )  {
     console.log("check intmdata", intmData);
     let colorSchemeTable: any = null;
@@ -244,7 +245,8 @@ async function initGraphClassifier(
         final,
         graph,
         adjList,
-        colorSchemeTable
+        colorSchemeTable,
+        sandBoxMode
     );
     drawNodeAttributes(nodeAttrs, graph, 150);
     
@@ -284,7 +286,15 @@ export async function visualizeGraphClassifier(
         const processedData = await graph_to_matrix(data);
         console.log("matvis pipe 3", features, nodeAttrs, processedData);
         // Initialize and run D3 visualization with processe  d data
-        await initGraphClassifier(processedData, features, nodeAttrs, intmData, graph_path, dim);
+        await initGraphClassifier(
+            processedData, 
+            features, 
+            nodeAttrs, 
+            intmData, 
+            graph_path, 
+            dim,
+            sandBoxMode
+        );
     } catch (error) {
         console.error("Error in visualizeGNN:", error);
     } finally {
@@ -305,7 +315,7 @@ export async function visualizeNodeClassifier(
         // Process data
         let data = simGraphData;
         if(!sandBoxMode) data = await load_json(graph_path);
-        let {weights, bias} = loadSimulatedModelWeights();
+        let {weights, bias} = loadSimulatedModelWeights("node");
         if(!sandBoxMode) {
             ({weights, bias} = loadNodeWeights());
             data = await load_json(graph_path);
@@ -318,6 +328,7 @@ export async function visualizeNodeClassifier(
             const dim = bias[i].length;
             dimensions.push(dim);
         }
+        console.log("dimensions", dimensions);
         const trainingNodes = [1, 5, 3];
         //accept the features from original json file
         const features = await get_features_origin(data);
