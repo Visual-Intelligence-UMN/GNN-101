@@ -18,7 +18,9 @@ export function graphVisDrawMatrixWeight(
     featureChannels: number,
     g: any,
     mode: number,
-    id:string = "tempath"
+    sandBoxMode: boolean,
+    id:string = "tempath",
+
 ){
     if (!g.selectAll) {
         g = d3.select(g)
@@ -37,7 +39,8 @@ export function graphVisDrawMatrixWeight(
         featureChannels,
         g,
         mode,
-        id
+        id,
+        sandBoxMode
     });
 
 
@@ -70,6 +73,11 @@ export function graphVisDrawMatrixWeight(
     }
     if (mode === 0 && node.graphIndex === 5) {
         Xt = flipHorizontally(Xt);
+        Xt = flipVertically(Xt);
+    }
+    console.log("GRAD", node.graphIndex, sandBoxMode)
+    if (sandBoxMode && node.graphIndex == 5) {
+        console.log("FLIP!")
         Xt = flipVertically(Xt);
     }
     
@@ -141,6 +149,7 @@ export function graphVisDrawMatrixWeight(
 
             changed = true;
         }
+        
 
         if(!changed){
             if((Xt[0].length<Xt.length && Xt.length!=64)||(Xt[0].length==64&&Xt.length==2)
@@ -206,11 +215,13 @@ export function graphVisDrawMatrixWeight(
 
 
 
-export function displayerHandler(node: any, aggregatedData: any, calculatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], i: number, mode: number, isOutput: boolean) {
+export function displayerHandler(node: any, aggregatedData: any, calculatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], i: number, mode: number, isOutput: boolean, sandboxMode: boolean = false) {
 
     if (!g.selectAll) {
         g = d3.selectAll(g);
     }
+
+
 
     
     const group = g.append("g")
@@ -231,6 +242,11 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
 
    
     let weightMat = weights[index];
+    console.log(sandboxMode, mode)
+    if (sandboxMode && mode === 0) {
+        console.log("DWABD")
+        weightMat = weightMat.slice().reverse().map((row: any) => row.slice().reverse());
+        }
     const math = create(all, {});
     weightMat = math.transpose(weightMat);
 
@@ -430,7 +446,7 @@ export function displayerHandler(node: any, aggregatedData: any, calculatedData:
 }
 
 
-export function hoverOverHandler(node: any, aggregatedData: any, calculatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], Xt: any, startCoordList: any, endCoordList: any, svg: any, mode: number, isOutput: boolean) {
+export function hoverOverHandler(node: any, aggregatedData: any, calculatedData: any, state: State, g: any, displayHeight: number, rectL: number, wmRectL: number, myColor: any, weights: number[][][], index: number, weightsLocation: number[][][], Xt: any, startCoordList: any, endCoordList: any, svg: any, mode: number, isOutput: boolean, sandBoxMode: boolean = false) {
     console.log("node feature length", node.features.length)
     for (let i = 0; i < calculatedData.length; i++) {
         d3.select(`.calculatedFeatures${i}`)
@@ -442,15 +458,15 @@ export function hoverOverHandler(node: any, aggregatedData: any, calculatedData:
                 if (mode === 1 && node.graphIndex === 4) {
      
                     
-                    graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, 1, i, myColor, weightsLocation, node.features.length, svg, mode)
+                    graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, 1, i, myColor, weightsLocation, node.features.length, svg, mode, sandBoxMode)
                 }
                 else {
-                    graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode)
+                    graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode, sandBoxMode)
                 }
                 d3.selectAll(".calculatedRect").style("opacity", 0.2)
                 d3.selectAll(`.calculatedFeatures${i}`).style("opacity", 1)
                 d3.selectAll(`#tempath${i}`).style("opacity", 1);
-                displayerHandler(node, aggregatedData, calculatedData, state, g, displayHeight, rectL, wmRectL, myColor, weights, index, weightsLocation, i, mode, isOutput)
+                displayerHandler(node, aggregatedData, calculatedData, state, g, displayHeight, rectL, wmRectL, myColor, weights, index, weightsLocation, i, mode, isOutput, sandBoxMode)
             })
             .on("mouseout", function () {
                 if (!state.isClicked || state.isPlaying || state.isAnimating) {
