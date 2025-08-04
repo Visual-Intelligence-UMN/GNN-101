@@ -273,6 +273,7 @@ export function matrix_to_hmap(data: number[][]) {
 
 //input a JSON file and transform it into a matrix representation of graph
 export async function graph_to_matrix(data: any) {
+    console.log("graph_to_matrix", data);
     //get the number of nodes
     const nodeCount = data.x.length;
     //tranformation process
@@ -284,6 +285,7 @@ export async function graph_to_matrix(data: any) {
 
         matrix[source][target] = 1;
     }
+    console.log("graph_to_matrix matrix", matrix);
 
     return matrix;
 }
@@ -1842,6 +1844,7 @@ console.log("model-output", session);
 }
 
 export function graphToAdjList(graph: any, addingSelfLoop = true) {
+    console.log("graphToAdjList", graph, addingSelfLoop);
     let adjList: number[][] = Array.from({ length: graph.length }, () => []);
     for (let i = 0; i < graph.length; i++) {
         //push itself to the linkMap
