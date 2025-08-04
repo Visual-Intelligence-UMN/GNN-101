@@ -309,6 +309,9 @@ export function outputVisualizer(
     }, 3000)
 
     let weights = allWeights[3];
+    // if (sandBoxMode) {
+    //     weights = weights.slice().reverse().map((row: any) => row.slice().reverse());
+    // }
     if (!svg.selectAll) {
         svg = d3.selectAll(svg);
     }
@@ -418,16 +421,30 @@ export function outputVisualizer(
 
 
     let startCoordList = [];
-    for (let i = 0; i < node.relatedNodes[0].features.length; i++) {
-        let s: [number, number] = [
-            node.x +
-            prevRectHeight * i -
-            offset -
-            moveOffset - temp + 855,
-            node.y - 15,
-        ];
-        startCoordList.push(s);
+    if (!sandBoxMode) {
+        for (let i = 0; i < node.relatedNodes[0].features.length; i++) {
+            let s: [number, number] = [
+                node.x +
+                prevRectHeight * i -
+                offset -
+                moveOffset - temp + 855,
+                node.y - 15,
+            ];
+            startCoordList.push(s);
+        }
+    } else {
+        for (let i = 0; i < node.relatedNodes[0].features.length; i++) {
+            let s: [number, number] = [
+                node.x -
+                prevRectHeight * i -
+                offset -
+                moveOffset - temp + 1040,
+                node.y - 15,
+            ];
+            startCoordList.push(s);
+        }
     }
+
 
     for (let i = 0; i < node.relatedNodes[0].features.length; i++) {
         const value = node.relatedNodes[0].features[i];
@@ -535,9 +552,12 @@ export function outputVisualizer(
 
     const math = create(all, {});
     let wMat = math.transpose(allWeights[3]);
+    if (sandBoxMode) {
+        wMat = wMat.slice().reverse().map((row: any) => row.slice().reverse());
+    }
+    
 
     let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 100, endCoordList[0][1], -1, rectHeight / 3, node.features.length, [wMat], 0);
-    console.log("DAWD", wMat, startCoordList)
     // startCoordList = startCoordList.reverse()
 
 
@@ -990,7 +1010,7 @@ export function outputVisualizer(
             sandBoxMode
         );
         const matmulGroup = g5.append("g").attr("transform", `translate(0, -15)`);
-        hoverOverHandler(node, node.relatedNodes[0].features, calculatedData, state, matmulGroup, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true);
+        hoverOverHandler(node, node.relatedNodes[0].features, calculatedData, state, matmulGroup, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true, sandBoxMode);
         d3.selectAll(".displayer-group").attr("transform", `translate(${endCoordList[0][0] - 90}, ${endCoordList[0][1] - 260}) scale(1.5)`);
 
         let start_x = node.x + 170 - temp;
@@ -1438,6 +1458,9 @@ export function calculationVisualizer(
     d3.selectAll(".graph-displayer").remove();
     showFeature(node);
     let currentWeights = weights[node.graphIndex - 1]
+    if (sandboxMode && mode === 0) {
+            currentWeights = currentWeights.slice().reverse().map((row: any) => row.slice().reverse());
+        }
 
 
     d3.select(".switchBtn").style("pointer-events", "none");
@@ -2960,7 +2983,7 @@ export function calculationVisualizer(
     
         
     
-        hoverOverHandler(node, aggregatedData, calculatedData, state, g4, displayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, weights, node.graphIndex - 1, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, false)          
+        hoverOverHandler(node, aggregatedData, calculatedData, state, g4, displayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, weights, node.graphIndex - 1, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, false, sandboxMode)          
     }, 6500)
     
 }
@@ -3029,6 +3052,7 @@ function weightAnimation(
         d3.selectAll(".to-be-removed").remove();
         return
     }
+
 
     let i = 0;
     let endNumber: number = weightsLocation[0].length
@@ -3150,7 +3174,10 @@ function weightAnimation(
     });
 
     const math = create(all, {});
-    let Xt = math.transpose(weights);
+    let Xt = weights
+    if (!sandBoxMode) {
+        Xt = math.transpose(weights);
+    } 
     if (node.graphIndex === 1) {
         Xt = math.transpose(Xt);
     }
@@ -3199,20 +3226,20 @@ function weightAnimation(
                 //     prevLayerFeatureLength,
                 //     state
                 // );
-                if (mode === 0 && node.graphIndex === 5 || mode === 1 && node.graphIndex === 4) {
+                if (mode === 0 && node.graphIndex === 5 || mode === 1 && node.graphIndex === 4 && !sandBoxMode) {
                     const math = create(all, {});
                     const wMat = math.transpose(allWeights[3]);
          
              
-                        displayerHandler(node, aggregatedData, calculatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, i, mode, true)
+                        displayerHandler(node, aggregatedData, calculatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, i, mode, true, sandBoxMode=sandBoxMode)
       
                 } else {
-                displayerHandler(node, aggregatedData, calculatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, allWeights, node.graphIndex - 1, weightsLocation, i, mode, false)
+                displayerHandler(node, aggregatedData, calculatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, allWeights, node.graphIndex - 1, weightsLocation, i, mode, false, sandBoxMode=sandBoxMode)
                 }
 
-
+                console.log("SAND", sandBoxMode)
                 
-                graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode = mode)
+                graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode, sandBoxMode)
 
                 d3.selectAll(`#columnGroup-${i - 1}`).style("opacity", 0.3).lower();
                 d3.selectAll(`#columnUnit-${i - 1}`).remove()
@@ -3582,6 +3609,10 @@ export function fcLayerCalculationVisualizer(
     let displayerWidth = 300; // Width of the graph-displayer
     let numRect = [];
     let ySpacing = 5; // Additional spacing for y direction
+    if (sandBoxMode) {
+
+        rectL = 100 / node.relatedNodes.length
+    }
 
     for (let i = 0; i < node.relatedNodes.length; i++) {
         let x =
@@ -3638,9 +3669,10 @@ export function fcLayerCalculationVisualizer(
             start_x =
                 3.5 * offset + n.features.length * rectHeight - offset - moveOffset + 135;
                 start_y = height / 20 + 100 + 45 * i - 7.5;
-                if (node.relatedNodes.length <= 8) {
+                if (node.relatedNodes.length <= 8 && !sandBoxMode) {
                     start_y = height / 5 + 100 + 45 * i - 7.5;
                 }
+
             const control1_x = start_x + (end_x - start_x) * 0.3;
             const control1_y = start_y;
             const control2_x = start_x + (end_x - start_x) * 0.7;
@@ -3866,6 +3898,7 @@ export function nodeOutputVisualizer(
     sandBoxMode: boolean = false
 
 ) {
+    buildDetailedViewArea((node.graphIndex - 2.5) * offset - 180, 0, 1000, 1000, svg)
 
     showFeature(node)
     let weights = allWeights[3]
@@ -3950,7 +3983,6 @@ export function nodeOutputVisualizer(
     .style("opacity", 0)
     .text(`Initial Vector^T: 1x${node.relatedNodes[0].features.length}`);
 
-    buildDetailedViewArea((node.graphIndex - 2.5) * offset - 180, 0, 1000, 1000, svg)
     const calculatedFeatureGroup = svg
         .append("g")
         .attr("transform", `translate(${xPos - temp - moveOffset}, ${node.y})`);
@@ -3991,7 +4023,10 @@ export function nodeOutputVisualizer(
         endCoordList.push(s);
     }
     const math = create(all, {});
-    const wMat = math.transpose(allWeights[3]);
+    let wMat = math.transpose(allWeights[3]);
+    if (sandBoxMode) {
+        wMat = wMat.slice().reverse().map((row: any) => row.slice().reverse());
+    }
 
     let weightsLocation = computeMatrixLocations(endCoordList[0][0] - 200, endCoordList[0][1], -1, 10, node.features.length, [wMat], 0);
 
@@ -4242,7 +4277,7 @@ export function nodeOutputVisualizer(
             mode,
             sandBoxMode
         );
-        hoverOverHandler(node, node.relatedNodes[0].features, calculatedData, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true)
+        hoverOverHandler(node, node.relatedNodes[0].features, calculatedData, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true, sandBoxMode)
         d3.selectAll(".displayer-group").attr("transform", `translate(${endCoordList[0][0]}, ${endCoordList[0][1] - 230}) scale(1.5)`);
 
 

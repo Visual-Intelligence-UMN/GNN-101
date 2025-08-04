@@ -261,6 +261,7 @@ export function featureVisMouseOver(
     colFrames: any,
     featureChannels: number
 ) {
+    console.log("check adjl", adjList);
 
     if (paths != null) {
 
