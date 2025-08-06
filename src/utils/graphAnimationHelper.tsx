@@ -75,12 +75,11 @@ export function graphVisDrawMatrixWeight(
         Xt = flipHorizontally(Xt);
         Xt = flipVertically(Xt);
     }
-    console.log("GRAD", node.graphIndex, sandBoxMode)
+    
     if (sandBoxMode && node.graphIndex == 5) {
         console.log("FLIP!")
         Xt = flipVertically(Xt);
     }
-    
     
 
     let Xv = Xt[currentStep];

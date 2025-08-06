@@ -1346,7 +1346,7 @@ export function outputVisualizer(
                     d3.selectAll(".columnGroup").remove();
                     d3.selectAll(".columnUnit").remove();
                     d3.selectAll(".to-be-removed").remove();
-            
+                    d3.selectAll(".button-group").remove()
                     d3.selectAll(".graph-displayer").remove();
                     moveFeaturesBack(node.relatedNodes, originalCoordinates);
                     node.featureGroup
@@ -2957,6 +2957,7 @@ export function calculationVisualizer(
             d3.selectAll(".parameter").remove();
             d3.selectAll(".to-be-removed").remove();
             d3.selectAll(".intermediate-path").remove();
+            d3.selectAll(".button-group").remove()
             handleClickEvent(svg, node, event, moveOffset, allNodes, convNum, mode, state);
     
 
@@ -3107,8 +3108,7 @@ function weightAnimation(
     .lower()
 
 
-    const btn = svg.append("g").attr("class", "button-group to-be-removed");
-
+    const btn = svg.append("g").attr("class", "button-group");
 
     let btnYOffset = 100;
     if (node.relatedNodes.length == 2) btnYOffset = 150;
@@ -3150,6 +3150,7 @@ function weightAnimation(
     })
 
     btn.on("click", function (event: any) {
+        console.log("CLICKED!!")
         if (isSwitched === 0) {
             
             
@@ -3193,7 +3194,7 @@ function weightAnimation(
         if (!state.isClicked || !state.isPlaying) {
             return;
         }
-        d3.selectAll(".bbox").style("pointer-events", "none");
+        // d3.selectAll(".bbox").style("pointer-events", "none");
 
         d3.selectAll(".columnGroup").style("opacity", 0.3).lower();
         d3.select(".weight-matrix-frame").style("opacity", 0)
@@ -3237,7 +3238,7 @@ function weightAnimation(
                 displayerHandler(node, aggregatedData, calculatedData, state, displayerSVG, displayerHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, allWeights, node.graphIndex - 1, weightsLocation, i, mode, false, sandBoxMode=sandBoxMode)
                 }
 
-                console.log("SAND", sandBoxMode)
+
                 
                 graphVisDrawMatrixWeight(node, Xt, startCoordList, endCoordList, -1, i, myColor, weightsLocation, node.features.length, svg, mode, sandBoxMode)
 
@@ -3252,6 +3253,7 @@ function weightAnimation(
 
 
                 if (i >= endNumber) {
+                    btn.raise()
         
 
  
@@ -3302,7 +3304,7 @@ function weightAnimation(
                     }, 500);
                     setTimeout(() => {
                         if (state.isAnimating) {
-                            d3.selectAll(".bbox").style("pointer-events", "none");
+                            // d3.selectAll(".bbox").style("pointer-events", "none");
                         } else {
                         
                         d3.selectAll(".bbox").style("pointer-events", "all");
@@ -3931,11 +3933,20 @@ export function nodeOutputVisualizer(
     //color schemes interaction
     let xPos = (node.graphIndex) * offset - 300;
     let yPos = node.y - 15
-    let originalCoordinates = moveFeatures(
-        node.relatedNodes,
-        xPos - 200,
-        yPos - 100
-    );
+    let originalCoordinates
+    if (sandBoxMode) {
+        originalCoordinates = moveFeatures(
+            node.relatedNodes,
+            xPos - 200,
+            yPos - 100
+        );
+    } else {
+        originalCoordinates = moveFeatures(
+            node.relatedNodes,
+            xPos,
+            yPos - 100
+        );
+    }
     const featureGroupCopy = svg.append("g")
         .attr("transform", `translate(${node.featureGroupLocation.xPos - 7.5}, ${node.featureGroupLocation.yPos})`);
 
@@ -3948,8 +3959,7 @@ export function nodeOutputVisualizer(
             "transform",
             `translate(${xPos - moveOffset}, ${yPos}) rotate(-90)`
         );
-
-    let temp = 350;
+    let temp = 350
 
 
     let calculatedData: number[] = [];
@@ -3964,10 +3974,17 @@ export function nodeOutputVisualizer(
 
 
     let startCoordList = [];
-    for (let i = 0; i < 16; i++) { // need to make it adaptable
+
+    for (let i = 0; i < node.relatedNodes[0].features.length; i++) { // need to make it adaptable
+        let ad
+        if (sandBoxMode) {
+            ad = 415
+        } else {
+            ad = 215
+        }
         let s: [number, number] = [
             xPos - temp - moveOffset
-            + prevRectHeight * i - 415,
+            + prevRectHeight * i - ad,
             node.y - 15,
         ];
         startCoordList.push(s);
@@ -4277,8 +4294,9 @@ export function nodeOutputVisualizer(
             mode,
             sandBoxMode
         );
+        
         hoverOverHandler(node, node.relatedNodes[0].features, calculatedData, state, g5, DisplayHeight, (32 / node.relatedNodes[0].features.length), (32 / node.relatedNodes[0].features.length), myColor, [wMat], 0, weightsLocation, Xt, startCoordList, endCoordList, svg, mode, true, sandBoxMode)
-        d3.selectAll(".displayer-group").attr("transform", `translate(${endCoordList[0][0]}, ${endCoordList[0][1] - 230}) scale(1.5)`);
+        d3.selectAll(".displayer-group").attr("transform", `translate(${endCoordList[0][0]}, ${endCoordList[0][1] - 230}) scale(1.5)`)
 
 
 
@@ -4398,6 +4416,8 @@ export function nodeOutputVisualizer(
             
 
     }, 2000);
+
+    
 
 
     /* ─────────────────────────  fixed constants  ───────────────────────── */
@@ -4590,6 +4610,7 @@ export function nodeOutputVisualizer(
                     d3.selectAll(".graph-displayer").remove();
                     d3.selectAll(".columnGroup").remove();
                     d3.selectAll(".columnUnit").remove();
+                    d3.selectAll(".p").remove()
                     moveFeaturesBack(node.relatedNodes, originalCoordinates);
                     node.featureGroup
                         .transition()
@@ -4602,6 +4623,7 @@ export function nodeOutputVisualizer(
                 
                 }
             });
+
 
     }, 5500)
     

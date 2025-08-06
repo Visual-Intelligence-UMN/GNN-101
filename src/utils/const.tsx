@@ -31,7 +31,7 @@ export const midGraphNodeSelectionList = [
 ];
 
 export const twitchNodeSelectionList = [
-148, 407, 79, 116, 994, 632, 71, 110, 420, 772, 394, 109, 241, 471
+ 317, 784, 203, 651, 50, 70, 297, 696, 623, 590, 194
 ];
 
 export const nodeList: { [k: string]: string } = {

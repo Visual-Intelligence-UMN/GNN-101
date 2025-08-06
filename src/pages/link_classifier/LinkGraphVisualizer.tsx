@@ -198,6 +198,7 @@ const LinkGraphVisualizer: React.FC<LinkVisualizerProps> = ({
 
 
                 data.nodes.forEach((node: any, i: number) => {
+
                     if (location[node.id]) {
                         node.x = location[node.id].x + offset;
                         node.y = location[node.id].y;

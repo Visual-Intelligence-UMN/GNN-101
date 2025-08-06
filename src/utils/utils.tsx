@@ -1892,14 +1892,14 @@ export function loadNodesLocation(mode: number, path: string) {
 export function fetchSubGraphNodeLocation(index: number, innerComputationMode: string) {
 
     let data;
-    //   if (innerComputationMode === "GAT" || innerComputationMode === "GCN") {
-    //     data = require("../../public/json_data/node_location/subGraphList.json")
-    //   } else {
-    //     data = require("../../public/json_data/node_location/subMidGraphList.json")
-    //   }
+    if (innerComputationMode === "GAT" || innerComputationMode === "GCN") {
+        data = require("../../public/json_data/node_location/subGraphList.json")
+      } else {
+        data = require("../../public/json_data/node_location/subMidGraphList.json")
+      }
     data = require("../../public/json_data/node_location/subMidGraphList.json")
 
-    return data[index];
+    return data[index]; //784
 }
 
 
