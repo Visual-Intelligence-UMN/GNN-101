@@ -23,6 +23,65 @@ export const formulaClass: { [k: string]: string[] } = {
     "formula_activation": ["relu-icon"]
 }
 
+export const formulaInterpretation: any = {
+    "formula_weights": {
+        "title": "Weight Matrix",
+        "text1": "A learnable weight matrix that transforms input features.",
+        "text2": "Each row corresponds to a node's features, and each column corresponds"
+    },
+    "formula_bias": {
+        "title": "Bias",
+        "text1": "A learnable bias vector added to the transformed features.",
+        "text2": "It helps the model to fit the data better by shifting the output."
+    },
+    "formula_x": {
+        "title": "Output Features",
+        "text1": "The output features of the GNN layer.",
+        "text2": "These are the transformed features after applying the weight matrix and bias."
+    },
+    "formula_summation": {
+        "GCN": {
+            "title": "GCN Aggregation",
+            "text1": "The summation of the features of the current node and its neighbors, ",
+            "text2": "multiplied with degree multipliers before multiply with weight matrix."
+        },
+        "GAT": {
+            "title": "GAT Aggregation",
+            "text1": "The summation of the features of the current node and its neighbors.",
+            "text2": "multiplied with attention scores before multiply with weight matrix."
+        },
+        "GraphSAGE": {
+            "title": "GraphSAGE Aggregation",
+            "text1": "The summation of the features of the current node and its neighbors,",
+            "text2": "with an user-defined aggregator(e.g., mean, max, LSTM)."
+        }
+    },
+    "formula_xj": {
+        "title": "Input Features",
+        "text1": "The features of the input nodes.",
+        "text2": "These are the features that are transformed by the weight matrix."
+    },
+    "formula_degree": {
+        "GCN": {
+            "title": "A Value from Degree Matrix",
+            "text1": "A value derived from the degree of the current node and its neighbors,where e_{i, j} = 1, ",
+            "text2": "d_i is the degree of current node, and d_j is the degree of a designated neighbor node."
+        },
+        "GAT": {
+            "title": "Attention Score",
+            "text1": "An attention mechanism that assigns different weights to different neighbors,",
+            "text2": "as a multiplier in the aggregation process of GAT."
+        }
+    },
+    "formula_activation": {
+        "title": "Activation Function",
+        "text1": "A non-linear function applied to the output features.",
+        "text2": "This introduces non-linearity to the model, allowing it to learn complex patterns."
+    }
+
+}
+
+
 export const formulaTextClass: { [k: string]: string[] } = {
     "formula_weights": ["weightMatrixText"],
     "formula_bias": ["biasText"],

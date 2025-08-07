@@ -902,9 +902,9 @@ export function drawActivationExplanation(
     y: number,
     title: string,
     formula: string,
-    description: string
+    description: string,
+    displayW: number = 320,
 ) {
-    let displayW = 320;
     let displayH = 100;
     let eqXOffset = 40;
     let eqYOffset = 55;
