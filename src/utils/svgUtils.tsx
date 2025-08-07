@@ -62,6 +62,7 @@ function formularInteractionHandler(x: number, y: number, g: any, class_name: st
         d3.selectAll(`.${class_name}`).style("opacity", 1)
 
 
+        console.log("mouseover-formulahandler", class_name, formulaClass[class_name], formulaTextClass[class_name])
 
         
         for (let i = 0; i < formulaClass[class_name].length; i ++) {

@@ -6,8 +6,19 @@ export const formulaClass: { [k: string]: string[] } = {
     "formula_weights": ["weight-matrix-frame", "columnGroup", "weight-matrix-text"],
     "formula_bias": ["biasFrame", "bias"],
     "formula_x": ["output", "outputFeature"],
-    "formula_summation": ["aggregatedFeatureGroup", "origin-to-aggregated", "summation", "parameter", "multiplier", "original-features", "inputFeature", "sampling"],
-    "formula_xj": ["original-features", "inputFeature"],
+    "formula_summation": [
+        "aggregatedFeatureGroup", 
+        "origin-to-aggregated", 
+        "summation", 
+        "parameter", 
+        "multiplier", 
+        "original-features", 
+        "inputFeature", 
+        "sampling",
+        "summation-rect",
+        "inputFeatureRect"
+    ],
+    "formula_xj": ["original-features", "inputFeature", "inputFeatureRect"],
     "formula_degree": ["multiplier", "origin-to-aggregated", "parameter", "attention"],
     "formula_activation": ["relu-icon"]
 }

@@ -215,7 +215,7 @@ export function drawEScoreEquation(
 
 
     const aTs = eDisplayer.append("g").attr("id", "ats").attr("class", "math-latex");
-    injectSVG(aTs, dX + 130 +offsetX+17, textH+20, "./assets/SVGs/a_t_s.svg", "math-latex");
+    injectSVG(aTs, dX + 130 +offsetX+17, textH, "./assets/SVGs/a_t_s.svg", "math-latex");
     
     const graphicsYOffset = -60;
 
@@ -266,7 +266,7 @@ export function drawEScoreEquation(
 
     
 
-    injectSVG(aTd, dX + 220 +offsetX+17, textH+20, "./assets/SVGs/a_t_d.svg", "math-latex");
+    injectSVG(aTd, dX + 220 +offsetX+17, textH, "./assets/SVGs/a_t_d.svg", "math-latex");
 
     
         
