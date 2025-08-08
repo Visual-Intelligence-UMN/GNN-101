@@ -909,7 +909,8 @@ export function drawSamplingAggregation(
                     y,
                     "Neighborhood Sampling",
                     "This notation indicate this node",
-                    " was removed during training stage."
+                    " was removed during training stage.",
+                    480
                 );
             });
 
