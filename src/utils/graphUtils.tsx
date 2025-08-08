@@ -2329,10 +2329,27 @@ export function calculationVisualizer(
                                 sampling,
                                 start_x - 55,
                                 start_y + 22,
-                                "Drop Out during Training Stage",
+                                "Removed from Sampling during Training Stage",
                                 "procVis to-be-removed sampling",
                                 "10px"
                             );
+                            sampling.on("mouseover", function (event: any, d: any) {
+                                            const [x, y] = d3.pointer(event);
+                            
+                                            //set-up the paramtere for the math displayer
+                                            drawActivationExplanation(
+                                                x,
+                                                y,
+                                                "Neighborhood Sampling",
+                                                "This notation indicate this node",
+                                                " was removed during training stage.",
+                                                480,
+                                                sampling
+                                            );
+                                        })
+                            sampling.on("mouseout", function () {
+                                            d3.selectAll(".math-displayer").remove();
+                                     });
 
 
                         }

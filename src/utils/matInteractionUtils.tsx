@@ -904,6 +904,7 @@ export function drawActivationExplanation(
     formula: string,
     description: string,
     displayW: number = 320,
+    g: any = null,
 ) {
     let displayH = 100;
     let eqXOffset = 40;
@@ -918,7 +919,12 @@ export function drawActivationExplanation(
     }
 
     //add displayer
-    d3.select(".mats")
+    const container = g ? g : d3.select(".mats");
+    
+
+
+
+    container
         .append("rect")
         .attr("x", displayX)
         .attr("y", displayY)
@@ -934,7 +940,7 @@ export function drawActivationExplanation(
 
     const titleYOffset = 20;
     const titleXOffset = 150;
-    d3.select(".mats")
+    container
         .append("text")
         .attr("x", displayX + titleXOffset)
         .attr("y", displayY + titleYOffset)
@@ -951,7 +957,7 @@ export function drawActivationExplanation(
 
         // formula: SVG vs text
         if (formula.endsWith(".svg")) {
-            const formulaGroup = d3.select(".mats")
+            const formulaGroup = container
                 .append("g")
                 .attr("class", "math-formula");
             injectSVG(
@@ -963,7 +969,7 @@ export function drawActivationExplanation(
             );
             
         } else {
-            d3.select(".mats")
+            container
                 .append("text")
                 .attr("x", displayX + eqXOffset)
                 .attr("y", displayY + eqYOffset)
@@ -975,7 +981,7 @@ export function drawActivationExplanation(
         }
     
     
-    d3.select(".mats")
+    container
         .append("text")
         .attr("x", displayX + eqXOffset)
         .attr("y", displayY + eqYOffset + 30)

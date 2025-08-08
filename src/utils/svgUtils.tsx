@@ -97,7 +97,8 @@ function formularInteractionHandler(
                             interpWindowTitle,
                             interpWindowText1,
                             interpWindowText2,
-                            960
+                            960,
+                            g
                         );
 
         console.log("mouseover-formulahandler", class_name, formulaClass[class_name], formulaTextClass[class_name])

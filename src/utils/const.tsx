@@ -26,8 +26,8 @@ export const formulaClass: { [k: string]: string[] } = {
 export const formulaInterpretation: any = {
     "formula_weights": {
         "title": "Weight Matrix",
-        "text1": "A learnable weight matrix that transforms input features.",
-        "text2": "Each row corresponds to a node's features, and each column corresponds"
+        "text1": "A learnable weight matrix that transforms input features",
+        "text2": "(same length as each column) to output features (same length as each row)"
     },
     "formula_bias": {
         "title": "Bias",
@@ -59,7 +59,7 @@ export const formulaInterpretation: any = {
     "formula_xj": {
         "title": "Input Features",
         "text1": "The features of the input nodes.",
-        "text2": "These are the features that are transformed by the weight matrix."
+        "text2": "These are the features that will be transformed by the weight matrix."
     },
     "formula_degree": {
         "GCN": {
