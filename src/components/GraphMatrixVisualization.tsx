@@ -62,7 +62,7 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
       : [];
 
   }
-  console.log("BUAIWDGFUIAGFWUIGBFIWAYUH", nodePositions)
+
 
 
   const styles = `

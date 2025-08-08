@@ -215,7 +215,7 @@ export function drawEScoreEquation(
 
 
     const aTs = eDisplayer.append("g").attr("id", "ats").attr("class", "math-latex");
-    injectSVG(aTs, dX + 130 +offsetX+17, textH+20, "./assets/SVGs/a_t_s.svg", "math-latex");
+    injectSVG(aTs, dX + 130 +offsetX+17, textH, "./assets/SVGs/a_t_s.svg", "math-latex");
     
     const graphicsYOffset = -60;
 
@@ -266,7 +266,7 @@ export function drawEScoreEquation(
 
     
 
-    injectSVG(aTd, dX + 220 +offsetX+17, textH+20, "./assets/SVGs/a_t_d.svg", "math-latex");
+    injectSVG(aTd, dX + 220 +offsetX+17, textH, "./assets/SVGs/a_t_d.svg", "math-latex");
 
     
         
@@ -902,9 +902,10 @@ export function drawActivationExplanation(
     y: number,
     title: string,
     formula: string,
-    description: string
+    description: string,
+    displayW: number = 320,
+    g: any = null,
 ) {
-    let displayW = 320;
     let displayH = 100;
     let eqXOffset = 40;
     let eqYOffset = 55;
@@ -918,7 +919,12 @@ export function drawActivationExplanation(
     }
 
     //add displayer
-    d3.select(".mats")
+    const container = g ? g : d3.select(".mats");
+    
+
+
+
+    container
         .append("rect")
         .attr("x", displayX)
         .attr("y", displayY)
@@ -934,7 +940,7 @@ export function drawActivationExplanation(
 
     const titleYOffset = 20;
     const titleXOffset = 150;
-    d3.select(".mats")
+    container
         .append("text")
         .attr("x", displayX + titleXOffset)
         .attr("y", displayY + titleYOffset)
@@ -951,7 +957,7 @@ export function drawActivationExplanation(
 
         // formula: SVG vs text
         if (formula.endsWith(".svg")) {
-            const formulaGroup = d3.select(".mats")
+            const formulaGroup = container
                 .append("g")
                 .attr("class", "math-formula");
             injectSVG(
@@ -963,7 +969,7 @@ export function drawActivationExplanation(
             );
             
         } else {
-            d3.select(".mats")
+            container
                 .append("text")
                 .attr("x", displayX + eqXOffset)
                 .attr("y", displayY + eqYOffset)
@@ -975,7 +981,7 @@ export function drawActivationExplanation(
         }
     
     
-    d3.select(".mats")
+    container
         .append("text")
         .attr("x", displayX + eqXOffset)
         .attr("y", displayY + eqYOffset + 30)
