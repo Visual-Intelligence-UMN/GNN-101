@@ -94,6 +94,17 @@ export function visualizeGraphClassifierFeatures(
     let matFrames: SVGElement[] = framePackage.matFrames; //a
 
     //-----------------------------------FIRST LAYER-----------------------------------------------
+    // Adjust vector size for sandbox mode in graph classifier
+    let graphFirstLayerRectW = 10;
+    let graphFirstLayerRectH = 15;
+    let graphFirstLayerGap = 100;
+    
+    if (sandboxMode) {
+        graphFirstLayerRectW = 15;  // 增大向量宽度
+        graphFirstLayerRectH = 22;  // 增大向量高度
+        graphFirstLayerGap = 130;   // 增大间隔
+    }
+    
     const firstLayerPackage = drawNodeFeatures(
         locations,
         graph,
@@ -103,9 +114,9 @@ export function visualizeGraphClassifierFeatures(
         schemeLocations,
         featureVisTable,
         features[0].length,
-        10,
-        15,
-        100
+        graphFirstLayerRectW,
+        graphFirstLayerRectH,
+        graphFirstLayerGap
     );
     //updated variables
     locations = firstLayerPackage.locations;
@@ -436,6 +447,17 @@ export function visualizeNodeClassifierFeatures(
     let matFrames: SVGElement[] = framePackage.matFrames; //a
 
     //-----------------------------------FIRST LAYER-----------------------------------------------
+    // Adjust vector size for sandbox mode
+    let firstLayerRectW = 5;
+    let firstLayerRectH = 15;
+    let firstLayerGap = 150;
+    
+    if (sandBoxMode) {
+        firstLayerRectW = 12;  // 增大向量宽度
+        firstLayerRectH = 25;  // 增大向量高度
+        firstLayerGap = 200;   // 增大间隔
+    }
+    
     const firstLayerPackage = drawNodeFeatures(
         locations,
         graph,
@@ -445,9 +467,9 @@ export function visualizeNodeClassifierFeatures(
         schemeLocations,
         featureVisTable,
         features[0].length,
-        5,
-        15,
-        150
+        firstLayerRectW,
+        firstLayerRectH,
+        firstLayerGap
     );
     //updated variables
     locations = firstLayerPackage.locations;
