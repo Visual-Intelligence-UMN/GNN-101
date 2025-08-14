@@ -1186,11 +1186,13 @@ export function drawSummationFeature(
     //draw label
     const dim = X.length;
   
-    //draw label
+    //draw label  
+    // Place label below the vector instead of above
+    const labelY = coordFeatureVis[1] + rectH + 25; // 放到向量下方
     drawHintLabel(
       g1,
-      coordFeatureVis[0],
-      coordFeatureVis[1] + rectH * curveDir * 1.1,
+      coordFeatureVis[0] - 60,  // 再向左移动更多
+      labelY,
       `Vector Summation^T: 1 x ${dim}`,
       "procVis"
     );
@@ -1369,8 +1371,8 @@ export function drawWeightsVector(
     }
     drawHintLabel(
         g,
-        coordFeatureVis[0],
-        coordFeatureVis[1] + rectH + 6,
+        coordFeatureVis[0] - 10,   // 稍微向左对齐
+        coordFeatureVis[1] + rectH/2 + 15,  // 紧贴组件下方，但不重合
         labelName,
         "procVis"
     );
@@ -1463,9 +1465,9 @@ export function computeMatrixLocations(
     layerID: number
 ) {
     //draw weight matrix
-    //positioning
-    let offsetH = -1 * 50;
-    if (curveDir == 1) offsetH = 60 + weights[layerID].length * rectW;
+    //positioning - increase distance between components
+    let offsetH = -1 * 80;  // 增加间距从50到80
+    if (curveDir == 1) offsetH = 90 + weights[layerID].length * rectW;  // 增加间距从60到90
     const math = create(all, {});
     const matX = btnX;
     const matY = btnY - offsetH;
@@ -1620,8 +1622,8 @@ export function drawWeightMatrix(
   
     drawHintLabel(
       g,
-      weightMatrixPostions[0][0][0],
-      weightMatrixPostions[0][0][1] - 12,
+      weightMatrixPostions[0][0][0] - 10,   // 稍微向左对齐
+      weightMatrixPostions[weightMatrixPostions.length - 1][0][1] + rectW + 20,   // 放到矩阵下方
       `Weight Matrix: ${dimY} x ${dimX}`,
       "procVis weightMatrixText to-be-removed"
     );
@@ -1839,8 +1841,8 @@ export function drawWeightMatrix(
     
     drawHintLabel(
         g,
-        coordFeatureVis[0],
-        coordFeatureVis[1] + rectH + 6,
+        coordFeatureVis[0] - 10,   // 稍微向左对齐
+        coordFeatureVis[1] + rectH/2 + 15,  // 紧贴组件下方，但不重合
         `Bias Vector: ${layerBias.length} x 1`,
         "procVis biasFrame"
     );
