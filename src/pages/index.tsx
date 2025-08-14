@@ -578,7 +578,7 @@ export default function Home() {
                                                                 : undefined
                                                         }
                                                         modelType={model}
-                                                        sandboxMode={sandBoxMode}
+                                                        sandboxMode={model.includes('link prediction') ? false : sandBoxMode}
                                                         nodePositions={nodePositions}
                                                         onNodePositionChange={handleNodePositionsChange}
                                                     />
