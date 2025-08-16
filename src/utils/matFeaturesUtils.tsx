@@ -119,7 +119,7 @@ export function drawCrossConnection(
 
     let alocations = deepClone(locations);
     for (let i = 0; i < alocations.length; i++) {
-        alocations[i][0] += firstVisSize;
+        alocations[i][0] += firstVisSize + 10;
         alocations[i][1] += rectH / 2;
     }
 
@@ -846,7 +846,7 @@ export function drawGCNConvGraphModel(
             paths = drawCrossConnection(
                 graph,
                 locations,
-                (featureChannels-2) * rectW,
+                featureChannels * rectW,
                 connectionGap,
                 k + 1
             );
@@ -1356,7 +1356,7 @@ export function drawPoolingVis(
         (locations[locations.length - 1][1] - locations[0][1]) / 2 + 150;
     //all paths should connect to mid point
     let poolingOffset = 150;
-    const one = [[locations[0][0] + poolingOffset, midY + 2]];
+    const one = [[locations[0][0] + poolingOffset - 50, midY + 2]];
     //drawPoints(".mats", "red", one);
     //draw the pooling layer
 
@@ -1714,7 +1714,7 @@ export function drawTwoLayers(one: any, final: any, myColor: any, featureChannel
     let rectH = 22;
     let rectW = 15;
     //find the next position
-    let finalLayerOffset = 150;
+    let finalLayerOffset = 100;
     one[0][0] += featureChannels * rectW + finalLayerOffset;
     let aOne = deepClone(one);
     one[0][1] -= rectH / 2;
