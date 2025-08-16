@@ -1084,7 +1084,7 @@ export function outputVisClick(
 
     //locations calculation
     //find the next position
-    one[0][0] += 350;
+    one[0][0] += 420;
     let aOne = deepClone(one);
     //locations for paths' starting points
     let startCoord = [];
