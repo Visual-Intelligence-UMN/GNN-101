@@ -94,10 +94,15 @@ export function visualizeGraphClassifierFeatures(
     let matFrames: SVGElement[] = framePackage.matFrames; //a
 
     //-----------------------------------FIRST LAYER-----------------------------------------------
-    // Force larger vector sizes for first layer
-    let graphFirstLayerRectW = 15;
-    let graphFirstLayerRectH = 22;
-    let graphFirstLayerGap = 130;
+    // Conditional vector sizes for first layer based on sandbox mode
+    let graphFirstLayerRectW = 5;
+    let graphFirstLayerRectH = 15;
+    let graphFirstLayerGap = 100;
+    if (sandboxMode) {
+        graphFirstLayerRectW = 15;
+        graphFirstLayerRectH = 22;
+        graphFirstLayerGap = 130;
+    }
     
     const firstLayerPackage = drawNodeFeatures(
         locations,
@@ -210,7 +215,9 @@ export function visualizeGraphClassifierFeatures(
                 featureChannels,
                 100,
                 [],
-                sandboxMode
+                sandboxMode,
+                "normal",
+                graphFirstLayerRectW
             );
             //update variables
             dview = recoverPackage.dview;
@@ -451,10 +458,15 @@ export function visualizeNodeClassifierFeatures(
     let matFrames: SVGElement[] = framePackage.matFrames; //a
 
     //-----------------------------------FIRST LAYER-----------------------------------------------
-    // Force larger vector sizes for first layer
-    let firstLayerRectW = 12;
-    let firstLayerRectH = 25;
-    let firstLayerGap = 200;
+    // Conditional vector sizes for first layer based on sandbox mode
+    let firstLayerRectW = 5;
+    let firstLayerRectH = 15;
+    let firstLayerGap = 90;
+    if (sandBoxMode) {
+        firstLayerRectW = 12;
+        firstLayerRectH = 25;
+        firstLayerGap = 200;
+    }
     
     const firstLayerPackage = drawNodeFeatures(
         locations,
@@ -623,7 +635,9 @@ export function visualizeNodeClassifierFeatures(
                 featureChannels,
                 90,
                 resultLabelsList,
-                sandBoxMode,"node"
+                sandBoxMode,
+                "node",
+                firstLayerRectW
             );
             //update variables
             dview = recoverPackage.dview;
@@ -1381,7 +1395,9 @@ export function visualizeLinkClassifierFeatures(
                 featureChannels,
                 90,
                 [],
-                true
+                true,
+                "normal",
+                5
             );
             //update variables
             dview = recoverPackage.dview;

@@ -123,7 +123,8 @@ export function detailedViewRecovery(
     gap:number,
     resultLabelsList:any,
     sandBoxMode: boolean,
-    task:string = "normal"
+    task:string = "normal",
+    rectW: number = 15
 ) {
     //remove temp classes
     d3.select(".switchBtn").style("pointer-events", "auto");
@@ -165,7 +166,7 @@ export function detailedViewRecovery(
         else if (recordLayerID >= 0) {
             translateLayers(
                 recordLayerID,
-                -((gap+2) * 3 + 15 * featureChannels * 2 + 100)
+                -((gap+2) * 3 + rectW * featureChannels * 2 + 100)
             );
             recordLayerID = -1;
         }

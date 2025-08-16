@@ -113,9 +113,9 @@ export function drawCrossConnection(
     locations: any,
     firstVisSize: number,
     gapSize: number,
-    layerID: number
+    layerID: number,
+    rectH: number = 22
 ) {
-    const rectH = 22;
 
     let alocations = deepClone(locations);
     for (let i = 0; i < alocations.length; i++) {
@@ -313,7 +313,7 @@ export function drawNodeFeatures(
         if (rectW > 10) {
             adjustedGap = gap + (rectW - 5) * featureChannels -5; 
         }
-        drawCrossConnection(graph, locations, featureChannels * rectW, adjustedGap, 0);
+        drawCrossConnection(graph, locations, featureChannels * rectW, adjustedGap, 0, rectH);
     }
 
     //using locations to find the positions for first feature visualizers
@@ -789,9 +789,13 @@ export function drawGCNConvGraphModel(
 
 
     for (let k = 0; k < 3; k++) {
-        // Force larger vector sizes for all GCNConv layers to match first layer
-        let rectH = 22;
-        let rectW = 15;
+        // Conditional vector sizes based on sandbox mode
+        let rectH = 15;
+        let rectW = 5;
+        if (sandboxMode) {
+            rectH = 22;
+            rectW = 15;
+        }
 
         const layer = d3
             .select(".mats")
@@ -803,7 +807,12 @@ export function drawGCNConvGraphModel(
                 let layerGap = 150;
                 locations[i][0] += rectW * featureChannels + layerGap;
             } else {
-                locations[i][0] += 7 * rectW + 100 + 25;
+                // Adjust GCNConv1 position based on sandbox mode
+                let firstLayerOffset = 7 * rectW + 100 + 25;
+                if (!sandboxMode) {
+                    firstLayerOffset += -15; // Additional offset for non-sandbox mode
+                }
+                locations[i][0] += firstLayerOffset;
             }
         }
 
@@ -848,7 +857,8 @@ export function drawGCNConvGraphModel(
                 locations,
                 featureChannels * rectW,
                 connectionGap,
-                k + 1
+                k + 1,
+                rectH
             );
 
         } else {
@@ -992,9 +1002,13 @@ export function drawGCNConvNodeModel(
 
     let resultLabelsList: any;
     for (let k = 0; k < 3; k++) {
-        // Force larger vector sizes for all GCNConv layers to match first layer
-        let rectH = 25;
-        let rectW = 12;
+        // Conditional vector sizes based on sandbox mode
+        let rectH = 15;
+        let rectW = 10;
+        if (sandBoxMode) {
+            rectH = 25;
+            rectW = 12;
+        }
         const layer = d3
             .select(".mats")
             .append("g")
@@ -1005,8 +1019,12 @@ export function drawGCNConvNodeModel(
                 let layerGap = 200;
                 locations[i][0] += rectW * featureChannels + layerGap;
             } else {
-                
-                locations[i][0] += 7 * rectW + 100 + 25;
+                // Adjust GCNConv1 position based on sandbox mode
+                let firstLayerOffset = 7 * rectW + 100 + 25;
+                if (!sandBoxMode) {
+                    firstLayerOffset += 85; // Additional offset for non-sandbox mode
+                }
+                locations[i][0] += firstLayerOffset;
             }
         }
 
@@ -1059,7 +1077,8 @@ export function drawGCNConvNodeModel(
                 locations,
                 (featureChannels) * rectW,
                 152,
-                k + 1
+                k + 1,
+                rectH
             );
 
         } else {
@@ -1343,9 +1362,13 @@ export function drawPoolingVis(
 
     let poolingFrame:any = null;
 
-    // Force larger vector sizes to match other layers
-    let rectH = 22;
-    let rectW = 15;
+    // Conditional vector sizes based on sandbox mode
+    let rectH = 15;
+    let rectW = 5;
+    if (sandboxMode) {
+        rectH = 22;
+        rectW = 15;
+    }
     let oLocations = deepClone(locations);
     //find edge points
     locations[0][0] += featureChannels * rectW;
@@ -1710,9 +1733,13 @@ export function drawPoolingVis(
 
 //the function to draw the last two layers of the model
 export function drawTwoLayers(one: any, final: any, myColor: any, featureChannels: number, sandboxMode: boolean = false) {
-    // Force larger vector sizes to match other layers
-    let rectH = 22;
-    let rectW = 15;
+    // Conditional vector sizes based on sandbox mode
+    let rectH = 15;
+    let rectW = 5;
+    if (sandboxMode) {
+        rectH = 22;
+        rectW = 15;
+    }
     //find the next position
     let finalLayerOffset = 100;
     one[0][0] += featureChannels * rectW + finalLayerOffset;
