@@ -165,7 +165,7 @@ export function detailedViewRecovery(
         else if (recordLayerID >= 0) {
             translateLayers(
                 recordLayerID,
-                -((gap+2) * 3 + 5 * featureChannels * 2)
+                -((gap+2) * 3 + 15 * featureChannels * 2 + 100)
             );
             recordLayerID = -1;
         }
@@ -459,7 +459,7 @@ export function featureVisClick(
     // const rectW = 5;
     const rectW7 = 10;
 
-    translateLayers(layerID, (gap+2) * 3 + 5 * featureChannels * 2);
+    translateLayers(layerID, (gap+2) * 3 + rectW * featureChannels * 2 + 100);
     //record the layerID
     recordLayerID = layerID;
 
@@ -595,7 +595,7 @@ export function featureVisClick(
 
     //draw paths from intermediate result -> final result
     const layerBias = bias[layerID];
-    coordFeatureVis2[1] += curveDir * 50;
+    coordFeatureVis2[1] += curveDir * 80;  // 增加垂直间距从50到80
     matrixMultiplicationResults.bias[node] = layerBias;
 
     let coordFeatureVis2Copy = deepClone(coordFeatureVis2);
@@ -608,7 +608,7 @@ export function featureVisClick(
     //draw paths from WMVisualizer and Bias Visualizer to final output
     const wmCoord: [number, number] = [
         coordFeatureVis2[0] + rectW * featureChannels,
-        coordFeatureVis2[1] - curveDir * 50,
+        coordFeatureVis2[1] - curveDir * 80,  // 增加垂直间距从50到80
     ];
     biasCoord = [
         coordFeatureVis2Copy[0] + rectW * featureChannels,
@@ -623,7 +623,7 @@ export function featureVisClick(
         rectW,
         oRectW
     );
-    nextCoord = [c[0] + (gap+2) * 3 + rectW * featureChannels * 2 + (gap+2), c[1]];
+    nextCoord = [c[0] + (gap+2) * 3 + rectW * featureChannels * 2 + (gap+2) + 160, c[1]];
 
     //adjustment based on cases
     if(featureChannels==4)nextCoord[0]+=15;
@@ -1464,7 +1464,7 @@ export function featureGATClick(
     // const rectW = 5;
     const rectW7 = 10;
 
-    translateLayers(layerID, (gap+2) * 3 + 5 * featureChannels * 2);
+    translateLayers(layerID, (gap+2) * 3 + rectW * featureChannels * 2 + 100);
     //record the layerID
     recordLayerID = layerID;
 
@@ -1621,7 +1621,7 @@ export function featureGATClick(
 
     //draw paths from intermediate result -> final result
     const layerBias = bias[layerID];
-    coordFeatureVis2[1] += curveDir * 50;
+    coordFeatureVis2[1] += curveDir * 80;  // 增加垂直间距从50到80
 
     let coordFeatureVis2Copy = deepClone(coordFeatureVis2);
 
@@ -1633,7 +1633,7 @@ export function featureGATClick(
     //draw paths from WMVisualizer and Bias Visualizer to final output
     const wmCoord: [number, number] = [
         coordFeatureVis2[0] + rectW * featureChannels,
-        coordFeatureVis2[1] - curveDir * 50,
+        coordFeatureVis2[1] - curveDir * 80,  // 增加垂直间距从50到80
     ];
     biasCoord = [
         coordFeatureVis2Copy[0] + rectW * featureChannels,
@@ -1648,7 +1648,7 @@ export function featureGATClick(
         rectW,
         oRectW
     );
-    nextCoord = [c[0] + (gap+2) * 3 + rectW * featureChannels * 2 + (gap+2), c[1]];
+    nextCoord = [c[0] + (gap+2) * 3 + rectW * featureChannels * 2 + (gap+2) + 80, c[1]];
 
     //adjustment based on cases
     if(featureChannels==4)nextCoord[0]+=15;
@@ -2029,7 +2029,7 @@ export function featureSAGEClick(
     // const rectW = 5;
     const rectW7 = 10;
 
-    translateLayers(layerID, (gap+2) * 3 + 5 * featureChannels * 2);
+    translateLayers(layerID, (gap+2) * 3 + rectW * featureChannels * 2 + 100);
     //record the layerID
     recordLayerID = layerID;
 
@@ -2166,7 +2166,7 @@ export function featureSAGEClick(
 
     //draw paths from intermediate result -> final result
     const layerBias = bias[layerID];
-    coordFeatureVis2[1] += curveDir * 50;
+    coordFeatureVis2[1] += curveDir * 80;  // 增加垂直间距从50到80
 
     let coordFeatureVis2Copy = deepClone(coordFeatureVis2);
 
@@ -2178,7 +2178,7 @@ export function featureSAGEClick(
     //draw paths from WMVisualizer and Bias Visualizer to final output
     const wmCoord: [number, number] = [
         coordFeatureVis2[0] + rectW * featureChannels,
-        coordFeatureVis2[1] - curveDir * 50,
+        coordFeatureVis2[1] - curveDir * 80,  // 增加垂直间距从50到80
     ];
     biasCoord = [
         coordFeatureVis2Copy[0] + rectW * featureChannels,
@@ -2193,7 +2193,7 @@ export function featureSAGEClick(
         rectW,
         oRectW
     );
-    nextCoord = [c[0] + (gap+2) * 3 + rectW * featureChannels * 2 + (gap+2), c[1]];
+    nextCoord = [c[0] + (gap+2) * 3 + rectW * featureChannels * 2 + (gap+2) + 80, c[1]];
 
     //adjustment based on cases
     if(featureChannels==4)nextCoord[0]+=15;

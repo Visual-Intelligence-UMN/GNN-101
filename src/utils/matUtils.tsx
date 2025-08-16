@@ -94,16 +94,10 @@ export function visualizeGraphClassifierFeatures(
     let matFrames: SVGElement[] = framePackage.matFrames; //a
 
     //-----------------------------------FIRST LAYER-----------------------------------------------
-    // Adjust vector size for sandbox mode in graph classifier
-    let graphFirstLayerRectW = 10;
-    let graphFirstLayerRectH = 15;
-    let graphFirstLayerGap = 100;
-    
-    if (sandboxMode) {
-        graphFirstLayerRectW = 15;  // 增大向量宽度
-        graphFirstLayerRectH = 22;  // 增大向量高度
-        graphFirstLayerGap = 130;   // 增大间隔
-    }
+    // Force larger vector sizes for first layer
+    let graphFirstLayerRectW = 15;
+    let graphFirstLayerRectH = 22;
+    let graphFirstLayerGap = 130;
     
     const firstLayerPackage = drawNodeFeatures(
         locations,
@@ -146,7 +140,8 @@ export function visualizeGraphClassifierFeatures(
         final,
         firstLayer,
         maxVals,
-        featureChannels
+        featureChannels,
+        sandboxMode
     );
     locations = GCNConvPackage.locations;
     frames = GCNConvPackage.frames;
@@ -264,6 +259,15 @@ export function visualizeGraphClassifierFeatures(
             //translate each layer
             const layerID = Number(d3.select(this).attr("layerID")) - 1;
             const node = Number(d3.select(this).attr("node"));
+            let rectHParam = 15;
+            let rectWParam = 5;
+            let gapParam = 100;
+            if (sandboxMode) {
+                rectHParam = 22;
+                rectWParam = 15;
+                gapParam = 100;
+            }
+            
             const featureVisPack = featureVisClick(
                 layerID,
                 node,
@@ -279,9 +283,9 @@ export function visualizeGraphClassifierFeatures(
                 lock,
                 setIntervalID,
                 featureChannels,
-                15,
-                5,
-                100,
+                rectHParam,
+                rectWParam,
+                gapParam,
                 7,
                 10
             );
@@ -447,16 +451,10 @@ export function visualizeNodeClassifierFeatures(
     let matFrames: SVGElement[] = framePackage.matFrames; //a
 
     //-----------------------------------FIRST LAYER-----------------------------------------------
-    // Adjust vector size for sandbox mode
-    let firstLayerRectW = 5;
-    let firstLayerRectH = 15;
-    let firstLayerGap = 150;
-    
-    if (sandBoxMode) {
-        firstLayerRectW = 12;  // 增大向量宽度
-        firstLayerRectH = 25;  // 增大向量高度
-        firstLayerGap = 200;   // 增大间隔
-    }
+    // Force larger vector sizes for first layer
+    let firstLayerRectW = 12;
+    let firstLayerRectH = 25;
+    let firstLayerGap = 200;
     
     const firstLayerPackage = drawNodeFeatures(
         locations,
@@ -677,17 +675,20 @@ export function visualizeNodeClassifierFeatures(
             //translate each layer
             const layerID = Number(d3.select(this).attr("layerID")) - 1;
             const node = Number(d3.select(this).attr("node"));
-            let p1 = 10;
-            let p2 = 90;
-            let p3 = 34;
-            let p4 = 5;
+            let p1 = 10;  // rectW
+            let p2 = 90;  // gap
+            let p3 = 34;  // oFeatureChannels  
+            let p4 = 5;   // oRectW
             let p5 = 'tanh';
+            let rectHParam = 15;  // rectH
+            
             if (sandBoxMode){
-                p1 = 5;
-                p2 = 150;
-                p3 = 3;
-                p4 = 10;
+                p1 = 15;
+                p2 = 90;
+                p3 = 3;       // oFeatureChannels
+                p4 = 10;      // oRectW
                 p5 = 'relu';
+                rectHParam = 22;
             }
             const featureVisPack = featureVisClick(
                 layerID,
@@ -704,7 +705,7 @@ export function visualizeNodeClassifierFeatures(
                 lock,
                 setIntervalID,
                 featureChannels,
-                15,
+                rectHParam,
                 p1,p2,p3,p4,p5
             );
             // update variables
@@ -1094,7 +1095,7 @@ export function visualizeNodeClassifierFeatures(
                         d3.selectAll(".matmul-displayer").transition().delay(200).remove();
                         d3.select(".mats").selectAll(".removeRect").transition().delay(200).remove();
                         d3.select(".mats").selectAll(".pauseRemove").transition().delay(200).remove();
-                        currentStep = 0; // 重置步骤
+                        currentStep = 0;
                         featureVisTable[4][node].style.opacity = "0.25";
                         resultLabelsList[node].style.fill = "gray";
                     }
@@ -1181,7 +1182,8 @@ export function visualizeLinkClassifierFeatures(
     featureKeys: number[],
     featureKeysEachLayer: number[][],
     mergedNodes: number[],
-    innerComputationMode: string = "GCN"
+    innerComputationMode: string = "GCN",
+    sandboxMode: boolean = false
     // trainingNodes: number[]
 ) {
     //--------------------------------DATA PREP MANAGEMENT--------------------------------
@@ -1429,6 +1431,15 @@ export function visualizeLinkClassifierFeatures(
             const layerID = Number(d3.select(this).attr("layerID")) - 1;
             const node = Number(d3.select(this).attr("node"));
             if(innerComputationMode == "GCN"){
+                let rectHParam = 15;
+                let rectWParam = 5;
+                let gapParam = 90;
+                if (sandboxMode) {
+                    rectHParam = 22;
+                    rectWParam = 15;
+                    gapParam = 90;
+                }
+                
                 const featureVisPack = featureVisClick(
                     layerID,
                     node,
@@ -1444,9 +1455,9 @@ export function visualizeLinkClassifierFeatures(
                     lock,
                     setIntervalID,
                     featureChannels,
-                    15,
-                    5,
-                    90,
+                    rectHParam,
+                    rectWParam,
+                    gapParam,
                     128,
                     2.5,
                 );

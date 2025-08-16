@@ -35,7 +35,7 @@ export const AnimationController = {
     currentStep: 0,
 
     runAnimations(index: number, animations: Animation[]) {
-        this.animationsList = animations; // 保存动画列表
+        this.animationsList = animations;
         if (index < animations.length) {
             if (!this.isPaused) {
                 const { func, delay } = animations[index];
@@ -60,8 +60,8 @@ export const AnimationController = {
         }
     },
     startAnimations(animations: Animation[]) {
-        this.isPaused = false; // 重置暂停状态
-        this.currentAnimationIndex = 0; // 重置当前索引
+        this.isPaused = false;
+        this.currentAnimationIndex = 0;
         this.runAnimations(0, animations);
     },
     getIntervalID() {
@@ -195,12 +195,12 @@ export function drawAniPath(
     d3.selectAll(".interactRect").style("pointer-events", "none");
 }
 /**
- * 在 (x, y) 位置绘制一个“Matmul Visualization”风格的 Tooltip。
- * @param x 鼠标或想放置的 X 坐标
- * @param y 鼠标或想放置的 Y 坐标
- * @param rowVector  行向量（如 [1, 0, 0, ...]）
- * @param colVector  列向量（如 [0.02, 0.61, ...]）
- * @param result     计算结果 (rowVector ⋅ colVector)
+ * Draw a "Matmul Visualization" style tooltip at (x, y) position.
+ * @param x Mouse or placement X coordinate
+ * @param y Mouse or placement Y coordinate
+ * @param rowVector Row vector (e.g. [1, 0, 0, ...])
+ * @param colVector Column vector (e.g. [0.02, 0.61, ...])
+ * @param result Calculation result (rowVector ⋅ colVector)
  */
 export function showMatmulTooltip(
     x: number,
@@ -1466,8 +1466,8 @@ export function computeMatrixLocations(
 ) {
     //draw weight matrix
     //positioning - increase distance between components
-    let offsetH = -1 * 80;  // 增加间距从50到80
-    if (curveDir == 1) offsetH = 90 + weights[layerID].length * rectW;  // 增加间距从60到90
+    let offsetH = -1 * 120;  // 进一步增加间距到120，给更多空间
+    if (curveDir == 1) offsetH = 130 + weights[layerID].length * rectW;  // 进一步增加间距到130
     const math = create(all, {});
     const matX = btnX;
     const matY = btnY - offsetH;

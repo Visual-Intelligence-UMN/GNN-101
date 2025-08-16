@@ -569,7 +569,7 @@ async function initLinkClassifier(
     const featuresManager = visualizeLinkClassifierFeatures(
         locations, featuresArray, myColor, 
         conv1, conv2, prob_adj[hubNodeA][hubNodeB], graph, adjList, [], keys, 
-        keysForEach, mergedNodes, innerComputationMode);
+        keysForEach, mergedNodes, innerComputationMode, true);
     
 
     // const intervalID = featuresManager.getIntervalID();

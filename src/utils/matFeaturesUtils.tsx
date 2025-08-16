@@ -83,7 +83,7 @@ export function drawCrossConnectionForSubgraph(
     const groupedPaths: GroupedPaths = paths
         .nodes()
         .reduce((acc: GroupedPaths, path: SVGPathElement) => {
-            const layerID: string = path.getAttribute("layerID") || ""; // 确保 layerID 和 endingNode 不是 null
+            const layerID: string = path.getAttribute("layerID") || "";
             const endingNode: string = path.getAttribute("endingNode") || "";
 
             if (!acc[layerID]) {
@@ -115,7 +115,7 @@ export function drawCrossConnection(
     gapSize: number,
     layerID: number
 ) {
-    const rectH = 15;
+    const rectH = 22;
 
     let alocations = deepClone(locations);
     for (let i = 0; i < alocations.length; i++) {
@@ -183,7 +183,7 @@ export function drawCrossConnection(
     const groupedPaths: GroupedPaths = paths
         .nodes()
         .reduce((acc: GroupedPaths, path: SVGPathElement) => {
-            const layerID: string = path.getAttribute("layerID") || ""; // 确保 layerID 和 endingNode 不是 null
+            const layerID: string = path.getAttribute("layerID") || "";
             const endingNode: string = path.getAttribute("endingNode") || "";
 
             if (!acc[layerID]) {
@@ -307,7 +307,14 @@ export function drawNodeFeatures(
     }
     //draw cross connections for features layer and first GCNConv layer
     //drawPaths controls the cross connection func
-    if(drawPaths)drawCrossConnection(graph, locations, featureChannels * rectW, gap+2, 0);
+    if(drawPaths){
+        let adjustedGap = gap + 2;
+        // Adjust gap for larger vectors in sandbox mode
+        if (rectW > 10) {
+            adjustedGap = gap + (rectW - 5) * featureChannels -5; 
+        }
+        drawCrossConnection(graph, locations, featureChannels * rectW, adjustedGap, 0);
+    }
 
     //using locations to find the positions for first feature visualizers
     const firstLayer = d3.select(".mats").append("g").attr("id", "layerNum_0").attr("class", "layerVis");
@@ -762,7 +769,8 @@ export function drawGCNConvGraphModel(
     final: any,
     firstLayer: any,
     maxVals: any,
-    featureChannels: number
+    featureChannels: number,
+    sandboxMode: boolean = false
 ) {
     let path1:any = null;
     let fr1:any = null;
@@ -781,8 +789,10 @@ export function drawGCNConvGraphModel(
 
 
     for (let k = 0; k < 3; k++) {
-        const rectH = 15;
-        const rectW = 5;
+        // Force larger vector sizes for all GCNConv layers to match first layer
+        let rectH = 22;
+        let rectW = 15;
+
         const layer = d3
             .select(".mats")
             .append("g")
@@ -790,7 +800,8 @@ export function drawGCNConvGraphModel(
             .attr("id", `layerNum_${k + 1}`);
         for (let i = 0; i < locations.length; i++) {
             if (k != 0) {
-                locations[i][0] += rectW * featureChannels + 100;
+                let layerGap = 150;
+                locations[i][0] += rectW * featureChannels + layerGap;
             } else {
                 locations[i][0] += 7 * rectW + 100 + 25;
             }
@@ -828,11 +839,15 @@ export function drawGCNConvGraphModel(
 
         if (k != 2) {
             // visualize cross connections btw 1st, 2nd, 3rd GCNConv
+            let connectionGap = 102;
+            if (sandboxMode) {
+                connectionGap = 120;
+            }
             paths = drawCrossConnection(
                 graph,
                 locations,
                 (featureChannels-2) * rectW,
-                102,
+                connectionGap,
                 k + 1
             );
 
@@ -845,7 +860,8 @@ export function drawGCNConvGraphModel(
                 frames,
                 thirdGCN,
                 conv3,
-                featureChannels
+                featureChannels,
+                sandboxMode
             );
             one = poolingPack["one"];
             poolingVis = poolingPack["g"];
@@ -854,7 +870,7 @@ export function drawGCNConvGraphModel(
 
             schemeLocations.push([one[0][0], 350]);
             //visualize last layer and softmax output
-            const tlPack = drawTwoLayers(one, final, myColor, featureChannels);
+            const tlPack = drawTwoLayers(one, final, myColor, featureChannels, sandboxMode);
             let aOne = tlPack["locations"];
             outputVis = tlPack["g"];
             resultVis = tlPack["g1"];
@@ -976,8 +992,9 @@ export function drawGCNConvNodeModel(
 
     let resultLabelsList: any;
     for (let k = 0; k < 3; k++) {
-        const rectH = 15;
-        const rectW = 10;
+        // Force larger vector sizes for all GCNConv layers to match first layer
+        let rectH = 25;
+        let rectW = 12;
         const layer = d3
             .select(".mats")
             .append("g")
@@ -985,12 +1002,11 @@ export function drawGCNConvNodeModel(
             .attr("id", `layerNum_${k + 1}`);
         for (let i = 0; i < locations.length; i++) {
             if (k != 0) {
-                locations[i][0] += rectW * featureChannels + 150;
+                let layerGap = 200;
+                locations[i][0] += rectW * featureChannels + layerGap;
             } else {
                 
-                if(!sandBoxMode)locations[i][0] += 34 * 5 + 150;
-                else locations[i][0] += 7 * rectW + 100 + 25;
-                console.log("first layout layout ", sandBoxMode, locations[i][0]);
+                locations[i][0] += 7 * rectW + 100 + 25;
             }
         }
 
@@ -1320,14 +1336,16 @@ export function drawPoolingVis(
     frames: any,
     thirdGCN: any,
     conv3: any,
-    featureChannels: number
+    featureChannels: number,
+    sandboxMode: boolean = false
 ) {
 
 
     let poolingFrame:any = null;
 
-    const rectH = 15;
-    const rectW = 5;
+    // Force larger vector sizes to match other layers
+    let rectH = 22;
+    let rectW = 15;
     let oLocations = deepClone(locations);
     //find edge points
     locations[0][0] += featureChannels * rectW;
@@ -1337,7 +1355,8 @@ export function drawPoolingVis(
     const midY =
         (locations[locations.length - 1][1] - locations[0][1]) / 2 + 150;
     //all paths should connect to mid point
-    const one = [[locations[0][0] + 102, midY + 2]];
+    let poolingOffset = 150;
+    const one = [[locations[0][0] + poolingOffset, midY + 2]];
     //drawPoints(".mats", "red", one);
     //draw the pooling layer
 
@@ -1690,11 +1709,13 @@ export function drawPoolingVis(
 }
 
 //the function to draw the last two layers of the model
-export function drawTwoLayers(one: any, final: any, myColor: any, featureChannels: number) {
-    const rectH = 15;
-    const rectW = 5;
+export function drawTwoLayers(one: any, final: any, myColor: any, featureChannels: number, sandboxMode: boolean = false) {
+    // Force larger vector sizes to match other layers
+    let rectH = 22;
+    let rectW = 15;
     //find the next position
-    one[0][0] += featureChannels * rectW + 102;
+    let finalLayerOffset = 150;
+    one[0][0] += featureChannels * rectW + finalLayerOffset;
     let aOne = deepClone(one);
     one[0][1] -= rectH / 2;
     //drawPoints(".mats", "red", one);
@@ -1707,9 +1728,9 @@ export function drawTwoLayers(one: any, final: any, myColor: any, featureChannel
         .attr("id", "layerNum_5");
     for (let m = 0; m < final.length; m++) {
         g.append("rect")
-            .attr("x", one[0][0] + rectH * m)
+            .attr("x", one[0][0] + rectW * m)
             .attr("y", one[0][1])
-            .attr("width", rectH)
+            .attr("width", rectW)
             .attr("height", rectH)
             .attr("fill", myColor(result[m]))
             .attr("opacity", 1)
@@ -1744,7 +1765,7 @@ export function drawTwoLayers(one: any, final: any, myColor: any, featureChannel
         .append("rect")
         .attr("x", one[0][0])
         .attr("y", one[0][1])
-        .attr("width", 2 * rectH)
+        .attr("width", final.length * rectW)
         .attr("height", rectH)
         .attr("fill", "none")
         .attr("opacity", 0.25)
