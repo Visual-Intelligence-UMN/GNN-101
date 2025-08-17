@@ -35,6 +35,7 @@ import {
 import { Footer, NavBar } from "../components/Surfaces";
 import { Inter } from "@next/font/google";
 import GraphEditor from "@/components/GraphEditor";
+import DualViews from "@/components/DualViews/DualViews";
 
 export const inter = Inter({
     variable: "--font-inter",
@@ -536,7 +537,7 @@ export default function Home() {
                                                         overflow: "auto",
                                                     }}
                                                 >
-                                                    <GraphMatrixVisualization
+                                                    <DualViews
                                                         dataFile={
                                                             model.includes(
                                                                 "graph classification"
@@ -584,6 +585,8 @@ export default function Home() {
                                                         sandboxMode={model.includes('link prediction') ? false : sandBoxMode}
                                                         nodePositions={nodePositions}
                                                         onNodePositionChange={handleNodePositionsChange}
+                                                        handleNodePositionsChange={handleNodePositionsChange}
+                                                        handleSimulatedGraphChange={handleSimulatedGraphChange}
                                                     />
                                                 </div>
                                             </div>

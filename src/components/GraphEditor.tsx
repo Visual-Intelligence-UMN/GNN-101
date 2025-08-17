@@ -303,7 +303,7 @@ export default function GraphEditor({
                         )
                         .attr("x", (d: any) => d.x)
                         .attr("y", (d: any) => d.y);
-                        
+
                     if (onNodePositionsChange) {
                         onNodePositionsChange(nodesRef.current.map(node => ({ id: node.id, x: node.x, y: node.y })));
                     }
@@ -339,7 +339,7 @@ export default function GraphEditor({
                 }
 
                 function addNodeAt(x: number, y: number) {
-                    const newNodeId = `N${nodesRef.current.length + 1}`;
+                    const newNodeId = `N${nodesRef.current.length}`;
                     const newNode = {
                         id: newNodeId,
                         group: 3,
@@ -453,50 +453,7 @@ export default function GraphEditor({
     };
 
     return (
-        <Draggable defaultPosition={defaultPos} handle=".header">
-            <div
-                style={{
-                    position: "fixed",
-                    zIndex: 9999,
-                    width: size.width,
-                    height: size.height,
-                    background: "white",
-                    border: "1px solid #ccc",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-                    overflow: "hidden",
-                }}
-            >
-                <div
-                    className="header"
-                    style={{
-                        position: "relative",
-                        padding: "4px 8px",
-                        backgroundColor: "black",
-                        color: "white",
-                        fontWeight: "bold",
-                        fontSize: "16px",
-                        cursor: "move",
-                        paddingLeft: "40px",
-                    }}
-                >
-                    Graph Editor
-                    <span
-                        onClick={onClose}
-                        style={{
-                            position: "absolute",
-                            left: 0,
-                            top: 0,
-                            padding: "4px 8px",
-                            backgroundColor: "black",
-                            color: "white",
-                            cursor: "pointer",
-                            borderBottomRightRadius: "6px",
-                        }}
-                    >
-                        ×
-                    </span>
-                </div>
-
+            <div>
                 <div style={{ padding: "4px" }}>
                     <button
                         onClick={handleToggleSimulation}
@@ -519,6 +476,5 @@ export default function GraphEditor({
                     style={{ width: "100%", height: "100%" }}
                 ></div>
             </div>
-        </Draggable>
     );
 }

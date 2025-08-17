@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { loadNodeWeights } from '@/utils/matHelperUtils';
 import { loadNodesLocation } from '@/utils/utils';
+import { dualViewVisualizerStyle } from '@/utils/const';
 
 interface GraphMatrixVisualizationProps {
   dataFile: string;
@@ -64,103 +65,7 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
 
   }
 
-
-
-  const styles = `
-    .container {
-      display: flex;
-      gap: 20px;
-      padding: 20px;
-    }
-    .view {
-      border: 1px solid #ccc;
-      padding: 10px;
-    }
-    .node {
-      fill: white;
-      stroke: #69b3a2;
-      stroke-width: 1.5px;
-      cursor: pointer;
-    }
-    .node.highlighted {
-      fill: #006d5b; 
-      stroke: #004f41; 
-      stroke-width: 2px;
-    }
-    .link {
-      stroke: #aaa;
-      stroke-width: 1px;
-      stroke-opacity: 0.6;
-      cursor: pointer;
-    }
-    .link.highlighted {
-      stroke: #006d5b; 
-      stroke-width: 2px;
-      stroke-opacity: 1;
-    }
-    .matrix-cell {
-      stroke: #fff;
-      stroke-width: 0.5px;
-      cursor: pointer;
-    }
-    .matrix-cell.highlighted {
-      fill: #006d5b !important;
-      stroke: #004f41;
-      stroke-width: 1px;
-    }
-    .node-label {
-      font-size: 10px;
-      pointer-events: none;
-      text-anchor: middle;
-      dominant-baseline: middle;
-    }
-    .axis-label {
-      font-size: 11px;
-    }
-    .info-container-wrapper {
-      display: flex;
-      gap: 20px;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 15px;
-      position: relative;
-    }
-    .info-container {
-      background: #f9f9f9;
-      padding: 10px 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      font-size: 14px;
-      flex: 1;
-      min-width: 250px;
-      position: relative;
-      color: #333;
-    }
-    .info-title {
-      font-size: 16px;
-      font-weight: bold;
-      position: relative;
-      color: #333;
-    }
-    .info-box {
-      position: relative;
-      width: 100%;
-      background: white;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-      font-size: 13px;
-      line-height: 1.5;
-      z-index: 10;
-      margin-top: 10px;
-      color: #333;
-    }
-    @media (max-width: 768px) {
-      .info-container-wrapper {
-        flex-direction: column;
-      }
-    }
-  `;
+  const styles = dualViewVisualizerStyle;
 
   useEffect(() => {
       const loadData = async () => {
