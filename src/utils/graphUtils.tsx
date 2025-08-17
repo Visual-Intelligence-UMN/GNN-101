@@ -2197,7 +2197,7 @@ export function calculationVisualizer(
                         .attr("fill", "url(#text-gradient)")
                         .attr("class", "parameter procVis to-be-removed attention")
                         .attr("font-weight", "bold")
-                        .attr("opacity", 0)
+                        // .attr("opacity", 0)
                         .raise()
 
                         d3.selectAll(".attention").on("mouseover", function () {

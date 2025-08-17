@@ -50,7 +50,8 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
     mode = 0
   }
 
-  if (!sandboxMode) {
+  // For link prediction, don't use preset node positions - use force simulation like Correct version
+  if (!sandboxMode && !modelType?.includes('link prediction')) {
     console.log("VNAUWN",mode, select)
     const nodePositionsDic = loadNodesLocation(mode, select)
     nodePositions = nodePositionsDic
@@ -162,22 +163,23 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
   `;
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        if(!sandboxMode){
+      const loadData = async () => {
+    try {
+      // For link prediction, always use dataFile regardless of sandbox mode
+      if (modelType?.includes('link prediction') || !sandboxMode) {
         console.log("Loading data from:", dataFile);
         const response = await fetch(dataFile);
         console.log("Response status:", response);
         const data = await response.json();
         console.log("Loaded data:", data);
         createVisualization(data);
-        } else {
-          createVisualization(simulatedGraphData);
-        }
-      } catch (error) {
-        console.error('Error loading data:', error);
+      } else {
+        createVisualization(simulatedGraphData);
       }
-    };
+    } catch (error) {
+      console.error('Error loading data:', error);
+    }
+  };
 
     const createVisualization = (data: any) => {
       if (!containerRef.current) return;
@@ -248,22 +250,26 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
 
       const nodes = processedNodes.map((nodeId: number) => {
         let label = nodeId.toString();
-        if (sandboxMode || !modelType?.includes('node prediction')) {
+        // For link prediction, use the same logic as Correct version
+        if (modelType?.includes('link prediction')) {
           label = nodeId.toString();
-        } else {if (!isTwitchData) {
-          console.log(sandboxMode, modelType, modelType?.includes('node prediction'))
-          const features = data.x[nodeId];
-          const idx = Array.isArray(features) ? features.indexOf(1) : -1;
-          if (idx !== -1 && elementMap[idx as keyof typeof elementMap]) {
-            label = elementMap[idx as keyof typeof elementMap];
-          } else if (data.train_nodes) {
-            const isTrainNode = data.train_nodes.includes(nodeId);
-            label = isTrainNode ? 'T' : '?';
-          } else if (data.y) {
-            label = data.y[nodeId];
+        } else if (sandboxMode || !modelType?.includes('node prediction')) {
+          label = nodeId.toString();
+        } else {
+          if (!isTwitchData) {
+            console.log(sandboxMode, modelType, modelType?.includes('node prediction'))
+            const features = data.x[nodeId];
+            const idx = Array.isArray(features) ? features.indexOf(1) : -1;
+            if (idx !== -1 && elementMap[idx as keyof typeof elementMap]) {
+              label = elementMap[idx as keyof typeof elementMap];
+            } else if (data.train_nodes) {
+              const isTrainNode = data.train_nodes.includes(nodeId);
+              label = isTrainNode ? 'T' : '?';
+            } else if (data.y) {
+              label = data.y[nodeId];
+            }
           }
         }
-      }
         return {
           id: nodeId,
           element: label,
@@ -281,25 +287,36 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
       const filteredLinks = data.edge_index[0].reduce((acc: any[], sourceId: number, i: number) => {
         const targetId = data.edge_index[1][i];
 
-        const sourceNode = nodes[sourceId];
-        const targetNode = nodes[targetId];
-
-        if (!sourceNode || !targetNode) return acc;
-
         if (isTwitchData && modelType?.includes('link prediction')) {
           if (processedNodes.includes(sourceId) && processedNodes.includes(targetId)) {
             acc.push({
-              source: sourceNode,
-              target: targetNode,
+              source: sourceId,
+              target: targetId,
               attr: data.edge_attr ? data.edge_attr[i] : null
             });
           }
         } else {
-          acc.push({
-            source: sourceNode,
-            target: targetNode,
-            attr: data.edge_attr ? data.edge_attr[i] : null
-          });
+          // For node classification and graph classification, check if both nodes exist
+          const sourceNode = nodes.find((n: any) => n.id === sourceId);
+          const targetNode = nodes.find((n: any) => n.id === targetId);
+          
+          if (sourceNode && targetNode) {
+            if (modelType?.includes('link prediction')) {
+              // Link prediction uses IDs for d3 force simulation
+              acc.push({
+                source: sourceId,
+                target: targetId,
+                attr: data.edge_attr ? data.edge_attr[i] : null
+              });
+            } else {
+              // Other tasks use IDs too, but we'll handle them in the force simulation
+              acc.push({
+                source: sourceId,
+                target: targetId,
+                attr: data.edge_attr ? data.edge_attr[i] : null
+              });
+            }
+          }
         }
 
         return acc;
@@ -307,6 +324,8 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
 
       console.log("Processed Nodes:", processedNodes);
       console.log("Filtered Links:", filteredLinks);
+      console.log("Model Type:", modelType);
+      console.log("Is Twitch Data:", isTwitchData);
 
       let simulation: d3.Simulation<any, undefined> | undefined;
       let graphLinks: any;
@@ -314,7 +333,8 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
       let graphNodes: any;
       let nodeLabels: any;
       console.log("AUEFJBHUIOABGHWFUIOGHAWUIFH", nodePositions, nodePositions && nodePositions.length > 0)
-      if (nodePositions && nodePositions.length > 0) {
+      // For link prediction, always use force simulation like Correct version
+      if (nodePositions && nodePositions.length > 0 && !modelType?.includes('link prediction')) {
         console.log("nodelocation")
         nodes.forEach((node: any) => {
           const fixedPos = nodePositions[node.id];
@@ -340,10 +360,22 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
           .enter()
           .append("line")
           .attr("class", "link")
-          .attr("x1", (d: any) => nodes.find((n: any) => n.id === d.source.id)?.x || 0)
-          .attr("y1", (d: any) => nodes.find((n: any) => n.id === d.source.id)?.y || 0)
-          .attr("x2", (d: any) => nodes.find((n: any) => n.id === d.target.id)?.x || 0)
-          .attr("y2", (d: any) => nodes.find((n: any) => n.id === d.target.id)?.y || 0)
+          .attr("x1", (d: any) => {
+            const sourceId = d.source.id || d.source;
+            return nodes.find((n: any) => n.id === sourceId)?.x || 0;
+          })
+          .attr("y1", (d: any) => {
+            const sourceId = d.source.id || d.source;
+            return nodes.find((n: any) => n.id === sourceId)?.y || 0;
+          })
+          .attr("x2", (d: any) => {
+            const targetId = d.target.id || d.target;
+            return nodes.find((n: any) => n.id === targetId)?.x || 0;
+          })
+          .attr("y2", (d: any) => {
+            const targetId = d.target.id || d.target;
+            return nodes.find((n: any) => n.id === targetId)?.y || 0;
+          })
           .style("stroke", function (d: any) {
                             return d.type === "aromatic" ? "purple" : "#aaa";
                         });
@@ -379,7 +411,8 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
             if (!event.active) simulation?.alphaTarget(0);
             d.fx = null;
             d.fy = null;
-            if (onNodePositionChange) {
+            // For link prediction, don't call onNodePositionChange to avoid flickering
+            if (onNodePositionChange && !modelType?.includes('link prediction')) {
               onNodePositionChange(nodes.map((n: any) => ({ id: n.id.toString(), x: n.x, y: n.y })));
             }
           });
@@ -438,6 +471,10 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
             if (!event.active) simulation?.alphaTarget(0);
             d.fx = null;
             d.fy = null;
+            // For link prediction, don't call onNodePositionChange to avoid flickering
+            if (onNodePositionChange && !modelType?.includes('link prediction')) {
+              onNodePositionChange(nodes.map((n: any) => ({ id: n.id.toString(), x: n.x, y: n.y })));
+            }
           });
 
         nodeGroups.call(drag);
@@ -455,7 +492,8 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
           nodeGroups
             .attr("transform", (d: any) => `translate(${d.x},${d.y})`);
           
-          if (onNodePositionChange) {
+          // For link prediction, don't call onNodePositionChange to avoid flickering
+          if (onNodePositionChange && !modelType?.includes('link prediction')) {
             onNodePositionChange(nodes.map((n: any) => ({ id: n.id.toString(), x: n.x, y: n.y })));
           }
         });
@@ -465,8 +503,8 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
       const matrix = Array(numNodes).fill(null)
         .map(() => Array(numNodes).fill(0));
       filteredLinks.forEach((link: any) => {
-        const sourceIndex = nodes.findIndex((n: any) => n.id === link.source.id);
-        const targetIndex = nodes.findIndex((n: any) => n.id === link.target.id);
+        const sourceIndex = nodes.findIndex((n: any) => n.id === (link.source.id || link.source));
+        const targetIndex = nodes.findIndex((n: any) => n.id === (link.target.id || link.target));
         if (sourceIndex !== -1 && targetIndex !== -1) {
           matrix[sourceIndex][targetIndex] = 1;
           matrix[targetIndex][sourceIndex] = 1;
@@ -528,19 +566,27 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
           const nodeId = d.id;
       
           graphNodes.classed("highlighted", (n: any) => n.id === nodeId);
-    
+          
+          // Highlight edges connected to this node
+          graphLinks.classed("highlighted", (l: any) => {
+            const sourceId = l.source.id || l.source;
+            const targetId = l.target.id || l.target;
+            return sourceId === nodeId || targetId === nodeId;
+          });
       
           matrixCells.classed("highlighted", (cell: any) => {
             const columnIndex = nodes.findIndex((n: any) => n.id === nodeId);
             return cell.i === columnIndex || cell.j === columnIndex;
           });
         } else if (isGraphEdgeHover) {
-          const sourceId = d.source.id;
-          const targetId = d.target.id;
+          const sourceId = d.source.id || d.source;
+          const targetId = d.target.id || d.target;
       
-          graphLinks.classed("highlighted", (l: any) =>
-            l.source.id === sourceId && l.target.id === targetId
-          );
+          graphLinks.classed("highlighted", (l: any) => {
+            const lSourceId = l.source.id || l.source;
+            const lTargetId = l.target.id || l.target;
+            return lSourceId === sourceId && lTargetId === targetId;
+          });
       
           graphNodes.classed("highlighted", (n: any) =>
             n.id === sourceId || n.id === targetId
@@ -572,10 +618,12 @@ const GraphMatrixVisualization: React.FC<GraphMatrixVisualizationProps> = ({
           n.id === sourceNode.id || n.id === targetNode.id
         );
 
-        graphLinks.classed("highlighted", (l: any) =>
-          (l.source.id === sourceNode.id && l.target.id === targetNode.id) ||
-          (l.source.id === targetNode.id && l.target.id === sourceNode.id)
-        );
+        graphLinks.classed("highlighted", (l: any) => {
+          const sourceId = l.source.id || l.source;
+          const targetId = l.target.id || l.target;
+          return (sourceId === sourceNode.id && targetId === targetNode.id) ||
+                 (sourceId === targetNode.id && targetId === sourceNode.id);
+        });
       };
       const highlightMatrixLabel = (index: number) => {
         // 高亮矩阵中，第 i 行或第 i 列的 cell
