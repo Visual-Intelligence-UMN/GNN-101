@@ -945,7 +945,8 @@ export function drawSummationFeature(
     dList: any,
     featuresTable: any,
     layerID: number,
-    node: number
+    node: number,
+    sandboxMode: boolean = false
   ) {
     const g = g1.append("g").attr("class", "aggregatedFeatureGroup");
     g.selectAll("rect.summation-rect")
@@ -1187,10 +1188,14 @@ export function drawSummationFeature(
     const dim = X.length;
   
     //draw label
+    const labelY = sandboxMode ? 
+      coordFeatureVis[1] + rectH / 2 + 20 :  // sandbox模式：组件下方
+      coordFeatureVis[1] + rectH * curveDir * 1.1;  // 原来的逻辑
+    
     drawHintLabel(
       g1,
       coordFeatureVis[0],
-      coordFeatureVis[1] + rectH * curveDir * 1.1,
+      labelY,
       `Vector Summation^T: 1 x ${dim}`,
       "procVis"
     );

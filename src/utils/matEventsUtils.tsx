@@ -567,12 +567,12 @@ export function featureVisClick(
 
 
     const g = d3.select(".mats").append("g");
-    let w = 5;
+    let w = 12;
     if (Xt[0].length < featureChannels) {
-        w = 10;
+        w = 12;
 
     } else if(Xt[0].length<10){
-        w = 10;
+        w = 12;
     }
     if(oFeatureChannels==128 && Xt[0].length==128){
         w = 2.5;
@@ -717,7 +717,7 @@ export function featureVisClick(
 
     let animateSeqAfterPath: any = [
         {func: () => {
-            drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir,adjList, dList, featuresTable, layerID, node)
+            drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir,adjList, dList, featuresTable, layerID, node, sandboxMode)
             
 
             d3.selectAll("#procPath")
@@ -1596,12 +1596,12 @@ export function featureGATClick(
 
 
     const g = d3.select(".mats").append("g");
-    let w = 5;
+    let w = 12;
     if (Xt[0].length < featureChannels) {
-        w = 10;
+        w = 12;
 
     } else if(Xt[0].length<10){
-        w = 10;
+        w = 12;
     }
     if(oFeatureChannels==128 && Xt[0].length==128){
         w = 2.5;
@@ -2144,12 +2144,12 @@ export function featureSAGEClick(
 
 
     const g = d3.select(".mats").append("g");
-    let w = 5;
+    let w = 12;
     if (Xt[0].length < featureChannels) {
-        w = 10;
+        w = 12;
 
     } else if(Xt[0].length<10){
-        w = 10;
+        w = 12;
     }
     if(oFeatureChannels==128 && Xt[0].length==128){
         w = 2.5;
