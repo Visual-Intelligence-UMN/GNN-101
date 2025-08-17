@@ -568,7 +568,7 @@ export function outputVisualizer(
         }
       
         addExitBtn(endCoordList[0][0] - 350, endCoordList[0][1] - 100, svg);
-        drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1], 1, rectHeight / 3, rectHeight / 3, node.features.length, [wMat], 0, myColor, svg, weightsLocation);
+        drawWeightMatrix(endCoordList[0][0] - 90, endCoordList[0][1], 1, rectHeight / 2, rectHeight / 2, node.features.length, [wMat], 0, myColor, svg, weightsLocation);
 
         d3.selectAll(".bias").style("opacity", 1);
         d3.selectAll(".softmax").attr("opacity", 0.07);
@@ -4068,7 +4068,7 @@ export function nodeOutputVisualizer(
         if (!state.isClicked) {
             return;
         }
-        drawWeightMatrix(endCoordList[0][0] - 200, endCoordList[0][1], 1, 10, 10, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
+        drawWeightMatrix(endCoordList[0][0] - 200, endCoordList[0][1], 1, 15, 15, node.features.length, [wMat], 0, myColor, svg, weightsLocation)
         
         addExitBtn(endCoordList[0][0] - 350, endCoordList[0][1] - 135, svg);
 

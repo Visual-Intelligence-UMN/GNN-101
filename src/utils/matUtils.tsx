@@ -269,10 +269,12 @@ export function visualizeGraphClassifierFeatures(
                 setIntervalID,
                 featureChannels,
                 15,
-                5,
+                12,
                 100,
                 7,
-                10
+                10,
+                "relu",
+                sandboxMode
             );
             // update variables
             recordLayerID = featureVisPack.recordLayerID;
@@ -661,7 +663,7 @@ export function visualizeNodeClassifierFeatures(
             let p4 = 5;
             let p5 = 'tanh';
             if (sandBoxMode){
-                p1 = 5;
+                p1 = 12;
                 p2 = 150;
                 p3 = 3;
                 p4 = 10;
@@ -683,7 +685,8 @@ export function visualizeNodeClassifierFeatures(
                 setIntervalID,
                 featureChannels,
                 15,
-                p1,p2,p3,p4,p5
+                p1,p2,p3,p4,p5,
+                sandBoxMode
             );
             // update variables
             recordLayerID = featureVisPack.recordLayerID;
@@ -929,7 +932,7 @@ export function visualizeNodeClassifierFeatures(
                         const Xt = modelParams.weights[3];
                         const prevCon3Val: number[] = [conv3[node][0], conv3[node][1]];
 
-                        drawWeightMatrix(btnX, btnY + 15, 1, 15, 15, featureChannels, [wMat], 0, myColor, g1, weightMatrixPostions);
+                        drawWeightMatrix(btnX, btnY + 15, 1, 20, 20, featureChannels, [wMat], 0, myColor, g1, weightMatrixPostions);
                         drawWeightsVector(g, vectorAfterMul, outputCoord, 15, 10,
                             myColor, wMat, startPathCoords, endPathCoords, curveDir,
                             weightMatrixPostions, featureChannels, prevCon3Val)
