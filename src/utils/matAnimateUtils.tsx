@@ -100,11 +100,15 @@ export function drawAniPath(
 ) {
     d3.selectAll("#tempath").remove();
     d3.selectAll(".matmul-displayer").remove();
+    // Scale up for animation rect to match other components
+    const scaledRectW = rectW * 1.3;
+    const scaledRectH = rectH * 1.3;
+    
     g.append("rect")
-        .attr("x", coordFeatureVis[0] + rectW * currentStep)
-        .attr("y", coordFeatureVis[1] - rectH / 2)
-        .attr("width", rectW)
-        .attr("height", rectH)
+        .attr("x", coordFeatureVis[0] + scaledRectW * currentStep)
+        .attr("y", coordFeatureVis[1] - scaledRectH / 2)
+        .attr("width", scaledRectW)
+        .attr("height", scaledRectH)
         .attr("fill", myColor(dummy[currentStep]))
         .attr("opacity", 1)
         .attr("stroke", "gray")
@@ -1323,13 +1327,17 @@ export function drawWeightsVector(
     rectClass: string = "procVis removeRect wRect interactRect",
     labelName = `Matmul Result: ${dummy.length} x 1`
 ) {
+    // Scale up Matmul Result to match Vector Summation component size
+    const scaledRectW = rectW * 1.3;
+    const scaledRectH = rectH * 1.3;
+    
     console.log("draw matrix weight - 0", startCoordList);
     for (let m = 0; m < dummy.length; m++) {
         g.append("rect")
-            .attr("x", coordFeatureVis[0] + rectW * m)
-            .attr("y", coordFeatureVis[1] - rectH / 2)
-            .attr("width", rectW)
-            .attr("height", rectH)
+            .attr("x", coordFeatureVis[0] + scaledRectW * m)
+            .attr("y", coordFeatureVis[1] - scaledRectH / 2)
+            .attr("width", scaledRectW)
+            .attr("height", scaledRectH)
             .attr("fill", myColor(dummy[m]))
             .attr("opacity", 1)
             .attr("stroke", "gray")
@@ -1374,7 +1382,7 @@ export function drawWeightsVector(
     drawHintLabel(
         g,
         coordFeatureVis[0],
-        coordFeatureVis[1] + rectH + 6,
+        coordFeatureVis[1] + scaledRectH / 2 + 15,
         labelName,
         "procVis"
     );
@@ -1382,9 +1390,9 @@ export function drawWeightsVector(
     //draw frame
     g.append("rect")
         .attr("x", coordFeatureVis[0])
-        .attr("y", coordFeatureVis[1] - rectH / 2)
-        .attr("width", rectW * dummy.length)
-        .attr("height", rectH)
+        .attr("y", coordFeatureVis[1] - scaledRectH / 2)
+        .attr("width", scaledRectW * dummy.length)
+        .attr("height", scaledRectH)
         .attr("fill", "none")
         .attr("opacity", 1)
         .attr("stroke", "black")
@@ -1765,15 +1773,19 @@ export function drawWeightMatrix(
     layerBias: number[],
     layerID: number
 ) {
+    // Scale up bias vector to match Vector Summation component size
+    const scaledRectW = rectW * 1.3;
+    const scaledRectH = rectH * 1.3;
+    
     let channels = featureChannels;
     if (layerID === 2 && featureChannels === 4) channels = 2;
     for (let m = 0; m < channels; m++) {
         let biasValue = layerBias[m];
         g.append("rect")
-            .attr("x", coordFeatureVis[0] + rectW * m)
-            .attr("y", coordFeatureVis[1] - rectH / 2)
-            .attr("width", rectW)
-            .attr("height", rectH)
+            .attr("x", coordFeatureVis[0] + scaledRectW * m)
+            .attr("y", coordFeatureVis[1] - scaledRectH / 2)
+            .attr("width", scaledRectW)
+            .attr("height", scaledRectH)
             .attr("fill", myColor(biasValue))
             .style("opacity", 1)
             .attr("stroke", "gray")
@@ -1832,9 +1844,9 @@ export function drawWeightMatrix(
     // Draw bias vector border
     g.append("rect")
         .attr("x", coordFeatureVis[0])
-        .attr("y", coordFeatureVis[1] - rectH / 2)
-        .attr("width", rectW * channels)
-        .attr("height", rectH)
+        .attr("y", coordFeatureVis[1] - scaledRectH / 2)
+        .attr("width", scaledRectW * channels)
+        .attr("height", scaledRectH)
         .attr("fill", "none")
         .style("opacity", 1)
         .attr("stroke", "black")
@@ -1844,7 +1856,7 @@ export function drawWeightMatrix(
     drawHintLabel(
         g,
         coordFeatureVis[0],
-        coordFeatureVis[1] + rectH + 6,
+        coordFeatureVis[1] + scaledRectH / 2 + 17,
         `Bias Vector: ${layerBias.length} x 1`,
         "procVis biasFrame"
     );
