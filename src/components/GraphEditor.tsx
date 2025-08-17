@@ -35,6 +35,7 @@ export default function GraphEditor({
     const selectionState = useRef(false);
 
     const datasetRef = useRef<any>({});
+    const [mode, setMode] = useState("edge");
 
     // Sync state
     const selectedNodeRef = useRef<string | null>(null);
@@ -279,6 +280,7 @@ export default function GraphEditor({
                                     setSelectedNodeId(null);
                                     setSecondSelectedNodeId(null);
                                     selectionState.current = false;
+                                    handleTransmitToMainVisualizer();
                                 }
 
                                 return;
@@ -329,6 +331,7 @@ export default function GraphEditor({
                             event.subject.fx = null;
                             event.subject.fy = null;
                         }
+                        handleTransmitToMainVisualizer();
                     }
 
                     return d3
@@ -355,6 +358,7 @@ export default function GraphEditor({
                     if (onNodePositionsChange) {
                         onNodePositionsChange(nodesRef.current.map(node => ({ id: node.id, x: node.x, y: node.y })));
                     }
+                    handleTransmitToMainVisualizer();
                 }
 
                 const handleKeyDown = (e: KeyboardEvent) => {
@@ -408,6 +412,7 @@ export default function GraphEditor({
                             onNodePositionsChange(nodesRef.current.map(node => ({ id: node.id, x: node.x, y: node.y })));
                         }
                     }
+                    handleTransmitToMainVisualizer();
                 };
 
                 window.addEventListener("keydown", handleKeyDown);
@@ -440,6 +445,11 @@ export default function GraphEditor({
         sim.alpha(0.5).restart();
     };
 
+    const handleModeSwitch=()=>{
+        handleToggleSimulation();
+        setMode(mode === "edge" ? "node" : "edge");
+    }
+
     const handleTransmitToMainVisualizer = () => {
         const currentDataset = getCurrentDataset();
 
@@ -456,18 +466,31 @@ export default function GraphEditor({
             <div>
                 <div style={{ padding: "4px" }}>
                     <button
-                        onClick={handleToggleSimulation}
-                        style={{ marginBottom: "10px" }}
+                        onClick={handleModeSwitch}
+                        style={{
+                            padding: "10px 20px",
+                            borderRadius: "30px",
+                            border: "2px solid #aaa",
+                            fontWeight: "bold",
+                            backgroundColor: mode === "node" ? "yellow" : "white",
+                            cursor: "pointer"
+                            , color: "#aaa"
+                            }}
                     >
-                        {isRunning
-                            ? "Switch to Node Adding"
-                            : "Switch to Edge Adding"}
+                        Node Edit
                     </button>
                     <button
-                        onClick={handleTransmitToMainVisualizer}
-                        style={{ marginBottom: "10px" }}
+                        onClick={handleModeSwitch}
+                        style={{
+                            padding: "10px 20px",
+                            borderRadius: "30px",
+                            border: "2px solid #aaa",
+                            fontWeight: "bold",
+                            backgroundColor: mode === "edge" ? "yellow" : "white",
+                            cursor: "pointer", color: "#aaa"
+                            }}
                     >
-                        Send to Main Visualizer
+                        Edge Edit
                     </button>
                 </div>
 

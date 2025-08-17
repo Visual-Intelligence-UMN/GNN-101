@@ -304,11 +304,9 @@ export const SandboxModeSelector: React.FC<SandboxModeSelectorProps> = ({
             id="dataset-selector"
         />
         {sandBoxMode && 
-            <button 
-                key={'graph-editor'}
-                onClick={handleGraphEditor}
-                className="ml-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >Open the Graph</button>}
+            <div>
+                Modify the input graph data in main visualizer. 
+            </div>}
         </>
     )
 }

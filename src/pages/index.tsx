@@ -366,11 +366,7 @@ export default function Home() {
                                         </h1>
                                         {!model.includes("link") && <div>
                                         
-                                        {sandBoxMode? <button 
-                                                            key={'graph-editor'}
-                                                            onClick={handleGraphEditor}
-                                                            className="ml-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                                                        >Open the Graph</button>: <div
+                                        {sandBoxMode? <>Modify the graph in the graph visualizer. </>: <div
                                             className={`flex-1 items-center gap-x-6 ${inter2.className}`}
                                             id="dataset-description"
                                         >
