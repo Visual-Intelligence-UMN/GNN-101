@@ -880,7 +880,7 @@ export function drawSamplingAggregation(
         d3.select(".mats")
             .append("text")
             .text(mulValues[i].toFixed(2))
-            .attr("x", posList[i][0] + 5)
+            .attr("x", posList[i][0] + 10)  // Increased offset for larger input vectors
             .attr("y", posList[i][1] + 5)
             .attr("text-anchor", "middle")
             .attr("font-size", 7.5)
@@ -1193,7 +1193,7 @@ export function drawSummationFeature(
     //draw label
     drawHintLabel(
       g1,
-      coordFeatureVis[0],
+      coordFeatureVis[0] - 110, 
       coordFeatureVis[1] + scaledRectH / 2 + 20,
       `Vector Summation^T: 1 x ${dim}`,
       "procVis"
@@ -1289,7 +1289,7 @@ export function drawSummationFeature(
       d3.select(".mats")
         .append("text")
         .text(mulValues[i].toFixed(2))
-        .attr("x", posList[i][0] + 7.5)
+        .attr("x", posList[i][0] + 20) 
         .attr("y", posList[i][1])
         .attr("text-anchor", "middle")
         .attr("font-size", 7.5)

@@ -300,6 +300,11 @@ export function drawNodeFeatures(
     gap:number,
     drawPaths: boolean = true
 ) {
+    // Scale up input feature vectors for better visibility in sandbox mode
+    // Check if we're likely in sandbox mode by detecting small rectangles
+    const isLikelyInputLayer = rectW <= 5 && rectH <= 15;
+    const scaledRectW = isLikelyInputLayer ? rectW * 2 : rectW;
+    const scaledRectH = isLikelyInputLayer ? rectH * 1.5 : rectH;
     //initial visualizer
     for (let i = 0; i < locations.length; i++) {
         locations[i][0] += 50;
@@ -307,7 +312,7 @@ export function drawNodeFeatures(
     }
     //draw cross connections for features layer and first GCNConv layer
     //drawPaths controls the cross connection func
-    if(drawPaths)drawCrossConnection(graph, locations, featureChannels * rectW, gap+2, 0);
+    if(drawPaths)drawCrossConnection(graph, locations, featureChannels * scaledRectW, gap+2, 0);
 
     //using locations to find the positions for first feature visualizers
     const firstLayer = d3.select(".mats").append("g").attr("id", "layerNum_0").attr("class", "layerVis");
@@ -323,10 +328,10 @@ export function drawNodeFeatures(
         for (let j = 0; j < featureChannels; j++) {
             const fVis = g
                 .append("rect")
-                .attr("x", locations[i][0] + rectW * j)
+                .attr("x", locations[i][0] + scaledRectW * j)
                 .attr("y", locations[i][1])
-                .attr("width", rectW)
-                .attr("height", rectH)
+                .attr("width", scaledRectW)
+                .attr("height", scaledRectH)
                 .attr("fill", myColor(features[i][j]))
                 .attr("opacity", 1)
                 .attr("stroke", "gray")
@@ -337,8 +342,8 @@ export function drawNodeFeatures(
             .append("rect")
             .attr("x", locations[i][0])
             .attr("y", locations[i][1])
-            .attr("width", rectW * featureChannels)
-            .attr("height", rectH)
+            .attr("width", scaledRectW * featureChannels)
+            .attr("height", scaledRectH)
             .attr("fill", "none")
             .attr("opacity", 0.25)
             .attr("stroke", "black")
