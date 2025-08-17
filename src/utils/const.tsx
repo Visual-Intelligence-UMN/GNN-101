@@ -117,7 +117,9 @@ export const modelList: { [k: string]: string } = {
     "GCN - node classification": "./gnn_node_model.onnx",
     "GCN - link prediction": "./gnn_link_model.onnx",
     "GAT - link prediction": "./gat_link_model.onnx",
-    "GraphSAGE - link prediction": "./sage_link_model.onnx"
+    "GraphSAGE - link prediction": "./sage_link_model.onnx",
+    "GCN - graph classification(Sandbox)": "./simulations/simulated_gcn_graph_model.onnx",
+    "GCN - node classification(Sandbox)": "./simulations/simulated_gcn_node_model.onnx",
 };
 
 

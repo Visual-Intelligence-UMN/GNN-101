@@ -83,7 +83,7 @@ export default function Home() {
 
     const [simGraphData, setSimGraphData] = useState({});
     const [nodePositions, setNodePositions] = useState<any[]>([]);
-    const [sandBoxMode, setSandBoxMode] = useState(true);
+    const [sandBoxMode, setSandBoxMode] = useState(false);
 
     const [hubNodeA, setHubNodeA] = useState(241);
     const [hubNodeB, setHubNodeB] = useState(109);
@@ -272,6 +272,14 @@ export default function Home() {
                                                     setSimulation(false);
                                                     setProbabilities([]);
                                                     setIntmData(null);
+
+                                                    if(newModel.includes("Sandbox")){
+                                                        setSandBoxMode(true);
+                                                        setPredicted(false);
+                                                    } else {
+                                                        setSandBoxMode(false);
+                                                    }
+
                                                     if (
                                                         newModel.includes("GAT")
                                                     ) {
@@ -355,13 +363,8 @@ export default function Home() {
                                         <h1 className="text-3xl font-black min-w-48">
                                             Input Graph
                                         </h1>
-                                        {!model.includes("link") && <div><div className="m-1"> Sandbox Mode </div>
-                                                <Selector
-                                                    selectedOption={sandBoxMode ? "On" : "Off"}
-                                                    handleChange={handleSandboxModeSelection}
-                                                    OptionList={["On", "Off"]}
-                                                    id="dataset-selector"
-                                                />
+                                        {!model.includes("link") && <div>
+                                        
                                         {sandBoxMode? <button 
                                                             key={'graph-editor'}
                                                             onClick={handleGraphEditor}
@@ -639,8 +642,7 @@ export default function Home() {
                                             <div
                                                 className={styles.vizContainer}
                                             >
-                                                {model ==
-                                                "GCN - graph classification" ? (
+                                                {model.includes("GCN - graph classification") ? (
                                                     isGraphView ? (
                                                         <GraphVisualizer
                                                             graph_path={
@@ -712,8 +714,7 @@ export default function Home() {
                                                             }
                                                         />
                                                     )
-                                                ) : model ==
-                                                  "GCN - node classification" ? (
+                                                ) : model.includes("GCN - node classification") ? (
                                                     isGraphView ? (
                                                         <NodeGraphVisualizer
                                                             graph_path={
