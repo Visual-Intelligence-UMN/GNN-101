@@ -945,18 +945,21 @@ export function drawSummationFeature(
     dList: any,
     featuresTable: any,
     layerID: number,
-    node: number,
-    sandboxMode: boolean = false
+    node: number
   ) {
+    // Scale up the heatmap size for sandbox mode
+    const scaledW = w * 2;
+    const scaledRectH = rectH * 1.5;
+    
     const g = g1.append("g").attr("class", "aggregatedFeatureGroup");
     g.selectAll("rect.summation-rect")
       .data(X as number[])
       .enter()
       .append("rect")
-      .attr("x", (d: number, i: number) => coordFeatureVis[0] + w * i)
-      .attr("y", coordFeatureVis[1] - rectH / 2)
-      .attr("width", w)
-      .attr("height", rectH)
+      .attr("x", (d: number, i: number) => coordFeatureVis[0] + scaledW * i)
+      .attr("y", coordFeatureVis[1] - scaledRectH / 2)
+      .attr("width", scaledW)
+      .attr("height", scaledRectH)
       .attr("fill", (d: number) => myColor(d))
       .attr("opacity", 1)
       .attr("stroke", "gray")
@@ -1175,9 +1178,9 @@ export function drawSummationFeature(
     //draw frame
     g1.append("rect")
       .attr("x", coordFeatureVis[0])
-      .attr("y", coordFeatureVis[1] - rectH / 2)
-      .attr("width", w * X.length)
-      .attr("height", rectH)
+      .attr("y", coordFeatureVis[1] - scaledRectH / 2)
+      .attr("width", scaledW * X.length)
+      .attr("height", scaledRectH)
       .attr("fill", "none")
       .attr("opacity", 0)
       .attr("stroke", "black")
@@ -1188,14 +1191,10 @@ export function drawSummationFeature(
     const dim = X.length;
   
     //draw label
-    const labelY = sandboxMode ? 
-      coordFeatureVis[1] + rectH / 2 + 20 :  // sandbox模式：组件下方
-      coordFeatureVis[1] + rectH * curveDir * 1.1;  // 原来的逻辑
-    
     drawHintLabel(
       g1,
       coordFeatureVis[0],
-      labelY,
+      coordFeatureVis[1] + scaledRectH / 2 + 20,
       `Vector Summation^T: 1 x ${dim}`,
       "procVis"
     );

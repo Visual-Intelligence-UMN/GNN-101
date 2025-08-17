@@ -163,11 +163,9 @@ export function detailedViewRecovery(
             recordLayerID = -1;
         }
         else if (recordLayerID >= 0) {
-            const baseDistance = (gap+2) * 3 + 5 * featureChannels * 2;
-            const sandboxExtraSpace = sandBoxMode ? 120 : 0;
             translateLayers(
                 recordLayerID,
-                -(baseDistance + sandboxExtraSpace)
+                -((gap+2) * 3 + 5 * featureChannels * 2)
             );
             recordLayerID = -1;
         }
@@ -446,8 +444,7 @@ export function featureVisClick(
     gap:number,
     oFeatureChannels:number,
     oRectW:number,
-    activation: string = "relu",
-    sandboxMode: boolean = false
+    activation: string = "relu"
 ) {
     d3.select(".switchBtn").style("pointer-events", "none");
     d3.select(".switchBtn").style("opacity", 0.3);
@@ -462,9 +459,7 @@ export function featureVisClick(
     // const rectW = 5;
     const rectW7 = 10;
 
-    const baseDistance = (gap+2) * 3 + 5 * featureChannels * 2;
-    const sandboxExtraSpace = sandboxMode ? 120 : 0;
-    translateLayers(layerID, baseDistance + sandboxExtraSpace);
+    translateLayers(layerID, (gap+2) * 3 + 5 * featureChannels * 2);
     //record the layerID
     recordLayerID = layerID;
 
@@ -567,12 +562,12 @@ export function featureVisClick(
 
 
     const g = d3.select(".mats").append("g");
-    let w = 12;
+    let w = 5;
     if (Xt[0].length < featureChannels) {
-        w = 12;
+        w = 10;
 
     } else if(Xt[0].length<10){
-        w = 12;
+        w = 10;
     }
     if(oFeatureChannels==128 && Xt[0].length==128){
         w = 2.5;
@@ -628,7 +623,7 @@ export function featureVisClick(
         rectW,
         oRectW
     );
-    nextCoord = [c[0] + (gap+2) * 3 + rectW * featureChannels * 2 + (gap+2) - (rectW - 5) * featureChannels, c[1]];
+    nextCoord = [c[0] + (gap+2) * 3 + rectW * featureChannels * 2 + (gap+2), c[1]];
 
     //adjustment based on cases
     if(featureChannels==4)nextCoord[0]+=15;
@@ -717,7 +712,7 @@ export function featureVisClick(
 
     let animateSeqAfterPath: any = [
         {func: () => {
-            drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir,adjList, dList, featuresTable, layerID, node, sandboxMode)
+            drawSummationFeature(g, X, coordFeatureVis, w, rectH, myColor, posList, mulValues, curveDir,adjList, dList, featuresTable, layerID, node)
             
 
             d3.selectAll("#procPath")
@@ -1055,7 +1050,7 @@ export function outputVisClick(
     let isPlaying = false;
     let intervalID: any = null;
     const rectH = 15;
-    const rectW = 12;
+    const rectW = 5;
     const poolingPt = get_cood_from_parent(".mats", ".pooling");
 
     let coordForStart = deepClone(poolingPt);
@@ -1447,7 +1442,6 @@ export function featureGATClick(
     featureKeysEachLayer: number[][],
     mergedNodes:number[],
     activation: string = "relu",
-    sandboxMode: boolean = false
 ){
     d3.select(".switchBtn").style("pointer-events", "none");
     d3.select(".switchBtn").style("opacity", 0.3);
@@ -1470,9 +1464,7 @@ export function featureGATClick(
     // const rectW = 5;
     const rectW7 = 10;
 
-    const baseDistance = (gap+2) * 3 + 5 * featureChannels * 2;
-    const sandboxExtraSpace = sandboxMode ? 120 : 0;
-    translateLayers(layerID, baseDistance + sandboxExtraSpace);
+    translateLayers(layerID, (gap+2) * 3 + 5 * featureChannels * 2);
     //record the layerID
     recordLayerID = layerID;
 
@@ -1596,12 +1588,12 @@ export function featureGATClick(
 
 
     const g = d3.select(".mats").append("g");
-    let w = 12;
+    let w = 5;
     if (Xt[0].length < featureChannels) {
-        w = 12;
+        w = 10;
 
     } else if(Xt[0].length<10){
-        w = 12;
+        w = 10;
     }
     if(oFeatureChannels==128 && Xt[0].length==128){
         w = 2.5;
@@ -1656,7 +1648,7 @@ export function featureGATClick(
         rectW,
         oRectW
     );
-    nextCoord = [c[0] + (gap+2) * 3 + rectW * featureChannels * 2 + (gap+2) - (rectW - 5) * featureChannels, c[1]];
+    nextCoord = [c[0] + (gap+2) * 3 + rectW * featureChannels * 2 + (gap+2), c[1]];
 
     //adjustment based on cases
     if(featureChannels==4)nextCoord[0]+=15;
@@ -2016,7 +2008,6 @@ export function featureSAGEClick(
     oRectW:number,
     featureKeysEachLayer: number[][],
     activation: string = "relu",
-    sandboxMode: boolean = false
 ){
     d3.select(".switchBtn").style("pointer-events", "none");
     d3.select(".switchBtn").style("opacity", 0.3);
@@ -2038,9 +2029,7 @@ export function featureSAGEClick(
     // const rectW = 5;
     const rectW7 = 10;
 
-    const baseDistance = (gap+2) * 3 + 5 * featureChannels * 2;
-    const sandboxExtraSpace = sandboxMode ? 120 : 0;
-    translateLayers(layerID, baseDistance + sandboxExtraSpace);
+    translateLayers(layerID, (gap+2) * 3 + 5 * featureChannels * 2);
     //record the layerID
     recordLayerID = layerID;
 
@@ -2144,12 +2133,12 @@ export function featureSAGEClick(
 
 
     const g = d3.select(".mats").append("g");
-    let w = 12;
+    let w = 5;
     if (Xt[0].length < featureChannels) {
-        w = 12;
+        w = 10;
 
     } else if(Xt[0].length<10){
-        w = 12;
+        w = 10;
     }
     if(oFeatureChannels==128 && Xt[0].length==128){
         w = 2.5;
@@ -2204,7 +2193,7 @@ export function featureSAGEClick(
         rectW,
         oRectW
     );
-    nextCoord = [c[0] + (gap+2) * 3 + rectW * featureChannels * 2 + (gap+2) - (rectW - 5) * featureChannels, c[1]];
+    nextCoord = [c[0] + (gap+2) * 3 + rectW * featureChannels * 2 + (gap+2), c[1]];
 
     //adjustment based on cases
     if(featureChannels==4)nextCoord[0]+=15;
