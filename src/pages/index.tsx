@@ -35,6 +35,7 @@ import {
 import { Footer, NavBar } from "../components/Surfaces";
 import { Inter } from "@next/font/google";
 import GraphEditor from "@/components/GraphEditor";
+import DualViews from "@/components/DualViews/DualViews";
 
 export const inter = Inter({
     variable: "--font-inter",
@@ -83,7 +84,7 @@ export default function Home() {
 
     const [simGraphData, setSimGraphData] = useState({});
     const [nodePositions, setNodePositions] = useState<any[]>([]);
-    const [sandBoxMode, setSandBoxMode] = useState(true);
+    const [sandBoxMode, setSandBoxMode] = useState(false);
 
     const [hubNodeA, setHubNodeA] = useState(241);
     const [hubNodeB, setHubNodeB] = useState(109);
@@ -272,6 +273,14 @@ export default function Home() {
                                                     setSimulation(false);
                                                     setProbabilities([]);
                                                     setIntmData(null);
+
+                                                    if(newModel.includes("Sandbox")){
+                                                        setSandBoxMode(true);
+                                                        setPredicted(false);
+                                                    } else {
+                                                        setSandBoxMode(false);
+                                                    }
+
                                                     if (
                                                         newModel.includes("GAT")
                                                     ) {
@@ -355,18 +364,9 @@ export default function Home() {
                                         <h1 className="text-3xl font-black min-w-48">
                                             Input Graph
                                         </h1>
-                                        {!model.includes("link") && <div><div className="m-1"> Sandbox Mode </div>
-                                                <Selector
-                                                    selectedOption={sandBoxMode ? "On" : "Off"}
-                                                    handleChange={handleSandboxModeSelection}
-                                                    OptionList={["On", "Off"]}
-                                                    id="dataset-selector"
-                                                />
-                                        {sandBoxMode? <button 
-                                                            key={'graph-editor'}
-                                                            onClick={handleGraphEditor}
-                                                            className="ml-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                                                        >Open the Graph</button>: <div
+                                        {!model.includes("link") && <div>
+                                        
+                                        {sandBoxMode? <>Modify the graph in the graph visualizer. </>: <div
                                             className={`flex-1 items-center gap-x-6 ${inter2.className}`}
                                             id="dataset-description"
                                         >
@@ -533,7 +533,7 @@ export default function Home() {
                                                         overflow: "auto",
                                                     }}
                                                 >
-                                                    <GraphMatrixVisualization
+                                                    <DualViews
                                                         dataFile={
                                                             model.includes(
                                                                 "graph classification"
@@ -581,6 +581,8 @@ export default function Home() {
                                                         sandboxMode={model.includes('link prediction') ? false : sandBoxMode}
                                                         nodePositions={nodePositions}
                                                         onNodePositionChange={handleNodePositionsChange}
+                                                        handleNodePositionsChange={handleNodePositionsChange}
+                                                        handleSimulatedGraphChange={handleSimulatedGraphChange}
                                                     />
                                                 </div>
                                             </div>
@@ -639,8 +641,7 @@ export default function Home() {
                                             <div
                                                 className={styles.vizContainer}
                                             >
-                                                {model ==
-                                                "GCN - graph classification" ? (
+                                                {model.includes("GCN - graph classification") ? (
                                                     isGraphView ? (
                                                         <GraphVisualizer
                                                             graph_path={
@@ -712,8 +713,7 @@ export default function Home() {
                                                             }
                                                         />
                                                     )
-                                                ) : model ==
-                                                  "GCN - node classification" ? (
+                                                ) : model.includes("GCN - node classification") ? (
                                                     isGraphView ? (
                                                         <NodeGraphVisualizer
                                                             graph_path={

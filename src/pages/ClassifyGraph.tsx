@@ -2,7 +2,7 @@ import React, { useState, ChangeEvent } from "react";
 import { graphPrediction, linkPrediction, nodePrediction } from "@/utils/utils";
 import { Hint, PredictionVisualizer } from "../components/WebUtils";
 import { IntmData, IntmDataLink, IntmDataNode } from "@/types";
-import { simulatedModelList } from "@/utils/const";
+import { modelList, simulatedModelList } from "@/utils/const";
 
 interface ClassifyGraphProps {
     graphPath: string;
@@ -51,11 +51,11 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
             console.log("inference parameters:", sandBoxMode, modelPath, graphPath)
 
             if (modelPath.includes("node")) {
-                if(sandBoxMode)modelPath = simulatedModelList["node-task-simodel"];
+                if(sandBoxMode)modelPath = modelList["GCN - node classification(Sandbox)"];
                 console.log("node pred pipe modelPath - 0", modelPath, graphPath, simGraphData, sandBoxMode);
                 ({ prob, intmData } = await nodePrediction(modelPath, graphPath, simGraphData, sandBoxMode));
             } else if (modelPath.includes("graph")) {
-                if(sandBoxMode)modelPath = simulatedModelList["graph-task-simodel"];
+                // if(sandBoxMode)modelPath = simulatedModelList["GCN - graph classification(Sandbox)"];
                 ({ prob, intmData } = await graphPrediction(modelPath, graphPath, simGraphData, sandBoxMode));
             } else if(modelPath.includes("link")){
                 ({ prob, intmData } = await linkPrediction(
@@ -63,7 +63,7 @@ const ClassifyGraph: React.FC<ClassifyGraphProps> = ({
                     "./json_data/links/twitch.json" // this is for twitch dataset originally
                 ));
             } else {
-                if(sandBoxMode)modelPath = simulatedModelList["graph-task-simodel"];
+                if(sandBoxMode)modelPath = modelList["graph-task-simodel"];
                 ({ prob, intmData } = await graphPrediction(modelPath, graphPath, simGraphData, sandBoxMode));
             }
     

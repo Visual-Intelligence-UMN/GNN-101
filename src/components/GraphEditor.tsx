@@ -35,6 +35,7 @@ export default function GraphEditor({
     const selectionState = useRef(false);
 
     const datasetRef = useRef<any>({});
+    const [mode, setMode] = useState("edge");
 
     // Sync state
     const selectedNodeRef = useRef<string | null>(null);
@@ -124,13 +125,28 @@ export default function GraphEditor({
 
                 const linkGroup = svg
                     .append("g")
-                    .attr("stroke", "#999")
+                    .attr("stroke", "#aaa")
                     .attr("stroke-opacity", 0.6);
 
                 const nodeGroup = svg
                     .append("g")
                     .attr("stroke", "#fff")
                     .attr("stroke-width", 1.5);
+
+                const labelGroup = svg
+                    .append("g")
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", 12)
+                    .attr("text-anchor", "middle")
+                    .attr("pointer-events", "none");
+
+                function getNodeNumber(d: any) {
+                    if (typeof d.id === "string") {
+                    const m = d.id.match(/\d+/);
+                    if (m) return +m[0];
+                    }
+                    return (d.index ?? nodesRef.current.indexOf(d)) + 1;
+                }
 
                 function ticked() {
                     linkGroup
@@ -147,7 +163,7 @@ export default function GraphEditor({
                             if (selectedLinkRef.current) {
                                 d3.select(selectedLinkRef.current).attr(
                                     "stroke",
-                                    "#999"
+                                    "#aaa"
                                 );
                             }
 
@@ -164,8 +180,9 @@ export default function GraphEditor({
                         .selectAll("circle")
                         .data(nodesRef.current, (d: any) => d.id)
                         .join("circle")
-                        .attr("r", 10)
-                        .attr("fill", "cyan")
+                        .attr("r", 12)
+                        .attr("stroke", "#aaa")
+                        .attr("fill", "white")
                         .call(drag(simulation) as any)
                         .attr("cx", (d: any) => d.x)
                         .attr("cy", (d: any) => d.y)
@@ -263,11 +280,32 @@ export default function GraphEditor({
                                     setSelectedNodeId(null);
                                     setSecondSelectedNodeId(null);
                                     selectionState.current = false;
+                                    handleTransmitToMainVisualizer();
                                 }
 
                                 return;
                             }
                         });
+                    
+
+                    labelGroup
+                        .selectAll("text")
+                        .data(nodesRef.current, (d: any) => d.id)
+                        .join(
+                        (enter) =>
+                        enter
+                        .append("text")
+                        .text((d: any) => getNodeNumber(d))
+                        .attr("dy", "0.35em")
+                        .attr("stroke", "#fff")
+                        .attr("stroke-width", 3)
+                        .attr("paint-order", "stroke")
+                        .attr("fill", "#111"),
+                        (update) => update.text((d: any) => getNodeNumber(d))
+                        )
+                        .attr("x", (d: any) => d.x)
+                        .attr("y", (d: any) => d.y);
+
                     if (onNodePositionsChange) {
                         onNodePositionsChange(nodesRef.current.map(node => ({ id: node.id, x: node.x, y: node.y })));
                     }
@@ -293,6 +331,7 @@ export default function GraphEditor({
                             event.subject.fx = null;
                             event.subject.fy = null;
                         }
+                        handleTransmitToMainVisualizer();
                     }
 
                     return d3
@@ -303,7 +342,7 @@ export default function GraphEditor({
                 }
 
                 function addNodeAt(x: number, y: number) {
-                    const newNodeId = `N${nodesRef.current.length + 1}`;
+                    const newNodeId = `N${nodesRef.current.length}`;
                     const newNode = {
                         id: newNodeId,
                         group: 3,
@@ -319,6 +358,7 @@ export default function GraphEditor({
                     if (onNodePositionsChange) {
                         onNodePositionsChange(nodesRef.current.map(node => ({ id: node.id, x: node.x, y: node.y })));
                     }
+                    handleTransmitToMainVisualizer();
                 }
 
                 const handleKeyDown = (e: KeyboardEvent) => {
@@ -372,6 +412,7 @@ export default function GraphEditor({
                             onNodePositionsChange(nodesRef.current.map(node => ({ id: node.id, x: node.x, y: node.y })));
                         }
                     }
+                    handleTransmitToMainVisualizer();
                 };
 
                 window.addEventListener("keydown", handleKeyDown);
@@ -404,6 +445,11 @@ export default function GraphEditor({
         sim.alpha(0.5).restart();
     };
 
+    const handleModeSwitch=()=>{
+        handleToggleSimulation();
+        setMode(mode === "edge" ? "node" : "edge");
+    }
+
     const handleTransmitToMainVisualizer = () => {
         const currentDataset = getCurrentDataset();
 
@@ -417,64 +463,34 @@ export default function GraphEditor({
     };
 
     return (
-        <Draggable defaultPosition={defaultPos} handle=".header">
-            <div
-                style={{
-                    position: "fixed",
-                    zIndex: 9999,
-                    width: size.width,
-                    height: size.height,
-                    background: "white",
-                    border: "1px solid #ccc",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-                    overflow: "hidden",
-                }}
-            >
-                <div
-                    className="header"
-                    style={{
-                        position: "relative",
-                        padding: "4px 8px",
-                        backgroundColor: "black",
-                        color: "white",
-                        fontWeight: "bold",
-                        fontSize: "16px",
-                        cursor: "move",
-                        paddingLeft: "40px",
-                    }}
-                >
-                    Graph Editor
-                    <span
-                        onClick={onClose}
-                        style={{
-                            position: "absolute",
-                            left: 0,
-                            top: 0,
-                            padding: "4px 8px",
-                            backgroundColor: "black",
-                            color: "white",
-                            cursor: "pointer",
-                            borderBottomRightRadius: "6px",
-                        }}
-                    >
-                        ×
-                    </span>
-                </div>
-
+            <div>
                 <div style={{ padding: "4px" }}>
                     <button
-                        onClick={handleToggleSimulation}
-                        style={{ marginBottom: "10px" }}
+                        onClick={handleModeSwitch}
+                        style={{
+                            padding: "10px 20px",
+                            borderRadius: "30px",
+                            border: "2px solid #aaa",
+                            fontWeight: "bold",
+                            backgroundColor: mode === "node" ? "yellow" : "white",
+                            cursor: "pointer"
+                            , color: "#aaa"
+                            }}
                     >
-                        {isRunning
-                            ? "Switch to Node Adding"
-                            : "Switch to Edge Adding"}
+                        Node Edit
                     </button>
                     <button
-                        onClick={handleTransmitToMainVisualizer}
-                        style={{ marginBottom: "10px" }}
+                        onClick={handleModeSwitch}
+                        style={{
+                            padding: "10px 20px",
+                            borderRadius: "30px",
+                            border: "2px solid #aaa",
+                            fontWeight: "bold",
+                            backgroundColor: mode === "edge" ? "yellow" : "white",
+                            cursor: "pointer", color: "#aaa"
+                            }}
                     >
-                        Send to Main Visualizer
+                        Edge Edit
                     </button>
                 </div>
 
@@ -483,6 +499,5 @@ export default function GraphEditor({
                     style={{ width: "100%", height: "100%" }}
                 ></div>
             </div>
-        </Draggable>
     );
 }
