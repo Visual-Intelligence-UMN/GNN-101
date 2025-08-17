@@ -124,13 +124,28 @@ export default function GraphEditor({
 
                 const linkGroup = svg
                     .append("g")
-                    .attr("stroke", "#999")
+                    .attr("stroke", "#aaa")
                     .attr("stroke-opacity", 0.6);
 
                 const nodeGroup = svg
                     .append("g")
                     .attr("stroke", "#fff")
                     .attr("stroke-width", 1.5);
+
+                const labelGroup = svg
+                    .append("g")
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", 12)
+                    .attr("text-anchor", "middle")
+                    .attr("pointer-events", "none");
+
+                function getNodeNumber(d: any) {
+                    if (typeof d.id === "string") {
+                    const m = d.id.match(/\d+/);
+                    if (m) return +m[0];
+                    }
+                    return (d.index ?? nodesRef.current.indexOf(d)) + 1;
+                }
 
                 function ticked() {
                     linkGroup
@@ -147,7 +162,7 @@ export default function GraphEditor({
                             if (selectedLinkRef.current) {
                                 d3.select(selectedLinkRef.current).attr(
                                     "stroke",
-                                    "#999"
+                                    "#aaa"
                                 );
                             }
 
@@ -164,8 +179,9 @@ export default function GraphEditor({
                         .selectAll("circle")
                         .data(nodesRef.current, (d: any) => d.id)
                         .join("circle")
-                        .attr("r", 10)
-                        .attr("fill", "cyan")
+                        .attr("r", 12)
+                        .attr("stroke", "#aaa")
+                        .attr("fill", "white")
                         .call(drag(simulation) as any)
                         .attr("cx", (d: any) => d.x)
                         .attr("cy", (d: any) => d.y)
@@ -268,6 +284,26 @@ export default function GraphEditor({
                                 return;
                             }
                         });
+                    
+
+                    labelGroup
+                        .selectAll("text")
+                        .data(nodesRef.current, (d: any) => d.id)
+                        .join(
+                        (enter) =>
+                        enter
+                        .append("text")
+                        .text((d: any) => getNodeNumber(d))
+                        .attr("dy", "0.35em")
+                        .attr("stroke", "#fff")
+                        .attr("stroke-width", 3)
+                        .attr("paint-order", "stroke")
+                        .attr("fill", "#111"),
+                        (update) => update.text((d: any) => getNodeNumber(d))
+                        )
+                        .attr("x", (d: any) => d.x)
+                        .attr("y", (d: any) => d.y);
+                        
                     if (onNodePositionsChange) {
                         onNodePositionsChange(nodesRef.current.map(node => ({ id: node.id, x: node.x, y: node.y })));
                     }
