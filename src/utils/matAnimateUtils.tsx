@@ -100,11 +100,15 @@ export function drawAniPath(
 ) {
     d3.selectAll("#tempath").remove();
     d3.selectAll(".matmul-displayer").remove();
+    // Scale up for animation rect to match other components
+    const scaledRectW = rectW * 1.3;
+    const scaledRectH = rectH * 1.3;
+    
     g.append("rect")
-        .attr("x", coordFeatureVis[0] + rectW * currentStep)
-        .attr("y", coordFeatureVis[1] - rectH / 2)
-        .attr("width", rectW)
-        .attr("height", rectH)
+        .attr("x", coordFeatureVis[0] + scaledRectW * currentStep)
+        .attr("y", coordFeatureVis[1] - scaledRectH / 2)
+        .attr("width", scaledRectW)
+        .attr("height", scaledRectH)
         .attr("fill", myColor(dummy[currentStep]))
         .attr("opacity", 1)
         .attr("stroke", "gray")
@@ -880,7 +884,7 @@ export function drawSamplingAggregation(
         d3.select(".mats")
             .append("text")
             .text(mulValues[i].toFixed(2))
-            .attr("x", posList[i][0] + 5)
+            .attr("x", posList[i][0] + 10)  
             .attr("y", posList[i][1] + 5)
             .attr("text-anchor", "middle")
             .attr("font-size", 7.5)
@@ -947,15 +951,19 @@ export function drawSummationFeature(
     layerID: number,
     node: number
   ) {
+    // Scale up the heatmap size for sandbox mode
+    const scaledW = w * 2;
+    const scaledRectH = rectH * 1.5;
+    
     const g = g1.append("g").attr("class", "aggregatedFeatureGroup");
     g.selectAll("rect.summation-rect")
       .data(X as number[])
       .enter()
       .append("rect")
-      .attr("x", (d: number, i: number) => coordFeatureVis[0] + w * i)
-      .attr("y", coordFeatureVis[1] - rectH / 2)
-      .attr("width", w)
-      .attr("height", rectH)
+      .attr("x", (d: number, i: number) => coordFeatureVis[0] + scaledW * i)
+      .attr("y", coordFeatureVis[1] - scaledRectH / 2)
+      .attr("width", scaledW)
+      .attr("height", scaledRectH)
       .attr("fill", (d: number) => myColor(d))
       .attr("opacity", 1)
       .attr("stroke", "gray")
@@ -1174,9 +1182,9 @@ export function drawSummationFeature(
     //draw frame
     g1.append("rect")
       .attr("x", coordFeatureVis[0])
-      .attr("y", coordFeatureVis[1] - rectH / 2)
-      .attr("width", w * X.length)
-      .attr("height", rectH)
+      .attr("y", coordFeatureVis[1] - scaledRectH / 2)
+      .attr("width", scaledW * X.length)
+      .attr("height", scaledRectH)
       .attr("fill", "none")
       .attr("opacity", 0)
       .attr("stroke", "black")
@@ -1189,8 +1197,8 @@ export function drawSummationFeature(
     //draw label
     drawHintLabel(
       g1,
-      coordFeatureVis[0],
-      coordFeatureVis[1] + rectH * curveDir * 1.1,
+      coordFeatureVis[0] - 110, 
+      coordFeatureVis[1] + scaledRectH / 2 + 20,
       `Vector Summation^T: 1 x ${dim}`,
       "procVis"
     );
@@ -1285,7 +1293,7 @@ export function drawSummationFeature(
       d3.select(".mats")
         .append("text")
         .text(mulValues[i].toFixed(2))
-        .attr("x", posList[i][0] + 7.5)
+        .attr("x", posList[i][0] + 20) 
         .attr("y", posList[i][1])
         .attr("text-anchor", "middle")
         .attr("font-size", 7.5)
@@ -1319,13 +1327,16 @@ export function drawWeightsVector(
     rectClass: string = "procVis removeRect wRect interactRect",
     labelName = `Matmul Result: ${dummy.length} x 1`
 ) {
+    const scaledRectW = rectW * 1.3;
+    const scaledRectH = rectH * 1.3;
+    
     console.log("draw matrix weight - 0", startCoordList);
     for (let m = 0; m < dummy.length; m++) {
         g.append("rect")
-            .attr("x", coordFeatureVis[0] + rectW * m)
-            .attr("y", coordFeatureVis[1] - rectH / 2)
-            .attr("width", rectW)
-            .attr("height", rectH)
+            .attr("x", coordFeatureVis[0] + scaledRectW * m)
+            .attr("y", coordFeatureVis[1] - scaledRectH / 2)
+            .attr("width", scaledRectW)
+            .attr("height", scaledRectH)
             .attr("fill", myColor(dummy[m]))
             .attr("opacity", 1)
             .attr("stroke", "gray")
@@ -1370,7 +1381,7 @@ export function drawWeightsVector(
     drawHintLabel(
         g,
         coordFeatureVis[0],
-        coordFeatureVis[1] + rectH + 6,
+        coordFeatureVis[1] + scaledRectH / 2 + 15,
         labelName,
         "procVis"
     );
@@ -1378,9 +1389,9 @@ export function drawWeightsVector(
     //draw frame
     g.append("rect")
         .attr("x", coordFeatureVis[0])
-        .attr("y", coordFeatureVis[1] - rectH / 2)
-        .attr("width", rectW * dummy.length)
-        .attr("height", rectH)
+        .attr("y", coordFeatureVis[1] - scaledRectH / 2)
+        .attr("width", scaledRectW * dummy.length)
+        .attr("height", scaledRectH)
         .attr("fill", "none")
         .attr("opacity", 1)
         .attr("stroke", "black")
@@ -1761,15 +1772,19 @@ export function drawWeightMatrix(
     layerBias: number[],
     layerID: number
 ) {
+    // Scale up bias vector to match Vector Summation component size
+    const scaledRectW = rectW * 1.3;
+    const scaledRectH = rectH * 1.3;
+    
     let channels = featureChannels;
     if (layerID === 2 && featureChannels === 4) channels = 2;
     for (let m = 0; m < channels; m++) {
         let biasValue = layerBias[m];
         g.append("rect")
-            .attr("x", coordFeatureVis[0] + rectW * m)
-            .attr("y", coordFeatureVis[1] - rectH / 2)
-            .attr("width", rectW)
-            .attr("height", rectH)
+            .attr("x", coordFeatureVis[0] + scaledRectW * m)
+            .attr("y", coordFeatureVis[1] - scaledRectH / 2)
+            .attr("width", scaledRectW)
+            .attr("height", scaledRectH)
             .attr("fill", myColor(biasValue))
             .style("opacity", 1)
             .attr("stroke", "gray")
@@ -1828,9 +1843,9 @@ export function drawWeightMatrix(
     // Draw bias vector border
     g.append("rect")
         .attr("x", coordFeatureVis[0])
-        .attr("y", coordFeatureVis[1] - rectH / 2)
-        .attr("width", rectW * channels)
-        .attr("height", rectH)
+        .attr("y", coordFeatureVis[1] - scaledRectH / 2)
+        .attr("width", scaledRectW * channels)
+        .attr("height", scaledRectH)
         .attr("fill", "none")
         .style("opacity", 1)
         .attr("stroke", "black")
@@ -1840,7 +1855,7 @@ export function drawWeightMatrix(
     drawHintLabel(
         g,
         coordFeatureVis[0],
-        coordFeatureVis[1] + rectH + 6,
+        coordFeatureVis[1] + scaledRectH / 2 + 17,
         `Bias Vector: ${layerBias.length} x 1`,
         "procVis biasFrame"
     );
