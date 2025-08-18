@@ -884,7 +884,7 @@ export function drawSamplingAggregation(
         d3.select(".mats")
             .append("text")
             .text(mulValues[i].toFixed(2))
-            .attr("x", posList[i][0] + 10)  // Increased offset for larger input vectors
+            .attr("x", posList[i][0] + 10)  
             .attr("y", posList[i][1] + 5)
             .attr("text-anchor", "middle")
             .attr("font-size", 7.5)
@@ -1327,7 +1327,6 @@ export function drawWeightsVector(
     rectClass: string = "procVis removeRect wRect interactRect",
     labelName = `Matmul Result: ${dummy.length} x 1`
 ) {
-    // Scale up Matmul Result to match Vector Summation component size
     const scaledRectW = rectW * 1.3;
     const scaledRectH = rectH * 1.3;
     

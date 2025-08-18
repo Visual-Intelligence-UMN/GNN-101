@@ -300,8 +300,6 @@ export function drawNodeFeatures(
     gap:number,
     drawPaths: boolean = true
 ) {
-    // Scale up input feature vectors for better visibility in sandbox mode
-    // Check if we're likely in sandbox mode by detecting small rectangles
     const isLikelyInputLayer = rectW <= 5 && rectH <= 15;
     const scaledRectW = isLikelyInputLayer ? rectW * 2 : rectW;
     const scaledRectH = isLikelyInputLayer ? rectH * 1.5 : rectH;
