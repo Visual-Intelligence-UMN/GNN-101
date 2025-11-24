@@ -1,5 +1,7 @@
 # GNN101: Visual Learning of Graph Neural Networks in Your Web Browser 
 
+The paper was accepted by IEEE Transactions on Visualization and Computer Graphics as a regular paper. 
+
 ![githubPre-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/799cc2e1-7443-4d53-ac89-f1d62ed813df)
 
 ## Team Members
@@ -7,6 +9,8 @@
 Yilin Lu, Chongwei Chen, Kexin Huang, Marinka Zitnik, Qianwen Wang
 
 ## Paper
+
+IEEE Transactions on Visualization and Computer Graphics (early access): https://ieeexplore.ieee.org/document/11263953/
 
 Link to arXiv: https://arxiv.org/abs/2411.17849 
 
