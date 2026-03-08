@@ -8,6 +8,7 @@
 <p align="center">
   <a href="https://visual-intelligence-umn.github.io/web-gnn-vis"><img src="https://img.shields.io/badge/🌐_Project_Page-Live_Demo-blue?style=for-the-badge" alt="Project Page"></a>
   <a href="https://visual-intelligence-umn.github.io/web-gnn-vis"><img src="https://img.shields.io/badge/🎮_Demo-Try_Online-green?style=for-the-badge" alt="Demo"></a>
+  <a href="https://www.youtube.com/watch?v=_0jXy4Zoh-o"><img src="https://img.shields.io/badge/▶_Video-YouTube-red?style=for-the-badge&logo=youtube&logoColor=white" alt="Video"></a>
   <a href="https://arxiv.org/abs/2411.17849"><img src="https://img.shields.io/badge/📄_arXiv-2411.17849-b31b1b?style=for-the-badge" alt="arXiv"></a>
   <a href="https://ieeexplore.ieee.org/document/11263953/"><img src="https://img.shields.io/badge/IEEE-Paper-00629B?style=for-the-badge&logo=ieee&logoColor=white" alt="IEEE"></a>
   <img src="https://img.shields.io/badge/Python-3.8+-blue?style=for-the-badge&logo=python&logoColor=white" alt="Python">
@@ -39,7 +40,7 @@
 
 ## Team
 
-Yilin Lu, Chongwei Chen, Kexin Huang, Marinka Zitnik, Qianwen Wang
+Yilin Lu, Chongwei Chen, Yuxin Chen, Kexin Huang, Marinka Zitnik, Qianwen Wang
 
 ---
 
@@ -88,9 +89,9 @@ If you find GNN 101 useful, please cite our paper:
 ```bibtex
 @article{gnn101,
   title={GNN 101: Visual Learning of Graph Neural Networks in Your Web Browser},
-  author={Lu, Yilin and Chen, Chongwei and Huang, Kexin and Zitnik, Marinka and Wang, Qianwen},
-  journal={arXiv preprint arXiv:2411.17849},
-  year={2024}
+  author={Lu, Yilin and Chen, Chongwei and Yuxin Chen and Huang, Kexin and Zitnik, Marinka and Wang, Qianwen},
+  journal={IEEE Transactions on Visualization and Computer Graphics},
+  year={2025}
 }
 ```
 
